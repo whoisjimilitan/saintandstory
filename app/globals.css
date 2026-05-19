@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* GPU-accelerated marquee */
+.animate-marquee {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-pulse,
+  .animate-ping {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
