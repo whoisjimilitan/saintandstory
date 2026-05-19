@@ -1,10 +1,9 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   console.log("[/api/quote] Received quote request");
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const { firstName, lastName, email, phone, page } = await req.json();
 
