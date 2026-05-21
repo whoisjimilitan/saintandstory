@@ -11,54 +11,56 @@ export const metadata: Metadata = {
 };
 
 const nav = [
-  { href: "/dashboard", label: "My Farm",    icon: "🌱" },
-  { href: "/factory",   label: "My Seeds",   icon: "📄" },
-  { href: "/schedule",  label: "Post Today", icon: "📅" },
+  { href: "/engine",   label: "Seeds",    icon: "🌱", sub: "Discover gaps" },
+  { href: "/factory",  label: "Guides",   icon: "📄", sub: "Your planted seeds" },
+  { href: "/harvests", label: "Harvests", icon: "🌾", sub: "Earnings" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={geist.variable}>
       <body className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside style={{ background: "var(--surface)", borderRight: "1px solid var(--border)" }}
-          className="w-56 flex-shrink-0 flex flex-col">
-          <div className="px-5 py-6 border-b" style={{ borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-2.5">
-              <div style={{ width: 30, height: 30, background: "#6366F1", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem", flexShrink: 0 }}>
-                🌱
-              </div>
-              <div>
-                <div className="text-sm font-bold" style={{ color: "var(--text)", letterSpacing: "-0.01em" }}>PDF Seeds</div>
-                <div className="text-xs font-semibold tracking-widest uppercase" style={{ color: "var(--muted)", fontSize: "0.6rem" }}>Plant · Grow · Harvest</div>
+        <aside style={{ background: "var(--surface)", borderRight: "1px solid var(--border)", width: 220 }}
+          className="flex-shrink-0 flex flex-col">
+
+          {/* Logo */}
+          <Link href="/dashboard" style={{ textDecoration: "none" }}>
+            <div className="px-5 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
+              <div className="flex items-center gap-2.5">
+                <div style={{ width: 28, height: 28, background: "var(--accent)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem", flexShrink: 0 }}>
+                  🌱
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.01em", lineHeight: 1.2 }}>PDF Seeds</div>
+                  <div style={{ fontSize: "0.58rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Plant · Grow · Harvest</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="px-3 pt-4 pb-2">
-            <Link href="/engine"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold text-white"
-              style={{ background: "var(--accent)" }}>
-              + Plant New Seed
-            </Link>
-          </div>
-          <nav className="flex-1 px-3 py-2 space-y-1">
-            {nav.map(({ href, label, icon }) => (
+          </Link>
+
+          {/* Nav */}
+          <nav className="flex-1 px-3 py-4 space-y-0.5">
+            {nav.map(({ href, label, icon, sub }) => (
               <Link key={href} href={href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors hover:bg-[#EEF2FF] hover:text-[#4F46E5]"
-                style={{ color: "var(--muted)" }}>
-                <span className="text-base">{icon}</span>
-                {label}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-[#EFEDE7] hover:text-[#5E7153]"
+                style={{ textDecoration: "none", color: "var(--muted)" }}>
+                <span style={{ fontSize: "1rem" }}>{icon}</span>
+                <div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 600, lineHeight: 1.2 }}>{label}</div>
+                  <div style={{ fontSize: "0.68rem", opacity: 0.7, lineHeight: 1.2 }}>{sub}</div>
+                </div>
               </Link>
             ))}
           </nav>
-          <div className="px-5 py-4 border-t" style={{ borderColor: "var(--border)" }}>
-            <Link href="/store" className="text-xs" style={{ color: "var(--muted)", textDecoration: "none" }}>
-              View Store →
-            </Link>
+
+          {/* Footer */}
+          <div className="px-5 py-4" style={{ borderTop: "1px solid var(--border)" }}>
+            <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>
+              One seed at a time.
+            </div>
           </div>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 overflow-y-auto" style={{ background: "var(--bg)" }}>
           {children}
         </main>
