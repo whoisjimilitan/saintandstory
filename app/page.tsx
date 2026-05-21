@@ -302,7 +302,8 @@ export default function HomePage() {
               Across African markets, millions of urgent, specific questions are typed into Google
               every day — questions no PDF guide has ever answered. PDF Seeds identifies those gaps,
               scores the demand, validates the opportunity, and builds the guide, the sales page,
-              and the SEO article automatically. One platform. Systematic publishing. Permanent digital assets.
+              and the SEO article in minutes. One subscription. One repeatable system.
+              Every guide becomes a permanent search asset.
             </p>
             <p className="lp-offer-line">
               ✅ Identify your first opportunity and publish your first guide within 7 days — or your first month is free.
@@ -790,6 +791,128 @@ export default function HomePage() {
             <p style={{ fontSize: "0.75rem", color: "#CBD5E1", marginTop: 14, textAlign: "center" }}>
               Gaps close when a guide is published. First planter wins the ground.
             </p>
+          </div>
+        </section>
+
+        {/* ── INSIDE THE TOOL ── */}
+        <section className="lp-section lp-section-alt">
+          <div className="lp-section-inner" style={{ maxWidth: 860 }}>
+            <div style={{ textAlign: "center", marginBottom: 36 }}>
+              <div className="lp-section-label">Inside the intelligence platform</div>
+              <div className="lp-section-title">This is what you see when you run the gap finder.</div>
+              <p style={{ fontSize: "0.92rem", color: "#64748B", maxWidth: 500, margin: "0 auto" }}>
+                Real output. Every result scored against demand, competition, and intent.
+                You only see what&apos;s worth planting.
+              </p>
+            </div>
+
+            {/* Browser chrome + app mock */}
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.06)" }}>
+              {/* Browser bar */}
+              <div style={{ background: "#F1F5F9", borderBottom: "1px solid #E2E8F0", padding: "10px 18px", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ display: "flex", gap: 5 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FCA5A5" }} />
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FDE68A" }} />
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#A7F3D0" }} />
+                </div>
+                <div style={{ flex: 1, background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 6, padding: "4px 12px", fontSize: "0.72rem", color: "#94A3B8", textAlign: "center" }}>
+                  pdfseeds.com/engine
+                </div>
+              </div>
+
+              {/* App content */}
+              <div style={{ padding: "20px 24px" }}>
+                {/* Scan header */}
+                <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0F172A" }}>
+                    📊 WHAT&apos;S WORTH MAKING IN GHANA · LIVE DISCOVERY
+                  </span>
+                  <span style={{ fontSize: "0.7rem", color: "#16A34A", fontWeight: 700, marginLeft: "auto" }}>
+                    ✓ 12 opportunities found · Score ≥ 70 · Google + Reddit signals
+                  </span>
+                </div>
+
+                {/* Tier label */}
+                <div style={{ background: "#10B98110", border: "1px solid #10B98130", borderRadius: 8, padding: "7px 14px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#10B981" }}>🟢 HIGH OPPORTUNITY (90–100)</span>
+                  <span style={{ fontSize: "0.7rem", color: "#10B981", fontWeight: 600 }}>✅ SAVE & CREATE</span>
+                </div>
+
+                {/* Opportunity card */}
+                <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 10, padding: "16px 18px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 12 }}>
+                    <div style={{ textAlign: "center", minWidth: 48, flexShrink: 0 }}>
+                      <div style={{ fontSize: "1.5rem", fontWeight: 900, color: "#0F172A", lineHeight: 1 }}>97</div>
+                      <div style={{ fontSize: "0.65rem", color: "#94A3B8" }}>/100</div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
+                        <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#64748B", textTransform: "uppercase" as const, letterSpacing: "0.08em" }}>PDF Guide</span>
+                        <span style={{ fontSize: "0.62rem", fontWeight: 700, background: "#FEF3C7", color: "#D97706", border: "1px solid #FDE68A", borderRadius: 4, padding: "1px 6px" }}>🎯 QUICK WIN</span>
+                        <span style={{ fontSize: "0.62rem", fontWeight: 700, background: "#EEF2FF", color: "#6366F1", border: "1px solid #C7D2FE", borderRadius: 4, padding: "1px 6px" }}>inheritance</span>
+                      </div>
+                      <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "#0F172A", marginBottom: 3, lineHeight: 1.35 }}>
+                        The Complete Land Transfer Guide for Ghanaian Families
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#94A3B8", fontStyle: "italic" }}>
+                        Search: &ldquo;how to transfer land ownership in Ghana after death&rdquo;
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
+                      <span style={{ fontSize: "1.1rem", cursor: "pointer" }}>🏷️</span>
+                      <div style={{ background: "#6366F1", color: "#fff", fontSize: "0.72rem", fontWeight: 700, padding: "6px 12px", borderRadius: 7, cursor: "pointer", whiteSpace: "nowrap" as const }}>
+                        Build PDF →
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pain point bar */}
+                  <div style={{ background: "#FEF2F2", borderLeft: "3px solid #EF4444", borderRadius: "0 6px 6px 0", padding: "8px 12px", marginBottom: 10 }}>
+                    <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#EF4444", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 3 }}>
+                      The pain this PDF solves
+                    </div>
+                    <div style={{ fontSize: "0.78rem", color: "#1E293B", lineHeight: 1.5 }}>
+                      Families are losing inherited land to legal disputes because the transfer process is complex and undocumented. Most make critical errors and lose the land entirely.
+                    </div>
+                  </div>
+
+                  {/* Volume */}
+                  <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 6, padding: "7px 12px", display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#10B981" }}>🔥 Viral Demand</span>
+                    <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#10B981" }}>4,200/mo</span>
+                    <span style={{ fontSize: "0.7rem", color: "#94A3B8", marginLeft: "auto" }}>monthly searches</span>
+                  </div>
+
+                  {/* Stats row */}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const, borderTop: "1px solid #E2E8F0", paddingTop: 10, alignItems: "center" }}>
+                    {[
+                      { label: "⬆️ rising", c: "#10B981" },
+                      { label: "Competition: low", c: "#10B981" },
+                      { label: "Ease: easy", c: "#10B981" },
+                      { label: "fear", c: "#EF4444" },
+                    ].map((chip) => (
+                      <span key={chip.label} style={{ background: chip.c + "18", color: chip.c, borderRadius: 5, padding: "2px 8px", fontSize: "0.65rem", fontWeight: 600 }}>
+                        {chip.label}
+                      </span>
+                    ))}
+                    <span style={{ marginLeft: "auto", fontSize: "0.85rem", fontWeight: 800, color: "#0F172A" }}>£8 – £12</span>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "center", fontSize: "0.72rem", color: "#CBD5E1", marginTop: 10, paddingBottom: 4 }}>
+                  + 11 more opportunities · sorted by opportunity score
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 28 }}>
+              <a href={STRIPE} style={{ display: "inline-block", background: "#6366F1", color: "#fff", fontWeight: 700, padding: "13px 32px", borderRadius: 10, textDecoration: "none", fontSize: "0.9rem" }}>
+                Access the Gap Finder →
+              </a>
+              <p style={{ fontSize: "0.78rem", color: "#94A3B8", marginTop: 10 }}>
+                Every gap scored. Every opportunity ranked. Every seed waiting.
+              </p>
+            </div>
           </div>
         </section>
 

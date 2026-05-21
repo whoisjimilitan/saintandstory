@@ -11,13 +11,11 @@ export const metadata: Metadata = {
 };
 
 const nav = [
-  { href: "/engine",   label: "PDF Idea Finder",  icon: "💡" },
-  { href: "/factory",  label: "Content Factory",   icon: "🏭" },
-  { href: "/schedule", label: "Plant & Schedule",  icon: "🗓️" },
-  { href: "/store",    label: "Store",             icon: "🛍️" },
-  { href: "/hooks",    label: "Hook Library",      icon: "🎣" },
-  { href: "/clusters", label: "Cluster Map",       icon: "🗺️" },
-  { href: "/dashboard", label: "Dashboard",         icon: "📊" },
+  { href: "/dashboard", label: "My Farm",       icon: "🌱" },
+  { href: "/engine",    label: "Find Gaps",      icon: "🔍" },
+  { href: "/factory",   label: "Grow Guides",    icon: "📄" },
+  { href: "/schedule",  label: "Daily Schedule", icon: "📅" },
+  { href: "/store",     label: "Store",          icon: "🛍️" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/engine"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold text-white"
               style={{ background: "var(--accent)" }}>
-              🔍 Generate New Ideas
+              🔍 Find New Gaps →
             </Link>
           </div>
           <nav className="flex-1 px-3 py-2 space-y-1">
