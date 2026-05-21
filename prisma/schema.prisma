@@ -21,9 +21,13 @@ model Opportunity {
   minPrice         Float
   maxPrice         Float
   emotionalIntent  String
-  exactQuestions   String
-  painPoint        String    @default("")
-  saved            Boolean   @default(false)
+  exactQuestions      String
+  painPoint           String    @default("")
+  hookPotential       String    @default("medium")
+  hookAngle           String    @default("")
+  pdfSuitability      String    @default("")
+  actionabilityRating String    @default("medium")
+  saved               Boolean   @default(false)
   isQuickWin       Boolean   @default(false)
   isDiaspora       Boolean   @default(false)
   clusterId        String?

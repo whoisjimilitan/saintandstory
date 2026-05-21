@@ -994,6 +994,37 @@ FINAL GATE — ask this before including any result:
 "Would someone who just discovered they have a problem RIGHT NOW pay ${pricing.symbol}${pricing.min} for a clear PDF answer to this?"
 If the honest answer is "maybe" or "probably not" — exclude it.
 
+HOOK POTENTIAL — every PDF opportunity must be evaluated for TikTok/Reels/Pinterest virality.
+This is the discovery engine: a 5-second faceless video drives strangers to the profile, 1–2% buy the PDF.
+Hook potential scoring:
+  HIGH — topic spreads automatically (strong emotional trigger, PSA format, relatable fear):
+    • FEAR + CONSEQUENCE: "If you do X without knowing this, you lose everything"
+    • DIASPORA + PROCESS: "For [Ghanaians/Nigerians] in the UK — the step nobody tells you about"
+    • MONEY + MISTAKE: "This mistake costs people [price] — most don't even realise"
+    • DEADLINE + PANIC: "Your [document] expires soon — here's what to do RIGHT NOW"
+  MEDIUM — topic motivates but requires setup to hook:
+    • PROCESS + CONFUSION without strong fear component
+    • CAREER + SIDE HUSTLE topics
+    • Exam prep with seasonal urgency (WAEC, JAMB, KCSE period)
+  LOW — informational, general how-to, requires long explanation to hook:
+    • General guides without emotional urgency
+    • Topics where the payoff isn't instantly clear in 5 seconds
+
+HOOK ANGLE — write the EXACT opening line of a 5-second faceless TikTok/Reels video.
+This is the scroll-stopper. One sentence. Direct PSA, fear trigger, surprising fact, or relatable frustration.
+✅ "PSA for Ghanaians in the UK — if you book the wrong embassy slot, you lose your fee AND your appointment 🚨"
+✅ "If your MoMo transfer disappeared, DON'T call customer service. Do this first:"
+✅ "This one mistake on your JAMB registration gets you disqualified — most students don't know this"
+❌ "Today I'm going to teach you how to renew your passport" (too soft, no pattern interrupt)
+
+PDF SUITABILITY EXPLANATION — in 1–2 sentences, explain specifically WHY this topic is better as a downloadable PDF than a blog post or YouTube video.
+Focus on: portability, offline access, the user keeps it and refers back, checklists they tick off, step clarity that video can't replicate.
+
+ACTIONABILITY RATING:
+  easy: clear steps, limited variables, one correct path (e.g., passport renewal checklist — same for everyone)
+  medium: process varies by situation, 2–3 possible paths, user needs to make some judgment calls
+  hard: highly variable, depends heavily on individual circumstances, difficult to make universally useful
+
 PAIN POINT WRITING — this is your most important output:
 Format: "[Specific group of people] [what they're trying to do] [what keeps going wrong] [the real cost of not solving it]"
 40–80 words. Raw, honest, first-person. This becomes the emotional hook — the intro of the PDF, the TikTok script, the buy page opener.
@@ -1044,12 +1075,16 @@ OUTPUT FORMAT
   "searchVolume": <integer — use ✓ figure if provided, otherwise estimate conservatively. Minimum ${ABSOLUTE_MIN_VOLUME}>,
   "opportunityScore": <integer 70–100 from the four-axis scoring>,
   "competition": "low | medium | high",
-  "trend": "rising | stable | declining",
+  "trend": "rising | stable | seasonal | exploding | declining",
   "easeToSell": "easy | medium | hard",
   "minPrice": ${pricing.min},
   "maxPrice": ${pricing.max},
   "emotionalIntent": "fear | urgency | desire | pain | confusion",
-  "exactQuestions": ["Short fragment", "Short fragment", "Short fragment", "Short fragment"]
+  "exactQuestions": ["Short fragment", "Short fragment", "Short fragment", "Short fragment"],
+  "hookPotential": "high | medium | low",
+  "hookAngle": "The exact opening line of a 5-second TikTok/Reels — one sentence, scroll-stopping",
+  "pdfSuitability": "1–2 sentences: why this is better as a PDF than a blog post or video",
+  "actionabilityRating": "easy | medium | hard"
 }
 
 PRICING: ${pricing.symbol}${pricing.min}–${pricing.symbol}${pricing.max} (${pricing.note})
@@ -1137,8 +1172,12 @@ Return ONLY valid JSON: { "results": [...] }`,
             easeToSell:       String(o.easeToSell || "medium"),
             minPrice:         Number(o.minPrice) || pricing.min,
             maxPrice:         Number(o.maxPrice) || pricing.max,
-            emotionalIntent:  String(o.emotionalIntent || "desire"),
-            exactQuestions:   JSON.stringify(Array.isArray(o.exactQuestions) ? o.exactQuestions : []),
+            emotionalIntent:     String(o.emotionalIntent || "desire"),
+            exactQuestions:      JSON.stringify(Array.isArray(o.exactQuestions) ? o.exactQuestions : []),
+            hookPotential:       String(o.hookPotential || "medium"),
+            hookAngle:           String(o.hookAngle || ""),
+            pdfSuitability:      String(o.pdfSuitability || ""),
+            actionabilityRating: String(o.actionabilityRating || "medium"),
             isQuickWin,
             isDiaspora: Boolean(diaspora),
           },
