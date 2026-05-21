@@ -47,6 +47,10 @@ function GuidesContent() {
   const [payUrlSaving, setPayUrlSaving] = useState(false);
   const [payUrlSaved, setPayUrlSaved]   = useState(false);
   const [deleting, setDeleting]         = useState(false);
+  const [contentOpen, setContentOpen]   = useState(false);
+  const [customContent, setCustomContent] = useState("");
+  const [contentSaving, setContentSaving] = useState(false);
+  const [contentSaved, setContentSaved]   = useState(false);
 
   const load = useCallback(async () => {
     const [gRes, hRes] = await Promise.all([fetch("/api/factory"), fetch("/api/hooks")]);
@@ -88,6 +92,24 @@ function GuidesContent() {
       setGuides((prev) => prev.map((x) => x.id === g.id ? { ...x, ...updated } : x));
       setSelected((prev) => prev?.id === g.id ? { ...prev, ...updated } : prev);
     } finally { setPublishing(false); }
+  }
+
+  async function saveContent(g: Product) {
+    if (!customContent.trim()) return;
+    setContentSaving(true);
+    try {
+      const res = await fetch(`/api/products/${g.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdfContent: customContent.trim() }),
+      });
+      const updated = await res.json();
+      setGuides((prev) => prev.map((x) => x.id === g.id ? { ...x, ...updated } : x));
+      setSelected((prev) => prev?.id === g.id ? { ...prev, ...updated } : prev);
+      setContentSaved(true);
+      setContentOpen(false);
+      setTimeout(() => setContentSaved(false), 3000);
+    } finally { setContentSaving(false); }
   }
 
   async function deleteGuide(g: Product) {
@@ -173,7 +195,7 @@ function GuidesContent() {
           </div>
         ) : guides.map((g) => (
           <div key={g.id}
-            onClick={() => { setSelected(g); setPayUrl(g.gumroadUrl ?? ""); setHooksOpen(false); }}
+            onClick={() => { setSelected(g); setPayUrl(g.gumroadUrl ?? ""); setHooksOpen(false); setContentOpen(false); setCustomContent(""); }}
             style={{
               padding: "12px 16px",
               borderBottom: "1px solid var(--border)",
@@ -270,17 +292,45 @@ function GuidesContent() {
 
               {/* PDF Guide */}
               <div style={card}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: contentOpen ? 16 : 0 }}>
                   <div>
                     <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>📄 PDF Guide</div>
-                    <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Your complete guide, ready to download and sell.</div>
+                    <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
+                      {contentSaved ? "✅ Content updated — download to see changes." : "Your complete guide, ready to download and sell."}
+                    </div>
                   </div>
-                  {selected.slug && (
-                    <a href={`/guide/${selected.slug}/pdf`} target="_blank" rel="noopener noreferrer" style={btn("primary")}>
-                      Download
-                    </a>
-                  )}
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                    <button onClick={() => { setContentOpen((o) => !o); setCustomContent(selected.pdfContent); }} style={btn("ghost")}>
+                      {contentOpen ? "Cancel" : "Edit"}
+                    </button>
+                    {selected.slug && (
+                      <a href={`/guide/${selected.slug}/pdf`} target="_blank" rel="noopener noreferrer" style={btn("primary")}>
+                        Download
+                      </a>
+                    )}
+                  </div>
                 </div>
+
+                {contentOpen && (
+                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14 }}>
+                    <div style={{ fontSize: "0.72rem", color: "var(--muted)", marginBottom: 8 }}>
+                      Paste your own content below. Use # for headings, ## for subheadings, - for bullet points.
+                    </div>
+                    <textarea
+                      value={customContent}
+                      onChange={(e) => setCustomContent(e.target.value)}
+                      rows={16}
+                      placeholder={"# Chapter 1: Getting Started\n\nPaste or type your guide content here...\n\n## Section heading\n\n- Bullet point one\n- Bullet point two"}
+                      style={{ width: "100%", fontSize: "0.78rem", lineHeight: 1.65, padding: "12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", outline: "none", resize: "vertical", fontFamily: "monospace" }}
+                    />
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                      <button onClick={() => saveContent(selected)} disabled={contentSaving || !customContent.trim()}
+                        style={{ ...btn("primary"), opacity: !customContent.trim() ? 0.5 : 1 }}>
+                        {contentSaving ? "Saving…" : "Save & Replace"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Buy Page */}
