@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import WaitlistForm from "@/app/components/WaitlistForm";
 
 export const metadata: Metadata = {
   title: "PDF Seeds — Plant Once. Earn Every Month.",
@@ -420,35 +421,6 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Written testimonials */}
-            <div className="written-grid">
-              {[
-                {
-                  text: "I planted my first guide on a Saturday. By Thursday it had its first sale. I didn't do anything that week except post twice on TikTok.",
-                  name: "Ama K.", detail: "Ghana · Land documents guide", flag: "🇬🇭",
-                },
-                {
-                  text: "I've tried dropshipping, I've tried print-on-demand. This is the first thing that kept earning after I stopped doing work.",
-                  name: "Emeka U.", detail: "Nigeria · Business registration guide", flag: "🇳🇬",
-                },
-                {
-                  text: "The diaspora guides are underrated. I'm charging £17.99 for my passport renewal guide and there is literally nothing else like it.",
-                  name: "Adaeze N.", detail: "UK diaspora · Passport guide", flag: "🇬🇧",
-                },
-              ].map((t, i) => (
-                <div key={i} className="written-card">
-                  <Stars />
-                  <p className="written-text" style={{ marginTop: 10 }}>&ldquo;{t.text}&rdquo;</p>
-                  <div className="written-author">
-                    <div className="written-avatar">{t.flag}</div>
-                    <div>
-                      <div className="written-name">{t.name}</div>
-                      <div className="written-detail">{t.detail}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -480,8 +452,8 @@ export default function HomePage() {
               </div>
               <div>
                 <FaqItem
-                  q="Is $49 a month worth it?"
-                  a="One guide earning £8 a day is £240 a month — that's nearly 5x your subscription back from a single seed. Ten guides running at that rate is £2,400 a month. The subscription pays for itself the first week."
+                  q="Is £39 a month worth it?"
+                  a="One guide earning £8 a day is £240 a month — that's 6x your subscription back from a single seed. Ten guides running at that rate is £2,400 a month. The subscription pays for itself the first week."
                 />
                 <FaqItem
                   q="What if I don't see results?"
@@ -509,26 +481,26 @@ export default function HomePage() {
             </div>
             <div className="pricing-box">
               <div className="pricing-glow" />
-              <div className="pricing-badge">🌱 Founding Member Pricing — Limited Spots</div>
+              <div className="pricing-badge">🌱 Founding Member Pricing</div>
               <div className="pricing-title">PDF Seeds — Full Access</div>
               <div className="pricing-sub">Everything you need to plant, grow, and harvest.</div>
-              <div className="pricing-amount"><span>$</span>49</div>
+              <div className="pricing-amount"><span>£</span>39</div>
               <div className="pricing-period">per month · cancel anytime</div>
               <ul className="pricing-includes">
                 {[
                   "Unlimited PDF guide generation",
                   "Opportunity engine — 5 African markets",
-                  "Diaspora mode with GBP pricing",
-                  "10 platform-native hooks per guide",
-                  "SEO pages + conversion sell pages",
-                  "7-day planting schedule",
+                  "Built-in UK diaspora tools with pound pricing",
+                  "10 ready-to-post captions for TikTok, Instagram, Pinterest",
+                  "A Google page and a buy page — built automatically",
+                  "Daily posting plan — know exactly what to post and when",
                   "Email capture + subscriber list",
-                  "Full sales analytics dashboard",
+                  "See your sales and income in real time",
                 ].map((item, i) => (
                   <li key={i}><CheckIcon />{item}</li>
                 ))}
               </ul>
-              <a href="/dashboard" className="pricing-cta">Start Planting Today →</a>
+              <WaitlistForm />
               <div className="pricing-offer">
                 ✅ We&apos;ll get you earning within 7 days — or your first month is free.
               </div>
@@ -550,7 +522,7 @@ export default function HomePage() {
 
         {/* ── MOBILE STICKY CTA ── */}
         <div className="mobile-sticky">
-          <a href="#start">Start Planting — $49/month →</a>
+          <a href="#start">Start Planting — £39/month →</a>
         </div>
 
       </div>
