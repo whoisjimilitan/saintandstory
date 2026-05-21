@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "PDF Seeds — Plant once. Earn for years.",
-  description: "PDF Seeds finds questions people are already searching for across African markets — then helps you turn them into simple PDF guides people actually buy.",
+  description: "PDF Seeds finds questions people are already searching for — then helps you turn them into simple PDF guides people actually buy.",
 };
 
 const STRIPE = "https://buy.stripe.com/00waEX65Nb838Ce1aP5ZC00";
@@ -231,14 +231,13 @@ export default function HomePage() {
         <section className="lp-hero">
           <div className="lp-hero-glow" />
           <div className="lp-hero-inner">
-            <div className="lp-eyebrow">🌱 The farming system for African digital markets</div>
+            <div className="lp-eyebrow">🌱 The farming system for digital products.</div>
             <h1>
               Plant once.<br />
               <em>Earn for years.</em>
             </h1>
             <p className="lp-hero-sub">
-              PDF Seeds finds questions people are already searching for across African markets —
-              then helps you turn them into PDF guides people actually buy.
+              PDF Seeds finds questions people are already searching for — then helps you turn them into PDF guides people actually buy.
             </p>
             <div className="lp-hero-ctas">
               <a href={STRIPE} className="lp-btn-primary">Plant Your First Seed →</a>
@@ -461,7 +460,7 @@ export default function HomePage() {
               <p className="founder-quote">&ldquo;I wanted a farm. Not another job.&rdquo;</p>
               <p className="founder-body">
                 I built PDF Seeds because I kept seeing the same gap: millions of urgent searches
-                in African markets, and almost no simple PDF guides answering them.
+                online — and almost no simple PDF guides answering them.
                 The opportunity was obvious. The system to act on it wasn&apos;t. So I built it.
               </p>
               <span className="founder-cite">— Jimi, Founder of PDF Seeds</span>
@@ -478,7 +477,7 @@ export default function HomePage() {
             </div>
             <div className="steps-3">
               {[
-                { num: "01", icon: "🔍", title: "Find the gap", body: "We scan real search data across 5 African markets and surface questions with high demand and no PDF guide. You pick the one you want to plant." },
+                { num: "01", icon: "🔍", title: "Find the gap", body: "We scan real search data across underserved markets and surface questions with high demand and no PDF guide. You pick the one you want to plant." },
                 { num: "02", icon: "🌱", title: "Grow the guide", body: "One click generates your complete PDF guide, a buy page, an SEO article, and 10 social hooks. Nothing to write. Ready in 3 minutes." },
                 { num: "03", icon: "🌾", title: "Earn while it grows", body: "Share the buy link. Post the social hooks. Over time, Google sends buyers automatically. The guide keeps selling. You keep earning." },
               ].map((s, i) => (
