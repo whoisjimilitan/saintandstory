@@ -52,6 +52,15 @@ function GuidesContent() {
   const [contentSaving, setContentSaving] = useState(false);
   const [contentSaved, setContentSaved]   = useState(false);
 
+  const [articleOpen, setArticleOpen]   = useState(false);
+  const [customArticle, setCustomArticle] = useState("");
+  const [articleSaving, setArticleSaving] = useState(false);
+  const [articleSaved, setArticleSaved]   = useState(false);
+
+  const [editingHookId, setEditingHookId] = useState<string | null>(null);
+  const [hookDraft, setHookDraft]         = useState("");
+  const [hookSaving, setHookSaving]       = useState(false);
+
   const load = useCallback(async () => {
     const [gRes, hRes] = await Promise.all([fetch("/api/factory"), fetch("/api/hooks")]);
     const [gs, hs]     = await Promise.all([gRes.json(), hRes.json()]);
@@ -110,6 +119,39 @@ function GuidesContent() {
       setContentOpen(false);
       setTimeout(() => setContentSaved(false), 3000);
     } finally { setContentSaving(false); }
+  }
+
+  async function saveArticle(g: Product) {
+    if (!customArticle.trim()) return;
+    setArticleSaving(true);
+    try {
+      const res = await fetch(`/api/products/${g.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seoPageContent: customArticle.trim() }),
+      });
+      const updated = await res.json();
+      setGuides((prev) => prev.map((x) => x.id === g.id ? { ...x, ...updated } : x));
+      setSelected((prev) => prev?.id === g.id ? { ...prev, ...updated } : prev);
+      setArticleSaved(true);
+      setArticleOpen(false);
+      setTimeout(() => setArticleSaved(false), 3000);
+    } finally { setArticleSaving(false); }
+  }
+
+  async function saveHook(hookId: string, text: string) {
+    if (!text.trim()) return;
+    setHookSaving(true);
+    try {
+      const res = await fetch("/api/hooks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: hookId, text: text.trim() }),
+      });
+      const updated = await res.json();
+      setHooks((prev) => prev.map((h) => h.id === hookId ? { ...h, text: updated.text } : h));
+      setEditingHookId(null);
+    } finally { setHookSaving(false); }
   }
 
   async function deleteGuide(g: Product) {
@@ -195,7 +237,7 @@ function GuidesContent() {
           </div>
         ) : guides.map((g) => (
           <div key={g.id}
-            onClick={() => { setSelected(g); setPayUrl(g.gumroadUrl ?? ""); setHooksOpen(false); setContentOpen(false); setCustomContent(""); }}
+            onClick={() => { setSelected(g); setPayUrl(g.gumroadUrl ?? ""); setHooksOpen(false); setContentOpen(false); setCustomContent(""); setArticleOpen(false); setCustomArticle(""); setEditingHookId(null); }}
             style={{
               padding: "12px 16px",
               borderBottom: "1px solid var(--border)",
@@ -373,17 +415,45 @@ function GuidesContent() {
 
               {/* Google Article */}
               <div style={card}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: articleOpen ? 16 : 0 }}>
                   <div>
                     <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>📖 Google Article</div>
-                    <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>People find this on Google. It sends them to your buy page.</div>
+                    <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
+                      {articleSaved ? "✅ Article updated." : "People find this on Google. It sends them to your buy page."}
+                    </div>
                   </div>
-                  {selected.slug && (
-                    <a href={`/guide/${selected.slug}`} target="_blank" rel="noopener noreferrer" style={btn("ghost")}>
-                      View
-                    </a>
-                  )}
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                    <button onClick={() => { setArticleOpen((o) => !o); setCustomArticle(selected.seoPageContent); }} style={btn("ghost")}>
+                      {articleOpen ? "Cancel" : "Edit"}
+                    </button>
+                    {selected.slug && (
+                      <a href={`/guide/${selected.slug}`} target="_blank" rel="noopener noreferrer" style={btn("ghost")}>
+                        View
+                      </a>
+                    )}
+                  </div>
                 </div>
+
+                {articleOpen && (
+                  <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14 }}>
+                    <div style={{ fontSize: "0.72rem", color: "var(--muted)", marginBottom: 8 }}>
+                      Paste your article content. Use # for headings, ## for subheadings, - for bullets.
+                    </div>
+                    <textarea
+                      value={customArticle}
+                      onChange={(e) => setCustomArticle(e.target.value)}
+                      rows={16}
+                      placeholder="# Article Title&#10;&#10;Introduction paragraph...&#10;&#10;## Section Heading&#10;&#10;- Bullet point&#10;- Bullet point"
+                      style={{ width: "100%", fontSize: "0.78rem", lineHeight: 1.65, padding: "12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", outline: "none", resize: "vertical", fontFamily: "monospace" }}
+                    />
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                      <button onClick={() => saveArticle(selected)} disabled={articleSaving || !customArticle.trim()}
+                        style={{ ...btn("primary"), opacity: !customArticle.trim() ? 0.5 : 1 }}>
+                        {articleSaving ? "Saving…" : "Save & Replace"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Social Posts */}
@@ -413,14 +483,42 @@ function GuidesContent() {
                               {h.platform}
                             </span>
                           </div>
-                          <button onClick={() => copy(h.text, h.id)}
-                            style={{ fontSize: "0.72rem", fontWeight: 600, color: copied === h.id ? "var(--accent)" : "var(--muted)", background: "transparent", border: "none", cursor: "pointer" }}>
-                            {copied === h.id ? "✓ Copied" : "Copy"}
-                          </button>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button
+                              onClick={() => { setEditingHookId(h.id); setHookDraft(h.text); }}
+                              style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--muted)", background: "transparent", border: "none", cursor: "pointer" }}>
+                              Edit
+                            </button>
+                            <button onClick={() => copy(h.text, h.id)}
+                              style={{ fontSize: "0.72rem", fontWeight: 600, color: copied === h.id ? "var(--accent)" : "var(--muted)", background: "transparent", border: "none", cursor: "pointer" }}>
+                              {copied === h.id ? "✓ Copied" : "Copy"}
+                            </button>
+                          </div>
                         </div>
-                        <p style={{ fontSize: "0.8rem", color: "var(--text)", lineHeight: 1.65, margin: 0, whiteSpace: "pre-line" }}>
-                          {h.text}
-                        </p>
+
+                        {editingHookId === h.id ? (
+                          <div>
+                            <textarea
+                              value={hookDraft}
+                              onChange={(e) => setHookDraft(e.target.value)}
+                              rows={5}
+                              style={{ width: "100%", fontSize: "0.78rem", lineHeight: 1.65, padding: "10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", outline: "none", resize: "vertical", fontFamily: "inherit" }}
+                            />
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
+                              <button onClick={() => setEditingHookId(null)} style={{ ...btn("ghost"), fontSize: "0.75rem", padding: "7px 14px" }}>
+                                Cancel
+                              </button>
+                              <button onClick={() => saveHook(h.id, hookDraft)} disabled={hookSaving || !hookDraft.trim()}
+                                style={{ ...btn("primary"), fontSize: "0.75rem", padding: "7px 14px", opacity: !hookDraft.trim() ? 0.5 : 1 }}>
+                                {hookSaving ? "Saving…" : "Save"}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p style={{ fontSize: "0.8rem", color: "var(--text)", lineHeight: 1.65, margin: 0, whiteSpace: "pre-line" }}>
+                            {h.text}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

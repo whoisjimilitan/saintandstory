@@ -29,7 +29,10 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const { id } = await req.json();
-  const hook = await prisma.hook.update({ where: { id }, data: { usageCount: { increment: 1 } } });
+  const body = await req.json();
+  const { id } = body;
+  const data: Record<string, unknown> =
+    typeof body.text === "string" ? { text: body.text } : { usageCount: { increment: 1 } };
+  const hook = await prisma.hook.update({ where: { id }, data });
   return NextResponse.json(hook);
 }
