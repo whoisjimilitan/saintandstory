@@ -168,7 +168,6 @@ export default async function SellPage({ params }: Props) {
             <span className="trust-pill">⚡ Updated 2026</span>
           </div>
           <a href="#buy" className="hero-cta-btn">Get Instant Access — {price}</a>
-          <div className="hero-sub">Instant download after payment · Read on phone, tablet, or laptop</div>
           {sd?.urgencyLine && (
             <div className="urgency-line">⏳ {sd.urgencyLine}</div>
           )}
@@ -178,8 +177,7 @@ export default async function SellPage({ params }: Props) {
         {sd?.bulletedPain && sd.bulletedPain.length > 0 && (
           <div className="sell-section-dark">
             <div className="sell-section">
-              <div className="section-label">If this is you</div>
-              <div className="section-title">You&apos;ve been searching for this answer for a while now.</div>
+              <div className="section-label">Sound familiar?</div>
               <div>
                 {sd.bulletedPain.map((line, i) => (
                   <div key={i} className="pain-bullet">
@@ -196,7 +194,6 @@ export default async function SellPage({ params }: Props) {
         {sd?.whatsInside && sd.whatsInside.length > 0 && (
           <div className="sell-section">
             <div className="section-label">What&apos;s inside</div>
-            <div className="section-title">Everything you need to stop guessing and start acting.</div>
             <div className="chapters-grid">
               {sd.whatsInside.map((ch, i) => (
                 <div key={i} className="chapter-card">
@@ -216,7 +213,6 @@ export default async function SellPage({ params }: Props) {
           <div className="sell-section-dark">
             <div className="sell-section">
               <div className="section-label">Questions</div>
-              <div className="section-title">Everything you want to know before buying.</div>
               <div className="faq-wrap">
                 {sd.faqItems.map((item, i) => (
                   <details key={i}>

@@ -305,19 +305,19 @@ export default function HomePage() {
               {[
                 {
                   num: "01", icon: "🔍", title: "Find your seed",
-                  body: "Tell the engine your market. In 60 seconds it surfaces the exact questions people are typing into Google right now that have no PDF answer yet. Ten to fifteen real opportunities nobody else has spotted.",
+                  body: "Tell us your market. In 60 seconds you get 10–15 real questions people are searching — with no PDF answer yet.",
                 },
                 {
                   num: "02", icon: "📄", title: "Grow your guide",
-                  body: "Pick a topic. Click generate. In 3 minutes you have a complete PDF guide, a full conversion page, an SEO article, and 10 platform-native marketing hooks — all written to professional standard. Nothing for you to write.",
+                  body: "Pick a topic. Click generate. In 3 minutes: a complete PDF, a sell page, an SEO article, and 10 marketing hooks. Nothing for you to write.",
                 },
                 {
                   num: "03", icon: "🌍", title: "Plant it",
-                  body: "Publish. Post one thing per day. The planting schedule tells you exactly what to post and where — TikTok Monday, Pinterest Tuesday, Instagram Wednesday. Ten minutes a day. Your guide starts appearing on Google and in social feeds.",
+                  body: "Post one thing a day. The schedule tells you exactly where — TikTok Monday, Pinterest Tuesday. Ten minutes. Your guide starts appearing in Google and social feeds.",
                 },
                 {
                   num: "04", icon: "💰", title: "Harvest",
-                  body: "Every guide earns while you sleep. Every month you plant more, the library grows. A guide earning £8 a day is £240 a month. Ten guides is £2,400. The income compounds long after you stop planting.",
+                  body: "£8/day per guide = £240/month. Ten guides = £2,400. Every month you plant more, the library grows. The income compounds.",
                 },
               ].map((step, i) => (
                 <div key={i} className="step-card">

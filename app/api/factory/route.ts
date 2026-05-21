@@ -105,36 +105,33 @@ ${questions.join("\n")}
 
 Return ONLY a valid JSON object — no markdown, no explanation — in this exact shape:
 {
-  "heroTagline": "One devastating sentence that names the exact pain. Make them feel completely seen. Max 20 words.",
+  "heroTagline": "One sentence. Must name the exact keyword/topic. What they'll have after reading. Max 15 words.",
   "bulletedPain": [
-    "If you've spent hours searching online and still don't have a clear answer...",
-    "If you've tried [specific thing] and it didn't work...",
-    "If you're worried about [specific fear from the questions]...",
-    "If you feel stuck because [frustration derived from the questions]...",
-    "If you're losing [money/time/opportunity] every day this stays unsolved..."
+    "One real lived moment of frustration. Max 12 words. Start with You or a verb.",
+    "Another specific moment — something they actually Googled or experienced.",
+    "A third specific moment — fear, confusion, or wasted time."
   ],
   "whatsInside": [
-    {"chapter": "Chapter 1", "title": "Exact chapter title", "description": "What they can DO after reading this chapter — outcome language, not content summary"},
-    {"chapter": "Chapter 2", "title": "Exact chapter title", "description": "Outcome language"},
-    {"chapter": "Chapter 3", "title": "Exact chapter title", "description": "Outcome language"},
-    {"chapter": "Chapter 4", "title": "Exact chapter title", "description": "Outcome language"},
-    {"chapter": "Quick-Reference", "title": "Action Checklist", "description": "The 5 exact steps to implement everything, done in 30 minutes"}
+    {"chapter": "Chapter 1", "title": "5–7 word outcome — what they CAN DO", "description": "One sentence, max 10 words. What specific thing they walk away with."},
+    {"chapter": "Chapter 2", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
+    {"chapter": "Chapter 3", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
+    {"chapter": "Chapter 4", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
+    {"chapter": "Quick-Reference", "title": "Action Checklist", "description": "Five steps. Thirty minutes. Done."}
   ],
   "faqItems": [
-    {"q": "Will this actually work for [specific situation from the questions]?", "a": "Direct, confident answer. Name the specific outcome. 2-3 sentences."},
-    {"q": "What format does it come in?", "a": "PDF. Works on phone, tablet, laptop, and can be printed. You get it instantly after purchase."},
-    {"q": "What if it doesn't solve my problem?", "a": "30-day full refund. No questions, no forms, just email us."},
-    {"q": "How is this different from free info online?", "a": "Answer directly — free info is scattered, incomplete, contradictory. This is [specific value prop]."},
-    {"q": "[Objection specific to this topic — derived from the questions]", "a": "Handle it directly and confidently."}
+    {"q": "Biggest objection specific to THIS topic — not generic", "a": "Direct answer. 2 sentences max."},
+    {"q": "What format does it come in?", "a": "PDF. Works on phone, tablet, and laptop. Instant download."},
+    {"q": "What if it doesn't help me?", "a": "30-day full refund. No questions, no forms."}
   ],
-  "urgencyLine": "Short, specific, honest urgency statement. E.g. 'Introductory price — goes up when we hit 500 copies.' Max 15 words."
+  "urgencyLine": "Honest, specific. E.g. 'Introductory price — goes up after 200 sales.' Max 12 words."
 }
 
-Rules for the copy:
-- bulletedPain: each bullet must reference something a real person actually typed into Google — use the search questions as raw material
-- whatsInside: chapters must map to the exact search questions above
-- faqItems: first question must address the biggest objection someone in this niche has before buying
-- urgencyLine: do NOT use fake scarcity — make it honest and specific`
+Rules — non-negotiable:
+- bulletedPain: exactly 3 bullets. Each one real specific moment, not a vague category. Max 12 words.
+- whatsInside: chapters map directly to the search questions. Descriptions max 10 words.
+- faqItems: exactly 3. First question is the biggest objection for this specific topic. Answers 2 sentences max.
+- urgencyLine: honest and specific. No fake countdown timers.
+- Less is more. Cut every word that doesn't reduce anxiety or increase desire.`
         }],
       }),
       openai.chat.completions.create({
