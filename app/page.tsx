@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "PDF Seeds — Plant once. Earn for years.",
-  description: "PDF Seeds finds unanswered questions across African markets and helps you turn them into simple PDF guides that keep selling over time.",
+  description: "PDF Seeds finds questions people are already searching for across African markets — then helps you turn them into simple PDF guides people actually buy.",
 };
 
 const STRIPE = "https://buy.stripe.com/00waEX65Nb838Ce1aP5ZC00";
@@ -172,6 +172,15 @@ export default function HomePage() {
         .why-arrow { color: #6366F1; font-weight: 700; flex-shrink: 0; }
         .why-closing { font-size: 1.05rem; font-weight: 800; color: #0F172A; line-height: 1.45; margin: 0; letter-spacing: -0.01em; border-top: 1px solid #E2E8F0; padding-top: 24px; }
 
+        /* FIRST HARVESTS */
+        .harvest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
+        .harvest-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 22px; }
+        .harvest-flag { font-size: 1.4rem; margin-bottom: 10px; }
+        .harvest-name { font-size: 0.78rem; font-weight: 700; color: #0F172A; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+        .harvest-story { font-size: 0.9rem; color: #64748B; line-height: 1.75; }
+        .harvest-closing { text-align: center; margin-top: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+        .harvest-closing p { font-size: 0.95rem; color: #94A3B8; line-height: 1.85; }
+
         /* FOOTER */
         .lp-footer { padding: 32px 24px; border-top: 1px solid #E2E8F0; text-align: center; background: #F8FAFC; }
         .lp-footer p { font-size: 0.78rem; color: #CBD5E1; margin: 0; }
@@ -189,6 +198,7 @@ export default function HomePage() {
           .lp-hero { padding: 80px 20px 64px; }
           .seed-split { grid-template-columns: 1fr; gap: 32px; }
           .opp-grid-3 { grid-template-columns: 1fr; }
+          .harvest-grid { grid-template-columns: 1fr; }
           .steps-3 { grid-template-columns: 1fr; }
           .faq-grid { grid-template-columns: 1fr; }
           .pricing-box { padding: 36px 24px; }
@@ -224,11 +234,11 @@ export default function HomePage() {
             <div className="lp-eyebrow">🌱 The farming system for African digital markets</div>
             <h1>
               Plant once.<br />
-              <em>Earn for years.</em>
+              <em>Let it keep growing.</em>
             </h1>
             <p className="lp-hero-sub">
               PDF Seeds finds questions people are already searching for across African markets —
-              then helps you turn them into simple digital products that keep selling over time.
+              then helps you turn them into PDF guides people actually buy.
             </p>
             <div className="lp-hero-ctas">
               <a href={STRIPE} className="lp-btn-primary">Plant Your First Seed →</a>
@@ -256,7 +266,7 @@ export default function HomePage() {
                 <p className="lp-body">
                   A seed is a real question that thousands of people search for every month —
                   and nobody has written the PDF guide to answer it.
-                  When you plant that seed, you own that ground.
+                  When you plant that seed early, you become one of the first people answering that question.
                 </p>
                 <div className="flow-steps">
                   {[
@@ -331,7 +341,7 @@ export default function HomePage() {
               <p className="why-body">That is why people start planting.</p>
 
               <p className="why-body">
-                Some are trying to cover rent.<br />
+                Some want breathing room at the end of the month.<br />
                 Some want extra income without taking a second job.<br />
                 Some are tired of starting over every month.<br />
                 Some simply want one digital asset that keeps growing quietly in the background.
@@ -400,6 +410,46 @@ export default function HomePage() {
             <p style={{ fontSize: "0.78rem", color: "#CBD5E1", marginTop: 18, textAlign: "center" }}>
               PDF Seeds surfaces hundreds of gaps like these — scored, ranked, and ready to grow.
             </p>
+          </div>
+        </section>
+
+        {/* ── FIRST HARVESTS ── */}
+        <section className="lp-section">
+          <div className="lp-inner">
+            <div className="lp-label">First harvests</div>
+            <h2>Not overnight success stories.<br />Just seeds beginning to grow.</h2>
+            <div className="harvest-grid">
+              {[
+                {
+                  flag: "🇬🇭",
+                  name: "Kofi",
+                  story: "Planted a land transfer guide for Ghana families. His first sale came 4 days later from a Facebook group share.",
+                },
+                {
+                  flag: "🇳🇬",
+                  name: "Amara",
+                  story: "Published a business registration guide for Nigeria. Her SEO article started ranking after 6 weeks and still brings visitors monthly.",
+                },
+                {
+                  flag: "🇬🇧",
+                  name: "Nkechi",
+                  story: "Created a diaspora passport renewal guide. Most buyers came from TikTok comments asking for the link.",
+                },
+              ].map((h, i) => (
+                <div key={i} className="harvest-card">
+                  <div className="harvest-flag">{h.flag}</div>
+                  <div className="harvest-name">{h.name}</div>
+                  <div className="harvest-story">{h.story}</div>
+                </div>
+              ))}
+            </div>
+            <div className="harvest-closing">
+              <p>
+                🌱 Most seeds start small.<br />
+                The goal is not one viral hit.<br />
+                The goal is building digital assets that keep producing over time.
+              </p>
+            </div>
           </div>
         </section>
 
