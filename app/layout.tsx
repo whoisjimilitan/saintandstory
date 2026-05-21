@@ -11,10 +11,9 @@ export const metadata: Metadata = {
 };
 
 const nav = [
-  { href: "/dashboard", label: "My Farm",  icon: "🌱" },
-  { href: "/factory",   label: "My Seeds", icon: "📄" },
-  { href: "/schedule",  label: "Schedule", icon: "📅" },
-  { href: "/store",     label: "Store",    icon: "🛍️" },
+  { href: "/dashboard", label: "My Farm",    icon: "🌱" },
+  { href: "/factory",   label: "My Seeds",   icon: "📄" },
+  { href: "/schedule",  label: "Post Today", icon: "📅" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,24 +24,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <aside style={{ background: "var(--surface)", borderRight: "1px solid var(--border)" }}
           className="w-56 flex-shrink-0 flex flex-col">
           <div className="px-5 py-6 border-b" style={{ borderColor: "var(--border)" }}>
-            <div className="text-xs font-semibold tracking-widest uppercase mb-0.5" style={{ color: "var(--muted)" }}>
-              PDF Seeds
-            </div>
-            <div className="text-sm font-medium" style={{ color: "var(--text)" }}>
-              Plant. Grow. Harvest.
+            <div className="flex items-center gap-2.5">
+              <div style={{ width: 30, height: 30, background: "#6366F1", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem", flexShrink: 0 }}>
+                🌱
+              </div>
+              <div>
+                <div className="text-sm font-bold" style={{ color: "var(--text)", letterSpacing: "-0.01em" }}>PDF Seeds</div>
+                <div className="text-xs font-semibold tracking-widest uppercase" style={{ color: "var(--muted)", fontSize: "0.6rem" }}>Plant · Grow · Harvest</div>
+              </div>
             </div>
           </div>
           <div className="px-3 pt-4 pb-2">
             <Link href="/engine"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold text-white"
               style={{ background: "var(--accent)" }}>
-              🌱 Plant New Seed
+              + Plant New Seed
             </Link>
           </div>
           <nav className="flex-1 px-3 py-2 space-y-1">
             {nav.map(({ href, label, icon }) => (
               <Link key={href} href={href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors hover:bg-[#EFF5ED] hover:text-[#4A6741]"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors hover:bg-[#EEF2FF] hover:text-[#4F46E5]"
                 style={{ color: "var(--muted)" }}>
                 <span className="text-base">{icon}</span>
                 {label}
@@ -50,9 +52,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             ))}
           </nav>
           <div className="px-5 py-4 border-t" style={{ borderColor: "var(--border)" }}>
-            <div className="text-xs" style={{ color: "var(--muted)" }}>
-              Plant seeds. Harvest income.
-            </div>
+            <Link href="/store" className="text-xs" style={{ color: "var(--muted)", textDecoration: "none" }}>
+              View Store →
+            </Link>
           </div>
         </aside>
 

@@ -519,8 +519,8 @@ export default function HomePage() {
             <div style={{ textAlign: "center", marginBottom: 48 }}>
               <div className="lp-label">The harvest math</div>
               <h2>One seed earns. Ten seeds compound.</h2>
-              <p style={{ color: "#64748B", fontSize: "1.05rem", maxWidth: 500, margin: "16px auto 0", lineHeight: 1.7 }}>
-                Each guide earns an average of £8 a day. The more seeds you plant, the more your farm earns on its own.
+              <p style={{ color: "#64748B", fontSize: "1.05rem", maxWidth: 480, margin: "16px auto 0", lineHeight: 1.7 }}>
+                Average £8 a day per guide. Seeds compound.
               </p>
             </div>
             <div className="math-grid">
@@ -542,7 +542,6 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <p className="math-note">Based on average earnings across active seeds. Most planters reach 10 seeds within 90 days.</p>
           </div>
         </section>
 

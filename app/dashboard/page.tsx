@@ -61,7 +61,7 @@ export default async function DashboardPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl mb-1" style={{ color: "var(--text)", fontFamily: "Georgia, serif", fontWeight: 400 }}>
+        <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>
           My Farm
         </h1>
         <p className="text-sm" style={{ color: "var(--muted)" }}>
@@ -111,7 +111,7 @@ export default async function DashboardPage() {
         <div className="rounded-2xl p-8 mb-6 text-center"
           style={{ background: "var(--surface2)", border: "1px solid var(--border)" }}>
           <div className="text-4xl mb-4">🌱</div>
-          <div className="text-lg font-bold mb-2" style={{ color: "var(--text)", fontFamily: "Georgia, serif", fontWeight: 400 }}>
+          <div className="text-lg font-bold mb-2" style={{ color: "var(--text)" }}>
             Your farm is ready. Let&apos;s plant your first seed.
           </div>
           <p className="text-sm mb-6" style={{ color: "var(--muted)", maxWidth: 400, margin: "0 auto 24px" }}>
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
 
       {stage === "exploring" && (
         <div className="rounded-2xl p-6 mb-6"
-          style={{ background: "#FEF9EE", border: "1px solid #E4DDD5" }}>
+          style={{ background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
           <div className="flex items-start gap-4">
             <div className="text-3xl flex-shrink-0">🌾</div>
             <div className="flex-1">
@@ -164,7 +164,7 @@ export default async function DashboardPage() {
 
       {stage === "growing" && (
         <div className="rounded-2xl p-6 mb-6"
-          style={{ background: "#EFF5ED", border: "1px solid #C5D9C0" }}>
+          style={{ background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
           <div className="flex items-start gap-4">
             <div className="text-3xl flex-shrink-0">📄</div>
             <div className="flex-1">
@@ -211,9 +211,6 @@ export default async function DashboardPage() {
             style={{ borderColor: "var(--border)" }}>
             <div>
               <div className="font-semibold text-sm" style={{ color: "var(--text)" }}>Your Seeds</div>
-              <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-                Buy link → put in your TikTok or Instagram bio
-              </div>
             </div>
             <Link href="/factory" className="text-xs font-medium"
               style={{ color: "var(--accent)", textDecoration: "none" }}>
@@ -238,7 +235,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {p.published ? (
-                      <span style={{ fontSize: 10, background: "#EFF5ED", color: "#4A6741", padding: "2px 7px", borderRadius: 4, fontWeight: 700, border: "1px solid #C5D9C0" }}>
+                      <span style={{ fontSize: 10, background: "#DCFCE7", color: "#16A34A", padding: "2px 7px", borderRadius: 4, fontWeight: 700, border: "1px solid #BBF7D0" }}>
                         🟢 Live
                       </span>
                     ) : (
@@ -247,7 +244,7 @@ export default async function DashboardPage() {
                       </span>
                     )}
                     {p.salesCount > 0 && (
-                      <span style={{ fontSize: 10, background: "#FEF9EE", color: "#B5834A", padding: "2px 7px", borderRadius: 4, fontWeight: 700, border: "1px solid #E4DDD5" }}>
+                      <span style={{ fontSize: 10, background: "#FEF3C7", color: "#B45309", padding: "2px 7px", borderRadius: 4, fontWeight: 700, border: "1px solid #FDE68A" }}>
                         {p.salesCount} sold · {sym}{p.revenue.toFixed(0)}
                       </span>
                     )}
@@ -261,7 +258,7 @@ export default async function DashboardPage() {
                       ) : p.slug ? (
                         <Link href={`/factory?id=${p.id}`}
                           className="text-xs px-2.5 py-1 rounded font-semibold"
-                          style={{ background: "#EFF5ED", color: "#4A6741", border: "1px solid #C5D9C0", textDecoration: "none" }}>
+                          style={{ background: "#EEF2FF", color: "#4F46E5", border: "1px solid #C7D2FE", textDecoration: "none" }}>
                           Publish →
                         </Link>
                       ) : null}
@@ -309,7 +306,7 @@ export default async function DashboardPage() {
                     </div>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>
                       Score{" "}
-                      <span style={{ color: o.opportunityScore >= 85 ? "#4A6741" : "#B5834A", fontWeight: 700 }}>
+                      <span style={{ color: o.opportunityScore >= 85 ? "#6366F1" : "#B45309", fontWeight: 700 }}>
                         {o.opportunityScore}
                       </span>
                       {" · "}{o.niche}
