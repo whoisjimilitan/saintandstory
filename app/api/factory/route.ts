@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
     });
 
-    const [pdfRes, salesRes, seoRes, hooksRes] = await Promise.all([
+    const [pdfRes, salesRes, seoRes, hooksRes, scriptRes] = await Promise.all([
       openai.chat.completions.create({
         model: "gemini-2.5-flash",
         messages: [{
@@ -230,6 +230,28 @@ Return as JSON array:
 ]`
         }],
       }),
+      openai.chat.completions.create({
+        model: "gemini-2.5-flash",
+        messages: [{
+          role: "user",
+          content: `Write a 5–7 second faceless video script for this PDF guide.
+
+Topic: "${opportunity.pdfTitle || opportunity.keyword}"
+${painPoint ? `Pain: "${painPoint}"` : ""}
+
+Three lines only. Each line is spoken aloud in roughly 2 seconds.
+No intro. No "hey guys". Start with the pain immediately.
+
+1. HOOK (0–2s): Scroll-stopper. Name the exact situation, not a category. PSA format, fear trigger, or surprising fact. The person who has this problem must stop scrolling immediately.
+2. TEASE (2–4s): Stakes or payoff. What they risk getting wrong, or what they'll gain. One specific sentence. Do NOT explain the guide yet.
+3. CTA (4–7s): Point to bio. Short. "Link in bio for the complete step-by-step guide" is enough. Do not sell — just direct.
+
+Return ONLY valid JSON with exactly these three keys:
+{"hook": "...", "tease": "...", "cta": "..."}`
+        }],
+        response_format: { type: "json_object" },
+        temperature: 0.5,
+      }),
     ]);
 
     pdfContent = pdfRes.choices[0].message.content ?? "";
@@ -241,6 +263,18 @@ Return as JSON array:
       const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : "[]");
       generatedHooks.push(...parsed);
     } catch { /* use empty hooks */ }
+
+    // Save video script to the opportunity so it shows in the dashboard
+    try {
+      const vsRaw = scriptRes.choices[0].message.content ?? "{}";
+      const vs = JSON.parse(vsRaw);
+      if (vs.hook || vs.tease || vs.cta) {
+        await prisma.opportunity.update({
+          where: { id: opportunityId },
+          data: { videoScript: vsRaw },
+        });
+      }
+    } catch { /* non-fatal */ }
 
   } else {
     pdfContent = `# ${opportunity.keyword}\n\n## The Complete Guide\n\n${questions.map((q, i) => `## ${i + 1}. ${q}\n\n- Key point 1\n- Key point 2\n- Key point 3\n`).join("\n")}\n\n## Your 5-Step Action Plan\n\n${questions.slice(0, 5).map((q, i) => `${i + 1}. ${q}`).join("\n")}`;
