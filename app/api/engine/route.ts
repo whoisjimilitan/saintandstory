@@ -383,6 +383,75 @@ const GLOBAL_PAIN_SEEDS = [
   "procrastination", "social anxiety", "low self-esteem", "productivity",
 ];
 
+// Domain seeds per country — specific enough to open different autocomplete paths,
+// broad enough not to pre-select products. Autocomplete does the niche discovery.
+// Cover education, health, finance, business, transport, property, legal, family.
+const COUNTRY_DOMAIN_SEEDS: Record<string, string[]> = {
+  GH: [
+    "waec", "bece", "nhis ghana", "ssnit", "mobile money ghana",
+    "ghana university admission", "ghana scholarship", "driving test ghana",
+    "ghana land", "ghana rent", "ghana loan", "ghana tax", "ghana bank",
+    "ghana job", "ghana birth certificate", "ghana marriage certificate",
+    "ghana business registration", "ghana work permit", "ghana hospital",
+  ],
+  NG: [
+    "jamb", "waec nigeria", "nin registration", "bvn nigeria", "cac registration",
+    "nigeria university admission", "nigeria scholarship", "pos business nigeria",
+    "nigeria driving license", "nigeria land", "nigeria rent", "nigeria loan",
+    "nigeria tax clearance", "nigeria job", "nigeria hospital", "nhis nigeria",
+    "nigeria birth certificate", "nigeria work permit", "nigeria business",
+  ],
+  KE: [
+    "kcse", "helb loan", "nhif kenya", "nssf kenya", "mpesa",
+    "kenya university admission", "kenya scholarship", "driving test kenya",
+    "kenya land", "kenya rent", "kenya loan", "kenya tax", "kenya job",
+    "kenya business registration", "kenya hospital", "kenya birth certificate",
+    "kenya work permit", "saccos kenya", "kenya farming",
+  ],
+  ZA: [
+    "matric", "nsfas", "sassa grant", "sars tax", "cipc registration",
+    "south africa university", "south africa scholarship", "driving test south africa",
+    "south africa rent", "south africa housing", "south africa loan",
+    "south africa job", "south africa hospital", "south africa work permit",
+    "south africa pension", "uif south africa", "south africa business",
+  ],
+  US: [
+    "social security", "medicare", "student loan", "credit card debt",
+    "health insurance", "llc formation", "small business loan",
+    "eviction notice", "bankruptcy", "green card", "driving test",
+    "rental lease", "first time homebuyer", "401k", "unemployment benefits",
+  ],
+  GB: [
+    "universal credit", "hmrc self assessment", "council tax", "child benefit",
+    "nhis uk", "driving theory test", "student loan uk", "right to work",
+    "employment tribunal", "housing benefit", "landlord rights uk",
+    "sole trader uk", "planning permission", "pension credit", "pip claim",
+  ],
+  CA: [
+    "sin number", "cra tax return", "cpp pension", "employment insurance canada",
+    "driving test canada", "health card canada", "pr card canada",
+    "rrsp", "student loan canada", "business registration canada",
+    "rental agreement canada", "ontario works", "disability canada",
+  ],
+  AU: [
+    "myGov", "centrelink", "ato tax return", "driving test australia",
+    "medicare australia", "superannuation", "hecs debt", "pr australia",
+    "abn registration", "rental bond australia", "first home buyer australia",
+    "ndis", "aged care australia", "visa australia",
+  ],
+  GLOBAL: [], // GLOBAL uses GLOBAL_PAIN_SEEDS directly
+};
+
+// Deterministic rotation based on current hour — different combination each scan.
+// Same seed list, different order → different autocomplete paths → variety without repetition.
+function rotateByScan(items: string[]): string[] {
+  const hourSlot = Math.floor(Date.now() / (60 * 60 * 1000));
+  return [...items]
+    .map((item, i) => ({ item, rank: (i * 7 + hourSlot) % (items.length || 1) }))
+    .sort((a, b) => a.rank - b.rank)
+    .map(({ item }) => item);
+}
+
 function buildDiscoveryQueries(country: string, keyword: string, niche: string, diaspora = false): string[] {
   const label = COUNTRY_LABEL[country] ?? "";
 
@@ -474,8 +543,28 @@ function buildDiscoveryQueries(country: string, keyword: string, niche: string, 
     return nicheQueries;
   }
 
-  // Broad scan — no keyword, no niche. Pain patterns + country label let autocomplete
-  // surface whatever people are actually searching, with no niche pre-assumed by the developer.
+  // Broad scan — hybrid approach:
+  // 1. Domain seeds (GH: "waec", "nhis ghana"…) open specific autocomplete paths per country
+  // 2. Pain patterns × rotated seeds surface actionable queries ("how to register nhis ghana")
+  // 3. Rotation varies by scan hour — different combination each run, maximum variety over time
+  const domainSeeds = COUNTRY_DOMAIN_SEEDS[country] ?? [];
+
+  if (domainSeeds.length > 0) {
+    const rotatedSeeds    = rotateByScan(domainSeeds);
+    const rotatedPatterns = rotateByScan(PAIN_PATTERNS);
+    // Direct seeds → autocomplete expands these into long-tail variations
+    const directQueries = rotatedSeeds.slice(0, 10);
+    // Hybrid: top patterns × top seeds → specific, actionable queries
+    const hybridQueries = rotatedSeeds.slice(0, 8).flatMap((seed, i) => [
+      `${rotatedPatterns[i % rotatedPatterns.length]} ${seed}`,
+      `${rotatedPatterns[(i + 6) % rotatedPatterns.length]} ${seed}`,
+    ]);
+    // Label patterns — broad country-anchored sweep for anything the seeds miss
+    const labelPatterns = rotatedPatterns.slice(0, 8).map((p) => label ? `${p} ${label}` : p);
+    return [...new Set([...directQueries, ...hybridQueries, ...labelPatterns])].slice(0, 55);
+  }
+
+  // Fallback for countries without domain seeds (shouldn't happen in practice)
   return PAIN_PATTERNS.map((p) => (label ? `${p} ${label}` : p));
 }
 
@@ -499,25 +588,25 @@ export const DIASPORA_PRICING: Record<string, { symbol: string; min: number; max
   ZA: { symbol: "£", min: 9.99,  max: 14.99, note: "British Pounds — South African diaspora" },
 };
 
-const ABSOLUTE_MIN_VOLUME = 5000;
+const ABSOLUTE_MIN_VOLUME = 5000; // US/global default — overridden per market below
 
-const MARKET_CONTEXT: Record<string, { tier: string; strongVolume: number; massiveVolume: number }> = {
-  GH: { tier: "emerging",  strongVolume: 15000,  massiveVolume: 40000  },
-  NG: { tier: "emerging",  strongVolume: 20000,  massiveVolume: 60000  },
-  KE: { tier: "emerging",  strongVolume: 12000,  massiveVolume: 35000  },
-  ZA: { tier: "emerging",  strongVolume: 18000,  massiveVolume: 50000  },
-  US: { tier: "saturated", strongVolume: 40000,  massiveVolume: 100000 },
-  GB: { tier: "saturated", strongVolume: 25000,  massiveVolume: 70000  },
-  CA: { tier: "saturated", strongVolume: 20000,  massiveVolume: 60000  },
-  AU: { tier: "saturated", strongVolume: 18000,  massiveVolume: 55000  },
-  GLOBAL: { tier: "global", strongVolume: 40000, massiveVolume: 100000 },
+const MARKET_CONTEXT: Record<string, { tier: string; strongVolume: number; massiveVolume: number; minVolume: number }> = {
+  GH: { tier: "emerging",  strongVolume: 8000,   massiveVolume: 25000,  minVolume: 2500 },
+  NG: { tier: "emerging",  strongVolume: 10000,  massiveVolume: 35000,  minVolume: 2500 },
+  KE: { tier: "emerging",  strongVolume: 6000,   massiveVolume: 20000,  minVolume: 2000 },
+  ZA: { tier: "emerging",  strongVolume: 10000,  massiveVolume: 30000,  minVolume: 2500 },
+  US: { tier: "saturated", strongVolume: 40000,  massiveVolume: 100000, minVolume: 5000 },
+  GB: { tier: "saturated", strongVolume: 25000,  massiveVolume: 70000,  minVolume: 4000 },
+  CA: { tier: "saturated", strongVolume: 20000,  massiveVolume: 60000,  minVolume: 4000 },
+  AU: { tier: "saturated", strongVolume: 18000,  massiveVolume: 55000,  minVolume: 4000 },
+  GLOBAL: { tier: "global", strongVolume: 40000, massiveVolume: 100000, minVolume: 5000 },
 };
 
-const DIASPORA_MARKET_CONTEXT: Record<string, { tier: string; strongVolume: number; massiveVolume: number }> = {
-  GH: { tier: "diaspora-niche", strongVolume: 3000, massiveVolume: 10000 },
-  NG: { tier: "diaspora-niche", strongVolume: 5000, massiveVolume: 15000 },
-  KE: { tier: "diaspora-niche", strongVolume: 2000, massiveVolume: 8000  },
-  ZA: { tier: "diaspora-niche", strongVolume: 2000, massiveVolume: 8000  },
+const DIASPORA_MARKET_CONTEXT: Record<string, { tier: string; strongVolume: number; massiveVolume: number; minVolume: number }> = {
+  GH: { tier: "diaspora-niche", strongVolume: 3000, massiveVolume: 10000, minVolume: 500  },
+  NG: { tier: "diaspora-niche", strongVolume: 5000, massiveVolume: 15000, minVolume: 800  },
+  KE: { tier: "diaspora-niche", strongVolume: 2000, massiveVolume: 8000,  minVolume: 400  },
+  ZA: { tier: "diaspora-niche", strongVolume: 2000, massiveVolume: 8000,  minVolume: 400  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -965,6 +1054,12 @@ export async function POST(req: Request) {
     ? (DIASPORA_MARKET_CONTEXT[country] ?? MARKET_CONTEXT.GB)
     : (MARKET_CONTEXT[country] ?? MARKET_CONTEXT.US);
 
+  // Market-calibrated volume floor — emerging markets have lower search penetration,
+  // not lower demand. 2,500/month in Ghana = real buyers, same as 5,000 in the US.
+  const effectiveMinVolume = diaspora
+    ? (market.minVolume ?? 500)
+    : (market.minVolume ?? ABSOLUTE_MIN_VOLUME);
+
   const minResultsGate = diaspora ? 3 : 10;
   if (rawSearches.length < minResultsGate) {
     return NextResponse.json({
@@ -1086,7 +1181,7 @@ export async function POST(req: Request) {
         const data = volumeMap.get(s.query.toLowerCase());
         return { keyword: s.query, painScore: s.score, flags: s.flags, volume: data?.searchVolume, inDataForSEO: !!data };
       })
-      .filter(({ volume, inDataForSEO }) => !inDataForSEO || (volume ?? 0) >= ABSOLUTE_MIN_VOLUME)
+      .filter(({ volume, inDataForSEO }) => !inDataForSEO || (volume ?? 0) >= effectiveMinVolume)
       .sort((a, b) => (b.painScore * 1000 + (b.volume ?? 0)) - (a.painScore * 1000 + (a.volume ?? 0)));
 
     console.log(`[engine] After volume filter: ${enrichedKeywords.length}/${topForVolume.length} keywords survive`);
@@ -1283,9 +1378,9 @@ AXIS 2 — COMMERCIAL PAIN INTENSITY (30 pts max)
   pain: score < 10: +0 pts (probably skip)
 
 AXIS 3 — DEMAND REALITY (20 pts max)
-  Market: ${country} (${market.tier}). Floor: ${ABSOLUTE_MIN_VOLUME.toLocaleString()}/month.
+  Market: ${country} (${market.tier}). Floor: ${effectiveMinVolume.toLocaleString()}/month.
   ${market.strongVolume.toLocaleString()}+/month → +20 pts
-  ${ABSOLUTE_MIN_VOLUME.toLocaleString()}–${(market.strongVolume - 1).toLocaleString()}/month → +10 pts
+  ${effectiveMinVolume.toLocaleString()}–${(market.strongVolume - 1).toLocaleString()}/month → +10 pts
 
 AXIS 4 — FIRST-MOVER WINDOW (15 pts max)
   No quality guide exists yet: +15 pts
@@ -1520,11 +1615,11 @@ Return ONLY valid JSON: { "results": [...] }`,
   // Emerging African markets: AI undercounts → generous floor.
   // Saturated (US/GB): strong noise filter needed → higher floor.
   const volumeFloor = (() => {
-    if (hasRealVolumes) return ABSOLUTE_MIN_VOLUME; // trust real DataForSEO data
-    if (diaspora) return 800;                        // diaspora = niche but premium
-    const tier = MARKET_CONTEXT[country]?.tier;
-    if (tier === "global" || tier === "saturated") return 3000; // global + US/GB/CA/AU
-    return 1500;                                     // emerging markets (GH/NG/KE/ZA)
+    if (hasRealVolumes) return effectiveMinVolume;   // trust real DataForSEO data at market floor
+    if (diaspora) return market.minVolume ?? 500;    // diaspora = niche but premium
+    const tier = market.tier;
+    if (tier === "global" || tier === "saturated") return Math.round((market.minVolume ?? 5000) * 0.6);
+    return Math.round((market.minVolume ?? 2500) * 0.6); // estimated volumes → softer floor
   })();
 
   const allAiResults = [...opportunities];
@@ -1589,7 +1684,7 @@ Return ONLY valid JSON: { "results": [...] }`,
       const score       = Math.min(100, Math.max(0, Number(o.opportunityScore) || 70));
       const competition = String(o.competition || "medium");
       const volume      = Number(o.searchVolume) || 0;
-      const isQuickWin  = score >= 80 && competition === "low" && kw.trim().split(/\s+/).length >= 4 && volume >= ABSOLUTE_MIN_VOLUME * 2;
+      const isQuickWin  = score >= 80 && competition === "low" && kw.trim().split(/\s+/).length >= 4 && volume >= effectiveMinVolume * 2;
       const created = await prisma.opportunity.create({
         data: {
           keyword:          kw,

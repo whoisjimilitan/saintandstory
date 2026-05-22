@@ -124,6 +124,8 @@ export default function EnginePage() {
   const [error, setError]         = useState("");
   const [tab, setTab]             = useState<"results" | "saved">("results");
   const [scanInfo, setScanInfo]   = useState<{ country: string; keyword: string; niche: string; diaspora: boolean; timestamp: string; total: number } | null>(null);
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [loadingElapsed, setLoadingElapsed] = useState(0);
 
   const hasDiaspora = ["GH", "NG", "KE", "ZA"].includes(country);
 
@@ -140,6 +142,31 @@ export default function EnginePage() {
   }, []);
 
   useEffect(() => { loadSaved(); }, [loadSaved]);
+
+  const LOADING_STAGES = [
+    { label: "Fetching signals from 7 live sources", detail: "Google · YouTube · Bing · PAA variants · DuckDuckGo · Community forums · Reddit", seconds: 7 },
+    { label: "Pain-scoring every signal", detail: "Commercial intent · emotional flags · PDF suitability gate", seconds: 10 },
+    { label: "Checking real search volumes", detail: "DataForSEO live data for top clusters", seconds: 12 },
+    { label: "Analysing answer gaps", detail: "How poorly does the internet currently answer these?", seconds: 10 },
+    { label: "AI quality gate running", detail: "Gemini reviewing, scoring, and compressing into opportunities", seconds: 18 },
+    { label: "Finalising results", detail: "Writing hook angles, video scripts, distribution strategies", seconds: 999 },
+  ];
+
+  useEffect(() => {
+    if (!loading) { setLoadingStage(0); setLoadingElapsed(0); return; }
+    setLoadingStage(0); setLoadingElapsed(0);
+    const start = Date.now();
+    const tick = setInterval(() => setLoadingElapsed(Math.floor((Date.now() - start) / 1000)), 500);
+    let accumulated = 0;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    for (let i = 0; i < LOADING_STAGES.length - 1; i++) {
+      accumulated += LOADING_STAGES[i].seconds * 1000;
+      const stage = i + 1;
+      timers.push(setTimeout(() => setLoadingStage(stage), accumulated));
+    }
+    return () => { clearInterval(tick); timers.forEach(clearTimeout); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   async function discover() {
     setError("");
@@ -512,13 +539,48 @@ export default function EnginePage() {
 
       {/* Loading */}
       {loading && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }} className="p-16 text-center">
-          <div className="text-4xl mb-4">{countryMeta.flag}</div>
-          <p className="text-sm font-medium mb-1" style={{ color: "var(--text)" }}>
-            {country === "GLOBAL" ? "Scanning universal pain — anxiety, grief, debt, career, health, relationships…" : `Scanning ${countryMeta.label} — all categories…`}
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 }} className="p-10 text-center">
+          {/* Flag + pulse indicator */}
+          <div className="flex justify-center mb-5">
+            <div className="relative inline-block">
+              <span className="text-4xl">{countryMeta.flag}</span>
+              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#10B981" }}></span>
+                <span className="relative inline-flex rounded-full h-3 w-3" style={{ background: "#10B981" }}></span>
+              </span>
+            </div>
+          </div>
+
+          {/* Stage label */}
+          <p className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>
+            {LOADING_STAGES[loadingStage].label}…
           </p>
+          <p className="text-xs mb-5" style={{ color: "var(--muted)" }}>
+            {LOADING_STAGES[loadingStage].detail}
+          </p>
+
+          {/* Progress bar */}
+          <div className="w-64 mx-auto rounded-full mb-3" style={{ height: 3, background: "var(--border)" }}>
+            <div className="rounded-full transition-all duration-700 ease-out" style={{
+              height: 3,
+              background: "var(--accent)",
+              width: `${Math.min(96, Math.round((loadingElapsed / 57) * 100))}%`,
+            }} />
+          </div>
+
+          {/* Stage dots */}
+          <div className="flex justify-center gap-1.5 mb-3">
+            {LOADING_STAGES.slice(0, -1).map((_, i) => (
+              <div key={i} className="rounded-full transition-all duration-300" style={{
+                width: i === loadingStage ? 16 : 6,
+                height: 6,
+                background: i <= loadingStage ? "var(--accent)" : "var(--border)",
+              }} />
+            ))}
+          </div>
+
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            Google · YouTube · Bing · PAA variants · DuckDuckGo · Community signals · Answer gap scoring
+            {loadingElapsed}s elapsed · quality gate running — don&apos;t refresh
           </p>
         </div>
       )}
