@@ -25,6 +25,9 @@ type Opportunity = {
   gapScore: number;
   platformOfOrigin: string;
   distributionStrategy: string;
+  videoScript: string;
+  pdfOutline: string;
+  salesPage: string;
   saved: boolean;
   isQuickWin: boolean;
   isDiaspora: boolean;
@@ -335,6 +338,93 @@ export default function EnginePage() {
             <div className="text-xs leading-relaxed" style={{ color: "var(--text)" }}>{o.distributionStrategy}</div>
           </div>
         )}
+
+        {/* PDF Outline */}
+        {(() => {
+          try {
+            const outline: { title: string; brief: string }[] = JSON.parse(o.pdfOutline || "[]");
+            if (!Array.isArray(outline) || outline.length === 0) return null;
+            return (
+              <details className="mb-3 group">
+                <summary className="flex items-center gap-2 cursor-pointer list-none px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider select-none"
+                  style={{ background: "#3B82F608", border: "1px solid #3B82F620", color: "#60A5FA" }}>
+                  <span className="group-open:hidden">▶</span>
+                  <span className="hidden group-open:inline">▼</span>
+                  📄 PDF Outline — {outline.length} Chapters
+                </summary>
+                <div className="mt-2 space-y-1.5 pl-1">
+                  {outline.map((ch, i) => (
+                    <div key={i} className="flex gap-2 text-xs">
+                      <span className="font-bold shrink-0" style={{ color: "#60A5FA" }}>{i + 1}.</span>
+                      <div>
+                        <span className="font-semibold" style={{ color: "var(--text)" }}>{ch.title}</span>
+                        {ch.brief && <span style={{ color: "var(--muted)" }}> — {ch.brief}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            );
+          } catch { return null; }
+        })()}
+
+        {/* Sales Page */}
+        {(() => {
+          try {
+            const sp = JSON.parse(o.salesPage || "{}") as { headline?: string; subHeadline?: string; bullets?: string[]; cta?: string; guarantee?: string };
+            if (!sp.headline) return null;
+            return (
+              <details className="mb-3 group">
+                <summary className="flex items-center gap-2 cursor-pointer list-none px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider select-none"
+                  style={{ background: "#10B98108", border: "1px solid #10B98125", color: "#10B981" }}>
+                  <span className="group-open:hidden">▶</span>
+                  <span className="hidden group-open:inline">▼</span>
+                  💰 Sales Page — Copy-Paste Ready
+                </summary>
+                <div className="mt-2 space-y-2.5 pl-1">
+                  {sp.headline && (
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--muted)" }}>Headline</div>
+                      <div className="text-sm font-bold leading-snug" style={{ color: "var(--text)" }}>{sp.headline}</div>
+                    </div>
+                  )}
+                  {sp.subHeadline && (
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--muted)" }}>Sub-headline</div>
+                      <div className="text-xs leading-relaxed" style={{ color: "var(--text)" }}>{sp.subHeadline}</div>
+                    </div>
+                  )}
+                  {Array.isArray(sp.bullets) && sp.bullets.length > 0 && (
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--muted)" }}>Benefit Bullets</div>
+                      <div className="space-y-1">
+                        {sp.bullets.map((b, i) => (
+                          <div key={i} className="flex items-start gap-1.5 text-xs">
+                            <span style={{ color: "#10B981" }}>✓</span>
+                            <span style={{ color: "var(--text)" }}>{b}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {sp.cta && (
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--muted)" }}>CTA Button Text</div>
+                      <div className="inline-block text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "#fff" }}>
+                        {sp.cta}
+                      </div>
+                    </div>
+                  )}
+                  {sp.guarantee && (
+                    <div className="text-xs px-3 py-2 rounded-lg" style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--muted)" }}>
+                      🛡️ {sp.guarantee}
+                    </div>
+                  )}
+                </div>
+              </details>
+            );
+          } catch { return null; }
+        })()}
 
         {/* Stats */}
         <div className="flex flex-wrap items-center gap-2 pt-2" style={{ borderTop: "1px solid var(--border)" }}>

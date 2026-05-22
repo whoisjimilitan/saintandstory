@@ -28,6 +28,8 @@ model Opportunity {
   pdfSuitability      String    @default("")
   actionabilityRating String    @default("medium")
   videoScript         String    @default("")
+  pdfOutline          String    @default("[]")
+  salesPage           String    @default("{}")
   volumeTier          String    @default("niche")
   gapScore            Int       @default(0)
   platformOfOrigin    String    @default("autocomplete")

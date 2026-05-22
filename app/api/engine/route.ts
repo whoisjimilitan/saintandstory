@@ -1486,11 +1486,59 @@ SEARCH: "ghana passport renewal uk" | pain:47 [DIASPORA+IMMIGRATION+PROCESS] ←
 PAIN POINT: "Ghanaians living in the UK who need to renew their passport are navigating a confusing process with no clear guide — wrong appointment slots, missing documents, embassy delays, and no one to call who actually knows the correct current procedure."
 TITLE: "Ghana Passport Renewal from the UK: Complete Step-by-Step Guide 2026"
 
-TITLE RULES:
-— Keyword phrase must appear naturally in the title
+TITLE FORMULA SYSTEM — use exactly one of the four patterns below. No exceptions.
+The title is 80% of the sale. It must match what they typed AND feel like the perfect solution.
+
+FORMULA 1 — Most used. How-to, process, registration, step-by-step topics.
+[Action Word] + [Exact Problem/Need] + [Location/Context] + [Power Word]
+✅ "Step-by-Step Guide: How to Register Your Business in Ghana — Fast & Without Mistakes"
+✅ "Complete Guide: How to Renew Your Ghana Passport from the UK — Every Document, Every Step"
+✅ "How to Fix a Failed MoMo Transfer in Ghana — Get Your Money Back Fast"
+
+FORMULA 2 — Fear-driven, pain-heavy topics. FEAR + MONEY + DEADLINE flags.
+[Stop/No More + Pain they hate] + [Exact way to fix it] + [Result they get]
+✅ "Stop Losing Money on Failed MoMo Transfers — How to Recover Every Transaction in Ghana"
+✅ "No More Confusion: How to File Your SARS Tax Return in South Africa — Keep More, Pay Less"
+
+FORMULA 3 — Numbered, structured topics. Business, money, career, steps.
+[Number] + [Steps/Ways/Secrets] + [Exact Goal] + [Who it's for / Context]
+✅ "7 Steps to Start Your Online Business in Ghana — Even With No Experience or Capital"
+✅ "10 Ways to Make Money From Home in Nigeria — Proven, Legitimate, Low Starting Cost"
+
+FORMULA 4 — Definitive resource. Comprehensive, everything-in-one guides.
+[The Ultimate/Complete/Definitive] + Guide to + [Full Topic] + [Everything included signal]
+✅ "The Ultimate Guide to Buying Land in Ghana — All Documents, Fees & Legal Steps Included"
+✅ "Complete WAEC / WASSCE Preparation Guide — Everything You Need to Pass in 2026"
+
+TITLE RULES (apply to ALL formulas):
+— 6–14 words only
+— Must include the EXACT keyword people search
+— Must name WHO it's for or WHERE (Ghana, from the UK, for beginners, for students)
+— Must end with a result, speed, or completeness signal
+— No jargon — sound like a helpful friend, not a textbook
 — Add year (2026) for registration, legal, exam, visa, government topics
 — Use dual acronyms: "WAEC / WASSCE", "JAMB / UTME", "KCSE / KNEC"
-— Subtitle states a PROMISE or OUTCOME
+
+PDF OUTLINE — 6–8 chapters. This IS the table of contents. Guides the reader from confusion → clarity → action.
+Structure every outline using this arc:
+  Ch 1: The problem (why this matters, what keeps going wrong)
+  Ch 2: What you need to know first (requirements, key concepts, landscape)
+  Ch 3–6: The steps (numbered, one clear action per chapter)
+  Ch 7: Common mistakes & how to avoid them
+  Ch 8: Quick reference / Checklist / What to do next
+Each chapter: SHORT title (5–8 words) + ONE brief sentence on exactly what the reader learns.
+
+SALES PAGE COPY — five fields, copy-paste ready for Gumroad / Payhip / Selar.
+headline: One line. Mirrors the exact pain. Loss-aversion or relief trigger. Max 15 words. NOT the PDF title — this is the sales page opener.
+  ✅ "Stop Guessing — Here Is the Exact Step-by-Step Process for [Problem]"
+  ✅ "Thousands of [Group] Have Already Solved This — Now It's Your Turn"
+subHeadline: Expands the promise. Who it's for + what they walk away with. Max 20 words.
+bullets: 5 benefit bullets. Each starts with a verb. Outcome-focused, not feature-focused.
+  ✅ "Discover exactly which documents you need — no more back-and-forth"
+  ✅ "Learn the one step most people skip that causes rejection"
+  ✅ "Get a complete checklist you can print and tick off as you go"
+cta: The button text. Action + value. 4–8 words. "Get the Complete Guide — [Price]"
+guarantee: One sentence. Removes purchase fear. "30-day money-back guarantee — if this guide doesn't [specific promise], you get a full refund, no questions asked."
 
 EXACT QUESTIONS — 4 short human search fragments (these become chapter headings):
 ✅ "Documents needed", "How long it takes", "How much it costs", "Common mistakes"
@@ -1517,7 +1565,7 @@ OUTPUT FORMAT
 {
   "painPoint": "40–80 words. Specific group + what they're trying to do + what keeps going wrong + the real cost. Raw and honest.",
   "keyword": "exact verbatim phrase from the data above — copy precisely",
-  "pdfTitle": "Keyword embedded naturally. Reads like a real product. Subtitle states a promise.",
+  "pdfTitle": "Use one of the 4 title formulas. Action word + exact keyword + who/where + result promise. 6–14 words.",
   "niche": "health | finance | education | business | farming | technology | relationships | home | career | mindset | other",
   "searchVolume": <integer — use ✓REAL figure if provided; use est[Nsrc] figure if provided; only estimate freely if neither is marked. Minimum 2000>,
   "opportunityScore": <integer 70–100 from the four-axis scoring>,
@@ -1539,6 +1587,29 @@ OUTPUT FORMAT
     "hook": "The scroll-stopper — 0-2s. Exact situation named. Immediate pain or PSA. No intro.",
     "tease": "Stakes or payoff — 2-4s. What they risk or gain. One specific sentence.",
     "cta": "The CTA — 4-7s. Point to bio. Do not sell. Just direct."
+  },
+  "pdfOutline": [
+    { "title": "Ch 1 title — 5-8 words", "brief": "One sentence: what the reader learns in this chapter." },
+    { "title": "Ch 2 title", "brief": "One sentence." },
+    { "title": "Ch 3 title", "brief": "One sentence." },
+    { "title": "Ch 4 title", "brief": "One sentence." },
+    { "title": "Ch 5 title", "brief": "One sentence." },
+    { "title": "Ch 6 title", "brief": "One sentence." },
+    { "title": "Ch 7: Common Mistakes & How to Avoid Them", "brief": "The errors that cause failure — and how to sidestep each one." },
+    { "title": "Ch 8: Quick Reference Checklist", "brief": "Everything on one page — tick it off as you go." }
+  ],
+  "salesPage": {
+    "headline": "Max 15 words. Pain mirror or relief trigger. NOT the PDF title.",
+    "subHeadline": "Max 20 words. Who it's for + what they walk away with.",
+    "bullets": [
+      "Discover [specific benefit 1]",
+      "Learn [specific benefit 2]",
+      "Get [specific benefit 3]",
+      "Avoid [specific fear or mistake]",
+      "Finally [relief — what they've been trying to do]"
+    ],
+    "cta": "4-8 words. Action + value. e.g. Get the Complete Guide — [Price]",
+    "guarantee": "One sentence. 30-day money-back. Specific promise."
   }
 }
 
@@ -1708,6 +1779,12 @@ Return ONLY valid JSON: { "results": [...] }`,
           videoScript:         typeof o.videoScript === "object" && o.videoScript !== null
                                  ? JSON.stringify(o.videoScript)
                                  : String(o.videoScript || "{}"),
+          pdfOutline:          Array.isArray(o.pdfOutline)
+                                 ? JSON.stringify(o.pdfOutline)
+                                 : String(o.pdfOutline || "[]"),
+          salesPage:           typeof o.salesPage === "object" && o.salesPage !== null
+                                 ? JSON.stringify(o.salesPage)
+                                 : String(o.salesPage || "{}"),
           volumeTier:          computeVolumeTier(Number(o.searchVolume) || 0),
           gapScore:            Math.min(100, Math.max(0, Number(o.gapScore) || 0)),
           platformOfOrigin:    String(o.platformOfOrigin || "autocomplete"),
