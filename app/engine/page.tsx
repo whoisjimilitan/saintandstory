@@ -256,7 +256,18 @@ export default function EnginePage() {
                 {o.niche}
               </span>
             </div>
-            <div className="font-bold text-sm leading-snug mb-1" style={{ color: "var(--text)" }}>{o.pdfTitle || o.keyword}</div>
+            {(() => {
+              const raw = o.pdfTitle || o.keyword;
+              const parts = raw.split(" — ");
+              const main = parts[0];
+              const sub = parts.slice(1).join(" — ");
+              return (
+                <div className="mb-1">
+                  <div className="font-bold text-sm leading-snug" style={{ color: "var(--text)" }}>{main}</div>
+                  {sub && <div className="text-xs leading-snug mt-0.5" style={{ color: "var(--muted)" }}>{sub}</div>}
+                </div>
+              );
+            })()}
             <div className="text-xs italic" style={{ color: "var(--muted)" }}>Search: "{o.keyword}"</div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
