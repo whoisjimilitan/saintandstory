@@ -517,7 +517,7 @@ export default function HomePage() {
           {step === "idle" && (
             <>
               <span className="pg-hero-eyebrow">Step-by-step guides for the hard stuff</span>
-              <h1 className="pg-hero-h1">Stop Googling. There&apos;s a guide for that.</h1>
+              <h1 className="pg-hero-h1">Stop Googling. There&apos;s a PDF guide for that.</h1>
               <p className="pg-hero-sub">
                 If you&apos;ve Googled it, we&apos;ve already written the guide.
               </p>
