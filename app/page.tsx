@@ -519,7 +519,7 @@ export default function HomePage() {
               <span className="pg-hero-eyebrow">Step-by-step guides for the hard stuff</span>
               <h1 className="pg-hero-h1">Stop Googling. There&apos;s a guide for that.</h1>
               <p className="pg-hero-sub">
-                Whatever you&apos;re confused about — ask directly. We&apos;ve written a guide for your exact situation.
+                If you&apos;ve Googled it, we&apos;ve already written the guide.
               </p>
               <div className="pg-form">
                 <form onSubmit={handleSituation}>
@@ -528,7 +528,7 @@ export default function HomePage() {
                       className="pg-input"
                       value={situation}
                       onChange={e => setSituation(e.target.value)}
-                      placeholder="Ask your question directly."
+                      placeholder="What do you keep Googling?"
                       autoFocus
                       required
                     />
