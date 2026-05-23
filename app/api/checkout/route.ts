@@ -15,14 +15,7 @@ export async function POST(req: Request) {
   if (!product) return NextResponse.json({ error: "Guide not found" }, { status: 404 });
 
   const opp = product.opportunity;
-  const currency = opp?.isDiaspora || opp?.country === "GB" ? "gbp"
-    : opp?.country === "NG" ? "ngn"
-    : opp?.country === "GH" ? "ghs"
-    : opp?.country === "KE" ? "kes"
-    : opp?.country === "ZA" ? "zar"
-    : opp?.country === "CA" ? "cad"
-    : opp?.country === "AU" ? "aud"
-    : "usd";
+  const currency = "gbp";
 
   const unitAmount = Math.round((opp?.minPrice ?? 9.99) * 100);
 

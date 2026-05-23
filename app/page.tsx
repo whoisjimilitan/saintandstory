@@ -19,7 +19,7 @@ type Guide = {
 const MESSAGES = [
   "Searching our library…",
   "Found a match — checking the details…",
-  "Almost ready…",
+  "Getting file…",
 ];
 
 export default function HomePage() {

@@ -96,12 +96,11 @@ export async function POST(req: Request) {
       orderBy: { createdAt: "desc" },
     });
     if (existing) {
-      const currency = existing.opportunity?.isDiaspora ? "£" : (resolved.currency);
       const price = existing.opportunity?.minPrice ?? 9.99;
       return NextResponse.json({
         slug: existing.slug,
         title: existing.title,
-        price: `${currency}${price.toFixed(2)}`,
+        price: `£${price.toFixed(2)}`,
         painPoint: existing.opportunity?.painPoint ?? "",
         chapters: chaptersFromSalesCopy(existing.salesPageCopy),
         cached: true,
@@ -250,7 +249,7 @@ Return ONLY valid JSON. CRITICAL RULE: each whatsInside entry MUST directly corr
   return NextResponse.json({
     slug: product.slug,
     title: product.title,
-    price: `${resolved.currency}${(oppData.price ?? 9.99).toFixed(2)}`,
+    price: `£${(oppData.price ?? 9.99).toFixed(2)}`,
     painPoint: oppData.painPoint,
     chapters,
   });
