@@ -241,7 +241,7 @@ export default function HomePage() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .pg-country-label {
-          font-size: 0.82rem; font-weight: 600;
+          font-size: 0.88rem; font-weight: 600;
           color: #5B21B6; letter-spacing: 0.01em;
           margin: 0 0 12px; text-align: center;
         }
@@ -552,7 +552,7 @@ export default function HomePage() {
                 <div className="pg-locked-text">{situation}</div>
                 <div className="pg-locked-x">change ×</div>
               </div>
-              <p className="pg-country-label">Which country do you want to search in?</p>
+              <p className="pg-country-label">Which country are you in?</p>
               <div className="pg-form">
                 <form onSubmit={handleGenerate}>
                   <div className="pg-input-wrap pg-input-wrap--deep">
