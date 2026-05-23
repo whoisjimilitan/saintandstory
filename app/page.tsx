@@ -4,49 +4,60 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "PDF Seeds — Step-by-step guides for life's most searched questions",
-  description: "Practical PDF guides written for the exact situation you're in. Instant download. Clear steps. Done.",
+  title: "PDF Seeds — Find the guide for your situation",
+  description: "Step-by-step PDF guides written for the exact situation you're in. Search by topic, country, or situation.",
 };
 
 const FLAG: Record<string, string> = {
   GH: "🇬🇭", NG: "🇳🇬", KE: "🇰🇪", ZA: "🇿🇦",
   GB: "🇬🇧", CA: "🇨🇦", AU: "🇦🇺", US: "🇺🇸",
 };
-
+const COUNTRY_NAME: Record<string, string> = {
+  GH: "Ghana", NG: "Nigeria", KE: "Kenya", ZA: "South Africa",
+  GB: "United Kingdom", CA: "Canada", AU: "Australia", US: "United States",
+};
 const CURRENCY: Record<string, string> = {
   GH: "₵", NG: "₦", KE: "KSh", ZA: "R",
   GB: "£", CA: "CA$", AU: "A$", US: "$",
 };
 
-const QUESTIONS = [
-  "how to renew nigerian passport in uk",
-  "how to register a business in ghana",
-  "poultry farm startup cost in kenya",
-  "how to get nhis card 2026",
-  "waec result checker online",
-  "how to send money from uk to nigeria",
-  "how to apply for ghana card abroad",
-  "south africa id book to smart card",
-  "how to start mobile money business ghana",
-  "canadian pr application checklist 2026",
-  "how to register a company in nigeria online",
-  "kenya driving licence renewal steps",
-  "how to get tax clearance certificate ghana",
-  "nafdac registration process nigeria",
-  "how to open uk bank account as nigerian",
-  "how to apply for british citizenship",
-  "diaspora remittance tax rules uk",
-  "how to get police clearance certificate kenya",
+const COUNTRIES = [
+  { code: "GH", name: "Ghana" }, { code: "NG", name: "Nigeria" },
+  { code: "KE", name: "Kenya" }, { code: "ZA", name: "South Africa" },
+  { code: "GB", name: "United Kingdom" }, { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" }, { code: "US", name: "United States" },
 ];
 
-export default async function HomePage() {
+type Props = { searchParams: Promise<{ q?: string; country?: string }> };
+
+function getPrice(guide: { opportunity: { isDiaspora: boolean; country: string; minPrice: number } | null }) {
+  const opp = guide.opportunity;
+  if (!opp) return "£9.99";
+  const cur = opp.isDiaspora ? "£" : (CURRENCY[opp.country] ?? "£");
+  return `${cur}${opp.minPrice.toFixed(2)}`;
+}
+
+export default async function HomePage({ searchParams }: Props) {
+  const { q = "", country = "" } = await searchParams;
+  const hasQuery = q.trim().length > 0 || country.length > 0;
+
   const guides = await prisma.product.findMany({
-    where: { published: true },
+    where: {
+      published: true,
+      ...(country ? { opportunity: { country } } : {}),
+      ...(q.trim() ? {
+        OR: [
+          { title: { contains: q, mode: "insensitive" } },
+          { opportunity: { keyword: { contains: q, mode: "insensitive" } } },
+          { opportunity: { painPoint: { contains: q, mode: "insensitive" } } },
+          { opportunity: { niche: { contains: q, mode: "insensitive" } } },
+        ],
+      } : {}),
+    },
     orderBy: { createdAt: "desc" },
     include: { opportunity: true },
+    take: hasQuery ? 50 : 6,
   });
-
-  const tickerItems = [...QUESTIONS, ...QUESTIONS];
 
   return (
     <>
@@ -57,377 +68,395 @@ export default async function HomePage() {
         body > main { overflow: visible !important; height: auto !important; padding-bottom: 0 !important; }
         * { box-sizing: border-box; }
 
-        .lp {
-          background: #F5F4F8;
-          color: #374151;
+        .sp {
+          background: #FFFFFF;
+          color: #111111;
           font-family: -apple-system, "Inter", system-ui, sans-serif;
           min-height: 100vh;
+          display: flex; flex-direction: column;
         }
 
-        /* NAV */
-        .lp-nav {
+        /* ── TOP NAV (results mode) ── */
+        .sp-nav {
+          display: flex; align-items: center; gap: 20px;
+          padding: 14px 40px;
+          border-bottom: 1px solid #F3F4F6;
           position: sticky; top: 0; z-index: 50;
-          background: rgba(245,244,248,0.94);
-          backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(229,231,235,0.7);
-          padding: 0 40px;
+          background: rgba(255,255,255,0.96);
+          backdrop-filter: blur(12px);
         }
-        .lp-nav-inner {
-          max-width: 960px; margin: 0 auto;
-          height: 64px; display: flex; align-items: center; justify-content: space-between;
-        }
-        .lp-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .lp-logo-mark {
-          width: 32px; height: 32px;
+        .sp-nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; flex-shrink: 0; }
+        .sp-nav-mark {
+          width: 30px; height: 30px;
           background: linear-gradient(135deg, #7C3AED, #4F46E5);
-          border-radius: 8px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 0.9rem; flex-shrink: 0;
-          box-shadow: 0 3px 10px rgba(124,58,237,0.28);
+          border-radius: 8px; display: flex; align-items: center;
+          justify-content: center; font-size: 0.85rem;
+          box-shadow: 0 2px 8px rgba(124,58,237,0.25);
         }
-        .lp-logo-name { font-weight: 800; font-size: 0.95rem; color: #111111; }
-        .lp-nav-cta {
+        .sp-nav-name { font-weight: 800; font-size: 0.9rem; color: #111111; }
+        .sp-nav-form { flex: 1; display: flex; gap: 0; max-width: 640px; }
+        .sp-nav-input {
+          flex: 1; border: 1.5px solid #E5E7EB; border-right: none;
+          border-radius: 999px 0 0 999px;
+          padding: 9px 18px; font-size: 0.88rem; color: #111111;
+          outline: none; background: #FAFAFA;
+        }
+        .sp-nav-input:focus { border-color: #7C3AED; background: #FFFFFF; }
+        .sp-nav-select {
+          border: 1.5px solid #E5E7EB; border-left: none; border-right: none;
+          padding: 9px 12px; font-size: 0.82rem; color: #6B7280;
+          background: #FAFAFA; cursor: pointer; outline: none;
+        }
+        .sp-nav-select:focus { border-color: #7C3AED; }
+        .sp-nav-btn {
           background: linear-gradient(135deg, #7C3AED, #4F46E5);
-          color: #fff; font-weight: 700; font-size: 0.85rem;
-          padding: 9px 22px; border-radius: 999px;
-          text-decoration: none;
-          box-shadow: 0 4px 14px rgba(124,58,237,0.28);
-          transition: opacity 0.15s;
+          color: #fff; font-weight: 700; font-size: 0.82rem;
+          padding: 9px 20px; border: none; border-radius: 0 999px 999px 0;
+          cursor: pointer;
         }
-        .lp-nav-cta:hover { opacity: 0.9; }
-
-        /* HERO */
-        .lp-hero {
-          max-width: 960px; margin: 0 auto;
-          padding: 80px 40px 64px;
-          text-align: center;
-        }
-        .lp-eyebrow {
-          display: inline-flex; align-items: center; gap: 7px;
-          background: #EDE9FE; border: 1px solid #DDD6FE;
-          border-radius: 999px; padding: 5px 14px;
-          font-size: 0.76rem; font-weight: 700; color: #7C3AED;
-          margin-bottom: 24px;
-        }
-        .lp h1 {
-          font-size: clamp(2.4rem, 5vw, 3.8rem);
-          font-weight: 900; line-height: 1.08;
-          color: #111111; margin: 0 0 18px;
-          letter-spacing: -0.04em;
-          max-width: 700px; margin-left: auto; margin-right: auto;
-        }
-        .lp h1 em { color: #7C3AED; font-style: normal; }
-        .lp-hero-sub {
-          font-size: 1.05rem; color: #6B7280;
-          line-height: 1.75; margin: 0 auto 32px;
-          max-width: 520px;
-        }
-        .lp-btn-primary {
-          display: inline-block;
+        .sp-nav-signin {
           background: linear-gradient(135deg, #7C3AED, #4F46E5);
-          color: #fff; font-weight: 700; font-size: 0.97rem;
-          padding: 15px 32px; border-radius: 999px; text-decoration: none;
-          box-shadow: 0 4px 20px rgba(124,58,237,0.32);
-          transition: opacity 0.15s;
-        }
-        .lp-btn-primary:hover { opacity: 0.9; }
-        .lp-hero-trust {
-          margin-top: 20px;
-          font-size: 0.8rem; color: #9CA3AF;
-          display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+          color: #fff; font-weight: 700; font-size: 0.82rem;
+          padding: 9px 18px; border-radius: 999px; text-decoration: none;
+          white-space: nowrap; box-shadow: 0 2px 10px rgba(124,58,237,0.25);
         }
 
-        /* TICKER */
-        .ticker-section {
-          background: #FFFFFF;
-          border-top: 1px solid #E5E7EB;
-          border-bottom: 1px solid #E5E7EB;
-          padding: 28px 0;
-          overflow: hidden;
-          position: relative;
-        }
-        .ticker-label {
+        /* ── HERO (home mode) ── */
+        .sp-hero {
+          flex: 1; display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          padding: 80px 24px 40px;
           text-align: center;
-          font-size: 0.65rem; font-weight: 700; color: #9CA3AF;
-          text-transform: uppercase; letter-spacing: 0.14em;
-          margin-bottom: 16px;
         }
-        .ticker-track-wrap {
-          overflow: hidden;
-          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        .sp-hero-mark {
+          width: 64px; height: 64px;
+          background: linear-gradient(135deg, #7C3AED, #4F46E5);
+          border-radius: 16px; display: flex; align-items: center;
+          justify-content: center; font-size: 2rem; margin-bottom: 18px;
+          box-shadow: 0 8px 28px rgba(124,58,237,0.28);
         }
-        .ticker-track {
-          display: flex; align-items: center;
-          animation: ticker-scroll 40s linear infinite;
-          width: max-content;
+        .sp-hero-brand {
+          font-size: 2.2rem; font-weight: 900; color: #111111;
+          letter-spacing: -0.04em; margin-bottom: 8px;
         }
-        .ticker-track:hover { animation-play-state: paused; }
-        @keyframes ticker-scroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        .sp-hero-sub {
+          font-size: 0.95rem; color: #9CA3AF; margin-bottom: 32px;
         }
-        .ticker-item {
-          display: inline-flex; align-items: center; gap: 10px;
-          padding: 0 28px;
-          font-size: 0.82rem; color: #9CA3AF;
-          white-space: nowrap; font-weight: 500; font-style: italic;
-          transition: color 0.2s;
+        .sp-hero-form {
+          width: 100%; max-width: 600px;
+          display: flex; gap: 0;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+          border-radius: 999px;
         }
-        .ticker-item:hover { color: #374151; }
-        .ticker-dot {
-          width: 3px; height: 3px; border-radius: 50%;
-          background: #7C3AED; flex-shrink: 0; opacity: 0.5;
+        .sp-hero-input {
+          flex: 1; border: 1.5px solid #E5E7EB; border-right: none;
+          border-radius: 999px 0 0 999px;
+          padding: 14px 22px; font-size: 0.95rem; color: #111111;
+          outline: none; background: #FAFAFA;
         }
-        .ticker-guide-badge {
-          display: inline-block; font-size: 0.65rem; font-weight: 700;
-          color: #10B981; background: #F0FDF4;
-          border: 1px solid #DCFCE7;
-          border-radius: 4px; padding: 2px 6px; margin-left: 6px;
+        .sp-hero-input:focus { border-color: #7C3AED; background: #FFFFFF; }
+        .sp-hero-select {
+          border: 1.5px solid #E5E7EB; border-left: none; border-right: none;
+          padding: 14px 14px; font-size: 0.85rem; color: #6B7280;
+          background: #FAFAFA; cursor: pointer; outline: none;
+        }
+        .sp-hero-select:focus { border-color: #7C3AED; }
+        .sp-hero-btn {
+          background: linear-gradient(135deg, #7C3AED, #4F46E5);
+          color: #fff; font-weight: 700; font-size: 0.9rem;
+          padding: 14px 28px; border: none; border-radius: 0 999px 999px 0;
+          cursor: pointer; white-space: nowrap;
+        }
+
+        /* ── FEATURED CARDS (home, no query) ── */
+        .sp-featured {
+          width: 100%; max-width: 1080px; margin: 48px auto 0;
+          padding: 0 24px;
+        }
+        .sp-featured-label {
+          font-size: 0.72rem; font-weight: 700; color: #9CA3AF;
+          text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 18px;
+          text-align: left;
+        }
+        .sp-cards {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 16px;
+        }
+        .sp-card {
+          background: #FFFFFF; border: 1.5px solid #F3F4F6;
+          border-radius: 14px; padding: 20px;
+          display: flex; flex-direction: column; gap: 12px;
+          text-decoration: none; color: inherit;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .sp-card:hover {
+          border-color: #DDD6FE;
+          box-shadow: 0 4px 16px rgba(124,58,237,0.1);
+        }
+        .sp-card-top { display: flex; align-items: center; gap: 10px; }
+        .sp-card-flag { font-size: 1.4rem; flex-shrink: 0; }
+        .sp-card-country { font-size: 0.72rem; color: #9CA3AF; font-weight: 600; }
+        .sp-card-title {
+          font-size: 0.88rem; font-weight: 600; color: #111111;
+          line-height: 1.45; flex: 1;
+        }
+        .sp-card-bottom {
+          display: flex; align-items: center; justify-content: space-between;
+          padding-top: 10px; border-top: 1px solid #F3F4F6;
+        }
+        .sp-card-price {
+          font-size: 1rem; font-weight: 900; color: #7C3AED;
+        }
+        .sp-card-cta {
+          font-size: 0.75rem; font-weight: 700; color: #7C3AED;
+          display: flex; align-items: center; gap: 4px;
+        }
+
+        /* ── EMPTY STATE (home) ── */
+        .sp-empty-home {
+          width: 100%; max-width: 560px; margin: 48px auto 0;
+          text-align: center; padding: 0 24px;
+        }
+        .sp-empty-home-title {
+          font-size: 0.85rem; color: #9CA3AF; margin-bottom: 10px;
+        }
+        .sp-empty-home-hint {
+          font-size: 0.8rem; color: #D1D5DB;
+          font-style: italic;
+        }
+
+        /* ── RESULTS (with query) ── */
+        .sp-results { max-width: 960px; margin: 0 auto; padding: 32px 40px 64px; flex: 1; }
+        .sp-results-count {
+          font-size: 1.5rem; font-weight: 800; color: #111111;
+          margin-bottom: 24px; letter-spacing: -0.02em;
+        }
+        .sp-results-count span { color: #9CA3AF; font-weight: 400; font-size: 1rem; }
+
+        /* TABLE */
+        .sp-table { width: 100%; border-collapse: collapse; }
+        .sp-table th {
+          text-align: left; font-size: 0.72rem; font-weight: 700;
+          color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.07em;
+          padding: 10px 14px; border-bottom: 1.5px solid #F3F4F6;
+        }
+        .sp-table td {
+          padding: 16px 14px; border-bottom: 1px solid #F9FAFB;
           vertical-align: middle;
         }
+        .sp-table tr:hover td { background: #FAFBFF; }
+        .sp-table tr:last-child td { border-bottom: none; }
+        .sp-td-title { font-size: 0.88rem; font-weight: 600; color: #111111; line-height: 1.4; max-width: 400px; }
+        .sp-td-pain { font-size: 0.78rem; color: #9CA3AF; margin-top: 3px; line-height: 1.4; }
+        .sp-td-country { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: #6B7280; white-space: nowrap; }
+        .sp-td-country-badge {
+          background: #F3F4F6; border-radius: 999px;
+          padding: 3px 10px; font-size: 0.72rem; font-weight: 600; color: #374151;
+        }
+        .sp-td-price { font-size: 0.95rem; font-weight: 800; color: #7C3AED; white-space: nowrap; }
+        .sp-td-cta {
+          display: inline-block;
+          background: #EDE9FE; color: #7C3AED; font-weight: 700; font-size: 0.78rem;
+          padding: 8px 16px; border-radius: 999px; text-decoration: none;
+          white-space: nowrap; border: 1px solid #DDD6FE;
+          transition: background 0.15s;
+        }
+        .sp-td-cta:hover { background: #DDD6FE; }
 
-        /* GUIDE LIBRARY */
-        .library-section {
-          max-width: 960px; margin: 0 auto;
-          padding: 72px 40px 80px;
-        }
-        .library-header {
-          text-align: center; margin-bottom: 48px;
-        }
-        .lp-label {
-          font-size: 0.7rem; font-weight: 700; color: #7C3AED;
-          text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;
-          display: block;
-        }
-        .lp h2 {
-          font-size: clamp(1.8rem, 3vw, 2.4rem);
-          font-weight: 900; line-height: 1.12; color: #111111;
-          margin: 0 0 12px; letter-spacing: -0.03em;
-        }
-        .lp h2 em { color: #7C3AED; font-style: normal; }
-        .lp-sub { font-size: 0.95rem; color: #6B7280; line-height: 1.75; max-width: 460px; margin: 0 auto; }
-
-        /* GUIDE CARDS */
-        .guides-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 20px;
-        }
-        .guide-card {
-          background: #FFFFFF;
-          border: 1px solid #E5E7EB;
-          border-radius: 16px;
-          padding: 22px;
-          display: flex; flex-direction: column;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-          transition: box-shadow 0.2s, transform 0.2s;
-          text-decoration: none;
-        }
-        .guide-card:hover {
-          box-shadow: 0 8px 24px rgba(124,58,237,0.12);
-          transform: translateY(-2px);
-        }
-        .guide-card-flag {
-          font-size: 1.4rem; margin-bottom: 12px;
-        }
-        .guide-card-title {
-          font-size: 0.9rem; font-weight: 700; color: #111111;
-          line-height: 1.45; flex: 1; margin-bottom: 16px;
-        }
-        .guide-card-footer {
-          display: flex; align-items: center; justify-content: space-between;
-        }
-        .guide-card-price {
-          font-size: 1.1rem; font-weight: 900; color: #7C3AED;
-          letter-spacing: -0.02em;
-        }
-        .guide-card-cta {
-          font-size: 0.78rem; font-weight: 700; color: #7C3AED;
-          background: #EDE9FE; border: 1px solid #DDD6FE;
-          border-radius: 999px; padding: 6px 14px;
-          white-space: nowrap;
-        }
-
-        /* EMPTY STATE */
-        .guides-empty {
+        /* ── NO RESULTS ── */
+        .sp-no-results {
           text-align: center; padding: 60px 24px;
-          background: #FFFFFF; border: 1px solid #E5E7EB;
-          border-radius: 16px;
         }
-        .guides-empty-icon { font-size: 2.5rem; margin-bottom: 14px; }
-        .guides-empty-title { font-size: 1rem; font-weight: 700; color: #111111; margin-bottom: 6px; }
-        .guides-empty-sub { font-size: 0.85rem; color: #9CA3AF; }
+        .sp-no-results-icon { font-size: 2.2rem; margin-bottom: 14px; }
+        .sp-no-results-title { font-size: 1rem; font-weight: 700; color: #111111; margin-bottom: 6px; }
+        .sp-no-results-sub { font-size: 0.85rem; color: #9CA3AF; line-height: 1.7; }
 
-        /* TRUST STRIP */
-        .trust-strip {
-          background: #FFFFFF;
-          border-top: 1px solid #E5E7EB;
-          border-bottom: 1px solid #E5E7EB;
-          padding: 28px 40px;
+        /* ── FOOTER ── */
+        .sp-footer {
+          text-align: center; padding: 20px 24px;
+          border-top: 1px solid #F3F4F6;
+          font-size: 0.75rem; color: #D1D5DB;
         }
-        .trust-inner {
-          max-width: 960px; margin: 0 auto;
-          display: flex; gap: 32px; justify-content: center;
-          flex-wrap: wrap; align-items: center;
-        }
-        .trust-item {
-          display: flex; align-items: center; gap: 8px;
-          font-size: 0.82rem; color: #6B7280; font-weight: 500;
-        }
+        .sp-footer a { color: #9CA3AF; text-decoration: none; }
+        .sp-footer a:hover { color: #7C3AED; }
 
-        /* FOOTER */
-        .lp-footer {
-          background: #111111; padding: 20px 40px; text-align: center;
-          font-size: 0.75rem; color: rgba(255,255,255,0.3);
-        }
-        .lp-footer a { color: rgba(255,255,255,0.45); text-decoration: none; }
-        .lp-footer a:hover { color: rgba(255,255,255,0.7); }
-
-        /* MOBILE STICKY */
-        .mobile-sticky {
-          display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-          background: #FFFFFF; border-top: 1px solid #E5E7EB;
-          padding: 10px 16px; box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
-        }
-        .mobile-sticky a {
-          display: block;
-          background: linear-gradient(135deg, #7C3AED, #4F46E5);
-          color: #fff; font-weight: 700; font-size: 0.88rem;
-          padding: 14px; border-radius: 999px;
-          text-decoration: none; text-align: center;
-        }
-
-        /* RESPONSIVE */
+        /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
-          .lp-hero { padding: 52px 24px 48px; }
-          .library-section { padding: 52px 24px 60px; }
-          .trust-strip { padding: 22px 24px; }
-          .lp-nav { padding: 0 24px; }
-          .lp-footer { padding: 20px 24px; }
-          .guides-grid { grid-template-columns: 1fr; }
-          .mobile-sticky { display: block; }
-          body { padding-bottom: 68px !important; }
+          .sp-nav { padding: 12px 16px; gap: 12px; }
+          .sp-nav-form { max-width: 100%; }
+          .sp-nav-select { display: none; }
+          .sp-results { padding: 24px 16px 48px; }
+          .sp-table th:nth-child(2),
+          .sp-table td:nth-child(2) { display: none; }
+          .sp-table th:nth-child(3),
+          .sp-table td:nth-child(3) { display: none; }
+          .sp-hero { padding: 60px 16px 32px; }
+          .sp-hero-select { display: none; }
+          .sp-featured { padding: 0 16px; }
+          .sp-cards { grid-template-columns: 1fr 1fr; }
         }
       `}</style>
 
-      <div className="lp">
+      <div className="sp">
 
-        {/* NAV */}
-        <nav className="lp-nav">
-          <div className="lp-nav-inner">
-            <a href="/" className="lp-logo">
-              <div className="lp-logo-mark">🌱</div>
-              <div><div className="lp-logo-name">PDF Seeds</div></div>
-            </a>
-            <a href="#guides" className="lp-nav-cta">Browse Guides →</a>
-          </div>
-        </nav>
+        {hasQuery ? (
+          /* ── RESULTS MODE ── */
+          <>
+            <nav className="sp-nav">
+              <a href="/" className="sp-nav-logo">
+                <div className="sp-nav-mark">🌱</div>
+                <div className="sp-nav-name">PDF Seeds</div>
+              </a>
+              <form method="GET" action="/" className="sp-nav-form">
+                <input
+                  className="sp-nav-input"
+                  name="q"
+                  defaultValue={q}
+                  placeholder="Search by situation, topic, or country…"
+                  autoComplete="off"
+                />
+                <select className="sp-nav-select" name="country" defaultValue={country}>
+                  <option value="">All Countries</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
+                  ))}
+                </select>
+                <button type="submit" className="sp-nav-btn">Search</button>
+              </form>
+              <a href="/signin" className="sp-nav-signin">My Farm →</a>
+            </nav>
 
-        {/* HERO */}
-        <section>
-          <div className="lp-hero">
-            <div className="lp-eyebrow">📄 Step-by-step guides — instant download</div>
-            <h1>
-              You&apos;re searching.<br />
-              <em>We wrote the guide.</em>
-            </h1>
-            <p className="lp-hero-sub">
-              Practical, step-by-step PDF guides written for the exact situation you&apos;re in.
-              No fluff. No guesswork. Just clear steps from someone who&apos;s been through it.
-            </p>
-            <a href="#guides" className="lp-btn-primary">Find Your Guide →</a>
-            <div className="lp-hero-trust">
-              <span>📥 Instant download</span>
-              <span>📱 Read on any device</span>
-              <span>🔒 30-day money-back</span>
+            <div className="sp-results">
+              <div className="sp-results-count">
+                {guides.length} {guides.length === 1 ? "Guide" : "Guides"}
+                {q && <span> for &ldquo;{q}&rdquo;</span>}
+                {country && <span> · {FLAG[country]} {COUNTRY_NAME[country]}</span>}
+              </div>
+
+              {guides.length > 0 ? (
+                <table className="sp-table">
+                  <thead>
+                    <tr>
+                      <th>Guide</th>
+                      <th>Country</th>
+                      <th>Price</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {guides.map((g) => {
+                      const country = g.opportunity?.country ?? "GB";
+                      const flag = FLAG[country] ?? "🌍";
+                      const countryName = COUNTRY_NAME[country] ?? country;
+                      const href = g.gumroadUrl || `/sell/${g.slug}`;
+                      return (
+                        <tr key={g.id}>
+                          <td>
+                            <div className="sp-td-title">{g.title}</div>
+                            {g.opportunity?.painPoint && (
+                              <div className="sp-td-pain">{g.opportunity.painPoint}</div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="sp-td-country">
+                              <span>{flag}</span>
+                              <span className="sp-td-country-badge">{countryName}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="sp-td-price">{getPrice(g)}</div>
+                          </td>
+                          <td>
+                            <a href={href} className="sp-td-cta">Get Guide →</a>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="sp-no-results">
+                  <div className="sp-no-results-icon">🔍</div>
+                  <div className="sp-no-results-title">No guides found for &ldquo;{q}&rdquo;</div>
+                  <div className="sp-no-results-sub">
+                    This guide doesn&apos;t exist yet — but it might be coming soon.<br />
+                    Try a different search or browse all guides below.
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </section>
-
-        {/* QUESTION TICKER */}
-        <div className="ticker-section">
-          <div className="ticker-label">Questions people are searching right now — a guide exists for every one of these</div>
-          <div className="ticker-track-wrap">
-            <div className="ticker-track">
-              {tickerItems.map((q, i) => (
-                <span key={i} className="ticker-item">
-                  <span className="ticker-dot" />
-                  {q}
-                  {i % 5 === 2 && <span className="ticker-guide-badge">guide ✓</span>}
-                </span>
-              ))}
+          </>
+        ) : (
+          /* ── HOME MODE ── */
+          <>
+            <div className="sp-hero">
+              <div className="sp-hero-mark">🌱</div>
+              <div className="sp-hero-brand">PDF Seeds</div>
+              <div className="sp-hero-sub">Find the step-by-step guide for your exact situation</div>
+              <form method="GET" action="/" className="sp-hero-form">
+                <input
+                  className="sp-hero-input"
+                  name="q"
+                  placeholder="What do you need help with? e.g. renewing passport, registering a business…"
+                  autoComplete="off"
+                  autoFocus
+                />
+                <select className="sp-hero-select" name="country">
+                  <option value="">All Countries</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{FLAG[c.code]} {c.name}</option>
+                  ))}
+                </select>
+                <button type="submit" className="sp-hero-btn">Find Guide</button>
+              </form>
             </div>
-          </div>
-        </div>
 
-        {/* GUIDE LIBRARY */}
-        <section className="library-section" id="guides">
-          <div className="library-header">
-            <span className="lp-label">The library</span>
-            <h2>Find your guide.<br /><em>Get your answer.</em></h2>
-            <p className="lp-sub">
-              Every guide is written for one specific situation — so you get exactly what you need, nothing else.
-            </p>
-          </div>
-
-          {guides.length > 0 ? (
-            <div className="guides-grid">
-              {guides.map((guide) => {
-                const country = guide.opportunity?.country ?? "GB";
-                const flag = FLAG[country] ?? "🌍";
-                const currency = guide.opportunity?.isDiaspora
-                  ? "£"
-                  : CURRENCY[country] ?? "£";
-                const price = guide.opportunity
-                  ? `${currency}${guide.opportunity.minPrice.toFixed(2)}`
-                  : "£9.99";
-                const href = guide.gumroadUrl || `/sell/${guide.slug}`;
-
-                return (
-                  <a key={guide.id} href={href} className="guide-card">
-                    <div className="guide-card-flag">{flag}</div>
-                    <div className="guide-card-title">{guide.title}</div>
-                    <div className="guide-card-footer">
-                      <div className="guide-card-price">{price}</div>
-                      <span className="guide-card-cta">Get Guide →</span>
-                    </div>
-                  </a>
-                );
-              })}
+            <div className="sp-featured">
+              {guides.length > 0 ? (
+                <>
+                  <div className="sp-featured-label">Guides available right now</div>
+                  <div className="sp-cards">
+                    {guides.map((g) => {
+                      const c = g.opportunity?.country ?? "GB";
+                      const flag = FLAG[c] ?? "🌍";
+                      const countryName = COUNTRY_NAME[c] ?? c;
+                      const href = g.gumroadUrl || `/sell/${g.slug}`;
+                      return (
+                        <a key={g.id} href={href} className="sp-card">
+                          <div className="sp-card-top">
+                            <div className="sp-card-flag">{flag}</div>
+                            <div>
+                              <div className="sp-card-country">{countryName}</div>
+                            </div>
+                          </div>
+                          <div className="sp-card-title">{g.title}</div>
+                          <div className="sp-card-bottom">
+                            <div className="sp-card-price">{getPrice(g)}</div>
+                            <div className="sp-card-cta">View Guide →</div>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="sp-empty-home">
+                  <div className="sp-empty-home-title">First guides launching soon — search to be notified</div>
+                  <div className="sp-empty-home-hint">Try: &ldquo;renewing passport&rdquo; · &ldquo;registering a business&rdquo; · &ldquo;mobile money&rdquo;</div>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="guides-empty">
-              <div className="guides-empty-icon">🌱</div>
-              <div className="guides-empty-title">First guides launching soon</div>
-              <div className="guides-empty-sub">Check back shortly — new guides are being planted every week.</div>
-            </div>
-          )}
-        </section>
+          </>
+        )}
 
-        {/* TRUST STRIP */}
-        <div className="trust-strip">
-          <div className="trust-inner">
-            <div className="trust-item">📥 <span>Instant download after purchase</span></div>
-            <div className="trust-item">✍️ <span>Written by someone who&apos;s been through it</span></div>
-            <div className="trust-item">🔒 <span>30-day money-back, no questions</span></div>
-            <div className="trust-item">📱 <span>Works on any device</span></div>
-          </div>
-        </div>
-
-        {/* FOOTER */}
-        <footer className="lp-footer">
+        <footer className="sp-footer" style={{ marginTop: 48 }}>
           <p>
             © {new Date().getFullYear()} PDF Seeds ·{" "}
-            <a href="#guides">Browse Guides</a> ·{" "}
+            <a href="/">Search Guides</a> ·{" "}
             <a href="/signin">My Farm</a>
           </p>
         </footer>
-
-        {/* MOBILE STICKY */}
-        <div className="mobile-sticky">
-          <a href="#guides">Browse Guides →</a>
-        </div>
 
       </div>
     </>
