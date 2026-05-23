@@ -304,6 +304,21 @@ export default function EarnPage() {
           font-size: 0.88rem; color: #8C7D6E; line-height: 1.7; margin: 0;
         }
 
+        /* ── FINAL CTA ── */
+        .earn-final-cta {
+          text-align: center;
+          padding: 56px 40px;
+          background: #FFFFFF;
+          border: 1.5px solid #DDD6FE;
+          border-radius: 24px;
+        }
+        .earn-final-line {
+          font-size: clamp(1.2rem, 3vw, 1.55rem);
+          font-weight: 800; color: #1A1008;
+          line-height: 1.4; letter-spacing: -0.02em;
+          margin: 0 0 32px;
+        }
+
         /* ── FOOTER ── */
         .earn-footer {
           text-align: center; padding: 16px 24px;
@@ -490,6 +505,20 @@ export default function EarnPage() {
               <div className="earn-faq-q">Is this a monthly subscription?</div>
               <p className="earn-faq-a">No. £19.99 once. You keep access forever, including every new guide added to the library.</p>
             </div>
+          </div>
+        </section>
+
+        {/* FINAL CTA */}
+        <section className="earn-section" style={{ paddingBottom: 80 }}>
+          <div className="earn-final-cta">
+            <p className="earn-final-line">
+              The guides are written. The buyers are searching.<br />
+              The only thing missing is you.
+            </p>
+            <button className="earn-cta-primary" onClick={handleGetAccess} disabled={loading}>
+              {loading ? "Opening checkout…" : "Become a Farmer — £19.99 →"}
+            </button>
+            <div className="earn-trust-line">One-time payment · 30-day money-back guarantee</div>
           </div>
         </section>
 
