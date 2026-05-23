@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PASSWORD = process.env.ADMIN_PASSWORD ?? "";
-
 const PROTECTED_PREFIXES = [
   "/dashboard",
-  "/factory",
   "/engine",
+  "/factory",
+  "/harvests",
   "/hooks",
   "/clusters",
   "/schedule",
-  "/api/factory",
+  "/store",
+  "/guide",
+  "/sell",
   "/api/engine",
+  "/api/factory",
   "/api/products",
   "/api/hooks",
   "/api/clusters",
@@ -18,49 +20,39 @@ const PROTECTED_PREFIXES = [
 ];
 
 function isProtected(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  return PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + "/")
+  );
 }
 
 export function proxy(req: NextRequest) {
-  if (!isProtected(req.nextUrl.pathname)) {
-    return NextResponse.next();
-  }
+  const { pathname } = req.nextUrl;
 
-  if (!PASSWORD) {
-    // No password set — allow through (safe for local dev)
-    return NextResponse.next();
-  }
+  if (!isProtected(pathname)) return NextResponse.next();
 
-  const auth = req.headers.get("authorization");
+  const session = req.cookies.get("farm_session");
+  if (session?.value === "authenticated") return NextResponse.next();
 
-  if (auth?.startsWith("Basic ")) {
-    const encoded = auth.slice(6);
-    const decoded = atob(encoded);
-    const colonAt = decoded.indexOf(":");
-    const password = colonAt >= 0 ? decoded.slice(colonAt + 1) : decoded;
-    if (password === PASSWORD) {
-      return NextResponse.next();
-    }
-  }
-
-  return new NextResponse("Access denied", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": `Basic realm="PDF Seeds"`,
-    },
-  });
+  const url = req.nextUrl.clone();
+  url.pathname = "/signin";
+  url.searchParams.set("from", pathname);
+  return NextResponse.redirect(url);
 }
 
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/factory/:path*",
     "/engine/:path*",
+    "/factory/:path*",
+    "/harvests/:path*",
     "/hooks/:path*",
     "/clusters/:path*",
     "/schedule/:path*",
-    "/api/factory/:path*",
+    "/store/:path*",
+    "/guide/:path*",
+    "/sell/:path*",
     "/api/engine/:path*",
+    "/api/factory/:path*",
     "/api/products/:path*",
     "/api/hooks/:path*",
     "/api/clusters/:path*",
