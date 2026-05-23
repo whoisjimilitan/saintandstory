@@ -327,18 +327,75 @@ export default function EarnPage() {
           margin-top: 40px;
         }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 640px) {
+        /* ── RESPONSIVE: TABLET / IPAD (601–1024px) ── */
+        @media (min-width: 601px) and (max-width: 1024px) {
+          .earn-hero { padding: 64px 40px 56px; }
+          .earn-section { padding: 0 40px 72px; }
+          .earn-divider { margin: 0 40px 56px; }
+          .earn-steps { gap: 20px; }
+          .earn-pitch { padding: 40px 36px; }
+          .earn-price-block { padding: 48px 36px; }
+          .earn-final-cta { padding: 48px 36px; }
+          .earn-math { padding: 28px 32px; }
+        }
+
+        /* ── RESPONSIVE: MOBILE (≤600px) ── */
+        @media (max-width: 600px) {
           .earn-header { padding: 16px 20px; }
-          .earn-hero { padding: 56px 20px 48px; }
-          .earn-section { padding: 0 20px 60px; }
-          .earn-divider { margin: 0 20px 48px; }
-          .earn-steps { grid-template-columns: 1fr; gap: 16px; }
-          .earn-pitch { padding: 32px 24px; }
-          .earn-price-block { padding: 40px 24px; }
-          .earn-cta-primary { padding: 18px 32px; font-size: 1rem; width: 100%; }
-          .earn-cta-white { padding: 18px 32px; font-size: 1rem; width: 100%; }
-          .earn-faq-item { padding: 20px; }
+          .earn-logo-name { font-size: 0.9rem; }
+
+          .earn-hero { padding: 48px 20px 40px; }
+          .earn-h1 { font-size: 2rem; letter-spacing: -0.03em; }
+          .earn-sub { font-size: 0.92rem; }
+          .earn-cta-primary { padding: 18px 24px; font-size: 1rem; width: 100%; min-height: 56px; }
+
+          .earn-section { padding: 0 20px 56px; }
+          .earn-divider { margin: 0 20px 44px; }
+
+          .earn-steps { grid-template-columns: 1fr; gap: 14px; }
+          .earn-step { padding: 22px 20px; }
+          .earn-step-title { font-size: 0.95rem; }
+          .earn-step-body { font-size: 0.82rem; }
+
+          .earn-math { padding: 22px 18px; margin-bottom: 48px; }
+          .earn-math-base { font-size: 0.88rem; }
+          .earn-math-ex { padding: 10px 14px; }
+          .earn-math-ex-text { font-size: 0.8rem; }
+          .earn-math-ex-earn { font-size: 0.92rem; }
+          .earn-math-note { font-size: 0.74rem; }
+
+          .earn-pitch { padding: 28px 20px; }
+          .earn-pitch-h2 { font-size: 1.3rem; }
+          .earn-pitch-body { font-size: 0.88rem; }
+          .earn-pain-list li { font-size: 0.85rem; }
+          .earn-pitch-contrast { font-size: 0.88rem; padding: 14px 16px; }
+
+          .earn-get-h2 { font-size: 1.3rem; }
+          .earn-get-list li { font-size: 0.88rem; }
+
+          .earn-price-block { padding: 36px 20px; }
+          .earn-cta-white { padding: 18px 24px; font-size: 1rem; width: 100%; min-height: 56px; }
+
+          .earn-faq-h2 { font-size: 1.3rem; margin-bottom: 24px; }
+          .earn-faq-item { padding: 18px 20px; }
+          .earn-faq-q { font-size: 0.92rem; }
+          .earn-faq-a { font-size: 0.84rem; }
+
+          .earn-final-cta { padding: 32px 20px; }
+          .earn-final-line { font-size: 1.15rem; margin-bottom: 24px; }
+
+          .earn-footer { padding: 14px 20px; font-size: 0.7rem; }
+        }
+
+        /* ── RESPONSIVE: SMALL PHONES (≤380px) ── */
+        @media (max-width: 380px) {
+          .earn-hero { padding: 36px 16px 32px; }
+          .earn-section { padding: 0 16px 48px; }
+          .earn-divider { margin: 0 16px 36px; }
+          .earn-h1 { font-size: 1.75rem; }
+          .earn-price-amount { font-size: 3rem; }
+          .earn-math-examples { gap: 8px; }
+          .earn-math-ex { flex-wrap: wrap; }
         }
       `}</style>
 
