@@ -7,6 +7,27 @@ export const metadata: Metadata = {
 
 const STRIPE = "https://buy.stripe.com/00waEX65Nb838Ce1aP5ZC00";
 
+const QUESTIONS = [
+  "how to renew nigerian passport in uk",
+  "how to register a business in ghana",
+  "poultry farm startup cost in kenya",
+  "how to get nhis card 2026",
+  "waec result checker online",
+  "how to send money from uk to nigeria",
+  "how to apply for ghana card abroad",
+  "south africa id book to smart card",
+  "how to start mobile money business ghana",
+  "canadian pr application checklist 2026",
+  "how to register a company in nigeria online",
+  "kenya driving licence renewal steps",
+  "how to get tax clearance certificate ghana",
+  "nafdac registration process nigeria",
+  "how to open uk bank account as nigerian",
+  "how to apply for british citizenship",
+  "diaspora remittance tax rules uk",
+  "how to get police clearance certificate kenya",
+];
+
 function CheckIcon() {
   return (
     <span style={{ width: 18, height: 18, borderRadius: "50%", background: "#EDE9FE", border: "1px solid #DDD6FE", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
@@ -56,6 +77,8 @@ function SeedCard({ score, title, volume, gap, flag, market }: {
 }
 
 export default function HomePage() {
+  const tickerItems = [...QUESTIONS, ...QUESTIONS];
+
   return (
     <>
       <style>{`
@@ -126,8 +149,7 @@ export default function HomePage() {
         .lp h1 em { color: #7C3AED; font-style: normal; }
         .lp-hero-sub {
           font-size: 1rem; color: #6B7280;
-          line-height: 1.8; margin: 0 0 8px;
-          max-width: 440px;
+          line-height: 1.8; margin: 0 0 8px; max-width: 440px;
         }
         .lp-guarantee { font-size: 0.85rem; color: #16A34A; font-weight: 700; margin: 0 0 26px; }
         .lp-hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -166,6 +188,56 @@ export default function HomePage() {
           50%       { opacity: 0.5; transform: scale(1.4); }
         }
 
+        /* ── QUESTION TICKER ── */
+        .ticker-section {
+          background: #0F0F0F;
+          padding: 28px 0;
+          overflow: hidden;
+          position: relative;
+        }
+        .ticker-label {
+          text-align: center;
+          font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.3);
+          text-transform: uppercase; letter-spacing: 0.14em;
+          margin-bottom: 16px;
+        }
+        .ticker-track-wrap {
+          overflow: hidden;
+          /* fade edges */
+          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        }
+        .ticker-track {
+          display: flex; align-items: center; gap: 0;
+          animation: ticker-scroll 40s linear infinite;
+          width: max-content;
+        }
+        .ticker-track:hover { animation-play-state: paused; }
+        @keyframes ticker-scroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .ticker-item {
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 0 28px;
+          font-size: 0.82rem; color: rgba(255,255,255,0.45);
+          white-space: nowrap; font-weight: 500;
+          font-style: italic;
+          transition: color 0.2s;
+        }
+        .ticker-item:hover { color: rgba(255,255,255,0.85); }
+        .ticker-dot {
+          width: 3px; height: 3px; border-radius: 50%;
+          background: #7C3AED; flex-shrink: 0; opacity: 0.6;
+        }
+        .ticker-seed-arrow {
+          display: inline-block; font-size: 0.65rem; font-weight: 700;
+          color: #7C3AED; background: rgba(124,58,237,0.15);
+          border: 1px solid rgba(124,58,237,0.3);
+          border-radius: 4px; padding: 2px 6px; margin-left: 6px;
+          vertical-align: middle;
+        }
+
         /* ── SHARED ── */
         .lp-inner { max-width: 1080px; margin: 0 auto; }
         .lp-section { padding: 80px 40px; }
@@ -189,7 +261,7 @@ export default function HomePage() {
         .proof-num { font-size: 2.2rem; font-weight: 900; color: #7C3AED; letter-spacing: -0.04em; margin-bottom: 5px; line-height: 1; }
         .proof-label { font-size: 0.78rem; color: #6B7280; font-weight: 500; }
 
-        /* ── HOW IT WORKS ── */
+        /* ���─ HOW IT WORKS ── */
         .steps-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
         .step-card { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 24px; }
         .step-num { font-size: 2rem; font-weight: 900; color: #EDE9FE; letter-spacing: -0.04em; margin-bottom: 12px; line-height: 1; }
@@ -216,7 +288,7 @@ export default function HomePage() {
         .demo-pain-label { font-size: 0.65rem; font-weight: 700; color: #A78BFA; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
         .demo-pain-text { font-size: 0.82rem; color: rgba(255,255,255,0.7); line-height: 1.7; }
 
-        /* ── THREE LAWS ── */
+        /* ��─ THREE LAWS ── */
         .law-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
         .law-card { background: #F9F8FF; border: 1px solid #EDE9FE; border-radius: 14px; padding: 24px; }
         .law-icon { font-size: 1.6rem; margin-bottom: 14px; }
@@ -244,10 +316,7 @@ export default function HomePage() {
           padding: 28px 32px;
           background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px;
         }
-        .founder-note p {
-          font-size: 0.95rem; color: #374151; line-height: 1.8;
-          margin: 0 0 14px; font-style: italic;
-        }
+        .founder-note p { font-size: 0.95rem; color: #374151; line-height: 1.8; margin: 0 0 14px; font-style: italic; }
         .founder-note p::before { content: "\\201C"; color: #7C3AED; font-size: 1.6rem; font-style: normal; font-weight: 900; line-height: 0; vertical-align: -0.4rem; margin-right: 3px; }
         .founder-name { font-size: 0.82rem; font-weight: 700; color: #7C3AED; }
         .founder-role { font-size: 0.75rem; color: #9CA3AF; }
@@ -342,12 +411,13 @@ export default function HomePage() {
           .demo-outer { padding: 22px; }
           .faq-grid { grid-template-columns: 1fr; }
           .founder-note { padding: 22px; }
+          .ticker-item { font-size: 0.78rem; }
         }
       `}</style>
 
       <div className="lp">
 
-        {/* NAV — brand mark + single CTA only */}
+        {/* NAV */}
         <nav className="lp-nav">
           <div className="lp-nav-inner">
             <a href="/" className="lp-logo">
@@ -383,30 +453,9 @@ export default function HomePage() {
                 <div className="lp-hero-badge-dot" />
                 Live seeds — unplanted, right now
               </div>
-              <SeedCard
-                score={94}
-                title="How to Renew Your Nigerian Passport from the UK — Every Document, Every Step in 2026"
-                volume="2,900/month"
-                gap="empty shelf · gap: 90"
-                flag="🇬🇧"
-                market="UK Diaspora"
-              />
-              <SeedCard
-                score={91}
-                title="How to Register a Business in Nigeria — Every Form, Every Step, Done Right"
-                volume="6,800/month"
-                gap="empty shelf · gap: 78"
-                flag="🇳🇬"
-                market="Nigeria"
-              />
-              <SeedCard
-                score={87}
-                title="How to Start a Small Poultry Farm in Kenya With Little Money — Complete Beginner Guide"
-                volume="3,600/month"
-                gap="empty shelf · gap: 82"
-                flag="🇰🇪"
-                market="Kenya"
-              />
+              <SeedCard score={94} title="How to Renew Your Nigerian Passport from the UK — Every Document, Every Step in 2026" volume="2,900/month" gap="empty shelf · gap: 90" flag="🇬🇧" market="UK Diaspora" />
+              <SeedCard score={91} title="How to Register a Business in Nigeria — Every Form, Every Step, Done Right" volume="6,800/month" gap="empty shelf · gap: 78" flag="🇳🇬" market="Nigeria" />
+              <SeedCard score={87} title="How to Start a Small Poultry Farm in Kenya With Little Money — Complete Beginner Guide" volume="3,600/month" gap="empty shelf · gap: 82" flag="🇰🇪" market="Kenya" />
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10B981", display: "inline-block" }} />
                 <span style={{ fontSize: "0.72rem", color: "#9CA3AF", fontWeight: 600 }}>
@@ -417,7 +466,23 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* PROOF STRIP — numbers only, no persuasion */}
+        {/* QUESTION TICKER — the core idea made visual, no copy needed */}
+        <div className="ticker-section">
+          <div className="ticker-label">Questions asked today — no guide exists for any of these</div>
+          <div className="ticker-track-wrap">
+            <div className="ticker-track">
+              {tickerItems.map((q, i) => (
+                <span key={i} className="ticker-item">
+                  <span className="ticker-dot" />
+                  {q}
+                  {i % 5 === 2 && <span className="ticker-seed-arrow">seed →</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* PROOF STRIP */}
         <section className="lp-section-white" style={{ paddingTop: 0, paddingBottom: 0 }}>
           <div className="lp-inner">
             <div className="proof-strip">
@@ -435,7 +500,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* HOW IT WORKS — informational only, removes the "but how?" objection */}
+        {/* HOW IT WORKS */}
         <section className="lp-section" id="how-it-works">
           <div className="lp-inner">
             <div style={{ textAlign: "center", maxWidth: 520, margin: "0 auto" }}>
@@ -444,21 +509,9 @@ export default function HomePage() {
             </div>
             <div className="steps-3">
               {[
-                {
-                  num: "01",
-                  title: "Scan the field",
-                  body: "Pick a country. The engine checks 7 live sources — search autocomplete, forums, community questions — and surfaces only the gaps that clear the quality bar.",
-                },
-                {
-                  num: "02",
-                  title: "Plant your seed",
-                  body: "Choose an opportunity. One click generates the complete PDF guide, sales page, video scripts, and distribution plan. You write nothing.",
-                },
-                {
-                  num: "03",
-                  title: "Let it grow",
-                  body: "Share the link. Buyers find the guide through search and communities — they're already looking for this answer. The same seed earns every month.",
-                },
+                { num: "01", title: "Scan the field", body: "Pick a country. The engine checks 7 live sources and surfaces only the gaps where real demand exists and no quality guide does." },
+                { num: "02", title: "Plant your seed", body: "Choose an opportunity. One click builds the complete PDF, sales page, video scripts, and distribution plan. You write nothing." },
+                { num: "03", title: "Let it grow", body: "Share the link. Buyers find the guide through search and communities — they're already looking for this answer. The same seed earns every month." },
               ].map((s, i) => (
                 <div key={i} className="step-card">
                   <div className="step-num">{s.num}</div>
@@ -470,15 +523,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* PROOF OF HARVEST — lets the engine output speak for itself */}
+        {/* LIVE DEMO SEED */}
         <section className="lp-section lp-section-white">
           <div className="lp-inner">
             <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto" }}>
               <div className="lp-label">What the engine finds</div>
               <h2>Real demand.<br /><em>Empty shelf.</em></h2>
-              <p className="lp-sub" style={{ marginTop: 10 }}>
-                This seed is live in the engine right now — scored, titled, outlined, and ready to build.
-              </p>
+              <p className="lp-sub" style={{ marginTop: 10 }}>This seed is live right now — scored, titled, outlined, and ready to build.</p>
             </div>
             <div className="demo-outer">
               <div className="demo-label">Live seed · scored 94/100</div>
@@ -488,9 +539,7 @@ export default function HomePage() {
                   <div className="demo-score-sub">/100</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="demo-title">
-                    How to Renew Your Nigerian Passport from the UK — Every Document, Every Step, Every Fee in 2026
-                  </div>
+                  <div className="demo-title">How to Renew Your Nigerian Passport from the UK — Every Document, Every Step, Every Fee in 2026</div>
                   <div className="demo-chips">
                     <span className="dc dc-g">2,900 searches/month</span>
                     <span className="dc dc-v">empty shelf · gap: 90</span>
@@ -500,15 +549,13 @@ export default function HomePage() {
               </div>
               <div className="demo-pain">
                 <div className="demo-pain-label">The pain this guide resolves</div>
-                <div className="demo-pain-text">
-                  Nigerians in the UK navigating passport renewal face wrong appointment slots, missing documents, and costly return trips. No clear guide exists. The moment someone has a correct, complete application in hand — they pay £12 without hesitation.
-                </div>
+                <div className="demo-pain-text">Nigerians in the UK navigating passport renewal face wrong appointment slots, missing documents, and costly return trips. No clear guide exists. The moment someone has a correct, complete application — they pay £12 without hesitation.</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* THREE LAWS — the farming philosophy, builds credibility */}
+        {/* THREE LAWS */}
         <section className="lp-section">
           <div className="lp-inner">
             <div style={{ textAlign: "center", maxWidth: 520, margin: "0 auto" }}>
@@ -517,21 +564,9 @@ export default function HomePage() {
             </div>
             <div className="law-grid">
               {[
-                {
-                  icon: "🔍",
-                  title: "Test the soil before you plant",
-                  body: "A real farmer doesn't guess. The engine confirms demand, checks the competition, and scores the shelf gap — before you invest a single hour.",
-                },
-                {
-                  icon: "🌱",
-                  title: "Find the empty fields",
-                  body: "Planting where everyone else plants means competing for the same harvest. The engine finds where demand is real and the shelf is genuinely empty.",
-                },
-                {
-                  icon: "🌾",
-                  title: "Plant once. Harvest forever.",
-                  body: "A good seed doesn't need tending every day. You plant it, it grows, and the same guide earns month after month — without ongoing work.",
-                },
+                { icon: "🔍", title: "Test the soil before you plant", body: "A real farmer doesn't guess. The engine confirms demand, checks competition, and scores the shelf gap — before you invest a single hour." },
+                { icon: "🌱", title: "Find the empty fields", body: "Planting where everyone else plants means competing for the same harvest. The engine finds where demand is real and the shelf is genuinely empty." },
+                { icon: "🌾", title: "Plant once. Harvest forever.", body: "A good seed doesn't need tending every day. You plant it. It grows. The same guide earns month after month — without ongoing work." },
               ].map((c, i) => (
                 <div key={i} className="law-card">
                   <div className="law-icon">{c.icon}</div>
@@ -543,15 +578,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* HARVEST MATH — the numbers, no commentary needed */}
+        {/* HARVEST MATH */}
         <section className="lp-section lp-section-white">
           <div className="lp-inner">
             <div style={{ textAlign: "center", maxWidth: 480, margin: "0 auto" }}>
               <div className="lp-label">The harvest</div>
               <h2>One seed earns.<br />Ten seeds compound.</h2>
-              <p className="lp-sub" style={{ marginTop: 10, fontSize: "0.9rem" }}>
-                Plant more when the first one earns back the cost.
-              </p>
+              <p className="lp-sub" style={{ marginTop: 10, fontSize: "0.9rem" }}>Plant more when the first one earns back the cost.</p>
             </div>
             <div className="harvest-row">
               {[
@@ -567,20 +600,16 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <p style={{ textAlign: "center", fontSize: "0.74rem", color: "#9CA3AF", marginTop: 14 }}>
-              Illustrative averages. Some seeds earn more, some less.
-            </p>
+            <p style={{ textAlign: "center", fontSize: "0.74rem", color: "#9CA3AF", marginTop: 14 }}>Illustrative averages. Some seeds earn more, some less.</p>
           </div>
         </section>
 
-        {/* FOUNDER NOTE — brief, human, not a pitch */}
+        {/* FOUNDER NOTE */}
         <section className="lp-section">
           <div className="lp-inner" style={{ textAlign: "center" }}>
             <div className="lp-label">From the builder</div>
             <div className="founder-note">
-              <p>
-                I built this because I kept seeing smart people fail at the idea stage, not the execution stage. The engine finds the right soil first — so you only plant where something will actually grow.
-              </p>
+              <p>I built this because I kept seeing smart people fail at the idea stage, not the execution stage. The engine finds the right soil first — so you only plant where something will actually grow.</p>
               <div className="founder-name">Jimi</div>
               <div className="founder-role">Founder · PDF Seeds</div>
             </div>
@@ -639,7 +668,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* FINAL CTA — echo the hero, nothing new */}
+        {/* FINAL CTA */}
         <div className="cta-band">
           <div style={{ maxWidth: 480, margin: "0 auto" }}>
             <div style={{ fontSize: "2.6rem", marginBottom: 16 }}>🌱</div>
@@ -657,9 +686,7 @@ export default function HomePage() {
                 Scan the field first →
               </a>
             </div>
-            <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.75rem", marginTop: 18 }}>
-              30-day money-back · Cancel anytime
-            </p>
+            <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.75rem", marginTop: 18 }}>30-day money-back · Cancel anytime</p>
           </div>
         </div>
 
