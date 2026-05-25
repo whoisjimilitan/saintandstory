@@ -353,7 +353,7 @@ export default function EnginePage() {
             <button onClick={(e) => { e.stopPropagation(); toggleSave(o, e); }} title={o.saved ? "Saved" : "Save"} className="text-base px-1" style={{ color: o.saved ? bm.accentColor : "var(--muted)" }}>
               {o.saved ? "🔖" : "🏷️"}
             </button>
-            <button onClick={(e) => { e.stopPropagation(); router.push(`/factory?id=${o.id}`); }}
+            <button onClick={(e) => { e.stopPropagation(); router.push(`/factory?id=${o.id}&niche=${encodeURIComponent(o.niche)}`); }}
               className="px-3 py-1.5 text-xs font-bold text-white"
               style={{ background: bm.accentColor, borderRadius: 999, boxShadow: `0 2px 8px ${bm.accentColor}40` }}>
               {brand === "brotherjimi" ? "Write →" : "Build →"}

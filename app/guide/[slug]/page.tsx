@@ -5,11 +5,12 @@ import EmailCapture from "./email-capture";
 
 type Props = { params: Promise<{ slug: string }> };
 
+const BJ_NICHES = new Set(["grief","doubt","shame","loneliness","fear","exhaustion","faith","healing","identity"]);
+
 async function getProduct(slug: string) {
   return prisma.product.findFirst({
     where: { slug },
     include: { opportunity: true },
-    // createdAt included by default in Prisma select *
   });
 }
 
@@ -20,26 +21,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProduct(slug);
   if (!product) return { title: "Guide Not Found" };
 
+  const isBJ       = BJ_NICHES.has(product.opportunity?.niche ?? "");
   const keyword    = product.opportunity?.keyword ?? product.title;
   const painPoint  = product.opportunity?.painPoint ?? "";
   const year       = new Date().getFullYear();
-  const title      = `${product.title} — Complete Step-by-Step Guide ${year}`;
-  const description = painPoint
-    ? `${painPoint.slice(0, 140).trim()}. Download the complete PDF guide — instant access.`
-    : `Complete guide to ${keyword}. Everything you need, step by step — download the PDF instantly.`;
+  const siteName   = isBJ ? "Brother Jimi" : "PDF Seeds";
+  const title      = isBJ
+    ? `${product.title} — A Pastoral Reflection`
+    : `${product.title} — Complete Step-by-Step Guide ${year}`;
+  const description = isBJ
+    ? (painPoint ? `${painPoint.slice(0, 140).trim()}. A pastoral reflection guide — receive it today.` : `A pastoral word for ${keyword}.`)
+    : (painPoint ? `${painPoint.slice(0, 140).trim()}. Download the complete PDF guide — instant access.` : `Complete guide to ${keyword}. Everything you need, step by step.`);
   const canonical  = `${BASE}/guide/${slug}`;
 
   return {
     title,
     description,
-    keywords: `${keyword}, ${keyword} guide, how to ${keyword}, ${keyword} PDF, ${keyword} step by step`,
+    keywords: isBJ
+      ? `${keyword}, pastoral reflection, Brother Jimi, ${keyword} guidance, faith, devotional`
+      : `${keyword}, ${keyword} guide, how to ${keyword}, ${keyword} PDF, ${keyword} step by step`,
     alternates: { canonical },
     openGraph: {
       title,
       description,
       type: "article",
       url: canonical,
-      siteName: "PDF Seeds",
+      siteName,
     },
     twitter: {
       card: "summary_large_image",
@@ -99,15 +106,21 @@ export default async function GuidePage({ params }: Props) {
     orderBy: { createdAt: "desc" },
   });
 
+  const isBJ       = BJ_NICHES.has(opportunity?.niche ?? "");
+  const accent     = isBJ ? "#B07830" : "#6366F1";
+  const accentHover = isBJ ? "#8B6520" : "#4F46E5";
+
   const seoHtml    = renderMarkdown(product.seoPageContent);
   const keyword    = opportunity?.keyword ?? product.title;
   const painPoint  = opportunity?.painPoint ?? "";
   const year       = new Date().getFullYear();
   const canonical  = `${BASE}/guide/${slug}`;
-  const title      = `${product.title} — Complete Step-by-Step Guide ${year}`;
+  const title      = isBJ
+    ? `${product.title} — A Pastoral Reflection`
+    : `${product.title} — Complete Step-by-Step Guide ${year}`;
   const description = painPoint
-    ? `${painPoint.slice(0, 140).trim()}. Download the complete PDF guide — instant access.`
-    : `Complete guide to ${keyword}. Everything you need, step by step.`;
+    ? `${painPoint.slice(0, 140).trim()}. ${isBJ ? "A pastoral reflection guide — receive it today." : "Download the complete PDF guide — instant access."}`
+    : (isBJ ? `A pastoral word for ${keyword}.` : `Complete guide to ${keyword}. Everything you need, step by step.`);
 
   const questions: string[] = (() => {
     try { return JSON.parse(opportunity?.exactQuestions ?? "[]"); } catch { return []; }
@@ -144,25 +157,25 @@ export default async function GuidePage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
       <style>{`
-        body { margin: 0; font-family: system-ui, sans-serif; background: #0f0f11; color: #e2e8f0; }
+        body { margin: 0; font-family: ${isBJ ? "Georgia, 'Times New Roman', serif" : "system-ui, sans-serif"}; background: #0f0f11; color: #e2e8f0; }
         .guide-wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
-        .guide-wrap h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; color: #f8fafc; margin: 0 0 16px; }
-        .guide-wrap h2 { font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 28px 0 10px; }
+        .guide-wrap h1 { font-size: ${isBJ ? "1.75rem" : "2rem"}; font-weight: ${isBJ ? "600" : "800"}; line-height: 1.25; color: #f8fafc; margin: 0 0 16px; font-style: ${isBJ ? "italic" : "normal"}; }
+        .guide-wrap h2 { font-size: 1.2rem; font-weight: ${isBJ ? "500" : "700"}; color: #f1f5f9; margin: 32px 0 10px; font-style: ${isBJ ? "italic" : "normal"}; }
         .guide-wrap h3 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 20px 0 8px; }
-        .guide-wrap p { line-height: 1.75; color: #94a3b8; margin: 0 0 14px; }
+        .guide-wrap p { line-height: ${isBJ ? "1.9" : "1.75"}; color: #94a3b8; margin: 0 0 ${isBJ ? "20px" : "14px"}; font-style: ${isBJ ? "italic" : "normal"}; }
         .guide-wrap ul { padding-left: 20px; margin: 0 0 14px; }
         .guide-wrap li { line-height: 1.75; color: #94a3b8; margin-bottom: 4px; }
-        .pain-banner { background: #EF444410; border-left: 3px solid #EF4444; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 0 0 28px; color: #fca5a5; font-size: 0.95rem; line-height: 1.65; font-style: italic; }
-        .cta-box { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 16px; padding: 36px 32px; text-align: center; margin: 40px 0; }
-        .cta-box .cta-title { font-size: 1.5rem; font-weight: 800; color: #f8fafc; margin: 0 0 8px; }
-        .cta-box .cta-sub { color: #94a3b8; font-size: 0.95rem; margin: 0 0 24px; }
-        .cta-box .cta-price { font-size: 2rem; font-weight: 900; color: #10B981; margin: 0 0 20px; }
-        .cta-btn { display: inline-block; background: #6366F1; color: #fff; font-weight: 800; font-size: 1rem; padding: 16px 40px; border-radius: 10px; text-decoration: none; letter-spacing: 0.5px; }
-        .cta-btn:hover { background: #4F46E5; }
-        .guarantee { margin-top: 14px; font-size: 0.8rem; color: #64748b; }
+        .pain-banner { background: ${isBJ ? "#B0783008" : "#EF444410"}; border-left: 3px solid ${isBJ ? "#B07830" : "#EF4444"}; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 0 0 28px; color: ${isBJ ? "#D4A574" : "#fca5a5"}; font-size: 0.95rem; line-height: 1.75; font-style: italic; }
+        .cta-box { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid ${isBJ ? "#B0783030" : "#334155"}; border-radius: 16px; padding: 36px 32px; text-align: center; margin: 40px 0; }
+        .cta-box .cta-title { font-size: ${isBJ ? "1.3rem" : "1.5rem"}; font-weight: ${isBJ ? "500" : "800"}; color: #f8fafc; margin: 0 0 8px; font-style: ${isBJ ? "italic" : "normal"}; }
+        .cta-box .cta-sub { color: #94a3b8; font-size: 0.9rem; margin: 0 0 24px; font-style: ${isBJ ? "italic" : "normal"}; }
+        .cta-box .cta-price { font-size: 2rem; font-weight: 900; color: ${accent}; margin: 0 0 20px; }
+        .cta-btn { display: inline-block; background: ${accent}; color: #fff; font-weight: ${isBJ ? "500" : "800"}; font-size: 1rem; padding: 16px 40px; border-radius: 10px; text-decoration: none; letter-spacing: ${isBJ ? "0.03em" : "0.5px"}; }
+        .cta-btn:hover { background: ${accentHover}; }
+        .guarantee { margin-top: 14px; font-size: 0.8rem; color: #64748b; font-style: ${isBJ ? "italic" : "normal"}; }
         .breadcrumb { font-size: 0.8rem; color: #64748b; margin-bottom: 24px; }
-        .breadcrumb a { color: #6366F1; text-decoration: none; }
-        .badge { display: inline-block; background: #6366F120; color: #818CF8; border: 1px solid #6366F130; border-radius: 6px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; margin-bottom: 16px; }
+        .breadcrumb a { color: ${accent}; text-decoration: none; }
+        .badge { display: inline-block; background: ${accent}20; color: ${accent}; border: 1px solid ${accent}30; border-radius: 6px; padding: 4px 12px; font-size: 0.75rem; font-weight: ${isBJ ? "400" : "600"}; margin-bottom: 16px; font-style: ${isBJ ? "italic" : "normal"}; }
         .upsell-section { margin: 48px 0 0; border-top: 1px solid #1e293b; padding-top: 32px; }
         .upsell-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin-bottom: 14px; }
         .upsell-card { display: flex; align-items: center; gap: 14px; background: #0f1117; border: 1px solid #1e293b; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; text-decoration: none; transition: border-color 0.15s; }
@@ -176,9 +189,9 @@ export default async function GuidePage({ params }: Props) {
 
       <div className="guide-wrap">
         <div className="breadcrumb">
-          <a href="/store">All Guides</a> / {product.title}
+          <a href={isBJ ? "/store#brotherjimi" : "/store"}>{isBJ ? "All Words" : "All Guides"}</a> / {product.title}
         </div>
-        <span className="badge">📖 Free Guide</span>
+        <span className="badge">{isBJ ? "✦ Free Reflection" : "📖 Free Guide"}</span>
 
         {painPoint && (
           <div className="pain-banner">"{painPoint}"</div>
@@ -190,13 +203,13 @@ export default async function GuidePage({ params }: Props) {
         <EmailCapture slug={slug} country={opportunity?.country ?? "US"} />
 
         <div className="cta-box">
-          <div className="cta-title">Get the Complete PDF Guide</div>
-          <div className="cta-sub">Everything in one place — downloadable, printable, read on any device</div>
+          <div className="cta-title">{isBJ ? "Receive the complete word" : "Get the Complete PDF Guide"}</div>
+          <div className="cta-sub">{isBJ ? "Yours to keep and return to — read on any device" : "Everything in one place — downloadable, printable, read on any device"}</div>
           <div className="cta-price">{currency}{price}</div>
           <a href={`/sell/${slug}`} className="cta-btn">
-            📥 GET INSTANT ACCESS NOW
+            {isBJ ? "✦ RECEIVE THIS WORD" : "📥 GET INSTANT ACCESS NOW"}
           </a>
-          <div className="guarantee">✅ Instant download &nbsp;|&nbsp; 30-day money-back guarantee &nbsp;|&nbsp; No questions asked</div>
+          <div className="guarantee">{isBJ ? "If it doesn't reach you — return it in 30 days. No question asked." : "✅ Instant download · 30-day money-back guarantee · No questions asked"}</div>
         </div>
 
         {related.length > 0 && (

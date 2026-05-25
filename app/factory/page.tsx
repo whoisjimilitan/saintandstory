@@ -43,9 +43,12 @@ function parseVideoScript(raw: string): { hook: string; tease: string; cta: stri
   } catch { return { hook: "", tease: "", cta: "" }; }
 }
 
+const BJ_NICHES = new Set(["grief","doubt","shame","loneliness","fear","exhaustion","faith","healing","identity"]);
+
 function GuidesContent() {
   const params = useSearchParams();
   const opportunityId = params.get("id");
+  const urlNiche = params.get("niche") ?? "";
 
   const [guides, setGuides]         = useState<Product[]>([]);
   const [hooks, setHooks]           = useState<Hook[]>([]);
@@ -229,28 +232,38 @@ function GuidesContent() {
       {/* Detail */}
       <div style={{ flex: 1, overflowY: "auto", padding: "32px", background: "var(--bg)" }}>
 
-        {opportunityId && !selected && (
-          <div style={{ ...card, maxWidth: 560, marginBottom: 24, textAlign: "center" }}>
-            <div style={{ fontSize: "1.5rem", marginBottom: 12 }}>🌱</div>
-            <div style={{ fontSize: "0.97rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Ready to grow this seed.</div>
-            <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "0 0 20px", lineHeight: 1.7 }}>
-              One click generates your PDF guide, buy page, Google article, and social posts.
-            </p>
-            <button onClick={grow} disabled={growing} style={{ ...btn("primary"), opacity: growing ? 0.7 : 1, cursor: growing ? "not-allowed" : "pointer" }}>
-              {growing ? "Growing your guide…" : "Grow This Seed →"}
-            </button>
-          </div>
-        )}
+        {opportunityId && !selected && (() => {
+          const isBJPending = BJ_NICHES.has(urlNiche);
+          return (
+            <div style={{ ...card, maxWidth: 560, marginBottom: 24, textAlign: "center" }}>
+              <div style={{ fontSize: "1.5rem", marginBottom: 12 }}>{isBJPending ? "✦" : "🌱"}</div>
+              <div style={{ fontSize: "0.97rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
+                {isBJPending ? "Ready to write this word." : "Ready to grow this seed."}
+              </div>
+              <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "0 0 20px", lineHeight: 1.7 }}>
+                {isBJPending
+                  ? "One click writes the pastoral guide, the receive page, the Google article, and the social captions — all in the Brother Jimi voice."
+                  : "One click generates your PDF guide, buy page, Google article, and social posts."}
+              </p>
+              <button onClick={grow} disabled={growing} style={{ ...btn("primary"), opacity: growing ? 0.7 : 1, cursor: growing ? "not-allowed" : "pointer" }}>
+                {growing
+                  ? (isBJPending ? "Writing the word…" : "Growing your guide…")
+                  : (isBJPending ? "Write This Word →" : "Grow This Seed →")}
+              </button>
+            </div>
+          );
+        })()}
 
         {!selected && !opportunityId && (
           <div style={{ maxWidth: 560, textAlign: "center", paddingTop: 80 }}>
             <div style={{ fontSize: "2rem", marginBottom: 14 }}>📄</div>
             <div style={{ fontSize: "0.97rem", fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Select a guide to see its details.</div>
-            <p style={{ fontSize: "0.85rem", color: "var(--muted)", lineHeight: 1.7 }}>Or go to Seeds to find a new opportunity.</p>
+            <p style={{ fontSize: "0.85rem", color: "var(--muted)", lineHeight: 1.7 }}>Or go to the engine to find a new opportunity.</p>
           </div>
         )}
 
         {selected && (() => {
+          const isBJ = BJ_NICHES.has(selected.opportunity?.niche ?? "");
           const vs = parseVideoScript(selected.opportunity?.videoScript ?? "");
           const hasScript = vs.hook || vs.tease || vs.cta;
           const fullScript = [vs.hook && `Hook:\n${vs.hook}`, vs.tease && `Tease:\n${vs.tease}`, vs.cta && `CTA:\n${vs.cta}`].filter(Boolean).join("\n\n");
@@ -282,13 +295,13 @@ function GuidesContent() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
-                {/* Video Script */}
+                {/* Video Script / Caption */}
                 <div style={card}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: scriptOpen ? 16 : 0 }}>
                     <div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>🎬 Video Script</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>{isBJ ? "✦ Caption / Word" : "🎬 Video Script"}</div>
                       <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                        5–7 second faceless video. Record and post to drive traffic.
+                        {isBJ ? "Social caption and hook — copy and post to WhatsApp or Instagram." : "5–7 second faceless video. Record and post to drive traffic."}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -335,9 +348,9 @@ function GuidesContent() {
                 <div style={card}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: contentOpen ? 16 : 0 }}>
                     <div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>📄 PDF Guide</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>{isBJ ? "📖 Pastoral Guide" : "📄 PDF Guide"}</div>
                       <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                        {contentSaved ? "✅ Content updated." : "Your complete guide, ready to download and sell."}
+                        {contentSaved ? "✅ Content updated." : (isBJ ? "The complete pastoral reflection — download and offer to readers." : "Your complete guide, ready to download and sell.")}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -368,12 +381,12 @@ function GuidesContent() {
                   )}
                 </div>
 
-                {/* Buy Page */}
+                {/* Buy / Receive Page */}
                 <div style={card}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: selected.slug ? 14 : 0 }}>
                     <div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>🛒 Buy Page</div>
-                      <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Share this link. Put it in your bio. This is where people buy.</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>{isBJ ? "✦ Receive Page" : "🛒 Buy Page"}</div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{isBJ ? "Share this link. Put it in your bio. This is where readers receive the word." : "Share this link. Put it in your bio. This is where people buy."}</div>
                     </div>
                     {selected.slug && (
                       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -407,9 +420,9 @@ function GuidesContent() {
                 <div style={card}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: articleOpen ? 16 : 0 }}>
                     <div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>📖 Google Article</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>{isBJ ? "🌿 Google Article" : "📖 Google Article"}</div>
                       <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                        {articleSaved ? "✅ Article updated." : "People find this on Google. It sends them to your buy page."}
+                        {articleSaved ? "✅ Article updated." : (isBJ ? "People find this on Google. It sits with them — then sends them to the receive page." : "People find this on Google. It sends them to your buy page.")}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -440,13 +453,15 @@ function GuidesContent() {
                   )}
                 </div>
 
-                {/* Social Posts */}
+                {/* Social Posts / Words */}
                 <div style={card}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: hooksOpen && guideHooks.length > 0 ? 16 : 0 }}>
                     <div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>📱 Social Posts</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)", marginBottom: 3 }}>{isBJ ? "🕊️ Social Words" : "📱 Social Posts"}</div>
                       <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                        {guideHooks.length > 0 ? `${guideHooks.length} posts ready — TikTok, Instagram, Pinterest, and more.` : "Social posts will be available after growing."}
+                        {guideHooks.length > 0
+                          ? (isBJ ? `${guideHooks.length} captions ready — WhatsApp, Instagram, Facebook.` : `${guideHooks.length} posts ready — TikTok, Instagram, Pinterest, and more.`)
+                          : (isBJ ? "Social captions will be available after writing." : "Social posts will be available after growing.")}
                       </div>
                     </div>
                     {guideHooks.length > 0 && (

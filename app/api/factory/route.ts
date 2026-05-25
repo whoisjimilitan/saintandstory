@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { type Brand, buildBrandSystemContext, buildSocialCaptionContext, BRAND_CONFIG } from "@/lib/brand-config";
+
+const BJ_NICHES = new Set(["grief","doubt","shame","loneliness","fear","exhaustion","faith","healing","identity"]);
+
+function detectBrand(niche: string): Brand {
+  return BJ_NICHES.has(niche) ? "brotherjimi" : "pdfseeds";
+}
 
 function toSlug(text: string): string {
   return text
@@ -13,297 +20,286 @@ function toSlug(text: string): string {
 }
 
 export async function POST(req: Request) {
-  console.log("[/api/factory] POST — generating content");
   const { opportunityId } = await req.json();
 
   const opportunity = await prisma.opportunity.findUnique({ where: { id: opportunityId } });
   if (!opportunity) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const questions: string[] = JSON.parse(opportunity.exactQuestions);
-  const hasGoogleAI = !!process.env.GOOGLE_AI_API_KEY;
+  const brand       = detectBrand(opportunity.niche);
+  const brandCtx    = buildBrandSystemContext(brand);
+  const socialCtx   = buildSocialCaptionContext(brand);
+  const brandCfg    = BRAND_CONFIG[brand];
+  const isBJ        = brand === "brotherjimi";
 
-  let pdfContent = "";
-  let salesPageCopy = "";
-  let seoPageContent = "";
-  const generatedHooks: { text: string; platform: string; emotionType: string }[] = [];
+  const questions: string[] = (() => {
+    try { return JSON.parse(opportunity.exactQuestions); }
+    catch { return []; }
+  })();
 
   const painPoint = opportunity.painPoint || "";
 
-  if (hasGoogleAI) {
-    const openai = new OpenAI({
-      apiKey: process.env.GOOGLE_AI_API_KEY,
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    });
+  const openai = new OpenAI({
+    apiKey: process.env.GOOGLE_AI_API_KEY,
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  });
 
-    const [pdfRes, salesRes, seoRes, hooksRes, scriptRes] = await Promise.all([
-      openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [{
-          role: "user",
-          content: `You are writing a PDF guide that will be sold. The reader paid money for this. They have a specific problem. Your only job is to give them the exact answer — nothing more, nothing less.
+  // ── PDF content prompt ──────────────────────────────────────────────────────
+  const pdfPrompt = isBJ ? `
+Write a pastoral reflection guide for someone carrying: "${painPoint}"
 
-TOPIC: "${opportunity.pdfTitle || opportunity.keyword}"
-NICHE: ${opportunity.niche}
-${painPoint ? `CORE PAIN: "${painPoint}"` : ""}
+TITLE: "${opportunity.pdfTitle || opportunity.keyword}"
 
-QUESTIONS THIS GUIDE MUST ANSWER — one chapter per question:
+Follow the 6-stage pastoral arc exactly — one stage per chapter:
 ${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
----
+PASTORAL WRITING RULES (non-negotiable):
+- Open Ch 1 by naming the feeling precisely — not fixing it, naming it. The reader must feel seen before anything else.
+- No preaching. No moral explanations. No instruction in the imperative voice.
+- Each chapter moves inward before it moves outward — acknowledge before suggesting.
+- Short paragraphs. Breathing room between thoughts. Never a list of bullet points in the body text.
+- Sentences are unhurried. Write for someone reading slowly at 6am with something on their chest.
+- End with a benediction: a specific wish for this reader, crafted from the exact topic. Not a prayer instruction. A gift.
+- Offer 1–2 further reading verses as an invitation: "If this reached you, there is more here: [verse]"
+- Write in markdown but use it sparingly — no heavy formatting, mostly flowing paragraphs.
+`.trim() : `
+Write a practical PDF guide for someone with this exact situation: "${painPoint}"
 
-STRUCTURE:
-1. Title: "${opportunity.pdfTitle || opportunity.keyword}"
-2. Introduction (3 sentences only): Name the exact problem the reader is living through right now. State what this guide gives them. Tell them how long it takes to read.
-3. One chapter per question above. Each chapter answers its question completely.
-4. Final page: A numbered action checklist — the 5 steps the reader takes immediately after finishing.
+TITLE: "${opportunity.pdfTitle || opportunity.keyword}"
+NICHE: ${opportunity.niche}
 
----
+CHAPTERS — answer each question completely, one per chapter:
+${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
-WRITING RULES — follow every one of these without exception:
+WRITING RULES (non-negotiable):
+RULE 1 — CORRECT AND SPECIFIC. Every claim must be as precise as possible. Name the form, the fee, the office, the deadline. Precision is the product.
+RULE 2 — NO VAGUE CORRECTNESS. "It depends" is banned. Name the factors. List the things. Specify the conditions.
+RULE 3 — BOLD BUT TRUE. Never invent specific numbers, names, fees, or laws you are not certain of. If uncertain, tell the reader how to verify.
+RULE 4 — CONCRETE, NOT SURPRISING. Be specific where others are vague. Real fees. Real timelines. Real steps. Real common mistakes people actually make.
+RULE 5 — EVERY SENTENCE EARNS ITS PLACE. Does this directly help the reader solve the problem? If no, cut it.
+RULE 6 — IMPORTANT INFORMATION FIRST. Lead each chapter with the most consequential information.
+RULE 7 — LENGTH. 8–10 pages. Final page: "Your Action Checklist" — 5 immediate steps.
 
-RULE 1 — CORRECT AND SPECIFIC, NOT VAGUE.
-Every claim must be both true and as precise as possible. "Fees may apply" is forbidden. "The fee is X" is correct. If you know the typical amount, name it. If you know the typical timeframe, state it. If a step usually happens at a specific place or office, say so. Precision is the product. The reader is paying for specifics they couldn't easily piece together themselves.
+Write in markdown. Plain language. Short paragraphs. Bullet points for steps and lists.
+`.trim();
 
-RULE 2 — NO VAGUE CORRECTNESS.
-Never write a sentence that is technically true but contains no usable information. These phrases are banned:
-- "It depends on many factors"
-- "There are several things to consider"
-- "This is a complex issue"
-- "Results may vary"
-- "It is important to note that"
-If you are tempted to write any of these, stop. Instead name the factors, list the things, specify the conditions. If you genuinely cannot be specific, say exactly what the reader needs to do to get the specific answer — e.g. "Call the Lands Commission directly on [number] to confirm the current fee, as it changes annually."
+  // ── Sales copy prompt ───────────────────────────────────────────────────────
+  const salesPrompt = isBJ ? `
+Write the landing page copy for this Brother Jimi pastoral guide.
 
-RULE 3 — BOLD BUT TRUE. NEVER BOLD AND INVENTED.
-Make your claims as strong as they can be without becoming false. Do not invent specific numbers, names, fees, laws, or procedures you are not certain of. If you are certain, be direct and state it plainly. If you are not certain of a specific detail, say what IS certain and tell the reader how to verify the uncertain part. A guide that is honest about its limits is more useful than one that confidently invents.
+Title: "${opportunity.pdfTitle || opportunity.keyword}"
+What they are carrying: "${painPoint}"
+Price framing: Appreciation-based — £${brandCfg.pricing.min.toFixed(2)}
 
-RULE 4 — CONCRETE, NOT SURPRISING.
-Do not try to surprise the reader or manufacture insights. Instead, be concrete. Concrete information feels new because most sources are vague. You do not need to invent novelty — you only need to be specific where others are vague. Real fees. Real timelines. Real steps. Real common mistakes people actually make. That is enough.
+THE STAGES THIS GUIDE TAKES THEM THROUGH:
+${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
-RULE 5 — EVERY SENTENCE EARNS ITS PLACE.
-Read each sentence and ask: does this directly help the reader solve the problem? If no, cut it. Do not restate the question at the start of each chapter. Do not summarise what you are about to say — just say it. Do not close chapters with "in summary" paragraphs. The reader can see what they just read.
-
-RULE 6 — IMPORTANT INFORMATION FIRST.
-Within each chapter, lead with the most consequential information. The thing that, if the reader got it wrong, would cost them the most — time, money, or stress. Common mistakes that trip people up belong near the top, not at the end.
-
-RULE 7 — LENGTH.
-8–10 pages. No padding to reach a page count. No cutting to fit a page count. The right length is however many words it takes to fully answer every question with nothing wasted.
-
-Write in markdown. Plain language. Short paragraphs. Bullet points for steps and lists.`
-        }],
-      }),
-      openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [{
-          role: "user",
-          content: `You are a direct-response copywriter. Generate structured conversion page data for this PDF guide as valid JSON.
+Return ONLY valid JSON — no markdown, no explanation:
+{
+  "heroTagline": "One sentence, max 15 words. Names what they are carrying — not what the guide does. Reads like Brother Jimi is speaking directly to them.",
+  "bulletedPain": [
+    "A specific feeling or moment they have had — not a problem to fix, a recognition. Max 12 words.",
+    "Another moment of feeling unseen or unheard or unable to speak. Max 12 words.",
+    "The weight of it — what it costs them to keep carrying this alone. Max 12 words."
+  ],
+  "whatsInside": [
+    {"chapter": "Part 1", "title": "What they will feel after this section — 6–8 words", "description": "One sentence. What shifts in them after reading this part. Max 12 words."},
+    {"chapter": "Part 2", "title": "6–8 words", "description": "One sentence. Max 12 words."},
+    {"chapter": "Part 3", "title": "6–8 words", "description": "One sentence. Max 12 words."},
+    {"chapter": "Part 4", "title": "6–8 words", "description": "One sentence. Max 12 words."},
+    {"chapter": "Part 5", "title": "6–8 words", "description": "One sentence. Max 12 words."},
+    {"chapter": "Part 6", "title": "6–8 words", "description": "One sentence. Max 12 words."}
+  ],
+  "faqItems": [
+    {"q": "Most common hesitation someone would feel before reading this", "a": "Warm, direct. 2 sentences max."},
+    {"q": "What format does it come in?", "a": "A PDF — yours to keep, to return to."},
+    {"q": "What if it doesn't reach me?", "a": "30 days. Full return. No question asked."}
+  ],
+  "urgencyLine": "Not urgency — a quiet invitation. One sentence. Max 12 words."
+}` : `
+Generate conversion page copy for this PDF guide as valid JSON.
 
 PDF title: "${opportunity.pdfTitle || opportunity.keyword}"
-Price: ${opportunity.minPrice.toFixed(2)} ${opportunity.isDiaspora ? "GBP" : ""}. Niche: ${opportunity.niche}.
-${painPoint ? `Core pain this guide solves: "${painPoint}"` : ""}
-Exact search questions:
-${questions.join("\n")}
+Price: £${opportunity.minPrice.toFixed(2)}. Niche: ${opportunity.niche}.
+Core pain this guide solves: "${painPoint}"
+Exact search questions (one chapter per question, in this order):
+${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
-Return ONLY a valid JSON object — no markdown, no explanation — in this exact shape:
+Return ONLY valid JSON — no markdown, no explanation:
 {
-  "heroTagline": "One sentence. Must name the exact keyword/topic. What they'll have after reading. Max 15 words.",
+  "heroTagline": "One sentence. Names their exact situation. Max 15 words.",
   "bulletedPain": [
-    "One real lived moment of frustration. Max 12 words. Start with You or a verb.",
+    "One real lived moment of frustration. Max 12 words.",
     "Another specific moment — something they actually Googled or experienced.",
     "A third specific moment — fear, confusion, or wasted time."
   ],
   "whatsInside": [
-    {"chapter": "Chapter 1", "title": "5–7 word outcome — what they CAN DO", "description": "One sentence, max 10 words. What specific thing they walk away with."},
-    {"chapter": "Chapter 2", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
-    {"chapter": "Chapter 3", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
-    {"chapter": "Chapter 4", "title": "5–7 word outcome", "description": "One sentence, max 10 words."},
+    {"chapter": "Chapter 1", "title": "What they walk away knowing — 5–7 words", "description": "One sentence, what they can do after this chapter. Max 10 words."},
+    {"chapter": "Chapter 2", "title": "5–7 words", "description": "One sentence. Max 10 words."},
+    {"chapter": "Chapter 3", "title": "5–7 words", "description": "One sentence. Max 10 words."},
+    {"chapter": "Chapter 4", "title": "5–7 words", "description": "One sentence. Max 10 words."},
+    {"chapter": "Chapter 5", "title": "5–7 words", "description": "One sentence. Max 10 words."},
     {"chapter": "Quick-Reference", "title": "Action Checklist", "description": "Five steps. Thirty minutes. Done."}
   ],
   "faqItems": [
-    {"q": "Biggest objection specific to THIS topic — not generic", "a": "Direct answer. 2 sentences max."},
+    {"q": "Biggest objection specific to THIS topic", "a": "Direct answer. 2 sentences max."},
     {"q": "What format does it come in?", "a": "PDF. Works on phone, tablet, and laptop. Instant download."},
     {"q": "What if it doesn't help me?", "a": "30-day full refund. No questions, no forms."}
   ],
-  "urgencyLine": "Honest, specific. E.g. 'Introductory price — goes up after 200 sales.' Max 12 words."
-}
+  "urgencyLine": "Honest, specific. Max 12 words."
+}`;
 
-Rules — non-negotiable:
-- bulletedPain: exactly 3 bullets. Each one real specific moment, not a vague category. Max 12 words.
-- whatsInside: chapters map directly to the search questions. Descriptions max 10 words.
-- faqItems: exactly 3. First question is the biggest objection for this specific topic. Answers 2 sentences max.
-- urgencyLine: honest and specific. No fake countdown timers.
-- Less is more. Cut every word that doesn't reduce anxiety or increase desire.`
-        }],
-      }),
-      openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [{
-          role: "user",
-          content: `Write a long-form SEO article that will rank on Google for the keyword: "${opportunity.keyword}"
+  // ── SEO article prompt ──────────────────────────────────────────────────────
+  const seoPrompt = isBJ ? `
+Write a pastoral reflection article for someone searching: "${opportunity.keyword}"
+${painPoint ? `\nWhat they are carrying: "${painPoint}"\n` : ""}
 
-This article gets free organic traffic from Google and converts readers into PDF buyers. It must follow Google's quality guidelines — comprehensive, specific, genuinely helpful.
-${painPoint ? `\nCORE PAIN THIS ARTICLE ADDRESSES: "${painPoint}"\nUse this exact language in the opening — make the reader feel immediately understood.\n` : ""}
-────────────────────────────────────────
-MANDATORY STRUCTURE (in this exact order):
-────────────────────────────────────────
+This article is for Google — it must rank for the search query and send readers to a pastoral guide. It should feel like a Brother Jimi piece: warm, unhurried, personal.
 
-1. H1 — exact keyword: "${opportunity.keyword}" (add ${new Date().getFullYear()} if it's a process, registration, or exam topic)
-
-2. OPENING PARAGRAPH (80–120 words):
-   - First sentence: answer the query directly using the exact keyword
-   - Second sentence: name the specific pain — what goes wrong for most people
-   - Third sentence: what this article gives them, right now
-   - Google rewards direct answers in the first paragraph — do not delay
-
-3. ONE H2 SECTION PER QUESTION (use these exact questions as H2 headings — they are long-tail keywords themselves):
+Structure:
+1. H1: "${opportunity.keyword}" — quiet, direct
+2. Opening (60–80 words): Name the feeling. Name why they're here. Make them feel immediately understood. No solutions yet.
+3. One H2 section per question below (use these as headings):
 ${questions.map((q, i) => `   ${i + 1}. ## ${q}`).join("\n")}
-   Each section: 120–200 words. Lead with the most important information. Steps as numbered lists. Specific details — costs, timelines, office names where relevant. No filler.
+   Each section: 80–120 words. Reflective but grounded. No bullet points — flowing sentences.
+4. ## A word before you go
+   A closing paragraph (40–60 words) that offers the pastoral guide as a natural next step. Warm, not salesy. "If this reached you..."
 
-4. ## Common Mistakes to Avoid
-   3–5 specific mistakes people actually make with this topic. Concrete, not generic.
+Write in markdown. Pastoral tone throughout. No preaching.` : `
+Write a long-form SEO article that will rank on Google for: "${opportunity.keyword}"
+${painPoint ? `\nCore pain this article addresses: "${painPoint}"\nUse this exact language in the opening.\n` : ""}
 
-5. ## Frequently Asked Questions
-   3 Q&A pairs using real search variations of "${opportunity.keyword}". Short direct answers — 2–3 sentences each.
+Structure (exact):
+1. H1 — exact keyword: "${opportunity.keyword}" (add ${new Date().getFullYear()} if it's a process topic)
+2. Opening paragraph (80–120 words): answer the query directly, name the specific pain, state what this article gives them.
+3. One H2 per question below (these ARE the H2 headings):
+${questions.map((q, i) => `   ${i + 1}. ## ${q}`).join("\n")}
+   Each section: 120–200 words. Lead with the most important info. Steps as numbered lists. Specific details — costs, timelines, office names.
+4. ## Common Mistakes to Avoid (3–5 specific mistakes)
+5. ## Frequently Asked Questions (3 Q&A pairs)
+6. Closing paragraph (40–60 words): natural bridge to downloading the PDF guide. Not salesy.
 
-6. CLOSING PARAGRAPH (40–60 words):
-   Natural bridge to downloading the full PDF guide. Do not be salesy — frame it as "if you want the complete step-by-step checklist in one place…"
+SEO rules: use exact keyword "${opportunity.keyword}" in H1, opening, 2+ H2s, and closing. 900–1,400 words total. Write in markdown.`;
 
-────────────────────────────────────────
-SEO RULES (non-negotiable):
-────────────────────────────────────────
-- Use the exact keyword "${opportunity.keyword}" in: the H1, the opening paragraph, at least 2 H2 sections, and the closing paragraph
-- Use natural keyword variations throughout — never stuff the same phrase repeatedly
-- Every H2 = a real question people type into Google (use the list above exactly)
-- 900–1,400 words total — Google rewards comprehensive content for how-to and guide queries
-- No padding. Every sentence earns its place by giving usable information.
-- Plain language. Short paragraphs. Bullet points and numbered lists for steps.
-- Specific where possible: real fees, real timelines, real office names, real document names
+  // ── Social hooks prompt ─────────────────────────────────────────────────────
+  const hooksPrompt = isBJ ? `
+Write social captions for this Brother Jimi pastoral guide.
 
-Write in markdown.`
-        }],
-      }),
-      openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [{
-          role: "user",
-          content: `Generate 10 platform-native marketing hooks for this PDF guide: "${opportunity.pdfTitle || opportunity.keyword}"
-Emotional intent: ${opportunity.emotionalIntent}. Niche: ${opportunity.niche}.
-${painPoint ? `\nCore pain to lead with: "${painPoint}"\nLet this pain language drive the hooks — use its specific words and emotions, not generic phrases.\n` : ""}
+Title: "${opportunity.pdfTitle || opportunity.keyword}"
+What they are carrying: "${painPoint}"
 
-Create 2 hooks per platform in EXACTLY the format specified below. These hooks market the PAIN/FEAR/DESIRE — NOT the PDF.
-
-TIKTOK (video script format — 3 lines):
-Line 1: HOOK — the first 3 seconds, visual or shocking statement that stops the scroll
-Line 2: PROBLEM — name the pain or struggle in 1 sentence
-Line 3: CTA — "Download the free guide in bio"
-
-INSTAGRAM (full caption format):
-Line 1: Scroll-stopping first line (the hook)
-Lines 2–5: 3–4 short lines expanding the problem or insight
-Line 6: CTA — "Link in bio to get the full guide"
-Include 5 relevant hashtags on the last line
-
-PINTEREST (pin description format — optimised for Pinterest search):
-Title: Keyword-rich pin title (60 chars max)
-Description: 100–150 word keyword-dense description written as helpful content that naturally includes the search phrase multiple times. Pinterest is a search engine — write for discovery.
-Board: Suggested board name
-Hashtags: 5 hashtags
-
-EMAIL (subject + preview pair):
-Subject: compelling email subject line (50 chars max)
-Preview: the email preview text (90 chars max, completes the subject)
-
-TWITTER (punchy tweet):
-Single tweet under 240 chars. Specific, makes people feel called out, ends with hook.
-
-Return as JSON array:
+Return ONLY valid JSON — 6 caption objects:
 [
-  {"text": "HOOK: ...\nPROBLEM: ...\nCTA: ...", "platform": "tiktok", "emotionType": "fear|curiosity|urgency|transformation|mistake"},
-  {"text": "HOOK: ...\nPROBLEM: ...\nCTA: ...", "platform": "tiktok", "emotionType": "..."},
-  {"text": "[first line]\n[lines 2-5]\n[CTA]\n#tag1 #tag2 #tag3 #tag4 #tag5", "platform": "instagram", "emotionType": "..."},
-  {"text": "[first line]\n[lines 2-5]\n[CTA]\n#tag1 #tag2 #tag3 #tag4 #tag5", "platform": "instagram", "emotionType": "..."},
-  {"text": "TITLE: ...\nDESCRIPTION: ...\nBOARD: ...\nHASHTAGS: ...", "platform": "pinterest", "emotionType": "..."},
-  {"text": "TITLE: ...\nDESCRIPTION: ...\nBOARD: ...\nHASHTAGS: ...", "platform": "pinterest", "emotionType": "..."},
-  {"text": "SUBJECT: ...\nPREVIEW: ...", "platform": "email", "emotionType": "..."},
-  {"text": "SUBJECT: ...\nPREVIEW: ...", "platform": "email", "emotionType": "..."},
-  {"text": "...", "platform": "twitter", "emotionType": "..."},
-  {"text": "...", "platform": "twitter", "emotionType": "..."}
-]`
-        }],
-      }),
-      openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [{
-          role: "user",
-          content: `Write a 5–7 second faceless video script for this PDF guide.
+  {"text": "One sentence that stops someone mid-scroll. Does NOT summarise the guide. Opens a door to it. No hashtags. No CTA.", "platform": "whatsapp", "emotionType": "${opportunity.emotionalIntent || "grief"}"},
+  {"text": "One sentence that stops someone mid-scroll. Does NOT summarise the guide. Opens a door to it. No hashtags. No CTA.", "platform": "whatsapp", "emotionType": "${opportunity.emotionalIntent || "loneliness"}"},
+  {"text": "One sentence caption.\\n\\nToday's word is linked in bio.", "platform": "instagram", "emotionType": "${opportunity.emotionalIntent || "grief"}"},
+  {"text": "One sentence caption.\\n\\nLink in bio.", "platform": "instagram", "emotionType": "${opportunity.emotionalIntent || "shame"}"},
+  {"text": "Two sentences max. Warm. Intimate. For a faith community group.", "platform": "facebook", "emotionType": "${opportunity.emotionalIntent || "faith"}"},
+  {"text": "Two sentences max. Warm. Intimate. For a faith community group.", "platform": "facebook", "emotionType": "${opportunity.emotionalIntent || "doubt"}"}
+]
 
+RULES: Never transactional. No "buy", "product", "guide". Never exclamation marks. Tone: like receiving a message from someone who knows what you're carrying.` : `
+Generate 10 platform-native marketing hooks for this PDF guide: "${opportunity.pdfTitle || opportunity.keyword}"
+Niche: ${opportunity.niche}.
+${painPoint ? `Core pain: "${painPoint}"\n` : ""}
+
+Return as JSON array with 10 objects — 2 per platform:
+[
+  {"text": "HOOK: ...\nPROBLEM: ...\nCTA: Download the complete guide in bio", "platform": "tiktok", "emotionType": "fear|curiosity|urgency|mistake"},
+  {"text": "HOOK: ...\nPROBLEM: ...\nCTA: ...", "platform": "tiktok", "emotionType": "..."},
+  {"text": "[scroll-stopping first line]\\n[3–4 short lines expanding the pain]\\nLink in bio to get the full guide\\n#tag1 #tag2 #tag3 #tag4 #tag5", "platform": "instagram", "emotionType": "..."},
+  {"text": "[scroll-stopping first line]\\n[3–4 short lines]\\nLink in bio\\n#tag1 #tag2 #tag3 #tag4 #tag5", "platform": "instagram", "emotionType": "..."},
+  {"text": "TITLE: [keyword-rich, 60 chars max]\\nDESCRIPTION: [100–150 words keyword-dense, helpful]\\nBOARD: [suggested board]\\nHASHTAGS: #tag1 #tag2 #tag3 #tag4 #tag5", "platform": "pinterest", "emotionType": "..."},
+  {"text": "TITLE: ...\\nDESCRIPTION: ...\\nBOARD: ...\\nHASHTAGS: ...", "platform": "pinterest", "emotionType": "..."},
+  {"text": "SUBJECT: [compelling, 50 chars max]\\nPREVIEW: [completes subject, 90 chars max]", "platform": "email", "emotionType": "..."},
+  {"text": "SUBJECT: ...\\nPREVIEW: ...", "platform": "email", "emotionType": "..."},
+  {"text": "[tweet under 240 chars — specific, calls out the situation, ends with hook]", "platform": "twitter", "emotionType": "..."},
+  {"text": "[tweet under 240 chars]", "platform": "twitter", "emotionType": "..."}
+]`;
+
+  const [pdfRes, salesRes, seoRes, hooksRes, scriptRes] = await Promise.all([
+    openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      messages: [
+        { role: "system", content: brandCtx },
+        { role: "user", content: pdfPrompt },
+      ],
+    }),
+    openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      messages: [
+        { role: "system", content: brandCtx },
+        { role: "user", content: salesPrompt },
+      ],
+    }),
+    openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      messages: [
+        { role: "system", content: brandCtx },
+        { role: "user", content: seoPrompt },
+      ],
+    }),
+    openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      messages: [
+        { role: "system", content: socialCtx },
+        { role: "user", content: hooksPrompt },
+      ],
+    }),
+    openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: brandCtx },
+        { role: "user", content: isBJ ? `
+Write a short social caption for Brother Jimi to accompany this pastoral guide.
+
+Title: "${opportunity.pdfTitle || opportunity.keyword}"
+Carrying: "${painPoint}"
+
+Return ONLY valid JSON with these three keys — each a single sentence spoken by Brother Jimi:
+{
+  "hook": "One sentence that names what they are carrying. Intimate. No exclamation marks.",
+  "tease": "One sentence that names what shifts for the reader in this guide. Warm, not promotional.",
+  "cta": "Receive this word — it's linked in bio."
+}` : `
+Write a 5–7 second faceless video script for this PDF guide.
 Topic: "${opportunity.pdfTitle || opportunity.keyword}"
 ${painPoint ? `Pain: "${painPoint}"` : ""}
 
-Three lines only. Each line is spoken aloud in roughly 2 seconds.
-No intro. No "hey guys". Start with the pain immediately.
-
-1. HOOK (0–2s): Scroll-stopper. Name the exact situation, not a category. PSA format, fear trigger, or surprising fact. The person who has this problem must stop scrolling immediately.
-2. TEASE (2–4s): Stakes or payoff. What they risk getting wrong, or what they'll gain. One specific sentence. Do NOT explain the guide yet.
-3. CTA (4–7s): Point to bio. Short. "Link in bio for the complete step-by-step guide" is enough. Do not sell — just direct.
-
 Return ONLY valid JSON with exactly these three keys:
-{"hook": "...", "tease": "...", "cta": "..."}`
-        }],
-        response_format: { type: "json_object" },
-        temperature: 0.5,
-      }),
-    ]);
+{
+  "hook": "Hook (0–2s): PSA format or fear trigger. Name the exact situation. Person who has this problem MUST stop scrolling.",
+  "tease": "Tease (2–4s): The stakes or payoff. One specific sentence. Don't explain the guide.",
+  "cta": "CTA (4–7s): Point to bio. Short. 'Link in bio for the complete step-by-step guide' is enough."
+}`,
+      },
+      ],
+    }),
+  ]);
 
-    pdfContent = pdfRes.choices[0].message.content ?? "";
-    salesPageCopy = salesRes.choices[0].message.content ?? "";
-    seoPageContent = seoRes.choices[0].message.content ?? "";
+  const pdfContent    = pdfRes.choices[0].message.content ?? "";
+  const salesPageCopy = salesRes.choices[0].message.content ?? "";
+  const seoPageContent = seoRes.choices[0].message.content ?? "";
+
+  const generatedHooks: { text: string; platform: string; emotionType: string }[] = (() => {
     try {
       const raw = hooksRes.choices[0].message.content ?? "[]";
-      const jsonMatch = raw.match(/\[[\s\S]*\]/);
-      const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : "[]");
-      generatedHooks.push(...parsed);
-    } catch { /* use empty hooks */ }
+      const match = raw.match(/\[[\s\S]*\]/);
+      return JSON.parse(match ? match[0] : "[]");
+    } catch { return []; }
+  })();
 
-    // Save video script to the opportunity so it shows in the dashboard
-    try {
-      const vsRaw = scriptRes.choices[0].message.content ?? "{}";
-      const vs = JSON.parse(vsRaw);
-      if (vs.hook || vs.tease || vs.cta) {
-        await prisma.opportunity.update({
-          where: { id: opportunityId },
-          data: { videoScript: vsRaw },
-        });
-      }
-    } catch { /* non-fatal */ }
-
-  } else {
-    pdfContent = `# ${opportunity.keyword}\n\n## The Complete Guide\n\n${questions.map((q, i) => `## ${i + 1}. ${q}\n\n- Key point 1\n- Key point 2\n- Key point 3\n`).join("\n")}\n\n## Your 5-Step Action Plan\n\n${questions.slice(0, 5).map((q, i) => `${i + 1}. ${q}`).join("\n")}`;
-    salesPageCopy = JSON.stringify({
-      heroTagline: `Still searching for answers about ${opportunity.keyword}? You're not alone — and you don't have to figure this out alone.`,
-      bulletedPain: questions.map(q => `If you've been wondering: "${q}"...`),
-      whatsInside: questions.map((q, i) => ({ chapter: `Chapter ${i + 1}`, title: q, description: `Clear, direct answer to ${q} — so you can stop guessing and start acting.` })),
-      faqItems: [
-        { q: "Will this work for my specific situation?", a: "Yes — every chapter addresses a real search question people in your situation are typing into Google right now. If you found this page, the guide is for you." },
-        { q: "What format does it come in?", a: "PDF. Works on phone, tablet, laptop, and can be printed. You get it instantly after purchase." },
-        { q: "What if it doesn't solve my problem?", a: "30-day full refund. No questions, no forms, just email us." },
-        { q: "How is this different from free info online?", a: "Free info is scattered, incomplete, and often contradictory. This guide gives you one clear, tested answer in one place — no more tab-hopping." },
-      ],
-      urgencyLine: "Introductory price — goes up when we hit 500 copies sold.",
-    });
-    seoPageContent = `# ${opportunity.keyword}\n\n${questions.map(q => `## ${q}\n\nClear, direct answer to ${q}.\n`).join("\n")}`;
-    generatedHooks.push(
-      { text: `HOOK: Did you know most people get ${opportunity.keyword} completely wrong?\nPROBLEM: You've been searching for answers but everything you try doesn't work.\nCTA: Download the free guide in bio`, platform: "tiktok", emotionType: "curiosity" },
-      { text: `HOOK: This changed everything for me about ${opportunity.keyword}\nPROBLEM: I was stuck for months until I found this out.\nCTA: Download the free guide in bio`, platform: "tiktok", emotionType: "transformation" },
-      { text: `Nobody tells you this about ${opportunity.keyword}…\n\nI spent months trying everything.\nNothing worked until I found this.\nNow I'm sharing it with you for free.\nLink in bio to get the full guide\n#${opportunity.niche.replace(/\s/g, "")} #howto #guide #tips #freeguide`, platform: "instagram", emotionType: "transformation" },
-      { text: `Stop scrolling — if you're struggling with ${opportunity.keyword} you need to see this\n\nMost people make the same 3 mistakes.\nI made them all too.\nHere's what actually works.\nLink in bio to get the full guide\n#${opportunity.niche.replace(/\s/g, "")} #tips #help #guide #free`, platform: "instagram", emotionType: "mistake" },
-      { text: `TITLE: ${opportunity.keyword} — Complete Guide\nDESCRIPTION: Everything you need to know about ${opportunity.keyword}. This step-by-step guide covers ${questions.slice(0, 2).join(" and ")}. Whether you're a beginner or have been struggling for a while, this guide gives you the exact answers you need. Save this pin and download the free guide.\nBOARD: ${opportunity.niche} Tips\nHASHTAGS: #${opportunity.niche.replace(/[\s&]/g, "")} #howto #guide #tips #freeguide`, platform: "pinterest", emotionType: "curiosity" },
-      { text: `TITLE: How to Solve ${opportunity.keyword} — Step by Step\nDESCRIPTION: Struggling with ${opportunity.keyword}? You're not alone. Thousands of people search for this every day. This complete guide answers ${questions.slice(0, 3).join(", ")}. Download free and start getting results today.\nBOARD: ${opportunity.niche} Resources\nHASHTAGS: #${opportunity.niche.replace(/[\s&]/g, "")} #stepbystep #download #free #guide`, platform: "pinterest", emotionType: "desire" },
-      { text: `SUBJECT: The ${opportunity.keyword} mistake you're probably making\nPREVIEW: Most people never figure this out. Here's what actually works (free guide inside)`, platform: "email", emotionType: "fear" },
-      { text: `SUBJECT: Free guide: ${opportunity.keyword.slice(0, 40)}\nPREVIEW: Download it now — covers everything you need step by step, no fluff`, platform: "email", emotionType: "desire" },
-      { text: `Most people searching "${opportunity.keyword}" never get the answer they need because they're looking in the wrong places. Here's what actually works 🧵`, platform: "twitter", emotionType: "mistake" },
-      { text: `The real reason you're struggling with ${opportunity.keyword}: you don't have a clear step-by-step system. Once you do, everything changes.`, platform: "twitter", emotionType: "transformation" },
-    );
-  }
+  // Save video/caption script back to the opportunity
+  try {
+    const vsRaw = scriptRes.choices[0].message.content ?? "{}";
+    const vs = JSON.parse(vsRaw);
+    if (vs.hook || vs.tease || vs.cta) {
+      await prisma.opportunity.update({
+        where: { id: opportunityId },
+        data: { videoScript: vsRaw },
+      });
+    }
+  } catch { /* non-fatal */ }
 
   const slug = toSlug(opportunity.keyword);
 
@@ -324,8 +320,7 @@ Return ONLY valid JSON with exactly these three keys:
     });
   }
 
-  console.log("[/api/factory] Product created:", product.id, "slug:", slug);
-  return NextResponse.json({ product, hooks: generatedHooks });
+  return NextResponse.json({ product, hooks: generatedHooks, brand });
 }
 
 export async function GET() {
