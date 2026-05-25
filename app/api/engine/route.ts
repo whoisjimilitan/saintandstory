@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { type Brand, buildBrandSystemContext, BRAND_CONFIG } from "@/lib/brand-config";
 
 async function fetchAutocompleteSuggestions(query: string): Promise<string[]> {
   try {
@@ -973,7 +974,10 @@ function computeVolumeTier(volume: number): string {
 
 export async function POST(req: Request) {
   try {
-  const { keyword, niche = "", count = 20, country = "US", diaspora = false } = await req.json();
+  const { keyword, niche = "", count = 20, country = "US", diaspora = false, brand: brandParam } = await req.json();
+  const brand: Brand = brandParam === "brotherjimi" ? "brotherjimi" : "pdfseeds";
+  const brandContext = buildBrandSystemContext(brand);
+  const brandCfg = BRAND_CONFIG[brand];
 
   if (!process.env.GOOGLE_AI_API_KEY) {
     return NextResponse.json({ error: "Google AI API key not configured" }, { status: 500 });
@@ -1327,7 +1331,15 @@ Minimum estimate for any included result: 2,500/month.`;
       messages: [
         {
           role: "system",
-          content: `You are an opportunity compression engine. You compress raw search demand into three decisions per opportunity: Problem → Product → Placement.
+          content: `${brandContext}
+
+---
+
+ACTIVE BRAND: ${brand === "brotherjimi" ? "BROTHER JIMI — pastoral/devotional guidance. Pain taxonomy: grief, shame, doubt, loneliness, exhaustion, spiritual confusion. Every opportunity must address a real emotional or spiritual weight people are carrying. PDF structure follows the 6-stage pastoral arc. Voice is warm, unhurried, personal. Never commercial, never preachy." : "PDFSEEDS — practical clarity products. Pain taxonomy: bureaucratic confusion, financial uncertainty, process complexity, diaspora logistics. PDF structure follows the process arc: map, steps, mistakes, checklist. Voice is direct, specific, outcome-focused."}
+
+---
+
+You are an opportunity compression engine. You compress raw search demand into three decisions per opportunity: Problem → Product → Placement.
 
 PROBLEM: Identify who is confused, afraid, or stuck — and what exactly they need to do.
 PRODUCT: Specify the PDF format that solves it (checklist, step-by-step guide, template, reference sheet).
@@ -1656,6 +1668,7 @@ OUTPUT FORMAT
 }
 
 PRICING: ${pricing.symbol}${pricing.min}–${pricing.symbol}${pricing.max} (${pricing.note})
+BRAND PRICING OVERRIDE (use this if brand is not pdfseeds): ${brandCfg.pricing.symbol}${brandCfg.pricing.min}–${brandCfg.pricing.symbol}${brandCfg.pricing.max} | ${brandCfg.pricing.note}
 
 Return ONLY valid JSON: { "results": [...] }`,
         },
