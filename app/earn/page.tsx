@@ -63,7 +63,7 @@ export default function EarnPage() {
         .earn {
           min-height: 100dvh;
           background: #FAF9F7;
-          font-family: -apple-system, "Inter", system-ui, sans-serif;
+          font-family: var(--font-geist-sans), -apple-system, system-ui, sans-serif;
           color: #1A1008;
         }
 

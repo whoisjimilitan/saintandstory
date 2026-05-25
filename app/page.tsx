@@ -173,7 +173,7 @@ export default function HomePage() {
         .pg {
           min-height: 100dvh;
           background: #FAF9F7;
-          font-family: -apple-system, "Inter", system-ui, sans-serif;
+          font-family: var(--font-geist-sans), -apple-system, system-ui, sans-serif;
           display: flex;
           flex-direction: column;
           color: #1A1008;
