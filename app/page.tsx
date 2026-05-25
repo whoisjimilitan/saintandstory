@@ -241,7 +241,7 @@ export default function HomePage() {
           color: #8C7D6E;
           line-height: 1.7;
           margin: 0 0 40px;
-          max-width: 400px;
+          max-width: 520px;
         }
         .pg-form {
           width: 100%;
@@ -621,7 +621,7 @@ export default function HomePage() {
               <span className="pg-hero-eyebrow">Step-by-step guides for the hard stuff</span>
               <h1 className="pg-hero-h1">Stop Googling. There&apos;s a PDF guide for that.</h1>
               <p className="pg-hero-sub">
-                Visa applications. Business registration. Tax returns. No more wrong guides.
+                Visa applications. Business registration. Tax returns. Anything. No more wrong guides.
               </p>
               <div className="pg-form">
                 <form onSubmit={handleSituation}>
