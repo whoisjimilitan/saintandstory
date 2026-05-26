@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Search, ShieldCheck, PoundSterling, Banknote, Link2, MessageSquare, BarChart3, BookOpen, MessageCircle, Pin, Mail } from "lucide-react";
 
 const AVATARS = [
   { initials: "AO", name: "Adaeze O.", role: "WhatsApp Admin", stat: "£340 first month", how: "One pinned message" },
@@ -197,12 +198,11 @@ export default function EarnPage() {
           width: 36px; height: 36px; border-radius: 9px;
           background: #F5F0EB; border: 1px solid #EEE9E0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.9rem; flex-shrink: 0;
+          flex-shrink: 0;
         }
         .e-trust-label { font-size: 0.83rem; font-weight: 800; color: #0F0A1A; margin-bottom: 2px; }
         .e-trust-desc { font-size: 0.72rem; color: #6B5E52; line-height: 1.55; }
         .e-trust-arrow { align-self: center; color: #DDD6FE; font-size: 1.4rem; flex-shrink: 0; }
-        .e-icon-grey { filter: grayscale(1) brightness(0); }
 
         /* ─── HERO COPY ─── */
         .e-chip {
@@ -349,7 +349,7 @@ export default function EarnPage() {
           background: #fff; border: 1px solid #E0D9FF;
           border-radius: 12px; padding: 13px 17px;
         }
-        .e-math-icon { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; filter: grayscale(1) brightness(0); }
+        .e-math-icon { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .e-math-lbl { flex: 1; font-size: 0.84rem; color: #6B5E52; }
         .e-math-earn { font-size: 0.98rem; font-weight: 900; color: #6D28D9; }
         .e-math-note { font-size: 0.72rem; color: #A78BFA; line-height: 1.65; }
@@ -366,7 +366,7 @@ export default function EarnPage() {
           width: 34px; height: 34px; border-radius: 9px;
           background: #F5F0EB; border: 1px solid #EEE9E0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.85rem; flex-shrink: 0;
+          flex-shrink: 0;
         }
         .e-get-title { font-size: 0.88rem; font-weight: 800; color: #0F0A1A; margin-bottom: 2px; }
         .e-get-desc { font-size: 0.79rem; color: #6B5E52; line-height: 1.65; }
@@ -632,7 +632,7 @@ export default function EarnPage() {
         <div className="e-trust-outer">
           <div className="e-trust-block">
             <div className="e-trust-step">
-              <div className="e-trust-icon"><span className="e-icon-grey">🔍</span></div>
+              <div className="e-trust-icon"><Search size={16} strokeWidth={1.75} color="#0F0A1A" /></div>
               <div>
                 <div className="e-trust-label">Read it first</div>
                 <div className="e-trust-desc">You see it first. Always.</div>
@@ -640,7 +640,7 @@ export default function EarnPage() {
             </div>
             <div className="e-trust-arrow">→</div>
             <div className="e-trust-step">
-              <div className="e-trust-icon"><span className="e-icon-grey">✓</span></div>
+              <div className="e-trust-icon"><ShieldCheck size={16} strokeWidth={1.75} color="#0F0A1A" /></div>
               <div>
                 <div className="e-trust-label">Only share what you&apos;d stand behind</div>
                 <div className="e-trust-desc">Your reputation stays yours — you&apos;re the filter</div>
@@ -648,7 +648,7 @@ export default function EarnPage() {
             </div>
             <div className="e-trust-arrow">→</div>
             <div className="e-trust-step">
-              <div className="e-trust-icon"><span className="e-icon-grey">💷</span></div>
+              <div className="e-trust-icon"><PoundSterling size={16} strokeWidth={1.75} color="#0F0A1A" /></div>
               <div>
                 <div className="e-trust-label">Earn 80% — forever</div>
                 <div className="e-trust-desc">Every time someone buys through your link</div>
@@ -726,12 +726,12 @@ export default function EarnPage() {
               </div>
               <div className="e-math-rows">
                 {[
-                  { icon: "💬", text: "One WhatsApp message · 10 people buy", earn: "£79.90" },
-                  { icon: "📌", text: "Pinned post across 3 groups · 10 buyers each", earn: "£239.70" },
-                  { icon: "📧", text: "Newsletter mention · 50 buyers this month", earn: "£399.50" },
+                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy", earn: "£79.90" },
+                  { Icon: Pin, text: "Pinned post across 3 groups · 10 buyers each", earn: "£239.70" },
+                  { Icon: Mail, text: "Newsletter mention · 50 buyers this month", earn: "£399.50" },
                 ].map((r, i) => (
                   <div key={i} className="e-math-row">
-                    <span className="e-math-icon">{r.icon}</span>
+                    <span className="e-math-icon"><r.Icon size={16} strokeWidth={1.75} color="#6B5E52" /></span>
                     <span className="e-math-lbl">{r.text}</span>
                     <span className="e-math-earn">{r.earn}</span>
                   </div>
@@ -753,14 +753,14 @@ export default function EarnPage() {
             <h2 className="e-h2">Everything for £19.99 — once.</h2>
             <div className="e-get">
               {[
-                { icon: "💷", title: "80% commission — for life", desc: "Paid automatically every month. Nothing to chase, nothing to invoice." },
-                { icon: "🔗", title: "Your curator link for every guide in the library", desc: "Share any of the 1000+ guides across every niche. Each one has your unique link." },
-                { icon: "📱", title: "Ready-made posts, captions and WhatsApp templates", desc: "Copy, paste, send. You're live within minutes of joining." },
-                { icon: "📊", title: "Real-time dashboard — every buyer, every penny", desc: "See exactly what's earning and what isn't. Live, not delayed." },
-                { icon: "📚", title: "Every new guide added — at no extra cost", desc: "The library keeps growing. Your earning potential grows with it." },
+                { Icon: Banknote, title: "80% commission — for life", desc: "Paid automatically every month. Nothing to chase, nothing to invoice." },
+                { Icon: Link2, title: "Your curator link for every guide in the library", desc: "Share any of the 1000+ guides across every niche. Each one has your unique link." },
+                { Icon: MessageSquare, title: "Ready-made posts, captions and WhatsApp templates", desc: "Copy, paste, send. You're live within minutes of joining." },
+                { Icon: BarChart3, title: "Real-time dashboard — every buyer, every penny", desc: "See exactly what's earning and what isn't. Live, not delayed." },
+                { Icon: BookOpen, title: "Every new guide added — at no extra cost", desc: "The library keeps growing. Your earning potential grows with it." },
               ].map((b, i) => (
                 <div key={i} className="e-get-item">
-                  <div className="e-get-icon"><span className="e-icon-grey">{b.icon}</span></div>
+                  <div className="e-get-icon"><b.Icon size={16} strokeWidth={1.75} color="#0F0A1A" /></div>
                   <div>
                     <div className="e-get-title">{b.title}</div>
                     <div className="e-get-desc">{b.desc}</div>
