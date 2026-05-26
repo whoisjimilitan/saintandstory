@@ -554,8 +554,8 @@ export default function EarnPage() {
             display: flex;
             position: fixed; bottom: 0; left: 0; right: 0;
             padding: 12px 16px env(safe-area-inset-bottom, 6px);
-            background: rgba(30,27,75,0.97);
-            border-top: 1px solid rgba(196,181,253,0.18);
+            background: rgba(255,255,255,0.97);
+            border-top: 1px solid #EEE9E0;
             backdrop-filter: blur(16px); z-index: 100;
           }
           .e-mobile button {
@@ -599,7 +599,7 @@ export default function EarnPage() {
               <div className="e-chip">For WhatsApp admins, newsletter writers &amp; community leaders</div>
               <h1 className="e-h1">
                 They keep asking.<br />
-                But the group doesn&apos;t always know.<br />
+                But even group leaders don&apos;t know everything.<br />
                 <em>You will — in 60 seconds.</em>
               </h1>
               <p className="e-hero-sub">
