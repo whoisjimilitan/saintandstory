@@ -15,8 +15,8 @@ type Guide = {
 type WaitlistStatus = "idle" | "sending" | "done";
 
 const MESSAGES = [
-  "Searching for your guide…",
-  "Found your guide!",
+  "Searching for guide…",
+  "Found your guide…",
   "Getting your guide…",
 ];
 
