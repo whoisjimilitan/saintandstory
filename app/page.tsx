@@ -507,98 +507,126 @@ export default function HomePage() {
           border-top: 1px solid #EEE9E2;
         }
 
-        /* ── RESPONSIVE: TABLET / IPAD (601–1024px) ── */
-        @media (min-width: 601px) and (max-width: 1024px) {
-          .pg-header { padding: 22px 40px; }
-          .pg-main { padding: 60px 48px 100px; }
-          .pg-hero-h1 { font-size: clamp(2rem, 4.5vw, 2.8rem); max-width: 600px; }
-          .pg-hero-sub { max-width: 480px; }
+        /* ── DESKTOP (> 1024px) ── */
+        @media (min-width: 1025px) {
+          .pg {
+            background-image:
+              linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+            background-size: 64px 64px;
+          }
+          .pg-header { padding: 28px 56px; }
+          .pg-main { padding: 72px 40px 128px; }
+          .pg-hero-eyebrow { font-size: 0.75rem; margin-bottom: 32px; }
+          .pg-hero-h1 { font-size: clamp(3rem, 4.5vw, 4rem); max-width: 780px; margin-bottom: 20px; }
+          .pg-hero-sub { font-size: 1.1rem; max-width: 480px; margin-bottom: 48px; }
           .pg-form { max-width: 560px; }
-          .pg-gen { max-width: 440px; }
-          .pg-result { max-width: 540px; }
-          .pg-checkout { max-width: 560px; }
-          .pg-paid { max-width: 480px; }
+          .pg-input-wrap { padding: 8px 8px 8px 24px; border-radius: 18px; }
+          .pg-input { font-size: 1.05rem; padding: 12px 0; }
+          .pg-btn { padding: 14px 28px; font-size: 0.95rem; border-radius: 14px; }
+          .pg-hint { font-size: 0.82rem; margin-top: 18px; }
+          .pg-gen { max-width: 400px; }
+          .pg-result { max-width: 520px; }
           .pg-result-cta { padding: 22px; font-size: 1.15rem; }
-          .pg-btn { padding: 14px 26px; font-size: 0.95rem; }
-        }
-
-        /* ── RESPONSIVE: TABLET / IPAD (601–1024px) ── */
-        @media (min-width: 601px) and (max-width: 1024px) {
-          .pg-upsell { max-width: 480px; }
+          .pg-checkout { max-width: 600px; }
+          .pg-paid { max-width: 500px; }
+          .pg-upsell { max-width: 500px; }
           .pg-waitlist { max-width: 500px; }
         }
 
-        /* ── RESPONSIVE: MOBILE (≤ 600px) ── */
+        /* ── TABLET LANDSCAPE (769–1024px) ── */
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .pg-header { padding: 24px 44px; }
+          .pg-main { padding: 60px 48px 108px; }
+          .pg-hero-h1 { font-size: clamp(2.2rem, 4vw, 3rem); max-width: 640px; }
+          .pg-hero-sub { font-size: 1rem; max-width: 500px; }
+          .pg-form { max-width: 560px; }
+          .pg-btn { padding: 13px 24px; font-size: 0.92rem; }
+          .pg-gen { max-width: 460px; }
+          .pg-result { max-width: 540px; }
+          .pg-result-cta { padding: 22px; font-size: 1.15rem; }
+          .pg-checkout { max-width: 580px; }
+          .pg-paid { max-width: 500px; }
+          .pg-upsell { max-width: 500px; }
+          .pg-waitlist { max-width: 520px; }
+        }
+
+        /* ── TABLET PORTRAIT (601–768px) ── */
+        @media (min-width: 601px) and (max-width: 768px) {
+          .pg-header { padding: 20px 36px; }
+          .pg-main { padding: 52px 36px 96px; }
+          .pg-hero-h1 { font-size: clamp(2rem, 5vw, 2.6rem); max-width: 560px; }
+          .pg-hero-sub { font-size: 0.98rem; max-width: 440px; margin-bottom: 36px; }
+          .pg-form { max-width: 100%; }
+          .pg-btn { padding: 13px 20px; font-size: 0.9rem; }
+          .pg-gen { max-width: 420px; }
+          .pg-result { max-width: 480px; }
+          .pg-result-cta { padding: 20px; font-size: 1.08rem; }
+          .pg-checkout { max-width: 520px; }
+          .pg-paid { max-width: 460px; }
+          .pg-upsell { max-width: 460px; }
+          .pg-waitlist { max-width: 480px; }
+        }
+
+        /* ── MOBILE (≤ 600px) ── */
         @media (max-width: 600px) {
           .pg-header { padding: 16px 20px; }
           .pg-logo-name { font-size: 0.9rem; }
-
-          .pg-main {
-            padding: 44px 20px 80px;
-            justify-content: flex-start;
-          }
-
-          .pg-hero-eyebrow { margin-bottom: 12px; font-size: 0.68rem; }
-          .pg-hero-h1 {
-            font-size: 1.85rem;
-            letter-spacing: -0.03em;
-            max-width: 100%;
-            margin-bottom: 12px;
-          }
-          .pg-hero-sub {
-            font-size: 0.9rem;
-            max-width: 100%;
-            margin-bottom: 28px;
-          }
-
+          .pg-main { padding: 40px 20px 80px; justify-content: flex-start; }
+          .pg-hero-eyebrow { margin-bottom: 14px; font-size: 0.68rem; }
+          .pg-hero-h1 { font-size: 1.9rem; letter-spacing: -0.03em; max-width: 100%; margin-bottom: 14px; }
+          .pg-hero-sub { font-size: 0.92rem; max-width: 100%; margin-bottom: 28px; line-height: 1.65; }
           .pg-form { max-width: 100%; }
-          .pg-input-wrap { border-radius: 14px; padding: 5px 5px 5px 16px; }
-          .pg-input { font-size: 1rem; padding: 10px 0; }
-          .pg-btn { padding: 13px 16px; font-size: 0.85rem; min-height: 48px; border-radius: 10px; }
+          .pg-input-wrap { border-radius: 14px; padding: 6px 6px 6px 16px; gap: 6px; }
+          .pg-input { font-size: 0.95rem; padding: 10px 0; }
+          .pg-btn { padding: 13px 14px; font-size: 0.82rem; min-height: 48px; border-radius: 10px; }
           .pg-hint { font-size: 0.74rem; margin-top: 12px; }
-
           .pg-locked { max-width: 100%; border-radius: 14px; }
           .pg-locked-text { font-size: 0.84rem; }
-
           .pg-gen { max-width: 100%; }
           .pg-gen-orb { width: 64px; height: 64px; border-radius: 18px; font-size: 1.7rem; margin-bottom: 24px; }
           .pg-gen-msg { font-size: 0.95rem; margin-bottom: 24px; }
           .pg-track { margin-bottom: 24px; }
           .pg-gen-steps { gap: 8px; }
           .pg-step { font-size: 0.8rem; }
-
           .pg-result { max-width: 100%; }
           .pg-result-badge { font-size: 0.68rem; margin-bottom: 16px; }
-          .pg-result-title { font-size: 1.2rem; margin-bottom: 24px; }
+          .pg-result-title { font-size: 1.2rem; margin-bottom: 22px; }
           .pg-result-cta { padding: 18px; font-size: 1rem; min-height: 58px; border-radius: 14px; }
-          .pg-result-trust { gap: 12px; font-size: 0.74rem; margin-bottom: 20px; }
-
+          .pg-result-trust { gap: 10px; font-size: 0.74rem; margin-bottom: 20px; }
           .pg-checkout { max-width: 100%; }
           .pg-checkout-back { min-height: 44px; }
-
           .pg-paid { max-width: 100%; }
           .pg-paid-orb { width: 60px; height: 60px; font-size: 1.6rem; border-radius: 16px; }
-          .pg-paid-title { font-size: 1.3rem; }
+          .pg-paid-title { font-size: 1.25rem; }
           .pg-paid-sub { font-size: 0.88rem; }
           .pg-paid-btn { display: block; text-align: center; padding: 16px 24px; font-size: 0.95rem; }
-
           .pg-upsell { max-width: 100%; }
           .pg-upsell-card-title { font-size: 0.83rem; }
-
           .pg-waitlist { max-width: 100%; }
-          .pg-waitlist-title { font-size: 1.25rem; }
+          .pg-waitlist-title { font-size: 1.2rem; }
           .pg-waitlist-sub { font-size: 0.86rem; }
-
           .pg-footer { padding: 14px 20px; font-size: 0.7rem; }
         }
 
-        /* ── RESPONSIVE: SMALL PHONES (≤ 380px — iPhone SE, etc) ── */
-        @media (max-width: 380px) {
+        /* ── SMALL MOBILE (≤ 480px) — stack button below input ── */
+        @media (max-width: 480px) {
+          .pg-input-wrap {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 10px;
+            gap: 8px;
+          }
+          .pg-input { padding: 10px 8px; font-size: 1rem; }
+          .pg-btn { width: 100%; padding: 15px 20px; font-size: 0.92rem; border-radius: 10px; }
+        }
+
+        /* ── EXTRA SMALL (≤ 375px) ── */
+        @media (max-width: 375px) {
           .pg-header { padding: 14px 16px; }
-          .pg-main { padding: 36px 16px 72px; }
-          .pg-hero-h1 { font-size: 1.6rem; }
-          .pg-hero-sub { font-size: 0.86rem; }
-          .pg-btn { padding: 12px 12px; font-size: 0.8rem; }
+          .pg-main { padding: 32px 16px 72px; }
+          .pg-hero-h1 { font-size: 1.65rem; }
+          .pg-hero-sub { font-size: 0.88rem; }
           .pg-result-trust { flex-direction: column; align-items: center; gap: 8px; }
           .pg-result-cta { font-size: 0.95rem; }
         }
