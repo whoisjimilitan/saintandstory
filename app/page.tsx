@@ -668,7 +668,7 @@ export default function HomePage() {
                   </div>
                 </form>
                 <div className="pg-hint">
-                  e.g. How do I register a business in Nigeria?
+                  e.g. How do I register a business in Ghana?
                 </div>
               </div>
             </>
