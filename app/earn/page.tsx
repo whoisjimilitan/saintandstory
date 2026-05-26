@@ -349,7 +349,7 @@ export default function EarnPage() {
           background: #fff; border: 1px solid #E0D9FF;
           border-radius: 12px; padding: 13px 17px;
         }
-        .e-math-icon { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; filter: grayscale(1) opacity(0.45); }
+        .e-math-icon { font-size: 1rem; width: 22px; text-align: center; flex-shrink: 0; filter: grayscale(1) brightness(0); }
         .e-math-lbl { flex: 1; font-size: 0.84rem; color: #6B5E52; }
         .e-math-earn { font-size: 0.98rem; font-weight: 900; color: #6D28D9; }
         .e-math-note { font-size: 0.72rem; color: #A78BFA; line-height: 1.65; }
@@ -459,17 +459,26 @@ export default function EarnPage() {
           background-size: 72px 72px;
           border-top: 1px solid #EEE9E0;
         }
-        .e-final { text-align: center; padding: 96px 32px 80px; max-width: 580px; margin: 0 auto; }
+        .e-final { text-align: center; padding: 96px 32px 88px; max-width: 580px; margin: 0 auto; }
         .e-final-h {
           font-size: clamp(1.3rem, 3vw, 1.8rem);
           font-weight: 900; color: #0F0A1A;
           letter-spacing: -0.035em; line-height: 1.25; margin-bottom: 32px;
         }
-        .e-final-contact { margin-top: 28px; }
-        .e-final-contact a {
-          font-size: 0.78rem; color: #B0A89A; text-decoration: none; transition: color 0.15s;
+        .e-final-meta {
+          display: flex; align-items: center; justify-content: center;
+          flex-wrap: wrap; gap: 8px; margin-top: 20px;
         }
-        .e-final-contact a:hover { color: #8B5CF6; }
+        .e-final-link {
+          font-size: 0.74rem; color: #B0A89A; text-decoration: none; transition: color 0.15s;
+        }
+        .e-final-link:hover { color: #8B5CF6; }
+        .e-final-sep { font-size: 0.74rem; color: #DDD6FE; }
+        .e-final-link-btn {
+          background: none; border: none; color: #B0A89A; font-size: 0.74rem;
+          cursor: pointer; padding: 0; font-family: inherit; transition: color 0.15s;
+        }
+        .e-final-link-btn:hover { color: #8B5CF6; }
         .e-footer {
           text-align: center; padding: 20px;
           font-size: 0.68rem; color: #C4BAB0;
@@ -535,6 +544,10 @@ export default function EarnPage() {
           .e-trust-block { flex-direction: column; gap: 16px; }
           .e-trust-step { padding: 0; }
           .e-trust-arrow { display: none; }
+
+          .e-chip { font-size: 0.6rem; letter-spacing: 0.06em; padding: 6px 12px; }
+          .e-av-row { display: none; }
+          .e-final { padding: 64px 20px 72px; }
 
           /* Fixed mobile CTA bar */
           .e-mobile {
@@ -843,8 +856,8 @@ export default function EarnPage() {
         <div className="e-final-outer">
           <div className="e-final">
             <h2 className="e-final-h">
-              Your community already looks to you for answers.<br />
-              Now you have the answer every time — and 80% of what they pay for it.
+              They keep asking.<br />
+              You could be earning every time.
             </h2>
             <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
               {loading ? "Opening checkout…" : "Become a Curator — £19.99 →"}
@@ -852,58 +865,55 @@ export default function EarnPage() {
             <div style={{ fontSize: "0.68rem", color: "#B0A89A", marginTop: 14 }}>
               One-time payment · 30-day money-back guarantee
             </div>
-            <div className="e-final-contact">
-              <a href="mailto:hello@pdfseeds.com">Questions? hello@pdfseeds.com</a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── AFFILIATE RECOVERY ── */}
-        <div style={{ textAlign: "center", paddingBottom: 52 }}>
-          {!recovery ? (
-            <button
-              onClick={() => setRecovery(true)}
-              style={{ background: "none", border: "none", color: "#C4BAB0", fontSize: "0.75rem", cursor: "pointer", textDecoration: "underline", textDecorationColor: "#E8E4DE" }}
-            >
-              Already a curator? Resend my dashboard link →
-            </button>
-          ) : (
-            <div style={{ background: "#fff", border: "1.5px solid #EAE6E0", borderRadius: 14, padding: "26px 28px", maxWidth: 440, margin: "0 auto" }}>
-              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0F0A1A", marginBottom: 5 }}>Resend my dashboard link</div>
-              <div style={{ fontSize: "0.75rem", color: "#B0A89A", marginBottom: 18 }}>Enter the email you used when you joined.</div>
-              {recoveryStatus === "done" ? (
-                <div style={{ fontSize: "0.82rem", color: "#15803D", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10, padding: "13px 16px" }}>
-                  ✓ Check your inbox — your dashboard link is on its way.
-                </div>
-              ) : recoveryStatus === "notfound" ? (
-                <div>
-                  <div style={{ fontSize: "0.82rem", color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "13px 16px", marginBottom: 10 }}>
-                    No account found. Try the email you used when you paid.
-                  </div>
-                  <button onClick={() => setRecoveryStatus("idle")} style={{ background: "none", border: "none", color: "#8B5CF6", fontSize: "0.78rem", cursor: "pointer", fontWeight: 700 }}>
-                    Try a different email →
+            <div className="e-final-meta">
+              <a href="mailto:hello@pdfseeds.com" className="e-final-link">Questions? hello@pdfseeds.com</a>
+              {!recovery && (
+                <>
+                  <span className="e-final-sep">·</span>
+                  <button className="e-final-link-btn" onClick={() => setRecovery(true)}>
+                    Already a curator? Resend my link →
                   </button>
-                </div>
-              ) : (
-                <form onSubmit={handleRecovery}>
-                  <div style={{ background: "#FAF9F7", border: "1.5px solid #EAE6E0", borderRadius: 10, padding: "4px 4px 4px 14px", display: "flex", alignItems: "center", gap: 7 }}>
-                    <input
-                      type="email" value={recoveryEmail}
-                      onChange={e => setRecoveryEmail(e.target.value)}
-                      placeholder="Your email address" required autoFocus
-                      style={{ flex: 1, border: "none", outline: "none", fontSize: "0.86rem", color: "#0F0A1A", background: "transparent", padding: "10px 0", fontFamily: "inherit" }}
-                    />
-                    <button
-                      type="submit" disabled={recoveryStatus === "sending"}
-                      style={{ background: "linear-gradient(135deg,#8B5CF6,#6D28D9)", color: "#fff", fontWeight: 700, fontSize: "0.78rem", padding: "9px 15px", border: "none", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap", opacity: recoveryStatus === "sending" ? 0.5 : 1, fontFamily: "inherit" }}
-                    >
-                      {recoveryStatus === "sending" ? "Sending…" : "Send link →"}
-                    </button>
-                  </div>
-                </form>
+                </>
               )}
             </div>
-          )}
+            {recovery && (
+              <div style={{ background: "#fff", border: "1.5px solid #EAE6E0", borderRadius: 14, padding: "20px 22px", maxWidth: 400, margin: "16px auto 0", textAlign: "left" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0F0A1A", marginBottom: 5 }}>Resend my dashboard link</div>
+                <div style={{ fontSize: "0.75rem", color: "#B0A89A", marginBottom: 18 }}>Enter the email you used when you joined.</div>
+                {recoveryStatus === "done" ? (
+                  <div style={{ fontSize: "0.82rem", color: "#15803D", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10, padding: "13px 16px" }}>
+                    ✓ Check your inbox — your dashboard link is on its way.
+                  </div>
+                ) : recoveryStatus === "notfound" ? (
+                  <div>
+                    <div style={{ fontSize: "0.82rem", color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "13px 16px", marginBottom: 10 }}>
+                      No account found. Try the email you used when you paid.
+                    </div>
+                    <button onClick={() => setRecoveryStatus("idle")} style={{ background: "none", border: "none", color: "#8B5CF6", fontSize: "0.78rem", cursor: "pointer", fontWeight: 700 }}>
+                      Try a different email →
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleRecovery}>
+                    <div style={{ background: "#FAF9F7", border: "1.5px solid #EAE6E0", borderRadius: 10, padding: "4px 4px 4px 14px", display: "flex", alignItems: "center", gap: 7 }}>
+                      <input
+                        type="email" value={recoveryEmail}
+                        onChange={e => setRecoveryEmail(e.target.value)}
+                        placeholder="Your email address" required autoFocus
+                        style={{ flex: 1, border: "none", outline: "none", fontSize: "0.86rem", color: "#0F0A1A", background: "transparent", padding: "10px 0", fontFamily: "inherit" }}
+                      />
+                      <button
+                        type="submit" disabled={recoveryStatus === "sending"}
+                        style={{ background: "linear-gradient(135deg,#8B5CF6,#6D28D9)", color: "#fff", fontWeight: 700, fontSize: "0.78rem", padding: "9px 15px", border: "none", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap", opacity: recoveryStatus === "sending" ? 0.5 : 1, fontFamily: "inherit" }}
+                      >
+                        {recoveryStatus === "sending" ? "Sending…" : "Send link →"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <footer className="e-footer">
