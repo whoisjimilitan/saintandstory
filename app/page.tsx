@@ -20,9 +20,9 @@ type RelatedGuide = { slug: string; title: string; price: string };
 type WaitlistStatus = "idle" | "sending" | "done";
 
 const MESSAGES = [
-  "Searching our library…",
-  "Found a match — checking the details…",
-  "Getting your PDF file…",
+  "Searching for your guide…",
+  "Found your guide!",
+  "Getting your guide…",
 ];
 
 
@@ -59,8 +59,15 @@ export default function HomePage() {
     setProgress(0);
     const msgTimer = setInterval(() => setMsgIndex(i => Math.min(i + 1, MESSAGES.length - 1)), 5000);
     const progTimer = setInterval(() => {
-      setProgress(p => p >= 90 ? p : p + (p < 50 ? 2 : p < 75 ? 1 : 0.3));
-    }, 300);
+      setProgress(p => {
+        if (p >= 90) return p;
+        const r = Math.random();
+        if (p < 20) return p + r * 5 + 0.5;
+        if (p < 50) return p + r * 2 + 0.3;
+        if (p < 75) return p + r * 1 + 0.1;
+        return p + r * 0.5;
+      });
+    }, 250);
     return () => { clearInterval(msgTimer); clearInterval(progTimer); };
   }, [step]);
 
@@ -363,7 +370,12 @@ export default function HomePage() {
         }
         .pg-track {
           width: 100%; height: 3px; background: #EAE6E0;
-          border-radius: 999px; overflow: hidden; margin-bottom: 32px;
+          border-radius: 999px; overflow: hidden; margin-bottom: 8px;
+        }
+        .pg-gen-pct {
+          font-size: 0.75rem; font-weight: 700;
+          color: #7C3AED; letter-spacing: 0.05em;
+          text-align: right; width: 100%; margin-bottom: 28px;
         }
         .pg-bar {
           height: 100%;
@@ -710,6 +722,7 @@ export default function HomePage() {
               <div className="pg-track">
                 <div className="pg-bar" style={{ width: `${progress}%` }} />
               </div>
+              <div className="pg-gen-pct">{Math.round(progress)}%</div>
               <div className="pg-gen-steps">
                 {MESSAGES.map((m, i) => (
                   <div key={i} className={`pg-step${i < msgIndex ? " done" : i === msgIndex ? " active" : ""}`}>
