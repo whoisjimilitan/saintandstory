@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { type Brand, buildBrandSystemContext, buildSocialCaptionContext, BRAND_CONFIG } from "@/lib/brand-config";
 
+export const maxDuration = 300;
+
 const COUNTRY_MAP: Record<string, { code: string; currency: string; isDiaspora: boolean }> = {
   ghana: { code: "GH", currency: "₵", isDiaspora: false },
   gh: { code: "GH", currency: "₵", isDiaspora: false },
@@ -85,7 +87,11 @@ export async function POST(req: Request) {
     }],
   });
   const quickKeyword: string = (() => {
-    try { return (JSON.parse(kwRes.choices[0].message.content ?? "{}").keyword ?? "").toLowerCase(); }
+    try {
+      const raw = kwRes.choices[0].message.content ?? "{}";
+      const jsonStr = raw.match(/\{[\s\S]*?\}/)?.[0] ?? "{}";
+      return (JSON.parse(jsonStr).keyword ?? "").toLowerCase();
+    }
     catch { return ""; }
   })();
 
@@ -308,13 +314,13 @@ Chapters 4–7 descriptions: DESIRE copy. The reader thinks "I hadn't thought ab
     "A third specific pain — fear, cost, or wrong information — max 12 words"
   ],
   "whatsInside": [
-    {"chapter": "Chapter 1", "title": "Answer to question 1 — phrased as what they walk away knowing, 6–9 words", "description": "VALIDATION: confirms the guide covers the expected foundation. Max 12 words."},
-    {"chapter": "Chapter 2", "title": "6–9 words", "description": "VALIDATION: confirms a second expected area. Max 12 words."},
-    {"chapter": "Chapter 3", "title": "6–9 words", "description": "VALIDATION: confirms a third expected area. Max 12 words."},
-    {"chapter": "Chapter 4", "title": "6–9 words", "description": "DESIRE: the hidden risk or costly mistake this chapter prevents. Max 14 words."},
-    {"chapter": "Chapter 5", "title": "6–9 words", "description": "DESIRE: the overlooked step most people miss until it's too late. Max 14 words."},
-    {"chapter": "Chapter 6", "title": "6–9 words", "description": "DESIRE: what they would have regretted not knowing. Max 14 words."},
-    {"chapter": "Chapter 7", "title": "6–9 words", "description": "DESIRE: the thing that separates those who get it right from those who don't. Max 14 words."},
+    {"chapter": "Chapter 1", "title": "Answer to question 1 — what the reader walks away knowing, 6–9 words", "description": "Validation copy — confirms the guide covers what they expected. Max 12 words."},
+    {"chapter": "Chapter 2", "title": "6–9 words", "description": "Validation copy — confirms a second expected area. Max 12 words."},
+    {"chapter": "Chapter 3", "title": "6–9 words", "description": "Validation copy — confirms a third expected area. Max 12 words."},
+    {"chapter": "Chapter 4", "title": "6–9 words", "description": "Desire copy — names the hidden risk or costly mistake this chapter prevents. Max 14 words."},
+    {"chapter": "Chapter 5", "title": "6–9 words", "description": "Desire copy — the overlooked step most people miss until it's too late. Max 14 words."},
+    {"chapter": "Chapter 6", "title": "6–9 words", "description": "Desire copy — what they would have regretted not knowing. Max 14 words."},
+    {"chapter": "Chapter 7", "title": "6–9 words", "description": "Desire copy — the thing that separates those who get it right. Max 14 words."},
     {"chapter": "Checklist", "title": "Your Step-by-Step Action Plan", "description": "Everything in one place. Done in 30 minutes."}
   ],
   "faqItems": [
@@ -389,7 +395,8 @@ Return ONLY valid JSON:
     socialCaptions,
   });
   } catch (err) {
-    console.error("[generate] unhandled error:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[generate] error:", msg);
     return NextResponse.json(
       { error: "We hit a snag building your guide. Please try again." },
       { status: 500 }
