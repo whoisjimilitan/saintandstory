@@ -120,7 +120,7 @@ export async function POST(req: Request) {
       orderBy: { createdAt: "desc" },
     });
     if (existing) {
-      const price = existing.opportunity?.minPrice ?? 9.99;
+      const price = existing.opportunity?.minPrice ?? 24.99;
       return NextResponse.json({
         slug: existing.slug,
         title: existing.title,
@@ -180,7 +180,7 @@ Return ONLY valid JSON — no markdown, no explanation:
   }
 
   // Price by audience — returning is the most complex life decision, expat mid-tier
-  oppData.price = isReturning ? 19.99 : isExpat ? 12.99 : 9.99;
+  oppData.price = 24.99;
 
   // Step 2: Save opportunity
   const opportunity = await prisma.opportunity.create({
@@ -194,8 +194,8 @@ Return ONLY valid JSON — no markdown, no explanation:
       competition: "low",
       trend: "stable",
       easeToSell: "high",
-      minPrice: oppData.price ?? 9.99,
-      maxPrice: (oppData.price ?? 9.99) * 1.5,
+      minPrice: oppData.price ?? 24.99,
+      maxPrice: (oppData.price ?? 24.99) * 1.5,
       emotionalIntent: "problem-solving",
       exactQuestions: JSON.stringify(oppData.questions),
       painPoint: oppData.painPoint,

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   const opp = product.opportunity;
   const tripwireAmount = opp?.isReturning ? 799 : opp?.isExpat ? 499 : 299;
-  const unitAmount = tripwire ? tripwireAmount : Math.round((opp?.minPrice ?? 9.99) * 100);
+  const unitAmount = tripwire ? tripwireAmount : Math.round((opp?.minPrice ?? 24.99) * 100);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pdfseeds.com";
 
   const session = await stripe.checkout.sessions.create({

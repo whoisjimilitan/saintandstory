@@ -17,7 +17,7 @@ const PLATFORM_TEMPLATES = (link: string) => [
     templates: [
       {
         label: "Community group",
-        text: `Saw this and thought of the group — PDF guides for navigating your home country from abroad. Passports, visas, business, property. No Google rabbit holes. One guide that covers it properly. £9.99 → ${link}`,
+        text: `Saw this and thought of the group — PDF guides for navigating your home country from abroad. Passports, visas, business, property. No Google rabbit holes. One guide that covers it properly. £24.99 → ${link}`,
       },
       {
         label: "Reactive (someone just asked)",
@@ -81,7 +81,7 @@ const PLATFORM_TEMPLATES = (link: string) => [
     templates: [
       {
         label: "Email snippet",
-        text: `This week I wanted to share something useful — PDF Seeds has step-by-step guides for navigating your home country from abroad. Passports, visas, property, business — all covered. One guide, instant download, £9.99. Worth it: ${link}`,
+        text: `This week I wanted to share something useful — PDF Seeds has step-by-step guides for navigating your home country from abroad. Passports, visas, property, business — all covered. One guide, instant download, £24.99. Worth it: ${link}`,
       },
     ],
   },
@@ -261,7 +261,7 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
                 <div>
                   <div className="pd-guide-title">{g.title}</div>
                   <div className="pd-guide-meta">
-                    £{(g.opportunity.minPrice ?? 9.99).toFixed(2)} · {g.salesCount} sold · you earn £{((g.opportunity.minPrice ?? 9.99) * 0.80).toFixed(2)}
+                    £{(g.opportunity.minPrice ?? 24.99).toFixed(2)} · {g.salesCount} sold · you earn £{((g.opportunity.minPrice ?? 24.99) * 0.80).toFixed(2)}
                   </div>
                 </div>
                 <div className="pd-guide-copy">
