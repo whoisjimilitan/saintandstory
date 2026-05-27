@@ -58,6 +58,7 @@ function chaptersFromSalesCopy(salesPageCopy: string) {
 }
 
 export async function POST(req: Request) {
+  try {
   const { situation, country, brand: brandParam, forExpat, forReturning } = await req.json();
   if (!situation?.trim() || !country?.trim()) {
     return NextResponse.json({ error: "Missing situation or country" }, { status: 400 });
@@ -78,10 +79,9 @@ export async function POST(req: Request) {
   // ── Step 0: Quick keyword extraction for deduplication check ──────────────
   const kwRes = await openai.chat.completions.create({
     model: "gemini-2.5-flash",
-    response_format: { type: "json_object" },
     messages: [{
       role: "user",
-      content: `Extract the core search keyword (4–7 words) from this situation: "${situation}". Return ONLY: {"keyword": "..."}`,
+      content: `Extract the core search keyword (4–7 words) from this situation: "${situation}". Return ONLY valid JSON: {"keyword": "..."}`,
     }],
   });
   const quickKeyword: string = (() => {
@@ -117,7 +117,6 @@ export async function POST(req: Request) {
   // Step 1: Parse the user's situation into structured opportunity data
   const parseRes = await openai.chat.completions.create({
     model: "gemini-2.5-flash",
-    response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
@@ -154,7 +153,9 @@ Return ONLY valid JSON — no markdown, no explanation:
 
   let oppData: OppData;
   try {
-    oppData = JSON.parse(parseRes.choices[0].message.content ?? "{}") as OppData;
+    const raw = parseRes.choices[0].message.content ?? "{}";
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0] ?? "{}";
+    oppData = JSON.parse(jsonStr) as OppData;
     if (!oppData.keyword || !oppData.questions?.length) throw new Error("bad parse");
   } catch {
     return NextResponse.json({ error: "Could not understand your situation. Please try describing it differently." }, { status: 422 });
@@ -387,4 +388,11 @@ Return ONLY valid JSON:
     chapters,
     socialCaptions,
   });
+  } catch (err) {
+    console.error("[generate] unhandled error:", err);
+    return NextResponse.json(
+      { error: "We hit a snag building your guide. Please try again." },
+      { status: 500 }
+    );
+  }
 }
