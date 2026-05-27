@@ -24,6 +24,14 @@ const SEED_SEARCHES = [
   "How do I register a CAC business in Nigeria from the US?",
 ];
 
+const PLATFORMS = [
+  { name: "WhatsApp",   color: "#25D366", bg: "#25D36614", border: "#25D36628" },
+  { name: "YouTube",    color: "#FF0000", bg: "#FF000014", border: "#FF000028" },
+  { name: "TikTok",     color: "#374151", bg: "#37415114", border: "#37415128" },
+  { name: "Instagram",  color: "#E1306C", bg: "#E1306C14", border: "#E1306C28" },
+  { name: "Newsletter", color: "#7C3AED", bg: "#7C3AED14", border: "#7C3AED28" },
+];
+
 export default function EarnPage() {
   const [loading, setLoading] = useState(false);
   const [justJoined, setJustJoined] = useState(false);
@@ -86,21 +94,21 @@ export default function EarnPage() {
         .e-hero-left {
           background: #F0EAFF;
           display: flex; align-items: center; justify-content: center;
-          padding: 80px 56px;
+          padding: 80px 52px;
           position: relative; overflow: hidden;
         }
         .e-hero-left::before {
           content: '';
           position: absolute;
-          width: 600px; height: 600px;
-          background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 68%);
+          width: 700px; height: 700px;
+          background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%);
           top: 50%; left: 50%; transform: translate(-50%,-50%);
           pointer-events: none;
         }
         .e-hero-right {
           background: #fff;
           display: flex; flex-direction: column; justify-content: center;
-          padding: 80px 72px 80px 60px;
+          padding: 72px 68px 72px 56px;
         }
 
         /* ─── CHIP ─── */
@@ -110,21 +118,65 @@ export default function EarnPage() {
           border-radius: 999px; padding: 5px 13px;
           font-size: 0.63rem; font-weight: 800; color: #7C3AED;
           letter-spacing: 0.1em; text-transform: uppercase;
-          margin-bottom: 26px; width: fit-content;
+          margin-bottom: 24px; width: fit-content;
         }
 
         /* ─── HEADLINE ─── */
         .e-h1 {
-          font-size: clamp(2.8rem, 4.2vw, 4.8rem);
+          font-size: clamp(2.6rem, 3.8vw, 4.4rem);
           font-weight: 900; color: #0F0A1A;
           line-height: 1.04; letter-spacing: -0.048em;
-          margin-bottom: 22px;
+          margin-bottom: 18px;
         }
         .e-hero-sub {
-          font-size: 1.02rem; color: #4B4358;
-          line-height: 1.68; margin-bottom: 34px; max-width: 400px;
+          font-size: 0.97rem; color: #4B4358;
+          line-height: 1.65; margin-bottom: 28px; max-width: 420px;
         }
         .e-hero-sub strong { color: #0F0A1A; font-weight: 700; }
+
+        /* ─── 3-STEP MECHANISM ─── */
+        .e-steps {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          margin-bottom: 28px;
+          position: relative;
+        }
+        .e-steps::before {
+          content: '';
+          position: absolute;
+          top: 13px;
+          left: 20px;
+          right: 20px;
+          height: 1px;
+          background: rgba(124,58,237,0.15);
+        }
+        .e-step { position: relative; z-index: 1; padding-right: 10px; }
+        .e-step-num {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 26px; height: 26px;
+          border-radius: 7px;
+          background: rgba(124,58,237,0.09);
+          border: 1px solid rgba(124,58,237,0.2);
+          font-size: 0.58rem; font-weight: 900; color: #7C3AED;
+          letter-spacing: 0.04em;
+          margin-bottom: 9px;
+        }
+        .e-step-title {
+          font-size: 0.86rem; font-weight: 800; color: #0F0A1A;
+          margin-bottom: 4px; letter-spacing: -0.01em;
+        }
+        .e-step-desc {
+          font-size: 0.67rem; color: #6B5E52; line-height: 1.6;
+        }
+        .e-step-platforms {
+          display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px;
+        }
+        .e-plat {
+          font-size: 0.55rem; font-weight: 700;
+          padding: 2px 7px; border-radius: 999px;
+          border: 1px solid; white-space: nowrap;
+        }
 
         /* ─── CTA BUTTON ─── */
         .e-btn {
@@ -135,7 +187,7 @@ export default function EarnPage() {
           box-shadow: 0 4px 20px rgba(124,58,237,0.3);
           transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
           letter-spacing: -0.01em; margin-bottom: 14px;
-          display: inline-block; width: 100%; max-width: 380px; text-align: center;
+          display: inline-block; width: 100%; max-width: 400px; text-align: center;
         }
         .e-btn:hover { background: #6D28D9; box-shadow: 0 8px 30px rgba(109,40,217,0.35); transform: translateY(-1px); }
         .e-btn:active { transform: scale(0.99); }
@@ -151,10 +203,10 @@ export default function EarnPage() {
         /* ─── NOTIFICATION ─── */
         .e-notif {
           background: #fff; border-radius: 16px;
-          padding: 11px 15px;
-          display: flex; align-items: center; gap: 11px;
+          padding: 10px 14px;
+          display: flex; align-items: center; gap: 10px;
           box-shadow: 0 8px 36px rgba(0,0,0,0.13);
-          margin-bottom: 14px; width: 252px;
+          margin-bottom: 14px; width: 244px;
           animation: notif-in 0.5s ease 0.4s both;
         }
         @keyframes notif-in {
@@ -162,65 +214,112 @@ export default function EarnPage() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .e-notif-icon {
-          width: 36px; height: 36px; border-radius: 9px;
+          width: 34px; height: 34px; border-radius: 8px;
           background: #25D366;
           display: flex; align-items: center; justify-content: center;
-          font-size: 1.05rem; flex-shrink: 0;
+          font-size: 1rem; flex-shrink: 0;
         }
-        .e-notif-app { font-size: 0.58rem; font-weight: 800; color: #9B8899; text-transform: uppercase; letter-spacing: 0.07em; }
-        .e-notif-title { font-size: 0.72rem; font-weight: 800; color: #0F0A1A; margin-top: 1px; }
-        .e-notif-amt { font-size: 0.82rem; font-weight: 900; color: #15803D; }
-        .e-notif-sub { font-size: 0.58rem; color: #9B8899; margin-top: 1px; }
+        .e-notif-app { font-size: 0.57rem; font-weight: 800; color: #9B8899; text-transform: uppercase; letter-spacing: 0.07em; }
+        .e-notif-title { font-size: 0.71rem; font-weight: 800; color: #0F0A1A; margin-top: 1px; }
+        .e-notif-amt { font-size: 0.8rem; font-weight: 900; color: #15803D; }
+        .e-notif-sub { font-size: 0.57rem; color: #9B8899; margin-top: 1px; }
 
-        /* ─── iPHONE MOCKUP ─── */
+        /* ─── iPHONE 16 PRO MOCKUP ─── */
         .e-phone {
-          width: 252px;
-          background: linear-gradient(170deg, #54545A 0%, #1C1C1E 45%, #2C2C2E 100%);
-          border-radius: 50px;
-          padding: 14px 10px 22px;
+          width: 244px;
+          background: linear-gradient(
+            165deg,
+            #6E6E72 0%,
+            #4A4A4C 12%,
+            #2A2A2C 35%,
+            #1C1C1E 55%,
+            #262628 75%,
+            #323234 90%,
+            #3E3E40 100%
+          );
+          border-radius: 54px;
+          padding: 12px 9px 20px;
           position: relative;
           box-shadow:
-            0 60px 100px rgba(0,0,0,0.45),
-            0 20px 40px rgba(0,0,0,0.2),
-            0 0 0 1px rgba(255,255,255,0.13),
-            inset 0 1px 0 rgba(255,255,255,0.18),
-            inset 0 -1px 0 rgba(0,0,0,0.5);
+            0 90px 140px rgba(0,0,0,0.6),
+            0 45px 70px rgba(0,0,0,0.32),
+            0 18px 32px rgba(0,0,0,0.18),
+            0 6px 10px rgba(0,0,0,0.12),
+            0 0 0 1px rgba(255,255,255,0.16),
+            inset 0 2px 0 rgba(255,255,255,0.24),
+            inset 0 -3px 0 rgba(0,0,0,0.65),
+            inset 2px 0 0 rgba(255,255,255,0.07),
+            inset -2px 0 0 rgba(255,255,255,0.03);
         }
-        /* Volume / mute buttons — left side */
+
+        /* Left side: action button + vol up + vol down */
         .e-phone::before {
           content: '';
           position: absolute;
-          left: -4px; top: 80px;
-          width: 4px; height: 20px;
-          background: linear-gradient(180deg, #4A4A4C, #38383A);
-          border-radius: 2px 0 0 2px;
+          left: -5px; top: 84px;
+          width: 5px; height: 22px;
+          background: linear-gradient(90deg, #505052, #3C3C3E);
+          border-radius: 3px 0 0 3px;
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.08),
-            0 38px 0 0 #38383A,
-            0 76px 0 0 #38383A;
+            inset 0 1px 0 rgba(255,255,255,0.16),
+            inset 0 -1px 0 rgba(0,0,0,0.45),
+            0 40px 0 0 #3C3C3E,
+            0 77px 0 0 #3C3C3E;
         }
-        /* Power button — right side */
+
+        /* Right side: power button */
         .e-phone::after {
           content: '';
           position: absolute;
-          right: -4px; top: 110px;
-          width: 4px; height: 68px;
-          background: linear-gradient(180deg, #4A4A4C, #38383A);
-          border-radius: 0 2px 2px 0;
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+          right: -5px; top: 106px;
+          width: 5px; height: 70px;
+          background: linear-gradient(90deg, #3C3C3E, #505052);
+          border-radius: 0 3px 3px 0;
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.16),
+            inset 0 -1px 0 rgba(0,0,0,0.45);
         }
+
         .e-phone-screen {
           background: #fff;
-          border-radius: 38px;
+          border-radius: 44px;
           overflow: hidden;
+          position: relative;
+        }
+
+        /* Glass reflection on screen */
+        .e-phone-screen::after {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 70px;
+          background: linear-gradient(
+            175deg,
+            rgba(255,255,255,0.09) 0%,
+            rgba(255,255,255,0.03) 55%,
+            transparent 100%
+          );
+          pointer-events: none;
+          z-index: 10;
+          border-radius: 44px 44px 0 0;
         }
 
         /* Dynamic Island */
         .e-phone-di {
-          width: 82px; height: 26px;
+          width: 90px; height: 30px;
           background: #000;
-          border-radius: 18px;
+          border-radius: 20px;
           margin: 10px auto 8px;
+          position: relative; z-index: 2;
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+        }
+
+        /* Home indicator */
+        .e-phone-home {
+          width: 108px; height: 4px;
+          background: rgba(0,0,0,0.2);
+          border-radius: 3px;
+          margin: 8px auto 0;
         }
 
         /* Screen: header */
@@ -229,7 +328,7 @@ export default function EarnPage() {
           padding: 10px 18px 14px;
         }
         .e-ps-app {
-          font-size: 0.58rem; font-weight: 700;
+          font-size: 0.57rem; font-weight: 700;
           color: rgba(255,255,255,0.65);
           letter-spacing: 0.1em; text-transform: uppercase;
         }
@@ -240,31 +339,31 @@ export default function EarnPage() {
         /* Screen: week */
         .e-ps-week {
           background: #F9F5FF;
-          padding: 14px 18px 12px;
+          padding: 13px 18px 11px;
           border-bottom: 1px solid #EEE8F8;
         }
         .e-ps-week-lbl {
-          font-size: 0.58rem; font-weight: 800; color: #9B8AF0;
+          font-size: 0.57rem; font-weight: 800; color: #9B8AF0;
           text-transform: uppercase; letter-spacing: 0.09em;
         }
         .e-ps-week-amt {
-          font-size: 2rem; font-weight: 900; color: #15803D;
+          font-size: 1.9rem; font-weight: 900; color: #15803D;
           letter-spacing: -0.045em; line-height: 1.1; margin-top: 3px;
         }
         .e-ps-week-meta {
-          font-size: 0.58rem; color: #6B5E52; margin-top: 3px;
+          font-size: 0.57rem; color: #6B5E52; margin-top: 3px;
         }
 
         /* Screen: rows */
-        .e-ps-rows { padding: 8px 18px 16px; }
+        .e-ps-rows { padding: 8px 18px 14px; }
         .e-ps-row {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 6px 0; border-bottom: 1px solid #F5F0EB;
-          font-size: 0.68rem;
+          padding: 5px 0; border-bottom: 1px solid #F5F0EB;
+          font-size: 0.67rem;
         }
         .e-ps-row:last-child { border-bottom: none; }
         .e-ps-row-day { color: #6B5E52; font-weight: 500; flex: 1; }
-        .e-ps-row-sales { color: #A78BFA; font-weight: 600; font-size: 0.6rem; flex-shrink: 0; margin-right: 10px; }
+        .e-ps-row-sales { color: #A78BFA; font-weight: 600; font-size: 0.59rem; flex-shrink: 0; margin-right: 10px; }
         .e-ps-row-amt { font-weight: 800; color: #0F0A1A; }
 
         /* ─── PROOF STRIP ─── */
@@ -505,6 +604,11 @@ export default function EarnPage() {
           .e-av-row { display: none; }
         }
 
+        @media (max-width: 700px) {
+          .e-steps { grid-template-columns: 1fr; gap: 16px; }
+          .e-steps::before { display: none; }
+        }
+
         @media (max-width: 600px) {
           .e-hero-left { display: none; }
           .e-hero-right { padding: 56px 22px 44px; }
@@ -582,7 +686,7 @@ export default function EarnPage() {
                 </div>
               </div>
 
-              {/* iPhone mockup */}
+              {/* iPhone 16 Pro mockup */}
               <div className="e-phone">
                 <div className="e-phone-screen">
                   <div className="e-phone-di" />
@@ -610,11 +714,12 @@ export default function EarnPage() {
                     ))}
                   </div>
                 </div>
+                <div className="e-phone-home" />
               </div>
             </div>
           </div>
 
-          {/* Right — copy */}
+          {/* Right — copy + mechanism */}
           <div className="e-hero-right">
             <div className="e-chip">Curator Programme</div>
             <h1 className="e-h1">
@@ -623,8 +728,41 @@ export default function EarnPage() {
               Your earnings.
             </h1>
             <p className="e-hero-sub">
-              Your community already asks you. <strong>Earn £7.99 every time they find the answer.</strong>
+              Find a guide your community needs. Read it. <strong>If you&apos;d put your name on it — share your link and earn 80% of every sale.</strong>
             </p>
+
+            {/* 3-step mechanism */}
+            <div className="e-steps">
+              <div className="e-step">
+                <div className="e-step-num">01</div>
+                <div className="e-step-title">Read</div>
+                <div className="e-step-desc">
+                  Browse 1,000+ guides. Pick one for your niche. Read it before you share anything.
+                </div>
+              </div>
+              <div className="e-step">
+                <div className="e-step-num">02</div>
+                <div className="e-step-title">Share</div>
+                <div className="e-step-desc">
+                  If you&apos;d put your name on it — send your link.
+                </div>
+                <div className="e-step-platforms">
+                  {PLATFORMS.map((p) => (
+                    <span key={p.name} className="e-plat" style={{ color: p.color, background: p.bg, borderColor: p.border }}>
+                      {p.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="e-step">
+                <div className="e-step-num">03</div>
+                <div className="e-step-title">Earn</div>
+                <div className="e-step-desc">
+                  80% of every sale. £7.99 a time. For life.
+                </div>
+              </div>
+            </div>
+
             <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
               {loading ? "Opening checkout…" : "Become a Curator →"}
             </button>
@@ -652,7 +790,7 @@ export default function EarnPage() {
           <div className="e-proof-sep" />
           <div className="e-proof-item">
             <span className="e-proof-val">1000+</span>
-            <span className="e-proof-lbl">guides live</span>
+            <span className="e-proof-lbl">guides to share</span>
           </div>
         </div>
 
@@ -824,7 +962,8 @@ export default function EarnPage() {
               <div className="e-price-list">
                 {[
                   "£7.99 per sale — for life (80% of every guide)",
-                  "Your curator link for every guide in the library",
+                  "Read every guide in the library before you share it",
+                  "Your curator link for every guide — 1,000+ topics",
                   "Ready-made captions for WhatsApp, YouTube, TikTok and Instagram",
                   "Real-time earnings dashboard",
                   "Every new guide added, at no extra cost",
