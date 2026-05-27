@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
   const result = related.map(p => ({
     slug: p.slug,
     title: p.title,
-    price: `£${(p.opportunity.minPrice ?? 24.99).toFixed(2)}`,
+    price: `£${(p.opportunity.minPrice ?? 9.99).toFixed(2)}`,
   }));
 
   return NextResponse.json(result);

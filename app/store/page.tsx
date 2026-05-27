@@ -193,7 +193,7 @@ export default async function StorePage() {
                     const countryCode = p.opportunity?.country ?? "GB";
                     const flag = FLAG[countryCode] ?? "🌍";
                     const sym = p.opportunity?.isDiaspora ? "£" : (CURRENCY[countryCode] ?? "£");
-                    const priceAmt = p.opportunity?.minPrice ?? 24.99;
+                    const priceAmt = p.opportunity?.minPrice ?? 9.99;
 
                     return (
                       <div key={p.id} className="seeds-card">

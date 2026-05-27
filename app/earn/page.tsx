@@ -415,6 +415,24 @@ export default function EarnPage() {
         .e-btn-white:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .e-price-guarantee { font-size: 0.68rem; color: rgba(167,139,250,0.6); line-height: 1.8; }
 
+        /* ─── MILESTONE TRACK ─── */
+        .e-milestones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .e-ms {
+          background: #fff; border: 1px solid #E0D9FF;
+          border-radius: 14px; padding: 18px 14px; text-align: center;
+        }
+        .e-ms.e-ms-hi {
+          background: #F0FDF4; border-color: #86EFAC;
+          box-shadow: 0 4px 24px rgba(22,163,74,0.1);
+        }
+        .e-ms-num { font-size: 0.66rem; font-weight: 800; color: #A78BFA; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+        .e-ms-hi .e-ms-num { color: #15803D; }
+        .e-ms-earn { font-size: 1.5rem; font-weight: 900; color: #6D28D9; letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+        .e-ms-hi .e-ms-earn { color: #15803D; }
+        .e-ms-label { font-size: 0.7rem; color: #6B5E52; line-height: 1.45; }
+        .e-ms-hi .e-ms-label { color: #15803D; font-weight: 700; }
+        @media (max-width: 600px) { .e-milestones { grid-template-columns: repeat(3,1fr); gap: 8px; } .e-ms { padding: 14px 8px; } .e-ms-earn { font-size: 1.15rem; } }
+
         /* ─── FAQ ─── */
         .e-faqs { display: flex; flex-direction: column; gap: 10px; }
         .e-faq {
@@ -571,18 +589,18 @@ export default function EarnPage() {
 
             {/* Copy */}
             <div className="e-hero-copy">
-              <div className="e-chip">For diaspora leaders and creators</div>
+              <div className="e-chip">For the person your community asks about home</div>
               <h1 className="e-h1">
-                Your community keeps asking about home.<br />
-                <em>Now you earn every time they get an answer.</em>
+                Your community asks you about home.<br />
+                <em>You&apos;ve been answering for free.</em>
               </h1>
               <p className="e-hero-sub">
-                You already talk about home. Share the guide they need — <strong>earn £19.99 every time someone buys it. For life.</strong>
+                Share the guide that answers their question — earn £7.99 every time someone buys it. <strong>Three sales and your £19.99 membership is paid for. Everything after that is yours.</strong>
               </p>
               <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
                 {loading ? "Opening checkout…" : "Become a Curator →"}
               </button>
-              <div className="e-trust">£19.99 one-time · No monthly fees · 30-day money-back guarantee</div>
+              <div className="e-trust">£19.99 one-time · 3 sales covers it · 30-day money-back guarantee</div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 18 }}>
                 {([
                   { Icon: MessageCircle, name: "WhatsApp",   bg: "#F0FFF4", border: "#D1FAE5", color: "#22C55E" },
@@ -639,8 +657,8 @@ export default function EarnPage() {
             <div className="e-trust-step">
               <div className="e-trust-icon"><PoundSterling size={16} strokeWidth={1.75} color="#0F0A1A" /></div>
               <div>
-                <div className="e-trust-label">Earn 80% — forever</div>
-                <div className="e-trust-desc">Every time someone buys through your link</div>
+                <div className="e-trust-label">Earn £7.99 per sale — forever</div>
+                <div className="e-trust-desc">Paid monthly. Nothing to chase, nothing to invoice.</div>
               </div>
             </div>
           </div>
@@ -660,7 +678,7 @@ export default function EarnPage() {
           </div>
           <div className="e-proof-sep" />
           <div className="e-proof-item">
-            <span className="e-proof-val">£19.99</span>
+            <span className="e-proof-val">£7.99</span>
             <span className="e-proof-lbl">per recommendation</span>
           </div>
           <div className="e-proof-sep" />
@@ -708,16 +726,33 @@ export default function EarnPage() {
         <section className="e-section">
           <div className="e-wrap">
             <div className="e-tag">The numbers</div>
-            <h2 className="e-h2">What one post can return.</h2>
+            <h2 className="e-h2">Three sales. Then it&apos;s all yours.</h2>
             <div className="e-math">
               <div className="e-math-head">
-                Guide price <strong>£24.99</strong> × your <strong>80%</strong> = <strong>£19.99 per recommendation</strong>
+                Guide price <strong>£9.99</strong> × your <strong>80%</strong> = <strong>£7.99 per recommendation</strong>
+              </div>
+              <div className="e-milestones">
+                <div className="e-ms e-ms-hi">
+                  <div className="e-ms-num">3 sales</div>
+                  <div className="e-ms-earn">£23.97</div>
+                  <div className="e-ms-label">✓ Membership paid for<br />+ £3.98 profit</div>
+                </div>
+                <div className="e-ms">
+                  <div className="e-ms-num">10 sales</div>
+                  <div className="e-ms-earn">£79.90</div>
+                  <div className="e-ms-label">A quiet week</div>
+                </div>
+                <div className="e-ms">
+                  <div className="e-ms-num">30 sales</div>
+                  <div className="e-ms-earn">£239.70</div>
+                  <div className="e-ms-label">A good month</div>
+                </div>
               </div>
               <div className="e-math-rows">
                 {[
-                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy",       earn: "£199.90"  },
-                  { Icon: PlayCircle,    text: "YouTube description link · 30 buyers/month", earn: "£599.70" },
-                  { Icon: Music2,        text: "TikTok caption + link in bio · 20 buyers",   earn: "£399.80" },
+                  { Icon: MessageCircle, text: "One WhatsApp message to your group · 10 buyers",  earn: "£79.90"  },
+                  { Icon: PlayCircle,    text: "YouTube description link · 30 buyers/month",       earn: "£239.70" },
+                  { Icon: Music2,        text: "TikTok caption + link in bio · 20 buyers",         earn: "£159.80" },
                 ].map((r, i) => (
                   <div key={i} className="e-math-row">
                     <span className="e-math-icon"><r.Icon size={16} strokeWidth={1.75} color="#6B5E52" /></span>
@@ -727,7 +762,7 @@ export default function EarnPage() {
                 ))}
               </div>
               <div className="e-math-note">
-                Conservative. In an audience that trusts you, 10 buyers is a quiet week — and a good guide gets forwarded.
+                Three buyers from a WhatsApp group that trusts you is a quiet Tuesday. Most curators are in profit within the first week.
               </div>
             </div>
           </div>
@@ -742,7 +777,7 @@ export default function EarnPage() {
             <h2 className="e-h2">Everything for £19.99 — once.</h2>
             <div className="e-get">
               {[
-                { Icon: Banknote, title: "£19.99 per sale — for life", desc: "Paid automatically every month. Nothing to chase, nothing to invoice." },
+                { Icon: Banknote, title: "£7.99 per sale — for life", desc: "80% of every guide, paid automatically every month. Nothing to chase, nothing to invoice." },
                 { Icon: Link2, title: "One link. Every guide. Every niche.", desc: "Your unique curator link works across all 1000+ guides. Share any of them — they all earn." },
                 { Icon: MessageSquare, title: "Copy, paste, earn — everything pre-written.", desc: "WhatsApp messages, YouTube descriptions, TikTok captions, Instagram stories. Pick one, paste it, post. Live in two minutes." },
                 { Icon: BarChart3, title: "Real-time dashboard — every buyer, every penny", desc: "See exactly what's earning and what isn't. Live, not delayed." },
@@ -792,6 +827,36 @@ export default function EarnPage() {
           </>
         )}
 
+        {/* ── FAQ ── */}
+        <hr className="e-divider" />
+        <section className="e-section">
+          <div className="e-wrap">
+            <div className="e-tag">Before you ask</div>
+            <h2 className="e-h2">Three things people wonder.</h2>
+            <div className="e-faqs">
+              {[
+                {
+                  q: "Do I need a big following?",
+                  a: "No. Most top earners use WhatsApp. A group of 50 people who actually trust you will convert better than 5,000 followers who scroll past. Community beats audience every time.",
+                },
+                {
+                  q: "When does the money arrive?",
+                  a: "Every month, automatically. You don't invoice anyone. You don't chase anyone. It lands in your account.",
+                },
+                {
+                  q: "What if nobody buys?",
+                  a: "You have 30 days to try it, completely risk-free. If you want your money back, you get it — no questions, no conditions.",
+                },
+              ].map((f, i) => (
+                <div key={i} className="e-faq">
+                  <div className="e-faq-q">{f.q}</div>
+                  <div className="e-faq-a">{f.a}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── PRICE BLOCK ── */}
         <div className="e-price-bg">
           <div className="e-wrap">
@@ -799,10 +864,10 @@ export default function EarnPage() {
               <span className="e-price-eyebrow">Curator Programme Access</span>
               <div className="e-price-num">£19.99</div>
               <div className="e-price-sub">One-time. No subscriptions. No monthly fees.</div>
-              <div className="e-price-recover">One sale and your membership is paid for. Every one after that is pure profit.</div>
+              <div className="e-price-recover">Three sales covers your £19.99. Every sale after that is pure profit.</div>
               <div className="e-price-list">
                 {[
-                  "£19.99 per sale — for life (80% of every guide)",
+                  "£7.99 per sale — for life (80% of every guide)",
                   "Your curator link for every guide in the library",
                   "Ready-made captions, posts and templates for WhatsApp, YouTube, TikTok and Instagram",
                   "Real-time earnings dashboard",

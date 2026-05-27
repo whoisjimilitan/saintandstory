@@ -86,7 +86,7 @@ export default async function SellPage({ params }: Props) {
     return "£";
   })();
 
-  const priceNum  = opportunity?.minPrice ?? (isBJ ? 7 : 24.99);
+  const priceNum  = opportunity?.minPrice ?? (isBJ ? 7 : 9.99);
   const price     = `${currency}${priceNum.toFixed(2)}`;
   const buyUrl    = product.gumroadUrl || `/guide/${slug}`;
 

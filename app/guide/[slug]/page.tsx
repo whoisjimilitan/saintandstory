@@ -91,7 +91,7 @@ export default async function GuidePage({ params }: Props) {
     : opportunity?.country === "AU" ? "A$"
     : "$";
 
-  const price = opportunity ? `${opportunity.minPrice.toFixed(2)}` : "24.99";
+  const price = opportunity ? `${opportunity.minPrice.toFixed(2)}` : "9.99";
   const related = await prisma.product.findMany({
     where: {
       published: true,
