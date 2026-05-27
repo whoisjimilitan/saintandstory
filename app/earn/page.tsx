@@ -574,11 +574,10 @@ export default function EarnPage() {
               <div className="e-chip">For diaspora leaders and creators</div>
               <h1 className="e-h1">
                 Your community keeps asking about home.<br />
-                Now you always have the answer.<br />
-                <em>And earn 80% every time you share it.</em>
+                <em>Now you earn every time they get an answer.</em>
               </h1>
               <p className="e-hero-sub">
-                You only share what you&apos;d put your name behind. <strong>That&apos;s exactly why it converts.</strong>
+                You already talk about home. Share the guide they need — <strong>earn £19.99 every time someone buys it. For life.</strong>
               </p>
               <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
                 {loading ? "Opening checkout…" : "Become a Curator →"}
@@ -661,7 +660,7 @@ export default function EarnPage() {
           </div>
           <div className="e-proof-sep" />
           <div className="e-proof-item">
-            <span className="e-proof-val">£7.99</span>
+            <span className="e-proof-val">£19.99</span>
             <span className="e-proof-lbl">per recommendation</span>
           </div>
           <div className="e-proof-sep" />
@@ -712,13 +711,13 @@ export default function EarnPage() {
             <h2 className="e-h2">What one post can return.</h2>
             <div className="e-math">
               <div className="e-math-head">
-                Guide price <strong>£9.99</strong> × your <strong>80%</strong> = <strong>£7.99 per recommendation</strong>
+                Guide price <strong>£24.99</strong> × your <strong>80%</strong> = <strong>£19.99 per recommendation</strong>
               </div>
               <div className="e-math-rows">
                 {[
-                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy",       earn: "£79.90"  },
-                  { Icon: PlayCircle,    text: "YouTube description link · 30 buyers/month", earn: "£239.70" },
-                  { Icon: Music2,        text: "TikTok caption + link in bio · 20 buyers",   earn: "£159.80" },
+                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy",       earn: "£199.90"  },
+                  { Icon: PlayCircle,    text: "YouTube description link · 30 buyers/month", earn: "£599.70" },
+                  { Icon: Music2,        text: "TikTok caption + link in bio · 20 buyers",   earn: "£399.80" },
                 ].map((r, i) => (
                   <div key={i} className="e-math-row">
                     <span className="e-math-icon"><r.Icon size={16} strokeWidth={1.75} color="#6B5E52" /></span>
@@ -743,9 +742,9 @@ export default function EarnPage() {
             <h2 className="e-h2">Everything for £19.99 — once.</h2>
             <div className="e-get">
               {[
-                { Icon: Banknote, title: "80% commission — for life", desc: "Paid automatically every month. Nothing to chase, nothing to invoice." },
-                { Icon: Link2, title: "Your curator link for every guide in the library", desc: "Share any of the 1000+ guides across every niche. Each one has your unique link." },
-                { Icon: MessageSquare, title: "Ready-made posts, captions and templates", desc: "For WhatsApp, YouTube, TikTok and Instagram. Copy, paste, post — you're live in minutes." },
+                { Icon: Banknote, title: "£19.99 per sale — for life", desc: "Paid automatically every month. Nothing to chase, nothing to invoice." },
+                { Icon: Link2, title: "One link. Every guide. Every niche.", desc: "Your unique curator link works across all 1000+ guides. Share any of them — they all earn." },
+                { Icon: MessageSquare, title: "Copy, paste, earn — everything pre-written.", desc: "WhatsApp messages, YouTube descriptions, TikTok captions, Instagram stories. Pick one, paste it, post. Live in two minutes." },
                 { Icon: BarChart3, title: "Real-time dashboard — every buyer, every penny", desc: "See exactly what's earning and what isn't. Live, not delayed." },
                 { Icon: BookOpen, title: "Every new guide added — at no extra cost", desc: "The library keeps growing. Your earning potential grows with it." },
               ].map((b, i) => (
@@ -800,10 +799,10 @@ export default function EarnPage() {
               <span className="e-price-eyebrow">Curator Programme Access</span>
               <div className="e-price-num">£19.99</div>
               <div className="e-price-sub">One-time. No subscriptions. No monthly fees.</div>
-              <div className="e-price-recover">3 recommendations cover the £19.99. Every one after that is yours.</div>
+              <div className="e-price-recover">One sale and your membership is paid for. Every one after that is pure profit.</div>
               <div className="e-price-list">
                 {[
-                  "80% commission — for life",
+                  "£19.99 per sale — for life (80% of every guide)",
                   "Your curator link for every guide in the library",
                   "Ready-made captions, posts and templates for WhatsApp, YouTube, TikTok and Instagram",
                   "Real-time earnings dashboard",
@@ -830,8 +829,8 @@ export default function EarnPage() {
         <div className="e-final-outer">
           <div className="e-final">
             <h2 className="e-final-h">
-              Your community keeps asking about home.<br />
-              You could be earning every time they do.
+              Every question your community asks about home<br />
+              is money you could already be earning.
             </h2>
             <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
               {loading ? "Opening checkout…" : "Become a Curator — £19.99 →"}
