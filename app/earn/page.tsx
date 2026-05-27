@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Search, ShieldCheck, PoundSterling, Banknote, Link2, MessageSquare, BarChart3, BookOpen, MessageCircle, Pin, Mail } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, ShieldCheck, PoundSterling, Banknote, Link2, MessageSquare, BarChart3, BookOpen, MessageCircle, Mail, PlayCircle, Music2, Camera } from "lucide-react";
 
 const AVATARS = [
   { initials: "AO", name: "Adaeze O.", role: "Nigerian community · London", stat: "£340 first month", how: "One pinned message", platform: "WhatsApp", platformColor: "#25D366" },
@@ -31,20 +31,6 @@ const TESTIMONIALS = [
   },
 ];
 
-const FAQS = [
-  {
-    q: "Do I handle delivery, support, or refunds?",
-    a: "Nothing. You share the link. We handle everything — delivery, customer support, and any refunds come entirely from our side. Your name stays clean.",
-  },
-  {
-    q: "Do I need a big audience?",
-    a: "No. 200 followers who trust you will outperform 20,000 who don't. If people come to you for answers, they'll buy from you.",
-  },
-  {
-    q: "Is there a monthly fee?",
-    a: "No. £19.99 once. Full access forever, including every new guide we add to the library.",
-  },
-];
 
 export default function EarnPage() {
   const [loading, setLoading] = useState(false);
@@ -315,7 +301,7 @@ export default function EarnPage() {
           transition: box-shadow 0.2s;
         }
         .e-tcard:hover { box-shadow: 0 8px 28px rgba(139,92,246,0.1); }
-        .e-tcard-q { font-size: 1.8rem; color: #E0D9FF; font-family: Georgia, serif; line-height: 1; }
+        .e-tcard-q { font-size: 3.5rem; color: #C4B5FD; font-family: Georgia, serif; line-height: 1; }
         .e-tcard-text { font-size: 0.88rem; color: #1A1008; line-height: 1.7; flex: 1; font-weight: 500; }
         .e-tcard-name { font-size: 0.79rem; font-weight: 800; color: #0F0A1A; }
         .e-tcard-role { font-size: 0.67rem; color: #9B8AF0; margin-top: 2px; }
@@ -585,30 +571,32 @@ export default function EarnPage() {
 
             {/* Copy */}
             <div className="e-hero-copy">
-              <div className="e-chip">For diaspora community leaders and creators — on any platform</div>
+              <div className="e-chip">For diaspora leaders and creators</div>
               <h1 className="e-h1">
                 Your community keeps asking about home.<br />
                 Now you always have the answer.<br />
                 <em>And earn 80% every time you share it.</em>
               </h1>
               <p className="e-hero-sub">
-                You&apos;re already the go-to. <strong>Earn 80% every time you are.</strong>
+                You only share what you&apos;d put your name behind. <strong>That&apos;s exactly why it converts.</strong>
               </p>
               <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
                 {loading ? "Opening checkout…" : "Become a Curator →"}
               </button>
               <div className="e-trust">£19.99 one-time · No monthly fees · 30-day money-back guarantee</div>
-              <div style={{ marginTop: 16, fontSize: "0.65rem", color: "#B0A89A", letterSpacing: "0.04em", fontWeight: 500 }}>
-                Works on:&nbsp;
-                <span style={{ color: "#25D366", fontWeight: 700 }}>WhatsApp</span>
-                {" · "}
-                <span style={{ color: "#FF0000", fontWeight: 700 }}>YouTube</span>
-                {" · "}
-                <span style={{ color: "#2D2D2D", fontWeight: 700 }}>TikTok</span>
-                {" · "}
-                <span style={{ color: "#E1306C", fontWeight: 700 }}>Instagram</span>
-                {" · "}
-                <span style={{ fontWeight: 700 }}>Newsletter</span>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 18 }}>
+                {([
+                  { Icon: MessageCircle, name: "WhatsApp",   bg: "#F0FFF4", border: "#D1FAE5", color: "#22C55E" },
+                  { Icon: PlayCircle,    name: "YouTube",    bg: "#FFF1F1", border: "#FECACA", color: "#EF4444" },
+                  { Icon: Music2,        name: "TikTok",     bg: "#F5F5F5", border: "#E5E5E5", color: "#374151" },
+                  { Icon: Camera,        name: "Instagram",  bg: "#FFF0F7", border: "#FBCFE8", color: "#EC4899" },
+                  { Icon: Mail,          name: "Newsletter", bg: "#F5F3FF", border: "#DDD6FE", color: "#7C3AED" },
+                ] as { Icon: React.ElementType; name: string; bg: string; border: string; color: string }[]).map(({ Icon, name, bg, border, color }) => (
+                  <span key={name} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "4px 10px", fontSize: "0.64rem", fontWeight: 700, color }}>
+                    <Icon size={11} strokeWidth={2.5} />
+                    {name}
+                  </span>
+                ))}
               </div>
             </div>
 
@@ -728,9 +716,9 @@ export default function EarnPage() {
               </div>
               <div className="e-math-rows">
                 {[
-                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy", earn: "£79.90" },
-                  { Icon: Pin, text: "Pinned post across 3 groups · 10 buyers each", earn: "£239.70" },
-                  { Icon: Mail, text: "Newsletter mention · 50 buyers this month", earn: "£399.50" },
+                  { Icon: MessageCircle, text: "One WhatsApp message · 10 people buy",       earn: "£79.90"  },
+                  { Icon: PlayCircle,    text: "YouTube description link · 30 buyers/month", earn: "£239.70" },
+                  { Icon: Music2,        text: "TikTok caption + link in bio · 20 buyers",   earn: "£159.80" },
                 ].map((r, i) => (
                   <div key={i} className="e-math-row">
                     <span className="e-math-icon"><r.Icon size={16} strokeWidth={1.75} color="#6B5E52" /></span>
@@ -838,22 +826,6 @@ export default function EarnPage() {
           </div>
         </div>
 
-        {/* ── 3 FAQs ── */}
-        <section className="e-section">
-          <div className="e-wrap">
-            <div className="e-tag">Questions</div>
-            <h2 className="e-h2">The three things people ask before they join.</h2>
-            <div className="e-faqs">
-              {FAQS.map((f, i) => (
-                <div key={i} className="e-faq">
-                  <div className="e-faq-q">{f.q}</div>
-                  <p className="e-faq-a">{f.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* ── FINAL CTA ── */}
         <div className="e-final-outer">
           <div className="e-final">
@@ -864,58 +836,59 @@ export default function EarnPage() {
             <button className="e-btn" onClick={handleGetAccess} disabled={loading}>
               {loading ? "Opening checkout…" : "Become a Curator — £19.99 →"}
             </button>
-            <div style={{ fontSize: "0.68rem", color: "#B0A89A", marginTop: 14 }}>
-              One-time payment · 30-day money-back guarantee
-            </div>
             <div className="e-final-meta">
               <a href="mailto:hello@pdfseeds.com" className="e-final-link">Questions? hello@pdfseeds.com</a>
-              {!recovery && (
-                <>
-                  <span className="e-final-sep">·</span>
-                  <button className="e-final-link-btn" onClick={() => setRecovery(true)}>
-                    Already a curator? Resend my link →
-                  </button>
-                </>
-              )}
             </div>
-            {recovery && (
-              <div style={{ background: "#fff", border: "1.5px solid #EAE6E0", borderRadius: 14, padding: "20px 22px", maxWidth: 400, margin: "16px auto 0", textAlign: "left" }}>
-                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0F0A1A", marginBottom: 5 }}>Resend my dashboard link</div>
-                <div style={{ fontSize: "0.75rem", color: "#B0A89A", marginBottom: 18 }}>Enter the email you used when you joined.</div>
-                {recoveryStatus === "done" ? (
-                  <div style={{ fontSize: "0.82rem", color: "#15803D", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10, padding: "13px 16px" }}>
-                    ✓ Check your inbox — your dashboard link is on its way.
+          </div>
+        </div>
+
+        {/* ── RECOVERY — quiet, below main CTA ── */}
+        <div style={{ borderTop: "1px solid #EEE9E0", background: "#FAFAF9", padding: "32px 24px", textAlign: "center" }}>
+          {!recovery ? (
+            <button
+              className="e-final-link-btn"
+              onClick={() => setRecovery(true)}
+              style={{ fontSize: "0.72rem", color: "#B0A89A" }}
+            >
+              Already a curator? Get my dashboard link →
+            </button>
+          ) : (
+            <div style={{ maxWidth: 400, margin: "0 auto", textAlign: "left" }}>
+              <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0F0A1A", marginBottom: 4 }}>Resend my dashboard link</div>
+              <div style={{ fontSize: "0.72rem", color: "#B0A89A", marginBottom: 14 }}>Enter the email you used when you joined.</div>
+              {recoveryStatus === "done" ? (
+                <div style={{ fontSize: "0.82rem", color: "#15803D", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10, padding: "13px 16px" }}>
+                  ✓ Check your inbox — your dashboard link is on its way.
+                </div>
+              ) : recoveryStatus === "notfound" ? (
+                <div>
+                  <div style={{ fontSize: "0.82rem", color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "13px 16px", marginBottom: 10 }}>
+                    No account found. Try the email you used when you paid.
                   </div>
-                ) : recoveryStatus === "notfound" ? (
-                  <div>
-                    <div style={{ fontSize: "0.82rem", color: "#DC2626", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "13px 16px", marginBottom: 10 }}>
-                      No account found. Try the email you used when you paid.
-                    </div>
-                    <button onClick={() => setRecoveryStatus("idle")} style={{ background: "none", border: "none", color: "#8B5CF6", fontSize: "0.78rem", cursor: "pointer", fontWeight: 700 }}>
-                      Try a different email →
+                  <button onClick={() => setRecoveryStatus("idle")} style={{ background: "none", border: "none", color: "#8B5CF6", fontSize: "0.78rem", cursor: "pointer", fontWeight: 700 }}>
+                    Try a different email →
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleRecovery}>
+                  <div style={{ background: "#fff", border: "1.5px solid #EAE6E0", borderRadius: 10, padding: "4px 4px 4px 14px", display: "flex", alignItems: "center", gap: 7 }}>
+                    <input
+                      type="email" value={recoveryEmail}
+                      onChange={e => setRecoveryEmail(e.target.value)}
+                      placeholder="Your email address" required autoFocus
+                      style={{ flex: 1, border: "none", outline: "none", fontSize: "0.86rem", color: "#0F0A1A", background: "transparent", padding: "10px 0", fontFamily: "inherit" }}
+                    />
+                    <button
+                      type="submit" disabled={recoveryStatus === "sending"}
+                      style={{ background: "linear-gradient(135deg,#8B5CF6,#6D28D9)", color: "#fff", fontWeight: 700, fontSize: "0.78rem", padding: "9px 15px", border: "none", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap", opacity: recoveryStatus === "sending" ? 0.5 : 1, fontFamily: "inherit" }}
+                    >
+                      {recoveryStatus === "sending" ? "Sending…" : "Send link →"}
                     </button>
                   </div>
-                ) : (
-                  <form onSubmit={handleRecovery}>
-                    <div style={{ background: "#FAF9F7", border: "1.5px solid #EAE6E0", borderRadius: 10, padding: "4px 4px 4px 14px", display: "flex", alignItems: "center", gap: 7 }}>
-                      <input
-                        type="email" value={recoveryEmail}
-                        onChange={e => setRecoveryEmail(e.target.value)}
-                        placeholder="Your email address" required autoFocus
-                        style={{ flex: 1, border: "none", outline: "none", fontSize: "0.86rem", color: "#0F0A1A", background: "transparent", padding: "10px 0", fontFamily: "inherit" }}
-                      />
-                      <button
-                        type="submit" disabled={recoveryStatus === "sending"}
-                        style={{ background: "linear-gradient(135deg,#8B5CF6,#6D28D9)", color: "#fff", fontWeight: 700, fontSize: "0.78rem", padding: "9px 15px", border: "none", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap", opacity: recoveryStatus === "sending" ? 0.5 : 1, fontFamily: "inherit" }}
-                      >
-                        {recoveryStatus === "sending" ? "Sending…" : "Send link →"}
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            )}
-          </div>
+                </form>
+              )}
+            </div>
+          )}
         </div>
 
         <footer className="e-footer">

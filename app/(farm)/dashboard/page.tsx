@@ -23,7 +23,7 @@ const DAILY: Record<number, { icon: string; action: string; tip: string; est: st
 };
 
 export default async function DashboardPage() {
-  const [totalSeeds, liveSeeds, salesData, featuredSeed, recentGuides, topSearches] = await Promise.all([
+  const [totalSeeds, liveSeeds, salesData, featuredSeed, recentGuides, diasporaSearches, expatSearches] = await Promise.all([
     prisma.product.count(),
     prisma.product.count({ where: { published: true } }),
     prisma.product.aggregate({ _sum: { revenue: true } }),
@@ -38,9 +38,17 @@ export default async function DashboardPage() {
     }),
     prisma.searchQuery.groupBy({
       by: ["query"],
+      where: { source: { in: ["homepage", "homepage-with-country"] } },
       _count: { query: true },
       orderBy: { _count: { query: "desc" } },
-      take: 8,
+      take: 6,
+    }),
+    prisma.searchQuery.groupBy({
+      by: ["query"],
+      where: { source: { in: ["expat", "expat-with-country"] } },
+      _count: { query: true },
+      orderBy: { _count: { query: "desc" } },
+      take: 4,
     }),
   ]);
 
@@ -185,51 +193,82 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Search Intelligence — what real people typed into pdfseeds.com */}
-      {topSearches.length > 0 && (
+      {/* Search Intelligence — diaspora + expat demand split */}
+      {(diasporaSearches.length > 0 || expatSearches.length > 0) && (
         <div style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div>
               <div style={{ fontSize: "0.83rem", fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
-                🔍 What people are searching for
+                🔍 Live demand — what people are searching
               </div>
               <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>
-                Real queries typed on pdfseeds.com — each one is a demand signal
+                Real queries typed on pdfseeds.com, split by audience
               </div>
             </div>
             <Link href="/engine" style={{ fontSize: "0.75rem", color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
               Build one →
             </Link>
           </div>
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
-            {topSearches.map((s, i) => (
-              <div key={s.query} style={{
-                padding: "12px 20px",
-                borderBottom: i < topSearches.length - 1 ? "1px solid var(--border)" : "none",
-                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
-              }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "0.85rem", color: "var(--text)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    &ldquo;{s.query}&rdquo;
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                  <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 600 }}>
-                    {s._count.query}×
-                  </span>
-                  <Link
-                    href={`/engine?keyword=${encodeURIComponent(s.query)}`}
-                    style={{ fontSize: "0.72rem", color: "var(--accent)", textDecoration: "none", fontWeight: 700, background: "var(--surface2)", padding: "3px 10px", borderRadius: 6, border: "1px solid var(--border)" }}
-                  >
-                    Build →
-                  </Link>
-                </div>
+
+          {/* Diaspora searches */}
+          {diasporaSearches.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#7C3AED", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#7C3AED" }} />
+                Diaspora — pdfseeds.com
               </div>
-            ))}
-          </div>
-          <div style={{ fontSize: "0.7rem", color: "var(--muted)", marginTop: 8, textAlign: "right" }}>
-            Showing top 8 by search frequency
-          </div>
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
+                {diasporaSearches.map((s, i) => (
+                  <div key={s.query} style={{
+                    padding: "11px 18px",
+                    borderBottom: i < diasporaSearches.length - 1 ? "1px solid var(--border)" : "none",
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: "0.84rem", color: "var(--text)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      &ldquo;{s.query}&rdquo;
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 600 }}>{s._count.query}×</span>
+                      <Link href={`/engine?keyword=${encodeURIComponent(s.query)}`}
+                        style={{ fontSize: "0.72rem", color: "var(--accent)", textDecoration: "none", fontWeight: 700, background: "var(--surface2)", padding: "3px 10px", borderRadius: 6, border: "1px solid var(--border)" }}>
+                        Build →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Expat searches */}
+          {expatSearches.length > 0 && (
+            <div>
+              <div style={{ fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#0284C7", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#0284C7" }} />
+                Expats — pdfseeds.com/expat
+              </div>
+              <div style={{ background: "var(--surface)", border: "1px solid #BAE6FD", borderRadius: 16, overflow: "hidden" }}>
+                {expatSearches.map((s, i) => (
+                  <div key={s.query} style={{
+                    padding: "11px 18px",
+                    borderBottom: i < expatSearches.length - 1 ? "1px solid var(--border)" : "none",
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: "0.84rem", color: "var(--text)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      &ldquo;{s.query}&rdquo;
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 600 }}>{s._count.query}×</span>
+                      <Link href={`/engine?keyword=${encodeURIComponent(s.query)}`}
+                        style={{ fontSize: "0.72rem", color: "#0284C7", textDecoration: "none", fontWeight: 700, background: "#E0F2FE", padding: "3px 10px", borderRadius: 6, border: "1px solid #BAE6FD" }}>
+                        Build →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

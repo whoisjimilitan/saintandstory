@@ -7,28 +7,95 @@ export const revalidate = 60;
 
 const SITE = "https://pdfseeds.com";
 
-const TEMPLATES = (link: string) => [
+const PLATFORM_TEMPLATES = (link: string) => [
   {
-    type: "General community",
+    platform: "WhatsApp",
+    color: "#16A34A",
+    bg: "#F0FFF4",
+    border: "#BBF7D0",
     icon: "💬",
-    text: `Saw this and thought of the group — a site with clear PDF guides for things like visa applications, business registration, and tax returns. No Google rabbit holes. Just one guide that explains it properly. Only £9.99 → ${link}`,
+    templates: [
+      {
+        label: "Community group",
+        text: `Saw this and thought of the group — PDF guides for navigating your home country from abroad. Passports, visas, business, property. No Google rabbit holes. One guide that covers it properly. £9.99 → ${link}`,
+      },
+      {
+        label: "Reactive (someone just asked)",
+        text: `Someone just asked about this in the group — found a proper guide: ${link}`,
+      },
+    ],
   },
   {
-    type: "Diaspora / immigration",
-    icon: "🌍",
-    text: `For anyone in the group navigating UK systems — visas, indefinite leave, self-employment, HMRC, NHS. I found a site with guides written specifically for people in our position. Way more useful than Googling. Check it out → ${link}`,
+    platform: "YouTube",
+    color: "#DC2626",
+    bg: "#FFF1F1",
+    border: "#FECACA",
+    icon: "📹",
+    templates: [
+      {
+        label: "Video description",
+        text: `Navigating your home country from abroad? I've been sharing this with my community — step-by-step PDF guides for passports, visas, business, property and more. No agent, no guesswork. Check it out: ${link}`,
+      },
+      {
+        label: "Community post",
+        text: `For everyone who's been asking about this — there's a proper guide for it: ${link}`,
+      },
+    ],
   },
   {
-    type: "Faith community",
-    icon: "🕊️",
-    text: `For anyone who's asked me about navigating life admin — business registration, visas, tax — I found a resource worth sharing. Clear, step-by-step guides, not overwhelming. It's from PDF Seeds → ${link}`,
+    platform: "TikTok",
+    color: "#374151",
+    bg: "#F9FAFB",
+    border: "#E5E7EB",
+    icon: "🎵",
+    templates: [
+      {
+        label: "Caption + bio CTA",
+        text: `If you're trying to navigate your home country from abroad — this will save you weeks of confusion. Full guide, link in bio → ${link}`,
+      },
+    ],
   },
   {
-    type: "Professional network",
-    icon: "💼",
-    text: `Sharing this for anyone who needs it — PDF Seeds has practical guides on business registration, tax returns, immigration processes and more. Useful for clients and contacts alike. Instant download, £9.99 → ${link}`,
+    platform: "Instagram",
+    color: "#DB2777",
+    bg: "#FDF2F8",
+    border: "#FBCFE8",
+    icon: "📸",
+    templates: [
+      {
+        label: "Post caption",
+        text: `One thing I wish I'd found earlier — proper step-by-step PDF guides for navigating home. Passports. Visas. Business. Property. No agent. No Google rabbit hole. Link in bio → ${link}`,
+      },
+      {
+        label: "Story caption",
+        text: `Navigating your home country from abroad? This is what I've been sharing with my community. Swipe up / link in bio → ${link}`,
+      },
+    ],
+  },
+  {
+    platform: "Newsletter",
+    color: "#6D28D9",
+    bg: "#F5F3FF",
+    border: "#DDD6FE",
+    icon: "📧",
+    templates: [
+      {
+        label: "Email snippet",
+        text: `This week I wanted to share something useful — PDF Seeds has step-by-step guides for navigating your home country from abroad. Passports, visas, property, business — all covered. One guide, instant download, £9.99. Worth it: ${link}`,
+      },
+    ],
   },
 ];
+
+const DAILY_TIPS: Record<number, { platform: string; tip: string; hook: string }> = {
+  0: { platform: "WhatsApp", hook: "React, don't broadcast.", tip: "Reply directly to a question someone just asked. 'Found a guide for this exact thing' converts 3–5× better than a generic group post." },
+  1: { platform: "TikTok",   hook: "Ask the question your audience is thinking.", tip: "Start with 15 seconds: 'Did you know you can register a business in Ghana from the UK in 48 hours?' End with 'Full guide, link in bio'." },
+  2: { platform: "Instagram", hook: "The FAQ carousel is the highest-performing format.", tip: "Turn one question your community keeps asking into a 5-slide carousel. Last slide: 'Get the full guide →'. Carousels save 3× better than single images." },
+  3: { platform: "Newsletter", hook: "One sentence outperforms a paragraph every time.", tip: "Drop this into your next email: 'For anyone navigating X, I found a proper guide — not a Google rabbit hole.' Trust does the selling." },
+  4: { platform: "YouTube",   hook: "Your description is permanent — make it work.", tip: "Add your link to the description of any relevant video — including old ones. Description traffic is passive and builds for months after upload." },
+  5: { platform: "Instagram", hook: "The poll pre-qualifies your audience for free.", tip: "Run a Story poll: 'Do you know how to [do X back home]?' Yes/No. Follow up with 'Here's the guide if you said No.'" },
+  6: { platform: "WhatsApp",  hook: "Set it and forget it.", tip: "Pin your referral link in your WhatsApp group description — not a post, the group info itself. Every new member sees it before anything else." },
+};
 
 export default async function PartnerDashboard({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
@@ -49,10 +116,12 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
   if (!partner) notFound();
 
   const myLink = `${SITE}/?ref=${partner.code}`;
-  const templates = TEMPLATES(myLink);
+  const platformTemplates = PLATFORM_TEMPLATES(myLink);
   const payout = partner.totalEarned.toFixed(2);
   const nextPayout = Math.max(0, 19.99 - partner.totalEarned).toFixed(2);
   const recovered = partner.totalEarned >= 19.99;
+  const recoveryPct = Math.min(100, (partner.totalEarned / 19.99) * 100);
+  const todayTip = DAILY_TIPS[new Date().getDay()];
 
   return (
     <>
@@ -93,8 +162,17 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
         .pd-template-label { font-size: 0.78rem; font-weight: 700; color: #7C3AED; }
         .pd-template-text { font-size: 0.85rem; color: #4B3D30; line-height: 1.7; margin-bottom: 14px; }
 
-        .pd-recover { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 14px 18px; margin-bottom: 32px; font-size: 0.83rem; color: #15803D; font-weight: 600; line-height: 1.6; }
-        .pd-recover.pending { background: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
+        .pd-recover-bar { background: #FFFFFF; border: 1px solid #EAE6E0; border-radius: 12px; padding: 14px 18px; margin-bottom: 32px; }
+        .pd-recover-bar-label { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; font-weight: 600; margin-bottom: 10px; }
+        .pd-recover-bar-track { height: 6px; background: #EAE6E0; border-radius: 999px; overflow: hidden; }
+        .pd-recover-bar-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #A78BFA); border-radius: 999px; transition: width 0.6s ease; }
+
+        .pd-platform-section { margin-bottom: 20px; }
+        .pd-platform-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .pd-platform-name { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; }
+        .pd-template { background: #FFFFFF; border: 1.5px solid #EAE6E0; border-radius: 14px; padding: 16px 18px; margin-bottom: 8px; }
+        .pd-template-label { font-size: 0.65rem; font-weight: 700; color: #B0A89A; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+        .pd-template-text { font-size: 0.84rem; color: #4B3D30; line-height: 1.7; margin-bottom: 12px; }
 
         .pd-sales { background: #FFFFFF; border: 1.5px solid #EAE6E0; border-radius: 14px; overflow: hidden; }
         .pd-sales-row { padding: 12px 18px; border-bottom: 1px solid #F5F0EB; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.83rem; }
@@ -105,6 +183,7 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
 
         .pd-tip { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 12px; padding: 16px 18px; font-size: 0.85rem; color: #92400E; line-height: 1.7; }
         .pd-tip strong { color: #78350F; }
+        .pd-tip-platform { display: inline-flex; align-items: center; font-size: 0.62rem; font-weight: 800; background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 999px; padding: 2px 9px; color: #92400E; letter-spacing: 0.04em; margin-bottom: 8px; text-transform: uppercase; }
 
         @media (max-width: 600px) {
           .pd { padding: 32px 16px 64px; }
@@ -153,16 +232,18 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
           </div>
         </div>
 
-        {/* Recovery status */}
-        {recovered ? (
-          <div className="pd-recover">
-            ✓ You&apos;ve recovered your £19.99. Everything from here is pure profit.
+        {/* Recovery progress bar */}
+        <div className="pd-recover-bar">
+          <div className="pd-recover-bar-label">
+            <span style={{ color: recovered ? "#15803D" : "#6B5E52" }}>
+              {recovered ? "✓ Join fee recovered — all profit from here" : `£${nextPayout} to recover your join fee`}
+            </span>
+            <span style={{ color: "#C4BAB0", fontWeight: 500 }}>{Math.round(recoveryPct)}%</span>
           </div>
-        ) : (
-          <div className="pd-recover pending">
-            £{nextPayout} more in earnings will cover your £19.99 join fee. After that, it&apos;s all yours.
+          <div className="pd-recover-bar-track">
+            <div className="pd-recover-bar-fill" style={{ width: `${recoveryPct}%`, background: recovered ? "linear-gradient(90deg,#10B981,#34D399)" : undefined }} />
           </div>
-        )}
+        </div>
 
         {/* Generate a guide on demand */}
         <GenerateGuide partnerCode={partner.code} />
@@ -191,26 +272,32 @@ export default async function PartnerDashboard({ params }: { params: Promise<{ c
           })}
         </div>
 
-        {/* WhatsApp templates */}
+        {/* Platform templates */}
         <div className="pd-section">
           <div className="pd-section-title">Ready to send</div>
-          <div className="pd-section-h">WhatsApp templates — pick your community</div>
-          {templates.map(t => (
-            <div key={t.type} className="pd-template">
-              <div className="pd-template-type">
-                <span className="pd-template-icon">{t.icon}</span>
-                <span className="pd-template-label">{t.type}</span>
+          <div className="pd-section-h">Platform templates — pick your channel</div>
+          {platformTemplates.map(p => (
+            <div key={p.platform} className="pd-platform-section">
+              <div className="pd-platform-header">
+                <span>{p.icon}</span>
+                <span className="pd-platform-name" style={{ color: p.color }}>{p.platform}</span>
               </div>
-              <div className="pd-template-text">{t.text}</div>
-              <CopyButton text={t.text} label="Copy message" />
+              {p.templates.map(t => (
+                <div key={t.label} className="pd-template">
+                  <div className="pd-template-label">{t.label}</div>
+                  <div className="pd-template-text">{t.text}</div>
+                  <CopyButton text={t.text} label="Copy message" />
+                </div>
+              ))}
             </div>
           ))}
         </div>
 
-        {/* This week's tip */}
+        {/* Today's action tip */}
         <div className="pd-section">
           <div className="pd-tip">
-            <strong>This week&apos;s tip:</strong> Don&apos;t broadcast — plant. Send the guide directly in response to a question someone just asked in your group. &ldquo;Someone just asked about X — I actually found a guide for this&rdquo; converts 3–5x better than a generic recommendation.
+            <div className="pd-tip-platform">{todayTip.platform} · Today&apos;s action</div>
+            <strong>{todayTip.hook}</strong> {todayTip.tip}
           </div>
         </div>
 

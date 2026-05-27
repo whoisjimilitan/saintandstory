@@ -37,9 +37,11 @@ export default function GenerateGuide({ partnerCode }: { partnerCode: string }) 
   const effectiveCountry = showOther ? otherCountry.trim() || "United Kingdom" : country;
 
   const guideLink = result ? `${SITE}/sell/${result.slug}?ref=${partnerCode}` : "";
-  const waMessage = result
-    ? `Someone in the group asked about this — found a guide that covers it properly: ${guideLink}`
-    : "";
+  const messages = result ? {
+    whatsapp:  `Someone just asked about this in the group — found a proper guide: ${guideLink}`,
+    youtube:   `For anyone navigating this from abroad — step-by-step PDF guide, link in description → ${guideLink}`,
+    tiktok:    `If you've ever wondered how to handle this from abroad — this guide covers it properly. Link in bio → ${guideLink}`,
+  } : null;
 
   async function generate() {
     if (!question.trim()) return;
@@ -219,16 +221,26 @@ export default function GenerateGuide({ partnerCode }: { partnerCode: string }) 
             <CopyButton text={guideLink} label="Copy link" />
           </div>
 
-          {/* Ready-to-send WhatsApp message */}
-          <div>
-            <div style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9B8AF0", marginBottom: 6 }}>
-              Ready to paste in WhatsApp
+          {/* Platform-ready messages */}
+          {messages && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {([
+                { key: "whatsapp" as const, label: "💬 WhatsApp",          color: "#16A34A" },
+                { key: "youtube"  as const, label: "📹 YouTube description", color: "#DC2626" },
+                { key: "tiktok"   as const, label: "🎵 TikTok / Instagram", color: "#6D28D9" },
+              ] as { key: keyof typeof messages; label: string; color: string }[]).map(({ key, label, color }) => (
+                <div key={key}>
+                  <div style={{ fontSize: "0.62rem", fontWeight: 800, color, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>
+                    {label}
+                  </div>
+                  <div style={{ background: "#FFFFFF", border: "1px solid #DDD6FE", borderRadius: 8, padding: "10px 14px", fontSize: "0.83rem", color: "#4B3D30", lineHeight: 1.65, marginBottom: 6 }}>
+                    {messages[key]}
+                  </div>
+                  <CopyButton text={messages[key]} label="Copy" />
+                </div>
+              ))}
             </div>
-            <div style={{ background: "#FFFFFF", border: "1px solid #DDD6FE", borderRadius: 8, padding: "10px 14px", fontSize: "0.83rem", color: "#4B3D30", lineHeight: 1.65, marginBottom: 8 }}>
-              {waMessage}
-            </div>
-            <CopyButton text={waMessage} label="Copy message" />
-          </div>
+          )}
 
           {/* Preview link */}
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #DDD6FE" }}>
