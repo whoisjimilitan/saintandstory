@@ -716,7 +716,7 @@ export default function HomePage() {
               <span className="pg-hero-eyebrow">For the diaspora — wherever home is</span>
               <h1 className="pg-hero-h1">Navigate home. From anywhere.</h1>
               <p className="pg-hero-sub">
-                Land. Inheritance. Business. Passport. Your home country, step by step. No agent. No guesswork.
+                Land. Inheritance. Business. Visa. Your home country, step by step. No agent. No guesswork.
               </p>
               <div className="pg-form">
                 <form onSubmit={handleSituation}>
@@ -920,11 +920,11 @@ export default function HomePage() {
         <footer className="pg-footer">
           © {new Date().getFullYear()}{" "}PDF Seeds
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/expat" style={{ color: "#C4BAB0", textDecoration: "none" }}>Expats →</a>
+          <a href="/expat" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Expats →</a>
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/earn" style={{ color: "#C4BAB0", textDecoration: "none" }}>Curators →</a>
+          <a href="/earn" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Curators →</a>
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/signin" style={{ color: "#C4BAB0", textDecoration: "none" }}>Login</a>
+          <a href="/signin" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Login</a>
         </footer>
 
       </div>

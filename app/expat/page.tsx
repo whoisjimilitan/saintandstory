@@ -576,7 +576,7 @@ export default function ExpatPage() {
         {/* HEADER */}
         <header className="pg-header">
           <a href="/" className="pg-logo">
-            <div className="pg-logo-mark">🌍</div>
+            <div className="pg-logo-mark">🌱</div>
             <span className="pg-logo-name">PDF Seeds</span>
             <span className="pg-logo-tag">Expat</span>
           </a>
@@ -790,11 +790,11 @@ export default function ExpatPage() {
         <footer className="pg-footer">
           © {new Date().getFullYear()}{" "}PDF Seeds
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/" style={{ color: "#C4BAB0", textDecoration: "none" }}>Diaspora →</a>
+          <a href="/" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Diaspora →</a>
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/earn" style={{ color: "#C4BAB0", textDecoration: "none" }}>Curators →</a>
+          <a href="/earn" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Curators →</a>
           &nbsp;&nbsp;·&nbsp;&nbsp;
-          <a href="/signin" style={{ color: "#C4BAB0", textDecoration: "none" }}>Login</a>
+          <a href="/signin" style={{ color: "#1A1008", textDecoration: "none", fontWeight: 600 }}>Login</a>
         </footer>
 
       </div>
