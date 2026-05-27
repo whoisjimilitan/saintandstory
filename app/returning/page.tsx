@@ -429,51 +429,81 @@ export default function ReturningPage() {
           margin-bottom: 22px; text-align: center; line-height: 1.5;
         }
 
-        /* ── BOOK COVER ── */
-        .pg-book-wrap {
-          display: flex; justify-content: center;
-          margin: 0 0 20px;
+        /* ── BOOK PAGE (open book interior) ── */
+        .pg-book-page {
+          width: 100%;
+          background: #FDFBF6;
+          border: 1.5px solid #DDD6C8;
+          border-radius: 2px 6px 6px 2px;
+          padding: 32px 28px 24px;
+          margin-bottom: 24px;
+          position: relative;
+          box-shadow: -5px 0 14px rgba(0,0,0,0.07), 0 4px 28px rgba(0,0,0,0.07);
+          animation: page-appear 0.4s ease both;
         }
-        .pg-book {
-          width: 158px; min-height: 210px;
-          position: relative; border-radius: 3px 10px 10px 3px;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: space-between;
-          padding: 20px 16px 16px;
-          transform: perspective(500px) rotateY(-12deg);
-          overflow: hidden;
-          animation: book-appear 0.5s ease both;
+        .pg-book-page::before {
+          content: "";
+          position: absolute;
+          left: 0; top: 0; bottom: 0; width: 5px;
+          background: linear-gradient(90deg, rgba(0,0,0,0.13) 0%, transparent 100%);
+          border-radius: 2px 0 0 2px;
         }
-        @keyframes book-appear {
-          from { opacity: 0; transform: perspective(500px) rotateY(-12deg) translateY(10px); }
-          to   { opacity: 1; transform: perspective(500px) rotateY(-12deg) translateY(0); }
+        @keyframes page-appear {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        .pg-book::before {
-          content: ""; position: absolute;
-          left: 0; top: 0; bottom: 0; width: 13px;
-          background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.04) 100%);
-        }
-        .pg-book-brand {
-          font-size: 0.58rem; font-weight: 800;
-          color: rgba(255,255,255,0.65); letter-spacing: 0.1em;
+        .pg-book-page-brand {
+          font-size: 0.56rem; font-weight: 700;
+          color: #C4BAB0; letter-spacing: 0.16em;
           text-transform: uppercase; text-align: center;
-          position: relative; z-index: 1;
+          margin-bottom: 22px;
         }
-        .pg-book-cover-title {
-          flex: 1;
-          font-size: 0.66rem; font-weight: 800;
-          color: rgba(255,255,255,0.93);
-          text-align: center; line-height: 1.45;
-          padding: 10px 4px;
-          position: relative; z-index: 1;
-          display: flex; align-items: center; justify-content: center;
-          overflow: hidden; max-height: 108px;
+        .pg-book-page-title {
+          font-size: clamp(1.05rem, 3vw, 1.3rem);
+          font-weight: 800; color: #1A1008;
+          text-align: center; line-height: 1.4;
+          letter-spacing: -0.02em; margin-bottom: 6px;
         }
-        .pg-book-type {
-          font-size: 0.52rem; font-weight: 700;
-          color: rgba(255,255,255,0.4); letter-spacing: 0.14em;
-          text-transform: uppercase; text-align: center;
-          position: relative; z-index: 1;
+        .pg-book-page-sub {
+          font-size: 0.77rem; color: #8C7D6E; font-style: italic;
+          text-align: center; margin-bottom: 22px; line-height: 1.5;
+        }
+        .pg-book-page-rule {
+          height: 1px; background: linear-gradient(90deg, transparent, #DDD6C8 20%, #DDD6C8 80%, transparent);
+          margin-bottom: 18px;
+        }
+        .pg-toc-heading {
+          font-size: 0.6rem; font-weight: 700; letter-spacing: 0.16em;
+          text-transform: uppercase; color: #C4BAB0; margin-bottom: 14px;
+        }
+        .pg-toc { width: 100%; }
+        .pg-toc-row { padding: 7px 0; border-bottom: 1px solid #F0EDE8; }
+        .pg-toc-row:last-child { border-bottom: none; }
+        .pg-toc-item {
+          display: flex; align-items: baseline; gap: 10px;
+        }
+        .pg-toc-num {
+          font-size: 0.58rem; font-weight: 800; color: #C4BAB0;
+          min-width: 18px; flex-shrink: 0; letter-spacing: 0.06em;
+          padding-top: 2px;
+        }
+        .pg-toc-title {
+          flex: 1; font-size: 0.9rem; font-weight: 700;
+          color: #1A1008; line-height: 1.35;
+        }
+        .pg-toc-desc {
+          font-size: 0.73rem; color: #8C7D6E; line-height: 1.55;
+          padding: 3px 0 2px 28px;
+        }
+        .pg-toc-row--locked { opacity: 0.3; user-select: none; }
+        .pg-toc-row--locked .pg-toc-title { filter: blur(3.5px); }
+        .pg-toc-locked-block {
+          border-top: 1px solid #F0EDE8; margin-top: 2px; padding-top: 4px;
+        }
+        .pg-toc-lock-row {
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+          padding: 12px 0 4px;
+          font-size: 0.72rem; font-weight: 600; color: #B0A89A;
         }
 
         /* Chapter preview card */
@@ -761,55 +791,46 @@ export default function ReturningPage() {
           {step === "result" && guide && (
             <div className="pg-result">
               <div className="pg-result-badge">✓ Return guide ready</div>
-              <div className="pg-book-wrap">
-                <div className="pg-book" style={{
-                  background: "linear-gradient(150deg,#D97706 0%,#B45309 55%,#78350F 100%)",
-                  boxShadow: "-6px 2px 10px rgba(0,0,0,0.28), 8px 16px 38px rgba(217,119,6,0.42)",
-                }}>
-                  <span className="pg-book-brand">🌱 PDF Seeds</span>
-                  <div className="pg-book-cover-title">
-                    {guide.title.length > 80 ? guide.title.slice(0, 77) + "…" : guide.title}
-                  </div>
-                  <span className="pg-book-type">Return Guide</span>
-                </div>
-              </div>
-              <div className="pg-result-title">{guide.title}</div>
-              {situation && (
-                <div className="pg-result-echo">&ldquo;{situation}&rdquo;</div>
-              )}
 
-              {guide.chapters && guide.chapters.length > 0 && (
-                <div className="pg-chapters">
-                  <div className="pg-chapters-head">
-                    <span>Contents</span>
-                    <span>{guide.chapters.length} chapters</span>
-                  </div>
-
-                  {guide.chapters.slice(0, 3).map((ch, i) => (
-                    <div key={i} className="pg-chapter">
-                      <div className="pg-chapter-label">Chapter {ch.chapter}</div>
-                      <div className="pg-chapter-title">{ch.title}</div>
-                      <div className="pg-chapter-desc">{ch.description}</div>
-                    </div>
-                  ))}
-
-                  {guide.chapters.length > 3 && (
-                    <div className="pg-chapters-locked">
-                      <div className="pg-chapters-locked-fade" />
-                      {guide.chapters.slice(3, 6).map((ch, i) => (
-                        <div key={i} className="pg-chapter pg-chapter--locked">
-                          <div className="pg-chapter-label">Chapter {ch.chapter}</div>
-                          <div className="pg-chapter-title">{ch.title}</div>
+              {/* Open book page */}
+              <div className="pg-book-page">
+                <div className="pg-book-page-brand">🌱 PDF Seeds · Return Guide</div>
+                <div className="pg-book-page-title">{guide.title}</div>
+                {situation && (
+                  <div className="pg-book-page-sub">&ldquo;{situation}&rdquo;</div>
+                )}
+                <div className="pg-book-page-rule" />
+                <div className="pg-toc-heading">Contents</div>
+                {guide.chapters && guide.chapters.length > 0 && (
+                  <div className="pg-toc">
+                    {guide.chapters.slice(0, 3).map((ch, i) => (
+                      <div key={i} className="pg-toc-row">
+                        <div className="pg-toc-item">
+                          <span className="pg-toc-num">{ch.chapter}</span>
+                          <span className="pg-toc-title">{ch.title}</span>
                         </div>
-                      ))}
-                      <div className="pg-chapters-lock">
-                        <Lock size={13} strokeWidth={2} />
-                        {guide.chapters.length - 3} more chapters — unlocked with your guide
+                        <div className="pg-toc-desc">{ch.description}</div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    ))}
+                    {guide.chapters.length > 3 && (
+                      <div className="pg-toc-locked-block">
+                        {guide.chapters.slice(3, 6).map((ch, i) => (
+                          <div key={i} className="pg-toc-row pg-toc-row--locked">
+                            <div className="pg-toc-item">
+                              <span className="pg-toc-num">{ch.chapter}</span>
+                              <span className="pg-toc-title">{ch.title}</span>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="pg-toc-lock-row">
+                          <Lock size={11} strokeWidth={2} />
+                          {guide.chapters.length - 3} more chapters — unlock below
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {isFirstBuy && (
                 <div className="pg-result-offer">
