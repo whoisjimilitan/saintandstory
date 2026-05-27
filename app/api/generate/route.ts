@@ -160,6 +160,9 @@ Return ONLY valid JSON — no markdown, no explanation:
     return NextResponse.json({ error: "Could not understand your situation. Please try describing it differently." }, { status: 422 });
   }
 
+  // Price by audience — returning is the most complex life decision, expat mid-tier
+  oppData.price = isReturning ? 19.99 : isExpat ? 12.99 : 9.99;
+
   // Step 2: Save opportunity
   const opportunity = await prisma.opportunity.create({
     data: {
@@ -292,6 +295,10 @@ ${oppData.questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
 Return ONLY valid JSON. CRITICAL RULE: each whatsInside entry MUST directly correspond to one question above — the title is what the reader knows or can do after that chapter. Titles must feel written for this specific person's situation.
 
+WHATS INSIDE — DESCRIPTION STRATEGY (non-negotiable):
+Chapters 1–3 descriptions: VALIDATION copy. The reader thinks "yes, exactly what I expected." Confirms the guide covers the foundational need. E.g. "Exactly which forms, in what order, and where to submit them." Max 12 words.
+Chapters 4–7 descriptions: DESIRE copy. The reader thinks "I hadn't thought about that." Name the hidden risk, costly mistake, or overlooked step this chapter prevents. Use "What most [returnees/expats/people] miss about…" or "The [mistake/trap] that [specific consequence]" framing. Max 14 words.
+
 {
   "heroTagline": "One sentence, max 15 words, names their exact situation.",
   "bulletedPain": [
@@ -300,13 +307,13 @@ Return ONLY valid JSON. CRITICAL RULE: each whatsInside entry MUST directly corr
     "A third specific pain — fear, cost, or wrong information — max 12 words"
   ],
   "whatsInside": [
-    {"chapter": "Chapter 1", "title": "Answer to question 1 — phrased as what they walk away knowing, 6–9 words", "description": "One sentence. What specifically they can do after this chapter. Max 12 words."},
-    {"chapter": "Chapter 2", "title": "6–9 words", "description": "One sentence. Max 12 words."},
-    {"chapter": "Chapter 3", "title": "6–9 words", "description": "One sentence. Max 12 words."},
-    {"chapter": "Chapter 4", "title": "6–9 words", "description": "One sentence. Max 12 words."},
-    {"chapter": "Chapter 5", "title": "6–9 words", "description": "One sentence. Max 12 words."},
-    {"chapter": "Chapter 6", "title": "6–9 words", "description": "One sentence. Max 12 words."},
-    {"chapter": "Chapter 7", "title": "6–9 words", "description": "One sentence. Max 12 words."},
+    {"chapter": "Chapter 1", "title": "Answer to question 1 — phrased as what they walk away knowing, 6–9 words", "description": "VALIDATION: confirms the guide covers the expected foundation. Max 12 words."},
+    {"chapter": "Chapter 2", "title": "6–9 words", "description": "VALIDATION: confirms a second expected area. Max 12 words."},
+    {"chapter": "Chapter 3", "title": "6–9 words", "description": "VALIDATION: confirms a third expected area. Max 12 words."},
+    {"chapter": "Chapter 4", "title": "6–9 words", "description": "DESIRE: the hidden risk or costly mistake this chapter prevents. Max 14 words."},
+    {"chapter": "Chapter 5", "title": "6–9 words", "description": "DESIRE: the overlooked step most people miss until it's too late. Max 14 words."},
+    {"chapter": "Chapter 6", "title": "6–9 words", "description": "DESIRE: what they would have regretted not knowing. Max 14 words."},
+    {"chapter": "Chapter 7", "title": "6–9 words", "description": "DESIRE: the thing that separates those who get it right from those who don't. Max 14 words."},
     {"chapter": "Checklist", "title": "Your Step-by-Step Action Plan", "description": "Everything in one place. Done in 30 minutes."}
   ],
   "faqItems": [
