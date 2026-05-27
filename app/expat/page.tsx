@@ -282,6 +282,19 @@ export default function ExpatPage() {
           font-size: 0.78rem; color: #C4BAB0;
           margin-top: 14px; line-height: 1.6;
         }
+        .pg-hint-pills {
+          display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+          margin-top: 16px;
+        }
+        .pg-hint-pill {
+          font-size: 0.72rem; font-weight: 600;
+          color: #0284C7;
+          background: #F0F9FF;
+          border: 1px solid #BAE6FD;
+          border-radius: 999px;
+          padding: 3px 12px;
+          letter-spacing: 0.02em;
+        }
 
         /* ── COUNTRY STEP ── */
         .pg-country-wrap {
@@ -612,8 +625,10 @@ export default function ExpatPage() {
                     <button type="submit" className="pg-btn">Get My Guide →</button>
                   </div>
                 </form>
-                <div className="pg-hint">
-                  Brits in Ghana · Americans in Kenya · Europeans in Nigeria · Expats across Africa
+                <div className="pg-hint-pills">
+                  <span className="pg-hint-pill">Expats in Africa</span>
+                  <span className="pg-hint-pill">Expats in Asia</span>
+                  <span className="pg-hint-pill">Expats everywhere</span>
                 </div>
               </div>
             </>

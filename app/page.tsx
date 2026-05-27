@@ -285,6 +285,19 @@ export default function HomePage() {
           font-size: 0.78rem; color: #C4BAB0;
           margin-top: 14px; line-height: 1.6;
         }
+        .pg-hint-pills {
+          display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+          margin-top: 16px;
+        }
+        .pg-hint-pill {
+          font-size: 0.72rem; font-weight: 600;
+          color: #7C3AED;
+          background: #F5F3FF;
+          border: 1px solid #DDD6FE;
+          border-radius: 999px;
+          padding: 3px 12px;
+          letter-spacing: 0.02em;
+        }
 
         /* ── COUNTRY STEP ── */
         .pg-country-wrap {
@@ -738,8 +751,10 @@ export default function HomePage() {
                     <button type="submit" className="pg-btn">Get My Guide →</button>
                   </div>
                 </form>
-                <div className="pg-hint">
-                  Diaspora · Expats · Global citizens
+                <div className="pg-hint-pills">
+                  <span className="pg-hint-pill">Diasporans</span>
+                  <span className="pg-hint-pill">Expats</span>
+                  <span className="pg-hint-pill">Global citizens</span>
                 </div>
               </div>
             </>
