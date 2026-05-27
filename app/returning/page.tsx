@@ -282,6 +282,20 @@ export default function ReturningPage() {
           font-size: 0.78rem; color: #C4BAB0;
           margin-top: 14px; line-height: 1.6;
         }
+        .pg-hint-pills {
+          display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+          margin-top: 16px;
+        }
+        .pg-hint-pill {
+          font-size: 0.72rem; font-weight: 600;
+          color: #B45309;
+          background: #FFFBEB;
+          border: 1px solid #FDE68A;
+          border-radius: 999px;
+          padding: 3px 12px;
+          letter-spacing: 0.02em;
+          cursor: pointer; font-family: inherit;
+        }
 
         /* ── COUNTRY STEP ── */
         .pg-country-wrap {
@@ -612,6 +626,26 @@ export default function ReturningPage() {
                     <button type="submit" className="pg-btn">Get My Guide →</button>
                   </div>
                 </form>
+                <div className="pg-hint-pills">
+                  {[
+                    "Pension and savings transfer",
+                    "Housing and property back home",
+                    "Healthcare after leaving abroad",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      className="pg-hint-pill"
+                      onClick={() => {
+                        setSituation(prompt);
+                        fetch("/api/search-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: prompt, source: "returning" }) }).catch(() => {});
+                        setStep("country");
+                      }}
+                    >
+                      {prompt} →
+                    </button>
+                  ))}
+                </div>
               </div>
             </>
           )}

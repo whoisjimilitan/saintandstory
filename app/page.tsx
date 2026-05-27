@@ -742,7 +742,7 @@ export default function HomePage() {
             <>
               <span className="pg-hero-eyebrow">For the diaspora — wherever home is</span>
               <h1 className="pg-hero-h1">Navigate home. From anywhere.</h1>
-              <p className="pg-hero-use-cases">Work. Passports. Visas. Business. Land.</p>
+              <p className="pg-hero-use-cases">Passports. Land. Business. Banking. Visas.</p>
               <p className="pg-hero-sub">Your home country, step by step. No agent. No guesswork.</p>
               <div className="pg-form">
                 <form onSubmit={handleSituation}>
@@ -761,8 +761,8 @@ export default function HomePage() {
                   </div>
                 </form>
                 <div className="pg-hint-pills">
-                  <a href="/expat" className="pg-hint-pill" style={{ textDecoration: "none" }}>Expat →</a>
-                  <a href="/returning" className="pg-hint-pill" style={{ textDecoration: "none" }}>Going home for good →</a>
+                  <a href="/expat" className="pg-hint-pill" style={{ textDecoration: "none" }}>Expat? Your page →</a>
+                  <a href="/returning" className="pg-hint-pill" style={{ textDecoration: "none" }}>Going home for good? →</a>
                 </div>
               </div>
             </>
