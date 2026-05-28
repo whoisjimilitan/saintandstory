@@ -6,7 +6,7 @@ import { Banknote, Link2, MessageSquare, BarChart3, BookOpen, MessageCircle, Pla
 const AVATARS = [
   { initials: "AO", name: "Adaeze O.", location: "London", stat: "£340 first month", platformIcon: "💬" },
   { initials: "MA", name: "Mohammed A.", location: "28k subscribers", stat: "£580 in 6 weeks", platformIcon: "▶" },
-  { initials: "FK", name: "Femi K.", location: "UK–Ghana", stat: "£211 in 10 days", platformIcon: "♪" },
+  { initials: "FK", name: "Femi K.", location: "UK–Ghana", stat: "£211 in 10 days", platformIcon: "🎵" },
   { initials: "PR", name: "Priya R.", location: "14k followers", stat: "£220 first month", platformIcon: "📸" },
 ];
 
@@ -437,10 +437,10 @@ export default function EarnPage() {
           font-size: 0.7rem; font-weight: 800; color: #fff;
         }
         .e-av-platform {
-          width: 18px; height: 18px; border-radius: 50%;
+          width: 20px; height: 20px; border-radius: 50%;
           background: #F4F4F5; border: 1px solid #E4E4E7;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.6rem; margin-left: -8px; flex-shrink: 0;
+          font-size: 0.65rem; margin-left: -8px; flex-shrink: 0;
           position: relative; z-index: 1;
         }
         .e-av-name { font-size: 0.7rem; font-weight: 700; color: #0F0A1A; }
@@ -832,7 +832,7 @@ export default function EarnPage() {
           </div>
           <div className="e-proof-sep" />
           <div className="e-proof-item">
-            <span className="e-proof-val">1000+</span>
+            <span className="e-proof-val">1K+</span>
             <span className="e-proof-lbl">guides to share</span>
           </div>
         </div>
