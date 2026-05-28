@@ -205,19 +205,19 @@ export default function EarnPage() {
         .e-notif-msg { font-size: 0.7rem; color: #3C3C43; line-height: 1.4; letter-spacing: -0.005em; }
         .e-notif-body { flex: 1; min-width: 0; }
 
-        /* ─── iPHONE 17 MOCKUP ─── */
+        /* ─── iPHONE 17 MOCKUP — real proportions (19.5:9) ─── */
         .e-phone {
-          width: 252px;
+          width: 256px;
           background: #161618;
-          border-radius: 52px;
-          padding: 11px 8px 20px;
+          border-radius: 54px;
+          padding: 12px 9px 22px;
           position: relative;
           box-shadow:
             0 0 0 1px rgba(255,255,255,0.16),
-            0 0 0 1.5px rgba(0,0,0,0.95),
-            0 70px 120px rgba(0,0,0,0.6),
-            0 32px 56px rgba(0,0,0,0.3),
-            0 12px 24px rgba(0,0,0,0.16),
+            0 0 0 2px rgba(0,0,0,0.95),
+            0 80px 140px rgba(0,0,0,0.65),
+            0 36px 64px rgba(0,0,0,0.32),
+            0 14px 28px rgba(0,0,0,0.18),
             inset 0 1px 0 rgba(255,255,255,0.18),
             inset 0 -1.5px 0 rgba(0,0,0,0.6);
         }
@@ -226,51 +226,50 @@ export default function EarnPage() {
         .e-phone::before {
           content: '';
           position: absolute;
-          left: -3.5px; top: 80px;
+          left: -3.5px; top: 88px;
           width: 3.5px; height: 18px;
           background: #2C2C2E;
           border-radius: 2.5px 0 0 2.5px;
           box-shadow:
             inset 0 0.5px 0 rgba(255,255,255,0.12),
-            0 38px 0 0 #2C2C2E,
-            0 72px 0 0 #2C2C2E;
+            0 40px 0 0 #2C2C2E,
+            0 76px 0 0 #2C2C2E;
         }
 
         /* Right: Power + Camera Control */
         .e-phone::after {
           content: '';
           position: absolute;
-          right: -3.5px; top: 100px;
-          width: 3.5px; height: 60px;
+          right: -3.5px; top: 110px;
+          width: 3.5px; height: 64px;
           background: #2C2C2E;
           border-radius: 0 2.5px 2.5px 0;
           box-shadow:
             inset 0 0.5px 0 rgba(255,255,255,0.12),
-            0 80px 0 0 #2C2C2E,
-            0 80px 0 1.5px #2C2C2E;
+            0 90px 0 0 #2C2C2E,
+            0 90px 0 0 #2C2C2E;
         }
 
         .e-phone-screen {
-          background: #fff;
-          border-radius: 43px;
+          background: #F2F2F7;
+          border-radius: 44px;
           overflow: hidden;
           position: relative;
+          min-height: 512px;
+          display: flex;
+          flex-direction: column;
         }
 
-        /* Subtle glass sheen on screen edge */
+        /* Subtle glass sheen */
         .e-phone-screen::after {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 60px;
-          background: linear-gradient(
-            175deg,
-            rgba(255,255,255,0.07) 0%,
-            transparent 100%
-          );
+          background: linear-gradient(175deg, rgba(255,255,255,0.07) 0%, transparent 100%);
           pointer-events: none;
           z-index: 10;
-          border-radius: 43px 43px 0 0;
+          border-radius: 44px 44px 0 0;
         }
 
         /* Dynamic Island */
@@ -278,63 +277,78 @@ export default function EarnPage() {
           width: 88px; height: 29px;
           background: #000;
           border-radius: 18px;
-          margin: 10px auto 8px;
+          margin: 10px auto 0;
           position: relative; z-index: 2;
-          box-shadow:
-            0 0 0 0.5px rgba(255,255,255,0.06),
-            inset 0 0 6px rgba(0,0,0,0.8);
+          flex-shrink: 0;
+          box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
         }
+
+        /* iOS status bar */
+        .e-phone-statusbar {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 6px 22px 0;
+          flex-shrink: 0;
+        }
+        .e-phone-time { font-size: 0.67rem; font-weight: 700; color: #1C1C1E; letter-spacing: -0.02em; }
+        .e-phone-icons { display: flex; align-items: center; gap: 5px; }
+        .e-phone-signal { font-size: 0.5rem; color: #1C1C1E; font-weight: 700; letter-spacing: -0.02em; }
+
+        /* Screen body fills remaining space */
+        .e-ps-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         /* Home indicator bar */
         .e-phone-home {
-          width: 112px; height: 4px;
-          background: rgba(0,0,0,0.18);
+          width: 120px; height: 4px;
+          background: rgba(0,0,0,0.2);
           border-radius: 3px;
-          margin: 8px auto 0;
+          margin: 6px auto 0;
+          flex-shrink: 0;
         }
 
         /* Screen: header */
         .e-ps-head {
           background: #7C3AED;
-          padding: 10px 18px 14px;
+          padding: 8px 18px 12px;
+          flex-shrink: 0;
         }
         .e-ps-app {
-          font-size: 0.57rem; font-weight: 700;
+          font-size: 0.52rem; font-weight: 700;
           color: rgba(255,255,255,0.65);
           letter-spacing: 0.1em; text-transform: uppercase;
         }
         .e-ps-title {
-          font-size: 0.9rem; font-weight: 800; color: #fff; margin-top: 2px;
+          font-size: 0.88rem; font-weight: 800; color: #fff; margin-top: 2px;
         }
 
         /* Screen: week */
         .e-ps-week {
           background: #F9F5FF;
-          padding: 13px 18px 11px;
+          padding: 11px 18px 9px;
           border-bottom: 1px solid #EEE8F8;
+          flex-shrink: 0;
         }
         .e-ps-week-lbl {
-          font-size: 0.57rem; font-weight: 800; color: #9B8AF0;
+          font-size: 0.52rem; font-weight: 800; color: #9B8AF0;
           text-transform: uppercase; letter-spacing: 0.09em;
         }
         .e-ps-week-amt {
-          font-size: 1.9rem; font-weight: 900; color: #15803D;
-          letter-spacing: -0.045em; line-height: 1.1; margin-top: 3px;
+          font-size: 1.75rem; font-weight: 900; color: #15803D;
+          letter-spacing: -0.045em; line-height: 1.1; margin-top: 2px;
         }
         .e-ps-week-meta {
-          font-size: 0.57rem; color: #6B5E52; margin-top: 3px;
+          font-size: 0.52rem; color: #6B5E52; margin-top: 2px;
         }
 
         /* Screen: rows */
-        .e-ps-rows { padding: 8px 18px 14px; }
+        .e-ps-rows { padding: 6px 18px 8px; flex: 1; overflow: hidden; }
         .e-ps-row {
           display: flex; align-items: center; justify-content: space-between;
           padding: 5px 0; border-bottom: 1px solid #F5F0EB;
-          font-size: 0.67rem;
+          font-size: 0.63rem;
         }
         .e-ps-row:last-child { border-bottom: none; }
         .e-ps-row-day { color: #6B5E52; font-weight: 500; flex: 1; }
-        .e-ps-row-sales { color: #A78BFA; font-weight: 600; font-size: 0.59rem; flex-shrink: 0; margin-right: 10px; }
+        .e-ps-row-sales { color: #A78BFA; font-weight: 600; font-size: 0.55rem; flex-shrink: 0; margin-right: 8px; }
         .e-ps-row-amt { font-weight: 800; color: #0F0A1A; }
 
         /* ─── PROOF STRIP ─── */
@@ -658,28 +672,65 @@ export default function EarnPage() {
               <div className="e-phone">
                 <div className="e-phone-screen">
                   <div className="e-phone-di" />
-                  <div className="e-ps-head">
-                    <div className="e-ps-app">PDF Seeds</div>
-                    <div className="e-ps-title">Earnings</div>
+                  <div className="e-phone-statusbar">
+                    <span className="e-phone-time">9:41</span>
+                    <div className="e-phone-icons">
+                      <span className="e-phone-signal">●●●●</span>
+                      <span className="e-phone-signal">WiFi</span>
+                      <span className="e-phone-signal">█</span>
+                    </div>
                   </div>
-                  <div className="e-ps-week">
-                    <div className="e-ps-week-lbl">This week</div>
-                    <div className="e-ps-week-amt">£79.90</div>
-                    <div className="e-ps-week-meta">10 sales · ↑ 3 more than last week</div>
-                  </div>
-                  <div className="e-ps-rows">
-                    {[
-                      { day: "Today",     sales: "2 sales", amt: "£15.98" },
-                      { day: "Yesterday", sales: "3 sales", amt: "£23.97" },
-                      { day: "Monday",    sales: "1 sale",  amt: "£7.99"  },
-                      { day: "Sunday",    sales: "4 sales", amt: "£31.96" },
-                    ].map((r, i) => (
-                      <div key={i} className="e-ps-row">
-                        <span className="e-ps-row-day">{r.day}</span>
-                        <span className="e-ps-row-sales">{r.sales}</span>
-                        <span className="e-ps-row-amt">{r.amt}</span>
-                      </div>
-                    ))}
+                  <div className="e-ps-body">
+                    <div className="e-ps-head">
+                      <div className="e-ps-app">PDF Seeds</div>
+                      <div className="e-ps-title">Earnings</div>
+                    </div>
+                    <div className="e-ps-week">
+                      <div className="e-ps-week-lbl">This week</div>
+                      <div className="e-ps-week-amt">£79.90</div>
+                      <div className="e-ps-week-meta">10 sales · ↑ 3 more than last week</div>
+                    </div>
+                    <div className="e-ps-rows">
+                      {[
+                        { day: "Today",      sales: "2 sales", amt: "£15.98" },
+                        { day: "Yesterday",  sales: "3 sales", amt: "£23.97" },
+                        { day: "Monday",     sales: "1 sale",  amt: "£7.99"  },
+                        { day: "Sunday",     sales: "4 sales", amt: "£31.96" },
+                        { day: "Saturday",   sales: "2 sales", amt: "£15.98" },
+                        { day: "Last week",  sales: "7 sales", amt: "£55.93" },
+                      ].map((r, i) => (
+                        <div key={i} className="e-ps-row">
+                          <span className="e-ps-row-day">{r.day}</span>
+                          <span className="e-ps-row-sales">{r.sales}</span>
+                          <span className="e-ps-row-amt">{r.amt}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* iOS tab bar */}
+                    <div style={{
+                      marginTop: "auto", borderTop: "0.5px solid #E5E5EA",
+                      background: "rgba(249,249,249,0.94)",
+                      display: "flex", padding: "8px 0 10px",
+                    }}>
+                      {[
+                        { icon: "🏠", label: "Home" },
+                        { icon: "💰", label: "Earnings", active: true },
+                        { icon: "🔗", label: "Links" },
+                        { icon: "👤", label: "Profile" },
+                      ].map((t) => (
+                        <div key={t.label} style={{
+                          flex: 1, display: "flex", flexDirection: "column",
+                          alignItems: "center", gap: 2,
+                        }}>
+                          <span style={{ fontSize: "0.9rem" }}>{t.icon}</span>
+                          <span style={{
+                            fontSize: "0.42rem", fontWeight: t.active ? 700 : 500,
+                            color: t.active ? "#7C3AED" : "#8E8E93",
+                            letterSpacing: "-0.01em",
+                          }}>{t.label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="e-phone-home" />
