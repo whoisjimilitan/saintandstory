@@ -641,16 +641,16 @@ export default function EarnPage() {
           <div className="e-hero-left">
             <div className="e-phone-wrap">
 
-              {/* iOS iMessage notification */}
+              {/* iOS PDF Seeds deposit notification */}
               <div className="e-notif">
-                <div className="e-notif-icon">💬</div>
+                <div className="e-notif-icon" style={{ background: "linear-gradient(135deg,#7C3AED,#4F46E5)", fontSize: "0.95rem" }}>🌱</div>
                 <div className="e-notif-body">
                   <div className="e-notif-header">
-                    <span className="e-notif-app">Messages</span>
+                    <span className="e-notif-app">PDF Seeds</span>
                     <span className="e-notif-time">now</span>
                   </div>
-                  <div className="e-notif-sender">Amara K.</div>
-                  <div className="e-notif-msg">That guide link you shared... just bought it 🙌 thank you!</div>
+                  <div className="e-notif-sender">£7.99 deposited</div>
+                  <div className="e-notif-msg">1 sale via your link · balance updated</div>
                 </div>
               </div>
 
