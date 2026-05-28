@@ -786,7 +786,7 @@ export default function EarnPage() {
               Your earnings.
             </h1>
             <p className="e-hero-sub">
-              You&apos;re already the one they ask. We make sure you have the answer. <strong>A guide worth putting your name on.</strong> Share your link. Earn 80%.
+              You&apos;re already the one they ask. We make sure you have the answer. <strong>A guide worth putting your name on.</strong> Share your link. Earn forever.
             </p>
 
             {/* Flow indicator — minimal, no descriptions */}
