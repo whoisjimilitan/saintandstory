@@ -1,42 +1,6 @@
 "use client";
 
-import Image from "next/image";
 import posthog from "posthog-js";
-
-function VanMark() {
-  return (
-    <svg width="34" height="21" viewBox="0 0 80 50" fill="none">
-      <rect x="2" y="8" width="48" height="28" rx="2" fill="#E8244A" />
-      <path d="M50 14 L50 36 L76 36 L76 22 L66 12 L50 12 Z" fill="#E8244A" />
-      <path d="M53 15 L53 22 L72 22 L72 19 L63 13 Z" fill="white" fillOpacity="0.4" />
-      <line x1="50" y1="12" x2="50" y2="36" stroke="white" strokeWidth="1" strokeOpacity="0.35" />
-      <circle cx="14" cy="38" r="7" fill="white" />
-      <circle cx="14" cy="38" r="4" fill="#0D0E17" />
-      <circle cx="14" cy="38" r="1.5" fill="#E8244A" />
-      <circle cx="62" cy="38" r="7" fill="white" />
-      <circle cx="62" cy="38" r="4" fill="#0D0E17" />
-      <circle cx="62" cy="38" r="1.5" fill="#E8244A" />
-    </svg>
-  );
-}
-
-function Logo() {
-  return (
-    <div className="flex items-center gap-3 mb-12">
-      <div className="border border-[#E8244A]/60 rounded-md p-2 inline-flex items-center justify-center">
-        <VanMark />
-      </div>
-      <div>
-        <p className="font-sans font-black text-white text-[13px] tracking-[0.18em] uppercase leading-none">
-          Saint &amp; Story
-        </p>
-        <p className="text-[#E8244A] text-[9px] tracking-[0.45em] uppercase font-bold mt-1">
-          Logistics &middot; London
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function Stars() {
   return (
@@ -50,119 +14,100 @@ function Stars() {
   );
 }
 
+const SERVICES = [
+  "Home moves",
+  "Office moves",
+  "Same-day moves",
+  "Student moves",
+  "Piano moving",
+  "Single item",
+];
+
+function openModal(source: string) {
+  posthog.capture("hero_cta_clicked", { source });
+  document.dispatchEvent(new CustomEvent("open-lead-modal"));
+}
+
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="bg-white pt-28 pb-16 md:pt-36 md:pb-24">
+      <div className="max-w-4xl mx-auto px-6 text-center">
 
-      {/* Full-bleed van photo */}
-      <Image
-        src="/hero-van.jpg"
-        alt="Saint & Story moving van on the road"
-        fill
-        className="object-cover object-center"
-        priority
-        sizes="100vw"
-      />
-
-      {/* Overlay — forest green darkens the left so text reads clearly,
-          fades right so the van and mountains show through */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, rgba(13,14,23,0.90) 0%, rgba(13,14,23,0.90) 38%, rgba(13,14,23,0.55) 62%, rgba(13,14,23,0.15) 100%)",
-        }}
-      />
-      {/* Extra overlay on mobile — full width needs more coverage */}
-      <div className="absolute inset-0 bg-[#0D0E17]/50 md:hidden" />
-      {/* Bottom vignette */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0D0E17]/60 to-transparent" />
-
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-24">
-        <div className="max-w-xl">
-
-          <Logo />
-
-          {/* Trust badge */}
-          <div className="inline-flex items-center gap-2.5 bg-white/10 border border-white/15 rounded-full px-4 py-2 mb-8 backdrop-blur-sm">
-            <Stars />
-            <span className="text-white/70 text-xs">
-              4.9 &mdash; 300+ verified Google reviews
-            </span>
-          </div>
-
-          {/* Headline — benefit-first, outcome-focused */}
-          <h1 className="font-sans font-black text-white text-4xl md:text-5xl xl:text-[3.25rem] leading-[1.05] tracking-tight mb-5">
-            We&apos;ll Handle Your<br />
-            Entire Move.{" "}
-            <span className="text-[#E8244A]">Guaranteed.</span>
-          </h1>
-
-          {/* Three scannable benefits */}
-          <p className="text-white/50 text-xs font-bold uppercase tracking-[0.25em] mb-5">
-            Same-Day Teams &nbsp;&middot;&nbsp; Fixed Price &nbsp;&middot;&nbsp; Zero Stress
-          </p>
-
-          {/* One sentence addressing the core pain */}
-          <p className="text-white/65 text-base leading-relaxed mb-10 max-w-sm">
-            Can&apos;t find a reliable mover at short notice?
-            We dispatch vetted, insured teams across London and the UK &mdash;
-            confirmed in 1 minute.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <a
-              href="#quote"
-              onClick={() => posthog.capture("hero_cta_clicked", { cta: "book_your_move" })}
-              className="bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white font-black px-8 py-4 rounded-xl transition-colors text-sm uppercase tracking-widest text-center"
-            >
-              Book Your Move &rarr;
-            </a>
-            <a
-              href="tel:+447885465680"
-              onClick={() => posthog.capture("hero_phone_clicked", { phone: "+447885465680" })}
-              className="border border-white/25 hover:border-white/50 bg-white/5 hover:bg-white/10 text-white font-semibold px-8 py-4 rounded-xl transition-colors text-sm text-center backdrop-blur-sm"
-            >
-              Call +44 7885 465680
-            </a>
-          </div>
-
-          {/* Risk reversal */}
-          <p className="text-white/30 text-xs mb-12">
-            Book today. Move within 24 hours. Or your deposit back &mdash; guaranteed.
-          </p>
-
-          {/* Social proof row */}
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-2.5">
-              {[11, 22, 33, 44, 55].map((seed) => (
-                <div
-                  key={seed}
-                  className="w-9 h-9 rounded-full border-2 border-[#0D0E17] overflow-hidden bg-[#131420] flex-shrink-0"
-                >
-                  <Image
-                    src={`https://picsum.photos/seed/face${seed}/36/36`}
-                    alt=""
-                    width={36}
-                    height={36}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-            <div>
-              <Stars />
-              <p className="text-white/40 text-xs mt-0.5">
-                1,000+ satisfied customers across the UK
-              </p>
-            </div>
-          </div>
-
+        {/* Trust badge */}
+        <div className="inline-flex items-center gap-2 bg-[#FFF1F3] border border-[#E8244A]/20 rounded-full px-4 py-1.5 mb-8">
+          <Stars />
+          <span className="text-[#0D0E17]/60 text-xs font-medium">
+            Rated 4.9 by 300+ customers across the UK
+          </span>
         </div>
-      </div>
 
+        {/* Headline */}
+        <h1 className="font-sans font-black text-[#0D0E17] text-4xl md:text-5xl xl:text-[3.5rem] leading-[1.05] tracking-tight mb-4">
+          Find the perfect{" "}
+          <span className="text-[#E8244A]">professional man<br className="hidden sm:block" /> with van</span>{" "}
+          service.
+        </h1>
+
+        {/* Sub-headline */}
+        <p className="text-[#0D0E17]/50 text-lg md:text-xl mb-10 max-w-lg mx-auto">
+          Get free quotes within minutes.
+        </p>
+
+        {/* Search widget */}
+        <div className="flex flex-col sm:flex-row max-w-2xl mx-auto mb-8 bg-white border border-[#0D0E17]/12 rounded-2xl shadow-lg shadow-[#0D0E17]/5 overflow-hidden">
+          <select
+            className="flex-1 px-5 py-4 text-sm text-[#0D0E17]/70 bg-transparent focus:outline-none border-b sm:border-b-0 sm:border-r border-[#0D0E17]/10 appearance-none cursor-pointer"
+            defaultValue=""
+          >
+            <option value="" disabled>What do you need moved?</option>
+            {SERVICES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Your postcode or town"
+            className="flex-1 px-5 py-4 text-sm text-[#0D0E17] bg-transparent focus:outline-none placeholder-[#0D0E17]/35 border-b sm:border-b-0 sm:border-r border-[#0D0E17]/10"
+          />
+          <button
+            onClick={() => openModal("search_widget")}
+            className="bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white font-bold px-6 py-4 text-sm transition-colors whitespace-nowrap"
+          >
+            Get free quotes →
+          </button>
+        </div>
+
+        {/* Service category pills */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          {SERVICES.map((s) => (
+            <button
+              key={s}
+              onClick={() => openModal(`pill_${s}`)}
+              className="border border-[#0D0E17]/12 hover:border-[#E8244A]/40 hover:bg-[#FFF1F3] text-[#0D0E17]/55 hover:text-[#E8244A] text-xs font-medium px-4 py-2 rounded-full transition-colors"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Social proof row */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 text-sm text-[#0D0E17]/40">
+          {[
+            "No obligation quotes",
+            "300+ verified professionals",
+            "1,000+ moves completed",
+          ].map((item, i) => (
+            <span key={item} className="flex items-center gap-1.5">
+              {i > 0 && <span className="hidden sm:block w-px h-4 bg-[#0D0E17]/10 mr-5" />}
+              <svg className="w-3.5 h-3.5 text-[#E8244A] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              {item}
+            </span>
+          ))}
+        </div>
+
+      </div>
     </section>
   );
 }
