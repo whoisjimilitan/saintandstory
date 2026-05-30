@@ -231,6 +231,7 @@ interface LeadModalProps {
 }
 
 export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
+  const [loading, setLoading] = useState(true);
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ phoneConsent: true });
   const [progress, setProgress] = useState(0);
@@ -243,6 +244,14 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   const progressPct = stepIdx <= 4
     ? Math.round(((stepIdx + 1) / 5) * 65)
     : Math.round(65 + ((stepIdx - 4) / (TOTAL - 5)) * 35);
+
+  // "Please wait" screen — shows for 2s before questions appear (Bark-style)
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoading(true);
+    const t = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(t);
+  }, [isOpen]);
 
   // Search animation → auto-advance to found → auto-advance to email
   useEffect(() => {
@@ -272,6 +281,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   useEffect(() => {
     if (!isOpen) {
       const t = setTimeout(() => {
+        setLoading(true);
         setStepIdx(0);
         setAnswers({ phoneConsent: true });
         setProgress(0);
@@ -351,7 +361,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
         </div>
 
         {/* Close button — floats top-right over content */}
-        {!isLast && (
+        {!loading && !isLast && (
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 z-10"
@@ -363,41 +373,52 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
           </button>
         )}
 
-        {/* Step body */}
-        <div className="px-6 pt-8 pb-4 overflow-y-auto flex-1">
-          <h2 className="font-bold text-navy text-xl mb-6 pr-8">{step.q}</h2>
-
-          {step.type === "options" && (
-            <StepOptions step={step as typeof STEPS[number] & { type: "options" }} answers={answers} setAnswers={setAnswers} />
-          )}
-          {step.type === "input" && (
-            <StepInput step={step as { q: string; placeholder: string; name: string }} answers={answers} setAnswers={setAnswers} onEnter={handleNext} />
-          )}
-          {step.type === "search" && <StepSearch progress={progress} />}
-          {step.type === "found" && <StepFound />}
-          {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
-          {step.type === "phoneConsent" && <StepPhoneConsent answers={answers} setAnswers={setAnswers} />}
-          {step.type === "name" && <StepName answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
-          {step.type === "success" && <StepSuccess onClose={onClose} />}
-        </div>
-
-        {/* Footer nav — Back (ghost) + Continue (solid) */}
-        {showNav && (
-          <div className="flex items-center justify-between px-6 py-5 border-t border-gray-100 shrink-0">
-            <button
-              onClick={handleBack}
-              className={`border border-gray-200 text-gray-600 font-medium px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition-colors ${stepIdx === 0 ? "invisible" : ""}`}
-            >
-              Back
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={!validate() || isSubmitting}
-              className="bg-brand hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-8 py-2.5 rounded-lg text-sm transition-colors"
-            >
-              {isSubmitting ? "Posting..." : step.type === "name" ? "Submit" : "Continue"}
-            </button>
+        {/* Please wait screen */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 px-6 flex-1">
+            <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-brand animate-spin mb-5" />
+            <p className="font-bold text-navy text-base">Please wait...</p>
+            <p className="text-gray-400 text-sm mt-1">Finding the best matches near you</p>
           </div>
+        ) : (
+          <>
+            {/* Step body */}
+            <div className="px-6 pt-8 pb-4 overflow-y-auto flex-1">
+              <h2 className="font-bold text-navy text-xl mb-6 pr-8">{step.q}</h2>
+
+              {step.type === "options" && (
+                <StepOptions step={step as typeof STEPS[number] & { type: "options" }} answers={answers} setAnswers={setAnswers} />
+              )}
+              {step.type === "input" && (
+                <StepInput step={step as { q: string; placeholder: string; name: string }} answers={answers} setAnswers={setAnswers} onEnter={handleNext} />
+              )}
+              {step.type === "search" && <StepSearch progress={progress} />}
+              {step.type === "found" && <StepFound />}
+              {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
+              {step.type === "phoneConsent" && <StepPhoneConsent answers={answers} setAnswers={setAnswers} />}
+              {step.type === "name" && <StepName answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
+              {step.type === "success" && <StepSuccess onClose={onClose} />}
+            </div>
+
+            {/* Footer nav — Back (ghost) + Continue (solid) */}
+            {showNav && (
+              <div className="flex items-center justify-between px-6 py-5 border-t border-gray-100 shrink-0">
+                <button
+                  onClick={handleBack}
+                  className={`border border-gray-200 text-gray-600 font-medium px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition-colors ${stepIdx === 0 ? "invisible" : ""}`}
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={!validate() || isSubmitting}
+                  className="bg-brand hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold px-8 py-2.5 rounded-lg text-sm transition-colors"
+                >
+                  {isSubmitting ? "Posting..." : step.type === "name" ? "Submit" : "Continue"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
