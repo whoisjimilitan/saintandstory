@@ -1,6 +1,5 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import SocialTicker from "@/components/SocialTicker";
 import TrustBar from "@/components/TrustBar";
 import FeatureCards from "@/components/FeatureCards";
 import HowItWorks from "@/components/HowItWorks";
@@ -16,7 +15,6 @@ export default function Home() {
       <ExperimentTracker variant="control" />
       <Nav />
       <Hero />
-      <SocialTicker />
       <TrustBar />
       <FeatureCards />
       <HowItWorks />
