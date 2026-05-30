@@ -5,29 +5,29 @@ import ModalCTA from "@/components/ModalCTA";
 import DriverCount from "@/components/DriverCount";
 
 export const metadata: Metadata = {
-  title: "Drive with Saint & Story | Earn on Your Terms",
-  description: "Join hundreds of drivers earning consistently on the Saint & Story platform. Claim your area, set your rate, get a live job feed.",
+  title: "Drive with Saint & Story | Post. Get Booked. Keep It All.",
+  description: "Post your availability. Get booked by verified customers in your area. Keep 100% of every job. £9.99/month.",
 };
 
 const STEPS = [
-  { num: "01", title: "Claim your area", desc: "Set your radius. Once claimed, jobs in your area come to you first." },
-  { num: "02", title: "Get a live job lead", desc: "Accept what works. Reject what doesn't. You're always in control." },
-  { num: "03", title: "Complete the job", desc: "Turn up, do what you do best. Every job builds your rating." },
-  { num: "04", title: "Get paid", desc: "Daily, direct to your account. No chasing, no delays." },
+  { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Live in minutes." },
+  { num: "02", title: "Post your availability", desc: "Tell the platform when you're free. Customers in your area see you." },
+  { num: "03", title: "Get booked and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
+  { num: "04", title: "Get paid", desc: "Daily, direct to your account. No cuts, no delays." },
 ];
 
 const EARNINGS = [
   { stat: "£68", label: "Avg. daily earnings" },
-  { stat: "4–5", label: "Jobs per week" },
-  { stat: "£39", label: "Flat monthly fee" },
-  { stat: null, label: "Drivers earning now" },
+  { stat: "4–5", label: "Bookings per week" },
+  { stat: "£9.99", label: "Monthly fee" },
+  { stat: null, label: "Drivers listed" },
 ];
 
 const FEATURES = [
-  { title: "No cold leads.", desc: "Jobs come to you. No quoting strangers, no marketing." },
-  { title: "Your schedule.", desc: "Set your own hours and availability. Work when you want." },
-  { title: "One flat fee.", desc: "£39/month. That's it. No cuts per job. Keep everything you earn." },
-  { title: "Build your rating.", desc: "Higher rating means priority job matching in your area." },
+  { title: "Your profile, live 24/7.", desc: "Searchable by every customer in your area. No cold calling. No ad spend." },
+  { title: "You set the calendar.", desc: "Post when you're free. Customers book around you, not the other way round." },
+  { title: "£9.99 a month.", desc: "That's it. Keep 100% of every job. First booking covers the month." },
+  { title: "Build your name.", desc: "Higher rating means you appear first when customers search your area." },
 ];
 
 const REVIEWS = [
@@ -35,19 +35,19 @@ const REVIEWS = [
     initials: "TO",
     name: "Tom O.",
     location: "London",
-    quote: "I haven't done a cold lead since I joined. Consistent work, every week.",
+    quote: "Posted my availability Sunday night. Had two bookings by Monday morning.",
   },
   {
     initials: "DF",
     name: "Daniel F.",
     location: "Birmingham",
-    quote: "Claimed my area on a Monday. Three jobs booked by Wednesday.",
+    quote: "Profile went live Monday. Three jobs booked by Wednesday. £9.99 paid back before lunch.",
   },
   {
     initials: "MK",
     name: "Marcus K.",
     location: "Manchester",
-    quote: "Set my radius to 15 miles. The feed fills up every morning. Best decision I made.",
+    quote: "I post my week on Sunday. By Monday it's full. Best thing I've done for my business.",
   },
 ];
 
@@ -60,21 +60,19 @@ export default function ForDriversPage() {
       <section className="bg-white pt-16 min-h-[85vh] flex items-center border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-6 py-20 w-full">
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
-            For drivers · Join the platform
+            For drivers · Post. Get booked. Keep it all.
           </p>
           <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
-            Y<span className="font-display italic font-normal">o</span>ur van.
-            <br />Y<span className="font-display italic font-normal">o</span>ur
-            earnings.
-            <br />Y<span className="font-display italic font-normal">o</span>ur
-            terms.
+            P<span className="font-display italic font-normal">o</span>st.
+            <br />G<span className="font-display italic font-normal">e</span>t b<span className="font-display italic font-normal">o</span>oked.
+            <br />Keep it all.
           </h1>
           <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Claim your area. Get a live job feed. <DriverCount /> drivers already earning.
+            Post your availability. Customers find you. <DriverCount /> drivers already earning.
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
-              label="Claim your area →"
+              label="List your availability →"
               source="for_drivers_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -88,7 +86,7 @@ export default function ForDriversPage() {
         </div>
       </section>
 
-      {/* Earnings stats */}
+      {/* Stats bar */}
       <section className="bg-[#0D0D0D] py-16 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {EARNINGS.map(({ stat, label }) => (
@@ -106,7 +104,7 @@ export default function ForDriversPage() {
         </div>
       </section>
 
-      {/* Fee callout — lightbulb: show ROI immediately */}
+      {/* Fee callout */}
       <section className="bg-[#F5F5F5] py-12 px-6 border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -114,16 +112,16 @@ export default function ForDriversPage() {
               Platform fee
             </p>
             <p className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
-              £39<span className="font-sans font-medium text-[#888888] text-base ml-1">/month</span>
+              £9.99<span className="font-sans font-medium text-[#888888] text-base ml-1">/month</span>
             </p>
           </div>
           <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
           <p className="text-[#0D0D0D] text-sm font-medium max-w-xs">
-            No cuts per job. Keep 100% of what you earn. The fee pays back in under one job.
+            No cuts per job. Keep 100% of what you earn. First booking covers the month.
           </p>
           <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
           <p className="text-[#888888] text-sm max-w-xs">
-            Average daily earning: £68. Monthly fee covered in less than a morning&apos;s work.
+            Average daily earning: £68. Monthly fee covered in your very first job.
           </p>
         </div>
       </section>
@@ -196,19 +194,19 @@ export default function ForDriversPage() {
       <section className="bg-[#0D0D0D] py-24 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <h2 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight">
-            Claim y<span className="font-display italic font-normal">o</span>ur
-            <br />area.
+            G<span className="font-display italic font-normal">e</span>t
+            <br />b<span className="font-display italic font-normal">o</span>oked.
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
               <DriverCount /> drivers already earning.
               <br />
-              Claim y<span className="font-display italic font-normal">o</span>urs
-              before s<span className="font-display italic font-normal">o</span>meone
-              else does.
+              P<span className="font-display italic font-normal">o</span>st y<span className="font-display italic font-normal">o</span>ur availability.
+              <br />
+              Keep everything y<span className="font-display italic font-normal">o</span>u earn.
             </p>
             <ModalCTA
-              label="Claim now →"
+              label="List your availability →"
               source="for_drivers_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

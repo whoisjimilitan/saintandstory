@@ -6,10 +6,10 @@ const CUSTOMER = [
 ];
 
 const DRIVER = [
-  { num: "01", title: "Claim your area", desc: "Set your radius and availability." },
-  { num: "02", title: "Get a live job lead", desc: "Accept what works for you." },
-  { num: "03", title: "Complete the job", desc: "Turn up and do what you do best." },
-  { num: "04", title: "Get paid", desc: "Daily. Directly. No chasing." },
+  { num: "01", title: "Post your availability", desc: "Set your area, hours, and rate. Go live." },
+  { num: "02", title: "Get booked", desc: "Customers find you and book direct." },
+  { num: "03", title: "Show up", desc: "Turn up and do what you do best." },
+  { num: "04", title: "Get paid", desc: "Daily. Directly. No cuts." },
 ];
 
 export default function HowItWorks() {

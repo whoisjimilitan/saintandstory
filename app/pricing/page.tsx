@@ -44,8 +44,8 @@ const DRIVER_CARDS = [
   },
   {
     title: "One flat fee. No cuts.",
-    desc: "Average daily earnings: £68. The fee pays itself back before your second job of the month.",
-    stat: "£39",
+    desc: "Your driver profile, live and searchable. Average daily earnings: £68. Fee covered on job one.",
+    stat: "£9.99",
     statLabel: "per month",
     highlight: true,
   },
@@ -58,10 +58,10 @@ const DRIVER_CARDS = [
 ];
 
 const DRIVER_FACTS = [
-  "No cold leads — jobs come to you",
-  "Set your own radius, hours, and rate",
+  "Post your availability — customers find and book you",
+  "Your verified driver profile, live and searchable 24/7",
   "Daily payouts, direct to your account",
-  "Build your rating, grow your income",
+  "Build your rating, rise in local search",
 ];
 
 const FAQS: Record<Tab, { q: string; a: string }[]> = {
@@ -73,9 +73,9 @@ const FAQS: Record<Tab, { q: string; a: string }[]> = {
   ],
   driver: [
     { q: "How do I get paid?", a: "Daily, directly to your account. No chasing, no delays." },
-    { q: "What does the £39 cover?", a: "Platform access, job matching, customer support, and payment processing. That's the only cost." },
-    { q: "Can I reject jobs?", a: "Yes — always. You only accept jobs that suit your schedule, location, and rate." },
-    { q: "How do I get my first job?", a: "Claim your area, complete your profile, and go live. Most drivers receive their first job within 48 hours." },
+    { q: "What does the £9.99 cover?", a: "Your driver profile on the platform — verified, searchable, with your availability shown to every customer in your area. That's the only cost." },
+    { q: "Do I have to accept every booking?", a: "No. You post when you're available and customers book you. You're always in control of your calendar." },
+    { q: "How do I get my first booking?", a: "Create your profile, post your availability, and go live. Most drivers receive their first booking within 48 hours." },
   ],
 };
 
@@ -193,9 +193,9 @@ export default function PricingPage() {
               {/* Math proof */}
               <div className="bg-[#0D0D0D] rounded-2xl px-7 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <p className="font-sans font-black text-white text-lg leading-tight tracking-tight">
-                  Pay £39. Earn £68 on day one.
+                  Pay £9.99. Earn £68 on day one.
                   <br />
-                  <span className="font-sans font-medium text-white/70 text-sm">You&apos;re in profit before the month is out.</span>
+                  <span className="font-sans font-medium text-white/70 text-sm">You&apos;re in profit before lunch.</span>
                 </p>
                 <div className="shrink-0 text-right">
                   <p className="text-[10px] text-white/55 uppercase tracking-[0.15em] mb-1">Other platforms charge</p>

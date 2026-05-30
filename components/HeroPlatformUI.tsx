@@ -1,9 +1,9 @@
 type Side = "customer" | "driver";
 
-const JOBS = [
-  { from: "Notting Hill", to: "Hackney", desc: "Large 2-bed · 3 hr", price: "£180", fresh: true },
-  { from: "Chelsea", to: "Fulham", desc: "1-bed flat · 1.5 hr", price: "£95", fresh: true },
-  { from: "Islington", to: "Brixton", desc: "Office move · 4 hr", price: "£240", fresh: false },
+const BOOKINGS = [
+  { customer: "Sarah M.", desc: "2-bed flat move · 10am", price: "£145" },
+  { customer: "James T.", desc: "Office clear-out · 9am", price: "£220" },
+  { customer: "Priya K.", desc: "Studio move · 2pm", price: "£85" },
 ];
 
 function CustomerView() {
@@ -79,14 +79,14 @@ function DriverView() {
       </div>
 
       <div className="flex items-center justify-between pt-1">
-        <p className="text-sm font-semibold text-[#0D0D0D]">Jobs near you</p>
+        <p className="text-sm font-semibold text-[#0D0D0D]">Your bookings</p>
         <span className="bg-[#0D0D0D] text-white text-[10px] font-semibold px-3 py-1 rounded-full">
-          3 new
+          3 confirmed
         </span>
       </div>
 
       <div className="space-y-2">
-        {JOBS.map((job, i) => (
+        {BOOKINGS.map((b, i) => (
           <div
             key={i}
             className={`border rounded-xl p-3.5 flex items-center gap-3 ${
@@ -94,19 +94,10 @@ function DriverView() {
             }`}
           >
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-sm font-semibold text-[#0D0D0D] truncate">
-                  {job.from} → {job.to}
-                </p>
-                {job.fresh && (
-                  <span className="text-[9px] font-semibold text-[#888888] border border-[#E8E8E8] px-1.5 py-0.5 rounded-full shrink-0">
-                    New
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-[#888888]">{job.desc}</p>
+              <p className="text-sm font-semibold text-[#0D0D0D] truncate mb-0.5">{b.customer}</p>
+              <p className="text-xs text-[#888888]">{b.desc}</p>
             </div>
-            <p className="font-bold text-[#0D0D0D] text-sm shrink-0">{job.price}</p>
+            <p className="font-bold text-[#0D0D0D] text-sm shrink-0">{b.price}</p>
           </div>
         ))}
       </div>
