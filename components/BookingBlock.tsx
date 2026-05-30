@@ -15,8 +15,8 @@ export default function BookingBlock() {
 
         <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200">
           <Image
-            src="/images/hero-movers.jpg"
-            alt="Saint & Story van and team"
+            src="/images/service-van.jpg"
+            alt="Saint & Story van"
             fill
             className="object-cover"
           />

@@ -28,8 +28,8 @@ export default function BenefitColumns() {
           ))}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gray-100">
             <Image
-              src="/images/hero-movers.jpg"
-              alt="Professional movers"
+              src="/images/movers-portrait.jpg"
+              alt="Professional mover"
               fill
               className="object-cover"
             />

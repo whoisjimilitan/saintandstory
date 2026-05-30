@@ -5,7 +5,7 @@ export default function ClosingCTA() {
     <section
       className="relative py-24 px-6 text-center overflow-hidden bg-navy"
       style={{
-        backgroundImage: "url('/images/hero-movers.jpg')",
+        backgroundImage: "url('/hero-van.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
