@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const STEPS = [
   { num: "01", title: "Claim your area", desc: "Set your radius. Once claimed, jobs in your area come to you first." },
-  { num: "02", title: "Get a live job feed", desc: "Accept what works. Reject what doesn't. You're always in control." },
+  { num: "02", title: "Get a live job lead", desc: "Accept what works. Reject what doesn't. You're always in control." },
   { num: "03", title: "Complete the job", desc: "Turn up, do what you do best. Every job builds your rating." },
   { num: "04", title: "Get paid", desc: "Daily, direct to your account. No chasing, no delays." },
 ];

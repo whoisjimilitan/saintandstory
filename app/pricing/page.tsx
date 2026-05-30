@@ -37,23 +37,23 @@ const CUSTOMER_TIERS = [
 
 const DRIVER_CARDS = [
   {
-    title: "Free to join.",
-    desc: "No upfront cost. Create your profile, claim your area, go live.",
+    title: "Free to start.",
+    desc: "Create your profile, claim your area, go live. No credit card. No obligation.",
     stat: "£0",
     statLabel: "to get started",
   },
   {
-    title: "One flat monthly fee.",
-    desc: "£39/month. No cuts per job. Keep everything you earn, paid daily to your account.",
+    title: "One flat fee. No cuts.",
+    desc: "Average daily earnings: £68. The fee pays itself back before your second job of the month.",
     stat: "£39",
-    statLabel: "per month, that's it",
+    statLabel: "per month",
     highlight: true,
   },
   {
-    title: "Consistent work.",
-    desc: "Average driver completing 4–5 jobs per week in a claimed 20-mile radius.",
-    stat: "£68",
-    statLabel: "avg. daily earnings",
+    title: "Keep 100% of every job.",
+    desc: "We take nothing per job — ever. Other platforms take 15–25%. We charge one flat fee, full stop.",
+    stat: "100%",
+    statLabel: "yours to keep",
   },
 ];
 
@@ -125,7 +125,7 @@ export default function PricingPage() {
                   }`}
                 >
                   {t.highlight && (
-                    <span className="inline-block text-[10px] font-semibold text-white/50 uppercase tracking-[0.2em] border border-white/20 px-3 py-1 rounded-full mb-5">
+                    <span className="inline-block text-[10px] font-semibold text-[#0D0D0D] bg-white uppercase tracking-[0.2em] px-3 py-1 rounded-full mb-5">
                       Most popular
                     </span>
                   )}
@@ -188,6 +188,20 @@ export default function PricingPage() {
                     </p>
                   </div>
                 ))}
+              </div>
+
+              {/* Math proof */}
+              <div className="bg-[#0D0D0D] rounded-2xl px-7 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <p className="font-sans font-black text-white text-lg leading-tight tracking-tight">
+                  Pay £39. Earn £68 on day one.
+                  <br />
+                  <span className="font-sans font-medium text-white/70 text-sm">You&apos;re in profit before the month is out.</span>
+                </p>
+                <div className="shrink-0 text-right">
+                  <p className="text-[10px] text-white/55 uppercase tracking-[0.15em] mb-1">Other platforms charge</p>
+                  <p className="font-black text-white text-2xl tracking-tight">15–25%</p>
+                  <p className="text-[10px] text-white/55 uppercase tracking-[0.15em]">per job. Every job.</p>
+                </div>
               </div>
 
               <div className="bg-white border border-[#E8E8E8] rounded-2xl p-7 grid md:grid-cols-2 gap-8 items-center">

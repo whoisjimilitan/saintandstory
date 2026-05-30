@@ -7,7 +7,7 @@ const CUSTOMER = [
 
 const DRIVER = [
   { num: "01", title: "Claim your area", desc: "Set your radius and availability." },
-  { num: "02", title: "Get a live job feed", desc: "Accept what works for you." },
+  { num: "02", title: "Get a live job lead", desc: "Accept what works for you." },
   { num: "03", title: "Complete the job", desc: "Turn up and do what you do best." },
   { num: "04", title: "Get paid", desc: "Daily. Directly. No chasing." },
 ];

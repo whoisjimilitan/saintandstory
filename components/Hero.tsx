@@ -51,7 +51,10 @@ export default function Hero() {
               {(["customer", "driver"] as Side[]).map((s) => (
                 <button
                   key={s}
-                  onClick={() => setSide(s)}
+                  onClick={() => {
+                    setSide(s);
+                    document.dispatchEvent(new CustomEvent("hero-side-change", { detail: { side: s } }));
+                  }}
                   className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                     side === s
                       ? "bg-[#0D0D0D] text-white"
