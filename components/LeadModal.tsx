@@ -343,14 +343,14 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Backdrop — fades in */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/50 animate-backdrop-in"
         onClick={isLast ? onClose : undefined}
       />
 
-      {/* Modal card */}
-      <div className="relative bg-white rounded-2xl w-full max-w-[520px] shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
+      {/* Modal card — drops in from above */}
+      <div className="relative bg-white rounded-2xl w-full max-w-[520px] shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-modal-drop-in">
 
         {/* Multi-stage progress bar — flush to top edge, no header padding */}
         <div className="h-1.5 bg-gray-100 shrink-0">
