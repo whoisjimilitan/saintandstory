@@ -1,82 +1,77 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import QuoteForm from "@/components/QuoteForm";
-import ExperimentTracker from "@/components/ExperimentTracker";
+import AutoOpenModal from "@/components/AutoOpenModal";
+import ModalCTA from "@/components/ModalCTA";
+import LandingHeroSearch from "@/components/LandingHeroSearch";
+import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Home Moves in London | Saint & Story Logistics",
-  description: "Trusted home removals across London. Fixed price, fully insured, confirmed in 60 seconds. 300+ five-star reviews.",
+  title: "London Home Moves | Post Your Job. We Find Your Driver. | Saint & Story",
+  description: "Post your London home move in 60 seconds. We match you to a verified local driver. Fixed price, fully insured, all 33 boroughs. Free to post.",
 };
 
 const STATS = [
-  { stat: "4.9", label: "Google rating" },
-  { stat: "2,400+", label: "Moves completed" },
+  { stat: "4.9★", label: "Verified reviews" },
   { stat: "< 60s", label: "Response time" },
+  { stat: "Fixed", label: "Price. Always." },
   { stat: "All 33", label: "London boroughs" },
 ];
 
 const STEPS = [
-  { num: "01", title: "Fill in the form", desc: "Postcodes, date, rough volume. Under 2 minutes." },
-  { num: "02", title: "We call within 1 minute", desc: "Fixed price confirmed on the call. No vague estimates." },
-  { num: "03", title: "Move day", desc: "Team arrives on time. Handles everything. You settle in." },
+  { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+  { num: "02", title: "We find your driver", desc: "Verified London driver, matched and confirmed." },
+  { num: "03", title: "Confirm your price", desc: "Fixed. Locked. No surprises on the day." },
+  { num: "04", title: "Move day", desc: "On time. Professional. Done." },
 ];
 
-const INCLUDED = [
-  "Dedicated team — 2 to 4 people depending on size",
-  "Blanket wrapping for all furniture",
-  "Loading and unloading at both addresses",
-  "Congestion charge and ULEZ included",
-  "Fully insured transit",
-  "Flat-pack assembly and disassembly",
-];
-
-const REVIEWS = [
+const TESTIMONIALS = [
   {
+    initials: "PM",
     name: "Priya M.",
     location: "Clapham → Islington",
-    quote: "Three-bedroom flat, two vans, done by 4pm. Called within 45 seconds of submitting the form.",
+    quote: "3-bed flat, two vans, done by 4pm. Fixed price quoted, fixed price paid. Called within 45 seconds of filling in the form.",
   },
   {
+    initials: "TW",
     name: "Tom W.",
     location: "Hackney → Peckham",
-    quote: "Quoted £480, paid £480. Careful with my record collection. Nothing scratched.",
+    quote: "4th floor, no lift. Team of three who knew exactly how to handle it. Not one scratch on my record collection.",
   },
   {
+    initials: "AO",
     name: "Amara O.",
     location: "Bethnal Green → Walthamstow",
-    quote: "4th-floor flat, no lift. Team of three who knew exactly how to handle it. Efficient, cheerful.",
+    quote: "Posted at 9am, driver matched by 9:02. Same-day move, fully done by 2pm. Couldn't believe how smooth it was.",
   },
+];
+
+const FEATURES = [
+  { title: "Fixed price, first call.", desc: "Your price is locked before anything moves. No changes, no additions on the day." },
+  { title: "Verified drivers only.", desc: "Background-checked, insured, and rated by real London customers before they're listed." },
+  { title: "All 33 boroughs covered.", desc: "Brixton, Hackney, Canary Wharf, Barnet — 7 days a week, 7am to 10pm." },
 ];
 
 const FAQS = [
-  { q: "How quickly can you arrange a move?", a: "We confirm your team within 1 minute. Same-day moves available across all London boroughs — call before 10am." },
-  { q: "Are there hidden charges?", a: "None. Congestion charge, ULEZ, and parking permits are included. The price quoted is the price you pay." },
-  { q: "What if something gets damaged?", a: "Every item is covered by full transit insurance. We handle the claim directly." },
-  { q: "Do I need to be at both addresses?", a: "Present at the start and end. During transit, you're free to travel ahead." },
+  { q: "How quickly can you match me in London?", a: "Within 60 seconds of posting your job, we match you to a verified driver near you. You receive confirmation immediately — no waiting, no chasing." },
+  { q: "Do you cover all 33 London boroughs?", a: "Yes. Every borough, 7 days a week from 7am to 10pm. Congestion zone, ULEZ, and parking are all factored into your fixed price upfront." },
+  { q: "Is the price fixed or an estimate?", a: "Always fixed. The number confirmed on the call is the number you pay. Nothing is added on the day without your explicit approval." },
+  { q: "What happens after I post my job?", a: "We match you to a verified local driver within 60 seconds and confirm your fixed price. You'll have a named driver and locked quote before we hang up." },
+  { q: "Are there hidden charges — congestion, ULEZ, parking?", a: "None. Congestion charge, ULEZ, and parking permits are all included in your quote. We don't spring extras on you on moving day." },
+  { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly — no complicated claims process, no argument." },
+  { q: "Do I need to be present during the move?", a: "Present at the start and end. During transit you're free to travel ahead. We keep you updated throughout via text or call." },
+  { q: "Can I book same-day in London?", a: "Yes — same-day is our speciality. Post before 10am for same-day availability. Need it urgently? Call us directly: 0208 234 4444." },
 ];
-
-function Stars() {
-  return (
-    <div className="flex gap-0.5">
-      {[...Array(5)].map((_, i) => (
-        <svg key={i} className="w-3.5 h-3.5 fill-[#0D0D0D]" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
 
 export default function LondonHomeMoves() {
   return (
     <main className="pb-20 md:pb-0">
-      <ExperimentTracker variant="test" />
+      <AutoOpenModal delayMs={2000} />
 
       {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="48" height="48" rx="11" fill="#0D0D0D"/>
               <path d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
               <circle cx="34" cy="12" r="3.5" fill="white"/>
@@ -86,47 +81,35 @@ export default function LondonHomeMoves() {
               Saint <span className="font-display italic font-normal">&amp;</span> Story
             </span>
           </Link>
-          <a
-            href="#quote"
+          <ModalCTA
+            label="Post a job"
+            source="lp_nav_london-home-moves"
             className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
-          >
-            Post a job
-          </a>
+          />
         </div>
       </header>
 
       {/* Hero */}
-      <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">
+      <section className="bg-[#0D0D0D] pt-16 min-h-[85vh] flex items-center border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-20 w-full">
-          <div className="flex items-center gap-3 mb-8">
-            <Stars />
-            <span className="text-[#888888] text-xs">4.9 · 300+ verified reviews</span>
-          </div>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
-            London home moves
+          <p className="text-[10px] font-semibold text-white/60 uppercase tracking-[0.2em] mb-5">
+            London · Post · Match · Move
           </p>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
+          <h1 className="font-sans font-black text-white text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
             L<span className="font-display italic font-normal">o</span>nd<span className="font-display italic font-normal">o</span>n
-            home m<span className="font-display italic font-normal">o</span>ves.
-            <br />D<span className="font-display italic font-normal">o</span>ne
-            pr<span className="font-display italic font-normal">o</span>perly.
+            <br />h<span className="font-display italic font-normal">o</span>me m<span className="font-display italic font-normal">o</span>ves.
+            <br />D<span className="font-display italic font-normal">o</span>ne right.
           </h1>
-          <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Fixed price. Confirmed in 60 seconds. Available across all 33 boroughs.
+          <p className="text-white/70 text-base mb-10 max-w-sm">
+            Post your job in 60 seconds. We match you to a verified London driver. Fixed price. No surprises.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <a href="#quote" className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
-              Get a free quote →
-            </a>
-            <a href="tel:+442082344444" className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
-              Call 0208 234 4444
-            </a>
-          </div>
+          <LandingHeroSearch city="London" />
+          <p className="text-white/40 text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="bg-[#F5F5F5] py-14 px-6 border-b border-[#E8E8E8]">
+      <section className="bg-[#F5F5F5] py-12 px-6 border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {STATS.map(({ stat, label }) => (
             <div key={label}>
@@ -138,13 +121,12 @@ export default function LondonHomeMoves() {
       </section>
 
       {/* How it works */}
-      <section className="bg-white py-20 px-6 border-b border-[#E8E8E8]">
+      <section id="how" className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-14">
-            Three steps.
-            <br />One stress-free m<span className="font-display italic font-normal">o</span>ve.
+          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-16">
+            H<span className="font-display italic font-normal">o</span>w it w<span className="font-display italic font-normal">o</span>rks.
           </h2>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
             {STEPS.map((s) => (
               <div key={s.num}>
                 <span className="font-sans font-black text-[#E8E8E8] text-4xl leading-none block mb-4">{s.num}</span>
@@ -156,52 +138,89 @@ export default function LondonHomeMoves() {
         </div>
       </section>
 
-      {/* What's included */}
-      <section className="bg-[#F5F5F5] py-20 px-6 border-b border-[#E8E8E8]">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
-          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
-            Everything
-            <br />incl<span className="font-display italic font-normal">u</span>ded.
-          </h2>
-          <div className="space-y-3">
-            {INCLUDED.map((item) => (
-              <div key={item} className="bg-white border border-[#E8E8E8] rounded-xl px-5 py-3.5">
-                <p className="text-[#0D0D0D] text-sm font-medium">{item}</p>
+      {/* Testimonials */}
+      <section className="bg-[#F5F5F5] py-24 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4">
+            <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
+              Real results.
+              <br />Real L<span className="font-display italic font-normal">o</span>nd<span className="font-display italic font-normal">o</span>n moves.
+            </h2>
+            <p className="text-[#888888] text-sm">4.9 · 300+ verified reviews</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {TESTIMONIALS.map((r) => (
+              <div key={r.name} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
+                <div className="flex gap-0.5 mb-5">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-3 h-3 fill-[#0D0D0D]" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-[#0D0D0D] text-sm leading-relaxed mb-6">&ldquo;{r.quote}&rdquo;</p>
+                <div className="flex items-center gap-3 border-t border-[#E8E8E8] pt-5">
+                  <div className="w-8 h-8 rounded-full bg-[#0D0D0D] flex items-center justify-center shrink-0">
+                    <span className="text-white text-[10px] font-bold">{r.initials}</span>
+                  </div>
+                  <div>
+                    <p className="text-[#0D0D0D] text-sm font-semibold">{r.name}</p>
+                    <p className="text-[#888888] text-xs">{r.location}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="bg-white py-20 px-6 border-b border-[#E8E8E8]">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-14">
-            Real m<span className="font-display italic font-normal">o</span>ves.
-            <br />Real reviews.
+      {/* Why us */}
+      <section className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-5xl leading-tight tracking-tight">
+            L<span className="font-display italic font-normal">o</span>gistics
+            <br />with<span className="font-display italic font-normal">o</span>ut
+            <br />the luck.
           </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {REVIEWS.map((r) => (
-              <div key={r.name} className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-6">
-                <div className="flex items-center gap-2 mb-5">
-                  <Stars />
-                </div>
-                <p className="text-[#0D0D0D] text-sm leading-relaxed mb-5">&ldquo;{r.quote}&rdquo;</p>
-                <div className="border-t border-[#E8E8E8] pt-4">
-                  <p className="text-[#0D0D0D] text-sm font-semibold">{r.name}</p>
-                  <p className="text-[#888888] text-xs">{r.location}</p>
-                </div>
+          <div className="space-y-3">
+            {FEATURES.map((f) => (
+              <div key={f.title} className="bg-[#F5F5F5] rounded-2xl px-6 py-5">
+                <p className="font-sans font-semibold text-[#0D0D0D] text-sm mb-1">{f.title}</p>
+                <p className="text-[#888888] text-sm">{f.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="bg-[#0D0D0D] py-24 px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <h2 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight">
+            Ready t<span className="font-display italic font-normal">o</span>
+            <br />m<span className="font-display italic font-normal">o</span>ve
+            <br />in L<span className="font-display italic font-normal">o</span>nd<span className="font-display italic font-normal">o</span>n?
+          </h2>
+          <div>
+            <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
+              Post your job in 60 seconds.
+              <br />We find y<span className="font-display italic font-normal">o</span>ur London driver.
+              <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
+            </p>
+            <ModalCTA
+              label="Post a job — it's free →"
+              source="lp_bottom_london-home-moves"
+              className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+            />
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="bg-[#F5F5F5] py-20 px-6 border-b border-[#E8E8E8]">
+      <section className="bg-white py-20 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16">
           <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
-            C<span className="font-display italic font-normal">o</span>mm<span className="font-display italic font-normal">o</span>n
+            L<span className="font-display italic font-normal">o</span>nd<span className="font-display italic font-normal">o</span>n
             <br />questi<span className="font-display italic font-normal">o</span>ns.
           </h2>
           <div className="divide-y divide-[#E8E8E8]">
@@ -218,60 +237,16 @@ export default function LondonHomeMoves() {
         </div>
       </section>
 
-      {/* Quote form */}
-      <section id="quote" className="bg-[#0D0D0D] py-20 px-6">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
-          <div>
-            <p className="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em] mb-5">
-              Free quote
-            </p>
-            <h2 className="font-sans font-black text-white text-3xl md:text-4xl leading-tight tracking-tight mb-6">
-              Ready t<span className="font-display italic font-normal">o</span>
-              <br />get m<span className="font-display italic font-normal">o</span>ving?
-            </h2>
-            <p className="text-white/50 text-base mb-8 max-w-xs">
-              Fill in the form. We call within 1 minute with a fixed price.
-            </p>
-            <div className="border border-white/10 rounded-2xl px-6 py-5">
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] mb-2">Response time</p>
-              <p className="text-white font-bold text-base">Under 1 minute</p>
-              <p className="text-white/30 text-xs mt-1">Mon–Sun, 7am–10pm</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-8">
-            <h3 className="font-sans font-black text-[#0D0D0D] text-base mb-1">Request a free quote</h3>
-            <p className="text-[#888888] text-sm mb-6">We&apos;ll call back within 60 seconds.</p>
-            <QuoteForm />
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-[#0D0D0D] border-t border-white/10 py-10 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
-              <rect width="48" height="48" rx="11" fill="white"/>
-              <path d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38" stroke="#0D0D0D" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
-              <circle cx="34" cy="12" r="3.5" fill="#0D0D0D"/>
-              <circle cx="34" cy="38" r="3.5" fill="#0D0D0D"/>
-            </svg>
-            <span className="text-white font-semibold text-sm">
-              Saint <span className="font-display italic font-normal">&amp;</span> Story
-            </span>
-          </Link>
-          <p className="text-white/25 text-xs">
-            &copy; {new Date().getFullYear()} Saint &amp; Story Logistics Limited
-          </p>
-        </div>
-      </footer>
-
-      {/* Mobile CTA */}
+      {/* Mobile sticky bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
-        <a href="#quote" className="block w-full bg-[#0D0D0D] text-white text-center font-semibold py-3.5 rounded-full text-sm">
-          Get a free quote →
-        </a>
+        <ModalCTA
+          label="Post a job — it's free →"
+          source="lp_mobile_bar_london-home-moves"
+          className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+        />
       </div>
+
+      <SiteFooter />
     </main>
   );
 }
