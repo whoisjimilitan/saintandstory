@@ -1,69 +1,64 @@
 "use client";
 
-import posthog from "posthog-js";
 import Link from "next/link";
+import posthog from "posthog-js";
 
-const NAV_LINKS = [
-  { label: "How It Works", href: "/#how" },
-  { label: "Services", href: "/services" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Contact", href: "/contact" },
-];
+// SVG logo mark — double-chevron forward arrow in a blue rounded square
+function LogoMark() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="7" fill="#0b6cff" />
+      <path d="M8 11L14 16L8 21" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 11L22 16L16 21" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+    </svg>
+  );
+}
 
 export default function Nav() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#0D0E17]/8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-[72px]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+        <div className="flex items-center justify-between h-[60px]">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 md:w-9 md:h-9 bg-[#E8244A] rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-sm">S</span>
-            </div>
-            <div className="hidden sm:block">
-              <p className="font-sans font-black text-[#0D0E17] text-sm tracking-tight leading-none">
+          {/* Left — logo + explore */}
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <LogoMark />
+              <span className="font-sans font-black text-navy text-[15px] tracking-tight">
                 Saint &amp; Story
-              </p>
-              <p className="text-[#E8244A] text-[9px] tracking-[0.3em] uppercase font-semibold mt-0.5">
-                Man &amp; Van · London
-              </p>
-            </div>
-          </Link>
+              </span>
+            </Link>
 
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-[#0D0E17]/50 text-sm hover:text-[#0D0E17] transition-colors font-medium"
-              >
-                {link.label}
-              </Link>
-            ))}
+            <div className="hidden md:flex items-center gap-1">
+              <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-navy transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-50 font-medium">
+                Explore
+                <svg className="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* CTA */}
-          <div className="flex items-center gap-3">
-            <a
-              href="tel:+447885465680"
-              className="hidden sm:flex items-center gap-1.5 text-[#0D0E17]/55 text-sm font-medium hover:text-[#0D0E17] transition-colors"
+          {/* Right — login + CTA */}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/contact"
+              className="hidden sm:block text-sm text-gray-500 hover:text-navy transition-colors font-medium"
             >
-              <svg className="w-3.5 h-3.5 text-[#E8244A]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
-              +44 7885 465680
-            </a>
+              Login
+            </Link>
             <button
               onClick={() => {
-                posthog.capture("nav_quote_clicked");
+                posthog.capture("nav_join_clicked");
                 document.dispatchEvent(new CustomEvent("open-lead-modal"));
               }}
-              className="bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white text-xs sm:text-sm font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg transition-colors"
+              className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
             >
-              <span className="sm:hidden">Quote →</span>
-              <span className="hidden sm:inline">Get a Free Quote →</span>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+              <span className="hidden sm:inline">Get a Free Quote</span>
+              <span className="sm:hidden">Quote</span>
             </button>
           </div>
 

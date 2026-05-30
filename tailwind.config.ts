@@ -13,19 +13,24 @@ const config: Config = {
         display: ["var(--font-cormorant)", "serif"],
       },
       colors: {
-        forest: "#0F2318",
-        gold: "#D4A853",
-        "gold-dark": "#B8912A",
-        cream: "#F7F4EE",
+        brand: "#0b6cff",
+        "brand-dark": "#0951cc",
+        navy: "#0b1232",
+        surface: "#f6f8fb",
+        muted: "#6b7280",
       },
       keyframes: {
         marquee: {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        spin: {
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         marquee: "marquee 30s linear infinite",
+        "spin-slow": "spin 1.6s linear infinite",
       },
     },
   },
