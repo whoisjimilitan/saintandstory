@@ -118,8 +118,8 @@ export default function LondonHomeMoves() {
             <a href="#quote" className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
               Get a free quote →
             </a>
-            <a href="tel:+447885465680" className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
-              Call +44 7885 465680
+            <a href="tel:+442082344444" className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
+              Call 0208 234 4444
             </a>
           </div>
         </div>

@@ -133,7 +133,7 @@ export default function ForDriversPage() {
             H<span className="font-display italic font-normal">o</span>w it
             w<span className="font-display italic font-normal">o</span>rks.
           </h2>
-          <div className="grid md:grid-cols-4 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
             {STEPS.map((s) => (
               <div key={s.num}>
                 <span className="font-sans font-black text-[#E8E8E8] text-4xl leading-none block mb-4">{s.num}</span>

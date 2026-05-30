@@ -35,7 +35,7 @@ export default function QuoteForm() {
   }
 
   const field =
-    "w-full border border-[#E8E8E8] rounded-xl px-4 py-3.5 text-sm text-[#0D0D0D] placeholder-[#888888] bg-white focus:outline-none focus:border-[#0D0D0D] transition-colors";
+    "w-full border border-[#E8E8E8] rounded-2xl px-4 py-3.5 text-sm text-[#0D0D0D] placeholder-[#888888] bg-white focus:outline-none focus:border-[#0D0D0D] transition-colors";
 
   const label = "block text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1.5";
 

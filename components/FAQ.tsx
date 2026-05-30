@@ -9,7 +9,7 @@ const categories = [
     items: [
       {
         q: "Can I book a same-day or last-minute move?",
-        a: "Yes — same-day is our speciality. Fill out the form and we confirm your team within 1 minute. Need someone in the next few hours? Call us directly at +44 7885 465680 and we will do everything we can to make it happen.",
+        a: "Yes — same-day is our speciality. Fill out the form and we confirm your team within 1 minute. Need someone in the next few hours? Call us directly at 0208 234 4444 and we will do everything we can to make it happen.",
       },
       {
         q: "How far in advance do I need to book?",
@@ -78,23 +78,23 @@ function Item({ q, a }: { q: string; a: string }) {
     setOpen(!open);
   }
   return (
-    <div className="border-b border-[#0D0E17]/8 last:border-0">
+    <div className="border-b border-[#E8E8E8] last:border-0">
       <button
         onClick={handleToggle}
         className="w-full flex items-start justify-between py-5 text-left gap-6 group"
       >
-        <span className="font-medium text-[#0D0E17] text-sm leading-snug group-hover:text-brand transition-colors">
+        <span className="font-medium text-[#0D0D0D] text-sm leading-snug group-hover:text-[#888888] transition-colors">
           {q}
         </span>
         <span
-          className="shrink-0 text-brand text-xl leading-none mt-0.5 transition-transform duration-200"
+          className="shrink-0 text-[#888888] text-xl leading-none mt-0.5 transition-transform duration-200"
           style={{ transform: open ? "rotate(45deg)" : "none" }}
         >
           +
         </span>
       </button>
       {open && (
-        <p className="text-[#0D0E17]/55 text-sm leading-relaxed pb-5">{a}</p>
+        <p className="text-[#888888] text-sm leading-relaxed pb-5">{a}</p>
       )}
     </div>
   );
@@ -106,15 +106,15 @@ export default function FAQ() {
       <div className="max-w-7xl mx-auto">
 
         <div className="text-center mb-14">
-          <span className="text-[10px] font-semibold text-brand uppercase tracking-[0.4em]">
+          <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.4em]">
             FAQ
           </span>
-          <h2 className="font-display text-4xl md:text-5xl font-semibold text-[#0D0E17] mt-3 mb-3">
-            Questions you&apos;re thinking right now.
+          <h2 className="font-sans font-black text-4xl md:text-5xl text-[#0D0D0D] tracking-tight mt-3 mb-3">
+            Questions y<span className="font-display italic font-normal">o</span>u&apos;re thinking right now.
           </h2>
-          <p className="text-[#0D0E17]/40 text-sm max-w-sm mx-auto">
+          <p className="text-[#888888] text-sm max-w-sm mx-auto">
             We&apos;ve answered the most common ones below. Still not sure?{" "}
-            <a href="tel:+447885465680" className="text-brand underline underline-offset-2">
+            <a href="tel:+442082344444" className="text-[#0D0D0D] underline underline-offset-2">
               Call us now.
             </a>
           </p>
@@ -123,7 +123,7 @@ export default function FAQ() {
         <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
           {categories.map((cat) => (
             <div key={cat.label}>
-              <h3 className="text-[10px] font-bold text-[#0D0E17] uppercase tracking-[0.4em] mb-4 pb-3 border-b border-[#0D0E17]/10">
+              <h3 className="text-[10px] font-bold text-[#888888] uppercase tracking-[0.4em] mb-4 pb-3 border-b border-[#E8E8E8]">
                 {cat.label}
               </h3>
               {cat.items.map((item) => (
@@ -139,19 +139,19 @@ export default function FAQ() {
               try { posthog.capture("faq_quote_clicked"); } catch { /* */ }
               document.dispatchEvent(new CustomEvent("open-lead-modal"));
             }}
-            className="inline-block bg-brand hover:bg-brand-dark text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm"
+            className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-8 py-3.5 rounded-full transition-colors text-sm"
           >
-            Get a free quote &rarr;
+            Post a job &rarr;
           </button>
           <a
-            href="tel:+447885465680"
+            href="tel:+442082344444"
             onClick={() => posthog.capture("faq_phone_clicked")}
-            className="inline-flex items-center gap-2 border border-[#0D0E17]/20 hover:border-[#0D0E17]/40 text-[#0D0E17] font-semibold px-8 py-4 rounded-xl transition-colors text-sm"
+            className="inline-flex items-center gap-2 border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-8 py-3.5 rounded-full transition-colors text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
             </svg>
-            +44 7885 465680
+            0208 234 4444
           </a>
         </div>
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const DETAILS = [
-  { label: "Phone", value: "+44 7885 465680", href: "tel:+447885465680" },
+  { label: "Phone", value: "0208 234 4444", href: "tel:+442082344444" },
   { label: "Email", value: "hello@saintandstory.co.uk", href: "mailto:hello@saintandstory.co.uk" },
   { label: "Hours", value: "Mon–Sun, 7am–10pm", href: null },
 ];
