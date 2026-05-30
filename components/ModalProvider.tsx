@@ -2,18 +2,27 @@
 
 import { useState, useEffect } from "react";
 import LeadModal from "./LeadModal";
+import DriverModal from "./DriverModal";
 
-// Mounts globally in layout.tsx.
-// No auto-open — listens only for manual "open-lead-modal" events.
-// Landing pages add <AutoOpenModal /> to trigger the auto-open sequence.
 export default function ModalProvider() {
-  const [open, setOpen] = useState(false);
+  const [leadOpen, setLeadOpen] = useState(false);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   useEffect(() => {
-    const handler = () => setOpen(true);
-    document.addEventListener("open-lead-modal", handler);
-    return () => document.removeEventListener("open-lead-modal", handler);
+    const openLead = () => setLeadOpen(true);
+    const openDriver = () => setDriverOpen(true);
+    document.addEventListener("open-lead-modal", openLead);
+    document.addEventListener("open-driver-modal", openDriver);
+    return () => {
+      document.removeEventListener("open-lead-modal", openLead);
+      document.removeEventListener("open-driver-modal", openDriver);
+    };
   }, []);
 
-  return <LeadModal isOpen={open} onClose={() => setOpen(false)} />;
+  return (
+    <>
+      <LeadModal isOpen={leadOpen} onClose={() => setLeadOpen(false)} />
+      <DriverModal isOpen={driverOpen} onClose={() => setDriverOpen(false)} />
+    </>
+  );
 }
