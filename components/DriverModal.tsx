@@ -22,12 +22,12 @@ const STEPS = [
   },
   {
     id: "start", type: "options" as const,
-    q: "When are you ready to start?",
+    q: "When do you want to go live?",
     opts: ["Immediately", "This week", "Next week", "Next month"],
   },
   {
     id: "days", type: "options" as const,
-    q: "How many days a week are you looking to work?",
+    q: "How many days a week do you want bookings?",
     opts: ["1–2 days", "3–4 days", "5+ days", "Flexible"],
   },
   { id: "details", type: "details" as const, q: "Your details." },
@@ -205,7 +205,7 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
               <br />registered.
             </h2>
             <p className="text-[#888888] text-sm leading-relaxed mb-8 max-w-xs mx-auto">
-              We&apos;ll be in touch to get your profile live and your first bookings coming in.
+              We&apos;ll get your profile live and your first bookings coming in.
             </p>
             <button
               onClick={onClose}
