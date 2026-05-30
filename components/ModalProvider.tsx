@@ -11,7 +11,7 @@ export default function ModalProvider() {
 
   // Auto-open on every page load after a short "please wait" delay
   useEffect(() => {
-    const t = setTimeout(() => setOpen(true), 800);
+    const t = setTimeout(() => setOpen(true), 2000);
     return () => clearTimeout(t);
   }, []);
 

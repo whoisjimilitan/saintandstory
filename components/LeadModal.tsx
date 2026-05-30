@@ -249,7 +249,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
-    const t = setTimeout(() => setLoading(false), 2000);
+    const t = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(t);
   }, [isOpen]);
 
