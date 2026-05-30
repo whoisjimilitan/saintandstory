@@ -43,7 +43,7 @@ function CustomerView() {
             <p className="text-sm font-semibold text-[#0D0D0D]">Marcus D.</p>
             <p className="text-xs text-[#888888]">Ford Transit · Verified · ★ 4.9</p>
           </div>
-          <p className="font-black text-[#0D0D0D] text-base shrink-0">£195</p>
+          <p className="font-black text-[#0D0D0D] text-base shrink-0">£95</p>
         </div>
         <div className="w-full bg-[#0D0D0D] text-white text-xs font-semibold py-2.5 rounded-lg text-center">
           Confirm booking →

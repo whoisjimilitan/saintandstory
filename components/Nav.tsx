@@ -36,14 +36,14 @@ export default function Nav() {
 
         <div className="hidden md:flex items-center gap-4">
           <ModalCTA
-            label="Get a quote"
+            label="Get quotes"
             source="nav"
             className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
           />
         </div>
 
         <ModalCTA
-          label="Get a quote"
+          label="Get quotes"
           source="nav_mobile"
           className="md:hidden bg-[#0D0D0D] text-white font-semibold px-4 py-2 rounded-full text-sm"
         />
