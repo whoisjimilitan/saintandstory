@@ -61,7 +61,7 @@ export default function Nav() {
             </button>
           ) : (
             <ModalCTA
-              label="Get quotes"
+              label="Post a job"
               source="nav"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
             />
@@ -77,7 +77,7 @@ export default function Nav() {
           </button>
         ) : (
           <ModalCTA
-            label="Get quotes"
+            label="Post a job"
             source="nav_mobile"
             className="md:hidden bg-[#0D0D0D] text-white font-semibold px-4 py-2 rounded-full text-sm"
           />

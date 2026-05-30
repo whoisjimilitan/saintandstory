@@ -8,7 +8,7 @@ type Side = "customer" | "driver";
 
 const CONTENT = {
   customer: {
-    badge: "Post your job · Get quotes · Move",
+    badge: "Post · Match · Move",
     headline: (
       <>
         Find a driver.
@@ -17,7 +17,7 @@ const CONTENT = {
         <span className="font-display italic font-normal">o</span>ving.
       </>
     ),
-    sub: "Post your job. Get quotes. Choose your driver.",
+    sub: "Post your job. We find your driver. Done.",
     cta: "Post a job — it's free",
     source: "hero_customer",
   },
