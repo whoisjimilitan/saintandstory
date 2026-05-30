@@ -32,7 +32,7 @@ const REVIEWS = [
     name: "Daniel F.",
     role: "Driver",
     location: "Birmingham",
-    quote: "Claimed my area Monday. Three jobs booked by Wednesday.",
+    quote: "Profile live Monday. Three bookings confirmed by Wednesday.",
   },
 ];
 
