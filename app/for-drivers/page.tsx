@@ -2,30 +2,31 @@ import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import MobileBar from "@/components/MobileBar";
 import ModalCTA from "@/components/ModalCTA";
+import DriverCount from "@/components/DriverCount";
 
 export const metadata: Metadata = {
   title: "Drive with Saint & Story | Earn on Your Terms",
-  description: "Join 367 drivers earning consistently on the Saint & Story platform. Claim your area, set your rate, get a live job feed.",
+  description: "Join hundreds of drivers earning consistently on the Saint & Story platform. Claim your area, set your rate, get a live job feed.",
 };
 
 const STEPS = [
   { num: "01", title: "Claim your area", desc: "Set your radius. Once claimed, jobs in your area come to you first." },
   { num: "02", title: "Get a live job feed", desc: "Accept what works. Reject what doesn't. You're always in control." },
   { num: "03", title: "Complete the job", desc: "Turn up, do what you do best. Every job builds your rating." },
-  { num: "04", title: "Get paid", desc: "Weekly, direct to your account. No chasing, no delays." },
+  { num: "04", title: "Get paid", desc: "Daily, direct to your account. No chasing, no delays." },
 ];
 
 const EARNINGS = [
-  { stat: "£340", label: "Avg. weekly earnings" },
+  { stat: "£68", label: "Avg. daily earnings" },
   { stat: "4–5", label: "Jobs per week" },
-  { stat: "85%", label: "Yours after platform fee" },
-  { stat: "367", label: "Drivers earning now" },
+  { stat: "£39", label: "Flat monthly fee" },
+  { stat: null, label: "Drivers earning now" },
 ];
 
 const FEATURES = [
   { title: "No cold leads.", desc: "Jobs come to you. No quoting strangers, no marketing." },
   { title: "Your schedule.", desc: "Set your own hours and availability. Work when you want." },
-  { title: "Transparent fee.", desc: "15% platform fee. Everything else is yours, weekly." },
+  { title: "One flat fee.", desc: "£39/month. That's it. No cuts per job. Keep everything you earn." },
   { title: "Build your rating.", desc: "Higher rating means priority job matching in your area." },
 ];
 
@@ -69,7 +70,7 @@ export default function ForDriversPage() {
             terms.
           </h1>
           <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Claim your area. Get a live job feed. 367 drivers already earning.
+            Claim your area. Get a live job feed. <DriverCount /> drivers already earning.
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
@@ -92,10 +93,38 @@ export default function ForDriversPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {EARNINGS.map(({ stat, label }) => (
             <div key={label}>
-              <p className="font-sans font-black text-white text-3xl md:text-4xl tracking-tight mb-1">{stat}</p>
-              <p className="text-white/40 text-xs uppercase tracking-[0.15em]">{label}</p>
+              {stat ? (
+                <p className="font-sans font-black text-white text-3xl md:text-4xl tracking-tight mb-1">{stat}</p>
+              ) : (
+                <p className="font-sans font-black text-white text-3xl md:text-4xl tracking-tight mb-1">
+                  <DriverCount />
+                </p>
+              )}
+              <p className="text-white/70 text-xs uppercase tracking-[0.15em]">{label}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Fee callout — lightbulb: show ROI immediately */}
+      <section className="bg-[#F5F5F5] py-12 px-6 border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+              Platform fee
+            </p>
+            <p className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
+              £39<span className="font-sans font-medium text-[#888888] text-base ml-1">/month</span>
+            </p>
+          </div>
+          <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
+          <p className="text-[#0D0D0D] text-sm font-medium max-w-xs">
+            No cuts per job. Keep 100% of what you earn. The fee pays back in under one job.
+          </p>
+          <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
+          <p className="text-[#888888] text-sm max-w-xs">
+            Average daily earning: £68. Monthly fee covered in less than a morning&apos;s work.
+          </p>
         </div>
       </section>
 
@@ -171,8 +200,8 @@ export default function ForDriversPage() {
             <br />area.
           </h2>
           <div>
-            <p className="font-sans font-medium text-white/65 text-lg leading-relaxed mb-8">
-              367 drivers already earning.
+            <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
+              <DriverCount /> drivers already earning.
               <br />
               Claim y<span className="font-display italic font-normal">o</span>urs
               before s<span className="font-display italic font-normal">o</span>meone

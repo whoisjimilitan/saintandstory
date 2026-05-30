@@ -1,4 +1,7 @@
+"use client";
+
 import ModalCTA from "./ModalCTA";
+import DriverCount from "./DriverCount";
 
 export default function ClaimArea() {
   return (
@@ -10,8 +13,8 @@ export default function ClaimArea() {
         </h2>
 
         <div>
-          <p className="font-sans font-medium text-white/65 text-lg leading-relaxed mb-8">
-            367 drivers already earning.
+          <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
+            <DriverCount /> drivers already earning.
             <br />
             Claim y<span className="font-display italic font-normal">o</span>urs
             before s<span className="font-display italic font-normal">o</span>meone

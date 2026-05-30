@@ -43,24 +43,24 @@ const DRIVER_CARDS = [
     statLabel: "to get started",
   },
   {
-    title: "15% platform fee.",
-    desc: "We take 15% per completed job. Everything else is yours, paid weekly.",
-    stat: "85%",
-    statLabel: "goes to you",
+    title: "One flat monthly fee.",
+    desc: "£39/month. No cuts per job. Keep everything you earn, paid daily to your account.",
+    stat: "£39",
+    statLabel: "per month, that's it",
     highlight: true,
   },
   {
     title: "Consistent work.",
-    desc: "Average driver completing 4–5 jobs per week in a 20-mile radius.",
-    stat: "£340",
-    statLabel: "avg. weekly earnings",
+    desc: "Average driver completing 4–5 jobs per week in a claimed 20-mile radius.",
+    stat: "£68",
+    statLabel: "avg. daily earnings",
   },
 ];
 
 const DRIVER_FACTS = [
   "No cold leads — jobs come to you",
   "Set your own radius, hours, and rate",
-  "Weekly payouts, direct to your account",
+  "Daily payouts, direct to your account",
   "Build your rating, grow your income",
 ];
 
@@ -72,8 +72,8 @@ const FAQS: Record<Tab, { q: string; a: string }[]> = {
     { q: "How do I pay?", a: "50% deposit to secure your date, balance on completion." },
   ],
   driver: [
-    { q: "How do I get paid?", a: "Weekly, directly to your account. No chasing, no delays." },
-    { q: "What does the 15% cover?", a: "Platform access, job matching, insurance layer, customer support, and payment processing." },
+    { q: "How do I get paid?", a: "Daily, directly to your account. No chasing, no delays." },
+    { q: "What does the £39 cover?", a: "Platform access, job matching, customer support, and payment processing. That's the only cost." },
     { q: "Can I reject jobs?", a: "Yes — always. You only accept jobs that suit your schedule, location, and rate." },
     { q: "How do I get my first job?", a: "Claim your area, complete your profile, and go live. Most drivers receive their first job within 48 hours." },
   ],
@@ -132,10 +132,10 @@ export default function PricingPage() {
                   <h2 className={`font-sans font-black text-xl mb-1 ${t.highlight ? "text-white" : "text-[#0D0D0D]"}`}>
                     {t.name}
                   </h2>
-                  <p className={`text-sm mb-6 ${t.highlight ? "text-white/40" : "text-[#888888]"}`}>{t.desc}</p>
+                  <p className={`text-sm mb-6 ${t.highlight ? "text-white/70" : "text-[#888888]"}`}>{t.desc}</p>
                   <div className="mb-7">
                     <span className={`font-black text-3xl ${t.highlight ? "text-white" : "text-[#0D0D0D]"}`}>{t.price}</span>
-                    <span className={`text-sm ml-1.5 ${t.highlight ? "text-white/30" : "text-[#888888]"}`}>{t.unit}</span>
+                    <span className={`text-sm ml-1.5 ${t.highlight ? "text-white/60" : "text-[#888888]"}`}>{t.unit}</span>
                   </div>
                   <ul className="space-y-3 mb-8">
                     {t.features.map((f) => (
@@ -177,13 +177,13 @@ export default function PricingPage() {
                     <p className={`font-black text-4xl tracking-tight mb-1 ${c.highlight ? "text-white" : "text-[#0D0D0D]"}`}>
                       {c.stat}
                     </p>
-                    <p className={`text-xs uppercase tracking-[0.15em] mb-5 ${c.highlight ? "text-white/40" : "text-[#888888]"}`}>
+                    <p className={`text-xs uppercase tracking-[0.15em] mb-5 ${c.highlight ? "text-white/65" : "text-[#888888]"}`}>
                       {c.statLabel}
                     </p>
                     <h3 className={`font-sans font-bold text-base mb-2 ${c.highlight ? "text-white" : "text-[#0D0D0D]"}`}>
                       {c.title}
                     </h3>
-                    <p className={`text-sm leading-relaxed ${c.highlight ? "text-white/50" : "text-[#888888]"}`}>
+                    <p className={`text-sm leading-relaxed ${c.highlight ? "text-white/75" : "text-[#888888]"}`}>
                       {c.desc}
                     </p>
                   </div>

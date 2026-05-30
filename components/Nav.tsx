@@ -35,12 +35,6 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Link
-            href="/#claim"
-            className="text-sm text-[#888888] hover:text-[#0D0D0D] transition-colors font-medium"
-          >
-            Drive with us
-          </Link>
           <ModalCTA
             label="Post a job"
             source="nav"
