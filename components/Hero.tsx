@@ -1,27 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import posthog from "posthog-js";
 import ModalCTA from "./ModalCTA";
-
-const VARIANTS = {
-  A: "Man and van.\nDone properly.",
-  B: "The removal company\nyou don't have to worry about.",
-};
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [headline, setHeadline] = useState(VARIANTS.A);
 
   useEffect(() => {
-    let v = localStorage.getItem("ss_hl_v") as "A" | "B" | null;
-    if (!v) {
-      v = Math.random() < 0.5 ? "A" : "B";
-      localStorage.setItem("ss_hl_v", v);
-    }
-    setHeadline(VARIANTS[v]);
-    try { posthog.capture("hero_variant", { variant: v }); } catch { /* */ }
+    videoRef.current?.play().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -38,7 +25,7 @@ export default function Hero() {
               Saint &amp; Story Logistics
             </p>
             <h1 className="font-sans font-black text-navy text-4xl md:text-5xl xl:text-[3.25rem] leading-[1.08] tracking-tight mb-6 whitespace-pre-line">
-              {headline}
+              {"Man and van.\nDone properly."}
             </h1>
             <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-md">
               Fixed price. Fully insured. Same-day across the UK.
