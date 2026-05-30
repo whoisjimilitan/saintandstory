@@ -1,3 +1,5 @@
+"use client";
+
 const ROW_ONE = [
   "Home moves", "Office relocations", "Student moves", "Same-day delivery",
   "Piano transport", "Furniture removal", "Home moves", "Office relocations",
@@ -42,12 +44,19 @@ export default function ForEveryMove() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <p className="font-sans font-black text-[#0D0D0D] text-2xl md:text-4xl leading-tight tracking-tight">
           We&apos;ve done the hard part.
           <br />
           Now just get m<span className="font-display italic font-normal">o</span>ving.
         </p>
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent("open-lead-modal")); }}
+          className="shrink-0 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+        >
+          Post a job →
+        </a>
       </div>
     </section>
   );

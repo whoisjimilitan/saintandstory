@@ -137,7 +137,9 @@ export default function HeroPlatformUI({ side }: { side: Side }) {
         </div>
       </div>
 
-      {side === "customer" ? <CustomerView /> : <DriverView />}
+      <div key={side} className="animate-fade-up">
+        {side === "customer" ? <CustomerView /> : <DriverView />}
+      </div>
     </div>
   );
 }

@@ -23,7 +23,7 @@ export default function Nav() {
           <Link href="/#how" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
             How it works
           </Link>
-          <Link href="/#claim" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
+          <Link href="/for-drivers" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
             For drivers
           </Link>
           <Link href="/pricing" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
