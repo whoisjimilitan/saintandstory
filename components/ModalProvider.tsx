@@ -3,26 +3,23 @@
 import { useState, useEffect } from "react";
 import LeadModal from "./LeadModal";
 
-// Mounts in layout.tsx — listens globally for "open-lead-modal" custom events
-// and manages the auto-open timer so the modal works on every page.
+// Mounts globally in layout.tsx.
+// Opens the lead modal automatically on every page load (Bark-style lead capture).
+// Also listens for manual triggers via the "open-lead-modal" custom event.
 export default function ModalProvider() {
   const [open, setOpen] = useState(false);
 
-  // Listen for any button/link dispatching the custom event
+  // Auto-open on every page load after a short "please wait" delay
+  useEffect(() => {
+    const t = setTimeout(() => setOpen(true), 800);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Listen for manual triggers (nav button, hero CTA, service pills, etc.)
   useEffect(() => {
     const handler = () => setOpen(true);
     document.addEventListener("open-lead-modal", handler);
     return () => document.removeEventListener("open-lead-modal", handler);
-  }, []);
-
-  // Auto-open once per session after 4 seconds
-  useEffect(() => {
-    if (sessionStorage.getItem("modal_auto_opened")) return;
-    const t = setTimeout(() => {
-      setOpen(true);
-      sessionStorage.setItem("modal_auto_opened", "1");
-    }, 4000);
-    return () => clearTimeout(t);
   }, []);
 
   return <LeadModal isOpen={open} onClose={() => setOpen(false)} />;
