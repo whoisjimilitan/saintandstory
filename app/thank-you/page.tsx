@@ -6,57 +6,59 @@ export const metadata: Metadata = {
   description: "We've received your quote request and will call you within 1 minute.",
 };
 
+const STEPS = [
+  { num: "01", text: "We call within 1 minute to discuss your move" },
+  { num: "02", text: "Fixed price confirmed on the call — no changes on the day" },
+  { num: "03", text: "Your team arrives and handles everything" },
+];
+
 export default function ThankYou() {
   return (
-    <main className="min-h-screen bg-[#0D0E17] flex items-center justify-center px-6 py-24">
-      <div className="max-w-xl w-full text-center">
+    <main className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-6 py-24">
+      <div className="max-w-lg w-full text-center">
 
-        {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-[#E8244A]/15 flex items-center justify-center mx-auto mb-8">
-          <svg className="w-8 h-8 text-[#E8244A]" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
+        <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-10">
+          <div className="w-1.5 h-1.5 rounded-full bg-white" />
         </div>
 
-        {/* Heading */}
-        <p className="text-[#E8244A] text-xs font-semibold uppercase tracking-[0.3em] mb-4">
-          Quote Received
-        </p>
-        <h1 className="font-display text-4xl md:text-5xl text-white leading-tight mb-4">
-          You&apos;re all set.
-        </h1>
-        <p className="text-white/55 text-base leading-relaxed mb-10">
-          We&apos;ve got your details and someone from our team will call you{" "}
-          <span className="text-white font-semibold">within 1 minute</span> to confirm your quote and moving date.
+        <p className="text-[10px] font-semibold text-white/40 uppercase tracking-[0.25em] mb-5">
+          Quote received
         </p>
 
-        {/* What happens next */}
-        <div className="bg-white/5 border border-white/8 rounded-2xl p-7 text-left mb-8 space-y-5">
-          <p className="text-white/40 text-[10px] font-semibold uppercase tracking-[0.3em]">What happens next</p>
-          {[
-            { step: "01", text: "We call you within 1 minute to discuss your move" },
-            { step: "02", text: "We confirm your team, van size, and fixed price on the call" },
-            { step: "03", text: "Our team shows up on the day and handles everything" },
-          ].map(({ step, text }) => (
-            <div key={step} className="flex items-start gap-4">
-              <span className="font-display text-2xl text-[#E8244A] leading-none shrink-0">{step}</span>
-              <p className="text-white/65 text-sm leading-snug pt-0.5">{text}</p>
+        <h1 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight mb-4">
+          Y<span className="font-display italic font-normal">o</span>u&apos;re
+          all set.
+        </h1>
+
+        <p className="text-white/50 text-base leading-relaxed mb-12 max-w-sm mx-auto">
+          Someone from our team will call you{" "}
+          <span className="text-white font-semibold">within 1 minute</span> to
+          confirm your quote and moving date.
+        </p>
+
+        <div className="border border-white/10 rounded-2xl p-7 text-left mb-10 space-y-6">
+          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.25em]">
+            What happens next
+          </p>
+          {STEPS.map(({ num, text }) => (
+            <div key={num} className="flex items-start gap-4">
+              <span className="font-sans font-black text-white/20 text-2xl leading-none shrink-0">
+                {num}
+              </span>
+              <p className="text-white/60 text-sm leading-snug pt-0.5">{text}</p>
             </div>
           ))}
         </div>
 
-        {/* Call CTA */}
-        <p className="text-white/35 text-sm mb-3">Can&apos;t wait? Call us directly:</p>
         <a
           href="tel:+447885465680"
-          className="inline-block bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm mb-8"
+          className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-3.5 rounded-full text-sm transition-colors mb-10"
         >
           Call +44 7885 465680
         </a>
 
-        {/* Back link */}
         <div>
-          <Link href="/" className="text-white/30 hover:text-white/60 text-xs transition-colors">
+          <Link href="/" className="text-white/25 hover:text-white/50 text-xs transition-colors">
             ← Back to homepage
           </Link>
         </div>

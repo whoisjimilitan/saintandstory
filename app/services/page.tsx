@@ -4,116 +4,92 @@ import MobileBar from "@/components/MobileBar";
 import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {
-  title: "Man & Van Services | Saint & Story Logistics",
-  description: "Professional man and van services across London — home moves, office moves, same-day, piano moving and more. Fixed prices, vetted drivers.",
+  title: "Services | Saint & Story Logistics",
+  description: "Every type of move, handled properly. Home, office, same-day, specialist — fixed price, verified drivers.",
 };
 
 const SERVICES = [
   {
-    emoji: "📦",
-    title: "Small Flat Moves",
-    desc: "1–2 bed flat or studio. We pack, load, drive, and unload — leaving you free to focus on settling in.",
+    title: "Home moves",
+    desc: "Studio to 5-bed. Load, drive, unload — or full-service packing if you need it.",
     from: "From £180",
-    tags: ["2-man team", "Van included", "Same-day available"],
   },
   {
-    emoji: "🏠",
-    title: "Whole House Moves",
-    desc: "3+ bedrooms, full property clearance. Our crews handle everything including furniture disassembly and reassembly.",
-    from: "From £350",
-    tags: ["Up to 4-man team", "Luton van", "Full insurance"],
-  },
-  {
-    emoji: "🏢",
-    title: "Office & Business Moves",
-    desc: "Desks, IT equipment, filing cabinets. We work around your schedule to minimise downtime.",
+    title: "Office relocations",
+    desc: "Desks, IT, filing. We work around your schedule to keep downtime minimal.",
     from: "From £280",
-    tags: ["Weekend slots", "IT-aware handling", "Itemised receipt"],
   },
   {
-    emoji: "⚡",
-    title: "Same-Day Moves",
-    desc: "Need to move today? We dispatch within the hour. Available 7 days a week, 7am–10pm across London.",
+    title: "Same-day",
+    desc: "Need it done today? Available 7 days a week across 30+ UK cities.",
     from: "From £150",
-    tags: ["1-hour dispatch", "Fixed price", "No hidden fees"],
   },
   {
-    emoji: "🎹",
-    title: "Piano & Specialist Items",
-    desc: "Grand pianos, antiques, gym equipment, pool tables. Specialist rigging and padded wrapping included.",
+    title: "Specialist items",
+    desc: "Pianos, antiques, gym equipment. Specialist rigging, padded wrapping included.",
     from: "From £220",
-    tags: ["Specialist crew", "Padded wrapping", "Fully insured"],
   },
   {
-    emoji: "🗑️",
-    title: "Rubbish & Clearance",
-    desc: "Unwanted furniture, appliances, junk. We remove it responsibly — recycling where possible.",
+    title: "Student moves",
+    desc: "End of term, halls to flat, city to city. Fixed price, no van hire stress.",
+    from: "From £95",
+  },
+  {
+    title: "Clearance",
+    desc: "Furniture, appliances, junk. Removed responsibly — recycling where possible.",
     from: "From £120",
-    tags: ["Same-day", "Eco-friendly disposal", "No sorting needed"],
   },
 ];
-
-function Check() {
-  return (
-    <span className="w-4 h-4 rounded-full bg-[#E8244A]/12 flex items-center justify-center shrink-0">
-      <svg className="w-2.5 h-2.5 text-[#E8244A]" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-      </svg>
-    </span>
-  );
-}
 
 export default function ServicesPage() {
   return (
     <main className="pb-20 md:pb-0">
       <Nav />
 
-      {/* Hero */}
       <section className="bg-white pt-28 pb-16 md:pt-36 md:pb-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="text-[10px] font-bold text-[#E8244A] uppercase tracking-[0.4em]">Our services</span>
-          <h1 className="font-sans font-black text-[#0D0E17] text-4xl md:text-5xl leading-[1.05] tracking-tight mt-3 mb-4">
-            Every type of move.<br />
-            <span className="text-[#E8244A]">One trusted team.</span>
-          </h1>
-          <p className="text-[#0D0E17]/50 text-lg mb-8 max-w-xl mx-auto">
-            Fixed prices, vetted professionals, and a 1-minute response guarantee — whatever you need moved.
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
+            What we move
           </p>
-          <ModalCTA label="Get free quotes in 60 seconds →" source="services_hero" />
+          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl leading-[1.05] tracking-tight mb-4 max-w-xl">
+            Every kind of m<span className="font-display italic font-normal">o</span>ve.
+            <br />One platform.
+          </h1>
+          <p className="text-[#888888] text-base max-w-sm">
+            Fixed price. Verified driver. Done properly.
+          </p>
         </div>
       </section>
 
-      {/* Services grid */}
-      <section className="bg-[#F6F7FA] py-14 md:py-20 px-6">
-        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="bg-[#F5F5F5] py-16 md:py-20 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {SERVICES.map((s) => (
-            <div key={s.title} className="bg-white rounded-2xl p-6 border border-[#0D0E17]/8 hover:border-[#E8244A]/30 hover:shadow-md transition-all group">
-              <span className="text-3xl block mb-4">{s.emoji}</span>
-              <h2 className="font-sans font-black text-[#0D0E17] text-lg mb-2 group-hover:text-[#E8244A] transition-colors">{s.title}</h2>
-              <p className="text-[#0D0E17]/50 text-sm leading-relaxed mb-4">{s.desc}</p>
-              <ul className="space-y-1.5 mb-5">
-                {s.tags.map((tag) => (
-                  <li key={tag} className="flex items-center gap-2 text-xs text-[#0D0E17]/60">
-                    <Check />
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-              <p className="font-black text-[#E8244A] text-sm">{s.from}</p>
+            <div key={s.title} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
+              <h2 className="font-sans font-bold text-[#0D0D0D] text-base mb-2">{s.title}</h2>
+              <p className="text-[#888888] text-sm leading-relaxed mb-5">{s.desc}</p>
+              <p className="font-sans font-black text-[#0D0D0D] text-sm">{s.from}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="bg-[#0D0E17] py-14 md:py-20 px-6 text-center">
-        <h2 className="font-sans font-black text-white text-3xl md:text-4xl mb-3">
-          Not sure which service you need?
-        </h2>
-        <p className="text-white/40 text-sm mb-8 max-w-md mx-auto">
-          Answer 6 quick questions and we&apos;ll match you with the right professional in under a minute.
-        </p>
-        <ModalCTA label="Find my match →" source="services_bottom" />
+      <section className="bg-[#0D0D0D] py-20 px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <h2 className="font-sans font-black text-white text-3xl md:text-4xl leading-tight tracking-tight">
+            N<span className="font-display italic font-normal">o</span>t sure
+            which service?
+          </h2>
+          <div>
+            <p className="text-white/50 text-base mb-8">
+              Tell us what needs moving. We match you to the right driver in minutes.
+            </p>
+            <ModalCTA
+              label="Post a job — it's free"
+              source="services_cta"
+              className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+            />
+          </div>
+        </div>
       </section>
 
       <MobileBar />

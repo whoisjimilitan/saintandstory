@@ -10,8 +10,12 @@ export default function ClaimArea() {
         </h2>
 
         <div>
-          <p className="text-white/50 text-base mb-8">
-            367 drivers already earning. Claim yours before someone else does.
+          <p className="font-sans font-medium text-white/65 text-lg leading-relaxed mb-8">
+            367 drivers already earning.
+            <br />
+            Claim y<span className="font-display italic font-normal">o</span>urs
+            before s<span className="font-display italic font-normal">o</span>meone
+            else does.
           </p>
           <ModalCTA
             label="Claim now →"
