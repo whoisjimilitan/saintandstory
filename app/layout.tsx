@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Saint & Story — The UK Logistics Platform",
   description:
     "Find verified drivers or find work. Post a job, get matched, move. The two-sided logistics marketplace built for the UK.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export const viewport: Viewport = {

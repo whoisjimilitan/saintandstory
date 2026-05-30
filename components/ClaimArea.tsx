@@ -10,7 +10,7 @@ export default function ClaimArea() {
         </h2>
 
         <div>
-          <p className="text-[#666666] text-base mb-8">
+          <p className="text-white/50 text-base mb-8">
             367 drivers earning consistently. Set your radius. Jobs come to you.
           </p>
           <ModalCTA
