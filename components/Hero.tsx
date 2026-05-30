@@ -29,7 +29,6 @@ export default function Hero() {
             </h1>
             <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-md">
               Fixed price. Fully insured. Same-day across the UK.
-              Tell us where — we handle the rest.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
               <ModalCTA

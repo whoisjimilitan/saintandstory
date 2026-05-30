@@ -3,15 +3,15 @@ import Image from "next/image";
 const BENEFITS = [
   {
     title: "You call once. We handle everything.",
-    desc: "Most removal companies make you manage the entire job. We don't. Tell us when and where. Your coordinator handles the rest.",
+    desc: "Tell us when and where. Your coordinator takes it from there.",
   },
   {
     title: "The price we quote is the price you pay.",
-    desc: "No assessments on the day. No surprise surcharges. Fixed price confirmed before we arrive. Not a penny more.",
+    desc: "Fixed price confirmed before we arrive. Not a penny more.",
   },
   {
     title: "Every mover vetted. Everything insured.",
-    desc: "Background-checked, uniformed teams. £50,000 insurance as standard. Not a stranger from an app.",
+    desc: "Background-checked, uniformed teams. £50,000 insurance as standard.",
   },
 ];
 

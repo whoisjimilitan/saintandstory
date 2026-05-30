@@ -15,8 +15,8 @@ export default function ClosingCTA() {
         <h2 className="font-black text-white text-3xl md:text-5xl leading-[1.1] tracking-tight mb-6">
           No searching.<br />No comparing.<br />No surprises.
         </h2>
-        <p className="text-white/60 text-base mb-10 max-w-md mx-auto leading-relaxed">
-          One call and your move is sorted. That&apos;s the Saint &amp; Story promise.
+        <p className="text-white/60 text-base mb-10">
+          That&apos;s the Saint &amp; Story promise.
         </p>
         <ModalCTA
           label="Get a free quote"

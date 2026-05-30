@@ -53,7 +53,7 @@ export default function PerfectFor() {
           Saint &amp; Story is right for...
         </h2>
         <p className="text-gray-500 text-sm mb-12">
-          Whatever you need moved, wherever you are in the UK.
+          Whatever you need moved, wherever you are.
         </p>
 
         <div className="grid grid-cols-5 gap-6 mb-12">

@@ -44,9 +44,7 @@ export default function ServiceIntro() {
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <p className="text-gray-600 text-base leading-relaxed">
-            Most people dread moving day. Not because of the boxes — because they&apos;ve been let down before.
-            Vague quotes. No-shows. Damage with no recourse. Saint &amp; Story was built to end that.
-            One call, fixed price, professional team at your door. No searching, no comparing, no hoping.
+            The UK&apos;s professional man and van service. One call and it&apos;s sorted.
           </p>
           <div className="space-y-6">
             {BULLETS.map(({ Icon, title, sub }) => (

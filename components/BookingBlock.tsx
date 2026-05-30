@@ -36,7 +36,7 @@ export default function BookingBlock() {
             Professional Man &amp; Van
           </h2>
           <p className="text-gray-500 text-sm leading-relaxed mb-6">
-            Fully insured. Fixed price. Available across the UK. One call and your move is sorted.
+            Fully insured. Fixed price. Nationwide.
           </p>
 
           <p className="font-black text-navy text-3xl tracking-tight mb-7">From £95</p>

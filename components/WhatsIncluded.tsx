@@ -53,9 +53,7 @@ export default function WhatsIncluded() {
         <div>
           <h3 className="font-black text-navy text-lg mb-4">Movers you can trust.</h3>
           <p className="text-gray-500 text-sm leading-relaxed">
-            Every Saint &amp; Story team is background-checked, trained, and uniformed.
-            We don&apos;t sub-contract, we don&apos;t use agency staff, and we don&apos;t renegotiate
-            prices at your door. What we quote is what you pay. Every time.
+            Background-checked. Uniformed. Trained in-house. No sub-contractors, no agency staff, no renegotiated prices.
           </p>
         </div>
 
