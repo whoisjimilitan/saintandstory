@@ -15,7 +15,7 @@ export default function Nav() {
             <circle cx="34" cy="38" r="3.5" fill="white"/>
           </svg>
           <span className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight">
-            Saint &amp; Story
+            Saint <span className="font-display italic font-normal">&amp;</span> Story
           </span>
         </Link>
 
