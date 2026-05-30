@@ -20,30 +20,36 @@ export default function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {[
-            { label: "How it works", href: "/how-it-works" },
-            { label: "For drivers", href: "/for-drivers" },
-            { label: "Pricing", href: "/pricing" },
-            { label: "About", href: "/about" },
-          ].map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
+          <Link href="/#how" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
+            How it works
+          </Link>
+          <Link href="/#claim" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
+            For drivers
+          </Link>
+          <Link href="/pricing" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
+            Pricing
+          </Link>
+          <Link href="/contact" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
+            About
+          </Link>
         </nav>
 
-        <ModalCTA
-          label="Join the platform"
-          source="nav"
-          className="hidden md:inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
-        />
+        <div className="hidden md:flex items-center gap-4">
+          <Link
+            href="/#claim"
+            className="text-sm text-[#888888] hover:text-[#0D0D0D] transition-colors font-medium"
+          >
+            Drive with us
+          </Link>
+          <ModalCTA
+            label="Post a job"
+            source="nav"
+            className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
+          />
+        </div>
 
         <ModalCTA
-          label="Join"
+          label="Post a job"
           source="nav_mobile"
           className="md:hidden bg-[#0D0D0D] text-white font-semibold px-4 py-2 rounded-full text-sm"
         />

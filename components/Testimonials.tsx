@@ -1,3 +1,10 @@
+const AVATAR_COLORS: Record<string, string> = {
+  SM: "bg-[#7C6F64]",
+  TO: "bg-[#4A6741]",
+  PK: "bg-[#4A5B7A]",
+  DF: "bg-[#7A4A5B]",
+};
+
 const REVIEWS = [
   {
     initials: "SM",
@@ -28,6 +35,11 @@ const REVIEWS = [
     quote: "Claimed my area Monday. Three jobs booked by Wednesday.",
   },
 ];
+
+const ROLE_STYLE: Record<string, string> = {
+  Customer: "text-[#4A5B7A] border-[#4A5B7A]/20 bg-[#4A5B7A]/5",
+  Driver: "text-[#4A6741] border-[#4A6741]/20 bg-[#4A6741]/5",
+};
 
 function Stars() {
   return (
@@ -61,14 +73,14 @@ export default function Testimonials() {
                 &ldquo;{r.quote}&rdquo;
               </p>
               <div className="flex items-center gap-3 border-t border-[#E8E8E8] pt-5">
-                <div className="w-8 h-8 rounded-full bg-[#0D0D0D] flex items-center justify-center shrink-0">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${AVATAR_COLORS[r.initials]}`}>
                   <span className="text-white text-[10px] font-bold">{r.initials}</span>
                 </div>
                 <div>
                   <p className="text-[#0D0D0D] text-sm font-semibold">{r.name}</p>
                   <p className="text-[#888888] text-xs">{r.location}</p>
                 </div>
-                <span className="ml-auto text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em] border border-[#E8E8E8] px-2.5 py-1 rounded-full bg-white">
+                <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.1em] border px-2.5 py-1 rounded-full ${ROLE_STYLE[r.role]}`}>
                   {r.role}
                 </span>
               </div>

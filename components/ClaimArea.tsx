@@ -2,7 +2,7 @@ import ModalCTA from "./ModalCTA";
 
 export default function ClaimArea() {
   return (
-    <section className="bg-[#0D0D0D] py-24 px-6">
+    <section id="claim" className="bg-[#0D0D0D] py-24 px-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         <h2 className="font-sans font-black text-white text-4xl md:text-6xl leading-tight tracking-tight">
           Claim y<span className="font-display italic font-normal">o</span>ur
@@ -11,7 +11,7 @@ export default function ClaimArea() {
 
         <div>
           <p className="text-white/50 text-base mb-8">
-            367 drivers earning consistently. Set your radius. Jobs come to you.
+            367 drivers already earning. Claim yours before someone else does.
           </p>
           <ModalCTA
             label="Claim now →"

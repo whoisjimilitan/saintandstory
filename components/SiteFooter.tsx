@@ -33,13 +33,15 @@ export default function SiteFooter() {
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
           <div>
-            <p className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight">
-              Saint <span className="font-display italic font-normal">&amp;</span> Story
-            </p>
-            <div className="border-t border-[#0D0D0D] mt-1.5 mb-1.5 w-full" />
-            <p className="font-sans font-medium text-[#0D0D0D] text-[9px] tracking-[0.3em] uppercase">
-              Logistics
-            </p>
+            <div className="inline-block">
+              <p className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight whitespace-nowrap">
+                Saint <span className="font-display italic font-normal">&amp;</span> Story
+              </p>
+              <div className="border-t border-[#0D0D0D] mt-1.5 mb-1.5" />
+              <p className="font-sans font-medium text-[#0D0D0D] text-[9px] tracking-[0.3em] uppercase">
+                Logistics
+              </p>
+            </div>
           </div>
 
           {COLS.map((col) => (
