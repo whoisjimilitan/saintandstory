@@ -310,8 +310,8 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   }, [stepIdx, answers, step]);
 
   function handleBack() {
-    // Skip back through search/found/email auto-advance group
-    if (stepIdx === 9) { setStepIdx(5); return; } // from email → postcode
+    // Email (8) must skip back over search (6) + found (7) which auto-advance and can't be navigated
+    if (stepIdx === 8) { setStepIdx(5); return; }
     if (stepIdx > 0) setStepIdx((i) => i - 1);
   }
 
