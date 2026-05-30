@@ -3,6 +3,10 @@
 import Link from "next/link";
 import posthog from "posthog-js";
 
+function track(event: string) {
+  try { posthog.capture(event); } catch { /* */ }
+}
+
 // SVG logo mark — double-chevron forward arrow in a blue rounded square
 function LogoMark() {
   return (
@@ -49,7 +53,7 @@ export default function Nav() {
             </Link>
             <button
               onClick={() => {
-                posthog.capture("nav_join_clicked");
+                track("nav_join_clicked");
                 document.dispatchEvent(new CustomEvent("open-lead-modal"));
               }}
               className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"

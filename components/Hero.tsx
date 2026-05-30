@@ -2,6 +2,10 @@
 
 import posthog from "posthog-js";
 
+function track(event: string, props?: Record<string, unknown>) {
+  try { posthog.capture(event, props); } catch { /* */ }
+}
+
 const POPULAR = [
   "Home moves",
   "Office moves",
@@ -12,7 +16,7 @@ const POPULAR = [
 ];
 
 function openModal(source: string) {
-  posthog.capture("hero_cta_clicked", { source });
+  track("hero_cta_clicked", { source });
   document.dispatchEvent(new CustomEvent("open-lead-modal"));
 }
 

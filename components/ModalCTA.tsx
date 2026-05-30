@@ -2,6 +2,10 @@
 
 import posthog from "posthog-js";
 
+function track(event: string, props?: Record<string, unknown>) {
+  try { posthog.capture(event, props); } catch { /* */ }
+}
+
 interface ModalCTAProps {
   label?: string;
   className?: string;
@@ -14,7 +18,7 @@ export default function ModalCTA({
   source = "cta",
 }: ModalCTAProps) {
   function open() {
-    posthog.capture("modal_cta_clicked", { source });
+    track("modal_cta_clicked", { source });
     document.dispatchEvent(new CustomEvent("open-lead-modal"));
   }
 
