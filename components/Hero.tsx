@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import ModalCTA from "./ModalCTA";
+import HeroPlatformUI from "./HeroPlatformUI";
 
 type Side = "customer" | "driver";
 
@@ -20,11 +20,6 @@ const CONTENT = {
     sub: "Post your job. Get matched. Fixed price.",
     cta: "Post a job — it's free",
     source: "hero_customer",
-    overlay: {
-      label: "Your move — confirmed",
-      lines: ["Fixed price locked", "Driver assigned", "Same-day available"],
-      badge: "4.9 · 300+ reviews",
-    },
   },
   driver: {
     badge: "Join the platform · Earn consistently",
@@ -38,11 +33,6 @@ const CONTENT = {
     sub: "Claim your area. Set your rate. Jobs come to you.",
     cta: "Start earning today",
     source: "hero_driver",
-    overlay: {
-      label: "Driver dashboard",
-      lines: ["3 jobs near you today", "£340 earned this week", "Radius: 20 miles"],
-      badge: "367 drivers earning now",
-    },
   },
 };
 
@@ -56,6 +46,7 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-16 items-center">
 
           <div>
+            {/* Toggle */}
             <div className="inline-flex items-center bg-[#F5F5F5] rounded-full p-1 mb-10">
               {(["customer", "driver"] as Side[]).map((s) => (
                 <button
@@ -97,31 +88,9 @@ export default function Hero() {
             </div>
           </div>
 
+          {/* Platform UI mockup — changes with toggle */}
           <div className="relative">
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-[#F5F5F5]">
-              <Image
-                src="/images/hero-movers.jpg"
-                alt="Professional movers"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-
-            <div className="absolute -bottom-5 -left-5 bg-white border border-[#E8E8E8] rounded-2xl p-5 shadow-lg min-w-[190px]">
-              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em] mb-3">
-                {c.overlay.label}
-              </p>
-              <div className="space-y-2 mb-3">
-                {c.overlay.lines.map((line) => (
-                  <div key={line} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0D0D0D] shrink-0" />
-                    <p className="text-[#0D0D0D] text-sm font-medium">{line}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-[#888888]">{c.overlay.badge}</p>
-            </div>
+            <HeroPlatformUI side={side} />
           </div>
 
         </div>
