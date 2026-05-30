@@ -33,7 +33,7 @@ const STEPS = [
   { id: "s9", type: "email", q: "What email address would you like quotes sent to?", name: "email" },
   { id: "s10", type: "phoneConsent", q: "Your number is safe with us." },
   { id: "s11", type: "name", q: "What is your name?", placeholder: "Please tell us your name", name: "full_name" },
-  { id: "s12", type: "success", q: "We've posted your request" },
+  { id: "s12", type: "success", q: "We're on it." },
 ] as const;
 
 const TOTAL = STEPS.length;
@@ -190,27 +190,42 @@ function StepName({ answers, setAnswers, onEnter }: { answers: Answers; setAnswe
   );
 }
 
-function StepSuccess({ onClose }: { onClose: () => void }) {
+function StepSuccess({ answers, onClose }: { answers: Answers; onClose: () => void }) {
+  const phone = (answers.phone as string) ?? "";
+  const email = (answers.email as string) ?? "";
+  const firstName = ((answers.full_name as string) ?? "").split(" ")[0];
+
   return (
-    <div className="py-4">
-      <p className="text-[#888888] text-sm mb-5">
-        Add more detail to get faster, more accurate quotes.
-      </p>
-      <div className="flex gap-3">
-        <button
-          onClick={onClose}
-          className="flex-1 border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold py-2.5 rounded-full text-sm transition-colors"
-        >
-          Add details
-        </button>
-        <button
-          onClick={onClose}
-          className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
-        >
-          View matches →
-        </button>
+    <div className="py-4 space-y-5">
+      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 space-y-3">
+        {phone ? (
+          <div>
+            <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">We&apos;ll call you on</p>
+            <p className="font-sans font-black text-[#0D0D0D] text-base">{phone}</p>
+          </div>
+        ) : null}
+        <div className={phone ? "border-t border-[#E8E8E8] pt-3" : ""}>
+          <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Quotes sent to</p>
+          <p className="font-sans font-black text-[#0D0D0D] text-base">{email}</p>
+        </div>
       </div>
-      <p className="text-[#888888] text-xs text-center mt-4">Protected under our privacy policy</p>
+      <p className="text-[#888888] text-sm leading-relaxed">
+        {phone
+          ? `${firstName ? `${firstName}, we` : "We"}'re matching your job to verified drivers near you. Expect our call within 30 minutes.`
+          : "We're matching your job to verified drivers near you. Quotes will arrive in your inbox within the hour."}
+      </p>
+      <button
+        onClick={onClose}
+        className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded-full text-sm transition-colors"
+      >
+        Done →
+      </button>
+      <p className="text-[#888888] text-xs text-center">
+        Need us sooner?{" "}
+        <a href="tel:+442082344444" className="text-[#0D0D0D] font-semibold underline-offset-2 hover:underline">
+          0208 234 4444
+        </a>
+      </p>
     </div>
   );
 }
@@ -385,7 +400,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
               {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
               {step.type === "phoneConsent" && <StepPhoneConsent answers={answers} setAnswers={setAnswers} />}
               {step.type === "name" && <StepName answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
-              {step.type === "success" && <StepSuccess onClose={onClose} />}
+              {step.type === "success" && <StepSuccess answers={answers} onClose={onClose} />}
             </div>
 
             {showNav && (
