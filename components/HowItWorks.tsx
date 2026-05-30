@@ -1,54 +1,65 @@
-import ModalCTA from "./ModalCTA";
+const CUSTOMER = [
+  { num: "01", title: "Post your job", desc: "60 seconds. No account needed." },
+  { num: "02", title: "Get matched", desc: "Verified driver, confirmed near you." },
+  { num: "03", title: "Confirm your price", desc: "Fixed. Locked. No surprises." },
+  { num: "04", title: "Move day", desc: "On time. Professional. Done." },
+];
 
-const STEPS = [
-  {
-    num: "01",
-    title: "Describe your move",
-    desc: "Tell us what's moving, where from, and when. Takes 60 seconds — no account needed, no commitment.",
-  },
-  {
-    num: "02",
-    title: "We confirm your team",
-    desc: "Your coordinator calls back with a fixed price and available dates. No haggling. No 'we'll assess on the day.'",
-  },
-  {
-    num: "03",
-    title: "Move day, stress-free",
-    desc: "Your vetted team arrives on time, handles everything, and leaves nothing behind — except you, settled in.",
-  },
+const DRIVER = [
+  { num: "01", title: "Claim your area", desc: "Set your radius and availability." },
+  { num: "02", title: "Get a live job feed", desc: "Accept what works for you." },
+  { num: "03", title: "Complete the job", desc: "Turn up and do what you do best." },
+  { num: "04", title: "Get paid", desc: "Weekly. Directly. No chasing." },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="bg-white py-16 md:py-24 px-6 border-t border-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <section id="how" className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-16">
+          B<span className="font-display italic font-normal">o</span>th sides
+          <br />of the j<span className="font-display italic font-normal">o</span>b.
+        </h2>
 
-        <div className="mb-14">
-          <p className="text-xs font-semibold text-brand uppercase tracking-[0.18em] mb-4">How it works</p>
-          <h2 className="font-sans font-black text-navy text-3xl md:text-4xl leading-tight max-w-md">
-            Three steps, one stress-free move.
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-10 md:gap-16 mb-14">
-          {STEPS.map((step) => (
-            <div key={step.num}>
-              <p className="font-black text-gray-100 text-7xl leading-none mb-5 select-none">{step.num}</p>
-              <h3 className="font-bold text-navy text-base mb-3">{step.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
+        <div className="grid md:grid-cols-2 gap-16">
+          <div>
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-8">
+              For customers
+            </p>
+            <div className="space-y-7">
+              {CUSTOMER.map((s) => (
+                <div key={s.num} className="flex gap-5">
+                  <span className="font-sans font-black text-[#E8E8E8] text-2xl leading-none w-8 shrink-0">
+                    {s.num}
+                  </span>
+                  <div>
+                    <p className="text-[#0D0D0D] font-semibold text-sm mb-0.5">{s.title}</p>
+                    <p className="text-[#888888] text-sm">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="flex items-center gap-6">
-          <ModalCTA
-            label="Get my free quote"
-            source="how_it_works"
-            className="inline-block bg-brand hover:bg-brand-dark text-white font-semibold px-7 py-3.5 rounded-lg transition-colors text-sm"
-          />
-          <p className="text-gray-400 text-xs">No obligation. We call back in under 2 minutes.</p>
+          <div className="md:border-l md:border-[#E8E8E8] md:pl-16">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-8">
+              For drivers
+            </p>
+            <div className="space-y-7">
+              {DRIVER.map((s) => (
+                <div key={s.num} className="flex gap-5">
+                  <span className="font-sans font-black text-[#E8E8E8] text-2xl leading-none w-8 shrink-0">
+                    {s.num}
+                  </span>
+                  <div>
+                    <p className="text-[#0D0D0D] font-semibold text-sm mb-0.5">{s.title}</p>
+                    <p className="text-[#888888] text-sm">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-
       </div>
     </section>
   );

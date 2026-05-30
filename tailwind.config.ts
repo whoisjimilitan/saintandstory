@@ -30,6 +30,7 @@ const config: Config = {
       },
       animation: {
         marquee: "marquee 30s linear infinite",
+        "marquee-reverse": "marquee-reverse 30s linear infinite",
         "spin-slow": "spin 1.6s linear infinite",
       },
     },

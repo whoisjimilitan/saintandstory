@@ -18,16 +18,16 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Saint & Story Logistics | London's Most Trusted Moving Service",
+  title: "Saint & Story — The UK Logistics Platform",
   description:
-    "On-demand home and office moving across London and the UK. Vetted movers, fixed pricing, same-day availability.",
+    "Find verified drivers or find work. Post a job, get matched, move. The two-sided logistics marketplace built for the UK.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#0D0E17",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
