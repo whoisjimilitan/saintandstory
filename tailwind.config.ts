@@ -13,10 +13,10 @@ const config: Config = {
         display: ["var(--font-cormorant)", "serif"],
       },
       colors: {
-        brand: "#0b6cff",
-        "brand-dark": "#0951cc",
-        navy: "#0b1232",
-        surface: "#f6f8fb",
+        brand: "#0A66C2",
+        "brand-dark": "#0851A8",
+        navy: "#222222",
+        surface: "#F3F6F9",
         muted: "#6b7280",
       },
       keyframes: {

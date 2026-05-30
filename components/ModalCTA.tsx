@@ -14,7 +14,7 @@ interface ModalCTAProps {
 
 export default function ModalCTA({
   label = "Get free quotes →",
-  className = "bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white font-bold px-8 py-4 rounded-xl text-sm transition-colors",
+  className = "bg-brand hover:bg-brand-dark text-white font-bold px-8 py-4 rounded-xl text-sm transition-colors",
   source = "cta",
 }: ModalCTAProps) {
   function open() {

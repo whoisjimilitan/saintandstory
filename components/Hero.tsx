@@ -1,162 +1,136 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import posthog from "posthog-js";
+import ModalCTA from "./ModalCTA";
 
-function track(event: string, props?: Record<string, unknown>) {
-  try { posthog.capture(event, props); } catch { /* */ }
-}
-
-// Drop a moving/removal photo at public/images/hero-movers.jpg to activate
-const HERO_IMG = "/images/hero-movers.jpg";
-
-const POPULAR = [
-  "Home moves",
-  "Office moves",
-  "Piano moving",
-  "Student moves",
-  "Same-day moves",
-  "Single item",
-];
-
-// Social proof ticker — scrolls across the bottom of the hero
-const TICKER = [
-  "🚚 Ahmed, Hackney — booked a same-day move · 2 min ago",
-  "⭐ Priya, Manchester — received 4 quotes in 8 minutes",
-  "📦 Tom, Bristol — home move confirmed, 3 movers matched",
-  "🚚 Sarah, Leeds — 3 local van drivers responded instantly",
-  "⭐ James, Birmingham — saved £180 vs booking direct",
-  "📦 Emma, Sheffield — piano specialist confirmed for Saturday",
-  "🚚 Raj, Nottingham — same-day slot secured",
-  "⭐ Claire, Edinburgh — 5★ experience, already rebooked",
-  "📦 Marcus, Liverpool — office move done in under 4 hours",
-  "🚚 Yemi, Brighton — got 3 quotes within 3 minutes",
-];
-
-function openModal(source: string) {
-  track("hero_cta_clicked", { source });
-  document.dispatchEvent(new CustomEvent("open-lead-modal"));
-}
-
-// Live activity counter — fluctuates realistically to create urgency
+// "47 people getting quotes right now" — hotel-style urgency trigger
 function LiveCounter() {
   const [count, setCount] = useState(47);
-
   useEffect(() => {
     const t = setInterval(() => {
-      setCount((c) => {
-        const delta = Math.random() > 0.45 ? 1 : -1;
-        return Math.min(71, Math.max(35, c + delta));
-      });
+      setCount((c) => Math.min(71, Math.max(35, c + (Math.random() > 0.45 ? 1 : -1))));
     }, 4200);
     return () => clearInterval(t);
   }, []);
-
   return (
-    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
-      <span className="text-white text-sm">
-        <strong className="tabular-nums">{count}</strong> people getting quotes right now
+    <div className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3.5 py-1.5 shadow-sm mb-6">
+      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+      <span className="text-gray-600 text-xs font-medium">
+        <strong className="text-navy tabular-nums">{count}</strong> people getting quotes right now
       </span>
     </div>
   );
 }
 
+const TRUST_ITEMS = [
+  "Insured to £50,000",
+  "Real-time GPS tracking",
+  "Same-day in 30+ cities",
+];
+
 export default function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Politely try to play; if browser blocks it, the poster image shows
+    videoRef.current?.play().catch(() => {});
+  }, []);
+
   return (
-    <section className="relative bg-navy pt-[60px] min-h-[88vh] flex flex-col overflow-hidden">
+    <section className="bg-surface pt-[64px] min-h-[90vh] flex items-center">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-16 md:py-24 w-full">
+        <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-      {/* Hero background photo — add your photo at public/images/hero-movers.jpg */}
-      <Image
-        src={HERO_IMG}
-        alt="Professional man and van movers"
-        fill
-        className="object-cover object-center"
-        priority
-      />
+          {/* ── Left column — text stack ── */}
+          <div>
+            <LiveCounter />
 
-      {/* Dark gradient overlay — deepens at bottom so ticker is readable */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(11,18,50,0.55) 0%, rgba(11,18,50,0.45) 60%, rgba(11,18,50,0.75) 100%)",
-        }}
-      />
+            <p className="text-xs font-bold text-brand uppercase tracking-[0.2em] mb-4">
+              Local Removals &amp; Logistics
+            </p>
 
-      {/* Main content */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="max-w-3xl mx-auto px-6 py-16 text-center w-full">
+            <h1 className="font-sans font-black text-navy text-4xl md:text-5xl xl:text-[3.25rem] leading-[1.08] tracking-tight mb-5">
+              The move you<br className="hidden sm:block" /> won&apos;t dread.
+            </h1>
 
-          {/* Live counter badge */}
-          <LiveCounter />
+            <p className="text-muted text-lg leading-relaxed mb-8 max-w-md">
+              Fully insured man &amp; van and removal specialists across the UK.
+              Fixed price, same-day available.
+            </p>
 
-          {/* Headline */}
-          <h1 className="font-sans font-black text-white text-4xl md:text-5xl xl:text-[3.25rem] leading-[1.08] tracking-tight mb-4 drop-shadow-sm">
-            Your move.<br />
-            Our job.
-          </h1>
-
-          {/* Sub */}
-          <p className="text-white/80 text-lg md:text-xl mb-10">
-            Man &amp; van and removal specialists across the UK — vetted, insured, fixed price.
-          </p>
-
-          {/* Search widget */}
-          <div className="flex flex-col sm:flex-row items-stretch max-w-2xl mx-auto bg-white rounded-lg border border-white/20 shadow-xl overflow-hidden mb-5">
-            <input
-              type="text"
-              placeholder="What service are you looking for?"
-              className="flex-[2] px-5 py-4 text-sm text-navy placeholder-gray-400 focus:outline-none border-b sm:border-b-0 sm:border-r border-gray-200"
-              onFocus={() => openModal("search_focus")}
-              readOnly
-            />
-            <div
-              className="flex items-center flex-1 px-5 py-4 border-b sm:border-b-0 sm:border-r border-gray-200 gap-2 cursor-pointer"
-              onClick={() => openModal("postcode_click")}
-            >
-              <svg className="w-4 h-4 text-gray-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm text-gray-400">Postcode</span>
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-8">
+              <ModalCTA
+                label="Get a Free Quote"
+                source="hero_primary"
+                className="bg-brand hover:bg-brand-dark text-white font-bold px-7 py-3.5 rounded-lg text-sm transition-colors text-center"
+              />
+              <a
+                href="#how"
+                className="border border-gray-300 hover:border-gray-400 text-navy font-semibold px-7 py-3.5 rounded-lg text-sm transition-colors text-center"
+              >
+                See how it works →
+              </a>
             </div>
-            <button
-              onClick={() => openModal("search_button")}
-              className="bg-brand hover:bg-brand-dark text-white font-bold px-8 py-4 text-sm transition-colors whitespace-nowrap"
+
+            {/* Trust row — specificity builds trust, not generic claims */}
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {TRUST_ITEMS.map((item) => (
+                <div key={item} className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <svg className="w-3.5 h-3.5 text-brand shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Right column — video (lightbulb) with photo fallback ── */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-navy aspect-[4/3] md:aspect-[5/4]">
+
+            {/*
+              LIGHTBULB — VIDEO HERO:
+              Drop a looping clip at public/videos/hero-movers.mp4 (6–10 seconds,
+              no audio, movers working — a truck, a couch, a smiling team).
+              A looping video increases time-on-page and trust vs any static photo.
+              The poster image shows instantly while the video loads.
+
+              PHOTO FALLBACK:
+              Drop a photo at public/images/hero-movers.jpg — shows if video fails
+              or hasn't been added yet. Aim for 1200×900, daylight, authentic.
+            */}
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/images/hero-movers.jpg"
+              className="absolute inset-0 w-full h-full object-cover z-10"
             >
-              Search
-            </button>
-          </div>
+              <source src="/videos/hero-movers.mp4" type="video/mp4" />
+            </video>
 
-          {/* Popular tags */}
-          <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-2 text-sm">
-            <span className="font-medium text-white/60">Popular:</span>
-            {POPULAR.map((tag, i) => (
-              <span key={tag}>
-                <button
-                  onClick={() => openModal(`popular_${tag}`)}
-                  className="text-white/80 hover:text-white transition-colors hover:underline underline-offset-2"
-                >
-                  {tag}
-                </button>
-                {i < POPULAR.length - 1 && <span className="text-white/30 ml-1.5">,</span>}
-              </span>
-            ))}
+            {/* Static photo — shown when video hasn't loaded or not provided */}
+            <Image
+              src="/images/hero-movers.jpg"
+              alt="Saint & Story professional movers"
+              fill
+              className="object-cover z-0"
+              priority
+            />
+
+            {/* Left-edge gradient so text stays readable on wide screens */}
+            <div
+              className="absolute inset-0 z-20 pointer-events-none"
+              style={{ background: "linear-gradient(90deg, rgba(243,246,249,0.25) 0%, transparent 35%)" }}
+            />
           </div>
 
         </div>
       </div>
-
-      {/* Social proof ticker — scrolls real UK bookings across the bottom */}
-      <div className="relative z-10 bg-black/30 backdrop-blur-sm border-t border-white/10 py-2.5 overflow-hidden shrink-0">
-        <div className="flex animate-marquee gap-10 whitespace-nowrap">
-          {[...TICKER, ...TICKER].map((item, i) => (
-            <span key={i} className="text-white/70 text-xs shrink-0">{item}</span>
-          ))}
-        </div>
-      </div>
-
     </section>
   );
 }

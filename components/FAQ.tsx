@@ -83,11 +83,11 @@ function Item({ q, a }: { q: string; a: string }) {
         onClick={handleToggle}
         className="w-full flex items-start justify-between py-5 text-left gap-6 group"
       >
-        <span className="font-medium text-[#0D0E17] text-sm leading-snug group-hover:text-[#E8244A] transition-colors">
+        <span className="font-medium text-[#0D0E17] text-sm leading-snug group-hover:text-brand transition-colors">
           {q}
         </span>
         <span
-          className="shrink-0 text-[#E8244A] text-xl leading-none mt-0.5 transition-transform duration-200"
+          className="shrink-0 text-brand text-xl leading-none mt-0.5 transition-transform duration-200"
           style={{ transform: open ? "rotate(45deg)" : "none" }}
         >
           +
@@ -106,7 +106,7 @@ export default function FAQ() {
       <div className="max-w-7xl mx-auto">
 
         <div className="text-center mb-14">
-          <span className="text-[10px] font-semibold text-[#E8244A] uppercase tracking-[0.4em]">
+          <span className="text-[10px] font-semibold text-brand uppercase tracking-[0.4em]">
             FAQ
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-semibold text-[#0D0E17] mt-3 mb-3">
@@ -114,7 +114,7 @@ export default function FAQ() {
           </h2>
           <p className="text-[#0D0E17]/40 text-sm max-w-sm mx-auto">
             We&apos;ve answered the most common ones below. Still not sure?{" "}
-            <a href="tel:+447885465680" className="text-[#E8244A] underline underline-offset-2">
+            <a href="tel:+447885465680" className="text-brand underline underline-offset-2">
               Call us now.
             </a>
           </p>
@@ -134,13 +134,15 @@ export default function FAQ() {
         </div>
 
         <div className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="#quote"
-            onClick={() => posthog.capture("faq_quote_clicked")}
-            className="inline-block bg-gradient-to-br from-[#E8244A] to-[#C0183A] hover:from-[#D41C40] hover:to-[#A01030] text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm"
+          <button
+            onClick={() => {
+              try { posthog.capture("faq_quote_clicked"); } catch { /* */ }
+              document.dispatchEvent(new CustomEvent("open-lead-modal"));
+            }}
+            className="inline-block bg-brand hover:bg-brand-dark text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm"
           >
             Get a free quote &rarr;
-          </a>
+          </button>
           <a
             href="tel:+447885465680"
             onClick={() => posthog.capture("faq_phone_clicked")}
