@@ -231,7 +231,7 @@ interface LeadModalProps {
 }
 
 export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
-  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ phoneConsent: true });
   const [progress, setProgress] = useState(0);
@@ -245,11 +245,11 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
     ? Math.round(((stepIdx + 1) / 5) * 65)
     : Math.round(65 + ((stepIdx - 4) / (TOTAL - 5)) * 35);
 
-  // "Please wait" screen — shows for 2s before questions appear (Bark-style)
+  // Small pill at top → expand to full centered modal after 800ms
   useEffect(() => {
     if (!isOpen) return;
-    setLoading(true);
-    const t = setTimeout(() => setLoading(false), 800);
+    setExpanded(false);
+    const t = setTimeout(() => requestAnimationFrame(() => setExpanded(true)), 800);
     return () => clearTimeout(t);
   }, [isOpen]);
 
@@ -281,7 +281,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   useEffect(() => {
     if (!isOpen) {
       const t = setTimeout(() => {
-        setLoading(true);
+        setExpanded(false);
         setStepIdx(0);
         setAnswers({ phoneConsent: true });
         setProgress(0);
@@ -343,25 +343,40 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop — fades in */}
+
+      {/* Backdrop: invisible while pill is small, fades in when card expands */}
       <div
-        className="absolute inset-0 bg-black/50 animate-backdrop-in"
-        onClick={isLast ? onClose : undefined}
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)", opacity: expanded ? 1 : 0 }}
+        onClick={isLast && expanded ? onClose : undefined}
       />
 
-      {/* Modal card — drops in from above */}
-      <div className="relative bg-white rounded-2xl w-full max-w-[520px] shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-modal-drop-in">
+      {/* Modal card:
+          Not expanded → small pill (300px wide, ~86px tall) near top of screen
+          Expanded     → full modal (520px, up to 92vh) centered
+          All three properties animate together via CSS transition            */}
+      <div
+        className="relative bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        style={{
+          width: expanded ? "min(520px, calc(100vw - 32px))" : "300px",
+          maxHeight: expanded ? "92vh" : "86px",
+          transform: expanded ? "translateY(0)" : "translateY(calc(-50vh + 90px))",
+          transition: "width 0.5s cubic-bezier(0.22,1,0.36,1), max-height 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      >
 
-        {/* Multi-stage progress bar — flush to top edge, no header padding */}
-        <div className="h-1.5 bg-gray-100 shrink-0">
-          <div
-            className="h-full transition-all duration-500 ease-out"
-            style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #0b6cff, #3ac3ff)" }}
-          />
-        </div>
+        {/* Progress bar — only once expanded */}
+        {expanded && (
+          <div className="h-1.5 bg-gray-100 shrink-0">
+            <div
+              className="h-full transition-all duration-500 ease-out"
+              style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #0b6cff, #3ac3ff)" }}
+            />
+          </div>
+        )}
 
-        {/* Close button — floats top-right over content */}
-        {!loading && !isLast && (
+        {/* Close button — only once expanded */}
+        {expanded && !isLast && (
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 z-10"
@@ -373,12 +388,14 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
           </button>
         )}
 
-        {/* Please wait screen */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 flex-1">
-            <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-brand animate-spin mb-5" />
-            <p className="font-bold text-navy text-base">Please wait...</p>
-            <p className="text-gray-400 text-sm mt-1">Finding the best matches near you</p>
+        {/* Please wait — compact horizontal pill shown while not expanded */}
+        {!expanded ? (
+          <div className="flex items-center gap-3 px-5 py-[26px]">
+            <div className="w-7 h-7 rounded-full border-[3px] border-gray-100 border-t-brand animate-spin shrink-0" />
+            <div>
+              <p className="font-semibold text-navy text-sm leading-tight">Please wait…</p>
+              <p className="text-gray-400 text-xs mt-0.5">Finding the best matches near you</p>
+            </div>
           </div>
         ) : (
           <>
