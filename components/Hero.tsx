@@ -94,13 +94,13 @@ export default function Hero() {
 
           {/* Headline */}
           <h1 className="font-sans font-black text-white text-4xl md:text-5xl xl:text-[3.25rem] leading-[1.08] tracking-tight mb-4 drop-shadow-sm">
-            Find the perfect<br />
-            professional for you
+            Your move.<br />
+            Our job.
           </h1>
 
           {/* Sub */}
           <p className="text-white/80 text-lg md:text-xl mb-10">
-            Get free quotes within minutes
+            Man &amp; van and removal specialists across the UK — vetted, insured, fixed price.
           </p>
 
           {/* Search widget */}

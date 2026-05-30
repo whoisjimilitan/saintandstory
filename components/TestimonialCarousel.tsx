@@ -4,11 +4,26 @@ import { useState } from "react";
 import Image from "next/image";
 
 const TESTIMONIALS = [
-  { name: "Jim", quote: "Saint & Story was easy to use and I received sensible quotes. I had a professional arrive the next day and he did an excellent job." },
-  { name: "Michelle", quote: "Great service, I'd totally recommend it. Excellent way to find a professional you need." },
-  { name: "David", quote: "Incredibly smooth from start to finish. The driver was professional, careful with my furniture, and finished ahead of schedule." },
-  { name: "Sarah", quote: "I was worried about moving my piano but the team handled it perfectly. Will definitely use again." },
-  { name: "Marcus", quote: "Same-day service and still managed to be cheaper than other quotes I got. Fantastic." },
+  {
+    name: "Rachel M., Hackney",
+    quote: "We'd been badly let down by another firm the week before. Called Saint & Story in a panic — they were back to me in 90 seconds with a fixed price. Team showed up early and had us done by lunch. Unreal.",
+  },
+  {
+    name: "Damien K., Manchester",
+    quote: "Moved our whole agency — six rooms of kit — over a Bank Holiday weekend. Not a single scratched monitor. The lads were professional and seemed to genuinely enjoy the job. Already booked them for our Bristol office.",
+  },
+  {
+    name: "Fiona T., Edinburgh",
+    quote: "The fixed price was what sold me. Every other company wanted to assess 'additional charges on the day.' Saint & Story quoted £285 and charged £285. Full stop.",
+  },
+  {
+    name: "James O., Birmingham",
+    quote: "Rang at 8am needing a same-day move. Confirmed at 8:02. Team arrived by 10:30. I nearly fell off my chair. Five stars isn't enough.",
+  },
+  {
+    name: "Yemi A., Bristol",
+    quote: "Third move in four years. I don't even bother looking elsewhere now.",
+  },
 ];
 
 // Floating profile images — staggered heights for the wave effect
