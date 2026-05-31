@@ -63,9 +63,14 @@ export default async function AdminPage() {
         <p className="text-[#888888] text-sm">
           {pendingJobs.length} pending · {offeredJobs.length} awaiting driver response
         </p>
-        <Link href="/dashboard/admin/revenue" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
-          Revenue →
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/api/indexnow" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
+            Index →
+          </Link>
+          <Link href="/dashboard/admin/revenue" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
+            Revenue →
+          </Link>
+        </div>
       </div>
 
       <AdminPanel

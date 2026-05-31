@@ -18,18 +18,36 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const BASE_URL = "https://saintandstoryltd.co.uk";
+const OG_IMAGE = `${BASE_URL}/og?title=Saint+%26+Story&sub=Fixed+price.+Verified+driver.+Done+properly.`;
+
 export const metadata: Metadata = {
-  title: "Saint & Story — The UK Logistics Platform",
+  title: "Saint & Story — UK Removals & Logistics",
   description:
-    "Find verified drivers or find work. Post a job, get matched, move. The two-sided logistics marketplace built for the UK.",
+    "Post your job in 60 seconds. We match you to a verified local driver. Fixed price, no surprises. Covering London, Manchester, Birmingham, Leeds and 30+ UK cities.",
   icons: {
     icon: "/favicon.svg",
   },
   manifest: "/manifest.json",
+  metadataBase: new URL(BASE_URL),
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "S&S Driver",
+    title: "Saint & Story",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Saint & Story",
+    title: "Saint & Story — UK Removals & Logistics",
+    description: "Fixed price. Verified driver. Done properly. 30+ UK cities covered.",
+    url: BASE_URL,
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Saint & Story Logistics" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Saint & Story — UK Removals & Logistics",
+    description: "Fixed price. Verified driver. Done properly.",
+    images: [OG_IMAGE],
   },
 };
 
@@ -45,12 +63,41 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MovingCompany",
+    "name": "Saint & Story Logistics",
+    "url": BASE_URL,
+    "telephone": "+442082344444",
+    "email": "hello@saintandstoryltd.co.uk",
+    "priceRange": "££",
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+      "opens": "07:00",
+      "closes": "22:00",
+    },
+    "areaServed": [
+      "London","Manchester","Birmingham","Leeds","Liverpool",
+      "Bristol","Sheffield","Glasgow","Nottingham","Edinburgh",
+      "Cardiff","Newcastle","Reading","Oxford","Cambridge",
+      "Southampton","Brighton","Derby","Wolverhampton","Norwich",
+      "Leicester","Coventry",
+    ],
+    "description": "Fixed price removals and logistics across the UK. Post a job in 60 seconds — we match you to a verified local driver.",
+    "sameAs": [],
+  };
+
   return (
     <ClerkProvider>
       <html lang="en">
         <body
           className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}
         >
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
           {children}
           <ModalProvider />
         </body>

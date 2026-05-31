@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PROGRAMMATIC_CITIES } from "@/lib/city-pages";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
 
@@ -12,10 +13,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/pricing", priority: 0.8 },
     { path: "/contact", priority: 0.7 },
     { path: "/for-drivers", priority: 0.8 },
+    { path: "/app", priority: 0.7 },
   ];
 
   const cityPages = [
-    { path: "/london-home-moves", priority: 0.9 },
+    { path: "/london-home-moves", priority: 0.95 },
     { path: "/birmingham-removals", priority: 0.9 },
     { path: "/leeds-removals", priority: 0.9 },
     { path: "/bristol-removals", priority: 0.9 },
@@ -30,10 +32,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/office-moves", priority: 0.85 },
     { path: "/student-moves", priority: 0.85 },
     { path: "/piano-moving", priority: 0.85 },
-    { path: "/app", priority: 0.7 },
   ];
 
-  const allPages = [...staticPages, ...cityPages, ...servicePages];
+  const programmaticPages = PROGRAMMATIC_CITIES.map((c) => ({
+    path: `/${c.slug}`,
+    priority: 0.85,
+  }));
+
+  const allPages = [...staticPages, ...cityPages, ...servicePages, ...programmaticPages];
 
   return allPages.map(({ path, priority }) => ({
     url: `${BASE_URL}${path}`,

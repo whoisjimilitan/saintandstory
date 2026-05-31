@@ -14,10 +14,27 @@ export interface CityPageData {
   source: string;
 }
 
+const BASE_URL = "https://saintandstoryltd.co.uk";
+
 export function buildMetadata(data: CityPageData): Metadata {
+  const title = `${data.city} Removals | Fixed Price, Verified Drivers | Saint & Story`;
+  const description = `${data.city} removals done properly. Post your job in 60 seconds — we match you to a verified local driver. Fixed price, no surprises.`;
+  const ogImage = `${BASE_URL}/og?title=${encodeURIComponent(data.city + " Removals")}&sub=${encodeURIComponent("Fixed price. Verified driver. Done properly.")}`;
   return {
-    title: `${data.city} Removals | Fixed Price, Verified Drivers | Saint & Story`,
-    description: `${data.city} removals done properly. Post your job in 60 seconds — we match you to a verified local driver. Fixed price, no surprises.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${data.source.replace(/_/g, "-")}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${data.city} Removals — Saint & Story` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
