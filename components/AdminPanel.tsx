@@ -287,44 +287,57 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
 
   return (
     <div className="space-y-8">
-      {/* Online drivers */}
+      {/* Driver fleet */}
       <div>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Drivers online ({onlineCount})
-        </p>
-        {onlineCount === 0 ? (
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+            Fleet ({typedDrivers.length})
+          </p>
+          {onlineCount > 0 && (
+            <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.12em]">
+              {onlineCount} online
+            </p>
+          )}
+        </div>
+        {typedDrivers.length === 0 ? (
           <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
-            <p className="text-[#888888] text-sm">No drivers online right now.</p>
+            <p className="text-[#888888] text-sm">No active drivers yet.</p>
           </div>
         ) : (
           <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
-            {typedDrivers.filter(d => isOnline(d.last_seen_at)).map(driver => (
-              <div key={driver.id} className="px-5 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-                    <div>
+            {typedDrivers.map(driver => {
+              const online = isOnline(driver.last_seen_at);
+              return (
+                <div key={driver.id} className="flex items-center gap-3 px-5 py-3.5">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${online ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
-                      <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                      <span className="text-[#888888] text-xs">{driver.vehicle_type}</span>
+                      <span className="text-[#D0D0D0] text-xs">·</span>
+                      <span className="text-[#888888] text-xs">{driver.area}</span>
+                      {driver.rating_avg != null && Number(driver.rating_avg) > 0 && (
+                        <>
+                          <span className="text-[#D0D0D0] text-xs">·</span>
+                          <span className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</span>
+                        </>
+                      )}
                     </div>
+                    <p className={`text-[10px] mt-0.5 ${online ? "text-green-600 font-semibold" : "text-[#888888]"}`}>
+                      {lastSeenLabel(driver.last_seen_at)}
+                    </p>
                   </div>
-                  <div className="text-right">
-                    {driver.rating_avg ? (
-                      <p className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</p>
-                    ) : null}
-                    <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.1em] mt-0.5">Online now</p>
-                  </div>
+                  {driver.phone && (
+                    <div className="flex items-center gap-3 shrink-0">
+                      <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline whitespace-nowrap">
+                        {driver.phone}
+                      </a>
+                      <SmsButton phone={driver.phone} driverName={driver.full_name} />
+                    </div>
+                  )}
                 </div>
-                {driver.phone && (
-                  <div className="flex items-center gap-4 mt-2 pl-5">
-                    <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline">
-                      📞 {driver.phone}
-                    </a>
-                    <SmsButton phone={driver.phone} driverName={driver.full_name} />
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
