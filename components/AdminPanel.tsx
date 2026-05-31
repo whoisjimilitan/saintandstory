@@ -276,6 +276,7 @@ interface Props {
 
 export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs }: Props) {
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
+  const [completedOpen, setCompletedOpen] = useState(false);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
@@ -447,10 +448,16 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       {/* Completed jobs */}
       {completedJobs.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Completed ({completedJobs.length})
-          </p>
-          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+          <button
+            onClick={() => setCompletedOpen(o => !o)}
+            className="flex items-center justify-between w-full mb-3 group"
+          >
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+              Completed ({completedJobs.length})
+            </p>
+            <span className={`text-[#888888] text-xs transition-transform ${completedOpen ? "rotate-180" : ""}`}>▾</span>
+          </button>
+          {completedOpen && <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
             {completedJobs.map((job) => (
               <div key={job.id as string} className="px-5 py-4">
                 <div className="flex items-start justify-between gap-4 mb-2">
@@ -486,7 +493,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                 </div>
               </div>
             ))}
-          </div>
+          </div>}
         </div>
       )}
     </div>
