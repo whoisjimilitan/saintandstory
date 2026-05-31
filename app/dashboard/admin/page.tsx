@@ -33,9 +33,11 @@ async function getOfferedJobs() {
 async function getCompletedJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT j.*, d.full_name as driver_name
+    SELECT j.*, d.full_name as driver_name,
+      COALESCE(j.price, e.amount) as display_price
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
+    LEFT JOIN earnings e ON e.job_id = j.id
     WHERE j.status = 'completed'
     ORDER BY j.updated_at DESC
     LIMIT 30

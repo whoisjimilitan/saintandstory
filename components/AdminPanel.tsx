@@ -594,9 +594,11 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    {job.price ? (
-                      <p className="font-sans font-black text-[#0D0D0D] text-sm">£{Number(job.price).toFixed(0)}</p>
-                    ) : null}
+                    {(job.display_price ?? job.price) != null ? (
+                      <p className="font-sans font-black text-[#0D0D0D] text-sm">£{Number(job.display_price ?? job.price).toFixed(0)}</p>
+                    ) : (
+                      <p className="text-[#888888] text-[10px]">No price set</p>
+                    )}
                     <p className="text-[#888888] text-[10px]">{timeAgo(job.updated_at as string)}</p>
                   </div>
                 </div>
