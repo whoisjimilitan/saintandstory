@@ -45,9 +45,12 @@ interface Job {
   large_items: unknown;
   address_from?: string;
   address_to?: string;
+  price?: number;
   created_at: string;
+  driver_id?: string;
   driver_name?: string;
   driver_phone?: string;
+  updated_at?: string;
 }
 
 function suggestDrivers(job: Job, drivers: Driver[]) {
@@ -248,19 +251,138 @@ function JobRow({
   );
 }
 
-function OfferedJobRow({ job }: { job: Job }) {
+function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driver[]; onReassigned: (jobId: string) => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const [reassigning, setReassigning] = useState(false);
+  const [showDrivers, setShowDrivers] = useState(false);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [price, setPrice] = useState(String(job.price ?? ""));
+
+  async function reassign() {
+    setReassigning(true);
+    try {
+      const res = await fetch("/api/jobs/reassign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id }),
+      });
+      if (res.ok) onReassigned(job.id);
+    } finally {
+      setReassigning(false);
+    }
+  }
+
+  async function assignTo(driverId: string) {
+    setAssigning(driverId);
+    try {
+      const res = await fetch("/api/jobs/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, driverId, price: price || null }),
+      });
+      if (res.ok) onReassigned(job.id);
+    } finally {
+      setAssigning(null);
+    }
+  }
+
   return (
-    <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
-      <div>
-        <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
-        <p className="text-[#888888] text-xs">
-          {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}
-          {job.driver_name ? ` · Offered to ${job.driver_name}` : ""}
-        </p>
-      </div>
-      <span className="text-[10px] font-semibold text-[#888888] bg-white border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">
-        Awaiting response
-      </span>
+    <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden">
+      <button
+        className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-[#F5F5F5] transition-colors"
+        onClick={() => setExpanded(e => !e)}
+      >
+        <div>
+          <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
+          <p className="text-[#888888] text-xs">
+            {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}
+            {job.driver_name ? ` · ${job.driver_name}` : ""}
+          </p>
+        </div>
+        <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">
+          Awaiting · {job.updated_at ? timeAgo(job.updated_at) : "—"}
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-[#E8E8E8]">
+          <div className="py-4 grid grid-cols-2 gap-3">
+            {job.driver_name && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Assigned to</p>
+                <p className="text-[#0D0D0D] text-sm font-semibold">{job.driver_name}</p>
+              </div>
+            )}
+            {job.driver_phone && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Driver phone</p>
+                <a href={`tel:${job.driver_phone}`} className="text-[#0D0D0D] text-sm font-semibold hover:underline">{job.driver_phone}</a>
+              </div>
+            )}
+            {job.customer_name && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Customer</p>
+                <p className="text-[#0D0D0D] text-sm">{job.customer_name}</p>
+              </div>
+            )}
+            {job.customer_phone && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Customer phone</p>
+                <a href={`tel:${job.customer_phone}`} className="text-[#0D0D0D] text-sm font-semibold hover:underline">{job.customer_phone}</a>
+              </div>
+            )}
+          </div>
+
+          {!showDrivers ? (
+            <div className="flex gap-3">
+              <button
+                onClick={reassign}
+                disabled={reassigning}
+                className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+              >
+                {reassigning ? "Resetting…" : "Return to orders →"}
+              </button>
+              <button
+                onClick={() => setShowDrivers(true)}
+                className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+              >
+                Reassign to different driver →
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div className="mb-3">
+                <label className="block text-[#888888] text-[10px] uppercase tracking-[0.1em] mb-1">Job price</label>
+                <div className="relative w-36">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888] text-sm">£</span>
+                  <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 180" className="w-full pl-7 pr-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D]" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                {drivers.filter(d => d.id !== job.driver_id).map(driver => (
+                  <div key={driver.id} className="flex items-center justify-between gap-3 bg-[#F5F5F5] rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline(driver.last_seen_at) ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
+                      <div>
+                        <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                        <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => assignTo(driver.id)}
+                      disabled={!!assigning}
+                      className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors shrink-0"
+                    >
+                      {assigning === driver.id ? "Assigning…" : "Assign →"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setShowDrivers(false)} className="mt-3 text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors">← Back</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -276,14 +398,18 @@ interface Props {
 
 export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs }: Props) {
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
+  const [offered, setOffered] = useState(offeredJobs as unknown as Job[]);
   const [completedOpen, setCompletedOpen] = useState(false);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
   }
 
+  function removeOffered(jobId: string) {
+    setOffered(prev => prev.filter(j => j.id !== jobId));
+  }
+
   const typedDrivers = drivers as unknown as Driver[];
-  const typedOffered = offeredJobs as unknown as Job[];
   const onlineCount = typedDrivers.filter(d => isOnline(d.last_seen_at)).length;
 
   return (
@@ -343,14 +469,14 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       </div>
 
       {/* Awaiting driver response */}
-      {typedOffered.length > 0 && (
+      {offered.length > 0 && (
         <div>
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Awaiting driver ({typedOffered.length})
+            Awaiting driver ({offered.length})
           </p>
           <div className="space-y-2">
-            {typedOffered.map(job => (
-              <OfferedJobRow key={job.id} job={job} />
+            {offered.map((job: Job) => (
+              <OfferedJobRow key={job.id} job={job} drivers={typedDrivers} onReassigned={removeOffered} />
             ))}
           </div>
         </div>
