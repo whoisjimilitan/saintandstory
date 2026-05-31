@@ -278,7 +278,10 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props)
                   <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
                   <div>
                     <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
-                    <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                    <p className="text-[#888888] text-xs">
+                      {driver.area} · {driver.vehicle_type}
+                      {driver.phone ? <> · <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] font-semibold hover:underline">{driver.phone}</a></> : null}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
