@@ -260,9 +260,62 @@ function JobRow({
               </button>
             )}
           </div>
+          <div className="mt-4 pt-4 border-t border-[#E8E8E8]">
+            <CancelButton jobId={job.id} onCancelled={onAssigned} />
+          </div>
         </div>
       )}
     </div>
+  );
+}
+
+function CancelButton({ jobId, onCancelled }: { jobId: string; onCancelled: (id: string) => void }) {
+  const [confirm, setConfirm] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  async function cancel() {
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/jobs/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId }),
+      });
+      if (res.ok) onCancelled(jobId);
+    } finally {
+      setCancelling(false);
+      setConfirm(false);
+    }
+  }
+
+  if (confirm) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-[#888888]">Cancel this job?</span>
+        <button
+          onClick={cancel}
+          disabled={cancelling}
+          className="bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors"
+        >
+          {cancelling ? "Cancelling…" : "Yes, cancel →"}
+        </button>
+        <button
+          onClick={() => setConfirm(false)}
+          className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors"
+        >
+          Keep
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setConfirm(true)}
+      className="text-red-500 hover:text-red-700 text-xs font-medium transition-colors"
+    >
+      Cancel job
+    </button>
   );
 }
 
@@ -355,20 +408,23 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
           </div>
 
           {!showDrivers ? (
-            <div className="flex gap-3">
-              <button
-                onClick={reassign}
-                disabled={reassigning}
-                className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-full text-xs transition-colors"
-              >
-                {reassigning ? "Resetting…" : "Return to orders →"}
-              </button>
-              <button
-                onClick={() => setShowDrivers(true)}
-                className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-5 py-2 rounded-full text-xs transition-colors"
-              >
-                Reassign to different driver →
-              </button>
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <button
+                  onClick={reassign}
+                  disabled={reassigning}
+                  className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+                >
+                  {reassigning ? "Resetting…" : "Return to orders →"}
+                </button>
+                <button
+                  onClick={() => setShowDrivers(true)}
+                  className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+                >
+                  Reassign to different driver →
+                </button>
+              </div>
+              <CancelButton jobId={job.id} onCancelled={onReassigned} />
             </div>
           ) : (
             <div>
