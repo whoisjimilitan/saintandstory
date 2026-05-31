@@ -99,6 +99,7 @@ export default async function EarningsPage() {
           <p className="font-sans font-semibold text-[#0D0D0D] text-sm">Founding rate</p>
           <p className="text-[#888888] text-xs mt-0.5">£9.99/month · locked forever</p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/api/stripe/portal"
           className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors"

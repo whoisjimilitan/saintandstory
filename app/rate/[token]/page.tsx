@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function RatePage() {
   const params = useParams();
@@ -64,12 +65,12 @@ export default function RatePage() {
           <h1 className="font-sans font-black text-white text-2xl tracking-tight mb-2">Thank you.</h1>
           <p className="text-white/65 text-sm">Your rating helps other customers choose with confidence.</p>
         </div>
-        <a
+        <Link
           href="/"
           className="inline-block bg-white border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3 rounded-full text-sm transition-colors"
         >
           Back to Saint &amp; Story →
-        </a>
+        </Link>
       </div>
     </div>
   );
