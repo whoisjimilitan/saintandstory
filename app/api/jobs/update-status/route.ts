@@ -70,6 +70,10 @@ async function notifyCustomerComplete(job: Record<string, unknown>) {
           ★ Rate ${driverName} →
         </a>
         <p style="color:#bbb;font-size:12px;margin-top:8px;">Your rating helps other customers choose with confidence.</p>
+        <div style="margin-top:28px;padding:20px 24px;background:#F5F5F5;border-radius:10px;border:1px solid #e8e8e8;">
+          <p style="margin:0 0 6px;color:#0D0D0D;font-size:13px;font-weight:600;">Know someone who needs to move?</p>
+          <p style="margin:0;color:#888;font-size:13px;">Share <a href="${BASE_URL}" style="color:#0D0D0D;font-weight:600;">saintandstoryltd.co.uk</a> — fixed price, verified driver, done properly.</p>
+        </div>
         <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e8e8e8;">
           <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London · <a href="tel:02082344444" style="color:#bbb;">0208 234 4444</a></p>
         </div>

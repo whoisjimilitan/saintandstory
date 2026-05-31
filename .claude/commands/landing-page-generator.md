@@ -648,3 +648,69 @@ Then confirm:
 `/landing-page-generator Birmingham home-moves` → customer page for people needing a driver
 `/landing-page-generator Birmingham removals driver` → driver recruitment page for Birmingham drivers
 Both can run as ads simultaneously — completely separate targeting.
+
+---
+
+## CityLandingPage template — lightweight alternative
+
+For simple city removals pages (not ad landing pages), use the `CityLandingPage` component instead of building a full custom page. It is faster to write and consistent with existing city pages.
+
+```tsx
+// app/[city]-removals/page.tsx
+import type { Metadata } from "next";
+import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/CityLandingPage";
+
+const data: CityPageData = {
+  city: "Leeds",
+  headline: "Leeds rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
+  sub: "Post your job in 60 seconds. Verified Leeds driver matched and confirmed.",
+  stats: [
+    { stat: "4.9★", label: "Verified reviews" },
+    { stat: "< 60s", label: "Response time" },
+    { stat: "Fixed", label: "Price. Always." },
+    { stat: "LS1–LS29", label: "All postcodes" },
+  ],
+  steps: [
+    { num: "01", title: "Post your job", desc: "60 seconds. Free. No account needed." },
+    { num: "02", title: "We find your driver", desc: "Verified local driver, matched by our team." },
+    { num: "03", title: "Confirm your price", desc: "Fixed on the call before anything moves." },
+    { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },
+  ],
+  testimonials: [/* 3 reviews with initials, name, location, quote */],
+  faq: [/* 5 Q&As specific to the city */],
+  source: "leeds_removals",
+};
+
+export const metadata: Metadata = buildMetadata(data);
+export default function LeedsRemovals() { return <CityLandingPage data={data} />; }
+```
+
+**When to use CityLandingPage vs full page:**
+- `CityLandingPage` — organic SEO city pages (removals, deliveries, standard moves)
+- Full custom page — paid ad landing pages where you control every pixel and section
+
+---
+
+## Step — Always update sitemap.ts
+
+After creating any new page, add it to `app/sitemap.ts`:
+
+```ts
+{ path: "/[SLUG]", priority: 0.9 },  // city landing pages
+{ path: "/[SLUG]", priority: 0.85 }, // service pages
+{ path: "/[SLUG]", priority: 0.8 },  // driver pages
+```
+
+The sitemap is at `app/sitemap.ts`. It exports a `sitemap()` function returning all routes. Add the new path to the appropriate array (`cityPages`, `servicePages`, or `staticPages`).
+
+---
+
+## Platform context (do not expose on landing pages)
+
+The site has a full driver + customer platform behind Clerk auth:
+- `/dashboard/driver` — driver dashboard (jobs, earnings, profile)
+- `/dashboard/admin` — admin panel (assign jobs, revenue)
+- Job lifecycle: `pending_review` → `offered` → `confirmed` → `in_progress` → `completed`
+- Drivers pay £9.99/month via Stripe, keep 100% of job earnings
+- Admin assigns every job — this is a concierge model, not a marketplace
+- Do NOT expose platform routes or internal links on public landing pages

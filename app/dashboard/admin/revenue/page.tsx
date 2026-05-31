@@ -136,7 +136,7 @@ export default async function RevenuePage() {
               </div>
               <div className="flex items-center gap-3">
                 {d.rating_avg != null && Number(d.rating_avg) > 0 && (
-                  <p className="text-[#888888] text-xs">★ {Number(d.rating_avg).toFixed(1)}</p>
+                  <p className="text-[#888888] text-xs">★ {Number(d.rating_avg).toFixed(1)}{d.rating_count ? ` · ${d.rating_count}` : ""}</p>
                 )}
                 <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] ${
                   d.profile_live ? "bg-[#0D0D0D] text-white" : "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]"

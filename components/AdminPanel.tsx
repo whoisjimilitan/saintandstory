@@ -46,6 +46,10 @@ function timeAgo(ts: string) {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+function isStale(ts: string) {
+  return Date.now() - new Date(ts).getTime() > 4 * 60 * 60 * 1000;
+}
+
 function JobRow({
   job,
   drivers,
@@ -97,7 +101,9 @@ function JobRow({
         </div>
         <div className="shrink-0 text-right">
           <p className="text-[#888888] text-[10px]">{timeAgo(job.created_at)}</p>
-          <p className="text-[10px] font-semibold text-[#0D0D0D] mt-0.5">{expanded ? "▲" : "▼"}</p>
+          {isStale(job.created_at) && (
+            <span className="inline-block mt-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-white bg-red-500 px-1.5 py-0.5 rounded-full">Urgent</span>
+          )}
         </div>
       </button>
 
