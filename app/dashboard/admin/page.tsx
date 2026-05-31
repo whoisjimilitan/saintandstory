@@ -41,6 +41,28 @@ async function getCompletedJobs() {
   ` as Record<string, unknown>[];
 }
 
+async function getConfirmedJobs() {
+  const sql = neon(process.env.DATABASE_URL!);
+  return await sql`
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+    FROM jobs j
+    LEFT JOIN drivers d ON d.id = j.driver_id
+    WHERE j.status = 'confirmed'
+    ORDER BY j.updated_at DESC
+  ` as Record<string, unknown>[];
+}
+
+async function getInProgressJobs() {
+  const sql = neon(process.env.DATABASE_URL!);
+  return await sql`
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+    FROM jobs j
+    LEFT JOIN drivers d ON d.id = j.driver_id
+    WHERE j.status = 'in_progress'
+    ORDER BY j.updated_at DESC
+  ` as Record<string, unknown>[];
+}
+
 async function getActiveDrivers() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
@@ -60,9 +82,11 @@ export default async function AdminPage() {
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
   if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) redirect("/dashboard/driver");
 
-  const [pendingJobs, offeredJobs, drivers, completedJobs] = await Promise.all([
+  const [pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs] = await Promise.all([
     getPendingJobs(),
     getOfferedJobs(),
+    getConfirmedJobs(),
+    getInProgressJobs(),
     getActiveDrivers(),
     getCompletedJobs(),
   ]);
@@ -83,6 +107,8 @@ export default async function AdminPage() {
       <AdminPanel
         pendingJobs={pendingJobs}
         offeredJobs={offeredJobs}
+        confirmedJobs={confirmedJobs}
+        inProgressJobs={inProgressJobs}
         drivers={drivers}
         completedJobs={completedJobs}
       />

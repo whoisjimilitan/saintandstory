@@ -268,11 +268,13 @@ function OfferedJobRow({ job }: { job: Job }) {
 interface Props {
   pendingJobs: Record<string, unknown>[];
   offeredJobs: Record<string, unknown>[];
+  confirmedJobs: Record<string, unknown>[];
+  inProgressJobs: Record<string, unknown>[];
   drivers: Record<string, unknown>[];
   completedJobs: Record<string, unknown>[];
 }
 
-export default function AdminPanel({ pendingJobs, offeredJobs, drivers, completedJobs }: Props) {
+export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs }: Props) {
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
 
   function removeJob(jobId: string) {
@@ -359,6 +361,71 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers, complete
           <div className="space-y-2">
             {typedOffered.map(job => (
               <OfferedJobRow key={job.id} job={job} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Confirmed jobs — driver accepted, not started */}
+      {confirmedJobs.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            Confirmed — awaiting start ({confirmedJobs.length})
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {confirmedJobs.map((job) => (
+              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+                <div>
+                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
+                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
+                  </p>
+                  <p className="text-[#888888] text-xs">
+                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
+                  </p>
+                  {job.driver_name != null && (
+                    <p className="text-xs mt-0.5">
+                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
+                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
+                    </p>
+                  )}
+                </div>
+                <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">Confirmed</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* In progress jobs — driver en route */}
+      {inProgressJobs.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            In progress ({inProgressJobs.length})
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {inProgressJobs.map((job) => (
+              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+                <div>
+                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
+                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
+                  </p>
+                  <p className="text-[#888888] text-xs">
+                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
+                  </p>
+                  {job.driver_name != null && (
+                    <p className="text-xs mt-0.5">
+                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
+                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
+                    </p>
+                  )}
+                  {job.customer_phone != null && (
+                    <p className="text-xs mt-0.5">
+                      Customer: <a href={`tel:${String(job.customer_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.customer_phone)}</a>
+                    </p>
+                  )}
+                </div>
+                <span className="text-[10px] font-semibold text-white bg-[#0D0D0D] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">En route</span>
+              </div>
             ))}
           </div>
         </div>
