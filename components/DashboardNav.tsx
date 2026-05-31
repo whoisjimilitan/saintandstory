@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 
-const NAV = [
+const DRIVER_NAV = [
   {
     label: "Home",
     href: "/dashboard/driver",
@@ -43,11 +43,36 @@ const NAV = [
   },
 ];
 
+const ADMIN_NAV = [
+  {
+    label: "Jobs",
+    href: "/dashboard/admin",
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+    ),
+  },
+  {
+    label: "Revenue",
+    href: "/dashboard/admin/revenue",
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
+];
+
 export default function DashboardNav() {
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/dashboard/admin");
+  const NAV = isAdmin ? ADMIN_NAV : DRIVER_NAV;
 
   const isActive = (href: string) =>
-    href === "/dashboard/driver" ? pathname === href : pathname.startsWith(href);
+    href === "/dashboard/driver" || href === "/dashboard/admin"
+      ? pathname === href
+      : pathname.startsWith(href);
 
   return (
     <>
@@ -57,7 +82,9 @@ export default function DashboardNav() {
           <p className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight whitespace-nowrap">
             Saint <span className="font-display italic font-normal">&amp;</span> Story
           </p>
-          <p className="font-sans font-medium text-[#888888] text-[9px] tracking-[0.3em] uppercase mt-0.5">Driver</p>
+          <p className="font-sans font-medium text-[#888888] text-[9px] tracking-[0.3em] uppercase mt-0.5">
+            {isAdmin ? "Admin" : "Driver"}
+          </p>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
