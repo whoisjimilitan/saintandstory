@@ -150,7 +150,6 @@ function StepEmail({ answers, setAnswers, onEnter }: { answers: Answers; setAnsw
 function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswers: (a: Answers) => void }) {
   return (
     <div className="space-y-4">
-      <p className="text-[#888888] text-sm">A quick call often means a more accurate quote.</p>
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"

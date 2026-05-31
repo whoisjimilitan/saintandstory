@@ -110,11 +110,6 @@ export default async function DriverDashboardHome() {
             <p className="text-white/70 text-xs mt-1">Every job from here is pure profit.</p>
           </div>
         )}
-        {roi === 0 && (
-          <div className="border-t border-white/15 pt-4">
-            <p className="text-white/70 text-xs">Complete your first job to see your ROI here.</p>
-          </div>
-        )}
       </div>
 
       {/* Quick stats */}
@@ -161,8 +156,7 @@ export default async function DriverDashboardHome() {
 
       {!driver && (
         <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-5 text-center">
-          <p className="text-[#888888] text-sm mb-3">No driver profile found for this account.</p>
-          <p className="text-[#888888] text-xs">Make sure you registered with this email address.</p>
+          <p className="text-[#888888] text-sm">No driver profile found.</p>
         </div>
       )}
 

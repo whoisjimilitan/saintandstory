@@ -334,8 +334,7 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                       <p className="text-white/70 text-xs leading-relaxed">
                         Your £9.99 monthly fee is covered in your first 2 hours of work.
                       </p>
-                      <p className="text-white/50 text-xs">Finish at 3pm. Paid before 4pm.</p>
-                    </div>
+                      </div>
                   </div>
 
                   <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
@@ -379,14 +378,13 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                       </span>
                     </div>
                     <p className="text-white/65 text-xs leading-relaxed">
-                      Locked at £9.99/month forever. Weekly billing launches at 100 drivers — you&apos;re grandfathered.
+                      Locked at £9.99 forever.
                     </p>
                   </div>
 
                   <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
                     <p className="text-[#888888] text-[10px] uppercase tracking-[0.12em] mb-2">Your earnings estimate</p>
                     <p className="font-sans font-black text-[#0D0D0D] text-base">£{weekly}/week · £{monthly}/month</p>
-                    <p className="text-[#888888] text-xs mt-1">Fee covered in your first 2 hours.</p>
                   </div>
 
                   {!stripeOpened ? (

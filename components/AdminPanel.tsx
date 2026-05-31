@@ -223,9 +223,6 @@ function JobRow({
             <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em] mb-2">
               {suggested.length > 0 ? `Suggested drivers (${job.postcode_from?.split(" ")[0]})` : "Assign driver"}
             </p>
-            {displayDrivers.length === 0 && (
-              <p className="text-[#888888] text-xs italic">No drivers in this area yet.</p>
-            )}
             <div className="space-y-2">
               {displayDrivers.map(driver => (
                 <div key={driver.id} className="flex items-center justify-between gap-3 bg-[#F5F5F5] rounded-xl px-4 py-3">
@@ -290,20 +287,20 @@ function CancelButton({ jobId, onCancelled }: { jobId: string; onCancelled: (id:
 
   if (confirm) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <span className="text-xs text-[#888888]">Cancel this job?</span>
         <button
           onClick={cancel}
           disabled={cancelling}
-          className="bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors"
+          className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors"
         >
-          {cancelling ? "Cancelling…" : "Yes, cancel →"}
+          {cancelling ? "Cancelling…" : "Confirm →"}
         </button>
         <button
           onClick={() => setConfirm(false)}
           className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors"
         >
-          Keep
+          ← back
         </button>
       </div>
     );
@@ -312,7 +309,7 @@ function CancelButton({ jobId, onCancelled }: { jobId: string; onCancelled: (id:
   return (
     <button
       onClick={() => setConfirm(true)}
-      className="text-red-500 hover:text-red-700 text-xs font-medium transition-colors"
+      className="text-[#888888] hover:text-[#0D0D0D] text-xs transition-colors"
     >
       Cancel job
     </button>
@@ -537,7 +534,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </p>
         {pending.length === 0 ? (
           <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
-            <p className="text-[#888888] text-sm">All clear — no pending jobs.</p>
+            <p className="text-[#888888] text-sm">No pending jobs.</p>
           </div>
         ) : (
           <div className="space-y-3">
