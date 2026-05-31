@@ -36,8 +36,8 @@ const STEPS = [
     id: "s5", type: "options", q: "How long do you want the service for?",
     opts: ["Up to 2 hours", "Half Day", "All Day", "Multiple days"],
   },
-  { id: "s6",  type: "postcode", q: "Where are you moving from?",       name: "postcode_from" },
-  { id: "s6b", type: "postcode", q: "And where are you moving to?",      name: "postcode_to"   },
+  { id: "s6",  type: "postcode", q: "What postcode are you moving from?", name: "postcode_from" },
+  { id: "s6b", type: "postcode", q: "What postcode are you moving to?",  name: "postcode_to"   },
   { id: "s7",  type: "search",   q: "Searching for matches…"                              },
   { id: "s8",  type: "found",    q: "Great! We’ve found your matches."                    },
   { id: "s9",  type: "email",    q: "What email should we send your quotes to?", name: "email"  },
@@ -83,33 +83,15 @@ function StepOptions({ step, answers, setAnswers }: { step: typeof STEPS[number]
 }
 
 function StepPostcode({ name, answers, setAnswers, onEnter }: { name: string; answers: Answers; setAnswers: (a: Answers) => void; onEnter: () => void }) {
-  const placeholder = name === "postcode_from"
-    ? "e.g. SW1A 2AA — where you’re moving from"
-    : "e.g. E1 6RF — where you’re moving to";
-  const addressKey = name === "postcode_from" ? "address_from" : "address_to";
-  const postcode = (answers[name] as string) ?? "";
-  const postcodeValid = postcode.replace(/\s/g, "").length >= 5;
-
+  const placeholder = name === "postcode_from" ? "e.g. SW1A 2AA" : "e.g. E1 6RF";
   return (
-    <div className="space-y-3">
-      <PostcodeSearch
-        value={postcode}
-        onChange={(v) => setAnswers({ ...answers, [name]: v })}
-        placeholder={placeholder}
-        autoFocus
-        onEnter={onEnter}
-      />
-      {postcodeValid && (
-        <input
-          type="text"
-          value={(answers[addressKey] as string) ?? ""}
-          onChange={(e) => setAnswers({ ...answers, [addressKey]: e.target.value })}
-          onKeyDown={(e) => e.key === "Enter" && onEnter()}
-          placeholder="Building name or number (optional)"
-          className={inputCls}
-        />
-      )}
-    </div>
+    <PostcodeSearch
+      value={(answers[name] as string) ?? ""}
+      onChange={(v) => setAnswers({ ...answers, [name]: v })}
+      placeholder={placeholder}
+      autoFocus
+      onEnter={onEnter}
+    />
   );
 }
 
