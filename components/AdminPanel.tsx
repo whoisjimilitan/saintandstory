@@ -10,6 +10,23 @@ interface Driver {
   phone: string;
   rating_avg: number | null;
   rating_count: number | null;
+  last_seen_at: string | null;
+}
+
+function isOnline(ts: string | null) {
+  if (!ts) return false;
+  return Date.now() - new Date(ts).getTime() < 5 * 60 * 1000;
+}
+
+function lastSeenLabel(ts: string | null) {
+  if (!ts) return "Offline";
+  const diff = Date.now() - new Date(ts).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 5) return "Online now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
 interface Job {
@@ -173,8 +190,9 @@ function JobRow({
                 <div key={driver.id} className="flex items-center justify-between gap-3 bg-[#F5F5F5] rounded-xl px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline(driver.last_seen_at) ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
                       <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                      <span className="text-[10px] text-[#888888]">{lastSeenLabel(driver.last_seen_at)}</span>
                     </div>
                     <p className="text-[#888888] text-xs">
                       {driver.area} · {driver.vehicle_type}
@@ -239,9 +257,18 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props)
 
   const typedDrivers = drivers as unknown as Driver[];
   const typedOffered = offeredJobs as unknown as Job[];
+  const onlineCount = typedDrivers.filter(d => isOnline(d.last_seen_at)).length;
 
   return (
     <div className="space-y-8">
+      {/* Online drivers summary */}
+      <div className="flex items-center gap-2">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${onlineCount > 0 ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
+        <p className="text-[#888888] text-sm">
+          {onlineCount > 0 ? `${onlineCount} driver${onlineCount !== 1 ? "s" : ""} online now` : "No drivers online"}
+        </p>
+      </div>
+
       {/* Pending jobs — need assignment */}
       <div>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">

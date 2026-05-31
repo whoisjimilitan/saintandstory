@@ -31,10 +31,10 @@ async function getOfferedJobs() {
 async function getActiveDrivers() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT id, full_name, area, vehicle_type, phone, rating_avg, rating_count
+    SELECT id, full_name, area, vehicle_type, phone, rating_avg, rating_count, last_seen_at
     FROM drivers
     WHERE profile_live = true
-    ORDER BY rating_avg DESC NULLS LAST, full_name ASC
+    ORDER BY last_seen_at DESC NULLS LAST, rating_avg DESC NULLS LAST, full_name ASC
   ` as Record<string, unknown>[];
 }
 
