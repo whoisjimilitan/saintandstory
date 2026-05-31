@@ -4,6 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 const BASE_URL = "https://saintandstoryltd.co.uk";
 
 export async function POST(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const adminEmail = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (!ADMIN_EMAILS.includes(adminEmail)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!ADMIN_EMAILS.includes(adminEmail) && !ADMIN_USER_IDS.includes(userId ?? "")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { jobId, driverId, price } = await request.json();
   if (!jobId || !driverId) return NextResponse.json({ error: "jobId and driverId required" }, { status: 400 });

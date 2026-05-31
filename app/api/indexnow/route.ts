@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 const BASE_URL = "https://saintandstoryltd.co.uk";
 const INDEXNOW_KEY = "ss2025indexnow";
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 const ALL_URLS = [
   "/",
@@ -50,7 +51,7 @@ export async function GET() {
 
   const user = await currentUser();
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (!ADMIN_EMAILS.includes(email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const urls = ALL_URLS.map((path) => `${BASE_URL}${path}`);
   const results: Record<string, unknown> = {};

@@ -5,6 +5,7 @@ import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 async function getPendingJobs() {
   const sql = neon(process.env.DATABASE_URL!);
@@ -45,7 +46,7 @@ export default async function AdminPage() {
   if (!userId) redirect("/sign-in");
 
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
+  if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) redirect("/dashboard/driver");
 
   const [pendingJobs, offeredJobs, drivers] = await Promise.all([
     getPendingJobs(),

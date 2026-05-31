@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 const MONTHLY_RATE = 9.99;
 
 async function getRevenueData() {
@@ -56,7 +57,7 @@ export default async function RevenuePage() {
   const user = await currentUser();
   if (!userId) redirect("/sign-in");
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
+  if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) redirect("/dashboard/driver");
 
   const data = await getRevenueData();
 
