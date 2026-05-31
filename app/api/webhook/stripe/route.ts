@@ -3,7 +3,9 @@ import Stripe from "stripe";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_placeholder");
+}
 
 async function getDriver(email: string): Promise<Record<string, unknown> | null> {
   const sql = neon(process.env.DATABASE_URL!);
@@ -57,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, secret);
+    event = getStripe().webhooks.constructEvent(body, sig, secret);
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
