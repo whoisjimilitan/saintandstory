@@ -3,6 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
+import AdminAutoRefresh from "@/components/AdminAutoRefresh";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
@@ -91,16 +92,28 @@ export default async function AdminPage() {
     getCompletedJobs(),
   ]);
 
+  const onlineCount = drivers.filter((d) => {
+    const t = d.last_seen_at as string | null;
+    return t && Date.now() - new Date(t).getTime() < 5 * 60 * 1000;
+  }).length;
+
+  const stats = [
+    inProgressJobs.length > 0 && `${inProgressJobs.length} en route`,
+    pendingJobs.length > 0 && `${pendingJobs.length} order${pendingJobs.length !== 1 ? "s" : ""}`,
+    offeredJobs.length > 0 && `${offeredJobs.length} awaiting`,
+    confirmedJobs.length > 0 && `${confirmedJobs.length} confirmed`,
+    `${onlineCount} online`,
+  ].filter(Boolean).join(" · ");
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
+      <AdminAutoRefresh />
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Admin</p>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
-        Incoming jobs.
+        Dashboard.
       </h1>
       <div className="flex items-center justify-between mb-8">
-        <p className="text-[#888888] text-sm">
-          {pendingJobs.length} pending · {offeredJobs.length} awaiting driver response
-        </p>
+        <p className="text-[#888888] text-sm">{stats}</p>
         <IndexNowButton />
       </div>
 

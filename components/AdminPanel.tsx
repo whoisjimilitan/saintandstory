@@ -288,7 +288,105 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
 
   return (
     <div className="space-y-8">
-      {/* Driver fleet */}
+
+      {/* In progress — most urgent, always first */}
+      {inProgressJobs.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            En route ({inProgressJobs.length})
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {inProgressJobs.map((job) => (
+              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+                <div>
+                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
+                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
+                  </p>
+                  <p className="text-[#888888] text-xs">
+                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
+                  </p>
+                  {job.driver_name != null && (
+                    <p className="text-xs mt-0.5">
+                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
+                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
+                    </p>
+                  )}
+                  {job.customer_phone != null && (
+                    <p className="text-xs mt-0.5">
+                      Customer: <a href={`tel:${String(job.customer_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.customer_phone)}</a>
+                    </p>
+                  )}
+                </div>
+                <span className="text-[10px] font-semibold text-white bg-[#0D0D0D] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">En route</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Orders — need driver assignment */}
+      <div>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+          Orders ({pending.length})
+        </p>
+        {pending.length === 0 ? (
+          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
+            <p className="text-[#888888] text-sm">All clear — no pending jobs.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {pending.map(job => (
+              <JobRow key={job.id} job={job} drivers={typedDrivers} onAssigned={removeJob} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Awaiting driver response */}
+      {typedOffered.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            Awaiting driver ({typedOffered.length})
+          </p>
+          <div className="space-y-2">
+            {typedOffered.map(job => (
+              <OfferedJobRow key={job.id} job={job} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Confirmed — driver accepted, not started */}
+      {confirmedJobs.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            Confirmed ({confirmedJobs.length})
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {confirmedJobs.map((job) => (
+              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+                <div>
+                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
+                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
+                  </p>
+                  <p className="text-[#888888] text-xs">
+                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
+                  </p>
+                  {job.driver_name != null && (
+                    <p className="text-xs mt-0.5">
+                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
+                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
+                    </p>
+                  )}
+                </div>
+                <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">Confirmed</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fleet */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
@@ -342,108 +440,6 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
           </div>
         )}
       </div>
-
-      {/* Pending jobs — need assignment */}
-      <div>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Orders ({pending.length})
-        </p>
-        {pending.length === 0 ? (
-          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
-            <p className="text-[#888888] text-sm">All clear — no pending jobs.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {pending.map(job => (
-              <JobRow
-                key={job.id}
-                job={job}
-                drivers={typedDrivers}
-                onAssigned={removeJob}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Offered jobs — waiting on driver */}
-      {typedOffered.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Awaiting driver response ({typedOffered.length})
-          </p>
-          <div className="space-y-2">
-            {typedOffered.map(job => (
-              <OfferedJobRow key={job.id} job={job} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Confirmed jobs — driver accepted, not started */}
-      {confirmedJobs.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Confirmed — awaiting start ({confirmedJobs.length})
-          </p>
-          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
-            {confirmedJobs.map((job) => (
-              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
-                <div>
-                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
-                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
-                  </p>
-                  <p className="text-[#888888] text-xs">
-                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
-                  </p>
-                  {job.driver_name != null && (
-                    <p className="text-xs mt-0.5">
-                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
-                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
-                    </p>
-                  )}
-                </div>
-                <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">Confirmed</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* In progress jobs — driver en route */}
-      {inProgressJobs.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            In progress ({inProgressJobs.length})
-          </p>
-          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
-            {inProgressJobs.map((job) => (
-              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
-                <div>
-                  <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
-                    {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
-                  </p>
-                  <p className="text-[#888888] text-xs">
-                    {String(job.postcode_from)}{job.postcode_to ? ` → ${String(job.postcode_to)}` : ""} · {String(job.customer_name || "—")}
-                  </p>
-                  {job.driver_name != null && (
-                    <p className="text-xs mt-0.5">
-                      Driver: <span className="text-[#0D0D0D] font-medium">{String(job.driver_name)}</span>
-                      {job.driver_phone != null && <> · <a href={`tel:${String(job.driver_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.driver_phone)}</a></>}
-                    </p>
-                  )}
-                  {job.customer_phone != null && (
-                    <p className="text-xs mt-0.5">
-                      Customer: <a href={`tel:${String(job.customer_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.customer_phone)}</a>
-                    </p>
-                  )}
-                </div>
-                <span className="text-[10px] font-semibold text-white bg-[#0D0D0D] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">En route</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Completed jobs */}
       {completedJobs.length > 0 && (
