@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   metadataBase: new URL(BASE_URL),
+  verification: {
+    google: "6XEt0P1P3yR6f_TIIX-7HehBl-cIoN7g8F7UDf8UPnk",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
