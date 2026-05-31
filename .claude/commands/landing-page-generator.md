@@ -160,6 +160,7 @@ These rules apply to every generated page without exception:
 ### CUSTOMER page imports
 ```tsx
 import type { Metadata } from "next";
+import Link from "next/link";
 import AutoOpenModal from "@/components/AutoOpenModal";
 import ModalCTA from "@/components/ModalCTA";
 import LandingHeroSearch from "@/components/LandingHeroSearch";
@@ -169,6 +170,7 @@ import SiteFooter from "@/components/SiteFooter";
 ### DRIVER page imports
 ```tsx
 import type { Metadata } from "next";
+import Link from "next/link";
 import AutoOpenModal from "@/components/AutoOpenModal";
 import DriverModalCTA from "@/components/DriverModalCTA";
 import SiteFooter from "@/components/SiteFooter";
@@ -203,7 +205,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
 ```tsx
 <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
   <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="/" className="flex items-center gap-2.5">
+    <Link href="/" className="flex items-center gap-2.5">
       <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
         <rect width="48" height="48" rx="11" fill="#0D0D0D"/>
         <path d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
@@ -213,7 +215,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
       <span className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight">
         Saint <span className="font-display italic font-normal">&amp;</span> Story
       </span>
-    </a>
+    </Link>
     <ModalCTA
       label="Post a job"
       source="lp_nav_[SLUG]"

@@ -24,7 +24,7 @@ async function saveToDb(lead: Record<string, unknown>) {
       help_loading TEXT,
       duration TEXT,
       postcode_from TEXT,
-      email TEXT NOT NULL,
+      email TEXT,
       phone TEXT,
       phone_consent BOOLEAN,
       full_name TEXT,
@@ -68,10 +68,15 @@ async function sendAlert(lead: Record<string, unknown>) {
     ? (lead.largeItems as string[]).join(", ") || "—"
     : "—";
 
+  const isDriver = lead.is_driver === true;
+  const subjectLabel = isDriver
+    ? `New driver: ${name} — ${(lead.area as string) || "area TBC"}`
+    : `New lead: ${name} — ${(lead.serviceType as string) || "General enquiry"}`;
+
   await resend.emails.send({
     from: "Saint & Story <onboarding@resend.dev>",
     to: ["whoisjimi.today@gmail.com", "oyedeleagile@gmail.com"],
-    subject: `New lead: ${name} — ${(lead.serviceType as string) || "General enquiry"}`,
+    subject: subjectLabel,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
         <div style="background:#0D0D0D;border-radius:8px;padding:20px 24px;margin-bottom:24px;">
@@ -102,7 +107,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (!body.email || typeof body.email !== "string") {
+  const isDriver = body.is_driver === true;
+  if (!isDriver && (!body.email || typeof body.email !== "string")) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
 
