@@ -8,26 +8,22 @@ async function getDriver(clerkUserId: string) {
   return rows[0] ?? null;
 }
 
-async function getAvailableJobs(area: string) {
-  const sql = neon(process.env.DATABASE_URL!);
-  const keyword = "%" + area.toLowerCase().split(" ")[0] + "%";
-  const rows = await sql`
-    SELECT * FROM jobs
-    WHERE status = 'new' AND driver_id IS NULL
-      AND (LOWER(postcode_from) LIKE ${keyword} OR LOWER(postcode_to) LIKE ${keyword} OR LOWER(customer_name) LIKE ${keyword})
-    ORDER BY created_at DESC
-    LIMIT 30
-  `;
-  return rows;
-}
-
 async function getMyJobs(driverId: string) {
   const sql = neon(process.env.DATABASE_URL!);
   const rows = await sql`
     SELECT * FROM jobs
     WHERE driver_id = ${driverId}
-    ORDER BY created_at DESC
-    LIMIT 30
+      AND status != 'pending_review'
+    ORDER BY
+      CASE status
+        WHEN 'offered' THEN 1
+        WHEN 'in_progress' THEN 2
+        WHEN 'confirmed' THEN 3
+        WHEN 'completed' THEN 4
+        ELSE 5
+      END,
+      created_at DESC
+    LIMIT 50
   `;
   return rows;
 }
@@ -37,19 +33,17 @@ export default async function JobsPage() {
   if (!userId || !process.env.DATABASE_URL) return null;
 
   const driver = await getDriver(userId);
-  const availableJobs = driver ? await getAvailableJobs(driver.area ?? "") : [];
   const myJobs = driver ? await getMyJobs(driver.id) : [];
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Jobs</p>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
-        Y<span className="font-display italic font-normal">o</span>ur area.
+        Y<span className="font-display italic font-normal">o</span>ur jobs.
       </h1>
 
       <JobsFeed
         driverId={driver?.id ?? null}
-        availableJobs={availableJobs as Record<string, unknown>[]}
         myJobs={myJobs as Record<string, unknown>[]}
       />
     </div>

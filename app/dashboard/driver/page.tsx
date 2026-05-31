@@ -38,13 +38,11 @@ async function getCompletedJobCount(driverId: string) {
   return Number(rows[0]?.count ?? 0);
 }
 
-async function getPendingJobCount(_driverId: string, area: string) {
+async function getOfferedJobCount(driverId: string) {
   const sql = neon(process.env.DATABASE_URL!);
   const rows = await sql`
     SELECT COUNT(*) as count FROM jobs
-    WHERE status = 'new'
-      AND driver_id IS NULL
-      AND LOWER(postcode_from) LIKE ${"%" + area.toLowerCase().split(" ")[0] + "%"}
+    WHERE driver_id = ${driverId} AND status = 'offered'
   `;
   return Number(rows[0]?.count ?? 0);
 }
@@ -63,7 +61,7 @@ export default async function DriverDashboardHome() {
 
   const monthEarned = driver ? await getMonthEarnings(driver.id) : 0;
   const completedJobs = driver ? await getCompletedJobCount(driver.id) : 0;
-  const pendingJobs = driver ? await getPendingJobCount(driver.id, driver.area ?? "") : 0;
+  const offeredJobs = driver ? await getOfferedJobCount(driver.id) : 0;
   const roi = monthEarned > 0 ? Math.round(monthEarned / 9.99) : 0;
 
   const displayName = driver?.full_name ?? clerkName ?? "Driver";
@@ -132,8 +130,8 @@ export default async function DriverDashboardHome() {
           <p className="text-[#888888] text-[10px] uppercase tracking-[0.12em] mt-1">Rating</p>
         </div>
         <Link href="/dashboard/driver/jobs" className="bg-white border border-[#E8E8E8] rounded-2xl px-4 py-4 text-center hover:border-[#0D0D0D] transition-colors">
-          <p className="font-sans font-black text-[#0D0D0D] text-2xl tracking-tight">{pendingJobs}</p>
-          <p className="text-[#888888] text-[10px] uppercase tracking-[0.12em] mt-1">New jobs</p>
+          <p className="font-sans font-black text-[#0D0D0D] text-2xl tracking-tight">{offeredJobs}</p>
+          <p className="text-[#888888] text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
         </Link>
       </div>
 

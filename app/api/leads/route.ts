@@ -38,7 +38,7 @@ async function createJob(lead: Record<string, unknown>): Promise<string | null> 
         ${(lead.timeframe as string) || null},
         ${(lead.helpLoading as string) || null},
         ${(lead.duration as string) || null},
-        'new',
+        'pending_review',
         ${lead.id as string}
       )
     `;

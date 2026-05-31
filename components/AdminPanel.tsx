@@ -1,0 +1,274 @@
+"use client";
+
+import { useState } from "react";
+
+interface Driver {
+  id: string;
+  full_name: string;
+  area: string;
+  vehicle_type: string;
+  phone: string;
+  rating_avg: number | null;
+  rating_count: number | null;
+}
+
+interface Job {
+  id: string;
+  reference: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  service_type: string;
+  postcode_from: string;
+  postcode_to: string;
+  timeframe: string;
+  duration: string;
+  help_loading: string;
+  large_items: unknown;
+  created_at: string;
+  driver_name?: string;
+  driver_phone?: string;
+}
+
+function suggestDrivers(job: Job, drivers: Driver[]) {
+  const prefix = (job.postcode_from ?? "").split(" ")[0].toLowerCase();
+  return drivers
+    .filter(d => (d.area ?? "").toLowerCase().includes(prefix))
+    .slice(0, 5);
+}
+
+function timeAgo(ts: string) {
+  const diff = Date.now() - new Date(ts).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function JobRow({
+  job,
+  drivers,
+  onAssigned,
+}: {
+  job: Job;
+  drivers: Driver[];
+  onAssigned: (jobId: string) => void;
+}) {
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [price, setPrice] = useState("");
+  const [expanded, setExpanded] = useState(false);
+
+  const suggested = suggestDrivers(job, drivers);
+  const allDrivers = drivers;
+  const [showAll, setShowAll] = useState(false);
+  const displayDrivers = showAll ? allDrivers : suggested;
+
+  async function assign(driverId: string) {
+    setAssigning(driverId);
+    try {
+      const res = await fetch("/api/jobs/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, driverId, price: price || null }),
+      });
+      if (res.ok) onAssigned(job.id);
+    } finally {
+      setAssigning(null);
+    }
+  }
+
+  return (
+    <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden">
+      {/* Job header */}
+      <button
+        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-[#F5F5F5] transition-colors"
+        onClick={() => setExpanded(e => !e)}
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="font-sans font-bold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
+            <span className="text-[10px] font-mono text-[#888888]">{job.reference}</span>
+          </div>
+          <p className="text-[#888888] text-xs">
+            {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}
+            {job.customer_name ? ` · ${job.customer_name}` : ""}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-[#888888] text-[10px]">{timeAgo(job.created_at)}</p>
+          <p className="text-[10px] font-semibold text-[#0D0D0D] mt-0.5">{expanded ? "▲" : "▼"}</p>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-[#E8E8E8]">
+          {/* Customer details */}
+          <div className="grid grid-cols-2 gap-3 py-4">
+            {job.customer_email && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Email</p>
+                <a href={`mailto:${job.customer_email}`} className="text-[#0D0D0D] text-sm font-medium hover:underline">{job.customer_email}</a>
+              </div>
+            )}
+            {job.customer_phone && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Phone</p>
+                <a href={`tel:${job.customer_phone}`} className="text-[#0D0D0D] text-sm font-medium hover:underline">{job.customer_phone}</a>
+              </div>
+            )}
+            {job.timeframe && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Timeframe</p>
+                <p className="text-[#0D0D0D] text-sm">{job.timeframe}</p>
+              </div>
+            )}
+            {job.duration && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Duration</p>
+                <p className="text-[#0D0D0D] text-sm">{job.duration}</p>
+              </div>
+            )}
+            {job.help_loading && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Loading help</p>
+                <p className="text-[#0D0D0D] text-sm">{job.help_loading}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Price field */}
+          <div className="mb-4">
+            <label className="block text-[#888888] text-[10px] uppercase tracking-[0.1em] mb-1">
+              Set job price (optional)
+            </label>
+            <div className="relative w-36">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888] text-sm">£</span>
+              <input
+                type="number"
+                value={price}
+                onChange={e => setPrice(e.target.value)}
+                placeholder="e.g. 180"
+                className="w-full pl-7 pr-3 py-2 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D]"
+              />
+            </div>
+          </div>
+
+          {/* Driver suggestions */}
+          <div>
+            <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em] mb-2">
+              {suggested.length > 0 ? `Suggested drivers (${job.postcode_from?.split(" ")[0]})` : "Assign driver"}
+            </p>
+            {displayDrivers.length === 0 && (
+              <p className="text-[#888888] text-xs italic">No drivers in this area yet.</p>
+            )}
+            <div className="space-y-2">
+              {displayDrivers.map(driver => (
+                <div key={driver.id} className="flex items-center justify-between gap-3 bg-[#F5F5F5] rounded-xl px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                    <p className="text-[#888888] text-xs">
+                      {driver.area} · {driver.vehicle_type}
+                      {driver.rating_avg ? ` · ★ ${Number(driver.rating_avg).toFixed(1)}` : ""}
+                      {driver.rating_count ? ` (${driver.rating_count})` : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => assign(driver.id)}
+                    disabled={!!assigning}
+                    className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors shrink-0"
+                  >
+                    {assigning === driver.id ? "Assigning…" : "Assign →"}
+                  </button>
+                </div>
+              ))}
+            </div>
+            {!showAll && allDrivers.length > suggested.length && (
+              <button
+                onClick={() => setShowAll(true)}
+                className="mt-2 text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors"
+              >
+                Show all {allDrivers.length} drivers →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OfferedJobRow({ job }: { job: Job }) {
+  return (
+    <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
+      <div>
+        <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
+        <p className="text-[#888888] text-xs">
+          {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}
+          {job.driver_name ? ` · Offered to ${job.driver_name}` : ""}
+        </p>
+      </div>
+      <span className="text-[10px] font-semibold text-[#888888] bg-white border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">
+        Awaiting response
+      </span>
+    </div>
+  );
+}
+
+interface Props {
+  pendingJobs: Record<string, unknown>[];
+  offeredJobs: Record<string, unknown>[];
+  drivers: Record<string, unknown>[];
+}
+
+export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props) {
+  const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
+
+  function removeJob(jobId: string) {
+    setPending(prev => prev.filter(j => j.id !== jobId));
+  }
+
+  const typedDrivers = drivers as unknown as Driver[];
+  const typedOffered = offeredJobs as unknown as Job[];
+
+  return (
+    <div className="space-y-8">
+      {/* Pending jobs — need assignment */}
+      <div>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+          Needs a driver ({pending.length})
+        </p>
+        {pending.length === 0 ? (
+          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
+            <p className="text-[#888888] text-sm">All clear — no pending jobs.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {pending.map(job => (
+              <JobRow
+                key={job.id}
+                job={job}
+                drivers={typedDrivers}
+                onAssigned={removeJob}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Offered jobs — waiting on driver */}
+      {typedOffered.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            Awaiting driver response ({typedOffered.length})
+          </p>
+          <div className="space-y-2">
+            {typedOffered.map(job => (
+              <OfferedJobRow key={job.id} job={job} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

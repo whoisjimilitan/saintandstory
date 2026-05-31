@@ -2,9 +2,9 @@ import { neon } from "@neondatabase/serverless";
 import { notFound } from "next/navigation";
 
 const STATUS_STEPS = [
-  { key: "new", label: "Job received" },
-  { key: "matched", label: "Driver matched" },
-  { key: "confirmed", label: "Confirmed" },
+  { key: "pending_review", label: "Request received" },
+  { key: "offered", label: "Finding your driver" },
+  { key: "confirmed", label: "Driver confirmed" },
   { key: "in_progress", label: "In progress" },
   { key: "completed", label: "Completed" },
 ];
