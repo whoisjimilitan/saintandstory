@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SmsButton from "@/components/SmsButton";
 
 interface Driver {
   id: string;
@@ -273,23 +274,30 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props)
         ) : (
           <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
             {typedDrivers.filter(d => isOnline(d.last_seen_at)).map(driver => (
-              <div key={driver.id} className="flex items-center justify-between px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-                  <div>
-                    <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
-                    <p className="text-[#888888] text-xs">
-                      {driver.area} · {driver.vehicle_type}
-                      {driver.phone ? <> · <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] font-semibold hover:underline">{driver.phone}</a></> : null}
-                    </p>
+              <div key={driver.id} className="px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                    <div>
+                      <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                      <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {driver.rating_avg ? (
+                      <p className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</p>
+                    ) : null}
+                    <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.1em] mt-0.5">Online now</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  {driver.rating_avg ? (
-                    <p className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</p>
-                  ) : null}
-                  <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.1em] mt-0.5">Online now</p>
-                </div>
+                {driver.phone && (
+                  <div className="flex items-center gap-4 mt-2 pl-5">
+                    <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline">
+                      📞 {driver.phone}
+                    </a>
+                    <SmsButton phone={driver.phone} driverName={driver.full_name} />
+                  </div>
+                )}
               </div>
             ))}
           </div>
