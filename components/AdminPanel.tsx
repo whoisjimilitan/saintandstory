@@ -346,7 +346,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       {/* Pending jobs — need assignment */}
       <div>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Needs a driver ({pending.length})
+          Orders ({pending.length})
         </p>
         {pending.length === 0 ? (
           <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
