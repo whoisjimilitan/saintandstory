@@ -51,13 +51,13 @@ export default function SiteFooter() {
 
         {/* Cities grid */}
         <div className="mb-14">
-          <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-5">Cities we serve</h3>
+          <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">Cities we serve</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
             {CITIES.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-xs text-[#888888] hover:text-[#0D0D0D] transition-colors py-1"
+                className="text-sm text-[#888888] hover:text-[#0D0D0D] transition-colors py-1"
               >
                 {l.label}
               </Link>
@@ -85,7 +85,7 @@ export default function SiteFooter() {
 
           {/* Services */}
           <div>
-            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-4">Services</h3>
+            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Services</h3>
             <ul className="space-y-2.5">
               {SERVICES.map((l) => (
                 <li key={l.label}>
@@ -99,7 +99,7 @@ export default function SiteFooter() {
 
           {/* Platform */}
           <div>
-            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-4">Platform</h3>
+            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Platform</h3>
             <ul className="space-y-2.5">
               {PLATFORM.map((l) => (
                 <li key={l.label}>
@@ -113,7 +113,7 @@ export default function SiteFooter() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.18em] mb-4">Contact</h3>
+            <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Contact</h3>
             <ul className="space-y-2.5">
               <li>
                 <a href="tel:+442082344444" className="text-sm text-[#0D0D0D] hover:text-[#888888] transition-colors">
@@ -133,10 +133,7 @@ export default function SiteFooter() {
           <p className="text-xs text-[#888888]">
             &copy; {new Date().getFullYear()} Saint &amp; Story Logistics Limited
           </p>
-          <div className="flex gap-6 text-xs text-[#888888]">
-            <Link href="/contact" className="hover:text-[#0D0D0D] transition-colors">Contact us</Link>
-            <a href="mailto:hello@saintandstoryltd.co.uk" className="hover:text-[#0D0D0D] transition-colors">hello@saintandstoryltd.co.uk</a>
-          </div>
+          <p className="text-xs text-[#888888]">Saint &amp; Story Logistics Limited · Registered in England &amp; Wales</p>
         </div>
       </div>
     </footer>
