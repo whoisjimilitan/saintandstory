@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import ModalCTA from "./ModalCTA";
+import DriverModalCTA from "./DriverModalCTA";
 import DriverCount from "./DriverCount";
 
 type Side = "customer" | "driver";
@@ -36,12 +36,11 @@ export default function ClaimArea() {
                 <br />
                 Keep everything y<span className="font-display italic font-normal">o</span>u earn.
               </p>
-              <Link
-                href="/for-drivers"
+              <DriverModalCTA
+                label="Join as driver →"
+                source="claim_area_driver"
                 className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
-              >
-                List your availability →
-              </Link>
+              />
             </div>
           </>
         ) : (

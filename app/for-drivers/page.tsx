@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
-import MobileBar from "@/components/MobileBar";
 import DriverModalCTA from "@/components/DriverModalCTA";
 import DriverCount from "@/components/DriverCount";
 
@@ -13,21 +12,22 @@ const STEPS = [
   { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Live in minutes." },
   { num: "02", title: "Post your availability", desc: "Tell the platform when you're free. Customers in your area see you." },
   { num: "03", title: "Get booked and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
-  { num: "04", title: "Get paid", desc: "Daily, direct to your account. No cuts, no delays." },
+  { num: "04", title: "Get paid", desc: "Finish a job at 3pm. Money in your account before 4pm." },
 ];
 
 const EARNINGS = [
   { stat: "£68", label: "Avg. daily earnings" },
   { stat: "4–5", label: "Bookings per week" },
-  { stat: "£9.99", label: "Monthly fee" },
+  { stat: "£9.99", label: "Founding rate/month" },
   { stat: null, label: "Drivers listed" },
 ];
 
 const FEATURES = [
   { title: "Your profile, live 24/7.", desc: "Searchable by every customer in your area. No cold calling. No ad spend." },
   { title: "You set the calendar.", desc: "Post when you're free. Customers book around you, not the other way round." },
-  { title: "£9.99 a month.", desc: "That's it. Keep 100% of every job. First booking covers the month." },
+  { title: "Founding rate — £9.99/month.", desc: "Locked forever. Weekly billing launches at 100 drivers. You're grandfathered." },
   { title: "Build your name.", desc: "Higher rating means you appear first when customers search your area." },
+  { title: "Paid within the hour.", desc: "Finish a job at 3pm. Money in your account before 4pm. No chasing, no delays." },
 ];
 
 const REVIEWS = [
@@ -72,7 +72,7 @@ export default function ForDriversPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <DriverModalCTA
-              label="List your availability →"
+              label="Join as driver →"
               source="for_drivers_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -109,11 +109,12 @@ export default function ForDriversPage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
-              Platform fee
+              Founding rate
             </p>
             <p className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
               £9.99<span className="font-sans font-medium text-[#888888] text-base ml-1">/month</span>
             </p>
+            <p className="text-[#888888] text-xs mt-1">Locked forever. Closes at 100 drivers.</p>
           </div>
           <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
           <p className="text-[#0D0D0D] text-sm font-medium max-w-xs">
@@ -121,7 +122,7 @@ export default function ForDriversPage() {
           </p>
           <div className="h-px md:h-12 w-full md:w-px bg-[#E8E8E8]" />
           <p className="text-[#888888] text-sm max-w-xs">
-            Average daily earning: £68. Monthly fee covered in your very first job.
+            Average daily earning: £68. Fee covered in your first job. Paid within the hour.
           </p>
         </div>
       </section>
@@ -206,7 +207,7 @@ export default function ForDriversPage() {
               Keep everything y<span className="font-display italic font-normal">o</span>u earn.
             </p>
             <DriverModalCTA
-              label="List your availability →"
+              label="Join as driver →"
               source="for_drivers_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -214,7 +215,13 @@ export default function ForDriversPage() {
         </div>
       </section>
 
-      <MobileBar />
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
+        <DriverModalCTA
+          label="Join as driver →"
+          source="for_drivers_mobile"
+          className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+        />
+      </div>
     </main>
   );
 }

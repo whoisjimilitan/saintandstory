@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ModalProvider from "@/components/ModalProvider";
 
@@ -24,6 +25,12 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "S&S Driver",
+  },
 };
 
 export const viewport: Viewport = {
@@ -39,13 +46,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}
-      >
-        {children}
-        <ModalProvider />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}
+        >
+          {children}
+          <ModalProvider />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

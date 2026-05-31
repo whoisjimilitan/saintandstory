@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import MobileBar from "@/components/MobileBar";
-import QuoteForm from "@/components/QuoteForm";
+import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {
   title: "Contact | Saint & Story Logistics",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const DETAILS = [
   { label: "Phone", value: "0208 234 4444", href: "tel:+442082344444" },
-  { label: "Email", value: "hello@saintandstory.co.uk", href: "mailto:hello@saintandstory.co.uk" },
+  { label: "Email", value: "hello@saintandstoryltd.co.uk", href: "mailto:hello@saintandstoryltd.co.uk" },
   { label: "Hours", value: "Mon–Sun, 7am–10pm", href: null },
 ];
 
@@ -66,10 +66,17 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-[#E8E8E8]">
-            <h2 className="font-sans font-black text-[#0D0D0D] text-lg mb-1">Request a free quote</h2>
-            <p className="text-[#888888] text-sm mb-6">We&apos;ll call you within 1 minute.</p>
-            <QuoteForm />
+          <div className="bg-white rounded-2xl p-8 border border-[#E8E8E8] flex flex-col gap-6">
+            <div>
+              <h2 className="font-sans font-black text-[#0D0D0D] text-lg mb-1">Request a free quote</h2>
+              <p className="text-[#888888] text-sm">Tell us about your move. We call back within 1 minute.</p>
+            </div>
+            <ModalCTA
+              label="Get an instant quote →"
+              source="contact_page"
+              className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-4 rounded-full text-sm transition-colors"
+            />
+            <p className="text-[#888888] text-xs">No obligation. Fixed price on the call.</p>
           </div>
 
         </div>

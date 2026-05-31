@@ -89,9 +89,6 @@ export default function PostcodeSearch({
         </div>
       )}
 
-      <p className="text-[#888888] text-xs px-1">
-        Start typing your postcode — we&apos;ll find it for you.
-      </p>
     </div>
   );
 }

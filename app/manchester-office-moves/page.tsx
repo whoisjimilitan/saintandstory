@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import QuoteForm from "@/components/QuoteForm";
+import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {
   title: "Office Moves in Manchester | Saint & Story Logistics",
@@ -15,7 +15,7 @@ const STATS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Fill in the form", desc: "Tell us the office size, both postcodes, and your preferred date." },
+  { num: "01", title: "Post your job", desc: "Tell us the office size, both postcodes, and your preferred date. Takes 60 seconds." },
   { num: "02", title: "Fixed price confirmed", desc: "We call within 1 minute. Price locked. Team assigned." },
   { num: "03", title: "Monday, fully operational", desc: "We move everything over the weekend. Your team walks in ready." },
 ];
@@ -84,12 +84,11 @@ export default function ManchesterOfficeMoves() {
               Saint <span className="font-display italic font-normal">&amp;</span> Story
             </span>
           </Link>
-          <a
-            href="#quote"
+          <ModalCTA
+            label="Get a free quote"
+            source="manchester_nav"
             className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
-          >
-            Post a job
-          </a>
+          />
         </div>
       </header>
 
@@ -112,9 +111,11 @@ export default function ManchesterOfficeMoves() {
             Fixed price. Weekend availability. Your team walks in operational.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href="#quote" className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
-              Get a free quote →
-            </a>
+            <ModalCTA
+              label="Get a free quote →"
+              source="manchester_hero"
+              className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+            />
             <a href="tel:+442082344444" className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
               Call 0208 234 4444
             </a>
@@ -215,17 +216,17 @@ export default function ManchesterOfficeMoves() {
         </div>
       </section>
 
-      {/* Quote form */}
-      <section id="quote" className="bg-[#0D0D0D] py-20 px-6">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+      {/* CTA */}
+      <section className="bg-[#0D0D0D] py-20 px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em] mb-5">Free quote</p>
-            <h2 className="font-sans font-black text-white text-3xl md:text-4xl leading-tight tracking-tight mb-6">
+            <h2 className="font-sans font-black text-white text-3xl md:text-4xl leading-tight tracking-tight mb-4">
               Ready t<span className="font-display italic font-normal">o</span>
               <br />get m<span className="font-display italic font-normal">o</span>ving?
             </h2>
             <p className="text-white/50 text-base mb-8 max-w-xs">
-              Fill in the form. We call within 1 minute with a fixed price.
+              We call within 1 minute with a fixed price.
             </p>
             <div className="border border-white/10 rounded-2xl px-6 py-5">
               <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] mb-2">Response time</p>
@@ -233,10 +234,18 @@ export default function ManchesterOfficeMoves() {
               <p className="text-white/30 text-xs mt-1">Mon–Sun, 7am–10pm</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-8">
-            <h3 className="font-sans font-black text-[#0D0D0D] text-base mb-1">Request a free quote</h3>
-            <p className="text-[#888888] text-sm mb-6">We&apos;ll call back within 60 seconds.</p>
-            <QuoteForm />
+          <div className="flex flex-col gap-4">
+            <ModalCTA
+              label="Get a free quote →"
+              source="manchester_cta"
+              className="w-full bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold py-4 rounded-full text-sm transition-colors"
+            />
+            <a
+              href="tel:+442082344444"
+              className="w-full border border-white/20 hover:border-white text-white text-center font-semibold py-4 rounded-full text-sm transition-colors"
+            >
+              Call 0208 234 4444
+            </a>
           </div>
         </div>
       </section>
@@ -263,9 +272,11 @@ export default function ManchesterOfficeMoves() {
 
       {/* Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
-        <a href="#quote" className="block w-full bg-[#0D0D0D] text-white text-center font-semibold py-3.5 rounded-full text-sm">
-          Get a free quote →
-        </a>
+        <ModalCTA
+          label="Get a free quote →"
+          source="manchester_mobile"
+          className="block w-full bg-[#0D0D0D] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+        />
       </div>
     </main>
   );

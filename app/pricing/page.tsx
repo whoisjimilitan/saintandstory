@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Nav from "@/components/Nav";
-import MobileBar from "@/components/MobileBar";
 import ModalCTA from "@/components/ModalCTA";
-import Link from "next/link";
+import DriverModalCTA from "@/components/DriverModalCTA";
 
 type Tab = "customer" | "driver";
 
@@ -38,15 +37,15 @@ const CUSTOMER_TIERS = [
 const DRIVER_CARDS = [
   {
     title: "Free to start.",
-    desc: "Create your profile, claim your area, go live. No credit card. No obligation.",
+    desc: "Create your profile, set your area, go live. No credit card. No obligation.",
     stat: "£0",
     statLabel: "to get started",
   },
   {
-    title: "One flat fee. No cuts.",
-    desc: "Your driver profile, live and searchable. Average daily earnings: £68. Fee covered on job one.",
+    title: "Founding driver rate.",
+    desc: "£9.99/month, locked forever. Weekly billing launches at 100 drivers — you're grandfathered in.",
     stat: "£9.99",
-    statLabel: "per month",
+    statLabel: "per month · founding",
     highlight: true,
   },
   {
@@ -60,7 +59,7 @@ const DRIVER_CARDS = [
 const DRIVER_FACTS = [
   "Post your availability — customers find and book you",
   "Your verified driver profile, live and searchable 24/7",
-  "Daily payouts, direct to your account",
+  "Paid within the hour, direct to your account",
   "Build your rating, rise in local search",
 ];
 
@@ -192,13 +191,15 @@ export default function PricingPage() {
 
               {/* Math proof */}
               <div className="bg-[#0D0D0D] rounded-2xl px-7 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                <p className="font-sans font-black text-white text-lg leading-tight tracking-tight">
-                  Pay £9.99. Earn £68 on day one.
-                  <br />
-                  <span className="font-sans font-medium text-white/70 text-sm">You&apos;re in profit before lunch.</span>
-                </p>
+                <div>
+                  <p className="font-sans font-black text-white text-lg leading-tight tracking-tight">
+                    Pay £9.99/month. Earn £68 on day one.
+                  </p>
+                  <p className="font-sans font-medium text-white/70 text-sm mt-1">You&apos;re in profit before lunch.</p>
+                  <p className="text-white/50 text-xs mt-2">Founding rate — locked forever. Closes at 100 drivers.</p>
+                </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-[10px] text-white/55 uppercase tracking-[0.15em] mb-1">Other platforms charge</p>
+                  <p className="text-[10px] text-white/55 uppercase tracking-[0.15em] mb-1">Others charge</p>
                   <p className="font-black text-white text-2xl tracking-tight">15–25%</p>
                   <p className="text-[10px] text-white/55 uppercase tracking-[0.15em]">per job. Every job.</p>
                 </div>
@@ -219,12 +220,11 @@ export default function PricingPage() {
                   </ul>
                 </div>
                 <div>
-                  <Link
-                    href="/#claim"
+                  <DriverModalCTA
+                    label="Join as driver →"
+                    source="pricing_driver"
                     className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3.5 rounded-full text-sm transition-colors text-center mb-3"
-                  >
-                    Claim your area →
-                  </Link>
+                  />
                   <p className="text-center text-[#888888] text-xs">Free to join. No obligation.</p>
                 </div>
               </div>
@@ -253,7 +253,21 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <MobileBar />
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
+        {tab === "driver" ? (
+          <DriverModalCTA
+            label="Join as driver →"
+            source="pricing_mobile_driver"
+            className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+          />
+        ) : (
+          <ModalCTA
+            label="Get a quote →"
+            source="pricing_mobile_customer"
+            className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+          />
+        )}
+      </div>
     </main>
   );
 }

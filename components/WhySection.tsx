@@ -8,8 +8,8 @@ const FEATURES = [
     desc: "Background-checked, insured, and rated by real customers.",
   },
   {
-    title: "Earn on your terms.",
-    desc: "Set your rate, your radius, your hours.",
+    title: "Covered door to door.",
+    desc: "Every item is insured from the moment we load to the moment we deliver.",
   },
 ];
 

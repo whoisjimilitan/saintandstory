@@ -8,6 +8,14 @@ function track(event: string, props?: Record<string, unknown>) {
   try { posthog.capture(event, props); } catch { /* */ }
 }
 
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 type Answers = Record<string, string | string[] | boolean>;
 
 const STEPS = [
@@ -96,7 +104,7 @@ function StepSearch({ progress }: { progress: number }) {
       <p className="text-[#888888] text-sm mb-5">Matching trusted local drivers near you.</p>
       <div className="bg-[#E8E8E8] rounded-full h-1 overflow-hidden">
         <div
-          className="h-full rounded-full bg-[#0D0D0D] transition-all duration-100"
+          className="h-full rounded-full bg-gradient-to-r from-[#888888] to-[#0D0D0D] transition-all duration-100"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -104,7 +112,7 @@ function StepSearch({ progress }: { progress: number }) {
   );
 }
 
-function StepFound({ from, to }: { from?: string; to?: string }) {
+function StepFound({ from, to, distance }: { from?: string; to?: string; distance?: number | null }) {
   return (
     <div className="py-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
@@ -117,7 +125,9 @@ function StepFound({ from, to }: { from?: string; to?: string }) {
       </div>
       {from && to && (
         <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-2.5 text-center mb-5">
-          <p className="text-[#0D0D0D] text-xs font-mono tracking-widest">{from} → {to}</p>
+          <p className="text-[#0D0D0D] text-xs font-mono tracking-widest">
+            {from} → {to}{distance != null ? ` · ~${distance} miles` : ""}
+          </p>
         </div>
       )}
       <p className="text-[#888888] text-sm text-center">One more thing — where do we send your quotes?</p>
@@ -127,25 +137,22 @@ function StepFound({ from, to }: { from?: string; to?: string }) {
 
 function StepEmail({ answers, setAnswers, onEnter }: { answers: Answers; setAnswers: (a: Answers) => void; onEnter: () => void }) {
   return (
-    <div className="space-y-2">
-      <input
-        type="email"
-        value={(answers.email as string) ?? ""}
-        onChange={(e) => setAnswers({ ...answers, email: e.target.value })}
-        onKeyDown={(e) => e.key === "Enter" && onEnter()}
-        placeholder="you@example.com"
-        className={inputCls}
-        autoFocus
-      />
-      <p className="text-[#888888] text-xs">We will send quotes to this address.</p>
-    </div>
+    <input
+      type="email"
+      value={(answers.email as string) ?? ""}
+      onChange={(e) => setAnswers({ ...answers, email: e.target.value })}
+      onKeyDown={(e) => e.key === "Enter" && onEnter()}
+      placeholder="you@example.com"
+      className={inputCls}
+      autoFocus
+    />
   );
 }
 
 function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswers: (a: Answers) => void }) {
   return (
     <div className="space-y-4">
-      <p className="text-[#888888] text-sm">Some matches prefer to provide quotes over the phone to get more details.</p>
+      <p className="text-[#888888] text-sm">A quick call often means a more accurate quote.</p>
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"
@@ -166,7 +173,6 @@ function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswer
           className={inputCls}
         />
       )}
-      <p className="text-[#888888] text-xs">You can skip adding a phone and stay email-only.</p>
     </div>
   );
 }
@@ -179,7 +185,7 @@ function StepName({ answers, setAnswers, onEnter }: { answers: Answers; setAnswe
         value={(answers.full_name as string) ?? ""}
         onChange={(e) => setAnswers({ ...answers, full_name: e.target.value })}
         onKeyDown={(e) => e.key === "Enter" && onEnter()}
-        placeholder="Please tell us your name"
+        placeholder="Your name"
         className={inputCls}
         autoFocus
       />
@@ -219,7 +225,7 @@ function StepSuccess({ answers, onClose }: { answers: Answers; onClose: () => vo
       </div>
       <p className="text-[#888888] text-sm leading-relaxed">
         {phone
-          ? `${firstName ? `${firstName}, we` : "We"}'re matching your job to verified drivers near you. Expect our call within 30 minutes.`
+          ? `${firstName ? `${firstName}, we` : "We"}'re matching your job to verified drivers near you. Expect our call within 15 minutes.`
           : "We're matching your job to verified drivers near you. Quotes will arrive in your inbox within the hour."}
       </p>
       <button
@@ -245,6 +251,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   const [stepIdx, setStepIdx] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ phoneConsent: true });
   const [progress, setProgress] = useState(0);
+  const [distance, setDistance] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const step = STEPS[stepIdx];
@@ -265,14 +272,31 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   useEffect(() => {
     if (step.type !== "search") return;
     setProgress(0);
+    const from = ((answers.postcode_from as string) ?? "").replace(/\s/g, "");
+    const to = ((answers.postcode_to as string) ?? "").replace(/\s/g, "");
+    if (from && to) {
+      fetch("https://api.postcodes.io/postcodes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postcodes: [from, to] }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          const r1 = data.result?.[0]?.result;
+          const r2 = data.result?.[1]?.result;
+          if (r1 && r2) setDistance(Math.round(haversine(r1.latitude, r1.longitude, r2.latitude, r2.longitude)));
+        })
+        .catch(() => {});
+    }
     const interval = setInterval(() => setProgress((p) => Math.min(p + 2, 95)), 50);
     const advance = setTimeout(() => {
       clearInterval(interval);
       setProgress(100);
       setStepIdx(stepIdx + 1);
-      setTimeout(() => setStepIdx(stepIdx + 2), 900);
-    }, 1400);
+      setTimeout(() => setStepIdx(stepIdx + 2), 1600);
+    }, 2400);
     return () => { clearInterval(interval); clearTimeout(advance); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.type, stepIdx]);
 
   useEffect(() => {
@@ -291,6 +315,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
         setStepIdx(0);
         setAnswers({ phoneConsent: true });
         setProgress(0);
+        setDistance(null);
       }, 300);
       return () => clearTimeout(t);
     }
@@ -299,7 +324,13 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   function validate(): boolean {
     if (step.type === "options") return !!answers[step.id];
     if (step.type === "postcode") return ((answers[(step as { name: string }).name] as string) ?? "").trim().length >= 5;
-    if (step.type === "email") return /\S+@\S+\.\S+/.test((answers.email as string) ?? "");
+    if (step.type === "email") return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test((answers.email as string) ?? "");
+    if (step.type === "phoneConsent") {
+      const phone = (answers.phone as string) ?? "";
+      if (!phone.trim()) return true;
+      const digits = phone.replace(/\D/g, "");
+      return digits.length >= 10 && digits.length <= 15;
+    }
     if (step.type === "name") return ((answers.full_name as string) ?? "").trim().length >= 2;
     return true;
   }
@@ -369,7 +400,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
         {expanded && (
           <div className="h-1 bg-[#E8E8E8] shrink-0">
             <div
-              className="h-full bg-[#0D0D0D] transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-[#888888] to-[#0D0D0D] transition-all duration-500 ease-out"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -416,6 +447,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
                 <StepFound
                   from={(answers.postcode_from as string) || undefined}
                   to={(answers.postcode_to as string) || undefined}
+                  distance={distance}
                 />
               )}
               {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}

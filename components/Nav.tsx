@@ -47,7 +47,7 @@ export default function Nav() {
             Pricing
           </Link>
           <Link href="/contact" className="text-[#0D0D0D] text-sm hover:text-[#888888] transition-colors">
-            About
+            Contact
           </Link>
         </nav>
 

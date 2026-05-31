@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import DriverModalCTA from "./DriverModalCTA";
 
 type Side = "customer" | "driver";
 
@@ -88,12 +88,11 @@ export default function ForEveryMove() {
               J<span className="font-display italic font-normal">o</span>bs come to you.
               <br />In y<span className="font-display italic font-normal">o</span>ur area. On y<span className="font-display italic font-normal">o</span>ur terms.
             </p>
-            <Link
-              href="/#claim"
+            <DriverModalCTA
+              label="Join as driver →"
+              source="for_every_move_driver"
               className="shrink-0 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
-            >
-              Claim your area →
-            </Link>
+            />
           </>
         ) : (
           <>

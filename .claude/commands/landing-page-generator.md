@@ -9,7 +9,7 @@ You are generating a conversion-optimised city landing page for Saint & Story Lo
 `$ARGUMENTS` format: `[city] [service] [customer|driver]`
 
 - The third argument is optional and defaults to `customer`
-- `customer` — page targets people who need a driver (fires the 12-step LeadModal)
+- `customer` — page targets people who need a driver (fires the 13-step LeadModal)
 - `driver` — page targets drivers looking to join the platform (fires the 5-step DriverModal)
 
 **Examples:**
@@ -130,20 +130,22 @@ Apply to at least the first vowel in each heading word where natural. Do not app
 These rules apply to every generated page without exception:
 
 ### The LeadModal (customer pages)
-- 12 steps — do not remove, reorder, or add to them
+- 13 steps — do not remove, reorder, or add to them
+- Steps: service type → large items → timeframe → help loading → duration → postcode from → postcode to → search animation → found → email → phone consent → name → success
 - 800ms delay before expanding: `setTimeout(() => requestAnimationFrame(() => setExpanded(true)), 800)`
 - CSS cubic-bezier: `transition: "width 0.5s cubic-bezier(0.22,1,0.36,1), max-height 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)"`
 - "Please wait" spinner shows during the 800ms
-- Search animation at step 7: 1400ms → found → 900ms → next
-- Back from email (step 8) skips to postcode (step 5)
-- All 12 steps collect data and POST to `/api/leads`
+- Search animation at step 7: 2400ms → found → 1600ms → next. During animation, postcodes.io bulk API calculates Haversine distance in miles, shown on found screen
+- Back from email (step 9) skips to destination postcode (step 6)
+- All 13 steps collect data and POST to `/api/leads` (includes postcode_from + postcode_to)
 - The modal is already in `ModalProvider` (via `app/layout.tsx`) — do not re-implement it
 
 ### The DriverModal (driver pages)
 - 5 steps: vehicle → area → when to go live → days/week wanted → details → success
 - Same 800ms delay + CSS cubic-bezier animation as above
 - "Please wait" spinner shows during 800ms
-- Posts to `/api/leads` with `is_driver: true`
+- Posts to `/api/leads` with `is_driver: true`. Email is optional for drivers. Phone required and validated (10–15 digits after stripping non-numeric characters)
+- Success screen: reflects phone + area, promises "We'll call you within 15 minutes to get your profile live and your first bookings lined up."
 - Already in `ModalProvider` — do not re-implement it
 
 ### AutoOpenModal

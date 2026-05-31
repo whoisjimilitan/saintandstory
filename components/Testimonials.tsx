@@ -1,8 +1,8 @@
 const AVATAR_COLORS: Record<string, string> = {
-  SM: "bg-[#7C6F64]",
-  TO: "bg-[#4A6741]",
-  PK: "bg-[#4A5B7A]",
-  DF: "bg-[#7A4A5B]",
+  SM: "bg-[#0D0D0D]",
+  TO: "bg-[#0D0D0D]",
+  PK: "bg-[#0D0D0D]",
+  DF: "bg-[#0D0D0D]",
 };
 
 const REVIEWS = [
@@ -37,8 +37,8 @@ const REVIEWS = [
 ];
 
 const ROLE_STYLE: Record<string, string> = {
-  Customer: "text-[#4A5B7A] border-[#4A5B7A]/20 bg-[#4A5B7A]/5",
-  Driver: "text-[#4A6741] border-[#4A6741]/20 bg-[#4A6741]/5",
+  Customer: "text-[#888888] border-[#E8E8E8] bg-[#F5F5F5]",
+  Driver: "text-[#888888] border-[#E8E8E8] bg-[#F5F5F5]",
 };
 
 function Stars() {

@@ -12,9 +12,9 @@ const COLS = [
   {
     heading: "For Drivers",
     links: [
-      { label: "How it works", href: "/for-drivers" },
-      { label: "Claim your area", href: "/#claim" },
       { label: "For drivers", href: "/for-drivers" },
+      { label: "Driver pricing", href: "/pricing" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
