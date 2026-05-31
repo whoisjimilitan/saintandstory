@@ -297,7 +297,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
           </p>
           <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
             {inProgressJobs.map((job) => (
-              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+              <div key={job.id as string} className="flex items-center justify-between px-5 py-4 gap-4 border-l-[3px] border-l-[#0D0D0D]">
                 <div>
                   <p className="font-sans font-semibold text-[#0D0D0D] text-sm">
                     {String(job.service_type || "Job")} · <span className="font-mono text-[10px] text-[#888888]">{String(job.reference)}</span>
