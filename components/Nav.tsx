@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ModalCTA from "./ModalCTA";
 
 type Side = "customer" | "driver";
+
+const DRIVER_PATHS = ["/for-drivers", "/london-drivers"];
 
 const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
@@ -14,7 +17,8 @@ const NAV_LINKS = [
 ];
 
 export default function Nav() {
-  const [side, setSide] = useState<Side>("customer");
+  const pathname = usePathname();
+  const [side, setSide] = useState<Side>(DRIVER_PATHS.includes(pathname) ? "driver" : "customer");
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
