@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
+import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
     UPDATE jobs
     SET driver_id = ${driverId},
         status = 'offered',
+        offered_at = NOW(),
         ${price ? sql`price = ${Number(price)},` : sql``}
         updated_at = NOW()
     WHERE id = ${jobId}
@@ -105,5 +107,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  triggerAdminRefresh("job-offered").catch(() => {});
   return NextResponse.json({ success: true });
 }

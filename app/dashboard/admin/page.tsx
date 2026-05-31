@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 import AdminAutoRefresh from "@/components/AdminAutoRefresh";
+import AdminPushSubscribe from "@/components/AdminPushSubscribe";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
@@ -11,9 +12,11 @@ const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 async function getPendingJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT * FROM jobs
-    WHERE status = 'pending_review'
-    ORDER BY created_at DESC
+    SELECT j.*,
+      (SELECT COUNT(*) FROM jobs j2 WHERE j2.customer_email = j.customer_email AND j2.id != j.id) as previous_jobs
+    FROM jobs j
+    WHERE j.status = 'pending_review'
+    ORDER BY j.created_at DESC
     LIMIT 50
   ` as Record<string, unknown>[];
 }
@@ -69,11 +72,28 @@ async function getInProgressJobs() {
 async function getActiveDrivers() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT id, full_name, area, vehicle_type, phone, rating_avg, rating_count, last_seen_at
-    FROM drivers
-    WHERE profile_live = true
-    ORDER BY last_seen_at DESC NULLS LAST, rating_avg DESC NULLS LAST, full_name ASC
+    SELECT d.id, d.full_name, d.area, d.vehicle_type, d.phone, d.rating_avg, d.rating_count, d.last_seen_at,
+      (
+        SELECT AVG(EXTRACT(EPOCH FROM (j.updated_at - j.offered_at)) / 60)::int
+        FROM jobs j
+        WHERE j.driver_id = d.id
+          AND j.status IN ('confirmed', 'in_progress', 'completed')
+          AND j.offered_at IS NOT NULL
+      ) as avg_response_mins
+    FROM drivers d
+    WHERE d.profile_live = true
+    ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
   ` as Record<string, unknown>[];
+}
+
+async function getTodayRevenue() {
+  const sql = neon(process.env.DATABASE_URL!);
+  const rows = await sql`
+    SELECT COALESCE(SUM(amount), 0) as total
+    FROM earnings
+    WHERE created_at >= DATE_TRUNC('day', NOW() AT TIME ZONE 'Europe/London') AT TIME ZONE 'Europe/London'
+  `;
+  return Number(rows[0]?.total ?? 0);
 }
 
 export default async function AdminPage() {
@@ -85,13 +105,14 @@ export default async function AdminPage() {
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
   if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) redirect("/dashboard/driver");
 
-  const [pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs] = await Promise.all([
+  const [pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs, todayRevenue] = await Promise.all([
     getPendingJobs(),
     getOfferedJobs(),
     getConfirmedJobs(),
     getInProgressJobs(),
     getActiveDrivers(),
     getCompletedJobs(),
+    getTodayRevenue(),
   ]);
 
   const onlineCount = drivers.filter((d) => {
@@ -105,11 +126,13 @@ export default async function AdminPage() {
     offeredJobs.length > 0 && `${offeredJobs.length} awaiting`,
     confirmedJobs.length > 0 && `${confirmedJobs.length} confirmed`,
     `${onlineCount} online`,
+    todayRevenue > 0 && `£${todayRevenue.toFixed(0)} today`,
   ].filter(Boolean).join(" · ");
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
-      <AdminAutoRefresh />
+      <AdminAutoRefresh pendingCount={pendingJobs.length} />
+      <AdminPushSubscribe />
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Admin</p>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         Dashboard.

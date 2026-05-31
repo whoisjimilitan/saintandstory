@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
+import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
     await notifyAdminDeclined(job);
   }
 
+  triggerAdminRefresh("driver-responded").catch(() => {});
   return NextResponse.json({ success: true });
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
+import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
@@ -141,5 +142,6 @@ export async function POST(request: NextRequest) {
     ]);
   }
 
+  triggerAdminRefresh(`status-${newStatus}`).catch(() => {});
   return NextResponse.json({ success: true, newStatus });
 }

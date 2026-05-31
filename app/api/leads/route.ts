@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "crypto";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
+import { sendPushToAdmins } from "@/lib/push";
+import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
 function sha256(str: string) {
   return createHash("sha256").update(str.toLowerCase().trim()).digest("hex");
@@ -235,6 +237,11 @@ export async function POST(request: NextRequest) {
     if (trackingToken) {
       await sendCustomerConfirmation(lead, trackingToken);
     }
+    sendPushToAdmins(
+      "New order",
+      `${(lead.fullName as string) || "Customer"} · ${(lead.postcode_from as string) || "—"}${lead.postcode_to ? ` → ${lead.postcode_to as string}` : ""}`
+    ).catch(() => {});
+    triggerAdminRefresh("new-order").catch(() => {});
   }
 
   await Promise.allSettled([

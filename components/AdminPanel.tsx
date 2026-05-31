@@ -13,6 +13,7 @@ interface Driver {
   rating_avg: number | null;
   rating_count: number | null;
   last_seen_at: string | null;
+  avg_response_mins: number | null;
 }
 
 function isOnline(ts: string | null) {
@@ -47,11 +48,17 @@ interface Job {
   address_from?: string;
   address_to?: string;
   price?: number;
+  previous_jobs?: number;
   created_at: string;
   driver_id?: string;
   driver_name?: string;
   driver_phone?: string;
   updated_at?: string;
+}
+
+function isStaleOffered(ts: string | undefined) {
+  if (!ts) return false;
+  return Date.now() - new Date(ts).getTime() > 2 * 60 * 60 * 1000;
 }
 
 function suggestDrivers(job: Job, drivers: Driver[]) {
@@ -135,6 +142,13 @@ function JobRow({
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
           {/* Customer details */}
           <div className="grid grid-cols-2 gap-3 py-4">
+            {job.previous_jobs != null && Number(job.previous_jobs) > 0 && (
+              <div className="col-span-2">
+                <p className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.1em]">
+                  Returning customer — {Number(job.previous_jobs)} previous job{Number(job.previous_jobs) !== 1 ? "s" : ""}
+                </p>
+              </div>
+            )}
             {job.customer_email && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Email</p>
@@ -300,9 +314,15 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
             {job.driver_name ? ` · ${job.driver_name}` : ""}
           </p>
         </div>
-        <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">
-          Awaiting · {job.updated_at ? timeAgo(job.updated_at) : "—"}
-        </span>
+        {isStaleOffered(job.updated_at) ? (
+          <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-white bg-red-500 px-2.5 py-1 rounded-full shrink-0">
+            Urgent · {job.updated_at ? timeAgo(job.updated_at) : "—"}
+          </span>
+        ) : (
+          <span className="text-[10px] font-semibold text-[#888888] bg-[#F5F5F5] border border-[#E8E8E8] px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0">
+            Awaiting · {job.updated_at ? timeAgo(job.updated_at) : "—"}
+          </span>
+        )}
       </button>
 
       {expanded && (
@@ -554,6 +574,9 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                     </div>
                     <p className={`text-[10px] mt-0.5 ${online ? "text-green-600 font-semibold" : "text-[#888888]"}`}>
                       {lastSeenLabel(driver.last_seen_at)}
+                      {driver.avg_response_mins != null && (
+                        <span className="text-[#888888] font-normal ml-2">avg {driver.avg_response_mins}min response</span>
+                      )}
                     </p>
                   </div>
                   {driver.phone && (
