@@ -261,12 +261,36 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props)
 
   return (
     <div className="space-y-8">
-      {/* Online drivers summary */}
-      <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full shrink-0 ${onlineCount > 0 ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
-        <p className="text-[#888888] text-sm">
-          {onlineCount > 0 ? `${onlineCount} driver${onlineCount !== 1 ? "s" : ""} online now` : "No drivers online"}
+      {/* Online drivers */}
+      <div>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+          Drivers online ({onlineCount})
         </p>
+        {onlineCount === 0 ? (
+          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
+            <p className="text-[#888888] text-sm">No drivers online right now.</p>
+          </div>
+        ) : (
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {typedDrivers.filter(d => isOnline(d.last_seen_at)).map(driver => (
+              <div key={driver.id} className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                  <div>
+                    <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                    <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  {driver.rating_avg ? (
+                    <p className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</p>
+                  ) : null}
+                  <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.1em] mt-0.5">Online now</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Pending jobs — need assignment */}
