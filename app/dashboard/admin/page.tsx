@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 async function getPendingJobs() {

@@ -3,7 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 const BASE_URL = "https://saintandstoryltd.co.uk";
 
