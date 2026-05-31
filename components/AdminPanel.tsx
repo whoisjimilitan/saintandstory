@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import SmsButton from "@/components/SmsButton";
 
 interface Driver {
@@ -397,16 +398,19 @@ interface Props {
 }
 
 export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, inProgressJobs, drivers, completedJobs }: Props) {
+  const router = useRouter();
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
   const [offered, setOffered] = useState(offeredJobs as unknown as Job[]);
   const [completedOpen, setCompletedOpen] = useState(false);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
+    router.refresh();
   }
 
   function removeOffered(jobId: string) {
     setOffered(prev => prev.filter(j => j.id !== jobId));
+    router.refresh();
   }
 
   const typedDrivers = drivers as unknown as Driver[];
