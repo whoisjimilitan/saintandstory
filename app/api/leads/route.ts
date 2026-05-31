@@ -25,7 +25,7 @@ async function createJob(lead: Record<string, unknown>): Promise<string | null> 
       INSERT INTO jobs (
         reference, tracking_token, customer_name, customer_email, customer_phone,
         service_type, postcode_from, postcode_to, large_items,
-        timeframe, help_loading, duration, status, lead_id
+        timeframe, help_loading, duration, address_from, address_to, status, lead_id
       ) VALUES (
         ${reference}, ${trackingToken},
         ${(lead.fullName as string) || null},
@@ -38,6 +38,8 @@ async function createJob(lead: Record<string, unknown>): Promise<string | null> 
         ${(lead.timeframe as string) || null},
         ${(lead.helpLoading as string) || null},
         ${(lead.duration as string) || null},
+        ${(lead.address_from as string) || null},
+        ${(lead.address_to as string) || null},
         'pending_review',
         ${lead.id as string}
       )
@@ -159,7 +161,7 @@ async function sendAlert(lead: Record<string, unknown>) {
 
   await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ["whoisjimi.today@gmail.com", "oyedeleagile@gmail.com"],
+    to: ["whoisjimi.today@gmail.com", "oye.van@outlook.com"],
     subject,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
@@ -212,6 +214,8 @@ export async function POST(request: NextRequest) {
     duration: body.duration ?? "",
     postcode_from: body.postcode_from ?? body.postcode ?? "",
     postcode_to: body.postcode_to ?? "",
+    address_from: body.address_from ?? "",
+    address_to: body.address_to ?? "",
     email: body.email ?? "",
     phone: body.phone ?? "",
     phoneConsent: body.phoneConsent ?? false,

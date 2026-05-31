@@ -43,6 +43,8 @@ interface Job {
   duration: string;
   help_loading: string;
   large_items: unknown;
+  address_from?: string;
+  address_to?: string;
   created_at: string;
   driver_name?: string;
   driver_phone?: string;
@@ -159,6 +161,26 @@ function JobRow({
                 <p className="text-[#0D0D0D] text-sm">{job.help_loading}</p>
               </div>
             )}
+            {job.address_from && (
+              <div className="col-span-2">
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Collection address</p>
+                <p className="text-[#0D0D0D] text-sm">{job.address_from} · {job.postcode_from}</p>
+              </div>
+            )}
+            {job.address_to && (
+              <div className="col-span-2">
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Delivery address</p>
+                <p className="text-[#0D0D0D] text-sm">{job.address_to} · {job.postcode_to}</p>
+              </div>
+            )}
+            {job.large_items != null && String(job.large_items) !== "[]" && (
+              <div className="col-span-2">
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Large items</p>
+                <p className="text-[#0D0D0D] text-sm">{
+                  (() => { try { const a = JSON.parse(String(job.large_items)); return Array.isArray(a) ? a.join(", ") : String(job.large_items); } catch { return String(job.large_items); } })()
+                }</p>
+              </div>
+            )}
           </div>
 
           {/* Price field */}
@@ -247,9 +269,10 @@ interface Props {
   pendingJobs: Record<string, unknown>[];
   offeredJobs: Record<string, unknown>[];
   drivers: Record<string, unknown>[];
+  completedJobs: Record<string, unknown>[];
 }
 
-export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props) {
+export default function AdminPanel({ pendingJobs, offeredJobs, drivers, completedJobs }: Props) {
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
 
   function removeJob(jobId: string) {
@@ -336,6 +359,52 @@ export default function AdminPanel({ pendingJobs, offeredJobs, drivers }: Props)
           <div className="space-y-2">
             {typedOffered.map(job => (
               <OfferedJobRow key={job.id} job={job} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completed jobs */}
+      {completedJobs.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+            Completed ({completedJobs.length})
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+            {completedJobs.map((job) => (
+              <div key={job.id as string} className="px-5 py-4">
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{(job.service_type as string) || "Job"}</p>
+                      <span className="text-[10px] font-mono text-[#888888]">{job.reference as string}</span>
+                    </div>
+                    <p className="text-[#888888] text-xs">
+                      {job.postcode_from as string}{job.postcode_to ? ` → ${job.postcode_to as string}` : ""}
+                      {job.driver_name ? ` · ${job.driver_name as string}` : ""}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {job.price ? (
+                      <p className="font-sans font-black text-[#0D0D0D] text-sm">£{Number(job.price).toFixed(0)}</p>
+                    ) : null}
+                    <p className="text-[#888888] text-[10px]">{timeAgo(job.updated_at as string)}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-[#888888]">
+                  {job.customer_name != null && <span><span className="text-[#0D0D0D] font-medium">{String(job.customer_name)}</span></span>}
+                  {job.customer_phone != null && <a href={`tel:${String(job.customer_phone)}`} className="text-[#0D0D0D] font-medium hover:underline">{String(job.customer_phone)}</a>}
+                  {job.customer_email != null && <a href={`mailto:${String(job.customer_email)}`} className="col-span-2 text-[#888888] hover:text-[#0D0D0D] hover:underline truncate">{String(job.customer_email)}</a>}
+                  {job.timeframe != null && <span>Timeframe: {String(job.timeframe)}</span>}
+                  {job.duration != null && <span>Duration: {String(job.duration)}</span>}
+                  {job.help_loading != null && <span>Loading help: {String(job.help_loading)}</span>}
+                  {job.large_items != null && String(job.large_items) !== "[]" && (
+                    <span className="col-span-2">Items: {
+                      (() => { try { const a = JSON.parse(String(job.large_items)); return Array.isArray(a) ? a.join(", ") : String(job.large_items); } catch { return String(job.large_items); } })()
+                    }</span>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>

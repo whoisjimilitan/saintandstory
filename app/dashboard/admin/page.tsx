@@ -29,6 +29,18 @@ async function getOfferedJobs() {
   ` as Record<string, unknown>[];
 }
 
+async function getCompletedJobs() {
+  const sql = neon(process.env.DATABASE_URL!);
+  return await sql`
+    SELECT j.*, d.full_name as driver_name
+    FROM jobs j
+    LEFT JOIN drivers d ON d.id = j.driver_id
+    WHERE j.status = 'completed'
+    ORDER BY j.updated_at DESC
+    LIMIT 30
+  ` as Record<string, unknown>[];
+}
+
 async function getActiveDrivers() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
@@ -48,10 +60,11 @@ export default async function AdminPage() {
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
   if (!ADMIN_EMAILS.includes(email) && !ADMIN_USER_IDS.includes(userId ?? "")) redirect("/dashboard/driver");
 
-  const [pendingJobs, offeredJobs, drivers] = await Promise.all([
+  const [pendingJobs, offeredJobs, drivers, completedJobs] = await Promise.all([
     getPendingJobs(),
     getOfferedJobs(),
     getActiveDrivers(),
+    getCompletedJobs(),
   ]);
 
   return (
@@ -71,6 +84,7 @@ export default async function AdminPage() {
         pendingJobs={pendingJobs}
         offeredJobs={offeredJobs}
         drivers={drivers}
+        completedJobs={completedJobs}
       />
     </div>
   );

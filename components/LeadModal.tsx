@@ -86,14 +86,30 @@ function StepPostcode({ name, answers, setAnswers, onEnter }: { name: string; an
   const placeholder = name === "postcode_from"
     ? "e.g. SW1A 2AA — where you’re moving from"
     : "e.g. E1 6RF — where you’re moving to";
+  const addressKey = name === "postcode_from" ? "address_from" : "address_to";
+  const postcode = (answers[name] as string) ?? "";
+  const postcodeValid = postcode.replace(/\s/g, "").length >= 5;
+
   return (
-    <PostcodeSearch
-      value={(answers[name] as string) ?? ""}
-      onChange={(v) => setAnswers({ ...answers, [name]: v })}
-      placeholder={placeholder}
-      autoFocus
-      onEnter={onEnter}
-    />
+    <div className="space-y-3">
+      <PostcodeSearch
+        value={postcode}
+        onChange={(v) => setAnswers({ ...answers, [name]: v })}
+        placeholder={placeholder}
+        autoFocus
+        onEnter={onEnter}
+      />
+      {postcodeValid && (
+        <input
+          type="text"
+          value={(answers[addressKey] as string) ?? ""}
+          onChange={(e) => setAnswers({ ...answers, [addressKey]: e.target.value })}
+          onKeyDown={(e) => e.key === "Enter" && onEnter()}
+          placeholder="Building name or number (optional)"
+          className={inputCls}
+        />
+      )}
+    </div>
   );
 }
 
@@ -169,7 +185,7 @@ function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswer
           type="tel"
           value={(answers.phone as string) ?? ""}
           onChange={(e) => setAnswers({ ...answers, phone: e.target.value })}
-          placeholder="+44 7700 000 000"
+          placeholder="07700 000 000"
           className={inputCls}
         />
       )}
@@ -329,7 +345,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
       const phone = (answers.phone as string) ?? "";
       if (!phone.trim()) return true;
       const digits = phone.replace(/\D/g, "");
-      return digits.length >= 10 && digits.length <= 15;
+      return digits.length >= 10 && digits.length <= 11;
     }
     if (step.type === "name") return ((answers.full_name as string) ?? "").trim().length >= 2;
     return true;
