@@ -24,6 +24,7 @@ async function saveToDb(lead: Record<string, unknown>) {
       help_loading TEXT,
       duration TEXT,
       postcode_from TEXT,
+      postcode_to TEXT,
       email TEXT,
       phone TEXT,
       phone_consent BOOLEAN,
@@ -32,10 +33,12 @@ async function saveToDb(lead: Record<string, unknown>) {
       utm JSONB
     )
   `;
+  // Safe migration: add postcode_to if this table existed before the column was introduced
+  await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS postcode_to TEXT`;
   await sql`
     INSERT INTO leads (
       id, created_at, service_type, large_items, timeframe,
-      help_loading, duration, postcode_from, email, phone,
+      help_loading, duration, postcode_from, postcode_to, email, phone,
       phone_consent, full_name, marketing_opt_in, utm
     ) VALUES (
       ${lead.id as string},
@@ -46,6 +49,7 @@ async function saveToDb(lead: Record<string, unknown>) {
       ${lead.helpLoading as string},
       ${lead.duration as string},
       ${lead.postcode_from as string},
+      ${lead.postcode_to as string},
       ${lead.email as string},
       ${lead.phone as string},
       ${lead.phoneConsent as boolean},
@@ -62,35 +66,43 @@ async function sendAlert(lead: Record<string, unknown>) {
   if (!resendKey) return;
 
   const resend = new Resend(resendKey);
-  const name = (lead.fullName as string) || (lead.email as string);
+  const name = (lead.fullName as string) || (lead.email as string) || "Unknown";
   const phone = (lead.phone as string) || "—";
   const items = Array.isArray(lead.largeItems)
     ? (lead.largeItems as string[]).join(", ") || "—"
     : "—";
-
+  const from = (lead.postcode_from as string) || "—";
+  const to = (lead.postcode_to as string) || "—";
   const isDriver = lead.is_driver === true;
-  const subjectLabel = isDriver
+
+  const subject = isDriver
     ? `New driver: ${name} — ${(lead.area as string) || "area TBC"}`
-    : `New lead: ${name} — ${(lead.serviceType as string) || "General enquiry"}`;
+    : `New lead: ${name} — ${from}${to !== "—" ? ` → ${to}` : ""}`;
 
   await resend.emails.send({
     from: "Saint & Story <onboarding@resend.dev>",
     to: ["whoisjimi.today@gmail.com", "oyedeleagile@gmail.com"],
-    subject: subjectLabel,
+    subject,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
         <div style="background:#0D0D0D;border-radius:8px;padding:20px 24px;margin-bottom:24px;">
-          <h2 style="margin:0;color:#fff;font-size:18px;font-weight:800;">New lead — Saint &amp; Story</h2>
+          <h2 style="margin:0;color:#fff;font-size:18px;font-weight:800;">${isDriver ? "New driver" : "New lead"} — Saint &amp; Story</h2>
           <p style="margin:6px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}</p>
         </div>
         <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e8e8e8;">
           <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;width:38%;text-transform:uppercase;letter-spacing:0.1em;">Name</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;font-weight:600;">${name}</td></tr>
-          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Email</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;font-size:14px;font-weight:600;"><a href="mailto:${lead.email}" style="color:#0D0D0D;">${lead.email}</a></td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Email</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;font-size:14px;font-weight:600;"><a href="mailto:${lead.email}" style="color:#0D0D0D;">${lead.email || "—"}</a></td></tr>
           <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Phone</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;font-size:14px;font-weight:600;"><a href="tel:${phone}" style="color:#0D0D0D;">${phone}</a></td></tr>
+          ${!isDriver ? `
           <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Service</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.serviceType as string) || "—"}</td></tr>
-          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Postcode</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.postcode_from as string) || "—"}</td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">From</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;font-family:monospace;letter-spacing:0.1em;">${from}</td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">To</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;font-family:monospace;letter-spacing:0.1em;">${to}</td></tr>
           <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Timeframe</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.timeframe as string) || "—"}</td></tr>
           <tr><td style="padding:12px 16px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Items</td><td style="padding:12px 16px;color:#0D0D0D;font-size:14px;">${items}</td></tr>
+          ` : `
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Area</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.area as string) || "—"}</td></tr>
+          <tr><td style="padding:12px 16px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Vehicle</td><td style="padding:12px 16px;color:#0D0D0D;font-size:14px;">${(lead.vehicle as string) || "—"}</td></tr>
+          `}
         </table>
         ${phone !== "—" ? `<a href="tel:${phone}" style="display:inline-block;margin-top:20px;background:#0D0D0D;color:#fff;font-weight:700;padding:13px 28px;border-radius:999px;text-decoration:none;font-size:14px;">Call ${name} now →</a>` : ""}
       </div>
@@ -120,16 +132,20 @@ export async function POST(request: NextRequest) {
     timeframe: body.timeframe ?? "",
     helpLoading: body.helpLoading ?? "",
     duration: body.duration ?? "",
-    postcode_from: body.postcode ?? "",
-    email: body.email,
+    postcode_from: body.postcode_from ?? body.postcode ?? "",
+    postcode_to: body.postcode_to ?? "",
+    email: body.email ?? "",
     phone: body.phone ?? "",
     phoneConsent: body.phoneConsent ?? false,
-    fullName: body.fullName ?? "",
+    fullName: body.fullName ?? body.full_name ?? "",
     marketingOptIn: body.marketingOptIn ?? false,
     utm: body.utm ?? {},
+    is_driver: isDriver,
+    area: body.area ?? "",
+    vehicle: body.vehicle ?? "",
   };
 
-  console.log("[leads] New lead:", lead.id, lead.email, lead.serviceType);
+  console.log("[leads] New lead:", lead.id, lead.email, isDriver ? "DRIVER" : lead.serviceType);
 
   await Promise.allSettled([
     saveToDb(lead),
@@ -138,8 +154,7 @@ export async function POST(request: NextRequest) {
       const pixelId = process.env.FACEBOOK_PIXEL_ID;
       const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
       if (!pixelId || !accessToken) return;
-
-      const userData: Record<string, unknown> = { em: [sha256(lead.email as string)] };
+      const userData: Record<string, unknown> = { em: [sha256((lead.email as string) || "noemail")] };
       if (lead.phone && typeof lead.phone === "string") {
         userData.ph = [sha256(lead.phone.replace(/\s+/g, ""))];
       }
@@ -170,12 +185,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) return NextResponse.json({ error: "DATABASE_URL not configured" }, { status: 503 });
+  if (!dbUrl) return NextResponse.json({ status: "no_db", count: 0 });
   try {
     const sql = neon(dbUrl);
     const rows = await sql`SELECT COUNT(*) as count FROM leads`;
-    return NextResponse.json({ count: Number(rows[0].count) });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ status: "ok", count: Number(rows[0].count) });
+  } catch {
+    // Table hasn't been created yet — fires on first POST submission
+    return NextResponse.json({ status: "ok", count: 0, note: "submit a test lead to initialise the table" });
   }
 }

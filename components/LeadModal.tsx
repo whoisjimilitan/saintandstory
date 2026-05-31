@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import posthog from "posthog-js";
+import PostcodeSearch from "./PostcodeSearch";
 
 function track(event: string, props?: Record<string, unknown>) {
   try { posthog.capture(event, props); } catch { /* */ }
@@ -27,16 +28,17 @@ const STEPS = [
     id: "s5", type: "options", q: "How long do you want the service for?",
     opts: ["Up to 2 hours", "Half Day", "All Day", "Multiple days"],
   },
-  { id: "s6", type: "input", q: "Where do you need the Man and Van Service?", placeholder: "Enter postcode or town", name: "postcode_from" },
-  { id: "s7", type: "search", q: "Searching for matches…" },
-  { id: "s8", type: "found", q: "Great! We've found you the perfect matches." },
-  { id: "s9", type: "email", q: "What email address would you like quotes sent to?", name: "email" },
-  { id: "s10", type: "phoneConsent", q: "Your number is safe with us." },
-  { id: "s11", type: "name", q: "What is your name?", placeholder: "Please tell us your name", name: "full_name" },
-  { id: "s12", type: "success", q: "We're on it." },
+  { id: "s6",  type: "postcode", q: "Where are you moving from?",       name: "postcode_from" },
+  { id: "s6b", type: "postcode", q: "And where are you moving to?",      name: "postcode_to"   },
+  { id: "s7",  type: "search",   q: "Searching for matches…"                              },
+  { id: "s8",  type: "found",    q: "Great! We’ve found your matches."                    },
+  { id: "s9",  type: "email",    q: "What email should we send your quotes to?", name: "email"  },
+  { id: "s10", type: "phoneConsent", q: "Your number is safe with us."                         },
+  { id: "s11", type: "name",     q: "What is your name?",                name: "full_name"     },
+  { id: "s12", type: "success",  q: "We’re on it."                                        },
 ] as const;
 
-const TOTAL = STEPS.length;
+const TOTAL = STEPS.length; // 13
 
 const inputCls = "w-full border border-[#E8E8E8] rounded-2xl px-4 py-3 text-sm text-[#0D0D0D] placeholder:text-[#888888] focus:outline-none focus:border-[#0D0D0D] transition-colors";
 
@@ -72,16 +74,17 @@ function StepOptions({ step, answers, setAnswers }: { step: typeof STEPS[number]
   );
 }
 
-function StepInput({ step, answers, setAnswers, onEnter }: { step: { q: string; placeholder: string; name: string }; answers: Answers; setAnswers: (a: Answers) => void; onEnter: () => void }) {
+function StepPostcode({ name, answers, setAnswers, onEnter }: { name: string; answers: Answers; setAnswers: (a: Answers) => void; onEnter: () => void }) {
+  const placeholder = name === "postcode_from"
+    ? "e.g. SW1A 2AA — where you’re moving from"
+    : "e.g. E1 6RF — where you’re moving to";
   return (
-    <input
-      type="text"
-      value={(answers[step.name] as string) ?? ""}
-      onChange={(e) => setAnswers({ ...answers, [step.name]: e.target.value })}
-      onKeyDown={(e) => e.key === "Enter" && onEnter()}
-      placeholder={step.placeholder}
-      className={inputCls}
+    <PostcodeSearch
+      value={(answers[name] as string) ?? ""}
+      onChange={(v) => setAnswers({ ...answers, [name]: v })}
+      placeholder={placeholder}
       autoFocus
+      onEnter={onEnter}
     />
   );
 }
@@ -101,7 +104,7 @@ function StepSearch({ progress }: { progress: number }) {
   );
 }
 
-function StepFound() {
+function StepFound({ from, to }: { from?: string; to?: string }) {
   return (
     <div className="py-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
@@ -112,6 +115,11 @@ function StepFound() {
           <p className="font-sans font-black text-[#0D0D0D] text-sm">Fast response · Verified drivers</p>
         </div>
       </div>
+      {from && to && (
+        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-2.5 text-center mb-5">
+          <p className="text-[#0D0D0D] text-xs font-mono tracking-widest">{from} → {to}</p>
+        </div>
+      )}
       <p className="text-[#888888] text-sm text-center">One more thing — where do we send your quotes?</p>
     </div>
   );
@@ -241,9 +249,10 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
 
   const step = STEPS[stepIdx];
 
-  const progressPct = stepIdx <= 4
-    ? Math.round(((stepIdx + 1) / 5) * 65)
-    : Math.round(65 + ((stepIdx - 4) / (TOTAL - 5)) * 35);
+  // First 7 steps (options + postcodes) = 65%, rest = 35%
+  const progressPct = stepIdx <= 6
+    ? Math.round(((stepIdx + 1) / 7) * 65)
+    : Math.round(65 + ((stepIdx - 6) / (TOTAL - 7)) * 35);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -252,6 +261,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
     return () => clearTimeout(t);
   }, [isOpen]);
 
+  // Search animation — step index 7
   useEffect(() => {
     if (step.type !== "search") return;
     setProgress(0);
@@ -288,7 +298,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
 
   function validate(): boolean {
     if (step.type === "options") return !!answers[step.id];
-    if (step.type === "input") return ((answers[(step as { name: string }).name] as string) ?? "").trim().length >= 2;
+    if (step.type === "postcode") return ((answers[(step as { name: string }).name] as string) ?? "").trim().length >= 5;
     if (step.type === "email") return /\S+@\S+\.\S+/.test((answers.email as string) ?? "");
     if (step.type === "name") return ((answers.full_name as string) ?? "").trim().length >= 2;
     return true;
@@ -327,7 +337,8 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   }, [stepIdx, answers, step]);
 
   function handleBack() {
-    if (stepIdx === 8) { setStepIdx(5); return; }
+    // From email (idx 9), skip back past search/found to destination postcode (idx 6)
+    if (stepIdx === 9) { setStepIdx(6); return; }
     if (stepIdx > 0) setStepIdx((i) => i - 1);
   }
 
@@ -392,11 +403,21 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
               {step.type === "options" && (
                 <StepOptions step={step as typeof STEPS[number] & { type: "options" }} answers={answers} setAnswers={setAnswers} />
               )}
-              {step.type === "input" && (
-                <StepInput step={step as { q: string; placeholder: string; name: string }} answers={answers} setAnswers={setAnswers} onEnter={handleNext} />
+              {step.type === "postcode" && (
+                <StepPostcode
+                  name={(step as { name: string }).name}
+                  answers={answers}
+                  setAnswers={setAnswers}
+                  onEnter={handleNext}
+                />
               )}
               {step.type === "search" && <StepSearch progress={progress} />}
-              {step.type === "found" && <StepFound />}
+              {step.type === "found" && (
+                <StepFound
+                  from={(answers.postcode_from as string) || undefined}
+                  to={(answers.postcode_to as string) || undefined}
+                />
+              )}
               {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
               {step.type === "phoneConsent" && <StepPhoneConsent answers={answers} setAnswers={setAnswers} />}
               {step.type === "name" && <StepName answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
