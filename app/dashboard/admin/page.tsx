@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
 import Link from "next/link";
 
-const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 
 async function getPendingJobs() {
   const sql = neon(process.env.DATABASE_URL!);
@@ -45,7 +45,7 @@ export default async function AdminPage() {
   if (!userId) redirect("/sign-in");
 
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (email !== ADMIN_EMAIL) redirect("/dashboard/driver");
+  if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
 
   const [pendingJobs, offeredJobs, drivers] = await Promise.all([
     getPendingJobs(),

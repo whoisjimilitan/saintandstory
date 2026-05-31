@@ -4,7 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 
 const VALID_TRANSITIONS: Record<string, string> = {
   confirmed: "in_progress",
@@ -89,7 +89,7 @@ async function notifyAdminComplete(job: Record<string, unknown>) {
   const price = job.price ? `£${Number(job.price).toFixed(0)}` : "price TBC";
   await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ADMIN_EMAIL,
+    to: ADMIN_EMAILS,
     subject: `✓ Job completed — ${job.reference as string} · ${price}`,
     html: `<p><strong>${job.driver_name as string}</strong> completed job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}) · ${price}. Rating request sent to customer.</p>`,
   });

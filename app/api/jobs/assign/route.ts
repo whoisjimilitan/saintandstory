@@ -3,7 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
-const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 const BASE_URL = "https://saintandstoryltd.co.uk";
 
 export async function POST(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const adminEmail = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (adminEmail !== ADMIN_EMAIL) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!ADMIN_EMAILS.includes(adminEmail)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { jobId, driverId, price } = await request.json();
   if (!jobId || !driverId) return NextResponse.json({ error: "jobId and driverId required" }, { status: 400 });

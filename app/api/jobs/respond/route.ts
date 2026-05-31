@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 
 // GET — driver clicks Accept/Decline link from email (no login needed)
 export async function GET(request: NextRequest) {
@@ -129,7 +129,7 @@ async function notifyAdminConfirmed(job: Record<string, unknown>) {
   const resend = new Resend(resendKey);
   await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ADMIN_EMAIL,
+    to: ADMIN_EMAILS,
     subject: `✓ Job confirmed — ${job.reference as string}`,
     html: `<p><strong>${job.driver_name as string}</strong> accepted job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}). Customer has been notified.</p>`,
   });
@@ -141,7 +141,7 @@ async function notifyAdminDeclined(job: Record<string, unknown>) {
   const resend = new Resend(resendKey);
   await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ADMIN_EMAIL,
+    to: ADMIN_EMAILS,
     subject: `⚠ Driver declined — ${job.reference as string} needs reassignment`,
     html: `<p><strong>${job.driver_name as string}</strong> declined job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}). Please reassign at <a href="${BASE_URL}/dashboard/admin">dashboard/admin</a>.</p>`,
   });

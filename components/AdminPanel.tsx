@@ -172,7 +172,10 @@ function JobRow({
               {displayDrivers.map(driver => (
                 <div key={driver.id} className="flex items-center justify-between gap-3 bg-[#F5F5F5] rounded-xl px-4 py-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                      <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                    </div>
                     <p className="text-[#888888] text-xs">
                       {driver.area} · {driver.vehicle_type}
                       {driver.rating_avg ? ` · ★ ${Number(driver.rating_avg).toFixed(1)}` : ""}

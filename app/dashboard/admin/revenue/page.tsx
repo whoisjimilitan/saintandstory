@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 const MONTHLY_RATE = 9.99;
 
 async function getRevenueData() {
@@ -56,7 +56,7 @@ export default async function RevenuePage() {
   const user = await currentUser();
   if (!userId) redirect("/sign-in");
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (email !== ADMIN_EMAIL) redirect("/dashboard/driver");
+  if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
 
   const data = await getRevenueData();
 
