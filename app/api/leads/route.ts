@@ -7,6 +7,84 @@ function sha256(str: string) {
   return createHash("sha256").update(str.toLowerCase().trim()).digest("hex");
 }
 
+function generateReference() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let ref = "SS-";
+  for (let i = 0; i < 6; i++) ref += chars[Math.floor(Math.random() * chars.length)];
+  return ref;
+}
+
+async function createJob(lead: Record<string, unknown>): Promise<string | null> {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return null;
+  const sql = neon(dbUrl);
+  const trackingToken = randomUUID();
+  const reference = generateReference();
+  try {
+    await sql`
+      INSERT INTO jobs (
+        reference, tracking_token, customer_name, customer_email, customer_phone,
+        service_type, postcode_from, postcode_to, large_items,
+        timeframe, help_loading, duration, status, lead_id
+      ) VALUES (
+        ${reference}, ${trackingToken},
+        ${(lead.fullName as string) || null},
+        ${(lead.email as string) || null},
+        ${(lead.phone as string) || null},
+        ${(lead.serviceType as string) || null},
+        ${(lead.postcode_from as string) || null},
+        ${(lead.postcode_to as string) || null},
+        ${JSON.stringify(lead.largeItems ?? [])},
+        ${(lead.timeframe as string) || null},
+        ${(lead.helpLoading as string) || null},
+        ${(lead.duration as string) || null},
+        'new',
+        ${lead.id as string}
+      )
+    `;
+    console.log("[leads] Job created:", reference, trackingToken);
+    return trackingToken;
+  } catch (err) {
+    console.error("[leads] Job creation failed:", err);
+    return null;
+  }
+}
+
+async function sendCustomerConfirmation(lead: Record<string, unknown>, trackingToken: string) {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey || !lead.email) return;
+  const resend = new Resend(resendKey);
+  const name = (lead.fullName as string)?.split(" ")[0] || "there";
+  const trackingUrl = `https://saintandstoryltd.co.uk/track/${trackingToken}`;
+  await resend.emails.send({
+    from: "Saint & Story <onboarding@resend.dev>",
+    to: lead.email as string,
+    subject: "We've got your booking request",
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;">
+        <div style="background:#0D0D0D;border-radius:12px;padding:28px 32px;margin-bottom:28px;">
+          <h1 style="margin:0;color:#fff;font-size:22px;font-weight:900;letter-spacing:-0.02em;">Saint &amp; Story</h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">Removals &amp; delivery, done properly.</p>
+        </div>
+        <p style="color:#0D0D0D;font-size:16px;font-weight:700;margin-bottom:8px;">Hi ${name},</p>
+        <p style="color:#555;font-size:14px;line-height:1.6;margin-bottom:24px;">
+          We've received your request and a driver in your area will be in touch shortly to confirm your booking.
+        </p>
+        <a href="${trackingUrl}" style="display:inline-block;background:#0D0D0D;color:#fff;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;font-size:14px;margin-bottom:24px;">
+          Track your booking →
+        </a>
+        <p style="color:#888;font-size:13px;line-height:1.6;">
+          You can check the status of your job at any time using the link above. Questions? Call us on <a href="tel:02082344444" style="color:#0D0D0D;">0208 234 4444</a>.
+        </p>
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e8e8e8;">
+          <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London</p>
+        </div>
+      </div>
+    `,
+  });
+  console.log("[leads] Customer confirmation sent to:", lead.email);
+}
+
 async function saveToDb(lead: Record<string, unknown>) {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
@@ -146,6 +224,14 @@ export async function POST(request: NextRequest) {
   };
 
   console.log("[leads] New lead:", lead.id, lead.email, isDriver ? "DRIVER" : lead.serviceType);
+
+  // For customer leads: create a job entry and email the customer their tracking link
+  if (!isDriver) {
+    const trackingToken = await createJob(lead);
+    if (trackingToken) {
+      await sendCustomerConfirmation(lead, trackingToken);
+    }
+  }
 
   await Promise.allSettled([
     saveToDb(lead),
