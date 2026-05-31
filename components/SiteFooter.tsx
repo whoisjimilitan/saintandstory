@@ -21,6 +21,11 @@ const CITIES = [
   { label: "Oxford removals", href: "/oxford-removals" },
   { label: "Cambridge removals", href: "/cambridge-removals" },
   { label: "Brighton removals", href: "/brighton-removals" },
+  { label: "Reading removals", href: "/reading-removals" },
+  { label: "Southampton removals", href: "/southampton-removals" },
+  { label: "Derby removals", href: "/derby-removals" },
+  { label: "Wolverhampton removals", href: "/wolverhampton-removals" },
+  { label: "Norwich removals", href: "/norwich-removals" },
 ];
 
 const SERVICES = [
@@ -129,9 +134,8 @@ export default function SiteFooter() {
             &copy; {new Date().getFullYear()} Saint &amp; Story Logistics Limited
           </p>
           <div className="flex gap-6 text-xs text-[#888888]">
-            <Link href="#" className="hover:text-[#0D0D0D] transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-[#0D0D0D] transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-[#0D0D0D] transition-colors">Cookies</Link>
+            <Link href="/contact" className="hover:text-[#0D0D0D] transition-colors">Contact us</Link>
+            <a href="mailto:hello@saintandstoryltd.co.uk" className="hover:text-[#0D0D0D] transition-colors">hello@saintandstoryltd.co.uk</a>
           </div>
         </div>
       </div>
