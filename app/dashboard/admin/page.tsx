@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
-import Link from "next/link";
+import IndexNowButton from "@/components/IndexNowButton";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
 
@@ -63,14 +63,7 @@ export default async function AdminPage() {
         <p className="text-[#888888] text-sm">
           {pendingJobs.length} pending · {offeredJobs.length} awaiting driver response
         </p>
-        <div className="flex items-center gap-4">
-          <Link href="/api/indexnow" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
-            Index →
-          </Link>
-          <Link href="/dashboard/admin/revenue" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
-            Revenue →
-          </Link>
-        </div>
+        <IndexNowButton />
       </div>
 
       <AdminPanel
