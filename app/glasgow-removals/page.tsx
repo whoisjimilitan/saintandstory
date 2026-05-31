@@ -1,0 +1,54 @@
+import type { Metadata } from "next";
+import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/CityLandingPage";
+
+const data: CityPageData = {
+  city: "Glasgow",
+  headline: "Glasg<span class=\"font-display italic font-normal\">o</span>w rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />N<span class=\"font-display italic font-normal\">o</span> fuss.<br />Fixed price.",
+  sub: "Post your Glasgow removal job in 60 seconds. Verified driver matched by our team. Fixed price from the first call.",
+  stats: [
+    { stat: "4.9★", label: "Verified reviews" },
+    { stat: "< 60s", label: "Response time" },
+    { stat: "Fixed", label: "Price. Always." },
+    { stat: "G1–G78", label: "All postcodes" },
+  ],
+  steps: [
+    { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+    { num: "02", title: "We find your driver", desc: "Verified Glasgow driver, matched and confirmed by our team." },
+    { num: "03", title: "Confirm your price", desc: "Fixed on the call before anything moves." },
+    { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },
+  ],
+  testimonials: [
+    {
+      initials: "FD",
+      name: "Fiona D.",
+      location: "West End → Southside",
+      quote: "Tenement flat, third floor, no lift. Driver and assistant handled it without a word of complaint. Everything arrived intact. Outstanding.",
+    },
+    {
+      initials: "KM",
+      name: "Kieran M.",
+      location: "Merchant City → Partick",
+      quote: "Fixed price confirmed on the call. Exactly that paid at the end. First time I've felt genuinely confident booking a removal.",
+    },
+    {
+      initials: "IG",
+      name: "Isla G.",
+      location: "Shawlands → Bearsden",
+      quote: "Brilliant from start to finish. Posted Sunday afternoon, driver confirmed Sunday evening for Monday morning. Seamless.",
+    },
+  ],
+  faq: [
+    { q: "Do you cover all Glasgow postcodes?", a: "Yes — all G postcodes including Paisley, Rutherglen, and the surrounding area. 7 days a week, 7am to 10pm." },
+    { q: "Can you handle tenement flats?", a: "Yes — tenements are something we deal with every day in Glasgow. Narrow stairs and high floors are no extra charge." },
+    { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on move day without your approval." },
+    { q: "Can you move the same day?", a: "Yes — same-day is available most days. Post before 10am for best availability." },
+    { q: "Are your drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers before being assigned any job." },
+  ],
+  source: "glasgow_removals",
+};
+
+export const metadata: Metadata = buildMetadata(data);
+
+export default function GlasgowRemovals() {
+  return <CityLandingPage data={data} />;
+}

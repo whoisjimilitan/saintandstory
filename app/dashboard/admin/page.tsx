@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
+import Link from "next/link";
 
 const ADMIN_EMAIL = "whoisjimi.today@gmail.com";
 
@@ -58,9 +59,14 @@ export default async function AdminPage() {
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         Incoming jobs.
       </h1>
-      <p className="text-[#888888] text-sm mb-8">
-        {pendingJobs.length} pending · {offeredJobs.length} awaiting driver response
-      </p>
+      <div className="flex items-center justify-between mb-8">
+        <p className="text-[#888888] text-sm">
+          {pendingJobs.length} pending · {offeredJobs.length} awaiting driver response
+        </p>
+        <Link href="/dashboard/admin/revenue" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors">
+          Revenue →
+        </Link>
+      </div>
 
       <AdminPanel
         pendingJobs={pendingJobs}

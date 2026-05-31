@@ -22,12 +22,16 @@ function JobCard({
   job,
   onAccept,
   onDecline,
+  onUpdateStatus,
   responding,
+  updating,
 }: {
   job: Record<string, unknown>;
   onAccept?: () => void;
   onDecline?: () => void;
+  onUpdateStatus?: (newStatus: string) => void;
   responding?: boolean;
+  updating?: boolean;
 }) {
   const status = (job.status as string) ?? "offered";
   const isOffered = status === "offered";
@@ -103,6 +107,30 @@ function JobCard({
           </button>
         </div>
       )}
+
+      {status === "confirmed" && onUpdateStatus && (
+        <div className="border-t border-[#E8E8E8] pt-4">
+          <button
+            onClick={() => onUpdateStatus("in_progress")}
+            disabled={updating}
+            className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
+          >
+            {updating ? "Updating…" : "Start job →"}
+          </button>
+        </div>
+      )}
+
+      {status === "in_progress" && onUpdateStatus && (
+        <div className="border-t border-[#E8E8E8] pt-4">
+          <button
+            onClick={() => onUpdateStatus("completed")}
+            disabled={updating}
+            className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
+          >
+            {updating ? "Completing…" : "Mark as complete →"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -122,12 +150,30 @@ export default function JobsFeed({ driverId, myJobs }: Props) {
   const [tab, setTab] = useState<Tab>(defaultTab);
   const [jobs, setJobs] = useState(myJobs);
   const [responding, setResponding] = useState<string | null>(null);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   const tabJobs = {
     offered: jobs.filter(j => j.status === "offered"),
     active: jobs.filter(j => ["confirmed", "in_progress"].includes(j.status as string)),
     done: jobs.filter(j => ["completed", "cancelled"].includes(j.status as string)),
   };
+
+  async function updateStatus(jobId: string, newStatus: string) {
+    setUpdating(jobId);
+    try {
+      await fetch("/api/jobs/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId, newStatus }),
+      });
+      setJobs(prev =>
+        prev.map(j => j.id === jobId ? { ...j, status: newStatus } : j)
+      );
+      if (newStatus === "completed") setTab("done");
+    } finally {
+      setUpdating(null);
+    }
+  }
 
   async function respond(jobId: string, action: "accept" | "decline") {
     if (!driverId) return;
@@ -199,7 +245,9 @@ export default function JobsFeed({ driverId, myJobs }: Props) {
             job={job}
             onAccept={tab === "offered" ? () => respond(job.id as string, "accept") : undefined}
             onDecline={tab === "offered" ? () => respond(job.id as string, "decline") : undefined}
-            responding={responding === job.id as string}
+            onUpdateStatus={tab === "active" ? (s) => updateStatus(job.id as string, s) : undefined}
+            responding={responding === (job.id as string)}
+            updating={updating === (job.id as string)}
           />
         ))}
       </div>

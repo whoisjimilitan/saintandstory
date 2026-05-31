@@ -86,9 +86,23 @@ export default async function EarningsPage() {
       </div>
 
       {/* All time */}
-      <div className="bg-white border border-[#E8E8E8] rounded-2xl px-5 py-4 flex items-center justify-between mb-8">
+      <div className="bg-white border border-[#E8E8E8] rounded-2xl px-5 py-4 flex items-center justify-between mb-4">
         <p className="text-[#888888] text-sm">All time</p>
         <p className="font-sans font-black text-[#0D0D0D] text-xl tracking-tight">£{allTime.toFixed(0)}</p>
+      </div>
+
+      {/* Subscription management */}
+      <div className="bg-white border border-[#E8E8E8] rounded-2xl px-5 py-4 flex items-center justify-between mb-8">
+        <div>
+          <p className="font-sans font-semibold text-[#0D0D0D] text-sm">Founding rate</p>
+          <p className="text-[#888888] text-xs mt-0.5">£9.99/month · locked forever</p>
+        </div>
+        <a
+          href="/api/stripe/portal"
+          className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.12em] transition-colors"
+        >
+          Manage →
+        </a>
       </div>
 
       {/* Monthly breakdown */}

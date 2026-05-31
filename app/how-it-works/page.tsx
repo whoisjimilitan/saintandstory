@@ -1,0 +1,170 @@
+import type { Metadata } from "next";
+import Nav from "@/components/Nav";
+import ModalCTA from "@/components/ModalCTA";
+import SiteFooter from "@/components/SiteFooter";
+import MobileBar from "@/components/MobileBar";
+
+export const metadata: Metadata = {
+  title: "How It Works | Saint & Story Logistics",
+  description: "Post your job in 60 seconds. We match you to a verified driver. Fixed price confirmed before anything moves. Here's exactly how it works.",
+};
+
+const CUSTOMER_STEPS = [
+  {
+    num: "01",
+    title: "Post your job",
+    desc: "Tell us what's moving, where from, where to, and when. Takes 60 seconds. No account needed. Free to post.",
+    detail: "We ask for the basics — collection postcode, delivery postcode, type of move, and preferred date. That's it. You don't create an account and you don't pay anything to post.",
+  },
+  {
+    num: "02",
+    title: "We call within 60 seconds",
+    desc: "Our team calls you back with a fixed price and a verified driver already matched.",
+    detail: "We don't send you a list of quotes to compare. We call, confirm the details, and give you one fixed price. The driver has already been selected and briefed before we hang up.",
+  },
+  {
+    num: "03",
+    title: "Fixed price confirmed",
+    desc: "The price on the call is the price you pay. Nothing is added on the day.",
+    detail: "No estimates, no ranges, no 'subject to access'. Your price is locked the moment we confirm it. If anything changes on your side, we discuss it before — never after — the move.",
+  },
+  {
+    num: "04",
+    title: "Move day",
+    desc: "Your driver arrives on time. Professional, insured, briefed. Done properly.",
+    detail: "You receive a confirmation with your driver's name and the job reference. Track your job in real time. If anything comes up, you have a direct line to us.",
+  },
+  {
+    num: "05",
+    title: "Done. Rate your driver.",
+    desc: "Once your job is marked complete, you receive a link to rate your driver.",
+    detail: "Ratings keep our drivers accountable and our standards high. Every driver on the platform is rated by real customers — visible to us before every assignment.",
+  },
+];
+
+const GUARANTEES = [
+  {
+    title: "Fixed price. Always.",
+    desc: "The price confirmed on the call is the price you pay. We have never added a charge after confirmation without prior customer approval.",
+  },
+  {
+    title: "Verified drivers only.",
+    desc: "Every driver is background-checked, insured, and rated by real customers before being assigned to any job. No exceptions.",
+  },
+  {
+    title: "Response in 60 seconds.",
+    desc: "Post your job and our team calls within 60 seconds — Mon to Sun, 7am to 10pm.",
+  },
+  {
+    title: "Full insurance.",
+    desc: "Every move is fully insured in transit and during loading and unloading. We handle any damage claim directly.",
+  },
+];
+
+const FAQS = [
+  { q: "Do I need to create an account?", a: "No. You can post a job and receive a confirmation without creating an account. Everything is handled by our team directly." },
+  { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing — then confirm availability before calling you back. You don't browse or choose from a list." },
+  { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
+  { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply — confirmed when you book." },
+  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time — from matched driver through to completed." },
+  { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Post your job — if we can't cover it, we'll tell you immediately." },
+];
+
+export default function HowItWorks() {
+  return (
+    <main className="pb-20 md:pb-0">
+      <Nav />
+
+      <section className="bg-white pt-16 min-h-[60vh] flex items-center border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto px-6 py-20 w-full">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
+            The process
+          </p>
+          <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
+            H<span className="font-display italic font-normal">o</span>w it
+            <br />w<span className="font-display italic font-normal">o</span>rks.
+          </h1>
+          <p className="text-[#888888] text-base max-w-sm">
+            Post in 60 seconds. Fixed price confirmed on the call. Verified driver. Done properly.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-3xl mx-auto">
+          <div className="space-y-0">
+            {CUSTOMER_STEPS.map((s, i) => (
+              <div key={s.num} className={`flex gap-8 pb-12 ${i < CUSTOMER_STEPS.length - 1 ? "border-l border-[#E8E8E8] ml-4 pl-10 relative" : "ml-4 pl-10 relative"}`}>
+                <div className="absolute -left-4 top-0 w-8 h-8 rounded-full bg-[#0D0D0D] flex items-center justify-center shrink-0">
+                  <span className="text-white text-[10px] font-bold">{s.num}</span>
+                </div>
+                <div className="pt-0.5 w-full">
+                  <h3 className="font-sans font-bold text-[#0D0D0D] text-base mb-1">{s.title}</h3>
+                  <p className="text-[#0D0D0D] text-sm font-medium mb-3">{s.desc}</p>
+                  <p className="text-[#888888] text-sm leading-relaxed">{s.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#F5F5F5] py-24 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-14">
+            Our guarantees.
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {GUARANTEES.map((g) => (
+              <div key={g.title} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
+                <h3 className="font-sans font-bold text-[#0D0D0D] text-base mb-2">{g.title}</h3>
+                <p className="text-[#888888] text-sm leading-relaxed">{g.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 px-6 border-t border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16">
+          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
+            Questi<span className="font-display italic font-normal">o</span>ns.
+          </h2>
+          <div className="divide-y divide-[#E8E8E8]">
+            {FAQS.map(({ q, a }) => (
+              <details key={q} className="group py-5">
+                <summary className="flex items-start justify-between cursor-pointer list-none gap-6">
+                  <span className="font-medium text-[#0D0D0D] text-sm leading-snug">{q}</span>
+                  <span className="shrink-0 text-[#888888] text-xl leading-none mt-0.5 transition-transform duration-200 group-open:rotate-45">+</span>
+                </summary>
+                <p className="text-[#888888] text-sm leading-relaxed pt-3">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#0D0D0D] py-24 px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <h2 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight">
+            Ready t<span className="font-display italic font-normal">o</span>
+            <br />get started?
+          </h2>
+          <div>
+            <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
+              Post your job in 60 seconds. Fixed price on the call.
+            </p>
+            <ModalCTA
+              label="Post a job — it's free →"
+              source="how_it_works_cta"
+              className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+            />
+          </div>
+        </div>
+      </section>
+
+      <SiteFooter />
+      <MobileBar />
+    </main>
+  );
+}
