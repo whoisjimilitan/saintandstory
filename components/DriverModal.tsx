@@ -195,24 +195,43 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
             </div>
           </div>
         ) : isSuccess ? (
-          <div className="px-8 py-14 text-center flex-1">
-            <div className="w-10 h-10 rounded-full border border-[#E8E8E8] flex items-center justify-center mx-auto mb-8">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#0D0D0D]" />
-            </div>
-            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Request received</p>
-            <h2 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-4">
+          <div className="px-8 py-10 flex-1">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-6">Registration received</p>
+            <h2 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-6">
               Y<span className="font-display italic font-normal">o</span>u&apos;re
               <br />registered.
             </h2>
-            <p className="text-[#888888] text-sm leading-relaxed mb-8 max-w-xs mx-auto">
-              We&apos;ll get your profile live and your first bookings coming in.
+            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 space-y-3 mb-5">
+              {answers.phone ? (
+                <div>
+                  <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">We&apos;ll call you on</p>
+                  <p className="font-sans font-black text-[#0D0D0D] text-base">{answers.phone as string}</p>
+                </div>
+              ) : null}
+              {answers.area ? (
+                <div className={answers.phone ? "border-t border-[#E8E8E8] pt-3" : ""}>
+                  <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Covering</p>
+                  <p className="font-sans font-black text-[#0D0D0D] text-base">{answers.area as string}</p>
+                </div>
+              ) : null}
+            </div>
+            <p className="text-[#888888] text-sm leading-relaxed mb-6">
+              {answers.phone
+                ? `We'll call you within 30 minutes to get your profile live and your first bookings lined up.`
+                : `We'll be in touch shortly to get your profile live and your first bookings lined up.`}
             </p>
             <button
               onClick={onClose}
-              className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-8 py-3.5 rounded-full text-sm transition-colors"
+              className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded-full text-sm transition-colors"
             >
               Done →
             </button>
+            <p className="text-[#888888] text-xs text-center mt-4">
+              Need us sooner?{" "}
+              <a href="tel:+442082344444" className="text-[#0D0D0D] font-semibold hover:underline underline-offset-2">
+                0208 234 4444
+              </a>
+            </p>
           </div>
         ) : (
           <>

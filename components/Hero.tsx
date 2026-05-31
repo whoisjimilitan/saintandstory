@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ModalCTA from "./ModalCTA";
+import DriverModalCTA from "./DriverModalCTA";
 import HeroPlatformUI from "./HeroPlatformUI";
 
 type Side = "customer" | "driver";
@@ -103,11 +104,19 @@ export default function Hero() {
             <p className={`text-base mb-10 transition-colors duration-500 ${st.sub}`}>{c.sub}</p>
 
             <div className="flex flex-wrap gap-3">
-              <ModalCTA
-                label={c.cta}
-                source={c.source}
-                className={`font-semibold px-7 py-3.5 rounded-full text-sm transition-colors duration-300 ${st.primaryCta}`}
-              />
+              {side === "driver" ? (
+                <DriverModalCTA
+                  label={c.cta}
+                  source={c.source}
+                  className={`font-semibold px-7 py-3.5 rounded-full text-sm transition-colors duration-300 ${st.primaryCta}`}
+                />
+              ) : (
+                <ModalCTA
+                  label={c.cta}
+                  source={c.source}
+                  className={`font-semibold px-7 py-3.5 rounded-full text-sm transition-colors duration-300 ${st.primaryCta}`}
+                />
+              )}
               <a
                 href="#how"
                 className={`font-semibold px-7 py-3.5 rounded-full text-sm transition-colors duration-300 ${st.secondaryCta}`}

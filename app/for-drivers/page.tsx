@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import MobileBar from "@/components/MobileBar";
-import ModalCTA from "@/components/ModalCTA";
+import DriverModalCTA from "@/components/DriverModalCTA";
 import DriverCount from "@/components/DriverCount";
 
 export const metadata: Metadata = {
@@ -71,7 +71,7 @@ export default function ForDriversPage() {
             Post your availability. Customers find you. <DriverCount /> drivers already earning.
           </p>
           <div className="flex flex-wrap gap-3">
-            <ModalCTA
+            <DriverModalCTA
               label="List your availability →"
               source="for_drivers_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
@@ -176,7 +176,7 @@ export default function ForDriversPage() {
               <div key={r.name} className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-6">
                 <p className="text-[#0D0D0D] text-sm leading-relaxed mb-6">&ldquo;{r.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 border-t border-[#E8E8E8] pt-5">
-                  <div className="w-8 h-8 rounded-full bg-[#4A6741] flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#0D0D0D] flex items-center justify-center shrink-0">
                     <span className="text-white text-[10px] font-bold">{r.initials}</span>
                   </div>
                   <div>
@@ -205,7 +205,7 @@ export default function ForDriversPage() {
               <br />
               Keep everything y<span className="font-display italic font-normal">o</span>u earn.
             </p>
-            <ModalCTA
+            <DriverModalCTA
               label="List your availability →"
               source="for_drivers_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
