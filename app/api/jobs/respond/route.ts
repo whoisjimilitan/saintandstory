@@ -97,7 +97,7 @@ async function notifyCustomerConfirmed(job: Record<string, unknown>) {
   const trackingUrl = `${BASE_URL}/track/${job.tracking_token as string}`;
 
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: job.customer_email as string,
     subject: "Your driver is confirmed",
     html: `
@@ -128,7 +128,7 @@ async function notifyAdminConfirmed(job: Record<string, unknown>) {
   if (!resendKey) return;
   const resend = new Resend(resendKey);
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: ADMIN_EMAIL,
     subject: `✓ Job confirmed — ${job.reference as string}`,
     html: `<p><strong>${job.driver_name as string}</strong> accepted job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}). Customer has been notified.</p>`,
@@ -140,7 +140,7 @@ async function notifyAdminDeclined(job: Record<string, unknown>) {
   if (!resendKey) return;
   const resend = new Resend(resendKey);
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: ADMIN_EMAIL,
     subject: `⚠ Driver declined — ${job.reference as string} needs reassignment`,
     html: `<p><strong>${job.driver_name as string}</strong> declined job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}). Please reassign at <a href="${BASE_URL}/dashboard/admin">dashboard/admin</a>.</p>`,

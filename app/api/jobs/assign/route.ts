@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const priceDisplay = price ? `£${Number(price).toFixed(0)}` : "Price TBC";
 
     await resend.emails.send({
-      from: "Saint & Story <onboarding@resend.dev>",
+      from: "Saint & Story <hello@saintandstoryltd.co.uk>",
       to: driver.email as string,
       subject: `New job offered — ${job.postcode_from}${job.postcode_to ? ` → ${job.postcode_to}` : ""}`,
       html: `

@@ -57,7 +57,7 @@ async function sendCustomerConfirmation(lead: Record<string, unknown>, trackingT
   const name = (lead.fullName as string)?.split(" ")[0] || "there";
   const trackingUrl = `https://saintandstoryltd.co.uk/track/${trackingToken}`;
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: lead.email as string,
     subject: "We've got your booking request",
     html: `
@@ -158,7 +158,7 @@ async function sendAlert(lead: Record<string, unknown>) {
     : `New lead: ${name} — ${from}${to !== "—" ? ` → ${to}` : ""}`;
 
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: ["whoisjimi.today@gmail.com", "oyedeleagile@gmail.com"],
     subject,
     html: `

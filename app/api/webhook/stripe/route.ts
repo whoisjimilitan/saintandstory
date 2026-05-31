@@ -32,7 +32,7 @@ async function sendActivationEmail(email: string, name: string) {
   if (!resendKey) return;
   const resend = new Resend(resendKey);
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: [email],
     subject: "Your driver profile is live — set your availability",
     html: `

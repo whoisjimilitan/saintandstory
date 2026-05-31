@@ -19,7 +19,7 @@ async function notifyCustomerEnRoute(job: Record<string, unknown>) {
   const driverName = (job.driver_name as string) || "Your driver";
 
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: job.customer_email as string,
     subject: `${driverName} is on the way`,
     html: `
@@ -50,7 +50,7 @@ async function notifyCustomerComplete(job: Record<string, unknown>) {
   const ratingUrl = `${BASE_URL}/rate/${job.tracking_token as string}`;
 
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: job.customer_email as string,
     subject: "Job complete — how did it go?",
     html: `
@@ -88,7 +88,7 @@ async function notifyAdminComplete(job: Record<string, unknown>) {
   const resend = new Resend(resendKey);
   const price = job.price ? `£${Number(job.price).toFixed(0)}` : "price TBC";
   await resend.emails.send({
-    from: "Saint & Story <onboarding@resend.dev>",
+    from: "Saint & Story <hello@saintandstoryltd.co.uk>",
     to: ADMIN_EMAIL,
     subject: `✓ Job completed — ${job.reference as string} · ${price}`,
     html: `<p><strong>${job.driver_name as string}</strong> completed job <strong>${job.reference as string}</strong> (${job.postcode_from as string}${job.postcode_to ? ` → ${job.postcode_to as string}` : ""}) · ${price}. Rating request sent to customer.</p>`,
