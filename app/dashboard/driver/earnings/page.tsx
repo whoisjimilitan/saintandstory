@@ -79,8 +79,10 @@ export default async function EarningsPage() {
           </div>
         </div>
         <div className="border-t border-white/15 pt-4">
-          {roi > 0 && (
+          {roi > 0 ? (
             <p className="font-sans font-black text-white tracking-tight">{roi}× your monthly fee.</p>
+          ) : (
+            <p className="text-white/50 text-sm">Complete 1 job to cover your £9.99 this month.</p>
           )}
         </div>
       </div>
