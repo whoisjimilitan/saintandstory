@@ -4,7 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
 
 const VALID_TRANSITIONS: Record<string, string> = {
   confirmed: "in_progress",

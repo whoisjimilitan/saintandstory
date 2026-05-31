@@ -3,7 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
 const INDEXNOW_KEY = "ss2025indexnow";
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
 
 const ALL_URLS = [
   "/",

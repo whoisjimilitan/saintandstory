@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
 
 async function getPendingJobs() {
   const sql = neon(process.env.DATABASE_URL!);

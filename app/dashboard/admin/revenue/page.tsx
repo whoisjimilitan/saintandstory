@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju@gmail.com"];
+const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oyedeleoyepeju2014@gmail.com"];
 const MONTHLY_RATE = 9.99;
 
 async function getRevenueData() {
