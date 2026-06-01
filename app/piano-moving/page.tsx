@@ -17,7 +17,7 @@ const STATS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Post your job", desc: "Piano type, both addresses, access details, preferred date. 60 seconds." },
+  { num: "01", title: "Tell us about your piano.", desc: "Type, both addresses, access details, preferred date. 60 seconds." },
   { num: "02", title: "Specialist team assigned", desc: "We call within 15 minutes. Fixed price confirmed. Piano-trained team briefed." },
   { num: "03", title: "Move day", desc: "Padding, specialist straps, board runners. Your piano protected at every stage." },
   { num: "04", title: "Placed and done", desc: "In the exact position you want. Checked, confirmed, nothing left to chance." },

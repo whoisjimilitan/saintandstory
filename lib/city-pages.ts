@@ -1,7 +1,7 @@
 import type { CityPageData } from "@/components/CityLandingPage";
 
 const STEPS = [
-  { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+  { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
   { num: "02", title: "We find your driver", desc: "Verified local driver, matched and confirmed by our team." },
   { num: "03", title: "Confirm your price", desc: "Fixed on the call before anything moves." },
   { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },

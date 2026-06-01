@@ -51,9 +51,7 @@ async function getCompletedJobs() {
 async function getConfirmedJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
-      j.driver_eta_minutes, j.location_sharing_since,
-      j.confirmed_at, j.in_progress_at, j.completed_at
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'confirmed'
@@ -64,9 +62,7 @@ async function getConfirmedJobs() {
 async function getInProgressJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
-      j.driver_eta_minutes, j.location_sharing_since,
-      j.confirmed_at, j.in_progress_at, j.completed_at
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'in_progress'
@@ -85,17 +81,11 @@ async function getActiveDrivers() {
           AND j.status IN ('confirmed', 'in_progress', 'completed')
           AND j.offered_at IS NOT NULL
       ) as avg_response_mins,
-      aj.reference as current_job_ref,
-      aj.postcode_from as current_job_from,
-      aj.postcode_to as current_job_to,
-      aj.status as current_job_status
+      (SELECT reference FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_ref,
+      (SELECT postcode_from FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_from,
+      (SELECT postcode_to FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_to,
+      (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status
     FROM drivers d
-    LEFT JOIN LATERAL (
-      SELECT reference, postcode_from, postcode_to, status
-      FROM jobs j2
-      WHERE j2.driver_id = d.id AND j2.status IN ('confirmed', 'in_progress')
-      LIMIT 1
-    ) aj ON true
     WHERE d.profile_live = true
     ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
   ` as Record<string, unknown>[];

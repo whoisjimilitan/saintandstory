@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 const CUSTOMER_STEPS = [
   {
     num: "01",
-    title: "Post your job",
-    desc: "Tell us what's moving, where from, where to, and when. Takes 60 seconds. No account needed. Free to post.",
+    title: "Tell us what's moving.",
+    desc: "Where from, where to, and when. Takes 60 seconds. No account needed.",
     detail: "We ask for the basics: collection postcode, delivery postcode, type of move, and preferred date. That's it. No account needed.",
   },
   {

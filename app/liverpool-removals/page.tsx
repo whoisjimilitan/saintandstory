@@ -12,7 +12,7 @@ const data: CityPageData = {
     { stat: "L1–L40", label: "All postcodes" },
   ],
   steps: [
-    { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+    { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
     { num: "02", title: "We find your driver", desc: "Verified Liverpool driver selected and briefed by our team." },
     { num: "03", title: "Confirm your price", desc: "Fixed on the call. Locked before anything moves." },
     { num: "04", title: "Move day", desc: "Professional, punctual, properly done." },

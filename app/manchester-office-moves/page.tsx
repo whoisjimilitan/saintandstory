@@ -15,7 +15,7 @@ const STATS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Post your job", desc: "Tell us the office size, both postcodes, and your preferred date. Takes 60 seconds." },
+  { num: "01", title: "Tell us about your office.", desc: "Size, both postcodes, and your preferred date. Takes 60 seconds." },
   { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked. Team assigned." },
   { num: "03", title: "Monday, fully operational", desc: "We move everything over the weekend. Your team walks in ready." },
 ];

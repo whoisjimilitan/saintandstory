@@ -19,8 +19,7 @@ async function getJob(token: string) {
   if (!process.env.DATABASE_URL) return null;
   const sql = neon(process.env.DATABASE_URL);
   const rows = await sql`
-    SELECT j.*, d.full_name as driver_name, d.vehicle_type, d.rating_avg,
-      j.driver_eta_minutes, j.location_sharing_since
+    SELECT j.*, d.full_name as driver_name, d.vehicle_type, d.rating_avg
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.tracking_token = ${token}

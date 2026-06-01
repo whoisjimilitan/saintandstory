@@ -10,15 +10,15 @@ export const metadata: Metadata = {
 };
 
 const STATS = [
-  { stat: "£68", label: "Avg. daily earnings" },
+  { stat: "£150", label: "Avg. day" },
   { stat: "4–5", label: "Bookings per week" },
-  { stat: "£9.99", label: "Monthly fee — all in" },
+  { stat: "£9.99", label: "Monthly fee, all in" },
   { stat: "100%", label: "Yours to keep" },
 ];
 
 const STEPS = [
   { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Live in minutes." },
-  { num: "02", title: "Post your availability", desc: "Tell the platform when you're free in London. Customers see you." },
+  { num: "02", title: "Post your availability", desc: "Tell us when you're free in London. Customers see you." },
   { num: "03", title: "Get booked and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
   { num: "04", title: "Get paid", desc: "Daily, direct to your account. No cuts, no delays." },
 ];
@@ -210,7 +210,7 @@ export default function LondonDrivers() {
           </p>
           <div className="h-px md:h-12 w-full md:w-px bg-white/10" />
           <p className="text-white/60 text-sm max-w-xs">
-            Pay £9.99. Earn £68 on day one. You&apos;re in profit before lunch.
+            Pay £9.99. Earn £150 on day one. You&apos;re in profit before lunch.
           </p>
         </div>
       </section>

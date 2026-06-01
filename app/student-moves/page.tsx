@@ -17,7 +17,7 @@ const STATS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Post your job", desc: "Tell us the pickup, drop-off, and date. 60 seconds. Free." },
+  { num: "01", title: "Tell us what's moving.", desc: "Pickup, drop-off, and date. 60 seconds. Free." },
   { num: "02", title: "We match your driver", desc: "Verified driver confirmed. Fixed price locked. No nasty surprises." },
   { num: "03", title: "Pack your stuff", desc: "We handle the heavy lifting. You handle the boxes." },
   { num: "04", title: "Moved", desc: "New place, zero stress. Done properly." },

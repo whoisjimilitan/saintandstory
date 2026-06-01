@@ -12,7 +12,7 @@ const data: CityPageData = {
     { stat: "B1–B45", label: "All postcodes" },
   ],
   steps: [
-    { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+    { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
     { num: "02", title: "We find your driver", desc: "Verified Birmingham driver, matched and confirmed by our team." },
     { num: "03", title: "Confirm your price", desc: "Fixed. Locked before anything moves. No surprises." },
     { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },

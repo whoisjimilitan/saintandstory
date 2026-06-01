@@ -12,7 +12,7 @@ const data: CityPageData = {
     { stat: "BS1–BS41", label: "All postcodes" },
   ],
   steps: [
-    { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
+    { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
     { num: "02", title: "We find your driver", desc: "Verified Bristol driver, matched, confirmed, and briefed by us." },
     { num: "03", title: "Confirm your price", desc: "Fixed before anything moves. No surprises on move day." },
     { num: "04", title: "Move day", desc: "Professional, on time, done properly." },
