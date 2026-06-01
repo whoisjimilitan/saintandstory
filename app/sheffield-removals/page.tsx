@@ -4,7 +4,7 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Sheffield",
   headline: "Sheffield rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed.<br />Fuss-free.",
-  sub: "Post your Sheffield removal in 60 seconds. We match you to a verified local driver. Fixed price, no surprises.",
+  sub: "Tell us about your Sheffield removal. We match you to a verified local driver. Fixed price, no surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },

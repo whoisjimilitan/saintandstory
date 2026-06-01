@@ -58,7 +58,7 @@ const FAQS = [
   { q: "How do you handle IT equipment?", a: "We treat IT as specialist cargo: wrapped, boxed, and tracked. We work with your IT team to ensure correct labelling and placement at the new site." },
   { q: "Is the price fixed?", a: "Always. Confirmed on the call before anything moves. No additions without your approval." },
   { q: "How large a move can you handle?", a: "From single-person offices to 50+ desk corporate relocations. We scale the team and vehicles to match your requirement." },
-  { q: "Which cities do you cover for office moves?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow and growing. Post your job and we'll confirm availability for your location." },
+  { q: "Which cities do you cover for office moves?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow and growing. Tell us about your move and we'll confirm availability for your location." },
 ];
 
 export default function OfficeMoves() {

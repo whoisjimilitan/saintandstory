@@ -12,7 +12,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "nottingham-removals",
     city: "Nottingham",
     headline: "N<span class=\"font-display italic font-normal\">o</span>ttingh<span class=\"font-display italic font-normal\">a</span>m rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Nottingham removal in 60 seconds. Verified driver matched and confirmed by our team.",
+    sub: "Tell us about your Nottingham removal. Verified driver matched and confirmed by our team.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -38,7 +38,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "coventry-removals",
     city: "Coventry",
     headline: "C<span class=\"font-display italic font-normal\">o</span>ventry rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />N<span class=\"font-display italic font-normal\">o</span> surprises.",
-    sub: "Post your Coventry removal job in 60 seconds. Fixed price confirmed on the call. Verified driver every time.",
+    sub: "Tell us about your Coventry removal. Fixed price confirmed on the call. Verified driver every time.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -64,7 +64,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "leicester-removals",
     city: "Leicester",
     headline: "Le<span class=\"font-display italic font-normal\">i</span>cester rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />D<span class=\"font-display italic font-normal\">o</span>ne pr<span class=\"font-display italic font-normal\">o</span>perly.",
-    sub: "Post your Leicester removal in 60 seconds. Verified driver. Fixed price. No guesswork.",
+    sub: "Tell us about your Leicester removal. Verified driver. Fixed price. No guesswork.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -90,7 +90,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "edinburgh-removals",
     city: "Edinburgh",
     headline: "Edinb<span class=\"font-display italic font-normal\">u</span>rgh rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed. Fuss-free.",
-    sub: "Post your Edinburgh removal in 60 seconds. Verified driver matched by our team. Fixed price from the first call.",
+    sub: "Tell us about your Edinburgh removal. Verified driver matched by our team. Fixed price from the first call.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -116,7 +116,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "cardiff-removals",
     city: "Cardiff",
     headline: "C<span class=\"font-display italic font-normal\">a</span>rdiff rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Cardiff removal in 60 seconds. Verified driver confirmed by our team. Fixed price guaranteed.",
+    sub: "Tell us about your Cardiff removal. Verified driver confirmed by our team. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -142,7 +142,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "newcastle-removals",
     city: "Newcastle",
     headline: "Newc<span class=\"font-display italic font-normal\">a</span>stle rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Pr<span class=\"font-display italic font-normal\">o</span>per j<span class=\"font-display italic font-normal\">o</span>b.",
-    sub: "Post your Newcastle removal in 60 seconds. Verified driver. Fixed price. Done right.",
+    sub: "Tell us about your Newcastle removal. Verified driver. Fixed price. Done right.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -168,7 +168,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "reading-removals",
     city: "Reading",
     headline: "Re<span class=\"font-display italic font-normal\">a</span>ding rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Reading removal in 60 seconds. Verified driver confirmed by our team. No surprises.",
+    sub: "Tell us about your Reading removal. Verified driver confirmed by our team. No surprises.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -194,7 +194,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "oxford-removals",
     city: "Oxford",
     headline: "<span class=\"font-display italic font-normal\">O</span>xf<span class=\"font-display italic font-normal\">o</span>rd rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Oxford removal in 60 seconds. Verified driver confirmed before you hang up.",
+    sub: "Tell us about your Oxford removal. Verified driver confirmed before you hang up.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -220,7 +220,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "cambridge-removals",
     city: "Cambridge",
     headline: "C<span class=\"font-display italic font-normal\">a</span>mbr<span class=\"font-display italic font-normal\">i</span>dge rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Cambridge removal in 60 seconds. Verified driver confirmed before you hang up.",
+    sub: "Tell us about your Cambridge removal. Verified driver confirmed before you hang up.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -246,7 +246,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "southampton-removals",
     city: "Southampton",
     headline: "S<span class=\"font-display italic font-normal\">o</span>uth<span class=\"font-display italic font-normal\">a</span>mpt<span class=\"font-display italic font-normal\">o</span>n rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Southampton removal in 60 seconds. Verified driver confirmed. Fixed price guaranteed.",
+    sub: "Tell us about your Southampton removal. Verified driver confirmed. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -272,7 +272,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "brighton-removals",
     city: "Brighton",
     headline: "Brght<span class=\"font-display italic font-normal\">o</span>n rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Brighton removal in 60 seconds. Verified driver. Fixed price. Done properly.",
+    sub: "Tell us about your Brighton removal. Verified driver. Fixed price. Done properly.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -298,7 +298,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "derby-removals",
     city: "Derby",
     headline: "Derby rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Derby removal in 60 seconds. Verified driver matched and confirmed by our team.",
+    sub: "Tell us about your Derby removal. Verified driver matched and confirmed by our team.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -324,7 +324,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "wolverhampton-removals",
     city: "Wolverhampton",
     headline: "W<span class=\"font-display italic font-normal\">o</span>lverh<span class=\"font-display italic font-normal\">a</span>mpt<span class=\"font-display italic font-normal\">o</span>n rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed.",
-    sub: "Post your Wolverhampton removal in 60 seconds. Verified driver. Fixed price guaranteed.",
+    sub: "Tell us about your Wolverhampton removal. Verified driver. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -350,7 +350,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "norwich-removals",
     city: "Norwich",
     headline: "N<span class=\"font-display italic font-normal\">o</span>rwich rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Norwich removal in 60 seconds. Verified driver matched by our team. Fixed price guaranteed.",
+    sub: "Tell us about your Norwich removal. Verified driver matched by our team. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -376,7 +376,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "south-london-removals",
     city: "South London",
     headline: "S<span class=\"font-display italic font-normal\">o</span>uth L<span class=\"font-display italic font-normal\">o</span>nd<span class=\"font-display italic font-normal\">o</span>n rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your South London removal in 60 seconds. Verified local driver. Fixed price confirmed on the call.",
+    sub: "Tell us about your South London removal. Verified local driver. Fixed price confirmed on the call.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -402,7 +402,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "east-london-removals",
     city: "East London",
     headline: "E<span class=\"font-display italic font-normal\">a</span>st L<span class=\"font-display italic font-normal\">o</span>nd<span class=\"font-display italic font-normal\">o</span>n rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your East London removal in 60 seconds. Verified local driver. Fixed price confirmed before anything moves.",
+    sub: "Tell us about your East London removal. Verified local driver. Fixed price confirmed before anything moves.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -428,7 +428,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "manchester-removals",
     city: "Manchester",
     headline: "M<span class=\"font-display italic font-normal\">a</span>nchester rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Post your Manchester removal in 60 seconds. Verified driver matched by our team. Fixed price guaranteed.",
+    sub: "Tell us about your Manchester removal. Verified driver matched by our team. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },

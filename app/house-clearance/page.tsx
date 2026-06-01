@@ -73,7 +73,7 @@ const FAQS = [
   { q: "What happens to the items?", a: "We sort everything. Usable items go to charity or are resold, recyclables are processed responsibly, and the remainder goes to licensed waste disposal. We don't just skip everything." },
   { q: "Can you do same-day clearances?", a: "Post before 10am for same-day availability most days. Urgent clearances outside those hours? Call us directly." },
   { q: "Do you cover probate and bereavement clearances?", a: "We do, and we approach them accordingly. Our team understands the sensitivity of these jobs. Professional and respectful throughout." },
-  { q: "Which areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow and growing. Post your job and we'll confirm availability for your location." },
+  { q: "Which areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow and growing. Tell us about your clearance and we'll confirm availability for your location." },
 ];
 
 export default function HouseClearance() {

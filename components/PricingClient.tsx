@@ -12,7 +12,7 @@ const HOW_STEPS = [
   {
     num: "01",
     title: "Tell us what's moving.",
-    desc: "What, where from, where to, and when. Takes 60 seconds. No account needed.",
+    desc: "Where from, where to, and when. Takes 60 seconds. No account needed.",
   },
   {
     num: "02",

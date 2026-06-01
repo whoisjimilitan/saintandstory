@@ -24,7 +24,7 @@ const OG_IMAGE = `${BASE_URL}/og?title=Saint+%26+Story&sub=Fixed+price.+Verified
 export const metadata: Metadata = {
   title: "Saint & Story — UK Removals & Logistics",
   description:
-    "Post your job in 60 seconds. We match you to a verified local driver. Fixed price, no surprises. Covering London, Manchester, Birmingham, Leeds and 30+ UK cities.",
+    "Tell us what's moving. We call back with a fixed price and a verified local driver. No surprises. Covering London, Manchester, Birmingham, Leeds and 30+ UK cities.",
   icons: {
     icon: "/favicon.svg",
   },

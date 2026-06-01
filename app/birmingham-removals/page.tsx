@@ -4,7 +4,7 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Birmingham",
   headline: "Birmingh<span class=\"font-display italic font-normal\">a</span>m rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />D<span class=\"font-display italic font-normal\">o</span>ne right.",
-  sub: "Post your job in 60 seconds. We match you to a verified Birmingham driver. Fixed price, no surprises.",
+  sub: "Tell us about your Birmingham removal. We match you to a verified local driver. Fixed price, no surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },

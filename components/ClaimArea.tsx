@@ -51,7 +51,7 @@ export default function ClaimArea() {
             </h2>
             <div>
               <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-                Post your job in 60 seconds.
+                Tell us what&apos;s moving.
                 <br />
                 Matched t<span className="font-display italic font-normal">o</span> a verified driver.
                 <br />

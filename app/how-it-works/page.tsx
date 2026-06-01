@@ -6,7 +6,7 @@ import MobileBar from "@/components/MobileBar";
 
 export const metadata: Metadata = {
   title: "How UK Removals Work | Fixed Price. Verified Driver. | Saint & Story",
-  description: "Post your job in 60 seconds. We call within 15 minutes with a fixed price and a named driver. No estimates, no surprises. Here's exactly how it works.",
+  description: "Tell us what's moving. We call within 15 minutes with a fixed price and a named driver. No estimates, no surprises. Here's exactly how it works.",
 };
 
 const CUSTOMER_STEPS = [
@@ -53,7 +53,7 @@ const GUARANTEES = [
   },
   {
     title: "Response in 15 minutes.",
-    desc: "Post your job and our team calls within 15 minutes. Mon to Sun, 7am to 10pm.",
+    desc: "Tell us what's moving and our team calls within 15 minutes. Mon to Sun, 7am to 10pm.",
   },
   {
     title: "Full insurance.",
@@ -67,7 +67,7 @@ const FAQS = [
   { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
   { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply. This is confirmed when you book." },
   { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time, from driver match to completion." },
-  { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Post your job and if we can't cover it, we'll tell you straight away." },
+  { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Tell us your move and if we can't cover it, we'll say so straight away." },
 ];
 
 export default function HowItWorks() {
@@ -96,7 +96,7 @@ export default function HowItWorks() {
             <br />w<span className="font-display italic font-normal">o</span>rks.
           </h1>
           <p className="text-[#888888] text-base max-w-sm">
-            Post in 60 seconds. Fixed price on the call. Verified driver. Done properly.
+            Tell us what&apos;s moving. Fixed price on the call. Verified driver. Done properly.
           </p>
         </div>
       </section>
@@ -163,7 +163,7 @@ export default function HowItWorks() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Post your job in 60 seconds. Fixed price on the call.
+              Tell us what&apos;s moving. Fixed price on the call.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"

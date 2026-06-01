@@ -1,5 +1,5 @@
 const CUSTOMER = [
-  { num: "01", title: "Post your job", desc: "60 seconds. No account needed." },
+  { num: "01", title: "Tell us what's moving.", desc: "60 seconds. No account needed." },
   { num: "02", title: "Get matched", desc: "Verified driver, confirmed near you." },
   { num: "03", title: "Confirm your price", desc: "Fixed. Locked. No surprises." },
   { num: "04", title: "Move day", desc: "On time. Professional. Done." },

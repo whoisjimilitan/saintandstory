@@ -7,7 +7,7 @@ import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "London Home Moves | Post Your Job. We Find Your Driver. | Saint & Story",
-  description: "Post your London home move in 60 seconds. We match you to a verified local driver. Fixed price, fully insured, all 33 boroughs. Free to post.",
+  description: "Tell us about your London home move. We call back with a fixed price and a verified local driver. Fully insured, all 33 boroughs. Free to post.",
 };
 
 const STATS = [
@@ -112,7 +112,7 @@ export default function LondonHomeMoves() {
             <br />D<span className="font-display italic font-normal">o</span>ne right.
           </h1>
           <p className="text-white/70 text-base mb-10 max-w-sm">
-            Post your job in 60 seconds. We match you to a verified London driver. Fixed price. No surprises.
+            Tell us about your London move. We match you to a verified local driver. Fixed price. No surprises.
           </p>
           <LandingHeroSearch city="London" />
           <p className="text-white/40 text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
