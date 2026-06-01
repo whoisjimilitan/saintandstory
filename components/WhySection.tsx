@@ -9,7 +9,7 @@ const FEATURES = [
   },
   {
     title: "Covered door to door.",
-    desc: "Every item is insured from the moment we load to the moment we deliver.",
+    desc: "Every item covered — loading, transit, delivery.",
   },
 ];
 
