@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import DriverModalCTA from "@/components/DriverModalCTA";
 import DriverCount from "@/components/DriverCount";
@@ -278,6 +279,12 @@ export default function ForDriversPage() {
               source="for_drivers_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
+            <p className="text-white/40 text-xs mt-5">
+              Based in London?{" "}
+              <Link href="/london-drivers" className="text-white/60 hover:text-white/80 underline transition-colors">
+                See our London driver page →
+              </Link>
+            </p>
           </div>
         </div>
       </section>

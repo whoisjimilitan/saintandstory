@@ -77,8 +77,41 @@ const FAQS = [
 ];
 
 export default function HouseClearance() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "House Clearance UK",
+    "serviceType": "House Clearance",
+    "description": "Professional house clearance across the UK. Furniture, appliances, full house lots. Fixed price, responsible disposal. No skips, no van hire.",
+    "provider": {
+      "@type": "MovingCompany",
+      "name": "Saint & Story Logistics",
+      "url": "https://saintandstoryltd.co.uk",
+      "telephone": "+442082344444",
+    },
+    "areaServed": { "@type": "Country", "name": "United Kingdom" },
+    "offers": {
+      "@type": "Offer",
+      "price": "90",
+      "priceCurrency": "GBP",
+      "description": "House clearance from £90",
+    },
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
       <Nav />
 
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">

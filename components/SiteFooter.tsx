@@ -33,6 +33,7 @@ const SERVICES = [
   { label: "Office relocations", href: "/office-moves" },
   { label: "Student moves", href: "/student-moves" },
   { label: "Piano moving", href: "/piano-moving" },
+  { label: "House clearance", href: "/house-clearance" },
   { label: "Same-day delivery", href: "/services" },
   { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
@@ -40,6 +41,7 @@ const SERVICES = [
 
 const PLATFORM = [
   { label: "For drivers", href: "/for-drivers" },
+  { label: "London drivers", href: "/london-drivers" },
   { label: "Get the app", href: "/app" },
   { label: "Contact", href: "/contact" },
 ];

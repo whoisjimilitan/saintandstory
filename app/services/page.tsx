@@ -39,6 +39,7 @@ const SERVICES = [
     desc: "Desks, IT, filing. We work weekends so your team walks in Monday morning ready to go.",
     from: "From £210",
     source: "services_office",
+    pageHref: "/office-moves",
   },
   {
     title: "Need it today?",
@@ -53,6 +54,7 @@ const SERVICES = [
     desc: "Pianos, antiques, gym equipment. Specialist rigging and padded wrapping on every job.",
     from: "From £165",
     source: "services_specialist",
+    pageHref: "/piano-moving",
   },
   {
     title: "Student moves",
@@ -60,6 +62,7 @@ const SERVICES = [
     desc: "End of term, halls to flat, city to city. Fixed price. No van hire, no borrowed favours.",
     from: "From £75",
     source: "services_student",
+    pageHref: "/student-moves",
   },
   {
     title: "Clearance",
@@ -96,7 +99,13 @@ export default function ServicesPage() {
           {SERVICES.map((s) => (
             <div key={s.title} className="bg-white border border-[#E8E8E8] rounded-2xl p-7 flex flex-col">
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h2 className="font-sans font-bold text-[#0D0D0D] text-base">{s.title}</h2>
+                {"pageHref" in s && s.pageHref ? (
+                  <Link href={s.pageHref} className="font-sans font-bold text-[#0D0D0D] text-base hover:text-[#888888] transition-colors">
+                    {s.title}
+                  </Link>
+                ) : (
+                  <h2 className="font-sans font-bold text-[#0D0D0D] text-base">{s.title}</h2>
+                )}
                 {"badge" in s && s.badge && (
                   <span className="shrink-0 text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em] bg-[#F5F5F5] px-2.5 py-1 rounded-full">
                     {s.badge}

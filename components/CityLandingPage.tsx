@@ -39,8 +39,19 @@ export function buildMetadata(data: CityPageData): Metadata {
 }
 
 export default function CityLandingPage({ data }: { data: CityPageData }) {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": data.faq.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Nav />
 
       {/* Hero */}

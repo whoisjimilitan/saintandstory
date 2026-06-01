@@ -71,8 +71,19 @@ const FAQS = [
 ];
 
 export default function HowItWorks() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Nav />
 
       <section className="bg-white pt-16 min-h-[60vh] flex items-center border-b border-[#E8E8E8]">

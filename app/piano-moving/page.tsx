@@ -62,8 +62,41 @@ const FAQS = [
 ];
 
 export default function PianoMoving() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Piano Moving UK",
+    "serviceType": "Specialist Piano Removal",
+    "description": "Piano moving done by specialists. Upright, grand, or baby grand. Padded, rigged, and placed exactly where you need it. Fixed price guaranteed.",
+    "provider": {
+      "@type": "MovingCompany",
+      "name": "Saint & Story Logistics",
+      "url": "https://saintandstoryltd.co.uk",
+      "telephone": "+442082344444",
+    },
+    "areaServed": { "@type": "Country", "name": "United Kingdom" },
+    "offers": {
+      "@type": "Offer",
+      "price": "165",
+      "priceCurrency": "GBP",
+      "description": "Piano moving from £165",
+    },
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
       <Nav />
 
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">

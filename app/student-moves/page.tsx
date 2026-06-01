@@ -62,8 +62,41 @@ const FAQS = [
 ];
 
 export default function StudentMoves() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Student Removals UK",
+    "serviceType": "Student Moving Service",
+    "description": "Student removals made simple. Fixed price, verified driver, no van hire. End of term, halls to flat, city to city.",
+    "provider": {
+      "@type": "MovingCompany",
+      "name": "Saint & Story Logistics",
+      "url": "https://saintandstoryltd.co.uk",
+      "telephone": "+442082344444",
+    },
+    "areaServed": { "@type": "Country", "name": "United Kingdom" },
+    "offers": {
+      "@type": "Offer",
+      "price": "75",
+      "priceCurrency": "GBP",
+      "description": "Student moves from £75",
+    },
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
       <Nav />
 
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">

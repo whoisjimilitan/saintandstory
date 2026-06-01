@@ -62,8 +62,41 @@ const FAQS = [
 ];
 
 export default function OfficeMoves() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      "name": q,
+      "acceptedAnswer": { "@type": "Answer", "text": a },
+    })),
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Office Removals UK",
+    "serviceType": "Office Relocation",
+    "description": "Professional office removals across the UK. Fixed price confirmed on the call. Weekend moves so your team walks in Monday ready.",
+    "provider": {
+      "@type": "MovingCompany",
+      "name": "Saint & Story Logistics",
+      "url": "https://saintandstoryltd.co.uk",
+      "telephone": "+442082344444",
+    },
+    "areaServed": { "@type": "Country", "name": "United Kingdom" },
+    "offers": {
+      "@type": "Offer",
+      "price": "210",
+      "priceCurrency": "GBP",
+      "description": "Office relocations from £210",
+    },
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
       <Nav />
 
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">
