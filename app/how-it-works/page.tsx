@@ -18,7 +18,7 @@ const CUSTOMER_STEPS = [
   },
   {
     num: "02",
-    title: "We call within 60 seconds",
+    title: "We call within 15 minutes",
     desc: "Our team calls you back with a fixed price and a verified driver already matched.",
     detail: "We don't send you a list of quotes to compare. We call, confirm the details, and give you one fixed price. The driver has already been selected and briefed before we hang up.",
   },
@@ -52,8 +52,8 @@ const GUARANTEES = [
     desc: "Every driver is background-checked, insured, and rated by real customers before being assigned to any job. No exceptions.",
   },
   {
-    title: "Response in 60 seconds.",
-    desc: "Post your job and our team calls within 60 seconds — Mon to Sun, 7am to 10pm.",
+    title: "Response in 15 minutes.",
+    desc: "Post your job and our team calls within 15 minutes — Mon to Sun, 7am to 10pm.",
   },
   {
     title: "Full insurance.",
