@@ -249,7 +249,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
       <br />D<span className="font-display italic font-normal">o</span>ne right.
     </h1>
     <p className="text-white/70 text-base mb-10 max-w-sm">
-      Get a fixed price in 60 seconds. Verified [CITY] driver matched and confirmed. No surprises.
+      Tell us your move in 60 seconds. We call back with a fixed price and a named driver. No surprises.
     </p>
     <LandingHeroSearch city="[CITY]" />
     <p className="text-white/40 text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
@@ -314,9 +314,9 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
 <section className="bg-[#0D0D0D] py-12 px-6">
   <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
     {/* Always use these exact driver stats: */}
-    {/* { stat: "£68", label: "Avg. daily earnings" } */}
+    {/* { stat: "£150", label: "Avg. day" } */}
     {/* { stat: "4–5", label: "Bookings per week" } */}
-    {/* { stat: "£9.99", label: "Monthly fee — all in" } */}
+    {/* { stat: "£9.99", label: "Monthly fee, all in" } */}
     {/* { stat: "100%", label: "Yours to keep" } */}
   </div>
 </section>
@@ -339,16 +339,16 @@ White background. Section id="how". 4 steps.
 
 **CUSTOMER steps (always these 4):**
 ```
-01 — Post your job — "60 seconds. No account needed. Free to post."
-02 — We find your driver — "Verified [CITY] driver, matched and confirmed."
-03 — Confirm your price — "Fixed. Locked. No surprises on the day."
+01 — Post your job — "Fill in the basics. Free. No account needed."
+02 — We find your driver — "Verified [CITY] driver, matched and confirmed by our team."
+03 — Confirm your price — "Fixed. Locked. Nothing changes on the day."
 04 — Move day — "On time. Professional. Done."
 ```
 
 **DRIVER steps (always these 4):**
 ```
-01 — Create your profile — "Set your area, van size, and rate. Live in minutes."
-02 — Post your availability — "Tell the platform when you're free in [CITY]. Customers see you."
+01 — Create your profile — "Set your area, van size, and rate. Transit, Luton, Sprinter. All welcome. Live in minutes."
+02 — Post your availability — "Tell us when you're free in [CITY]. Customers see you."
 03 — Get booked and deliver — "Show up, do what you do best. Every job builds your rating."
 04 — Get paid — "Daily, direct to your account. No cuts, no delays."
 ```
@@ -445,9 +445,9 @@ Always use these 4 for driver pages:
     </h2>
     <div>
       <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-        Get a fixed price in 60 seconds.
+        Fixed price confirmed in minutes.
         <br />We find y<span className="font-display italic font-normal">o</span>ur [CITY] driver.
-        <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
+        <br />N<span className="font-display italic font-normal">o</span> surprises.
       </p>
       <ModalCTA
         label="Get a fixed price — free →"
@@ -586,17 +586,30 @@ export default function PageName() {
 
 **Specificity:** Every claim needs a number, timeframe, or proper noun.
 - ❌ "We respond quickly"
-- ✅ "Matched to a verified driver within 1 minute"
+- ✅ "Our team calls within 15 minutes with a fixed price and a named driver"
 
 **CITY rule:** Name the city in the H1, the hero sub, at least one step description, and the bottom CTA.
 
 **Headline vowel rule:** Apply the italic Cormorant span to vowels in H1/H2 headings. Not every vowel — one or two per key word, where it reads naturally. Match the editorial style of saintandstory.co.uk.
+
+**Em dash rule — STRICT:** Do not use em dashes ( — ) in body copy or FAQ answers. They are a strong AI writing signal and undermine the human voice. Use a period, comma, or colon instead.
+- ❌ "Fixed price — confirmed before we arrive"
+- ✅ "Fixed price, confirmed before we arrive"
+- ❌ "Yes — all LS postcodes covered"
+- ✅ "We cover all LS postcodes"
+
+**FAQ answer rule:** Never start a FAQ answer with "Yes —". Instead answer directly.
+- ❌ "Yes — weekend moves are our speciality..."
+- ✅ "Weekend moves are our speciality..."
+- ❌ "Yes — all postcodes are covered..."
+- ✅ "We cover all [X] postcodes..."
 
 **What NOT to write:**
 - "Don't hesitate to contact us" — corporate filler
 - "We pride ourselves" — self-congratulatory
 - "State of the art" — meaningless
 - Long paragraphs — this site speaks in short, punchy lines
+- Em dashes in body copy — see rule above
 
 ---
 
@@ -663,10 +676,10 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Leeds",
   headline: "Leeds rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-  sub: "Get a fixed price in 60 seconds. Verified Leeds driver matched and confirmed.",
+  sub: "Tell us your move. We call back with a fixed price and a verified Leeds driver. No surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
-    { stat: "< 60s", label: "Response time" },
+    { stat: "< 15m", label: "Response time" },
     { stat: "Fixed", label: "Price. Always." },
     { stat: "LS1–LS29", label: "All postcodes" },
   ],
