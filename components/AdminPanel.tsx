@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SmsButton from "@/components/SmsButton";
+import AdminEtaBadge from "@/components/AdminEtaBadge";
 
 interface Driver {
   id: string;
@@ -54,6 +55,8 @@ interface Job {
   driver_name?: string;
   driver_phone?: string;
   updated_at?: string;
+  driver_eta_minutes?: number | null;
+  location_sharing_since?: string | null;
 }
 
 function isStaleOffered(ts: string | undefined) {
@@ -121,9 +124,16 @@ function JobRow({
         onClick={() => setExpanded(e => !e)}
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <p className="font-sans font-bold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
             <span className="text-[10px] font-mono text-[#888888]">{job.reference}</span>
+            {job.driver_name && (
+              <AdminEtaBadge
+                jobId={job.id}
+                initialEta={job.driver_eta_minutes ?? null}
+                initialSharing={!!job.location_sharing_since && job.driver_eta_minutes != null}
+              />
+            )}
           </div>
           <p className="text-[#888888] text-xs">
             {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}

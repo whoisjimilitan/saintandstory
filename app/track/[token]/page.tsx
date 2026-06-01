@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { notFound } from "next/navigation";
+import TrackingLive from "@/components/TrackingLive";
 
 const STATUS_STEPS = [
   { key: "pending_review", label: "Request received" },
@@ -18,7 +19,8 @@ async function getJob(token: string) {
   if (!process.env.DATABASE_URL) return null;
   const sql = neon(process.env.DATABASE_URL);
   const rows = await sql`
-    SELECT j.*, d.full_name as driver_name, d.vehicle_type, d.rating_avg
+    SELECT j.*, d.full_name as driver_name, d.vehicle_type, d.rating_avg,
+      j.driver_eta_minutes, j.location_sharing_since
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.tracking_token = ${token}
@@ -36,6 +38,8 @@ export default async function TrackPage({ params }: { params: Promise<{ token: s
   const currentStep = stepIndex(job.status as string);
   const isComplete = job.status === "completed";
   const isCancelled = job.status === "cancelled";
+  const driverFirstName = ((job.driver_name as string) ?? "").split(" ")[0] || "Your driver";
+  const isSharing = !!job.location_sharing_since && job.driver_eta_minutes != null;
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
@@ -82,6 +86,18 @@ export default async function TrackPage({ params }: { params: Promise<{ token: s
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Live ETA — shows when driver is en route */}
+        {!isCancelled && !isComplete && (
+          <div className="mb-4">
+            <TrackingLive
+              trackingToken={token}
+              driverFirstName={driverFirstName}
+              initialEta={job.driver_eta_minutes as number | null}
+              initialSharing={isSharing}
+            />
           </div>
         )}
 

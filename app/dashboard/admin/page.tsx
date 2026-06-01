@@ -5,6 +5,7 @@ import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 import AdminAutoRefresh from "@/components/AdminAutoRefresh";
 import AdminPushSubscribe from "@/components/AdminPushSubscribe";
+import AdminLocationUpdater from "@/components/AdminLocationUpdater";
 
 const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
@@ -50,7 +51,8 @@ async function getCompletedJobs() {
 async function getConfirmedJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
+      j.driver_eta_minutes, j.location_sharing_since
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'confirmed'
@@ -61,7 +63,8 @@ async function getConfirmedJobs() {
 async function getInProgressJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
+      j.driver_eta_minutes, j.location_sharing_since
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'in_progress'
@@ -133,6 +136,7 @@ export default async function AdminPage() {
     <div className="max-w-3xl mx-auto px-6 py-10">
       <AdminAutoRefresh pendingCount={pendingJobs.length} />
       <AdminPushSubscribe />
+      <AdminLocationUpdater />
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Admin</p>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         Dashboard.

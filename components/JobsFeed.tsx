@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import DriverLocationShare from "@/components/DriverLocationShare";
 
 const STATUS_LABEL: Record<string, string> = {
   offered: "Offered to you",
@@ -109,15 +110,11 @@ function JobCard({
       )}
 
       {status === "confirmed" && onUpdateStatus && (
-        <div className="border-t border-[#E8E8E8] pt-4">
-          <button
-            onClick={() => onUpdateStatus("in_progress")}
-            disabled={updating}
-            className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
-          >
-            {updating ? "Updating…" : "Start job →"}
-          </button>
-        </div>
+        <DriverLocationShare
+          job={job}
+          onArrived={() => onUpdateStatus("in_progress")}
+          arriving={updating}
+        />
       )}
 
       {status === "in_progress" && onUpdateStatus && (
