@@ -13,7 +13,7 @@ interface ModalCTAProps {
 }
 
 export default function ModalCTA({
-  label = "Get free quotes →",
+  label = "Get a fixed price — free →",
   className = "bg-brand hover:bg-brand-dark text-white font-bold px-8 py-4 rounded-xl text-sm transition-colors",
   source = "cta",
 }: ModalCTAProps) {

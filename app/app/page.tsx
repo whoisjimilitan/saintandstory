@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "Get a fixed price in 60 seconds.",
-    desc: "Tap, fill in the details, submit. Our team calls you back before you've put the phone down.",
+    title: "Fixed price in minutes.",
+    desc: "Tap, fill in the details, submit. Our team calls you back within 15 minutes with a locked price.",
   },
   {
     title: "Track your move in real time.",
@@ -147,7 +147,7 @@ export default function AppPage() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Get a fixed price in 60 seconds.
+              Tell us your move. We call back with a fixed price.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"

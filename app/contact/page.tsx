@@ -29,7 +29,7 @@ export default function ContactPage() {
             <br />y<span className="font-display italic font-normal">o</span>ur move.
           </h1>
           <p className="text-[#888888] text-base max-w-sm">
-            Fill in the form. We call back within 1 minute.
+            Fill in the form. We call back within 15 minutes.
           </p>
         </div>
       </section>
@@ -60,7 +60,7 @@ export default function ContactPage() {
                 Average response time
               </p>
               <p className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight">
-                1 min<span className="font-display italic font-normal">u</span>te
+                15 m<span className="font-display italic font-normal">i</span>nutes
               </p>
               <p className="text-[#888888] text-xs mt-2">Mon–Sun, 7am–10pm</p>
             </div>
@@ -69,10 +69,10 @@ export default function ContactPage() {
           <div className="bg-white rounded-2xl p-8 border border-[#E8E8E8] flex flex-col gap-6">
             <div>
               <h2 className="font-sans font-black text-[#0D0D0D] text-lg mb-1">Request a free quote</h2>
-              <p className="text-[#888888] text-sm">Tell us about your move. We call back within 1 minute.</p>
+              <p className="text-[#888888] text-sm">Tell us about your move. We call back within 15 minutes.</p>
             </div>
             <ModalCTA
-              label="Get an instant quote →"
+              label="Get a fixed price — free →"
               source="contact_page"
               className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-4 rounded-full text-sm transition-colors"
             />

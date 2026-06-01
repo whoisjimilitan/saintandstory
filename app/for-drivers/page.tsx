@@ -48,6 +48,7 @@ const FEATURES = [
   { title: "You set the calendar.", desc: "Post when you're free. Customers book around you, not the other way round." },
   { title: "Founding rate — £9.99/month.", desc: "Locked forever. Weekly billing launches at 100 drivers. You're grandfathered." },
   { title: "All van sizes welcome.", desc: "Transit, Luton, Sprinter — whatever you drive, there's work for you here." },
+  { title: "Your own driver dashboard.", desc: "Earnings breakdown, ratings history, availability calendar — everything in one place. Solo drivers don't normally get this." },
   { title: "Build your name.", desc: "Higher rating means you appear first when customers search your area." },
   { title: "Paid within the hour.", desc: "Finish a job at 3pm. Money in your account before 4pm. No chasing, no delays." },
 ];

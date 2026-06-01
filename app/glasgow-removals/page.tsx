@@ -7,7 +7,7 @@ const data: CityPageData = {
   sub: "Post your Glasgow removal job in 60 seconds. Verified driver matched by our team. Fixed price from the first call.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
-    { stat: "< 60s", label: "Response time" },
+    { stat: "< 15m", label: "Response time" },
     { stat: "Fixed", label: "Price. Always." },
     { stat: "G1–G78", label: "All postcodes" },
   ],

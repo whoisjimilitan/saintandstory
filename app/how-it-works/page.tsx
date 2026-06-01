@@ -5,8 +5,8 @@ import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 
 export const metadata: Metadata = {
-  title: "How It Works | Saint & Story Logistics",
-  description: "Post your job in 60 seconds. We match you to a verified driver. Fixed price confirmed before anything moves. Here's exactly how it works.",
+  title: "How UK Removals Work | Fixed Price. Verified Driver. | Saint & Story",
+  description: "Post your job in 60 seconds. We call within 15 minutes with a fixed price and a named driver. No estimates, no surprises. Here's exactly how it works.",
 };
 
 const CUSTOMER_STEPS = [
@@ -20,32 +20,32 @@ const CUSTOMER_STEPS = [
     num: "02",
     title: "We call within 15 minutes",
     desc: "Our team calls you back with a fixed price and a verified driver already matched.",
-    detail: "We don't send you a list of quotes to compare. We call, confirm the details, and give you one fixed price. The driver has already been selected and briefed before we hang up.",
+    detail: "No shortlist to wade through. One call, one price, one driver — already matched and briefed before we hang up.",
   },
   {
     num: "03",
     title: "Fixed price confirmed",
     desc: "The price on the call is the price you pay. Nothing is added on the day.",
-    detail: "No estimates, no ranges, no 'subject to access'. Your price is locked the moment we confirm it. If anything changes on your side, we discuss it before — never after — the move.",
+    detail: "No estimates, no ranges, no \"subject to access\". Your price is locked the moment we confirm it. If anything changes, we talk it through before the move — not on the day.",
   },
   {
     num: "04",
     title: "Move day",
     desc: "Your driver arrives on time. Professional, insured, briefed. Done properly.",
-    detail: "You receive a confirmation with your driver's name and the job reference. Track your job in real time. If anything comes up, you have a direct line to us.",
+    detail: "You get your driver's name and a job reference. Track everything in real time. If anything comes up, you have a direct line to us — not a chatbot.",
   },
   {
     num: "05",
     title: "Done. Rate your driver.",
     desc: "When the job's done, you get a link to rate your driver.",
-    detail: "Ratings keep our drivers accountable and our standards high. Every driver is rated by real customers — visible to us before every assignment.",
+    detail: "Ratings are how we keep every driver honest. Every score is visible to us before the next assignment — it's how good drivers rise and poor ones don't get reassigned.",
   },
 ];
 
 const GUARANTEES = [
   {
     title: "Fixed price. Always.",
-    desc: "The price confirmed on the call is the price you pay. We have never added a charge after confirmation without speaking to the customer first.",
+    desc: "The price on the call is the price you pay. We've never charged more than the confirmed amount without the customer's say-so first.",
   },
   {
     title: "Verified drivers only.",

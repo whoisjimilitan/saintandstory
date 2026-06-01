@@ -87,7 +87,7 @@ export default function RootLayout({
       "Southampton","Brighton","Derby","Wolverhampton","Norwich",
       "Leicester","Coventry",
     ],
-    "description": "Fixed price removals and logistics across the UK. Get a fixed price in 60 seconds — we match you to a verified local driver.",
+    "description": "Fixed price removals and logistics across the UK. Tell us your move in 60 seconds — we call back with a fixed price and a matched local driver.",
     "sameAs": [],
   };
 

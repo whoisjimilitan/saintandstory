@@ -5,63 +5,78 @@ import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 
 export const metadata: Metadata = {
-  title: "Piano Moving UK | Specialist Handlers, Fixed Price | Saint & Story",
-  description: "Piano moving done by specialists. Upright, grand, or baby grand — padded, rigged, and placed exactly where you need it. Fixed price guaranteed.",
+  title: "House Clearance UK | Fixed Price, Responsible Disposal | Saint & Story",
+  description:
+    "Professional house clearance across the UK. Furniture, appliances, full house lots — fixed price, responsible disposal. No skips, no van hire, no stress.",
+  openGraph: {
+    title: "House Clearance UK | Fixed Price, Responsible Disposal | Saint & Story",
+    description:
+      "House clearance done properly. Fixed price confirmed on the call. Furniture, appliances, full house lots — recycled and donated where possible.",
+    url: "https://saintandstoryltd.co.uk/house-clearance",
+    siteName: "Saint & Story",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "House Clearance UK | Fixed Price | Saint & Story",
+    description: "House clearance done properly. Fixed price. Responsible disposal. 30+ UK cities.",
+  },
 };
 
 const STATS = [
   { stat: "4.9★", label: "Verified reviews" },
-  { stat: "Specialist", label: "Piano team" },
+  { stat: "< 15m", label: "Response time" },
   { stat: "Fixed", label: "Price. Always." },
-  { stat: "Insured", label: "Every move" },
+  { stat: "30+", label: "UK cities covered" },
 ];
 
 const STEPS = [
-  { num: "01", title: "Post your job", desc: "Piano type, both addresses, access details, preferred date. 60 seconds." },
-  { num: "02", title: "Specialist team assigned", desc: "We call within 15 minutes. Fixed price confirmed. Piano-trained team briefed." },
-  { num: "03", title: "Move day", desc: "Padding, specialist straps, board runners. Your piano protected at every stage." },
-  { num: "04", title: "Placed and done", desc: "In the exact position you want. Checked, confirmed, nothing left to chance." },
+  { num: "01", title: "Tell us what's going", desc: "Rooms, contents, access. 60 seconds. Free to post." },
+  { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked before we arrive." },
+  { num: "03", title: "We clear it", desc: "Professional team. Everything removed. Property left clean." },
+  { num: "04", title: "Responsible disposal", desc: "Sorted for donation, recycling, and responsible disposal — not just landfill." },
 ];
 
 const INCLUDED = [
-  "Piano-specialist removal team",
-  "Professional padding and wrapping",
-  "Specialist piano straps and board runners",
-  "Stair management — no extra charge",
-  "Fully insured in transit",
+  "Full property or single room — any size",
+  "Furniture, appliances, clothing, general contents",
   "Fixed price — confirmed before we arrive",
+  "Responsible disposal — recycled and donated where possible",
+  "Property left swept and clear",
+  "7 days a week, 7am–10pm",
 ];
 
 const TESTIMONIALS = [
   {
-    initials: "MV",
-    name: "Margaret V.",
-    location: "Kensington → Richmond, London",
-    quote: "A Steinway baby grand. I was terrified. They padded every inch, used a specialist crane for the first floor, and placed it perfectly. Extraordinary care.",
+    initials: "SB",
+    name: "Sarah B.",
+    location: "Probate clearance, Leeds",
+    quote: "My mother's house after she passed. The team were respectful, efficient, and took everything. Fixed price with no surprises. I couldn't have asked for more.",
   },
   {
-    initials: "PL",
-    name: "Paul L.",
-    location: "Didsbury → Altrincham, Manchester",
-    quote: "Upright piano, narrow hallway, tight turn at the top of the stairs. They had a plan before they arrived. Done in 45 minutes without drama.",
+    initials: "MT",
+    name: "Mark T.",
+    location: "Full clearance, Birmingham",
+    quote: "3-bed house, 30 years of stuff. Two trips, done in a day. Fixed price. They sorted donation from disposal without being asked. Really impressive.",
   },
   {
-    initials: "CW",
-    name: "Catherine W.",
-    location: "Clifton → Cheltenham",
-    quote: "Fixed price quoted. Team arrived prepared. Piano moved without a mark. The price was exactly what was confirmed. Brilliant service.",
+    initials: "PO",
+    name: "Priya O.",
+    location: "End of tenancy, Manchester",
+    quote: "Tenant left everything behind. Called Saint & Story, had a price within 20 minutes, cleared by the next morning. Fixed price paid exactly as quoted.",
   },
 ];
 
 const FAQS = [
-  { q: "Do you move grand pianos?", a: "Yes — baby grands, boudoir grands, and concert grands. Each requires different handling and we brief the team on the specifics of your instrument before arrival." },
-  { q: "What about narrow stairs and tight spaces?", a: "We assess access before the move and arrive with the right equipment. Narrow hallways, tight turns, and high floors are handled as standard — no extra charge." },
-  { q: "Is the piano insured during the move?", a: "Yes — fully insured in transit and during loading and unloading. If anything happens we cover it directly." },
-  { q: "Will the move affect the piano's tuning?", a: "Any move can affect tuning slightly. We recommend booking a tuner 1–2 weeks after the move once the piano has acclimatised to its new environment." },
-  { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before the team arrives. Nothing is added on the day." },
+  { q: "What do you take?", a: "Everything — furniture, white goods, clothing, books, general household contents. If it's in the property and you want it gone, we'll take it." },
+  { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before we arrive. Nothing added on the day without your approval." },
+  { q: "What happens to the items?", a: "We sort everything — usable items go to charity or are resold, recyclables are processed responsibly, and the remainder goes to licenced waste disposal. We don't just skip everything." },
+  { q: "Can you do same-day clearances?", a: "Yes — post before 10am for same-day availability most days. Urgent clearances outside those hours? Call us directly." },
+  { q: "Do you cover probate and bereavement clearances?", a: "Yes — and we approach them accordingly. Our team understands the sensitivity of these jobs. Professional and respectful throughout." },
+  { q: "Which areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow — and growing. Post your job and we'll confirm availability for your location." },
 ];
 
-export default function PianoMoving() {
+export default function HouseClearance() {
   return (
     <main className="pb-20 md:pb-0">
       <Nav />
@@ -69,20 +84,20 @@ export default function PianoMoving() {
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-6 py-20 w-full">
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
-            Specialist piano moving · UK
+            House clearance · UK
           </p>
           <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
-            Pian<span className="font-display italic font-normal">o</span>
-            <br />m<span className="font-display italic font-normal">o</span>ving.
-            <br />D<span className="font-display italic font-normal">o</span>ne right.
+            Cleared.
+            <br />Pr<span className="font-display italic font-normal">o</span>perly.
+            <br />Fixed price.
           </h1>
           <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Specialist team. Padded and rigged. Fixed price. Your instrument protected at every stage.
+            Full house or single room. Fixed price confirmed before we arrive. Responsible disposal — not just landfill.
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
               label="Get a fixed price — free →"
-              source="piano_moving_hero"
+              source="clearance_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
             <a href="tel:+442082344444" className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
@@ -123,7 +138,7 @@ export default function PianoMoving() {
       <section className="bg-[#F5F5F5] py-24 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-start">
           <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
-            What&rsquo;s
+            Everything
             <br />incl<span className="font-display italic font-normal">u</span>ded.
           </h2>
           <div className="space-y-3">
@@ -139,7 +154,8 @@ export default function PianoMoving() {
       <section className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-14">
-            Instruments trusted t<span className="font-display italic font-normal">o</span> us.
+            Real clearances.
+            <br />Real reviews.
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
             {TESTIMONIALS.map((r) => (
@@ -163,7 +179,7 @@ export default function PianoMoving() {
       <section className="bg-white py-20 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16">
           <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
-            Pian<span className="font-display italic font-normal">o</span>
+            Clearance
             <br />questi<span className="font-display italic font-normal">o</span>ns.
           </h2>
           <div className="divide-y divide-[#E8E8E8]">
@@ -184,16 +200,16 @@ export default function PianoMoving() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <h2 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight">
             Ready t<span className="font-display italic font-normal">o</span>
-            <br />m<span className="font-display italic font-normal">o</span>ve
-            <br />y<span className="font-display italic font-normal">o</span>ur pian<span className="font-display italic font-normal">o</span>?
+            <br />clear it?
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Specialist team. Fixed price. Fully insured.
+              Fixed price confirmed before we arrive.
+              <br />N<span className="font-display italic font-normal">o</span> skips. N<span className="font-display italic font-normal">o</span> van hire. N<span className="font-display italic font-normal">o</span> stress.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"
-              source="piano_moving_cta"
+              source="clearance_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
           </div>

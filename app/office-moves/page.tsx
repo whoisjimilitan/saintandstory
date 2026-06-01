@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 
 const STATS = [
   { stat: "4.9★", label: "Verified reviews" },
-  { stat: "< 60s", label: "Response time" },
+  { stat: "< 15m", label: "Response time" },
   { stat: "Fixed", label: "Price. Always." },
   { stat: "Weekend", label: "Slots available" },
 ];
 
 const STEPS = [
   { num: "01", title: "Post your job", desc: "Office size, both postcodes, preferred date. 60 seconds." },
-  { num: "02", title: "Fixed price confirmed", desc: "We call within 1 minute. Price locked. Team assigned." },
+  { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked. Team assigned." },
   { num: "03", title: "We move the weekend", desc: "Out of hours so your business stays uninterrupted." },
   { num: "04", title: "Monday, fully operational", desc: "Your team walks in ready. Zero downtime." },
 ];
@@ -81,7 +81,7 @@ export default function OfficeMoves() {
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
-              label="Get a free quote →"
+              label="Get a fixed price — free →"
               source="office_moves_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -106,7 +106,7 @@ export default function OfficeMoves() {
       <section className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight mb-16">
-            Three steps.
+            F<span className="font-display italic font-normal">o</span>ur steps.
             <br />Zer<span className="font-display italic font-normal">o</span> disrupti<span className="font-display italic font-normal">o</span>n.
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -118,6 +118,24 @@ export default function OfficeMoves() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Monday Promise */}
+      <section className="bg-[#0D0D0D] py-12 px-6 border-t border-white/10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-[10px] font-semibold text-white/50 uppercase tracking-[0.2em] mb-2">Our guarantee</p>
+            <p className="font-sans font-black text-white text-xl tracking-tight">The M<span className="font-display italic font-normal">o</span>nday Pr<span className="font-display italic font-normal">o</span>mise.</p>
+            <p className="text-white/65 text-sm mt-2 max-w-sm">
+              We move everything over the weekend. If your team can&apos;t work as normal on Monday, we fix it at our cost. No arguments.
+            </p>
+          </div>
+          <ModalCTA
+            label="Get a fixed price — free →"
+            source="office_monday_promise"
+            className="shrink-0 bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+          />
         </div>
       </section>
 
@@ -194,7 +212,7 @@ export default function OfficeMoves() {
               Fixed price. Weekend slots. Zero downtime.
             </p>
             <ModalCTA
-              label="Get a free quote →"
+              label="Get a fixed price — free →"
               source="office_moves_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

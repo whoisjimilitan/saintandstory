@@ -4,10 +4,10 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Bristol",
   headline: "Brist<span class=\"font-display italic font-normal\">o</span>l rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Pr<span class=\"font-display italic font-normal\">o</span>perly d<span class=\"font-display italic font-normal\">o</span>ne.",
-  sub: "Fixed price. Verified driver. Matched within 60 seconds of posting. No surprises.",
+  sub: "Fixed price. Verified driver. We call within 15 minutes of posting. No surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
-    { stat: "< 60s", label: "Response time" },
+    { stat: "< 15m", label: "Response time" },
     { stat: "Fixed", label: "Price. Always." },
     { stat: "BS1–BS41", label: "All postcodes" },
   ],

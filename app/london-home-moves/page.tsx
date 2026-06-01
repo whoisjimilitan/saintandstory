@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const STATS = [
   { stat: "4.9★", label: "Verified reviews" },
-  { stat: "< 60s", label: "Response time" },
+  { stat: "< 15m", label: "Response time" },
   { stat: "Fixed", label: "Price. Always." },
   { stat: "All 33", label: "London boroughs" },
 ];
@@ -52,10 +52,10 @@ const FEATURES = [
 ];
 
 const FAQS = [
-  { q: "How quickly can you match me in London?", a: "Within 60 seconds of posting your job, we match you to a verified driver near you. You receive confirmation immediately — no waiting, no chasing." },
+  { q: "How quickly can you match me in London?", a: "Within 15 minutes of posting your job, our team calls to confirm a verified driver near you — name, quote, and job reference before we hang up." },
   { q: "Do you cover all 33 London boroughs?", a: "Yes. Every borough, 7 days a week from 7am to 10pm. Congestion zone, ULEZ, and parking are all factored into your fixed price upfront." },
   { q: "Is the price fixed or an estimate?", a: "Always fixed. The number confirmed on the call is the number you pay. Nothing is added on the day without your explicit approval." },
-  { q: "What happens after I post my job?", a: "We match you to a verified local driver within 60 seconds and confirm your fixed price. You'll have a named driver and locked quote before we hang up." },
+  { q: "What happens after I post my job?", a: "We call within 15 minutes to confirm your fixed price and the name of your driver. Locked quote before we hang up — nothing changes on the day." },
   { q: "Are there hidden charges — congestion, ULEZ, parking?", a: "None. Congestion charge, ULEZ, and parking permits are all included in your quote. We don't spring extras on you on moving day." },
   { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly — no complicated claims process, no argument." },
   { q: "Do I need to be present during the move?", a: "Present at the start and end. During transit you're free to travel ahead. We keep you updated throughout via text or call." },
@@ -117,6 +117,25 @@ export default function LondonHomeMoves() {
               <p className="text-[#888888] text-xs uppercase tracking-[0.15em]">{label}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ULEZ callout */}
+      <section className="bg-white py-8 px-6 border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-12">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#0D0D0D] shrink-0" />
+            <p className="text-[#0D0D0D] text-sm font-semibold">Congestion Zone included</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#0D0D0D] shrink-0" />
+            <p className="text-[#0D0D0D] text-sm font-semibold">ULEZ included</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#0D0D0D] shrink-0" />
+            <p className="text-[#0D0D0D] text-sm font-semibold">Parking permits included</p>
+          </div>
+          <p className="text-[#888888] text-xs sm:ml-auto">No surprise charges on move day — ever.</p>
         </div>
       </section>
 
@@ -203,7 +222,7 @@ export default function LondonHomeMoves() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Get a fixed price in 60 seconds.
+              Fixed price confirmed in minutes.
               <br />We find y<span className="font-display italic font-normal">o</span>ur London driver.
               <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
             </p>

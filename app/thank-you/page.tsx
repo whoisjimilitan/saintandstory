@@ -3,11 +3,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Thank You | Saint & Story Logistics",
-  description: "We've received your quote request and will call you within 1 minute.",
+  description: "We've received your quote request and will call you within 15 minutes.",
 };
 
 const STEPS = [
-  { num: "01", text: "We call within 1 minute to discuss your move" },
+  { num: "01", text: "We call within 15 minutes to discuss your move" },
   { num: "02", text: "Fixed price confirmed on the call — no changes on the day" },
   { num: "03", text: "Your team arrives and handles everything" },
 ];
@@ -32,7 +32,7 @@ export default function ThankYou() {
 
         <p className="text-white/70 text-base leading-relaxed mb-12 max-w-sm mx-auto">
           Someone from our team will call you{" "}
-          <span className="text-white font-semibold">within 1 minute</span> to
+          <span className="text-white font-semibold">within 15 minutes</span> to
           confirm your quote and moving date.
         </p>
 
@@ -56,6 +56,19 @@ export default function ThankYou() {
         >
           Call 0208 234 4444
         </a>
+
+        <div className="border border-white/10 rounded-2xl p-6 mb-10 text-left">
+          <p className="text-[10px] font-semibold text-white/45 uppercase tracking-[0.2em] mb-3">Know a driver?</p>
+          <p className="text-white/70 text-sm leading-relaxed mb-4">
+            If you know a man-and-van or removal driver who could do with more work — send them this link. They keep 100% of every job.
+          </p>
+          <a
+            href="/for-drivers"
+            className="inline-block border border-white/20 hover:border-white/40 text-white/70 hover:text-white font-semibold px-5 py-2.5 rounded-full text-xs transition-colors"
+          >
+            Share the driver page →
+          </a>
+        </div>
 
         <div>
           <Link href="/" className="text-white/50 hover:text-white/70 text-xs transition-colors">

@@ -7,7 +7,7 @@ const data: CityPageData = {
   sub: "Post your job in 60 seconds. We match you to a verified Birmingham driver. Fixed price, no surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
-    { stat: "< 60s", label: "Response time" },
+    { stat: "< 15m", label: "Response time" },
     { stat: "Fixed", label: "Price. Always." },
     { stat: "B1–B45", label: "All postcodes" },
   ],
@@ -40,7 +40,7 @@ const data: CityPageData = {
   faq: [
     { q: "Do you cover all Birmingham postcodes?", a: "Yes — every B postcode from B1 to B45, including Sutton Coldfield, Solihull, and surrounding areas. 7 days a week, 7am to 10pm." },
     { q: "Is the price fixed or an estimate?", a: "Always fixed. The price confirmed on the call is the price you pay. Nothing is added on the day without your explicit approval." },
-    { q: "How quickly can you match me?", a: "Within 60 seconds of posting your job, our team calls to confirm a verified driver and locked quote." },
+    { q: "How quickly can you match me?", a: "Within 15 minutes of posting your job, our team calls to confirm a verified driver and locked quote." },
     { q: "Can I book same-day in Birmingham?", a: "Yes — same-day is available most days. Post before 10am for best availability. Urgent? Call us directly." },
     { q: "Are drivers background-checked?", a: "Every driver is verified, insured, and rated by real customers before they're assigned to any job. No exceptions." },
   ],

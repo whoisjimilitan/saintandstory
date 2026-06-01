@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 const STATS = [
   { stat: "4.9", label: "Google rating" },
   { stat: "800+", label: "Office moves" },
-  { stat: "< 60s", label: "Response time" },
+  { stat: "< 15m", label: "Response time" },
   { stat: "Weekend", label: "Slots available" },
 ];
 
 const STEPS = [
   { num: "01", title: "Post your job", desc: "Tell us the office size, both postcodes, and your preferred date. Takes 60 seconds." },
-  { num: "02", title: "Fixed price confirmed", desc: "We call within 1 minute. Price locked. Team assigned." },
+  { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked. Team assigned." },
   { num: "03", title: "Monday, fully operational", desc: "We move everything over the weekend. Your team walks in ready." },
 ];
 
@@ -85,7 +85,7 @@ export default function ManchesterOfficeMoves() {
             </span>
           </Link>
           <ModalCTA
-            label="Get a free quote"
+            label="Get a fixed price"
             source="manchester_nav"
             className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
           />
@@ -112,7 +112,7 @@ export default function ManchesterOfficeMoves() {
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
-              label="Get a free quote →"
+              label="Get a fixed price — free →"
               source="manchester_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -226,7 +226,7 @@ export default function ManchesterOfficeMoves() {
               <br />get m<span className="font-display italic font-normal">o</span>ving?
             </h2>
             <p className="text-white/50 text-base mb-8 max-w-xs">
-              We call within 1 minute with a fixed price.
+              We call within 15 minutes with a fixed price.
             </p>
             <div className="border border-white/10 rounded-2xl px-6 py-5">
               <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] mb-2">Response time</p>
@@ -236,7 +236,7 @@ export default function ManchesterOfficeMoves() {
           </div>
           <div className="flex flex-col gap-4">
             <ModalCTA
-              label="Get a free quote →"
+              label="Get a fixed price — free →"
               source="manchester_cta"
               className="w-full bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold py-4 rounded-full text-sm transition-colors"
             />
@@ -273,7 +273,7 @@ export default function ManchesterOfficeMoves() {
       {/* Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
         <ModalCTA
-          label="Get a free quote →"
+          label="Get a fixed price — free →"
           source="manchester_mobile"
           className="block w-full bg-[#0D0D0D] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
         />

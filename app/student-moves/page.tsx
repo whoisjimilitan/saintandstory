@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const STATS = [
   { stat: "4.9★", label: "Verified reviews" },
   { stat: "From £95", label: "Fixed price" },
-  { stat: "< 60s", label: "Response time" },
+  { stat: "< 15m", label: "Response time" },
   { stat: "30+", label: "UK cities covered" },
 ];
 
@@ -81,7 +81,7 @@ export default function StudentMoves() {
           </p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
-              label="Get a quote →"
+              label="Get a fixed price — free →"
               source="student_moves_hero"
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -190,7 +190,7 @@ export default function StudentMoves() {
               No van hire. No stress. Fixed price.
             </p>
             <ModalCTA
-              label="Get a quote →"
+              label="Get a fixed price — free →"
               source="student_moves_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

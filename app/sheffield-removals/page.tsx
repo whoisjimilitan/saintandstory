@@ -7,7 +7,7 @@ const data: CityPageData = {
   sub: "Post your Sheffield removal in 60 seconds. We match you to a verified local driver. Fixed price, no surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
-    { stat: "< 60s", label: "Response time" },
+    { stat: "< 15m", label: "Response time" },
     { stat: "Fixed", label: "Price. Always." },
     { stat: "S1–S36", label: "All postcodes" },
   ],
@@ -41,7 +41,7 @@ const data: CityPageData = {
     { q: "Do you cover all Sheffield postcodes?", a: "Yes — all S postcodes from the city centre to Chesterfield and Rotherham. 7 days a week, 7am to 10pm." },
     { q: "Do you do student moves in Sheffield?", a: "Yes — student moves are a speciality. Halls to flat, flat to flat, Sheffield to anywhere in the UK. Fixed price." },
     { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on the day without your approval." },
-    { q: "How fast is the response?", a: "We call within 60 seconds of posting. Driver matched and price locked before we hang up." },
+    { q: "How fast is the response?", a: "We call within 15 minutes of posting. Driver matched and price locked before we hang up." },
     { q: "What if something gets damaged?", a: "Every move is fully insured. We handle damage claims directly — no complicated process." },
   ],
   source: "sheffield_removals",
