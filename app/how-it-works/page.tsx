@@ -14,7 +14,7 @@ const CUSTOMER_STEPS = [
     num: "01",
     title: "Post your job",
     desc: "Tell us what's moving, where from, where to, and when. Takes 60 seconds. No account needed. Free to post.",
-    detail: "We ask for the basics — collection postcode, delivery postcode, type of move, and preferred date. That's it. You don't create an account and you don't pay anything to post.",
+    detail: "We ask for the basics — collection postcode, delivery postcode, type of move, and preferred date. That's it. No account. Free to post.",
   },
   {
     num: "02",
@@ -37,19 +37,19 @@ const CUSTOMER_STEPS = [
   {
     num: "05",
     title: "Done. Rate your driver.",
-    desc: "Once your job is marked complete, you receive a link to rate your driver.",
-    detail: "Ratings keep our drivers accountable and our standards high. Every driver on the platform is rated by real customers — visible to us before every assignment.",
+    desc: "When the job's done, you get a link to rate your driver.",
+    detail: "Ratings keep our drivers accountable and our standards high. Every driver is rated by real customers — visible to us before every assignment.",
   },
 ];
 
 const GUARANTEES = [
   {
     title: "Fixed price. Always.",
-    desc: "The price confirmed on the call is the price you pay. We have never added a charge after confirmation without prior customer approval.",
+    desc: "The price confirmed on the call is the price you pay. We have never added a charge after confirmation without speaking to the customer first.",
   },
   {
     title: "Verified drivers only.",
-    desc: "Every driver is background-checked, insured, and rated by real customers before being assigned to any job. No exceptions.",
+    desc: "Every driver is background-checked, insured, and rated — before we put them on your job. No exceptions.",
   },
   {
     title: "Response in 15 minutes.",
@@ -57,16 +57,16 @@ const GUARANTEES = [
   },
   {
     title: "Full insurance.",
-    desc: "Every move is fully insured in transit and during loading and unloading. We handle any damage claim directly.",
+    desc: "Every move is fully insured — in transit and on the job. We handle any claim directly.",
   },
 ];
 
 const FAQS = [
-  { q: "Do I need to create an account?", a: "No. You can post a job and receive a confirmation without creating an account. Everything is handled by our team directly." },
+  { q: "Do I need to create an account?", a: "No. Post a job and get your confirmation without creating an account. We handle everything." },
   { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing — then confirm availability before calling you back. You don't browse or choose from a list." },
   { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
   { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply — confirmed when you book." },
-  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time — from matched driver through to completed." },
+  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time — from driver match to completion." },
   { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Post your job — if we can't cover it, we'll tell you immediately." },
 ];
 
@@ -85,7 +85,7 @@ export default function HowItWorks() {
             <br />w<span className="font-display italic font-normal">o</span>rks.
           </h1>
           <p className="text-[#888888] text-base max-w-sm">
-            Post in 60 seconds. Fixed price confirmed on the call. Verified driver. Done properly.
+            Post in 60 seconds. Fixed price on the call. Verified driver. Done properly.
           </p>
         </div>
       </section>
