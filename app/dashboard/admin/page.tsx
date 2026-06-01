@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import AdminPanel from "@/components/AdminPanel";
 import IndexNowButton from "@/components/IndexNowButton";
 import AdminAutoRefresh from "@/components/AdminAutoRefresh";
@@ -139,7 +140,12 @@ export default async function AdminPage() {
       <AdminAutoRefresh pendingCount={pendingJobs.length} />
       <AdminPushSubscribe />
       <AdminLocationUpdater />
-      <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Admin</p>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Admin</p>
+        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          B2B Pipeline →
+        </Link>
+      </div>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         Dashboard.
       </h1>

@@ -33,6 +33,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/student-moves", priority: 0.85 },
     { path: "/piano-moving", priority: 0.85 },
     { path: "/house-clearance", priority: 0.85 },
+    { path: "/b2b/florists", priority: 0.8 },
+    { path: "/b2b/restaurants", priority: 0.8 },
+    { path: "/b2b/retailers", priority: 0.8 },
+    { path: "/b2b/legal", priority: 0.8 },
+    { path: "/b2b/estate-agents", priority: 0.8 },
   ];
 
   const programmaticPages = PROGRAMMATIC_CITIES.map((c) => ({
