@@ -27,38 +27,45 @@ export const metadata: Metadata = {
 const SERVICES = [
   {
     title: "House moves",
-    desc: "Studio to 5-bed. Load, drive, unload — or full-service packing if you need it. All sizes, all floors.",
-    from: "From £180",
+    badge: "Most booked",
+    context: "1-bed flat from £135",
+    desc: "We load, drive, and unload. Studio to 5-bed, all floors. Need full packing too? Just say the word.",
+    from: "From £135",
     source: "services_home",
   },
   {
     title: "Office relocations",
-    desc: "Desks, IT, filing. We move around your schedule — weekends preferred — so your team walks in Monday ready.",
-    from: "From £280",
+    context: "10-desk office from £210",
+    desc: "Desks, IT, filing. We work weekends so your team walks in Monday morning ready to go.",
+    from: "From £210",
     source: "services_office",
   },
   {
-    title: "Same-day",
-    desc: "Need it gone today? Post before 10am. We cover 30+ UK cities, 7 days a week.",
-    from: "From £150",
+    title: "Need it today?",
+    context: "Same-day from £110",
+    desc: "Post before 10am. We cover 30+ UK cities, 7 days a week. Urgent? Call us directly.",
+    from: "From £110",
     source: "services_sameday",
   },
   {
     title: "Specialist items",
-    desc: "Pianos, antiques, gym equipment. Specialist rigging and padded wrapping included — nothing left to chance.",
-    from: "From £220",
+    context: "Piano or antique from £165",
+    desc: "Pianos, antiques, gym equipment. Specialist rigging and padded wrapping on every job.",
+    from: "From £165",
     source: "services_specialist",
   },
   {
     title: "Student moves",
-    desc: "End of term, halls to flat, city to city. Fixed price — no van hire, no friend guilt, no stress.",
-    from: "From £95",
+    context: "Halls to flat from £75",
+    desc: "End of term, halls to flat, city to city. Fixed price. No van hire, no borrowed favours.",
+    from: "From £75",
     source: "services_student",
   },
   {
     title: "Clearance",
-    desc: "Furniture, appliances, the lot. Removed responsibly — we sort what can be recycled or donated.",
-    from: "From £120",
+    context: "Single room from £90",
+    desc: "Furniture, appliances, the lot. We sort what gets recycled, donated, and disposed of properly.",
+    from: "From £90",
     source: "services_clearance",
     href: "/house-clearance",
   },
@@ -88,13 +95,21 @@ export default function ServicesPage() {
         <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {SERVICES.map((s) => (
             <div key={s.title} className="bg-white border border-[#E8E8E8] rounded-2xl p-7 flex flex-col">
-              <h2 className="font-sans font-bold text-[#0D0D0D] text-base mb-2">{s.title}</h2>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h2 className="font-sans font-bold text-[#0D0D0D] text-base">{s.title}</h2>
+                {"badge" in s && s.badge && (
+                  <span className="shrink-0 text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em] bg-[#F5F5F5] px-2.5 py-1 rounded-full">
+                    {s.badge}
+                  </span>
+                )}
+              </div>
+              <p className="text-[#888888] text-xs mb-3">{s.context}</p>
               <p className="text-[#888888] text-sm leading-relaxed mb-5 flex-1">{s.desc}</p>
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#E8E8E8]">
                 <p className="font-sans font-black text-[#0D0D0D] text-sm">{s.from}</p>
                 {"href" in s && s.href ? (
                   <Link href={s.href} className="text-[#0D0D0D] text-xs font-semibold hover:text-[#888888] transition-colors">
-                    Learn more →
+                    Get a price →
                   </Link>
                 ) : (
                   <ModalCTA
