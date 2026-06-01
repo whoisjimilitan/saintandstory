@@ -62,12 +62,12 @@ export default function ThankYou() {
           <p className="text-white/70 text-sm leading-relaxed mb-4">
             If you know a man-and-van or removal driver who could do with more work — send them this link. They keep 100% of every job.
           </p>
-          <a
+          <Link
             href="/for-drivers"
             className="inline-block border border-white/20 hover:border-white/40 text-white/70 hover:text-white font-semibold px-5 py-2.5 rounded-full text-xs transition-colors"
           >
             Share the driver page →
-          </a>
+          </Link>
         </div>
 
         <div>
