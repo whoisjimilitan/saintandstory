@@ -19,7 +19,7 @@ const CONTENT = {
       </>
     ),
     sub: "Verified drivers. Fixed price. Zero faff.",
-    cta: "Post a job — it's free",
+    cta: "Get a fixed price — free →",
     source: "hero_customer",
   },
   driver: {

@@ -58,7 +58,7 @@ export default function ClaimArea() {
                 Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
               </p>
               <ModalCTA
-                label="Post a job — it's free →"
+                label="Get a fixed price — free →"
                 source="claim_area_customer"
                 className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
               />

@@ -62,7 +62,7 @@ const GUARANTEES = [
 ];
 
 const FAQS = [
-  { q: "Do I need to create an account?", a: "No. Post a job and get your confirmation without creating an account. We handle everything." },
+  { q: "Do I need to create an account?", a: "No. Fill in your details and get your confirmation without creating an account. We handle everything." },
   { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing — then confirm availability before calling you back. You don't browse or choose from a list." },
   { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
   { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply — confirmed when you book." },
@@ -155,7 +155,7 @@ export default function HowItWorks() {
               Post your job in 60 seconds. Fixed price on the call.
             </p>
             <ModalCTA
-              label="Post a job — it's free →"
+              label="Get a fixed price — free →"
               source="how_it_works_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

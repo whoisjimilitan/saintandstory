@@ -82,7 +82,7 @@ export default function LondonHomeMoves() {
             </span>
           </Link>
           <ModalCTA
-            label="Post a job"
+            label="Get a fixed price"
             source="lp_nav_london-home-moves"
             className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
           />
@@ -203,12 +203,12 @@ export default function LondonHomeMoves() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Post your job in 60 seconds.
+              Get a fixed price in 60 seconds.
               <br />We find y<span className="font-display italic font-normal">o</span>ur London driver.
               <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
             </p>
             <ModalCTA
-              label="Post a job — it's free →"
+              label="Get a fixed price — free →"
               source="lp_bottom_london-home-moves"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -240,7 +240,7 @@ export default function LondonHomeMoves() {
       {/* Mobile sticky bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
         <ModalCTA
-          label="Post a job — it's free →"
+          label="Get a fixed price — free →"
           source="lp_mobile_bar_london-home-moves"
           className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
         />

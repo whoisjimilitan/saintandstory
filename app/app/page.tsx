@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "Post a job in 60 seconds.",
+    title: "Get a fixed price in 60 seconds.",
     desc: "Tap, fill in the details, submit. Our team calls you back before you've put the phone down.",
   },
   {
@@ -147,10 +147,10 @@ export default function AppPage() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Post your first job in 60 seconds.
+              Get a fixed price in 60 seconds.
             </p>
             <ModalCTA
-              label="Post a job — it's free →"
+              label="Get a fixed price — free →"
               source="app_page_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

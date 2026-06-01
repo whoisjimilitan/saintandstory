@@ -72,7 +72,7 @@ export default function Nav() {
                 Join as driver
               </button>
             ) : (
-              <ModalCTA label="Post a job" source="nav" className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors" />
+              <ModalCTA label="Get a fixed price" source="nav" className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors" />
             )}
           </div>
 
@@ -83,7 +83,7 @@ export default function Nav() {
                 Join as driver
               </button>
             ) : (
-              <ModalCTA label="Post a job" source="nav_mobile" className="bg-[#0D0D0D] text-white font-semibold px-4 py-2 rounded-full text-sm" />
+              <ModalCTA label="Get a fixed price" source="nav_mobile" className="bg-[#0D0D0D] text-white font-semibold px-4 py-2 rounded-full text-sm" />
             )}
             <button
               onClick={() => setMenuOpen(o => !o)}

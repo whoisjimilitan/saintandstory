@@ -84,7 +84,7 @@ export default function ServicesPage() {
               Tell us what needs moving. We match you to the right driver in minutes.
             </p>
             <ModalCTA
-              label="Post a job — it's free"
+              label="Get a fixed price — free"
               source="services_cta"
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />

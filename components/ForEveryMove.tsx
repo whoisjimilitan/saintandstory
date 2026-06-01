@@ -106,7 +106,7 @@ export default function ForEveryMove() {
               onClick={(e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent("open-lead-modal")); }}
               className="shrink-0 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             >
-              Post a job →
+              Get a fixed price →
             </a>
           </>
         )}

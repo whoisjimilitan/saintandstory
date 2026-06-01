@@ -56,7 +56,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
           <p className="text-[#888888] text-base mb-10 max-w-sm">{data.sub}</p>
           <div className="flex flex-wrap gap-3">
             <ModalCTA
-              label="Get a quote →"
+              label="Get a fixed price →"
               source={data.source}
               className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -156,7 +156,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
               Fixed price. Verified driver. Done properly.
             </p>
             <ModalCTA
-              label="Get a quote →"
+              label="Get a fixed price →"
               source={`${data.source}_cta`}
               className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
@@ -168,7 +168,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
 
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
         <ModalCTA
-          label="Get a quote →"
+          label="Get a fixed price →"
           source={`${data.source}_mobile`}
           className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
         />

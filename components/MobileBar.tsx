@@ -40,7 +40,7 @@ export default function MobileBar() {
           onClick={openLead}
           className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
         >
-          Post a job →
+          Get a fixed price →
         </button>
       )}
     </div>
