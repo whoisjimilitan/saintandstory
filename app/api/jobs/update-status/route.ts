@@ -121,7 +121,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Cannot transition from ${job.status} to ${newStatus}` }, { status: 400 });
   }
 
-  await sql`UPDATE jobs SET status = ${newStatus}, updated_at = NOW() WHERE id = ${jobId}`;
+  const tsCol = newStatus === "in_progress" ? "in_progress_at" : newStatus === "completed" ? "completed_at" : null;
+  if (tsCol === "in_progress_at") {
+    await sql`UPDATE jobs SET status = ${newStatus}, in_progress_at = NOW(), updated_at = NOW() WHERE id = ${jobId}`;
+  } else if (tsCol === "completed_at") {
+    await sql`UPDATE jobs SET status = ${newStatus}, completed_at = NOW(), updated_at = NOW() WHERE id = ${jobId}`;
+  } else {
+    await sql`UPDATE jobs SET status = ${newStatus}, updated_at = NOW() WHERE id = ${jobId}`;
+  }
 
   if (newStatus === "in_progress") {
     await notifyCustomerEnRoute(job);

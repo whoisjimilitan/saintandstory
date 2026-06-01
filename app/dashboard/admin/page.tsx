@@ -52,7 +52,8 @@ async function getConfirmedJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
     SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
-      j.driver_eta_minutes, j.location_sharing_since
+      j.driver_eta_minutes, j.location_sharing_since,
+      j.confirmed_at, j.in_progress_at, j.completed_at
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'confirmed'
@@ -64,7 +65,8 @@ async function getInProgressJobs() {
   const sql = neon(process.env.DATABASE_URL!);
   return await sql`
     SELECT j.*, d.full_name as driver_name, d.phone as driver_phone,
-      j.driver_eta_minutes, j.location_sharing_since
+      j.driver_eta_minutes, j.location_sharing_since,
+      j.confirmed_at, j.in_progress_at, j.completed_at
     FROM jobs j
     LEFT JOIN drivers d ON d.id = j.driver_id
     WHERE j.status = 'in_progress'
@@ -82,8 +84,18 @@ async function getActiveDrivers() {
         WHERE j.driver_id = d.id
           AND j.status IN ('confirmed', 'in_progress', 'completed')
           AND j.offered_at IS NOT NULL
-      ) as avg_response_mins
+      ) as avg_response_mins,
+      aj.reference as current_job_ref,
+      aj.postcode_from as current_job_from,
+      aj.postcode_to as current_job_to,
+      aj.status as current_job_status
     FROM drivers d
+    LEFT JOIN LATERAL (
+      SELECT reference, postcode_from, postcode_to, status
+      FROM jobs j2
+      WHERE j2.driver_id = d.id AND j2.status IN ('confirmed', 'in_progress')
+      LIMIT 1
+    ) aj ON true
     WHERE d.profile_live = true
     ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
   ` as Record<string, unknown>[];
@@ -123,14 +135,14 @@ export default async function AdminPage() {
     return t && Date.now() - new Date(t).getTime() < 5 * 60 * 1000;
   }).length;
 
-  const stats = [
-    inProgressJobs.length > 0 && `${inProgressJobs.length} en route`,
-    pendingJobs.length > 0 && `${pendingJobs.length} order${pendingJobs.length !== 1 ? "s" : ""}`,
-    offeredJobs.length > 0 && `${offeredJobs.length} awaiting`,
-    confirmedJobs.length > 0 && `${confirmedJobs.length} confirmed`,
-    `${onlineCount} online`,
-    todayRevenue > 0 && `£${todayRevenue.toFixed(0)} today`,
-  ].filter(Boolean).join(" · ");
+  const statLinks = [
+    inProgressJobs.length > 0 && { label: `${inProgressJobs.length} en route`, href: "#section-enroute", bold: true },
+    pendingJobs.length > 0 && { label: `${pendingJobs.length} order${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
+    offeredJobs.length > 0 && { label: `${offeredJobs.length} awaiting`, href: "#section-awaiting", bold: false },
+    confirmedJobs.length > 0 && { label: `${confirmedJobs.length} confirmed`, href: "#section-confirmed", bold: false },
+    { label: `${onlineCount} online`, href: "#section-fleet", bold: false },
+    todayRevenue > 0 && { label: `£${todayRevenue.toFixed(0)} today`, href: "#section-completed", bold: false },
+  ].filter(Boolean) as { label: string; href: string; bold: boolean }[];
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -142,7 +154,19 @@ export default async function AdminPage() {
         Dashboard.
       </h1>
       <div className="flex items-center justify-between mb-8">
-        <p className="text-[#888888] text-sm">{stats}</p>
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {statLinks.map((s, i) => (
+            <span key={s.href} className="flex items-center gap-3">
+              {i > 0 && <span className="text-[#E8E8E8] text-xs">·</span>}
+              <a
+                href={s.href}
+                className={`text-sm transition-colors hover:text-[#0D0D0D] ${s.bold ? "font-semibold text-[#0D0D0D]" : "text-[#888888]"}`}
+              >
+                {s.label}
+              </a>
+            </span>
+          ))}
+        </div>
         <IndexNowButton />
       </div>
 

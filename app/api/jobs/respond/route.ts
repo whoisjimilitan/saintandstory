@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   if (action === "accept") {
     await sql`
-      UPDATE jobs SET status = 'confirmed', updated_at = NOW()
+      UPDATE jobs SET status = 'confirmed', confirmed_at = NOW(), updated_at = NOW()
       WHERE tracking_token = ${token}
     `;
     await notifyCustomerConfirmed(job);
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
   if (!job) return NextResponse.json({ error: "Job not found" }, { status: 404 });
 
   if (action === "accept") {
-    await sql`UPDATE jobs SET status = 'confirmed', updated_at = NOW() WHERE id = ${jobId}`;
+    await sql`UPDATE jobs SET status = 'confirmed', confirmed_at = NOW(), updated_at = NOW() WHERE id = ${jobId}`;
     await notifyCustomerConfirmed(job);
     await notifyAdminConfirmed(job);
   } else {
