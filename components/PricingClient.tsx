@@ -17,7 +17,7 @@ const HOW_STEPS = [
   {
     num: "02",
     title: "We call with a fixed price.",
-    desc: "One number, locked on the call. Your driver is already matched and briefed before we hang up.",
+    desc: "One number, locked on the call. We've already picked your driver and told them about your move before we hang up.",
   },
   {
     num: "03",
@@ -31,7 +31,7 @@ const AFFECTS = [
   { factor: "Distance", detail: "Local or cross-country" },
   { factor: "Level of help", detail: "Driver only, or full crew with loading and unloading" },
   { factor: "Specialist items", detail: "Pianos, antiques, gym equipment" },
-  { factor: "Timing", detail: "Same-day or scheduled in advance" },
+  { factor: "Timing", detail: "Same-day or booked ahead" },
 ];
 
 const INCLUDED = [
@@ -56,7 +56,7 @@ const SERVICE_PRICES = [
 const DRIVER_CARDS = [
   {
     title: "Free to create your profile.",
-    desc: "Set up your profile and area at no cost. Your profile goes live and becomes searchable once you subscribe.",
+    desc: "Set up your profile and area for free. Customers can find you once you subscribe.",
     stat: "£0",
     statLabel: "to create your profile",
   },
