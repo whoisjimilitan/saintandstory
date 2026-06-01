@@ -183,7 +183,7 @@ import SiteFooter from "@/components/SiteFooter";
 // CUSTOMER:
 export const metadata: Metadata = {
   title: "[SERVICE] in [CITY] | Saint & Story Logistics",
-  description: "Post your [service] job in [CITY]. We match you to a verified local driver. Fixed price. No surprises. Free to post.",
+  description: "Get a fixed price for your [service] in [CITY]. Verified local driver matched and confirmed. Fixed price. No surprises.",
 };
 
 // DRIVER:
@@ -219,7 +219,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
       </span>
     </Link>
     <ModalCTA
-      label="Post a job"
+      label="Get a fixed price"
       source="lp_nav_[SLUG]"
       className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors"
     />
@@ -249,7 +249,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
       <br />D<span className="font-display italic font-normal">o</span>ne right.
     </h1>
     <p className="text-white/70 text-base mb-10 max-w-sm">
-      Post your job in 60 seconds. We match you to a verified [CITY] driver. Fixed price. No surprises.
+      Get a fixed price in 60 seconds. Verified [CITY] driver matched and confirmed. No surprises.
     </p>
     <LandingHeroSearch city="[CITY]" />
     <p className="text-white/40 text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
@@ -301,7 +301,7 @@ Self-contained nav — do NOT import the global Nav component. Keeps generated p
   <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
     {/* Write 4 stats relevant to CITY + SERVICE. Examples: */}
     {/* { stat: "4.9★", label: "Verified reviews" } */}
-    {/* { stat: "< 60s", label: "Response time" } */}
+    {/* { stat: "< 15m", label: "Response time" } */}
     {/* { stat: "Fixed", label: "Price. Always." } */}
     {/* { stat: "UK-wide", label: "Coverage" } */}
   </div>
@@ -445,12 +445,12 @@ Always use these 4 for driver pages:
     </h2>
     <div>
       <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-        Post your job in 60 seconds.
+        Get a fixed price in 60 seconds.
         <br />We find y<span className="font-display italic font-normal">o</span>ur [CITY] driver.
         <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
       </p>
       <ModalCTA
-        label="Post a job — it's free →"
+        label="Get a fixed price — free →"
         source="lp_bottom_[SLUG]"
         className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
       />
@@ -526,7 +526,7 @@ Hidden on desktop. Fixed bottom. `md:hidden`.
 ```tsx
 <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-[#E8E8E8] px-4 py-3">
   <ModalCTA
-    label="Post a job — it's free →"
+    label="Get a fixed price — free →"
     source="lp_mobile_bar_[SLUG]"
     className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
   />
@@ -663,7 +663,7 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Leeds",
   headline: "Leeds rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-  sub: "Post your job in 60 seconds. Verified Leeds driver matched and confirmed.",
+  sub: "Get a fixed price in 60 seconds. Verified Leeds driver matched and confirmed.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 60s", label: "Response time" },
