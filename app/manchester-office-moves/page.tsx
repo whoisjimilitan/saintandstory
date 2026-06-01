@@ -26,7 +26,7 @@ const INCLUDED = [
   "Furniture disassembly and reassembly",
   "Weekend and out-of-hours slots",
   "Fully insured transit",
-  "Fixed price — nothing added on the day",
+  "Fixed price. Nothing added on the day.",
 ];
 
 const REVIEWS = [
@@ -48,8 +48,8 @@ const REVIEWS = [
 ];
 
 const FAQS = [
-  { q: "Can you move our office over a weekend?", a: "Yes — weekend and out-of-hours moves are our speciality for offices. Your team arrives Monday to a fully operational workspace." },
-  { q: "How do you handle IT equipment?", a: "We treat IT as specialist cargo — wrapped, boxed, and tracked. We work with your IT team to ensure correct labelling and placement." },
+  { q: "Can you move our office over a weekend?", a: "Weekend and out-of-hours moves are our speciality for offices. Your team arrives Monday to a fully operational workspace." },
+  { q: "How do you handle IT equipment?", a: "We treat IT as specialist cargo: wrapped, boxed, and tracked. We work with your IT team to ensure correct labelling and placement." },
   { q: "Is the price fixed?", a: "Always. Confirmed on the call before anything moves. No additions without your approval." },
   { q: "How large a move can you handle?", a: "From single-person offices to 50+ desk corporate relocations. We scale the team and vehicles to match." },
 ];

@@ -48,7 +48,7 @@ const TESTIMONIALS = [
 const FEATURES = [
   { title: "Fixed price, first call.", desc: "Your price is locked before anything moves. No changes, no additions on the day." },
   { title: "Verified drivers only.", desc: "Background-checked, insured, and rated by real London customers before they're listed." },
-  { title: "All 33 boroughs covered.", desc: "Brixton, Hackney, Canary Wharf, Barnet — 7 days a week, 7am to 10pm." },
+  { title: "All 33 boroughs covered.", desc: "Brixton, Hackney, Canary Wharf, Barnet. Seven days a week, 7am to 10pm." },
 ];
 
 const FAQS = [
@@ -57,9 +57,9 @@ const FAQS = [
   { q: "Is the price fixed or an estimate?", a: "Always fixed. The number confirmed on the call is the number you pay. Nothing is added on the day without your explicit approval." },
   { q: "What happens after I post my job?", a: "We call within 15 minutes to confirm your fixed price and the name of your driver. Locked quote before we hang up — nothing changes on the day." },
   { q: "Are there hidden charges — congestion, ULEZ, parking?", a: "None. Congestion charge, ULEZ, and parking permits are all included in your quote. We don't spring extras on you on moving day." },
-  { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly — no complicated claims process, no argument." },
+  { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly. No complicated claims process, no argument." },
   { q: "Do I need to be present during the move?", a: "Present at the start and end. During transit you're free to travel ahead. We keep you updated throughout via text or call." },
-  { q: "Can I book same-day in London?", a: "Yes — same-day is our speciality. Post before 10am for same-day availability. Need it urgently? Call us directly: 0208 234 4444." },
+  { q: "Can I book same-day in London?", a: "Same-day is our speciality. Post before 10am for same-day availability. Need it urgently? Call us directly: 0208 234 4444." },
 ];
 
 export default function LondonHomeMoves() {

@@ -34,14 +34,14 @@ const STEPS = [
   { num: "01", title: "Tell us what's going", desc: "Rooms, contents, access. 60 seconds. Free to post." },
   { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked before we arrive." },
   { num: "03", title: "We clear it", desc: "Professional team. Everything removed. Property left clean." },
-  { num: "04", title: "Responsible disposal", desc: "Sorted for donation, recycling, and responsible disposal — not just landfill." },
+  { num: "04", title: "Responsible disposal", desc: "Sorted for donation, recycling, and responsible disposal. Not just landfill." },
 ];
 
 const INCLUDED = [
-  "Full property or single room — any size",
+  "Full property or single room. Any size.",
   "Furniture, appliances, clothing, general contents",
-  "Fixed price — confirmed before we arrive",
-  "Responsible disposal — recycled and donated where possible",
+  "Fixed price, confirmed before we arrive",
+  "Responsible disposal: recycled and donated where possible",
   "Property left swept and clear",
   "7 days a week, 7am–10pm",
 ];
@@ -68,12 +68,12 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "What do you take?", a: "Everything — furniture, white goods, clothing, books, general household contents. If it's in the property and you want it gone, we'll take it." },
+  { q: "What do you take?", a: "Furniture, white goods, clothing, books, general household contents. If it's in the property and you want it gone, we'll take it." },
   { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before we arrive. Nothing added on the day without your approval." },
-  { q: "What happens to the items?", a: "We sort everything — usable items go to charity or are resold, recyclables are processed responsibly, and the remainder goes to licenced waste disposal. We don't just skip everything." },
-  { q: "Can you do same-day clearances?", a: "Yes — post before 10am for same-day availability most days. Urgent clearances outside those hours? Call us directly." },
-  { q: "Do you cover probate and bereavement clearances?", a: "Yes — and we approach them accordingly. Our team understands the sensitivity of these jobs. Professional and respectful throughout." },
-  { q: "Which areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow — and growing. Post your job and we'll confirm availability for your location." },
+  { q: "What happens to the items?", a: "We sort everything. Usable items go to charity or are resold, recyclables are processed responsibly, and the remainder goes to licensed waste disposal. We don't just skip everything." },
+  { q: "Can you do same-day clearances?", a: "Post before 10am for same-day availability most days. Urgent clearances outside those hours? Call us directly." },
+  { q: "Do you cover probate and bereavement clearances?", a: "We do, and we approach them accordingly. Our team understands the sensitivity of these jobs. Professional and respectful throughout." },
+  { q: "Which areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow and growing. Post your job and we'll confirm availability for your location." },
 ];
 
 export default function HouseClearance() {

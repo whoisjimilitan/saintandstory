@@ -13,7 +13,7 @@ const data: CityPageData = {
   ],
   steps: [
     { num: "01", title: "Post your job", desc: "60 seconds. No account needed. Free to post." },
-    { num: "02", title: "We find your driver", desc: "Verified Bristol driver — matched, confirmed, and briefed by us." },
+    { num: "02", title: "We find your driver", desc: "Verified Bristol driver, matched, confirmed, and briefed by us." },
     { num: "03", title: "Confirm your price", desc: "Fixed before anything moves. No surprises on move day." },
     { num: "04", title: "Move day", desc: "Professional, on time, done properly." },
   ],
@@ -38,10 +38,10 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover the whole Bristol area?", a: "Yes — all BS postcodes including Bath, Clevedon, and the surrounding area. 7 days a week, 7am to 10pm." },
-    { q: "What about narrow streets and no parking?", a: "Bristol's tricky streets are our speciality. Parking permits and access challenges are handled upfront — included in your fixed price." },
+    { q: "Do you cover the whole Bristol area?", a: "We cover all BS postcodes including Bath, Clevedon, and surrounding areas. Seven days a week, 7am to 10pm." },
+    { q: "What about narrow streets and no parking?", a: "Bristol's tricky streets are our speciality. Parking permits and access challenges are handled upfront, included in your fixed price." },
     { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. No additions without your explicit approval." },
-    { q: "Can you do same-day in Bristol?", a: "Yes — same-day is available most days. Post before 10am for best availability." },
+    { q: "Can you do same-day in Bristol?", a: "Same-day is available most days. Post before 10am for the best slots." },
     { q: "Are your drivers vetted?", a: "Every driver is background-checked, insured, and rated by real Bristol customers. You always know who's coming." },
   ],
   source: "bristol_removals",

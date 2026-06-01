@@ -9,7 +9,7 @@ const FEATURES = [
   },
   {
     title: "Covered door to door.",
-    desc: "Every item covered — loading, transit, delivery.",
+    desc: "Every item covered: loading, transit, delivery.",
   },
 ];
 
@@ -23,7 +23,7 @@ export default function WhySection() {
             <br />without the luck.
           </h2>
           <p className="text-[#888888] text-sm leading-relaxed max-w-xs">
-            Both sides of the job — handled properly.
+            Both sides of the job, handled properly.
           </p>
         </div>
 

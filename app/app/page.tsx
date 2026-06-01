@@ -15,11 +15,11 @@ const FEATURES = [
   },
   {
     title: "Track your move in real time.",
-    desc: "From driver confirmed to job complete — every status update on your home screen.",
+    desc: "From driver confirmed to job complete. Every status update on your home screen.",
   },
   {
     title: "All your jobs, one place.",
-    desc: "Past jobs, upcoming moves, tracking links — everything accessible without logging in each time.",
+    desc: "Past jobs, upcoming moves, tracking links. Everything accessible without logging in each time.",
   },
   {
     title: "Works offline.",

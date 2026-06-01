@@ -36,10 +36,10 @@ const CUSTOMER_TIERS = [
 
 const DRIVER_CARDS = [
   {
-    title: "Free to start.",
-    desc: "Create your profile, set your area, go live. No credit card. No obligation.",
+    title: "Free to create your profile.",
+    desc: "Set up your profile and area at no cost. Your profile goes live and becomes searchable once you subscribe.",
     stat: "£0",
-    statLabel: "to get started",
+    statLabel: "to create your profile",
   },
   {
     title: "Founding driver rate.",

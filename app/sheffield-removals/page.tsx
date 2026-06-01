@@ -38,11 +38,11 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Sheffield postcodes?", a: "Yes — all S postcodes from the city centre to Chesterfield and Rotherham. 7 days a week, 7am to 10pm." },
-    { q: "Do you do student moves in Sheffield?", a: "Yes — student moves are a speciality. Halls to flat, flat to flat, Sheffield to anywhere in the UK. Fixed price." },
+    { q: "Do you cover all Sheffield postcodes?", a: "We cover all S postcodes from the city centre to Chesterfield and Rotherham. 7 days a week, 7am to 10pm." },
+    { q: "Do you do student moves in Sheffield?", a: "Student moves are a speciality. Halls to flat, flat to flat, Sheffield to anywhere in the UK. Fixed price." },
     { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on the day without your approval." },
     { q: "How fast is the response?", a: "We call within 15 minutes of posting. Driver matched and price locked before we hang up." },
-    { q: "What if something gets damaged?", a: "Every move is fully insured. We handle damage claims directly — no complicated process." },
+    { q: "What if something gets damaged?", a: "Every move is fully insured. We handle damage claims directly. No complicated process." },
   ],
   source: "sheffield_removals",
 };

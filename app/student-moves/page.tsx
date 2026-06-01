@@ -24,7 +24,7 @@ const STEPS = [
 ];
 
 const INCLUDED = [
-  "Fixed price — no surprises on collection day",
+  "Fixed price. No surprises on collection day.",
   "Verified, insured driver every time",
   "No van hire, no fuel costs, no friend guilt",
   "End of term and same-day availability",
@@ -54,11 +54,11 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "Is it cheaper than hiring a van?", a: "Often yes — especially when you factor in fuel, van hire insurance, and the time cost of doing it yourself. Get a fixed quote and compare." },
-  { q: "Can you do end-of-term moves?", a: "Yes — end-of-term is one of our busiest periods. Book early for the best slots. Fixed price confirmed before you commit." },
-  { q: "Do you move between cities?", a: "Yes. Leeds to London, Sheffield to Manchester, Bristol to Birmingham — any UK city to any UK city. Fixed price, no mileage surprises." },
+  { q: "Is it cheaper than hiring a van?", a: "For most students, yes. Van hire plus fuel, insurance, and a morning of your time often costs more than a fixed-price driver who loads for you. Get a quote and see." },
+  { q: "Can you do end-of-term moves?", a: "End of term is one of our busiest periods. Book early for the best slots. Fixed price confirmed before you commit." },
+  { q: "Do you move between cities?", a: "Leeds to London, Sheffield to Manchester, Bristol to Birmingham. Any UK city to any UK city. Fixed price, no mileage surprises." },
   { q: "Is the price really fixed?", a: "Completely fixed. The number confirmed on the call is the number you pay. Nothing added without your approval." },
-  { q: "What if I have a lot of stuff?", a: "Just tell us the approximate volume when you post. We match you to the right vehicle — van, long wheelbase, or luton as needed." },
+  { q: "What if I have a lot of stuff?", a: "Tell us the approximate volume when you post. We match you to the right vehicle: van, long wheelbase, or Luton as needed." },
 ];
 
 export default function StudentMoves() {

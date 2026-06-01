@@ -14,13 +14,13 @@ const CUSTOMER_STEPS = [
     num: "01",
     title: "Post your job",
     desc: "Tell us what's moving, where from, where to, and when. Takes 60 seconds. No account needed. Free to post.",
-    detail: "We ask for the basics — collection postcode, delivery postcode, type of move, and preferred date. That's it. No account. Free to post.",
+    detail: "We ask for the basics: collection postcode, delivery postcode, type of move, and preferred date. That's it. No account needed.",
   },
   {
     num: "02",
     title: "We call within 15 minutes",
     desc: "Our team calls you back with a fixed price and a verified driver already matched.",
-    detail: "No shortlist to wade through. One call, one price, one driver — already matched and briefed before we hang up.",
+    detail: "No shortlist to wade through. One call, one price, one driver. Already matched and briefed before we hang up.",
   },
   {
     num: "03",
@@ -32,7 +32,7 @@ const CUSTOMER_STEPS = [
     num: "04",
     title: "Move day",
     desc: "Your driver arrives on time. Professional, insured, briefed. Done properly.",
-    detail: "You get your driver's name and a job reference. Track everything in real time. If anything comes up, you have a direct line to us — not a chatbot.",
+    detail: "You get your driver's name and a job reference. Track everything in real time. If anything comes up, you have a direct line to us. Not a chatbot.",
   },
   {
     num: "05",
@@ -49,25 +49,25 @@ const GUARANTEES = [
   },
   {
     title: "Verified drivers only.",
-    desc: "Every driver is background-checked, insured, and rated — before we put them on your job. No exceptions.",
+    desc: "Every driver is background-checked, insured, and rated before we put them on your job. No exceptions.",
   },
   {
     title: "Response in 15 minutes.",
-    desc: "Post your job and our team calls within 15 minutes — Mon to Sun, 7am to 10pm.",
+    desc: "Post your job and our team calls within 15 minutes. Mon to Sun, 7am to 10pm.",
   },
   {
     title: "Full insurance.",
-    desc: "Every move is fully insured — in transit and on the job. We handle any claim directly.",
+    desc: "Every move is fully insured in transit and on the job. We handle any claim directly.",
   },
 ];
 
 const FAQS = [
   { q: "Do I need to create an account?", a: "No. Fill in your details and get your confirmation without creating an account. We handle everything." },
-  { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing — then confirm availability before calling you back. You don't browse or choose from a list." },
+  { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing, then confirm availability before calling you back. You don't browse or choose from a list." },
   { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
-  { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply — confirmed when you book." },
-  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time — from driver match to completion." },
-  { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Post your job — if we can't cover it, we'll tell you immediately." },
+  { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply. This is confirmed when you book." },
+  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time, from driver match to completion." },
+  { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Post your job and if we can't cover it, we'll tell you straight away." },
 ];
 
 export default function HowItWorks() {

@@ -38,9 +38,9 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Leeds postcodes?", a: "Yes — all LS postcodes from the city centre to Otley, Wetherby, and beyond. 7 days a week, 7am to 10pm." },
+    { q: "Do you cover all Leeds postcodes?", a: "We cover all LS postcodes from the city centre to Otley, Wetherby, and beyond. Seven days a week, 7am to 10pm." },
     { q: "Is the price fixed or an estimate?", a: "Fixed. Always. The number on the call is the number you pay. No additions on move day." },
-    { q: "Can I book a student move in Leeds?", a: "Yes — student moves are a speciality. End of term, halls to flat, Leeds to any UK city. Fixed price, no van hire stress." },
+    { q: "Can I book a student move in Leeds?", a: "Student moves are a speciality. End of term, halls to flat, Leeds to any UK city. Fixed price, no van hire." },
     { q: "How quickly do you respond?", a: "Our team calls within 15 minutes of you posting. Driver matched and price locked before we hang up." },
     { q: "Are drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers. You always know who's coming." },
   ],

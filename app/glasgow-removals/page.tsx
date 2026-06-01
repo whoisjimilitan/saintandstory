@@ -38,10 +38,10 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Glasgow postcodes?", a: "Yes — all G postcodes including Paisley, Rutherglen, and the surrounding area. 7 days a week, 7am to 10pm." },
-    { q: "Can you handle tenement flats?", a: "Yes — tenements are something we deal with every day in Glasgow. Narrow stairs and high floors are no extra charge." },
+    { q: "Do you cover all Glasgow postcodes?", a: "We cover all G postcodes including Paisley, Rutherglen, and surrounding areas. Seven days a week, 7am to 10pm." },
+    { q: "Can you handle tenement flats?", a: "Tenements are something we deal with every day in Glasgow. Narrow stairs and high floors at no extra charge." },
     { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on move day without your approval." },
-    { q: "Can you move the same day?", a: "Yes — same-day is available most days. Post before 10am for best availability." },
+    { q: "Can you move the same day?", a: "Same-day is available most days. Post before 10am for the best slots." },
     { q: "Are your drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers before being assigned any job." },
   ],
   source: "glasgow_removals",

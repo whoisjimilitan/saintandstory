@@ -38,11 +38,11 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Liverpool postcodes?", a: "Yes — all L postcodes from the city centre to Southport and the Wirral. 7 days a week, 7am to 10pm." },
+    { q: "Do you cover all Liverpool postcodes?", a: "We cover all L postcodes from the city centre to Southport and the Wirral. Seven days a week, 7am to 10pm." },
     { q: "Is the price truly fixed?", a: "Absolutely. The price confirmed on our call is what you pay. Nothing is added on move day without your approval." },
     { q: "How fast is the response?", a: "We call within 15 minutes of you posting. Driver assigned and price locked before we hang up." },
-    { q: "Can you move same-day in Liverpool?", a: "Yes — same-day availability most days. Post before 10am for same-day. Urgent? Call us directly." },
-    { q: "What if something gets damaged?", a: "Every move is fully insured. We handle any damage claim directly — no complicated process." },
+    { q: "Can you move same-day in Liverpool?", a: "Same-day availability most days. Post before 10am. Urgent? Call us directly." },
+    { q: "What if something gets damaged?", a: "Every move is fully insured. We handle any damage claim directly. No complicated process." },
   ],
   source: "liverpool_removals",
 };

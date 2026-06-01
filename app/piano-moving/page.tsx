@@ -27,9 +27,9 @@ const INCLUDED = [
   "Piano-specialist removal team",
   "Professional padding and wrapping",
   "Specialist piano straps and board runners",
-  "Stair management — no extra charge",
+  "Stair management. No extra charge.",
   "Fully insured in transit",
-  "Fixed price — confirmed before we arrive",
+  "Fixed price, confirmed before we arrive",
 ];
 
 const TESTIMONIALS = [
@@ -54,9 +54,9 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "Do you move grand pianos?", a: "Yes — baby grands, boudoir grands, and concert grands. Each requires different handling and we brief the team on the specifics of your instrument before arrival." },
-  { q: "What about narrow stairs and tight spaces?", a: "We assess access before the move and arrive with the right equipment. Narrow hallways, tight turns, and high floors are handled as standard — no extra charge." },
-  { q: "Is the piano insured during the move?", a: "Yes — fully insured in transit and during loading and unloading. If anything happens we cover it directly." },
+  { q: "Do you move grand pianos?", a: "Baby grands, boudoir grands, and concert grands. Each requires different handling and we brief the team on the specifics before arrival." },
+  { q: "What about narrow stairs and tight spaces?", a: "We assess access before the move and arrive with the right equipment. Narrow hallways, tight turns, and high floors are handled as standard at no extra charge." },
+  { q: "Is the piano insured during the move?", a: "Fully insured in transit and during loading and unloading. If anything happens we cover it directly." },
   { q: "Will the move affect the piano's tuning?", a: "Any move can affect tuning slightly. We recommend booking a tuner 1–2 weeks after the move once the piano has acclimatised to its new environment." },
   { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before the team arrives. Nothing is added on the day." },
 ];

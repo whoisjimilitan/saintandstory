@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Transit, Luton, Sprinter — all welcome. Live in minutes." },
+  { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Transit, Luton, Sprinter. All welcome. Live in minutes." },
   { num: "02", title: "Post your availability", desc: "Tell us when you're free. Customers in your area see you." },
   { num: "03", title: "Get booked and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
   { num: "04", title: "Get paid", desc: "Finish a job at 3pm. Money in your account before 4pm." },
