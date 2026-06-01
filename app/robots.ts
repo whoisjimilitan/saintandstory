@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard/", "/api/", "/sign-in", "/sign-up"],
+        disallow: ["/dashboard/", "/api/", "/sign-in/", "/sign-up/", "/thank-you", "/job-response", "/track/", "/rate/"],
       },
     ],
     sitemap: "https://saintandstoryltd.co.uk/sitemap.xml",

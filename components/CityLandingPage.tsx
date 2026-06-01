@@ -18,7 +18,7 @@ const BASE_URL = "https://saintandstoryltd.co.uk";
 
 export function buildMetadata(data: CityPageData): Metadata {
   const title = `${data.city} Removals | Fixed Price, Verified Drivers | Saint & Story`;
-  const description = `${data.city} removals done properly. Post your job in 60 seconds — we match you to a verified local driver. Fixed price, no surprises.`;
+  const description = `${data.city} removals done properly. Tell us your move in 60 seconds. We call back with a fixed price and a verified local driver. No surprises.`;
   const ogImage = `${BASE_URL}/og?title=${encodeURIComponent(data.city + " Removals")}&sub=${encodeURIComponent("Fixed price. Verified driver. Done properly.")}`;
   return {
     title,

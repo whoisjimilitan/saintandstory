@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Thank You | Saint & Story Logistics",
   description: "We've received your quote request and will call you within 15 minutes.",
+  robots: { index: false, follow: false },
 };
 
 const STEPS = [
