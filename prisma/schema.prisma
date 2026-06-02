@@ -1,0 +1,155 @@
+// This is a REALITY CAPTURE SYSTEM, not an intelligence system.
+//
+// It stores:
+// - what exists (Business)
+// - what was said (Review)
+// - what was thought (Hypothesis)
+// - what was asked (Conversation)
+// - what happened (Outcome)
+// - what belief changed over time (Assumption)
+//
+// It does NOT store:
+// - what is good
+// - what is better
+// - what is likely
+// - what is high value
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Purpose: What exists
+model Business {
+  id   String @id @default(cuid())
+  name String
+  placeId String? @unique
+  createdAt DateTime @default(now())
+
+  reviews Review[]
+  hypotheses Hypothesis[]
+  conversations Conversation[]
+  outcomes Outcome[]
+}
+
+// Purpose: What was said
+model Review {
+  id String @id @default(cuid())
+  businessId String
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  text String
+  rating Int?
+  author String?
+  createdAt DateTime @default(now())
+}
+
+// Purpose: What was thought (temporary interpretation)
+// Status is informational only, never used for filtering, ranking, or logic
+model Hypothesis {
+  id String @id @default(cuid())
+  businessId String
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  statement String
+  status HypothesisStatus? // Informational only, never used for logic
+  evidenceCount Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum HypothesisStatus {
+  emerging
+  supported
+  weak
+  rejected
+}
+
+// Purpose: What was asked
+model Conversation {
+  id String @id @default(cuid())
+  businessId String
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  question String
+  createdAt DateTime @default(now())
+
+  outcome Outcome?
+}
+
+// Purpose: What happened
+model Outcome {
+  id String @id @default(cuid())
+  conversationId String @unique
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  signalType OutcomeSignal
+  truthLevel TruthLevel
+  signalClassification SignalClassification
+  notes String?
+  createdAt DateTime @default(now())
+}
+
+enum OutcomeSignal {
+  no_contact
+  contacted
+  positive_response
+  negative_response
+  neutral_response
+  no_response
+  deal_not_possible
+}
+
+enum TruthLevel {
+  guess
+  inferred
+  direct
+  verified
+}
+
+enum SignalClassification {
+  supports
+  partially_supports
+  contradicts
+  irrelevant
+  unknown
+}
+
+// Purpose: What belief statement exists
+// Status is informational only, never used for logic.
+// Links to observations happen externally via queries, never encoded in schema.
+model Assumption {
+  id String @id @default(cuid())
+
+  statement String @unique
+  status AssumptionStatus? // Informational only, never used for logic
+}
+
+enum AssumptionStatus {
+  emerging
+  supported
+  weak
+  rejected
+}
+
+// Purpose: Raw observation events (decoupled from interpretation)
+// No links to assumptions. Interpretation happens externally via queries.
+// This ensures: database is memory dump of reality, not a brain.
+model ObservationEvent {
+  id String @id @default(cuid())
+
+  sourceType ObservationSource
+  sourceId String // ID of the source (outcome, review, or conversation)
+  text String // Raw observed signal
+  createdAt DateTime @default(now())
+}
+
+enum ObservationSource {
+  review
+  conversation
+  outcome
+}
