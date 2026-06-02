@@ -39,14 +39,17 @@ export default function OutcomesPage({ params }: { params: { id: string } }) {
           {outcomes.outcomes.map((o: any) => (
             <div key={o.id} className="bg-white border border-gray-200 p-6 rounded-lg">
               <div className="flex justify-between mb-4">
-                <p className="font-semibold">{o.question}</p>
+                <p className="font-semibold text-sm">{o.question}</p>
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                   {o.signal.type}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">Truth Level: {o.truthLevel}</p>
-              <p className="text-sm text-gray-600">Classification: {o.classification}</p>
-              {o.notes && <p className="mt-3 text-gray-700 italic">"{o.notes}"</p>}
+              <p className="text-sm text-gray-600 mb-2">Classification: {o.classification}</p>
+              {o.unexpectedLearning && (
+                <p className="mt-3 text-sm text-gray-700 italic">
+                  <span className="font-medium">Surprise:</span> "{o.unexpectedLearning}"
+                </p>
+              )}
             </div>
           ))}
         </div>

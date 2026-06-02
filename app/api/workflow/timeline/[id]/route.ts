@@ -87,8 +87,8 @@ export async function GET(
           title: "Outcome recorded",
           data: {
             signal: c.outcome.signalType,
-            truthLevel: c.outcome.truthLevel,
-            notes: c.outcome.notes?.substring(0, 100),
+            classification: c.outcome.signalClassification,
+            learning: c.outcome.unexpectedLearning?.substring(0, 100),
           },
         });
       }

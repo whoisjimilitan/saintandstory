@@ -40,9 +40,8 @@ export async function GET(
         outcome: c.outcome
           ? {
               signalType: c.outcome.signalType,
-              truthLevel: c.outcome.truthLevel,
               signalClassification: c.outcome.signalClassification,
-              notes: c.outcome.notes,
+              notes: c.outcome.unexpectedLearning,
               recordedAt: c.outcome.createdAt,
             }
           : null,

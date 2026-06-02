@@ -4,18 +4,16 @@ import { prisma } from "@/lib/prisma";
 /**
  * OUTCOMES: Record what reality said
  *
- * Shows:
- * - outcome signal
- * - truth level
- * - notes
- * - timestamp
+ * Phase 3.3: 3-step capture
+ * 1. What happened? (signal type)
+ * 2. What surprised you? (unexpectedLearning)
+ * 3. What does this say? (classification)
  *
- * Supports all truth contract outcome types.
- * No outcome scoring.
+ * No outcome scoring. Store exactly as entered.
  */
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -42,27 +40,16 @@ export async function GET(
           type: c.outcome!.signalType,
           description: getSignalDescription(c.outcome!.signalType),
         },
-        truthLevel: c.outcome!.truthLevel,
         classification: c.outcome!.signalClassification,
-        notes: c.outcome!.notes,
+        unexpectedLearning: c.outcome!.unexpectedLearning,
       }));
 
     const signalCounts = {
-      no_contact: outcomes.filter(o => o.signal.type === "no_contact").length,
-      contacted: outcomes.filter(o => o.signal.type === "contacted").length,
-      positive_response: outcomes.filter(
-        o => o.signal.type === "positive_response"
-      ).length,
-      negative_response: outcomes.filter(
-        o => o.signal.type === "negative_response"
-      ).length,
-      neutral_response: outcomes.filter(
-        o => o.signal.type === "neutral_response"
-      ).length,
-      no_response: outcomes.filter(o => o.signal.type === "no_response").length,
-      deal_not_possible: outcomes.filter(
-        o => o.signal.type === "deal_not_possible"
-      ).length,
+      no_answer: outcomes.filter(o => o.signal.type === "no_answer").length,
+      spoke_briefly: outcomes.filter(o => o.signal.type === "spoke_briefly").length,
+      real_conversation: outcomes.filter(o => o.signal.type === "real_conversation").length,
+      not_interested: outcomes.filter(o => o.signal.type === "not_interested").length,
+      wrong_fit: outcomes.filter(o => o.signal.type === "wrong_fit").length,
     };
 
     return NextResponse.json({
@@ -70,14 +57,6 @@ export async function GET(
       totalOutcomes: outcomes.length,
       outcomes: outcomes.reverse(),
       signalDistribution: signalCounts,
-      truthLevels: {
-        description:
-          "Truth levels indicate confidence in the outcome recording",
-        guess: "Assumption based on pattern only",
-        inferred: "Interpretation of what was said",
-        direct: "Business owner stated explicitly",
-        verified: "Externally confirmed",
-      },
       nextAction:
         outcomes.length === 0
           ? {
@@ -100,13 +79,11 @@ export async function GET(
 
 function getSignalDescription(signalType: string): string {
   const descriptions: Record<string, string> = {
-    no_contact: "Business not reached",
-    contacted: "Business was contacted",
-    positive_response: "Positive engagement",
-    negative_response: "Negative response",
-    neutral_response: "Neutral response",
-    no_response: "No response received",
-    deal_not_possible: "Not a potential customer",
+    no_answer: "No contact made",
+    spoke_briefly: "Brief conversation",
+    real_conversation: "Substantive discussion",
+    not_interested: "Not interested",
+    wrong_fit: "Wrong business type",
   };
   return descriptions[signalType] || "Unknown signal";
 }

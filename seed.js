@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
@@ -16,7 +16,7 @@ async function main() {
   console.log("✅ Created business:", business.name);
 
   // Create reviews
-  const review1 = await prisma.review.create({
+  await prisma.review.create({
     data: {
       businessId: business.id,
       text: "Hannah designed beautiful wedding flowers for us. Absolutely stunning and delivered perfectly on time.",
@@ -26,7 +26,7 @@ async function main() {
     },
   });
 
-  const review2 = await prisma.review.create({
+  await prisma.review.create({
     data: {
       businessId: business.id,
       text: "Perfect for our Mother's Day arrangements. Emma was so patient and coordinated everything brilliantly.",
@@ -36,7 +36,7 @@ async function main() {
     },
   });
 
-  const review3 = await prisma.review.create({
+  await prisma.review.create({
     data: {
       businessId: business.id,
       text: "Wedding coordination was seamless. Owner Hannah personally helped with all custom design elements. Highly recommend!",
@@ -49,7 +49,7 @@ async function main() {
   console.log("✅ Created 3 reviews");
 
   // Create hypotheses
-  const hypothesis1 = await prisma.hypothesis.create({
+  await prisma.hypothesis.create({
     data: {
       businessId: business.id,
       statement: "Owner is heavily involved in wedding coordination",
@@ -59,7 +59,7 @@ async function main() {
     },
   });
 
-  const hypothesis2 = await prisma.hypothesis.create({
+  await prisma.hypothesis.create({
     data: {
       businessId: business.id,
       statement: "Seasonal peaks like Mother's Day create operational stress",
@@ -84,7 +84,7 @@ async function main() {
   console.log("✅ Created conversation");
 
   // Create outcome
-  const outcome = await prisma.outcome.create({
+  await prisma.outcome.create({
     data: {
       conversationId: conversation.id,
       signalType: "real_conversation",
@@ -97,7 +97,7 @@ async function main() {
   console.log("✅ Created outcome");
 
   // Create assumption
-  const assumption = await prisma.assumption.create({
+  await prisma.assumption.create({
     data: {
       statement: "Owner is heavily involved in operations",
       status: "emerging",

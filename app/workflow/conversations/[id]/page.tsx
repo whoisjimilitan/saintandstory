@@ -1,8 +1,8 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import OutcomeCapture from "@/app/components/OutcomeCapture";
 
 type Conversation = {
   id: string;
@@ -11,7 +11,6 @@ type Conversation = {
   question: string;
   outcome?: {
     signalType: string;
-    truthLevel: string;
     signalClassification: string;
     notes?: string;
     recordedAt: string;
@@ -22,6 +21,8 @@ type Conversation = {
 export default function ConversationsPage({ params }: { params: { id: string } }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCapture, setShowCapture] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -68,17 +69,39 @@ export default function ConversationsPage({ params }: { params: { id: string } }
                 </span>
               </div>
               <p className="font-semibold mb-3">{c.question}</p>
-              {c.outcome && (
+              {c.outcome ? (
                 <div className="bg-gray-50 p-4 rounded mt-4">
                   <p className="text-sm font-medium mb-2">Outcome</p>
                   <p>Signal: {c.outcome.signalType}</p>
-                  <p>Truth Level: {c.outcome.truthLevel}</p>
+                  <p>Classification: {c.outcome.signalClassification}</p>
                   {c.outcome.notes && <p className="mt-2 italic">{c.outcome.notes}</p>}
                 </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setSelectedConversation(c);
+                    setShowCapture(true);
+                  }}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
+                >
+                  Log Outcome
+                </button>
               )}
             </div>
           ))}
         </div>
+      )}
+
+      {showCapture && selectedConversation && (
+        <OutcomeCapture
+          conversationId={selectedConversation.id}
+          question={selectedConversation.question}
+          onClose={() => setShowCapture(false)}
+          onSuccess={() => {
+            setShowCapture(false);
+            window.location.reload();
+          }}
+        />
       )}
 
       <div className="mt-8 flex gap-4">

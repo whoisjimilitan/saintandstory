@@ -87,35 +87,24 @@ model Outcome {
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   signalType OutcomeSignal
-  truthLevel TruthLevel
   signalClassification SignalClassification
-  notes String?
+  unexpectedLearning String? // What surprised you? Stored exactly as written.
   createdAt DateTime @default(now())
 }
 
 enum OutcomeSignal {
-  no_contact
-  contacted
-  positive_response
-  negative_response
-  neutral_response
-  no_response
-  deal_not_possible
-}
-
-enum TruthLevel {
-  guess
-  inferred
-  direct
-  verified
+  no_answer
+  spoke_briefly
+  real_conversation
+  not_interested
+  wrong_fit
 }
 
 enum SignalClassification {
   supports
-  partially_supports
   contradicts
-  irrelevant
-  unknown
+  unclear
+  new_signal
 }
 
 // Purpose: What belief statement exists
