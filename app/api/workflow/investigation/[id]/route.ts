@@ -16,10 +16,11 @@ import { extractPatterns } from "@/lib/interpretation/patterns";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = params.id;
+    const { id } = await params;
+    const businessId = id;
 
     const [business, reviews, hypotheses] = await Promise.all([
       prisma.business.findUnique({

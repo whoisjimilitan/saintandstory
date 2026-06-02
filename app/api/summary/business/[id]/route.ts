@@ -13,10 +13,11 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = params.id;
+    const { id } = await params;
+    const businessId = id;
 
     const [business, hypotheses, reviews, outcomes] = await Promise.all([
       getBusinessEvents(businessId),
