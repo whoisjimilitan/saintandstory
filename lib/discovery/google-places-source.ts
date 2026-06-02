@@ -31,7 +31,7 @@ export class GooglePlacesSource implements IDiscoverySource {
       }
 
       try {
-        const details = await getPlaceDetails(result.placeId);
+        const details = await getPlaceDetails(result.place_id);
         if (!details) continue;
 
         // Skip businesses with no reviews
@@ -44,8 +44,8 @@ export class GooglePlacesSource implements IDiscoverySource {
 
         const payload: RawBusinessPayload = {
           sourceType: "google_places",
-          sourceEntityId: details.place_id,
-          sourceUrl: `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
+          sourceEntityId: result.place_id,
+          sourceUrl: `https://www.google.com/maps/place/?q=place_id:${result.place_id}`,
           name: details.name,
           address: details.formatted_address,
           phone: details.formatted_phone_number,

@@ -79,7 +79,7 @@ export async function runDiscoveryPipeline(
         niche: input.niche,
         location: input.location,
         sourceType: payload.sourceType,
-        sourcePayload: payload.rawPayload,
+        sourcePayload: payload.rawPayload as any,
         pipelineState: "DISCOVERED",
         discoveredAt: new Date(),
       },
@@ -169,7 +169,7 @@ export async function runDiscoveryPipeline(
 
     // Delete old hypotheses
     await prisma.hypothesis.deleteMany({
-      where: { businessId, status: "pending" },
+      where: { businessId },
     });
 
     // Generate hypotheses from patterns
@@ -194,7 +194,7 @@ export async function runDiscoveryPipeline(
           evidencePatternId: pattern.id,
           statement: hypothesis.statement,
           evidenceCount: hypothesis.evidenceCount,
-          status: "pending",
+          status: "emerging",
         },
       });
 
