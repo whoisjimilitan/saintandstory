@@ -1,7 +1,7 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
 type InvestigationData = {
@@ -25,7 +25,10 @@ type InvestigationData = {
   nextAction: { type: string; label: string };
 };
 
-export default function InvestigationPage({ params }: { params: { id: string } }) {
+export default function InvestigationPage() {
+  const params = useParams();
+  const businessId = typeof params.id === 'string' ? params.id : '';
+
   const [data, setData] = useState<InvestigationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +36,7 @@ export default function InvestigationPage({ params }: { params: { id: string } }
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`/api/workflow/investigation/${params.id}`);
+        const res = await fetch(`/api/workflow/investigation/${businessId}`);
         if (!res.ok) throw new Error("Failed to fetch investigation");
         const result = await res.json();
         setData(result);
@@ -45,7 +48,7 @@ export default function InvestigationPage({ params }: { params: { id: string } }
     }
 
     fetchData();
-  }, [params.id]);
+  }, [businessId]);
 
   if (loading) return <div className="p-8">Loading...</div>;
   if (error) return <div className="p-8 text-red-600">Error: {error}</div>;

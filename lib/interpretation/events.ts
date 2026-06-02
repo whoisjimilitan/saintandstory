@@ -44,9 +44,8 @@ export async function getOutcomeHistory(businessId: string) {
       date: c.outcome?.createdAt,
       question: c.question,
       signalType: c.outcome?.signalType,
-      truthLevel: c.outcome?.truthLevel,
       signalClassification: c.outcome?.signalClassification,
-      notes: c.outcome?.notes,
+      unexpectedLearning: c.outcome?.unexpectedLearning,
     }));
 }
 

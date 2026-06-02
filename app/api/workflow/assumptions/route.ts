@@ -16,9 +16,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const assumptions = await prisma.assumption.findMany({
-      orderBy: { updatedAt: "desc" },
-    });
+    const assumptions = await prisma.assumption.findMany();
 
     // For each assumption, reconstruct state from events
     const assumptionDetails = await Promise.all(
@@ -38,7 +36,6 @@ export async function GET() {
           contradictingEvents:
             assumption.status === "rejected" ? [] : [],
           unresolvedEvents: [],
-          lastUpdated: assumption.updatedAt,
           actions: [
             {
               label: "View evidence chain",

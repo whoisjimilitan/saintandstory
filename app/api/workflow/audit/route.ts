@@ -43,7 +43,6 @@ export async function GET(request: Request) {
         assumption: {
           statement: assumption.statement,
           status: assumption.status,
-          createdAt: assumption.updatedAt,
         },
         supportingChain: {
           description: "Evidence chain supporting this assumption",

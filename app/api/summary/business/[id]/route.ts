@@ -34,7 +34,13 @@ export async function GET(
     }
 
     const patterns = extractPatterns(reviews);
-    const outcomeCounts = countOutcomeTypes(outcomes);
+    const validOutcomes = outcomes
+      .filter(o => o.signalType !== undefined)
+      .map(o => ({
+        signalType: o.signalType as string,
+        truthLevel: "tested",  // Placeholder since Outcome schema doesn't track truth levels
+      }));
+    const outcomeCounts = countOutcomeTypes(validOutcomes);
 
     return NextResponse.json({
       business: {

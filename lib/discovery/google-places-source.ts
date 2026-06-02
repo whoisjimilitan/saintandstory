@@ -65,7 +65,7 @@ export class GooglePlacesSource implements IDiscoverySource {
         );
       } catch (error) {
         console.error(
-          `[discovery] Error fetching details for ${result.placeId}:`,
+          `[discovery] Error fetching details for ${result.place_id}:`,
           error
         );
       }

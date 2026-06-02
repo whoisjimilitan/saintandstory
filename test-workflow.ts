@@ -112,7 +112,6 @@ async function testWorkflow() {
     console.log(`   Total outcomes: ${outcomes.length}`);
     if (outcomes.length > 0) {
       console.log(`   - Signal: ${outcomes[0]!.signalType}`);
-      console.log(`   - Truth Level: ${outcomes[0]!.truthLevel}`);
       console.log(`   - Classification: ${outcomes[0]!.signalClassification}`);
     }
   } catch (e) {

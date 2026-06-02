@@ -17,7 +17,6 @@ export async function GET() {
         // Only show assumptions that have been tested and found contradicting
         status: "weak",
       },
-      orderBy: { updatedAt: "desc" },
     });
 
     const contradictions = assumptions.map(assumption => ({

@@ -1,22 +1,25 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
-export default function OutcomesPage({ params }: { params: { id: string } }) {
+export default function OutcomesPage() {
+  const params = useParams();
+  const businessId = typeof params.id === 'string' ? params.id : '';
+
   const [outcomes, setOutcomes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch(`/api/workflow/outcomes/${params.id}`);
+      const res = await fetch(`/api/workflow/outcomes/${businessId}`);
       const data = await res.json();
       setOutcomes(data);
       setLoading(false);
     }
     fetchData();
-  }, [params.id]);
+  }, [businessId]);
 
   if (loading) return <div className="p-8">Loading...</div>;
   if (!outcomes) return null;

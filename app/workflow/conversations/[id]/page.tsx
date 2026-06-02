@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import OutcomeCapture from "@/app/components/OutcomeCapture";
 
@@ -18,7 +19,10 @@ type Conversation = {
   status: string;
 };
 
-export default function ConversationsPage({ params }: { params: { id: string } }) {
+export default function ConversationsPage() {
+  const params = useParams();
+  const businessId = typeof params.id === 'string' ? params.id : '';
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCapture, setShowCapture] = useState(false);
@@ -26,13 +30,13 @@ export default function ConversationsPage({ params }: { params: { id: string } }
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch(`/api/workflow/conversations/${params.id}`);
+      const res = await fetch(`/api/workflow/conversations/${businessId}`);
       const data = await res.json();
       setConversations(data.conversations);
       setLoading(false);
     }
     fetchData();
-  }, [params.id]);
+  }, [businessId]);
 
   if (loading) return <div className="p-8">Loading...</div>;
 

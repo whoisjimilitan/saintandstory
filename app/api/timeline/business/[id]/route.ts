@@ -19,9 +19,8 @@ export async function GET(
       outcome: conversation.outcome
         ? {
             signalType: conversation.outcome.signalType,
-            truthLevel: conversation.outcome.truthLevel,
             signalClassification: conversation.outcome.signalClassification,
-            notes: conversation.outcome.notes,
+            unexpectedLearning: conversation.outcome.unexpectedLearning,
             date: conversation.outcome.createdAt,
           }
         : null,

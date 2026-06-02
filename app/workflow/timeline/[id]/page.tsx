@@ -1,22 +1,25 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
-export default function TimelinePage({ params }: { params: { id: string } }) {
+export default function TimelinePage() {
+  const params = useParams();
+  const businessId = typeof params.id === 'string' ? params.id : '';
+
   const [timeline, setTimeline] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch(`/api/workflow/timeline/${params.id}`);
+      const res = await fetch(`/api/workflow/timeline/${businessId}`);
       const data = await res.json();
       setTimeline(data);
       setLoading(false);
     }
     fetchData();
-  }, [params.id]);
+  }, [businessId]);
 
   if (loading) return <div className="p-8">Loading...</div>;
   if (!timeline) return null;
