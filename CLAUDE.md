@@ -164,5 +164,7 @@ Never say "done" if:
 
 Only build what is requested. If anything is unclear, ask before starting.
 
+Start a new session for each new task.
+
 
 
