@@ -2,48 +2,61 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 /**
- * INBOX: Businesses discovered but not yet reviewed
+ * INBOX: Investigation-ready businesses
  *
- * Shows businesses that have no conversations or hypotheses yet.
- * This is the entry point for the workflow.
+ * Shows businesses with pipelineState = INBOX_READY.
+ * These have: reviews + hypotheses + pending questions.
+ * Ready for James to review and investigate.
  */
 
 export async function GET() {
   try {
-    // Get all businesses that have no conversations yet
     const inboxBusinesses = await prisma.business.findMany({
-      select: {
-        id: true,
-        name: true,
-        placeId: true,
-        createdAt: true,
+      where: { pipelineState: "INBOX_READY" },
+      include: {
         _count: {
           select: {
             reviews: true,
-            conversations: true,
             hypotheses: true,
+            conversations: true,
           },
         },
+        hypotheses: {
+          include: { evidencePattern: true },
+        },
+        conversations: {
+          where: { status: "pending" },
+          select: { id: true, question: true },
+        },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { discoveredAt: "desc" },
     });
 
-    // Filter to only those with no conversations
-    const unreviewed = inboxBusinesses.filter(b => b._count.conversations === 0);
-
     return NextResponse.json({
-      count: unreviewed.length,
-      businesses: unreviewed.map(b => ({
+      count: inboxBusinesses.length,
+      businesses: inboxBusinesses.map((b) => ({
         id: b.id,
         name: b.name,
         placeId: b.placeId,
+        niche: b.niche,
+        location: b.location,
         reviewCount: b._count.reviews,
         hypothesesCount: b._count.hypotheses,
-        discoveredAt: b.createdAt,
+        pendingQuestions: b.conversations.length,
+        discoveredAt: b.discoveredAt,
         status: "inbox",
+        hypotheses: b.hypotheses.map((h) => ({
+          id: h.id,
+          statement: h.statement,
+          evidenceCount: h.evidenceCount,
+          pattern: h.evidencePattern?.patternType,
+        })),
         actions: [
           { label: "Review", href: `/workflow/investigation/${b.id}` },
-          { label: "Archive", action: "archive", businessId: b.id },
+          {
+            label: "Questions",
+            href: `/workflow/conversations/${b.id}`,
+          },
         ],
       })),
     });

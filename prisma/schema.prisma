@@ -23,16 +23,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PipelineState {
+  DISCOVERED
+  EVIDENCE_COLLECTED
+  INVESTIGATED
+  INBOX_READY
+}
+
 // Purpose: What exists
 model Business {
-  id   String @id @default(cuid())
-  name String
-  placeId String? @unique
-  createdAt DateTime @default(now())
+  id               String          @id @default(cuid())
+  name             String
+  placeId          String?         @unique
+  address          String?
+  phone            String?
+  website          String?
+  niche            String?
+  location         String?
+  sourceType       String?
+  sourcePayload    Json?
+  pipelineState    PipelineState   @default(DISCOVERED)
+  discoveredAt     DateTime?
+  createdAt        DateTime        @default(now())
 
-  reviews Review[]
-  hypotheses Hypothesis[]
-  conversations Conversation[]
+  reviews          Review[]
+  hypotheses       Hypothesis[]
+  conversations    Conversation[]
+  evidencePatterns EvidencePattern[]
 }
 
 // Purpose: What was said
@@ -47,18 +64,34 @@ model Review {
   createdAt DateTime @default(now())
 }
 
+// Purpose: Extracted evidence patterns from reviews
+model EvidencePattern {
+  id              String      @id @default(cuid())
+  businessId      String
+  business        Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  patternType     String      // Description from patterns.ts e.g. "Wedding-related work mentioned"
+  occurrences     Int
+  examples        Json        // String[] of actual review text excerpts
+  createdAt       DateTime    @default(now())
+
+  hypotheses      Hypothesis[]
+}
+
 // Purpose: What was thought (temporary interpretation)
 // Status is informational only, never used for filtering, ranking, or logic
 model Hypothesis {
-  id String @id @default(cuid())
-  businessId String
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id                  String          @id @default(cuid())
+  businessId          String
+  business            Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  evidencePatternId   String?
+  evidencePattern     EvidencePattern? @relation(fields: [evidencePatternId], references: [id])
 
-  statement String
-  status HypothesisStatus? // Informational only, never used for logic
-  evidenceCount Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  statement           String
+  status              HypothesisStatus? // Informational only, never used for logic
+  evidenceCount       Int             @default(0)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
 enum HypothesisStatus {
@@ -70,14 +103,15 @@ enum HypothesisStatus {
 
 // Purpose: What was asked
 model Conversation {
-  id String @id @default(cuid())
-  businessId String
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id          String      @id @default(cuid())
+  businessId  String
+  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
-  question String
-  createdAt DateTime @default(now())
+  question    String
+  status      String      @default("pending")  // "pending" | "asked" | "answered"
+  createdAt   DateTime    @default(now())
 
-  outcome Outcome?
+  outcome     Outcome?
 }
 
 // Purpose: What happened
