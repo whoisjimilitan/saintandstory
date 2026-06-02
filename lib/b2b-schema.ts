@@ -72,6 +72,17 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // Add evidence and observations columns (new for learning engine)
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS business_evidence JSONB DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS human_observations JSONB DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS business_timeline JSONB DEFAULT NULL
+  `;
+
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_status ON b2b_leads(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_created ON b2b_leads(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
