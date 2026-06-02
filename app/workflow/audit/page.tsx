@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function AuditPage() {
+function AuditContent() {
   const searchParams = useSearchParams();
   const assumptionId = searchParams.get("assumption");
   const hypothesisId = searchParams.get("hypothesis");
@@ -157,5 +157,13 @@ export default function AuditPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function AuditPage() {
+  return (
+    <Suspense fallback={<div className="p-8">Loading...</div>}>
+      <AuditContent />
+    </Suspense>
   );
 }
