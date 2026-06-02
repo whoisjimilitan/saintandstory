@@ -33,7 +33,6 @@ model Business {
   reviews Review[]
   hypotheses Hypothesis[]
   conversations Conversation[]
-  outcomes Outcome[]
 }
 
 // Purpose: What was said
