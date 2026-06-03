@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
+import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -161,6 +162,30 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Website</p>
                 <a href={lead.website as string} target="_blank" rel="noopener noreferrer" className="text-[#0D0D0D] text-sm hover:underline truncate block">{lead.website as string}</a>
+              </div>
+            )}
+            {!!lead.delivery_frequency && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Frequency</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.delivery_frequency as string}</p>
+              </div>
+            )}
+            {!!lead.average_deliveries && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Avg Deliveries/Month</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.average_deliveries as string}</p>
+              </div>
+            )}
+            {!!lead.courier_provider && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Current Courier</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.courier_provider as string}</p>
+              </div>
+            )}
+            {!!lead.delivery_challenge && (
+              <div>
+                <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Main Challenge</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.delivery_challenge as string}</p>
               </div>
             )}
             {hasPainPoint && (
@@ -348,7 +373,19 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
 
 function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
   const defaultIndustry = Object.values(B2B_INDUSTRIES)[0][0];
-  const [form, setForm] = useState({ business_name: "", industry: defaultIndustry, deliveryType: DELIVERY_TYPES[0], email: "", phone: "", city: "", notes: "" });
+  const [form, setForm] = useState({
+    business_name: "",
+    industry: defaultIndustry,
+    deliveryType: DELIVERY_TYPES[0],
+    deliveryFrequency: DELIVERY_FREQUENCIES[0],
+    averageDeliveries: AVERAGE_DELIVERIES[0],
+    courierProvider: COURIER_PROVIDERS[0],
+    deliveryChallenge: DELIVERY_CHALLENGES[0],
+    email: "",
+    phone: "",
+    city: "",
+    notes: "",
+  });
   const [saving, setSaving] = useState(false);
 
   async function save() {
@@ -358,9 +395,29 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
       await fetch("/api/b2b/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, niche: form.industry, delivery_type: form.deliveryType }),
+        body: JSON.stringify({
+          ...form,
+          niche: form.industry,
+          delivery_type: form.deliveryType,
+          delivery_frequency: form.deliveryFrequency,
+          average_deliveries: form.averageDeliveries,
+          courier_provider: form.courierProvider,
+          delivery_challenge: form.deliveryChallenge,
+        }),
       });
-      setForm({ business_name: "", industry: defaultIndustry, deliveryType: DELIVERY_TYPES[0], email: "", phone: "", city: "", notes: "" });
+      setForm({
+        business_name: "",
+        industry: defaultIndustry,
+        deliveryType: DELIVERY_TYPES[0],
+        deliveryFrequency: DELIVERY_FREQUENCIES[0],
+        averageDeliveries: AVERAGE_DELIVERIES[0],
+        courierProvider: COURIER_PROVIDERS[0],
+        deliveryChallenge: DELIVERY_CHALLENGES[0],
+        email: "",
+        phone: "",
+        city: "",
+        notes: "",
+      });
       onRefresh();
     } finally {
       setSaving(false);
@@ -371,6 +428,8 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
     <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5 space-y-3">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Add lead manually</p>
       <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+
+      {/* Basic Info */}
       <div className="grid grid-cols-2 gap-3">
         <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
@@ -384,8 +443,33 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
         </select>
         <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
         <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
-        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
+
+      {/* Location & Intelligence */}
+      <div className="grid grid-cols-2 gap-3">
+        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          <option disabled>Delivery Frequency</option>
+          {DELIVERY_FREQUENCIES.map(df => <option key={df} value={df}>{df}</option>)}
+        </select>
+      </div>
+
+      {/* Intelligence Fields */}
+      <div className="grid grid-cols-2 gap-3">
+        <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          <option disabled>Avg Deliveries/Month</option>
+          {AVERAGE_DELIVERIES.map(ad => <option key={ad} value={ad}>{ad}</option>)}
+        </select>
+        <select value={form.courierProvider} onChange={e => setForm(f => ({ ...f, courierProvider: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          <option disabled>Current Courier</option>
+          {COURIER_PROVIDERS.map(cp => <option key={cp} value={cp}>{cp}</option>)}
+        </select>
+        <select value={form.deliveryChallenge} onChange={e => setForm(f => ({ ...f, deliveryChallenge: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          <option disabled>Biggest Challenge</option>
+          {DELIVERY_CHALLENGES.map(dc => <option key={dc} value={dc}>{dc}</option>)}
+        </select>
+      </div>
+
       <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
       <button onClick={save} disabled={saving || !form.business_name} className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors">
         {saving ? "Adding…" : "Add to pipeline →"}
