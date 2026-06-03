@@ -30,6 +30,31 @@ enum PipelineState {
 }
 
 // ============================================================================
+// JOB EVENTS & OPERATIONS ENUMS
+// ============================================================================
+
+enum JobEventType {
+  assigned
+  accepted
+  arrived_pickup
+  collected
+  on_way
+  arrived_delivery
+  delivered
+}
+
+enum JobPhotoType {
+  collection
+  delivery
+}
+
+enum JobInvoiceStatus {
+  pending
+  paid
+  cancelled
+}
+
+// ============================================================================
 // DISPATCH PLATFORM MODELS
 // ============================================================================
 
@@ -56,6 +81,7 @@ model Driver {
   jobs                  Job[]
   ratings               Rating[]
   earnings              Earning[]
+  invoices              JobInvoice[]
 
   @@index([lastSeenAt])
   @@index([profileLive])
@@ -106,12 +132,25 @@ model Job {
   driverLng         Decimal?  @map("driver_lng")
   driverEtaMinutes  Int?      @map("driver_eta_minutes")
   locationSharingSince DateTime? @map("location_sharing_since")
+
+  // Job operations tracking
+  arrivedPickupAt   DateTime? @map("arrived_pickup_at")
+  collectedAt       DateTime? @map("collected_at")
+  arrivedDeliveryAt DateTime? @map("arrived_delivery_at")
+  collectionPhotoUrl String?  @map("collection_photo_url")
+  deliveryPhotoUrl  String?   @map("delivery_photo_url")
+  recipientName     String?   @map("recipient_name")
+  requiresSignature Boolean   @default(false) @map("requires_signature")
+
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
   ratings           Rating[]
   earnings          Earning[]
   locationHistory   DriverLocationHistory[]
+  events            JobEvent[]
+  photos            JobPhoto[]
+  invoices          JobInvoice[]
 
   @@index([driverId, status])
   @@index([customerEmail])
@@ -164,6 +203,64 @@ model Earning {
   createdAt         DateTime  @default(now()) @map("created_at")
 
   @@map("earnings")
+}
+
+// ============================================================================
+// JOB OPERATIONS MODELS
+// ============================================================================
+
+model JobEvent {
+  id                String        @id @default(cuid())
+  jobId             String        @map("job_id")
+  job               Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  eventType         JobEventType  @map("event_type")
+  latitude          Decimal?
+  longitude         Decimal?
+  timestamp         DateTime      @default(now())
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  photos            JobPhoto[]
+
+  @@index([jobId])
+  @@index([timestamp])
+  @@map("job_events")
+}
+
+model JobPhoto {
+  id                String        @id @default(cuid())
+  jobId             String        @map("job_id")
+  job               Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobEventId        String?       @map("job_event_id")
+  jobEvent          JobEvent?     @relation(fields: [jobEventId], references: [id], onDelete: SetNull)
+  photoType         JobPhotoType  @map("photo_type")
+  photoUrl          String        @map("photo_url")
+  latitude          Decimal?
+  longitude         Decimal?
+  uploadedAt        DateTime      @default(now()) @map("uploaded_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  @@index([jobId])
+  @@index([jobEventId])
+  @@map("job_photos")
+}
+
+model JobInvoice {
+  id                String            @id @default(cuid())
+  jobId             String            @map("job_id")
+  job               Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  driverId          String            @map("driver_id")
+  driver            Driver            @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  invoiceNumber     String            @unique @map("invoice_number")
+  amount            Decimal
+  status            JobInvoiceStatus  @default(pending)
+  issuedAt          DateTime          @default(now()) @map("issued_at")
+  paidAt            DateTime?         @map("paid_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  @@index([jobId])
+  @@index([driverId])
+  @@index([status])
+  @@map("job_invoices")
 }
 
 // ============================================================================
