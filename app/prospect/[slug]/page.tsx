@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { findBusinessBySlug, buildProspectPageData } from "@/lib/prospect-pages";
-import ProspectBriefingPage from "@/components/ProspectBriefingPage";
+import ProspectBriefingPage from "@/components/ProspectBriefingPageV2";
 
 // Force dynamic rendering: pages are generated on-demand, not statically
 export const dynamic = "force-dynamic";
