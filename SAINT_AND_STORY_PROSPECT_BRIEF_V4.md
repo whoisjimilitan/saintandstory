@@ -103,28 +103,40 @@ The visitor should instantly understand:
 
 ### Visual Recognition System (REQUIRED)
 
-Every prospect page must include a category-specific visual.
+Every prospect page must include a category-specific visual label.
 
-The visual should instantly reflect the prospect's world.
+The visual label should instantly reflect what the prospect actually handles.
 
 Purpose: Visitor recognises their world before reading copy.
 
-**Visual Examples:**
+**Visual Labels:**
 
-| Category | Visual |
-|----------|--------|
-| Legal | Document icon or briefcase visual |
-| Estate Agents | Keys or property visual |
-| Construction | Materials or building site visual |
-| Healthcare | Prescription or medical visual |
-| Accounting | Files or financial visual |
-| Architecture | Plans or blueprint visual |
+| Category | Label |
+|----------|-------|
+| Legal | Your Document |
+| Estate Agents | Your Keys |
+| Healthcare/Pharmacy | Your Prescription |
+| Accounting | Your File |
+| Architecture | Your Plans |
+| Construction | Your Materials |
 
-The visual is a category-specific indicator.
+**Why "Your":**
 
-It is not branding.
+"Your Document" feels personal and specific.
 
-It is recognition.
+"Document icon" feels generic.
+
+The label should make the prospect think:
+
+"This is about what we actually do."
+
+Not:
+
+"This is a generic page adapted for our industry."
+
+The visual is a category-specific indicator that says:
+
+"We built this for your world."
 
 ---
 
@@ -193,37 +205,56 @@ Write as if speaking to an intelligent human being.
 
 ## CTA PHILOSOPHY
 
-### Universal CTA (REQUIRED)
+### Why Email is Better Than Phone
 
-The page does not ask for a sale.
+Phone requires:
+* Interrupting their day
+* Speaking to a stranger
+* Making a decision immediately
 
-The page does not ask for commitment.
+Email requires:
+* One click
+* A quick review
+* Sending when they're ready
 
-The page does not ask for a quote.
+**Email has lower psychological commitment.**
 
-**The page asks for a conversation.**
+The prospect is more likely to take action.
 
-### CTA Text (STANDARD)
+### CTA Text (OUTCOME-SPECIFIC)
 
-```
-START THE CONVERSATION
-```
+The button text should finish a thought.
 
-This CTA is now standard across all industries.
+The button should communicate value.
 
-**No variations.**
+The button should make taking action feel natural.
 
-**No alternatives.**
+**CTA Examples by Category:**
 
-**No category-specific buttons.**
+| Category | CTA Text |
+|----------|----------|
+| Legal | Help us protect deadlines |
+| Estate Agents | Help us prevent delayed completions |
+| Healthcare | Help us improve urgent deliveries |
+| Construction | Help us avoid site delays |
+| Accounting | Help us stop missing tax deadlines |
+| Architecture | Help us keep projects on schedule |
 
-The personalization happens inside the page.
+Each CTA is:
+* Outcome-focused (not "contact us")
+* Problem-specific (not generic)
+* Action-oriented (not passive)
+* Natural language (not marketing-speak)
 
-The CTA reduces friction.
+When clicked, the CTA opens a pre-populated email.
+
+The email itself is the conversion event.
 
 ---
 
 ## EMAIL CONVERSION SYSTEM (REQUIRED)
+
+### The Psychology of Email
 
 The CTA opens a pre-populated email.
 
@@ -233,6 +264,23 @@ The page should do the thinking.
 
 The visitor should only identify themselves.
 
+### Why Pre-Population Works
+
+The prospect is not:
+* Asking for a quote
+* Buying courier services
+* Starting a sales process
+
+The prospect is simply acknowledging:
+
+**"A few of the points you raised felt familiar."**
+
+That's psychologically much easier.
+
+It's not a purchase decision.
+
+It's a recognition.
+
 ### Email Structure
 
 **To:** james@saintandstory.co.uk
@@ -240,8 +288,10 @@ The visitor should only identify themselves.
 **Subject:**
 
 ```
-[COMPANY NAME] — Urgent Collections & Deliveries
+[COMPANY NAME]
 ```
+
+Example: `National Legal Service Solicitors`
 
 **Body (Pre-populated):**
 
@@ -262,7 +312,38 @@ Best contact number:
 Kind regards,
 ```
 
-The prospect only fills in the blanks.
+### The Prospect Only Provides
+
+* Name
+* Role
+* Company
+* Best contact number
+
+Everything else is provided by the page.
+
+The email requires zero thinking on their part.
+
+Only identification.
+
+### The Loop Completed
+
+1. Prospect lands on page
+2. Feels: "This was made for us"
+3. Sees their world (Your Document, Your Keys, etc.)
+4. Recognizes pain points
+5. Understands transformation
+6. Identifies themselves via email
+7. Sales team receives rich prospect record:
+   * Name
+   * Role
+   * Company
+   * Contact number
+   * Which pain point resonated
+   * Which page they came from
+
+This is a much stronger asset than a phone number.
+
+The prospect record is now complete.
 
 ---
 
