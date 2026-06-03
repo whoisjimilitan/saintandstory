@@ -67,7 +67,7 @@ async function validateWorkflow(): Promise<ValidationResult> {
   // STAGE 1: Count leads in database
   console.log("[STAGE 1] Counting leads in database...\n");
 
-  const leads = await sql<Lead>`
+  const leads = await sql`
     SELECT
       id,
       business_name,
@@ -77,7 +77,7 @@ async function validateWorkflow(): Promise<ValidationResult> {
       created_at
     FROM b2b_leads
     ORDER BY created_at DESC
-  `;
+  ` as Lead[];
 
   console.log(`✅ Found ${leads.length} leads in b2b_leads table\n`);
 
