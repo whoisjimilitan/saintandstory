@@ -17,12 +17,15 @@ export async function findBusinessBySlug(
   slug: string
 ): Promise<ProspectPageBusiness | null> {
   if (!process.env.DATABASE_URL) {
+    console.warn("[PROSPECT] DATABASE_URL not set");
     return null;
   }
 
   const sql = neon(process.env.DATABASE_URL);
 
   try {
+    console.log("[PROSPECT] Looking up slug in database:", slug);
+
     const result = await sql`
       SELECT business_name, business_category, city, website
       FROM b2b_leads
@@ -30,11 +33,16 @@ export async function findBusinessBySlug(
       LIMIT 1
     `;
 
+    console.log("[PROSPECT] Query returned", result.length, "rows for slug:", slug);
+
     if (result.length === 0) {
+      console.log("[PROSPECT] No business found for slug:", slug);
       return null;
     }
 
     const row = result[0] as any;
+    console.log("[PROSPECT] Found business:", row.business_name);
+
     return {
       name: row.business_name,
       category: row.business_category || "Business",
@@ -42,7 +50,7 @@ export async function findBusinessBySlug(
       website: row.website || undefined,
     };
   } catch (error) {
-    console.error("Error finding business by slug:", error);
+    console.error("[PROSPECT] Error finding business by slug:", slug, error);
     return null;
   }
 }

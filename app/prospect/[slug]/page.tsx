@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { findBusinessBySlug, buildProspectPageData } from "@/lib/prospect-pages";
 import ProspectBriefingPage from "@/components/ProspectBriefingPage";
 
+// Force dynamic rendering: pages are generated on-demand, not statically
+export const dynamic = "force-dynamic";
+
 interface ProspectPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -29,9 +32,14 @@ export async function generateMetadata({
 export default async function ProspectPage({ params }: ProspectPageProps) {
   const { slug } = await params;
 
+  console.log("[PROSPECT] Slug requested:", slug);
+
   // Find business by slug
   const business = await findBusinessBySlug(slug);
+  console.log("[PROSPECT] Business found:", business?.name || "NOT FOUND");
+
   if (!business) {
+    console.log("[PROSPECT] 404 - no business found for slug:", slug);
     return notFound();
   }
 
