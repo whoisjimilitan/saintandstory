@@ -18,9 +18,10 @@ Section 4: Call-to-action
 ```
 Stage 1: Recognition (This is about them)
 Stage 2: Understanding (We know their world)
-Stage 3: Tension (They see the cost)
-Stage 4: Relief (We have the solution)
-Stage 5: Action (One obvious next step)
+Stage 3: Hidden Cost (They see the cost)
+Stage 4: Transformation (They see a better future)
+Stage 5: Identity Shift (They imagine who they become)
+Stage 6: Action (One obvious next step)
 ```
 
 ---
@@ -108,7 +109,7 @@ This is where conversion happens.
 
 1. Start with a fact about their world
 2. Show the direct consequence
-3. Show the secondary consequence (the one they don't talk about)
+3. Show the secondary consequence (lost opportunities, damaged trust, etc.)
 4. Show the normalisation (what they've stopped questioning)
 
 **Example for Estate Agents:**
@@ -128,9 +129,11 @@ You've learned not to promise specific times anymore. It's cost you deals."
 
 ---
 
-### Step 5: Write the Relief Section
+### Step 5: Write the Transformation Section
 
-Only after they feel the tension do they see the way out.
+This is about showing life after the problem disappears.
+
+**Not service benefits. Transformation.**
 
 **Structure:**
 
@@ -138,16 +141,27 @@ Only after they feel the tension do they see the way out.
 2. What that enables (what changes as a result)
 3. Who experiences that change (team, clients, business)
 
+**Bad examples:**
+- "Reliable same-day delivery"
+- "Dedicated courier support"
+- "Fast collections"
+
+**Good examples:**
+- "Your team stops chasing updates"
+- "Deadlines stop feeling risky"
+- "Clients stop asking where things are"
+
 **Example for Estate Agents:**
 
 "When every key is delivered exactly when promised, everything changes.
 
-The buyer's confidence grows. Your team stops firefighting. Other agents stop stealing your transactions.
+The buyer's confidence grows. Your team stops firefighting. Chains complete smoothly.
 
 You operate like a business that knows how to execute."
 
 **Rules:**
 
+- Show the transformed state, not the service
 - Concrete, not abstract
 - Specific, not generic
 - Credible, not fantasy
@@ -155,7 +169,46 @@ You operate like a business that knows how to execute."
 
 ---
 
-### Step 6: Write the One CTA
+### Step 6: Write the Identity Shift Section
+
+This is the deepest level.
+
+People buy the person or company they want to become.
+
+**Structure:**
+
+1. What kind of business do you want to be known as?
+2. What reputation do you want with clients?
+3. What do your team believe about your reliability?
+
+**Examples:**
+
+**Solicitors:**
+"Become the firm known for meeting every deadline."
+
+**Estate Agents:**
+"Become the agency where chains complete on schedule."
+
+**Medical Practices:**
+"Become the practice patients trust when timing matters."
+
+**Manufacturing:**
+"Become the supplier customers can depend on completely."
+
+**Example for Estate Agents:**
+
+"You become the agent who closes deals. The one clients trust. The one other agents watch. The one who delivers."
+
+**Rules:**
+
+- Focus on identity, not service
+- Show what reputation is possible
+- Connect to their ambition
+- Make it personal
+
+---
+
+### Step 7: Write the One CTA
 
 **There is only one action.**
 
@@ -183,6 +236,7 @@ You operate like a business that knows how to execute."
 - [ ] Within 5 seconds, the prospect thinks "that's us"
 - [ ] No generic language
 - [ ] Specific to their category
+- [ ] At least 3 moments of recognition throughout
 
 ### Understanding Stage
 - [ ] Three observations (not features, not benefits)
@@ -190,20 +244,31 @@ You operate like a business that knows how to execute."
 - [ ] Specific to their daily experience
 - [ ] No sales language
 - [ ] Prospect nods while reading
+- [ ] Observation-based, not claim-based
 
-### Tension Stage
-- [ ] Hidden cost is specific and truthful
-- [ ] Shows what the problem creates (not just the problem)
+### Hidden Cost Stage
+- [ ] Reveals specific consequences (not just the problem)
+- [ ] Shows what the problem actually costs them
 - [ ] No exaggeration or fear tactics
 - [ ] Visitor feels clarity, not manipulation
 - [ ] Clear connection to their world
+- [ ] Truth-based, not manufactured
 
-### Relief Stage
-- [ ] New reality is concrete and specific
-- [ ] Shows what becomes possible
+### Transformation Stage
+- [ ] Shows life after the problem (not service benefits)
+- [ ] Concrete and specific about new reality
 - [ ] Credible based on actual capabilities
-- [ ] Prospect sees a real solution
+- [ ] Visitor sees what becomes possible
 - [ ] Not fantasy or hype
+- [ ] Outcome-focused language
+
+### Identity Shift Stage
+- [ ] Helps prospect imagine who they become
+- [ ] Specific to their business type
+- [ ] Focuses on reputation and identity
+- [ ] Personal and aspirational
+- [ ] Connected to their ambition
+- [ ] Shows a better version of themselves
 
 ### Action Stage
 - [ ] One CTA only
@@ -211,13 +276,15 @@ You operate like a business that knows how to execute."
 - [ ] Invites conversation, not commitment
 - [ ] No competing buttons
 - [ ] Obvious next step
+- [ ] Visitor feels "this is what I should do"
 
 ### Overall
 - [ ] Visually matches homepage atmosphere
-- [ ] Human language only
+- [ ] Human language only (no AI/marketing speak)
 - [ ] Less is more philosophy
 - [ ] No unnecessary elements
 - [ ] Every section earns its place
+- [ ] Six-stage psychological journey intact
 
 ---
 
@@ -316,13 +383,19 @@ No exceptions.
 
 ## The Difference It Makes
 
-### Before Transformation:
+### Before Transformation (Developer Thinking):
 - Visitor: "Here's information about their service"
+- Visitor feels: "This is interesting but not about me"
 - Action rate: Low (why should I act?)
 
-### After Transformation:
-- Visitor: "They understand exactly what I live with"
-- Action rate: High (the answer is obvious)
+### After Transformation (Salesperson Thinking):
+- Visitor Stage 1: "That's exactly us"
+- Visitor Stage 2: "They understand my world"
+- Visitor Stage 3: "This is costing us more than we thought"
+- Visitor Stage 4: "I can see a better way"
+- Visitor Stage 5: "I want to become that kind of business"
+- Visitor Stage 6: "I know exactly what to do"
+- Action rate: High (action becomes obvious)
 
 That's the salesperson difference.
 

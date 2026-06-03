@@ -125,7 +125,7 @@ For each prospect page, audit against the doctrine:
 
 ---
 
-#### Tension Stage
+#### Hidden Cost Stage
 - [ ] Has hidden cost section (or labeled as such)
 - [ ] Reveals specific consequences, not just problems
 - [ ] Shows what the problem creates (lost deals, damaged reputation)
@@ -142,18 +142,35 @@ For each prospect page, audit against the doctrine:
 
 ---
 
-#### Relief Stage
-- [ ] Shows what becomes possible
+#### Transformation Stage
+- [ ] Shows what life looks like after the problem disappears
 - [ ] Concrete and specific (not fantasy)
 - [ ] Based on actual capabilities
-- [ ] Visitor feels "there's a real solution"
+- [ ] Visitor sees transformation, not service benefits
 - [ ] Frames as competence, not magic
 
 **Current copy:**  
-[Check if "opportunity" or "solution" section exists]
+[Check if "opportunity" or "transformation" section exists]
 
 **Assessment:**  
 ❌ Missing / ⚠️ Generic / ✅ Specific and credible
+
+**Needs revision:** Yes / No
+
+---
+
+#### Identity Shift Stage
+- [ ] Shows what kind of business they can become
+- [ ] Specific to their category (solicitor, agent, practice, etc.)
+- [ ] Focuses on reputation and who they want to be
+- [ ] Personal and aspirational
+- [ ] Connected to their ambition and identity
+
+**Current copy:**  
+[Check if identity/reputation section exists]
+
+**Assessment:**  
+❌ Missing entirely / ⚠️ Generic / ✅ Specific and aspirational
 
 **Needs revision:** Yes / No
 
@@ -299,14 +316,18 @@ You've learned not to promise specific times anymore. It's cost you deals."
 
 ---
 
-#### 5. Write the Relief Section
+#### 5. Write the Transformation Section
 
-**Show what becomes possible when the problem is solved.**
+**Show life after the problem disappears. Not service benefits. Transformation.**
 
 Structure:
-1. New reality
+1. New reality (what becomes possible)
 2. What changes as a result
 3. Who experiences the change
+
+**Bad examples:** "Reliable same-day delivery" | "Dedicated support" | "Fast collections"
+
+**Good examples:** "Your team stops chasing updates" | "Deadlines stop feeling risky" | "Clients stop asking where things are"
 
 **Example for Legal:**
 
@@ -314,13 +335,36 @@ Structure:
 
 You operate like a business that never misses a court deadline."
 
-**Your relief section:**
+**Your transformation section:**
 
-[Write 2-3 sentences about the new reality]
+[Write 2-3 sentences about the new reality, not the service]
 
 ---
 
-#### 6. Write the Category-Specific CTA
+#### 6. Write the Identity Shift Section
+
+**People buy the person or company they want to become.**
+
+Structure:
+1. What kind of business do you want to be known as?
+2. What reputation do you want with clients?
+3. What identity do you want?
+
+**Examples:**
+
+**Solicitors:** "Become the firm known for meeting every deadline."
+
+**Estate Agents:** "Become the agency where chains complete on schedule."
+
+**Medical:** "Become the practice patients trust when timing matters."
+
+**Your identity shift section:**
+
+[Write 1-2 sentences about who they become]
+
+---
+
+#### 7. Write the Category-Specific CTA
 
 **One action. Outcome-driven.**
 
@@ -390,7 +434,8 @@ Before considering a page "transformed," verify:
 - [ ] Headline is specific to category pain
 - [ ] Three observations trigger nods
 - [ ] Hidden cost reveals truth (no exaggeration)
-- [ ] Relief is concrete and credible
+- [ ] Transformation shows concrete new reality (not service benefits)
+- [ ] Identity shift helps them imagine who they become
 - [ ] CTA is outcome-driven
 - [ ] No marketing jargon or AI language
 
@@ -405,7 +450,8 @@ Before considering a page "transformed," verify:
 - [ ] Would owner feel recognized? (Yes)
 - [ ] Do they feel understood? (Yes)
 - [ ] Do they see the cost clearly? (Yes)
-- [ ] Is solution credible? (Yes)
+- [ ] Do they see a better future? (Yes)
+- [ ] Do they see who they can become? (Yes)
 - [ ] Is action obvious? (Yes)
 
 ---
@@ -446,20 +492,27 @@ Introduction → Features → Benefits → Call-to-action
 
 ### Future State (Doctrine - Salesperson Thinking)
 ```
-Recognition → Understanding → Tension → Relief → Action
-= Prospect feels understood and acts
+Stage 1: Recognition (This is about us)
+Stage 2: Understanding (They know our world)
+Stage 3: Hidden Cost (They see the cost)
+Stage 4: Transformation (We see a better future)
+Stage 5: Identity Shift (This is who we become)
+Stage 6: Action (One obvious next step)
+= Prospect feels understood and acts with certainty
 ```
 
 ### What Changes
 - From generic to specific (category pain-specific)
-- From feature-focused to outcome-focused
+- From service-focused to outcome-focused
+- From feature-based to transformation-based
 - From informational to psychological
 - From "here's what we offer" to "I understand you"
+- From selling a service to helping them become who they want to be
 
 ### Timeline
 - Phase 1 (Identify): 1-2 hours
 - Phase 2 (Audit): 3-5 hours (15-20 min per page)
-- Phase 3 (Transform): 5-8 hours (30-40 min per page)
+- Phase 3 (Transform): 6-10 hours (35-50 min per page with 6 stages)
 - Phase 4 (Implement): 2-4 hours (component updates)
 - Phase 5 (Test & Rollout): 1-2 weeks
 

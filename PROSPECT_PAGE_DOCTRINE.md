@@ -6,6 +6,35 @@ This doctrine supersedes all other design guidance. It is non-negotiable.
 
 ---
 
+## Core Truth
+
+Businesses rarely buy services.
+
+Businesses buy outcomes.
+
+People buy transformations.
+
+Nobody wakes up wanting:
+
+* a courier
+* a logistics provider
+* a same-day delivery partner
+
+They wake up wanting:
+
+* fewer problems
+* fewer delays
+* fewer complaints
+* less stress
+* more trust
+* more reliability
+* more revenue
+* more certainty
+
+**The prospect page must sell the transformation. Never the service.**
+
+---
+
 ## Purpose
 
 A prospect page is not a report.
@@ -16,235 +45,210 @@ A prospect page is not a landing page.
 
 **A prospect page is a personalised sales intervention.**
 
-Its only purpose is to move one specific business owner toward one specific action.
+Its only purpose is to create one outcome:
 
-Everything that does not help achieve that goal must be removed.
+**The prospect willingly takes the next step.**
 
----
+Nothing else matters.
 
-## Core Principle
+Not page views.
 
-**The visitor should feel understood before they feel sold.**
+Not engagement.
 
-Most sales pages try to persuade.
+Not time on site.
 
-We diagnose.
+Not information consumption.
 
-We recognise.
-
-We reveal.
-
-Only then do we invite action.
-
-The page should feel less like marketing and more like someone quietly describing a problem the visitor already lives with.
-
-When that happens, trust is created before persuasion begins.
+**The page succeeds when action happens.**
 
 ---
 
-## The Saint & Story Design Standard
 
-Every prospect page must visually resemble the main Saint & Story homepage.
+## The Human Language Rule
 
-Not merely in colours.
+Nothing should sound AI-generated.
 
-In atmosphere.
+Nothing should sound corporate.
 
-In restraint.
+Nothing should sound like LinkedIn.
 
-In confidence.
+Nothing should sound like marketing copy.
 
-In spacing.
+Never use:
 
-In typography.
-
-In emotional tone.
-
-**The homepage is the standard.**
-
-Every prospect page is a child of that system.
-
-If a prospect page looks like a generic SaaS page, generic agency page, AI-generated page, dashboard page, report page, or template page, it has failed.
-
----
-
-## Less Is More
-
-The page should feel expensive.
-
-Expensive pages do not shout.
-
-Expensive pages do not explain everything.
-
-Expensive pages create clarity.
-
-Remove:
-
-* unnecessary sections
-* unnecessary buttons
-* unnecessary explanations
-* unnecessary words
-* unnecessary visual noise
-
-**Every element must earn its place.**
-
----
-
-## One Page. One Goal.
-
-Every prospect page has only one desired action.
-
-One.
-
-Not three.
-
-Not five.
-
-One.
-
-The visitor must never wonder:
-
-"What should I do next?"
-
-The answer should always be obvious.
-
-**Everything on the page points toward that action.**
-
----
-
-## Human Language Only
-
-The page must never sound AI-generated.
-
-Avoid:
-
-* corporate jargon
-* marketing clichés
-* startup language
-* agency language
-* empty adjectives
-* exaggerated claims
-* generic persuasion tactics
-
-Avoid phrases like:
-
-* streamline
 * leverage
-* unlock
 * optimise
-* cutting edge
-* game changer
-* revolutionary
-* industry leading
+* unlock
+* maximise
+* enhance
+* streamline
+* industry-leading
+* innovative
+* cutting-edge
+* game-changing
 
-**Write like a thoughtful human. Not a marketing department.**
+**Write like a thoughtful human speaking to another thoughtful human.**
 
 ---
 
-## The Five Psychological Stages
+## The Six Psychological Stages
 
-Every prospect page follows the same psychological structure.
+Every prospect page follows the same psychological sequence.
 
 ### Stage 1 — Recognition
 
-The visitor must immediately recognise themselves.
+The visitor immediately feels:
 
-Within seconds they should think:
+**"That is us."**
 
-**"That's exactly us."**
+Not:
+
+"That sounds interesting."
+
+Recognition is mandatory.
+
+Recognition must happen within seconds.
 
 The headline should describe a reality they already live with.
 
-Not a service.
-
-Not a feature.
-
-Not a company.
+Not a service. Not a feature. Not a company.
 
 A reality.
 
 ### Stage 2 — Understanding
 
-Show that we understand their world.
+The visitor feels:
 
-Not generally.
+**"They understand what we deal with."**
 
-Specifically.
+Not:
 
-The visitor should feel:
+"They understand logistics."
 
-**"They understand what my day actually looks like."**
+Not:
+
+"They understand marketing."
+
+They understand our world.
+
+Our pressures. Our frustrations. Our customers. Our risks.
 
 This is achieved through observations.
 
-Not claims.
-
-Not sales language.
+Not claims. Not sales language.
 
 Observations.
 
 **Observations create trust.**
 
-### Stage 3 — Tension
+### Stage 3 — Hidden Cost
 
-Most pages skip this.
+The visitor realises:
 
-We do not.
+**"This is costing us more than we thought."**
 
-The visitor must feel the cost of the problem.
+The hidden cost section is not about fear.
 
-Not through fear.
-
-**Through truth.**
+It is about clarity.
 
 Examples:
 
-* missed deadlines
 * lost opportunities
-* damaged reputation
-* frustrated staff
-* disappointed clients
+* missed referrals
+* damaged trust
+* staff frustration
 * wasted time
+* avoidable stress
+* reputation risk
 
-The goal is not pressure.
+The prospect should reach the conclusion themselves.
 
-The goal is clarity.
+### Stage 4 — Transformation
 
-### Stage 4 — Relief
+This is where most sales pages fail.
 
-Only after tension comes relief.
+The page must show life after the problem.
 
-The visitor should see a future where the problem is no longer present.
+Not service benefits.
 
-Not because of magic.
+**Transformation.**
 
-**Because of reliability. Because of certainty. Because somebody finally took responsibility for solving it.**
+Bad: "Reliable same-day delivery."  
+Good: "Your team stops chasing updates."
 
-### Stage 5 — Action
+Bad: "Dedicated courier support."  
+Good: "Deadlines stop feeling risky."
 
-Only now does the CTA appear.
+Bad: "Fast collections."  
+Good: "Clients stop asking where things are."
+
+The prospect must see the better future.
+
+### Stage 5 — Identity Shift
+
+This is the deepest level.
+
+People buy the person or company they want to become.
+
+Examples:
+
+**Solicitors:**
+Become the firm known for reliability.
+
+**Estate agents:**
+Become the agency where chains complete smoothly.
+
+**Pharmacies:**
+Become the pharmacy patients trust when timing matters.
+
+**Manufacturers:**
+Become the supplier customers can depend on.
+
+The page should move beyond fixing a problem.
+
+It should help the prospect imagine becoming something better.
+
+### Stage 6 — Action
+
+Only after the transformation is visible.
+
+Only after certainty exists.
+
+Only after trust exists.
+
+Then:
+
+One action.
+
+One CTA.
+
+One direction.
 
 The visitor should feel:
 
 **"This is the obvious next step."**
 
-Not:
-
-"They are trying to sell me."
-
 ---
 
-## The Movement Principle
+## The Observation Rule
 
-Movements are not features.
+Observations are more powerful than claims.
 
-Movements are not service descriptions.
+Do not say:
 
-**Movements are signs. Signals. Indicators. Patterns.**
+"We help firms improve reliability."
 
-The purpose of a movement is to create recognition.
+Instead say:
 
-The prospect should read a movement and think:
+"Court deadlines rarely fail because the legal work was wrong. They fail because something arrived late."
+
+The second creates recognition.
+
+The first creates skepticism.
+
+The purpose of observations is to create recognition.
+
+The prospect should read an observation and think:
 
 * "That happened last week."
 * "We've been dealing with that for months."
@@ -254,226 +258,66 @@ The prospect should read a movement and think:
 
 ---
 
-## The Hidden Cost Section
-
-Every prospect page should contain a hidden cost section.
-
-This is often the most important section on the page.
-
-**People rarely change because of inconvenience. They change because they finally see the cost.**
-
-The hidden cost section reveals:
-
-* lost time
-* lost money
-* lost opportunities
-* lost trust
-* lost momentum
-
-Without exaggeration.
-
-Without manipulation.
-
-Without drama.
-
-**Just truth.**
 
 ---
 
-## CTA Rules
-
-There is only one CTA.
-
-One.
-
-Never multiple competing actions.
-
-Never multiple primary buttons.
-
-Never:
-
-* contact us
-* book now
-* learn more
-* schedule
-* request quote
-
-All together.
-
-**One action.**
-
-One button.
-
-One destination.
-
-The CTA should feel like relief.
-
-Not like persuasion.
 
 ---
 
-## CTA Wording Rules
+## The Transformation Rule
 
-The CTA is outcome-driven.
+Every prospect page must answer:
 
-It describes what will happen, not what the visitor should do.
+**What does life look like after this problem disappears?**
 
-Never: "Contact us"
-
-Instead: "Let's see what's being missed"
-
-Never: "Book a call"
-
-Instead: "Talk through this together"
-
-Never: "Learn more"
-
-Instead: "Show me how this works"
-
-**The CTA invites conversation, not commitment.**
+If that answer is missing, the page is incomplete.
 
 ---
 
-## Observation Framework
+## The Recognition Rule
 
-Observations are specific, not generic.
+Every prospect page must answer:
 
-They describe patterns the prospect already lives with.
+**What will make this prospect say: "That's exactly what happens here"?**
 
-**Framework:**
+At least three times.
 
-* Observation 1: The repetitive challenge
-* Observation 2: The hidden cost
-* Observation 3: The acceptance of the problem
-
-Examples:
-
-**Legal:**
-* "Every deadline gets treated the same priority"
-* "Someone is always chasing deliveries"
-* "You've accepted that courts don't care about your constraints"
-
-**Estate Agent:**
-* "Keys are always promised sooner than possible"
-* "One failed handover can sink a deal"
-* "You've stopped trusting the timeline"
-
-**Medical:**
-* "Collections always run late"
-* "Someone is always calling to check status"
-* "You've accepted patient care delays as inevitable"
+Three moments of recognition create belief.
 
 ---
 
-## The Hidden Cost Framework
+## Final Validation Test
 
-Hidden costs are specific consequences.
+Before publishing any prospect page ask:
 
-They must be truthful.
+1. Does the visitor feel understood?
+2. Does the visitor recognise their problem?
+3. Does the visitor understand the hidden cost?
+4. Does the visitor see a better future?
+5. Does the visitor see a new identity?
+6. Is there only one obvious next step?
 
-No exaggeration.
-
-No manufactured urgency.
-
-**Framework:**
-
-* What is happening (situation)
-* What it creates (consequence)
-* What you've learned to accept (normalisation)
-
-Example:
-
-"Every missed court deadline is a case lost. More than that, it's your reputation on the line. You've learned to accept it as part of how the world works."
-
-Not:
-
-"Deadlines are killing your business!" (exaggeration)
-
-"You're losing millions!" (manufactured urgency)
-
-"Your life is chaos!" (manipulation)
+**If any answer is no, rebuild the page. Do not publish.**
 
 ---
 
-## The Relief Framework
+## Existing Pages
 
-Relief is concrete and specific.
+All current prospect pages must be reviewed and upgraded against this doctrine.
 
-It shows a future state where the problem is solved.
+The goal is not cosmetic improvement.
 
-Not through magic.
+The goal is conversion improvement.
 
-Through competence.
+Every existing page should be rewritten to:
 
-**Framework:**
+* increase recognition
+* increase transformation
+* increase clarity
+* increase trust
+* increase action
 
-* The new reality
-* What changes as a result
-* Who experiences that change
-
-Example:
-
-"When every deadline lands, your reputation grows. Your team stops firefighting. Your clients see a business that knows how to operate."
-
-Not:
-
-"You'll save millions!" (vague benefit)
-
-"Everything will change!" (empty promise)
-
-"Your life will be perfect!" (unrealistic)
-
----
-
-## Visual Hierarchy Rules
-
-The page should guide attention in order:
-
-1. Headline (recognition)
-2. Observations (understanding)
-3. Hidden cost (tension)
-4. Relief section (certainty)
-5. CTA (action)
-
-No competing visual weights.
-
-No distractions.
-
-**Clear path from recognition to action.**
-
----
-
-## Copy Tone Rules
-
-Short.
-
-Precise.
-
-Clear.
-
-Specific.
-
-Human.
-
-Sentences should be short enough to remember.
-
-Paragraphs should be short enough to scan.
-
-Sections should have exactly what's needed, nothing more.
-
----
-
-## Testing Requirement
-
-Before publishing any prospect page, ask:
-
-1. Would the business owner feel immediately recognized?
-2. Do they believe we understand their specific world?
-3. Do they see the cost of the problem clearly?
-4. Do they see a credible path forward?
-5. Is it obvious what action to take?
-
-If the answer to any question is "no," the page is not ready.
+without increasing word count unnecessarily.
 
 ---
 
@@ -489,11 +333,65 @@ No shortcuts.
 
 This is not a template to adapt.
 
-This is a doctrine to follow.
+**This is a doctrine to follow.**
 
 ---
 
-## Status
+## Design Rule
 
-**PERMANENT. NON-NEGOTIABLE. APPLIES TO ALL PROSPECT PAGES FOREVER.**
+The page must visually resemble the Saint & Story homepage.
+
+Not merely use the same colours.
+
+It must inherit:
+
+* typography
+* spacing
+* rhythm
+* restraint
+* atmosphere
+* confidence
+
+**The homepage is the standard.**
+
+Every prospect page must feel like part of the same world.
+
+---
+
+## Layout Rule
+
+Every section must earn its place.
+
+Remove:
+
+* unnecessary cards
+* unnecessary buttons
+* unnecessary sections
+* unnecessary explanations
+
+**Less is more. Always.**
+
+---
+
+## CTA Rule
+
+One CTA.
+
+Only one.
+
+No competing actions.
+
+No multiple primary buttons.
+
+No confusion.
+
+**The visitor should always know what to do next.**
+
+---
+
+## Permanent Instruction
+
+This doctrine becomes the governing standard for every future prospect page generated by Saint & Story.
+
+Do not generate future prospect pages without first applying this framework.
 
