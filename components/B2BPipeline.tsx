@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
+import { DELIVERY_TYPES } from "@/lib/delivery-types";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -131,7 +132,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
             )}
           </div>
           <p className="text-[#888888] text-xs">
-            {lead.business_category as string}{lead.city ? ` · ${lead.city as string}` : ""}
+            {lead.business_category as string}{lead.delivery_type ? ` · ${lead.delivery_type as string}` : ""}{lead.city ? ` · ${lead.city as string}` : ""}
             {lead.email ? ` · ${lead.email as string}` : " · No email"}
           </p>
           {hasPainPoint && (
@@ -263,6 +264,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
 
 function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
   const [industry, setIndustry] = useState(Object.values(B2B_INDUSTRIES)[0][0]);
+  const [deliveryType, setDeliveryType] = useState(DELIVERY_TYPES[0]);
   const [city, setCity] = useState("Manchester");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
@@ -274,7 +276,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
       const res = await fetch("/api/b2b/discover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niche: industry, city }),
+        body: JSON.stringify({ niche: industry, delivery_type: deliveryType, city }),
       });
       const data = await res.json() as { count: number; added: string[] };
       setResult(data);
@@ -288,7 +290,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
     <div className="space-y-4">
       <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Discover leads via Google Maps</p>
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Industry</label>
             <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
@@ -297,6 +299,12 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
                   {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
                 </optgroup>
               ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Delivery Type</label>
+            <select value={deliveryType} onChange={e => setDeliveryType(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+              {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
             </select>
           </div>
           <div>
@@ -340,7 +348,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
 
 function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
   const defaultIndustry = Object.values(B2B_INDUSTRIES)[0][0];
-  const [form, setForm] = useState({ business_name: "", industry: defaultIndustry, email: "", phone: "", city: "", notes: "" });
+  const [form, setForm] = useState({ business_name: "", industry: defaultIndustry, deliveryType: DELIVERY_TYPES[0], email: "", phone: "", city: "", notes: "" });
   const [saving, setSaving] = useState(false);
 
   async function save() {
@@ -350,9 +358,9 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
       await fetch("/api/b2b/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, niche: form.industry }),
+        body: JSON.stringify({ ...form, niche: form.industry, delivery_type: form.deliveryType }),
       });
-      setForm({ business_name: "", industry: defaultIndustry, email: "", phone: "", city: "", notes: "" });
+      setForm({ business_name: "", industry: defaultIndustry, deliveryType: DELIVERY_TYPES[0], email: "", phone: "", city: "", notes: "" });
       onRefresh();
     } finally {
       setSaving(false);
@@ -371,9 +379,12 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
             </optgroup>
           ))}
         </select>
-        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <select value={form.deliveryType} onChange={e => setForm(f => ({ ...f, deliveryType: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
+        </select>
         <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
         <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
       <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
       <button onClick={save} disabled={saving || !form.business_name} className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors">
