@@ -1,5 +1,6 @@
 # Project Overview
 
+@CLAUDE_PROJECT_GUIDE.md
 
 Build a lightweight web application. Each feature does one thing, the code is easy to follow, and the app is easy to run locally and deploy.
 
