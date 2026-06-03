@@ -6,11 +6,11 @@ const BOOKINGS = [
   { customer: "Priya K.", desc: "Studio move · 2pm", price: "£85" },
 ];
 
-function CustomerView() {
+function CustomerView({ label = "Your move" }: { label?: string }) {
   return (
     <div className="p-5 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-[#0D0D0D]">Your move</p>
+        <p className="text-sm font-semibold text-[#0D0D0D]">{label}</p>
         <span className="bg-[#0D0D0D] text-white text-[10px] font-semibold px-3 py-1 rounded-full">
           Driver matched
         </span>
@@ -105,7 +105,7 @@ function DriverView() {
   );
 }
 
-export default function HeroPlatformUI({ side }: { side: Side }) {
+export default function HeroPlatformUI({ side, mockupLabel }: { side: Side; mockupLabel?: string }) {
   return (
     <div className="rounded-2xl overflow-hidden border border-[#E8E8E8] bg-white shadow-2xl shadow-black/8">
       <div className="bg-[#F5F5F5] border-b border-[#E8E8E8] px-4 py-3 flex items-center gap-3">
@@ -120,7 +120,7 @@ export default function HeroPlatformUI({ side }: { side: Side }) {
       </div>
 
       <div key={side} className="animate-fade-up">
-        {side === "customer" ? <CustomerView /> : <DriverView />}
+        {side === "customer" ? <CustomerView label={mockupLabel} /> : <DriverView />}
       </div>
     </div>
   );

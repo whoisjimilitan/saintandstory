@@ -24,13 +24,32 @@ interface ProspectBriefingPageProps {
   data: ProspectPageData;
 }
 
+interface CategoryMessaging {
+  yourLabel: string;
+  headline: React.ReactNode;
+  heroExplanation: string;
+  painLabel: string;
+  pain1: string;
+  pain2: string;
+  pain3: string;
+  mechanismLabel: string;
+  mechanism: string;
+  costLabel: string;
+  cost: string;
+  transformationLabel: string;
+  transformation: string;
+  ctaButtonText: string;
+  emailSubject: string;
+  emailBody: string;
+}
+
 export default function ProspectBriefingPage({
   data,
 }: ProspectBriefingPageProps) {
   const { business } = data;
 
   // Category-specific copy (Pain + Mechanism + Transformation)
-  const getCategoryMessaging = (category: string) => {
+  const getCategoryMessaging = (category: string): CategoryMessaging => {
     const lower = category.toLowerCase();
 
     if (lower.includes("legal") || lower.includes("solicitor")) {
@@ -60,7 +79,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When collections happen as expected and deliveries arrive as promised, your team no longer has to wonder where something is. Work flows. Deadlines feel manageable. Clients feel reassured.",
 
-        ctaButtonText: "Protect our deadlines",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -93,7 +112,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When keys arrive exactly when promised, buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
 
-        ctaButtonText: "Complete our transactions",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -127,7 +146,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When every collection happens on time, patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
 
-        ctaButtonText: "Protect our specimens",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -160,7 +179,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive reliably, crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
 
-        ctaButtonText: "Keep us on schedule",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -192,7 +211,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When documents arrive as promised, your team stops firefighting deadlines. Work flows smoothly. Your clients see a firm that knows how to execute.",
 
-        ctaButtonText: "Protect our deadlines",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -225,7 +244,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When plans arrive reliably and on time, projects move smoothly. Contractors stay productive. Your clients see a practice that knows how to deliver.",
 
-        ctaButtonText: "Keep projects moving",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -258,7 +277,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive exactly when promised, transactions complete smoothly. Your team stops firefighting. Your clients see a business that can execute.",
 
-        ctaButtonText: "Close our deals faster",
+        ctaButtonText: "Start a conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -293,7 +312,7 @@ export default function ProspectBriefingPage({
       transformationLabel: "When this changes",
       transformation: "When reliability becomes normal, your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
 
-      ctaButtonText: "Improve our deliveries",
+      ctaButtonText: "Start a conversation",
       emailSubject: `${business.name}`,
       emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
     };
@@ -322,54 +341,54 @@ export default function ProspectBriefingPage({
       </header>
 
       {/* HERO - Two column layout (like homepage) */}
-      <section className="pt-16 pb-0 px-6 bg-[#0D0D0D] border-b border-white/10 min-h-screen md:min-h-auto flex items-center">
-        <div className="max-w-6xl mx-auto w-full py-20">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      <section className="pt-20 pb-0 px-6 bg-[#0D0D0D] border-b border-white/10 min-h-screen md:min-h-auto flex items-center">
+        <div className="max-w-6xl mx-auto w-full py-24">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
             {/* Left: Copy (personalized with company name) */}
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-8">
                 FOR {business.name}
               </p>
 
-              <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
+              <h1 className="text-white font-sans font-black text-5xl md:text-6xl xl:text-7xl tracking-tight leading-[1.05] mb-8">
                 {msg.headline}
               </h1>
 
-              <p className="text-white/60 text-base leading-relaxed mb-10 font-sans">
+              <p className="text-white/70 text-base leading-relaxed mb-12 font-sans max-w-lg">
                 {msg.heroExplanation}
               </p>
 
               <a
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
+                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-black px-8 py-4 rounded-full text-base transition-all hover:shadow-lg duration-200 font-sans"
               >
                 {msg.ctaButtonText}
               </a>
             </div>
 
-            {/* Right: Platform mockup (same as homepage) */}
+            {/* Right: Platform mockup with category-aware label */}
             <div className="relative">
-              <HeroPlatformUI side="customer" />
+              <HeroPlatformUI side="customer" mockupLabel={msg.yourLabel} />
             </div>
           </div>
         </div>
       </section>
 
       {/* PAIN - Operational reality */}
-      <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+      <section className="py-32 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
             {msg.painLabel}
           </p>
 
-          <div className="space-y-10">
-            <div className="border-b border-[#E8E8E8] pb-10">
+          <div className="space-y-12">
+            <div className="border-b border-[#E8E8E8] pb-12">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.pain1}
               </p>
             </div>
 
-            <div className="border-b border-[#E8E8E8] pb-10">
+            <div className="border-b border-[#E8E8E8] pb-12">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.pain2}
               </p>
@@ -385,9 +404,9 @@ export default function ProspectBriefingPage({
       </section>
 
       {/* MECHANISM - How we solve it */}
-      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
+      <section className="py-32 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
             {msg.mechanismLabel}
           </p>
 
@@ -398,9 +417,9 @@ export default function ProspectBriefingPage({
       </section>
 
       {/* COST - The real cost */}
-      <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+      <section className="py-32 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
             {msg.costLabel}
           </p>
 
@@ -411,9 +430,9 @@ export default function ProspectBriefingPage({
       </section>
 
       {/* TRANSFORMATION - When this changes */}
-      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
+      <section className="py-32 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
             {msg.transformationLabel}
           </p>
 
@@ -424,24 +443,24 @@ export default function ProspectBriefingPage({
       </section>
 
       {/* CTA - Email Conversion System */}
-      <section className="py-32 px-6 bg-[#0D0D0D] border-t border-white/10">
+      <section className="py-40 px-6 bg-[#0D0D0D] border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
-            Start the conversation
+          <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-6">
+            Start a conversation
           </h2>
 
-          <p className="text-white/60 text-base mb-12 max-w-2xl mx-auto font-sans">
+          <p className="text-white/60 text-base mb-16 max-w-2xl mx-auto font-sans leading-relaxed">
             A few of the points above felt familiar. Let's understand how Saint & Story could help.
           </p>
 
           <a
             href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-            className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-bold px-10 py-5 rounded-full text-base transition-colors font-sans"
+            className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-black px-8 py-4 rounded-full text-base transition-all hover:shadow-lg duration-200 font-sans"
           >
-            {msg.ctaButtonText}
+            Start a conversation
           </a>
 
-          <p className="text-white/40 text-xs mt-10 font-sans">
+          <p className="text-white/40 text-xs mt-12 font-sans">
             No contract. No obligation. Just a conversation.
           </p>
         </div>
