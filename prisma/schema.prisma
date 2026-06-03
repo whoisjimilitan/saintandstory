@@ -1,18 +1,17 @@
-// This is a REALITY CAPTURE SYSTEM, not an intelligence system.
+// DUAL SCHEMA: Dispatch Platform + Discovery System
 //
-// It stores:
-// - what exists (Business)
-// - what was said (Review)
-// - what was thought (Hypothesis)
-// - what was asked (Conversation)
-// - what happened (Outcome)
-// - what belief changed over time (Assumption)
+// DISPATCH PLATFORM (Original System)
+// - drivers: Fleet management and authentication
+// - jobs: Service requests and dispatch
+// - earnings: Driver compensation tracking
 //
-// It does NOT store:
-// - what is good
-// - what is better
-// - what is likely
-// - what is high value
+// DISCOVERY SYSTEM (B2B Investigation)
+// - Business: Prospect companies
+// - Review: Evidence from review platforms
+// - Hypothesis: Interpretations of evidence
+// - Conversation: Outreach tracking
+// - Outcome: Conversation results
+// - Assumption: Beliefs being tested
 
 generator client {
   provider = "prisma-client-js"
@@ -29,6 +28,147 @@ enum PipelineState {
   INVESTIGATED
   INBOX_READY
 }
+
+// ============================================================================
+// DISPATCH PLATFORM MODELS
+// ============================================================================
+
+model Driver {
+  id                    String    @id @default(cuid())
+  clerkUserId           String?   @unique @map("clerk_user_id")
+  fullName              String?   @map("full_name")
+  email                 String?   @unique
+  phone                 String?
+  vehicleType           String?   @map("vehicle_type")
+  area                  String?
+  daysPreference        String?   @map("days_preference")
+  stripeCustomerId      String?   @map("stripe_customer_id")
+  stripeSubscriptionId  String?   @map("stripe_subscription_id")
+  subscriptionStatus    String?   @default("inactive") @map("subscription_status")
+  ratingAvg             Decimal?  @map("rating_avg")
+  ratingCount           Int?      @default(0) @map("rating_count")
+  profileLive           Boolean?  @default(false) @map("profile_live")
+  lastSeenAt            DateTime? @map("last_seen_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  availability          DriverAvailability[]
+  jobs                  Job[]
+  ratings               Rating[]
+  earnings              Earning[]
+
+  @@index([lastSeenAt])
+  @@index([profileLive])
+  @@map("drivers")
+}
+
+model DriverAvailability {
+  id                String    @id @default(cuid())
+  driverId          String    @map("driver_id")
+  driver            Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  availableDate     DateTime  @map("available_date") @db.Date
+  notes             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@unique([driverId, availableDate])
+  @@map("driver_availability")
+}
+
+model Job {
+  id                String    @id @default(cuid())
+  reference         String    @unique
+  trackingToken     String    @unique @map("tracking_token")
+  customerName      String?   @map("customer_name")
+  customerEmail     String?   @map("customer_email")
+  customerPhone     String?   @map("customer_phone")
+  serviceType       String?   @map("service_type")
+  postcodeFrom      String?   @map("postcode_from")
+  postcodeTo        String?   @map("postcode_to")
+  distanceMiles     Int?      @map("distance_miles")
+  largeItems        Json?     @map("large_items")
+  timeframe         String?
+  helpLoading       String?   @map("help_loading")
+  duration          String?
+  driverId          String?   @map("driver_id")
+  driver            Driver?   @relation(fields: [driverId], references: [id])
+  status            String?   @default("new")
+  jobDate           DateTime? @map("job_date") @db.Date
+  price             Decimal?
+  notes             String?
+  leadId            String?   @map("lead_id")
+  offeredAt         DateTime? @map("offered_at")
+  confirmedAt       DateTime? @map("confirmed_at")
+  inProgressAt      DateTime? @map("in_progress_at")
+  completedAt       DateTime? @map("completed_at")
+  pickupLat         Decimal?  @map("pickup_lat")
+  pickupLng         Decimal?  @map("pickup_lng")
+  driverLat         Decimal?  @map("driver_lat")
+  driverLng         Decimal?  @map("driver_lng")
+  driverEtaMinutes  Int?      @map("driver_eta_minutes")
+  locationSharingSince DateTime? @map("location_sharing_since")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  ratings           Rating[]
+  earnings          Earning[]
+  locationHistory   DriverLocationHistory[]
+
+  @@index([driverId, status])
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@map("jobs")
+}
+
+model Rating {
+  id                String    @id @default(cuid())
+  jobId             String?   @unique @map("job_id")
+  job               Job?      @relation(fields: [jobId], references: [id])
+  driverId          String?   @map("driver_id")
+  driver            Driver?   @relation(fields: [driverId], references: [id])
+  score             Int?
+  comment           String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([driverId])
+  @@map("ratings")
+}
+
+model DriverLocationHistory {
+  id                String    @id @default(cuid())
+  jobId             String?   @map("job_id")
+  job               Job?      @relation(fields: [jobId], references: [id])
+  driverClerkId     String?   @map("driver_clerk_id")
+  lat               Decimal?
+  lng               Decimal?
+  accuracy          Decimal?
+  etaMinutes        Int?      @map("eta_minutes")
+  recordedAt        DateTime  @default(now()) @map("recorded_at")
+
+  @@index([jobId])
+  @@index([recordedAt])
+  @@map("driver_location_history")
+}
+
+model Earning {
+  id                String    @id @default(cuid())
+  driverId          String?   @map("driver_id")
+  driver            Driver?   @relation(fields: [driverId], references: [id])
+  jobId             String?   @map("job_id")
+  job               Job?      @relation(fields: [jobId], references: [id])
+  amount            Decimal?
+  status            String?   @default("pending")
+  paidAt            DateTime? @map("paid_at")
+  notes             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@map("earnings")
+}
+
+// ============================================================================
+// DISCOVERY SYSTEM MODELS
+// ============================================================================
 
 // Purpose: What exists
 model Business {
