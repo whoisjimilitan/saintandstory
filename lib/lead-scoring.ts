@@ -96,16 +96,29 @@ export function getScoreTier(score: number): "hot" | "warm" | "cool" {
   return "cool";
 }
 
-export function getScoreColor(score: number): string {
+export function getScoreStyle(score: number): { containerClass: string; badgeClass: string } {
   const tier = getScoreTier(score);
-  if (tier === "hot") return "bg-red-100 text-red-700 border-red-300";
-  if (tier === "warm") return "bg-yellow-100 text-yellow-700 border-yellow-300";
-  return "bg-gray-100 text-gray-700 border-gray-300";
+
+  if (tier === "hot") {
+    return {
+      containerClass: "bg-[#0D0D0D] text-white border-0",
+      badgeClass: "text-[11px] font-black",
+    };
+  }
+
+  if (tier === "warm") {
+    return {
+      containerClass: "bg-[#F5F5F5] text-[#0D0D0D] border border-[#E8E8E8]",
+      badgeClass: "text-[10px] font-semibold",
+    };
+  }
+
+  return {
+    containerClass: "bg-white text-[#888888] border border-[#E8E8E8]",
+    badgeClass: "text-[9px] font-medium",
+  };
 }
 
 export function getScoreLabel(score: number): string {
-  const tier = getScoreTier(score);
-  if (tier === "hot") return `🔥 ${score}/100 — Call first`;
-  if (tier === "warm") return `⚡ ${score}/100 — High potential`;
   return `${score}/100`;
 }

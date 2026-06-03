@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
-import { calculateLeadScore, getScoreLabel, getScoreColor } from "@/lib/lead-scoring";
+import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -59,7 +59,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
     deliveryChallenge: lead.delivery_challenge as string,
   });
   const scoreLabel = getScoreLabel(scoreBreakdown.total);
-  const scoreColor = getScoreColor(scoreBreakdown.total);
+  const scoreStyle = getScoreStyle(scoreBreakdown.total);
 
   async function getDraft() {
     setDrafting(true);
@@ -154,7 +154,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-2">
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${scoreColor}`}>
+            <span className={`px-2.5 py-1 rounded ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
               {scoreLabel}
             </span>
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
@@ -168,7 +168,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
           {/* Opportunity Score Breakdown */}
-          <div className={`bg-white border-2 rounded-xl p-3 mb-4 ${scoreColor}`}>
+          <div className={`border rounded-xl p-3 mb-4 ${scoreStyle.containerClass}`}>
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2">Opportunity Score</p>
             <div className="grid grid-cols-2 gap-2 text-xs">
               {scoreBreakdown.frequencyScore > 0 && (
