@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -25,7 +26,6 @@ const STATUS_STYLE: Record<string, string> = {
   dead: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
 };
 
-const B2B_NICHES = ["florists", "restaurants", "retailers", "legal", "estate-agents"];
 const UK_CITIES = ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Bristol", "Sheffield", "Glasgow", "Edinburgh", "Cardiff", "Newcastle", "Nottingham", "Leicester", "Southampton", "Brighton", "Oxford", "Cambridge", "Reading", "Derby", "Norwich"];
 
 function timeAgo(ts: string) {
@@ -262,7 +262,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
 }
 
 function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
-  const [niche, setNiche] = useState("florists");
+  const [industry, setIndustry] = useState(Object.values(B2B_INDUSTRIES)[0][0]);
   const [city, setCity] = useState("Manchester");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
@@ -274,7 +274,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
       const res = await fetch("/api/b2b/discover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niche, city }),
+        body: JSON.stringify({ niche: industry, city }),
       });
       const data = await res.json() as { count: number; added: string[] };
       setResult(data);
@@ -290,9 +290,13 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Discover leads via Google Maps</p>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Niche</label>
-            <select value={niche} onChange={e => setNiche(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
-              {B2B_NICHES.map(n => <option key={n} value={n}>{n}</option>)}
+            <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Industry</label>
+            <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+              {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
+                <optgroup key={category} label={category}>
+                  {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
           <div>
@@ -307,7 +311,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
           disabled={running}
           className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
         >
-          {running ? "Searching Google Maps…" : `Find ${niche} in ${city} →`}
+          {running ? "Searching Google Maps…" : `Find ${industry} in ${city} →`}
         </button>
         {result && (
           <div className="mt-4 bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
@@ -335,7 +339,8 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
 }
 
 function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
-  const [form, setForm] = useState({ business_name: "", business_category: "", email: "", phone: "", city: "", niche: "florists", notes: "" });
+  const defaultIndustry = Object.values(B2B_INDUSTRIES)[0][0];
+  const [form, setForm] = useState({ business_name: "", industry: defaultIndustry, email: "", phone: "", city: "", notes: "" });
   const [saving, setSaving] = useState(false);
 
   async function save() {
@@ -345,9 +350,9 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
       await fetch("/api/b2b/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, niche: form.industry }),
       });
-      setForm({ business_name: "", business_category: "", email: "", phone: "", city: "", niche: "florists", notes: "" });
+      setForm({ business_name: "", industry: defaultIndustry, email: "", phone: "", city: "", notes: "" });
       onRefresh();
     } finally {
       setSaving(false);
@@ -359,14 +364,17 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Add lead manually</p>
       <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       <div className="grid grid-cols-2 gap-3">
-        <input value={form.business_category} onChange={e => setForm(f => ({ ...f, business_category: e.target.value }))} placeholder="Category (e.g. florist)" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+          {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
+            <optgroup key={category} label={category}>
+              {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
+            </optgroup>
+          ))}
+        </select>
         <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
         <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
         <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
-      <select value={form.niche} onChange={e => setForm(f => ({ ...f, niche: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
-        {B2B_NICHES.map(n => <option key={n} value={n}>{n}</option>)}
-      </select>
       <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
       <button onClick={save} disabled={saving || !form.business_name} className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors">
         {saving ? "Adding…" : "Add to pipeline →"}
