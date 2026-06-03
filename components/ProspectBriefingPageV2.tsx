@@ -18,6 +18,7 @@
 import Link from "next/link";
 import { ProspectPageData } from "@/lib/prospect-types";
 import SiteFooter from "./SiteFooter";
+import HeroPlatformUI from "./HeroPlatformUI";
 
 interface ProspectBriefingPageProps {
   data: ProspectPageData;
@@ -228,27 +229,41 @@ export default function ProspectBriefingPage({
         </div>
       </header>
 
-      {/* HERO - Industry ID + Headline + Explanation + Service visible */}
-      <section className="pt-32 pb-24 px-6 bg-[#0D0D0D] border-b border-white/10">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
-            {msg.industry}
-          </p>
+      {/* HERO - Two column layout (like homepage) */}
+      <section className="pt-16 pb-0 px-6 bg-[#0D0D0D] border-b border-white/10 min-h-screen md:min-h-auto flex items-center">
+        <div className="max-w-6xl mx-auto w-full py-20">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left: Copy (personalized with company name) */}
+            <div>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
+                {msg.industry}
+              </p>
 
-          <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-10">
-            {msg.headline}
-          </h1>
+              <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
+                {msg.headline}
+              </h1>
 
-          <p className="text-white/60 text-base leading-relaxed max-w-2xl font-sans">
-            {msg.heroExplanation}
-          </p>
+              <p className="text-white/60 text-base leading-relaxed mb-10 font-sans">
+                {msg.heroExplanation}
+              </p>
 
-          <a
-            href="tel:+442082344444"
-            className="inline-block mt-10 bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-4 rounded-full text-sm transition-colors font-sans"
-          >
-            Call us — 0208 234 4444
-          </a>
+              <p className="text-white/40 text-sm font-sans mb-8">
+                For <span className="text-white font-semibold">{business.name}</span>
+              </p>
+
+              <a
+                href="tel:+442082344444"
+                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-4 rounded-full text-sm transition-colors font-sans"
+              >
+                Call us — 0208 234 4444
+              </a>
+            </div>
+
+            {/* Right: Platform mockup (same as homepage) */}
+            <div className="relative">
+              <HeroPlatformUI side="customer" />
+            </div>
+          </div>
         </div>
       </section>
 
