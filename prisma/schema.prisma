@@ -264,6 +264,93 @@ model JobInvoice {
 }
 
 // ============================================================================
+// B2B DISCOVERY SYSTEM MODELS (Prospect Intelligence)
+// ============================================================================
+
+// Purpose: B2B leads discovered through automated discovery
+// Integrates with Prospect Intelligence Pages for movement detection
+model B2bLead {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  businessName          String    @map("business_name")
+  businessCategory      String?   @map("business_category")
+  contactName           String?   @map("contact_name")
+  email                 String?
+  phone                 String?
+  website               String?
+  city                  String?
+  postcode              String?
+  googlePlaceId         String?   @map("google_place_id")
+  painPoint             String?   @map("pain_point")
+  painPointReview       String?   @map("pain_point_review")
+  reviewRating          Decimal?  @map("review_rating") @db.Decimal(2, 1)
+  source                String?   @default("discovery") // discovery, inbound, manual
+  status                String?   @default("new") // new, contacted, warm, closed, dead
+  notes                 String?
+  niche                 String?
+  landingPageUrl        String?   @map("landing_page_url")
+  businessEvidence      Json?     @map("business_evidence")
+  humanObservations     Json?     @map("human_observations")
+  businessTimeline      Json?     @map("business_timeline")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  outreach              B2bOutreach[]
+  standingOrders        B2bStandingOrder[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("b2b_leads")
+}
+
+// Purpose: Outreach tracking for B2B leads
+model B2bOutreach {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  leadId                String    @map("lead_id") @db.Uuid
+  lead                  B2bLead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  subject               String?
+  body                  String?
+  sentAt                DateTime? @map("sent_at")
+  followUp1At           DateTime? @map("follow_up_1_at")
+  followUp2At           DateTime? @map("follow_up_2_at")
+  replied               Boolean?  @default(false)
+  repliedAt             DateTime? @map("replied_at")
+  emailType             String?   @default("initial") @map("email_type")
+  resendMessageId       String?   @map("resend_message_id")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  @@index([leadId])
+  @@map("b2b_outreach")
+}
+
+// Purpose: Standing orders (recurring deliveries) for B2B leads
+model B2bStandingOrder {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  leadId                String    @map("lead_id") @db.Uuid
+  lead                  B2bLead   @relation(fields: [leadId], references: [id])
+  businessName          String    @map("business_name")
+  contactName           String?   @map("contact_name")
+  contactPhone          String?   @map("contact_phone")
+  contactEmail          String?   @map("contact_email")
+  pickupAddress         String?   @map("pickup_address")
+  pickupPostcode        String?   @map("pickup_postcode")
+  deliveryAddress       String?   @map("delivery_address")
+  deliveryPostcode      String?   @map("delivery_postcode")
+  serviceType           String?   @map("service_type")
+  frequency             String?   @default("weekly") // daily, weekly, fortnightly, monthly
+  dayOfWeek             Int?      @map("day_of_week") // 0=Mon 6=Sun
+  preferredTime         String?   @map("preferred_time")
+  price                 Decimal?  @db.Decimal(10, 2)
+  notes                 String?
+  active                Boolean?  @default(true)
+  lastGeneratedAt       DateTime? @map("last_generated_at")
+  nextScheduledAt       DateTime? @map("next_scheduled_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("b2b_standing_orders")
+}
+
+// ============================================================================
 // DISCOVERY SYSTEM MODELS
 // ============================================================================
 
