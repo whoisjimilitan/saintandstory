@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
+import { calculateLeadScore, getScoreLabel, getScoreColor } from "@/lib/lead-scoring";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -48,6 +49,17 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
 
   const hasPainPoint = !!lead.pain_point;
+
+  // Calculate opportunity score
+  const scoreBreakdown = calculateLeadScore({
+    industry: lead.business_category as string,
+    deliveryFrequency: lead.delivery_frequency as string,
+    averageDeliveries: lead.average_deliveries as string,
+    courierProvider: lead.courier_provider as string,
+    deliveryChallenge: lead.delivery_challenge as string,
+  });
+  const scoreLabel = getScoreLabel(scoreBreakdown.total);
+  const scoreColor = getScoreColor(scoreBreakdown.total);
 
   async function getDraft() {
     setDrafting(true);
@@ -140,16 +152,58 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
             <p className="text-[#888888] text-xs mt-0.5 italic">&ldquo;{(lead.pain_point_review as string)?.slice(0, 80)}…&rdquo;</p>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
-            {STATUS_LABELS[status] ?? status}
-          </span>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${scoreColor}`}>
+              {scoreLabel}
+            </span>
+            <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
+              {STATUS_LABELS[status] ?? status}
+            </span>
+          </div>
           {!!lead.created_at && <p className="text-[#888888] text-[10px]">{timeAgo(lead.created_at as string)}</p>}
         </div>
       </button>
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
+          {/* Opportunity Score Breakdown */}
+          <div className={`bg-white border-2 rounded-xl p-3 mb-4 ${scoreColor}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2">Opportunity Score</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              {scoreBreakdown.frequencyScore > 0 && (
+                <div>
+                  <span className="font-semibold">{scoreBreakdown.frequencyScore}pts</span>
+                  <span className="text-[#888888]"> Frequency</span>
+                </div>
+              )}
+              {scoreBreakdown.industryScore > 0 && (
+                <div>
+                  <span className="font-semibold">{scoreBreakdown.industryScore}pts</span>
+                  <span className="text-[#888888]"> Industry</span>
+                </div>
+              )}
+              {scoreBreakdown.volumeScore > 0 && (
+                <div>
+                  <span className="font-semibold">{scoreBreakdown.volumeScore}pts</span>
+                  <span className="text-[#888888]"> Volume</span>
+                </div>
+              )}
+              {scoreBreakdown.courierScore > 0 && (
+                <div>
+                  <span className="font-semibold">{scoreBreakdown.courierScore}pts</span>
+                  <span className="text-[#888888]"> Courier</span>
+                </div>
+              )}
+              {scoreBreakdown.challengeScore > 0 && (
+                <div>
+                  <span className="font-semibold">{scoreBreakdown.challengeScore}pts</span>
+                  <span className="text-[#888888]"> Challenge</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Lead details */}
           <div className="grid grid-cols-2 gap-3 py-4">
             {!!lead.phone && (
@@ -584,9 +638,29 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
               <p className="text-[#888888] text-sm">No active leads. Use Discover to find your first batch.</p>
             </div>
           ) : (
-            pipelineLeads.map(lead => (
-              <LeadCard key={lead.id as string} lead={lead} onRefresh={refresh} />
-            ))
+            (() => {
+              // Sort leads by opportunity score (highest first)
+              const sortedLeads = [...pipelineLeads].sort((a, b) => {
+                const scoreA = calculateLeadScore({
+                  industry: a.business_category as string,
+                  deliveryFrequency: a.delivery_frequency as string,
+                  averageDeliveries: a.average_deliveries as string,
+                  courierProvider: a.courier_provider as string,
+                  deliveryChallenge: a.delivery_challenge as string,
+                }).total;
+                const scoreB = calculateLeadScore({
+                  industry: b.business_category as string,
+                  deliveryFrequency: b.delivery_frequency as string,
+                  averageDeliveries: b.average_deliveries as string,
+                  courierProvider: b.courier_provider as string,
+                  deliveryChallenge: b.delivery_challenge as string,
+                }).total;
+                return scoreB - scoreA;
+              });
+              return sortedLeads.map(lead => (
+                <LeadCard key={lead.id as string} lead={lead} onRefresh={refresh} />
+              ));
+            })()
           )}
         </div>
       )}
