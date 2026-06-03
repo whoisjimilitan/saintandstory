@@ -35,7 +35,7 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("legal") || lower.includes("solicitor")) {
       return {
-        industry: "Legal services",
+        yourLabel: "Your Document",
         headline: (
           <>
             Court deadlines don't
@@ -60,14 +60,15 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When collections happen as expected and deliveries arrive as promised, your team no longer has to wonder where something is. Work flows. Deadlines feel manageable. Clients feel reassured.",
 
-        ctaHeading: "One simple conversation",
-        ctaSubtext: "If reliable same-day collections and deliveries would make life easier for your team, let's talk.",
+        ctaButtonText: "Start the conversation",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
     }
 
     if (lower.includes("estate") || lower.includes("agent")) {
       return {
-        industry: "Property and estate agents",
+        yourLabel: "Your Keys",
         headline: (
           <>
             Every missed key
@@ -92,14 +93,15 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When keys arrive exactly when promised, buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
 
-        ctaHeading: "Prevent the next failed key handover",
-        ctaSubtext: "Let's talk through your completions process",
+        ctaButtonText: "Help us prevent delayed completions",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
     }
 
     if (lower.includes("medical") || lower.includes("pharma")) {
       return {
-        industry: "Medical and healthcare",
+        yourLabel: "Your Prescription",
         headline: (
           <>
             Specimen delays
@@ -125,14 +127,15 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When every collection happens on time, patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
 
-        ctaHeading: "Protect time-sensitive collections",
-        ctaSubtext: "See how we handle urgent moves",
+        ctaButtonText: "Help us improve urgent deliveries",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
     }
 
     if (lower.includes("construct") || lower.includes("builder")) {
       return {
-        industry: "Construction and trades",
+        yourLabel: "Your Materials",
         headline: (
           <>
             Site delays c
@@ -157,14 +160,15 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive reliably, crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
 
-        ctaHeading: "Stop site delays before they cost you",
-        ctaSubtext: "Show us your supply chain",
+        ctaButtonText: "Help us avoid site delays",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
     }
 
     // Default for unrecognized categories
     return {
-      industry: "Business operations",
+      yourLabel: "Your Delivery",
       headline: (
         <>
           Timing is y
@@ -191,8 +195,9 @@ export default function ProspectBriefingPage({
       transformationLabel: "When this changes",
       transformation: "When reliability becomes normal, your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
 
-      ctaHeading: "Let's see what's being missed",
-      ctaSubtext: "Schedule a conversation",
+      ctaButtonText: "Help us improve our deliveries",
+      emailSubject: `${business.name}`,
+      emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
     };
   };
 
@@ -243,7 +248,7 @@ export default function ProspectBriefingPage({
               </div>
 
               <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
-                {msg.industry}
+                {msg.yourLabel}
               </p>
 
               <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
@@ -255,10 +260,10 @@ export default function ProspectBriefingPage({
               </p>
 
               <a
-                href="tel:+442082344444"
+                href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
                 className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-4 rounded-full text-sm transition-colors font-sans"
               >
-                Call us — 0208 234 4444
+                {msg.ctaButtonText}
               </a>
             </div>
 
@@ -338,22 +343,22 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* CTA - One simple action */}
+      {/* CTA - Email Conversion System */}
       <section className="py-32 px-6 bg-[#0D0D0D] border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
-            {msg.ctaHeading}
+            Start the conversation
           </h2>
 
           <p className="text-white/60 text-base mb-12 max-w-2xl mx-auto font-sans">
-            {msg.ctaSubtext}
+            A few of the points above felt familiar. Let's understand how Saint & Story could help.
           </p>
 
           <a
-            href="tel:+442082344444"
+            href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
             className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
           >
-            Call us — 0208 234 4444
+            {msg.ctaButtonText}
           </a>
 
           <p className="text-white/40 text-xs mt-10 font-sans">
