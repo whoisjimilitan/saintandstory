@@ -1,9 +1,27 @@
 # Project Overview
 
 @CLAUDE_PROJECT_GUIDE.md
-@PROSPECT_PAGE_DOCTRINE.md
+@SAINT_AND_STORY_PROSPECT_BRIEF_V4.md
 
-Build a lightweight web application. Each feature does one thing, the code is easy to follow, and the app is easy to run locally and deploy.
+Build a lightweight web application.
+
+---
+
+# PROSPECT PAGE SPECIFICATION
+
+**CANONICAL DOCUMENT:** SAINT_AND_STORY_PROSPECT_BRIEF_V4.md
+
+This is the sole source of truth for all prospect page generation.
+
+All previous prospect page specifications (V1, V2, V3) are archived.
+
+Do not reference archived specifications.
+
+All prospect pages must comply with V4.
+
+All future prospect page changes must comply with V4.
+
+V4 is permanent and non-negotiable. Each feature does one thing, the code is easy to follow, and the app is easy to run locally and deploy.
 
 
 ---
