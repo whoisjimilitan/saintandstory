@@ -358,7 +358,7 @@ export default function ProspectBriefingPage({
       {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
             {msg.painLabel}
           </p>
 
@@ -387,7 +387,7 @@ export default function ProspectBriefingPage({
       {/* MECHANISM - How we solve it */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
             {msg.mechanismLabel}
           </p>
 
@@ -400,7 +400,7 @@ export default function ProspectBriefingPage({
       {/* COST - The real cost */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
             {msg.costLabel}
           </p>
 
@@ -413,7 +413,7 @@ export default function ProspectBriefingPage({
       {/* TRANSFORMATION - When this changes */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
             {msg.transformationLabel}
           </p>
 
