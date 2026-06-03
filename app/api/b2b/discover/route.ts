@@ -26,6 +26,37 @@ const NICHE_SEARCH_MAP: Record<string, string[]> = {
   "estate-agents": ["estate agent", "property agent", "letting agent"],
 };
 
+// Form industry values → NICHE_SEARCH_MAP keys
+// Maps B2B_INDUSTRIES values to their corresponding search categories
+const FORM_VALUE_TO_NICHE: Record<string, string> = {
+  // Legal
+  "solicitors": "legal",
+  "barristers' chambers": "legal",
+  "conveyancing firms": "legal",
+  "litigation firms": "legal",
+  "notaries": "legal",
+
+  // Florists
+  "florists": "florists",
+  "flower shops": "florists",
+
+  // Restaurants
+  "restaurants": "restaurants",
+  "cafes": "restaurants",
+  "bistros": "restaurants",
+  "eateries": "restaurants",
+
+  // Retailers
+  "retail stores": "retailers",
+  "shops": "retailers",
+  "boutiques": "retailers",
+
+  // Estate Agents
+  "estate agents": "estate-agents",
+  "letting agents": "estate-agents",
+  "property management companies": "estate-agents",
+};
+
 interface PlacesResult {
   place_id: string;
   name: string;
@@ -147,11 +178,16 @@ export async function POST(request: NextRequest) {
   const { niche: rawNiche, city } = await request.json() as { niche: string; city: string };
   console.log("[DISCOVER] Request payload - raw niche:", rawNiche, "city:", city);
 
-  // Normalize niche: convert to lowercase to match NICHE_SEARCH_MAP keys
-  // Form sends "Solicitors", "Estate Agents", etc. (capitalized)
-  // NICHE_SEARCH_MAP has keys like "legal", "estate-agents" (lowercase)
-  const niche = rawNiche.toLowerCase().replace(/\s+/g, "-");
-  console.log("[DISCOVER] Normalized niche:", niche);
+  // Translate form industry value to NICHE_SEARCH_MAP key
+  // Form sends: "Solicitors", "Estate Agents", etc. (from B2B_INDUSTRIES)
+  // NICHE_SEARCH_MAP expects: "legal", "estate-agents", etc.
+  const lowerNiche = rawNiche.toLowerCase();
+  const mappedNiche = FORM_VALUE_TO_NICHE[lowerNiche];
+  const niche = mappedNiche || lowerNiche.replace(/\s+/g, "-");
+
+  console.log("[DISCOVER] Raw niche:", rawNiche);
+  console.log("[DISCOVER] Mapped niche:", mappedNiche || "(no direct mapping, using normalized)");
+  console.log("[DISCOVER] Final niche key:", niche);
 
   const queries = NICHE_SEARCH_MAP[niche] ?? [rawNiche];
   console.log("[DISCOVER] Search queries:", queries);
