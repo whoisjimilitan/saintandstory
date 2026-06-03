@@ -303,24 +303,18 @@ export default function ProspectBriefingPage({
 
   return (
     <main className="bg-white">
-      {/* Navigation - minimal, homepage style */}
+      {/* Navigation - matches main Nav structure */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
-              <rect width="48" height="48" rx="11" fill="#0D0D0D" />
-              <path
-                d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38"
-                stroke="white"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <circle cx="34" cy="12" r="3.5" fill="white" />
-              <circle cx="34" cy="38" r="3.5" fill="white" />
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="11" fill="#0D0D0D"/>
+              <path d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+              <circle cx="34" cy="12" r="3.5" fill="white"/>
+              <circle cx="34" cy="38" r="3.5" fill="white"/>
             </svg>
-            <span className="font-sans font-black text-[#0D0D0D] text-xs tracking-tight">
-              Saint &amp; Story
+            <span className="font-sans font-black text-[#0D0D0D] text-sm tracking-tight">
+              Saint <span className="font-display italic font-normal">&amp;</span> Story
             </span>
           </Link>
           <div></div>
@@ -333,15 +327,8 @@ export default function ProspectBriefingPage({
           <div className="grid md:grid-cols-2 gap-16 items-center">
             {/* Left: Copy (personalized with company name) */}
             <div>
-              {/* Company name as premium badge */}
-              <div className="inline-flex items-center gap-2 mb-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
-                <span className="text-white/80 text-xs font-semibold uppercase tracking-widest">
-                  {business.name}
-                </span>
-              </div>
-
               <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
-                {msg.yourLabel}
+                {business.name}
               </p>
 
               <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
@@ -354,7 +341,7 @@ export default function ProspectBriefingPage({
 
               <a
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-bold px-10 py-5 rounded-full text-base transition-colors font-sans"
+                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
               >
                 {msg.ctaButtonText}
               </a>
@@ -371,7 +358,7 @@ export default function ProspectBriefingPage({
       {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
             {msg.painLabel}
           </p>
 
@@ -400,7 +387,7 @@ export default function ProspectBriefingPage({
       {/* MECHANISM - How we solve it */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
             {msg.mechanismLabel}
           </p>
 
@@ -413,7 +400,7 @@ export default function ProspectBriefingPage({
       {/* COST - The real cost */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
             {msg.costLabel}
           </p>
 
@@ -426,7 +413,7 @@ export default function ProspectBriefingPage({
       {/* TRANSFORMATION - When this changes */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
+          <p className="text-[#555555] text-sm font-semibold uppercase tracking-[0.18em] mb-12">
             {msg.transformationLabel}
           </p>
 
