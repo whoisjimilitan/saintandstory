@@ -247,12 +247,12 @@ export async function POST(request: NextRequest) {
           INSERT INTO b2b_leads (
             business_name, business_category, email, phone, city,
             website, google_place_id, pain_point, pain_point_review, review_rating,
-            source, status, niche, landing_page_url
+            source, status, niche, landing_page_url, created_at, updated_at
           ) VALUES (
             ${place.name}, ${niche}, null, ${place.formatted_phone_number ?? null}, ${addressCity},
             ${place.website ?? null}, ${place.place_id}, ${painPoint}, ${reviewText ?? null},
             ${rating ?? null}, 'discovery', 'new', ${niche},
-            ${`${BASE_URL}/b2b/${niche}`}
+            ${`${BASE_URL}/b2b/${niche}`}, NOW(), NOW()
           )
         `;
 
