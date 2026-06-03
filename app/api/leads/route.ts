@@ -20,16 +20,18 @@ async function createJob(lead: Record<string, unknown>): Promise<string | null> 
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) return null;
   const sql = neon(dbUrl);
+  const jobId = randomUUID();
   const trackingToken = randomUUID();
   const reference = generateReference();
+  const now = new Date().toISOString();
   try {
     await sql`
       INSERT INTO jobs (
-        reference, tracking_token, customer_name, customer_email, customer_phone,
+        id, reference, tracking_token, customer_name, customer_email, customer_phone,
         service_type, postcode_from, postcode_to, large_items,
-        timeframe, help_loading, duration, status, lead_id
+        timeframe, help_loading, duration, status, lead_id, created_at, updated_at
       ) VALUES (
-        ${reference}, ${trackingToken},
+        ${jobId}, ${reference}, ${trackingToken},
         ${(lead.fullName as string) || null},
         ${(lead.email as string) || null},
         ${(lead.phone as string) || null},
@@ -41,7 +43,9 @@ async function createJob(lead: Record<string, unknown>): Promise<string | null> 
         ${(lead.helpLoading as string) || null},
         ${(lead.duration as string) || null},
         'pending_review',
-        ${lead.id as string}
+        ${lead.id as string},
+        ${now},
+        ${now}
       )
     `;
     console.log("[leads] Job created:", reference, trackingToken);
