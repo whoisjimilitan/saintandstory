@@ -93,7 +93,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When keys arrive exactly when promised, buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
 
-        ctaButtonText: "Help us prevent delayed completions",
+        ctaButtonText: "Start the conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -127,7 +127,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When every collection happens on time, patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
 
-        ctaButtonText: "Help us improve urgent deliveries",
+        ctaButtonText: "Start the conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -160,7 +160,105 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive reliably, crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
 
-        ctaButtonText: "Help us avoid site delays",
+        ctaButtonText: "Start the conversation",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
+      };
+    }
+
+    if (lower.includes("account") || lower.includes("tax")) {
+      return {
+        yourLabel: "Your Files",
+        headline: (
+          <>
+            Tax deadlines w
+            <span className="font-display italic font-normal">ai</span>t f
+            <span className="font-display italic font-normal">o</span>r no one.
+          </>
+        ),
+        heroExplanation: "When tax documents, client files, or audit materials need to reach accountants, compliance officers, or HMRC, delays create cascading problems. Saint & Story provides same-day collections and deliveries to protect the deadlines that drive your firm.",
+
+        painLabel: "The operational reality",
+        pain1: "Critical deadline documents often arrive at the last minute.",
+        pain2: "Your team spends time chasing document status instead of billable work.",
+        pain3: "You've built safety margins into deadlines that shouldn't be necessary.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving files. It's protecting compliance. Protecting cash flow. Protecting the reputation for reliability your clients depend on.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "A missed deadline isn't just embarrassing. It's regulatory risk, client risk, and revenue risk. Late fees. Missed filings. Frustrated clients. Lost trust. The operational problem and the business impact are inseparable.",
+
+        transformationLabel: "When this changes",
+        transformation: "When documents arrive as promised, your team stops firefighting deadlines. Work flows smoothly. Your clients see a firm that knows how to execute.",
+
+        ctaButtonText: "Start the conversation",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
+      };
+    }
+
+    if (lower.includes("architect")) {
+      return {
+        yourLabel: "Your Plans",
+        headline: (
+          <>
+            Design delays c
+            <span className="font-display italic font-normal">o</span>st
+            <br />
+            your reputation.
+          </>
+        ),
+        heroExplanation: "When architectural plans, specifications, and client presentations need to reach consultants, contractors, or approval bodies, delays kill projects. Saint & Story provides same-day deliveries so your projects stay on schedule.",
+
+        painLabel: "The operational reality",
+        pain1: "Critical plans need to reach contractors before work can begin.",
+        pain2: "Project delays compound—one late delivery ripples through the timeline.",
+        pain3: "You've learned to pad schedules because you can't trust delivery timing.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving documents. It's protecting project timelines. Protecting client confidence. Protecting the reputation for execution that wins future work.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "When critical plans don't arrive, work doesn't start. Contractors stand idle. Schedules slip. Relationships strain. The operational problem and the revenue impact are one.",
+
+        transformationLabel: "When this changes",
+        transformation: "When plans arrive reliably and on time, projects move smoothly. Contractors stay productive. Your clients see a practice that knows how to deliver.",
+
+        ctaButtonText: "Start the conversation",
+        emailSubject: `${business.name}`,
+        emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
+      };
+    }
+
+    if (lower.includes("financial") || lower.includes("bank") || lower.includes("insurance")) {
+      return {
+        yourLabel: "Your Client Pack",
+        headline: (
+          <>
+            Market timing is y
+            <span className="font-display italic font-normal">o</span>ur
+            <br />
+            business.
+          </>
+        ),
+        heroExplanation: "When time-sensitive client packs, compliance documents, or transaction materials need to move, delays cost business. Saint & Story provides same-day collections and deliveries so your transactions complete and your clients stay confident.",
+
+        painLabel: "The operational reality",
+        pain1: "Time-sensitive materials suddenly become urgent priorities.",
+        pain2: "Your team spends time tracking delivery status instead of serving clients.",
+        pain3: "You've accepted that some deliveries will fail and planned accordingly.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving documents. It's protecting transactions. Protecting client confidence. Protecting the market timing that makes deals possible.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "A missed delivery isn't just a logistical failure. It's a lost transaction. Lost fees. Lost opportunities. Lost reputation. The operational problem and the revenue impact are inseparable.",
+
+        transformationLabel: "When this changes",
+        transformation: "When materials arrive exactly when promised, transactions complete smoothly. Your team stops firefighting. Your clients see a business that can execute.",
+
+        ctaButtonText: "Start the conversation",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -195,7 +293,7 @@ export default function ProspectBriefingPage({
       transformationLabel: "When this changes",
       transformation: "When reliability becomes normal, your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
 
-      ctaButtonText: "Help us improve our deliveries",
+      ctaButtonText: "Start the conversation",
       emailSubject: `${business.name}`,
       emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
     };
@@ -225,12 +323,7 @@ export default function ProspectBriefingPage({
               Saint &amp; Story
             </span>
           </Link>
-          <a
-            href="tel:+442082344444"
-            className="text-[#0D0D0D] hover:text-[#555555] font-semibold text-sm transition-colors"
-          >
-            0208 234 4444
-          </a>
+          <div></div>
         </div>
       </header>
 
@@ -261,7 +354,7 @@ export default function ProspectBriefingPage({
 
               <a
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-4 rounded-full text-sm transition-colors font-sans"
+                className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-bold px-10 py-5 rounded-full text-base transition-colors font-sans"
               >
                 {msg.ctaButtonText}
               </a>
@@ -278,7 +371,7 @@ export default function ProspectBriefingPage({
       {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
             {msg.painLabel}
           </p>
 
@@ -307,7 +400,7 @@ export default function ProspectBriefingPage({
       {/* MECHANISM - How we solve it */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
             {msg.mechanismLabel}
           </p>
 
@@ -320,7 +413,7 @@ export default function ProspectBriefingPage({
       {/* COST - The real cost */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
             {msg.costLabel}
           </p>
 
@@ -333,7 +426,7 @@ export default function ProspectBriefingPage({
       {/* TRANSFORMATION - When this changes */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+          <p className="text-[#555555] text-sm font-bold uppercase tracking-[0.18em] mb-12">
             {msg.transformationLabel}
           </p>
 
@@ -356,7 +449,7 @@ export default function ProspectBriefingPage({
 
           <a
             href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-            className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
+            className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-bold px-10 py-5 rounded-full text-base transition-colors font-sans"
           >
             {msg.ctaButtonText}
           </a>
