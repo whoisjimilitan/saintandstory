@@ -1,22 +1,22 @@
 /**
- * PROSPECT BRIEFING PAGE - DOCTRINE IMPLEMENTATION
+ * PROSPECT BRIEFING PAGE - FULL DESIGN INHERITANCE
  *
- * Implements the 6-STAGE PSYCHOLOGICAL FRAMEWORK for prospect pages.
+ * Implements:
+ * 1. Six-stage psychological framework
+ * 2. Complete Saint & Story design system inheritance
  *
- * Stage 1: Recognition - "That's exactly us"
- * Stage 2: Understanding - "They understand our world"
- * Stage 3: Hidden Cost - "This is costing us"
- * Stage 4: Transformation - "Life can be different"
- * Stage 5: Identity Shift - "This is who we become"
- * Stage 6: Action - "One obvious next step"
+ * DESIGN SYSTEM (from PROSPECT_PAGE_DESIGN_AUDIT.md):
+ * - Typography: font-sans + font-display italic accents
+ * - Spacing: py-24 (generous), px-6, gap-16
+ * - Colors: #0D0D0D, #F5F5F5, #E8E8E8 with opacity hierarchy
+ * - Rhythm: Alternating section backgrounds (white/light)
+ * - Premium feel: Lots of whitespace, confident, expensive
+ * - Visual hierarchy: Clear text scaling and opacity
  *
- * DESIGN PHILOSOPHY:
- * - Inherits Saint & Story homepage design system
- * - Two-font typography (font-sans primary, font-display italic accent)
- * - Spacing, rhythm, restraint match homepage
- * - Feels like natural extension of homepage
- * - Minimal, confident, expensive-feeling
- * - One clear path to action
+ * KEY DIFFERENCE FROM HOMEPAGE:
+ * - max-w-3xl (narrower, more focused)
+ * - Single column (not grid)
+ * - Same spacing, same fonts, same aesthetic
  */
 
 import Link from "next/link";
@@ -38,14 +38,32 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("legal") || lower.includes("solicitor")) {
       return {
-        recognitionHeadline: "Court deadlines don't wait for anyone.",
+        companyName: business.name,
+        recognitionHeadline: (
+          <>
+            Court deadlines don't
+            <br />
+            w<span className="font-display italic font-normal">ai</span>t f
+            <span className="font-display italic font-normal">o</span>r anyone.
+          </>
+        ),
+        subheadline: `For ${business.name}`,
         observation1: "Every deadline gets treated as equally urgent.",
         observation2: "Someone is always chasing delivery status.",
         observation3: "You've learned to build in extra days as a buffer.",
-        hiddenCost: "Every missed court deadline is a case lost. And more than that—it's your reputation on the line.",
-        hiddenCostSecondary: "Lost cases. Lost trust. Lost clients. The operational problem and the business impact are the same thing.",
-        transformationHeading: "When every deadline lands",
+        hiddenCostLabel: "The real cost",
+        hiddenCost: "Every missed court deadline is a case lost.",
+        hiddenCostEmphasis: "And more than that—it's your reputation on the line.",
+        hiddenCostSecondary: "Lost cases. Lost trust. Lost clients. The operational problem and the business impact are one.",
+        transformationLabel: "When this changes",
+        transformationHeading: (
+          <>
+            When every deadl
+            <span className="font-display italic font-normal">i</span>ne lands
+          </>
+        ),
         transformationBody: "Your reputation grows. Your team stops firefighting. Your clients see a firm that knows how to execute.",
+        identityLabel: "Your future",
         identityHeading: "You become the firm",
         identityBody: "Known for meeting every deadline. The one clients trust. The one other firms watch.",
         ctaHeading: "Don't let another deadline slip past",
@@ -55,14 +73,32 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("estate") || lower.includes("agent")) {
       return {
-        recognitionHeadline: "Every missed key handover is a lost deal.",
+        companyName: business.name,
+        recognitionHeadline: (
+          <>
+            Every missed key
+            <br />
+            handover is a lost deal.
+          </>
+        ),
+        subheadline: `For ${business.name}`,
         observation1: "Keys are always promised sooner than you can realistically deliver.",
         observation2: "One failed handover creates doubt in the buyer's mind.",
         observation3: "You've stopped promising specific times anymore.",
-        hiddenCost: "One failed key handover isn't just an inconvenience. It's a failed transaction and a lost client.",
+        hiddenCostLabel: "The real cost",
+        hiddenCost: "One failed key handover isn't just an inconvenience.",
+        hiddenCostEmphasis: "It's a failed transaction and a lost client.",
         hiddenCostSecondary: "Lost transactions. Lost reputation. Lost revenue. The operational problem and the business impact are inseparable.",
-        transformationHeading: "When every key arrives on time",
+        transformationLabel: "When this changes",
+        transformationHeading: (
+          <>
+            When every key arrives
+            <br />
+            <span className="font-display italic font-normal">o</span>n time
+          </>
+        ),
         transformationBody: "Buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
+        identityLabel: "Your future",
         identityHeading: "You become the agency",
         identityBody: "Where chains complete on schedule. The one clients trust. The one other agents watch.",
         ctaHeading: "Prevent the next failed key handover",
@@ -72,14 +108,35 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("medical") || lower.includes("pharma")) {
       return {
-        recognitionHeadline: "Specimen delays cost patient care.",
+        companyName: business.name,
+        recognitionHeadline: (
+          <>
+            Specimen delays c
+            <span className="font-display italic font-normal">o</span>st
+            <br />
+            patient care.
+          </>
+        ),
+        subheadline: `For ${business.name}`,
         observation1: "Collections always run late.",
         observation2: "Someone is always calling to check status.",
         observation3: "You've accepted patient care delays as inevitable.",
-        hiddenCost: "Delayed specimen collection isn't just inefficient. It's patient care at risk.",
+        hiddenCostLabel: "The real cost",
+        hiddenCost: "Delayed specimen collection isn't just inefficient.",
+        hiddenCostEmphasis: "It's patient care at risk.",
         hiddenCostSecondary: "Lost time. Frustrated patients. Frustrated doctors. Reputation risk. The operational problem and the clinical impact are the same thing.",
-        transformationHeading: "When every collection happens on time",
+        transformationLabel: "When this changes",
+        transformationHeading: (
+          <>
+            When every c<span className="font-display italic font-normal">o</span>
+            llection h
+            <span className="font-display italic font-normal">a</span>ppens
+            <br />
+            <span className="font-display italic font-normal">o</span>n time
+          </>
+        ),
         transformationBody: "Patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
+        identityLabel: "Your future",
         identityHeading: "You become the practice",
         identityBody: "Patients trust when timing matters. The one doctors recommend. The one known for speed.",
         ctaHeading: "Protect time-sensitive collections",
@@ -89,14 +146,34 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("construct") || lower.includes("builder")) {
       return {
-        recognitionHeadline: "Site delays compound quickly.",
+        companyName: business.name,
+        recognitionHeadline: (
+          <>
+            Site delays c
+            <span className="font-display italic font-normal">o</span>mpound
+            <br />
+            quickly.
+          </>
+        ),
+        subheadline: `For ${business.name}`,
         observation1: "Critical materials don't always arrive when promised.",
         observation2: "Crews stand idle waiting for deliveries.",
         observation3: "You've learned to build delay into timelines.",
-        hiddenCost: "When a critical component doesn't arrive, a crew stands idle and costs mount quickly.",
+        hiddenCostLabel: "The real cost",
+        hiddenCost: "When a critical component doesn't arrive, a crew stands idle.",
+        hiddenCostEmphasis: "And costs mount quickly.",
         hiddenCostSecondary: "Lost revenue. Lost reputation. Lost opportunities. The operational problem and the business impact are one.",
-        transformationHeading: "When materials arrive reliably",
+        transformationLabel: "When this changes",
+        transformationHeading: (
+          <>
+            When materials arrive
+            <br />
+            reli
+            <span className="font-display italic font-normal">a</span>bly
+          </>
+        ),
         transformationBody: "Crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
+        identityLabel: "Your future",
         identityHeading: "You become the contractor",
         identityBody: "Known for on-time delivery. The one general contractors trust. The one that never delays projects.",
         ctaHeading: "Stop site delays before they cost you",
@@ -106,14 +183,36 @@ export default function ProspectBriefingPage({
 
     // Default for unrecognized categories
     return {
-      recognitionHeadline: "Timing is your competitive advantage.",
+      companyName: business.name,
+      recognitionHeadline: (
+        <>
+          Timing is y
+          <span className="font-display italic font-normal">o</span>ur
+          <br />
+          c<span className="font-display italic font-normal">o</span>mpetitive
+          <br />
+          advantage.
+        </>
+      ),
+      subheadline: `For ${business.name}`,
       observation1: "Your business operates on deadlines.",
       observation2: "Delays create cascading problems.",
       observation3: "You've learned to expect some failures.",
-      hiddenCost: "This isn't just a logistical problem. It's a revenue and reputation problem.",
+      hiddenCostLabel: "The real cost",
+      hiddenCost: "This isn't just a logistical problem.",
+      hiddenCostEmphasis: "It's a revenue and reputation problem.",
       hiddenCostSecondary: "Lost opportunities. Lost trust. Lost revenue. The operational problem and the business impact are inseparable.",
-      transformationHeading: "When reliability becomes normal",
+      transformationLabel: "When this changes",
+      transformationHeading: (
+        <>
+          When reliabil
+          <span className="font-display italic font-normal">i</span>ty
+          <br />
+          becomes n<span className="font-display italic font-normal">o</span>rmal
+        </>
+      ),
       transformationBody: "Your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
+      identityLabel: "Your future",
       identityHeading: "You become the business",
       identityBody: "Known for dependability. The one clients trust. The one that never misses.",
       ctaHeading: "Let's see what's being missed",
@@ -154,38 +253,38 @@ export default function ProspectBriefingPage({
         </div>
       </header>
 
-      {/* STAGE 1: RECOGNITION - Dark hero with recognition headline */}
-      <section className="pt-24 pb-20 px-6 bg-[#0D0D0D]">
+      {/* STAGE 1: RECOGNITION - Dark hero with generous spacing */}
+      <section className="pt-32 pb-24 px-6 bg-[#0D0D0D] border-b border-white/10">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-white font-sans font-black text-6xl tracking-tight leading-[1.1] mb-8">
+          <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
+            {msg.subheadline}
+          </p>
+
+          <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-10">
             {msg.recognitionHeadline}
           </h1>
 
-          <p className="text-white/70 text-lg leading-relaxed max-w-2xl">
-            We've spent time understanding what this means for {business.category}s like {business.name}.
-          </p>
-
-          <p className="text-white/40 text-sm mt-8">
-            {business.category} {business.city && `• ${business.city}`}
+          <p className="text-white/60 text-base leading-relaxed max-w-2xl font-sans">
+            We've spent time understanding what this means for businesses like yours.
           </p>
         </div>
       </section>
 
-      {/* STAGE 2: UNDERSTANDING - Three observations they recognize */}
-      <section className="py-20 px-6 bg-white border-t border-[#E8E8E8]">
+      {/* STAGE 2: UNDERSTANDING - White section with generous spacing */}
+      <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-widest mb-4">
+          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
             What we see
           </p>
 
-          <div className="space-y-12">
-            <div className="border-b border-[#E8E8E8] pb-12">
+          <div className="space-y-10">
+            <div className="border-b border-[#E8E8E8] pb-10">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.observation1}
               </p>
             </div>
 
-            <div className="border-b border-[#E8E8E8] pb-12">
+            <div className="border-b border-[#E8E8E8] pb-10">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.observation2}
               </p>
@@ -200,16 +299,20 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* STAGE 3: HIDDEN COST - The real cost revealed */}
-      <section className="py-20 px-6 bg-[#F5F5F5] border-t border-[#E8E8E8]">
+      {/* STAGE 3: HIDDEN COST - Light background with generous spacing */}
+      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-widest mb-4">
-            The real cost
+          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+            {msg.hiddenCostLabel}
           </p>
 
-          <h2 className="text-[#0D0D0D] font-sans font-black text-4xl tracking-tight leading-[1.2] mb-8">
+          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-6">
             {msg.hiddenCost}
           </h2>
+
+          <p className="text-[#0D0D0D] text-xl leading-relaxed mb-8 font-sans">
+            {msg.hiddenCostEmphasis}
+          </p>
 
           <p className="text-[#555555] text-base leading-relaxed font-sans">
             {msg.hiddenCostSecondary}
@@ -217,14 +320,14 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* STAGE 4: TRANSFORMATION - What life looks like after the problem */}
-      <section className="py-20 px-6 bg-white border-t border-[#E8E8E8]">
+      {/* STAGE 4: TRANSFORMATION - White section */}
+      <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-widest mb-4">
-            When this changes
+          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+            {msg.transformationLabel}
           </p>
 
-          <h2 className="text-[#0D0D0D] font-sans font-black text-4xl tracking-tight leading-[1.2] mb-8">
+          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
             {msg.transformationHeading}
           </h2>
 
@@ -234,14 +337,14 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* STAGE 5: IDENTITY SHIFT - Who they become */}
-      <section className="py-20 px-6 bg-[#F5F5F5] border-t border-[#E8E8E8]">
+      {/* STAGE 5: IDENTITY SHIFT - Light background */}
+      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-widest mb-4">
-            Your future
+          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+            {msg.identityLabel}
           </p>
 
-          <h2 className="text-[#0D0D0D] font-sans font-black text-4xl tracking-tight leading-[1.2] mb-8">
+          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
             {msg.identityHeading}
           </h2>
 
@@ -251,14 +354,14 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* STAGE 6: ACTION - Single, obvious next step */}
-      <section className="py-24 px-6 bg-[#0D0D0D] border-t border-white/10">
+      {/* STAGE 6: ACTION - Dark section, generous spacing */}
+      <section className="py-32 px-6 bg-[#0D0D0D] border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-white font-sans font-black text-5xl tracking-tight leading-[1.2] mb-6">
+          <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
             {msg.ctaHeading}
           </h2>
 
-          <p className="text-white/70 text-lg mb-12 max-w-2xl mx-auto font-sans">
+          <p className="text-white/60 text-lg mb-16 max-w-2xl mx-auto font-sans">
             {msg.ctaSubtext}
           </p>
 
@@ -269,7 +372,7 @@ export default function ProspectBriefingPage({
             Call us — 0208 234 4444
           </a>
 
-          <p className="text-white/40 text-xs mt-8 font-sans">
+          <p className="text-white/40 text-xs mt-10 font-sans">
             No contract. No obligation. Just a conversation.
           </p>
         </div>
