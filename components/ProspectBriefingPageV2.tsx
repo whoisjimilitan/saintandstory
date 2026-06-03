@@ -1,22 +1,18 @@
 /**
- * PROSPECT BRIEFING PAGE - FULL DESIGN INHERITANCE
+ * SAINT & STORY PROSPECT BRIEF SYSTEM
  *
- * Implements:
- * 1. Six-stage psychological framework
- * 2. Complete Saint & Story design system inheritance
+ * Implements 10 Non-Negotiable Rules:
  *
- * DESIGN SYSTEM (from PROSPECT_PAGE_DESIGN_AUDIT.md):
- * - Typography: font-sans + font-display italic accents
- * - Spacing: py-24 (generous), px-6, gap-16
- * - Colors: #0D0D0D, #F5F5F5, #E8E8E8 with opacity hierarchy
- * - Rhythm: Alternating section backgrounds (white/light)
- * - Premium feel: Lots of whitespace, confident, expensive
- * - Visual hierarchy: Clear text scaling and opacity
- *
- * KEY DIFFERENCE FROM HOMEPAGE:
- * - max-w-3xl (narrower, more focused)
- * - Single column (not grid)
- * - Same spacing, same fonts, same aesthetic
+ * 1. Service visible in 5 seconds (same-day courier must be obvious)
+ * 2. Pain + Mechanism + Transformation (all three always present)
+ * 3. Hero immediately understandable (industry ID + headline + explanation + CTA)
+ * 4. Inherits Saint & Story design (typography, spacing, rhythm, atmosphere)
+ * 5. Less is more (skimmable, not over-explained)
+ * 6. Human language only (plain English, conversational)
+ * 7. Sell transformation (benefits > features)
+ * 8. One primary action (no competing CTAs)
+ * 9. Feel expensive (premium, professional, thoughtful)
+ * 10. Pages are salespeople (recognize → understand → explain → transform → action)
  */
 
 import Link from "next/link";
@@ -32,14 +28,14 @@ export default function ProspectBriefingPage({
 }: ProspectBriefingPageProps) {
   const { business } = data;
 
-  // Category-specific messaging (observation-based, not feature-based)
+  // Category-specific copy (Pain + Mechanism + Transformation)
   const getCategoryMessaging = (category: string) => {
     const lower = category.toLowerCase();
 
     if (lower.includes("legal") || lower.includes("solicitor")) {
       return {
-        companyName: business.name,
-        recognitionHeadline: (
+        industry: "Legal services",
+        headline: (
           <>
             Court deadlines don't
             <br />
@@ -47,60 +43,54 @@ export default function ProspectBriefingPage({
             <span className="font-display italic font-normal">o</span>r anyone.
           </>
         ),
-        subheadline: `For ${business.name}`,
-        observation1: "Every deadline gets treated as equally urgent.",
-        observation2: "Someone is always chasing delivery status.",
-        observation3: "You've learned to build in extra days as a buffer.",
-        hiddenCostLabel: "The real cost",
-        hiddenCost: "Every missed court deadline is a case lost.",
-        hiddenCostEmphasis: "And more than that—it's your reputation on the line.",
-        hiddenCostSecondary: "Lost cases. Lost trust. Lost clients. The operational problem and the business impact are one.",
+        heroExplanation: "When documents need to reach court, chambers, clients or another office, there is rarely a second chance. Saint & Story provides same-day collections and deliveries to protect the deadlines that matter most.",
+
+        painLabel: "The operational reality",
+        pain1: "Urgent documents suddenly become everyone's priority.",
+        pain2: "Staff spend valuable time chasing delivery updates.",
+        pain3: "Important deadlines depend on courier companies you don't fully trust.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving documents. It's protecting deadlines. Protecting client confidence. Protecting the reputation your firm has worked hard to build.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "Most delivery problems never appear on a balance sheet. Instead they appear as unnecessary stress, interrupted work, frustrated staff, nervous clients, preventable risk. The cost is rarely the delivery itself. The cost is everything that happens when the delivery fails.",
+
         transformationLabel: "When this changes",
-        transformationHeading: (
-          <>
-            When every deadl
-            <span className="font-display italic font-normal">i</span>ne lands
-          </>
-        ),
-        transformationBody: "Your reputation grows. Your team stops firefighting. Your clients see a firm that knows how to execute.",
-        identityLabel: "Your future",
-        identityHeading: "You become the firm",
-        identityBody: "Known for meeting every deadline. The one clients trust. The one other firms watch.",
-        ctaHeading: "Don't let another deadline slip past",
-        ctaSubtext: "Schedule a 15-minute conversation",
+        transformation: "When collections happen as expected and deliveries arrive as promised, your team no longer has to wonder where something is. Work flows. Deadlines feel manageable. Clients feel reassured.",
+
+        ctaHeading: "One simple conversation",
+        ctaSubtext: "If reliable same-day collections and deliveries would make life easier for your team, let's talk.",
       };
     }
 
     if (lower.includes("estate") || lower.includes("agent")) {
       return {
-        companyName: business.name,
-        recognitionHeadline: (
+        industry: "Property and estate agents",
+        headline: (
           <>
             Every missed key
             <br />
-            handover is a lost deal.
+            handover is a l
+            <span className="font-display italic font-normal">o</span>st deal.
           </>
         ),
-        subheadline: `For ${business.name}`,
-        observation1: "Keys are always promised sooner than you can realistically deliver.",
-        observation2: "One failed handover creates doubt in the buyer's mind.",
-        observation3: "You've stopped promising specific times anymore.",
-        hiddenCostLabel: "The real cost",
-        hiddenCost: "One failed key handover isn't just an inconvenience.",
-        hiddenCostEmphasis: "It's a failed transaction and a lost client.",
-        hiddenCostSecondary: "Lost transactions. Lost reputation. Lost revenue. The operational problem and the business impact are inseparable.",
+        heroExplanation: "Completion days depend on reliable key transfers. Saint & Story provides same-day collections and deliveries so your chains complete smoothly and your clients stay confident.",
+
+        painLabel: "The operational reality",
+        pain1: "Keys are always promised sooner than you can realistically deliver.",
+        pain2: "One failed handover creates doubt in the buyer's mind.",
+        pain3: "You've stopped promising specific times anymore.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving keys. It's protecting transactions. Protecting buyer confidence. Protecting the commission that makes the deal worthwhile.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "One failed key handover isn't just an inconvenience. It's a failed transaction and a lost client. Lost transactions. Lost reputation. Lost revenue. The operational problem and the business impact are inseparable.",
+
         transformationLabel: "When this changes",
-        transformationHeading: (
-          <>
-            When every key arrives
-            <br />
-            <span className="font-display italic font-normal">o</span>n time
-          </>
-        ),
-        transformationBody: "Buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
-        identityLabel: "Your future",
-        identityHeading: "You become the agency",
-        identityBody: "Where chains complete on schedule. The one clients trust. The one other agents watch.",
+        transformation: "When keys arrive exactly when promised, buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
+
         ctaHeading: "Prevent the next failed key handover",
         ctaSubtext: "Let's talk through your completions process",
       };
@@ -108,37 +98,32 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("medical") || lower.includes("pharma")) {
       return {
-        companyName: business.name,
-        recognitionHeadline: (
+        industry: "Medical and healthcare",
+        headline: (
           <>
-            Specimen delays c
-            <span className="font-display italic font-normal">o</span>st
+            Specimen delays
+            <br />
+            c<span className="font-display italic font-normal">o</span>st
             <br />
             patient care.
           </>
         ),
-        subheadline: `For ${business.name}`,
-        observation1: "Collections always run late.",
-        observation2: "Someone is always calling to check status.",
-        observation3: "You've accepted patient care delays as inevitable.",
-        hiddenCostLabel: "The real cost",
-        hiddenCost: "Delayed specimen collection isn't just inefficient.",
-        hiddenCostEmphasis: "It's patient care at risk.",
-        hiddenCostSecondary: "Lost time. Frustrated patients. Frustrated doctors. Reputation risk. The operational problem and the clinical impact are the same thing.",
+        heroExplanation: "Time-sensitive specimens degrade. Urgent collections can't wait. Saint & Story provides same-day medical collections and deliveries so patient care never gets delayed by transport.",
+
+        painLabel: "The operational reality",
+        pain1: "Collections always run late.",
+        pain2: "Someone is always calling to check status.",
+        pain3: "You've accepted patient care delays as inevitable.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving specimens. It's protecting test accuracy. Protecting patient outcomes. Protecting the trust doctors place in your practice.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "Delayed specimen collection isn't just inefficient. It's patient care at risk. Lost time. Frustrated patients. Frustrated doctors. Reputation risk. The operational problem and the clinical impact are the same thing.",
+
         transformationLabel: "When this changes",
-        transformationHeading: (
-          <>
-            When every c<span className="font-display italic font-normal">o</span>
-            llection h
-            <span className="font-display italic font-normal">a</span>ppens
-            <br />
-            <span className="font-display italic font-normal">o</span>n time
-          </>
-        ),
-        transformationBody: "Patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
-        identityLabel: "Your future",
-        identityHeading: "You become the practice",
-        identityBody: "Patients trust when timing matters. The one doctors recommend. The one known for speed.",
+        transformation: "When every collection happens on time, patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
+
         ctaHeading: "Protect time-sensitive collections",
         ctaSubtext: "See how we handle urgent moves",
       };
@@ -146,8 +131,8 @@ export default function ProspectBriefingPage({
 
     if (lower.includes("construct") || lower.includes("builder")) {
       return {
-        companyName: business.name,
-        recognitionHeadline: (
+        industry: "Construction and trades",
+        headline: (
           <>
             Site delays c
             <span className="font-display italic font-normal">o</span>mpound
@@ -155,27 +140,22 @@ export default function ProspectBriefingPage({
             quickly.
           </>
         ),
-        subheadline: `For ${business.name}`,
-        observation1: "Critical materials don't always arrive when promised.",
-        observation2: "Crews stand idle waiting for deliveries.",
-        observation3: "You've learned to build delay into timelines.",
-        hiddenCostLabel: "The real cost",
-        hiddenCost: "When a critical component doesn't arrive, a crew stands idle.",
-        hiddenCostEmphasis: "And costs mount quickly.",
-        hiddenCostSecondary: "Lost revenue. Lost reputation. Lost opportunities. The operational problem and the business impact are one.",
+        heroExplanation: "When critical materials don't arrive, crews stand idle and costs mount. Saint & Story provides same-day deliveries so your projects stay on schedule and your reputation stays solid.",
+
+        painLabel: "The operational reality",
+        pain1: "Critical materials don't always arrive when promised.",
+        pain2: "Crews stand idle waiting for deliveries.",
+        pain3: "You've learned to build delay into timelines.",
+
+        mechanismLabel: "This is where same-day delivery matters",
+        mechanism: "A reliable same-day courier is more than moving materials. It's protecting project timelines. Protecting crew productivity. Protecting the profit margin that makes the job worthwhile.",
+
+        costLabel: "The real cost of unreliable delivery",
+        cost: "When a critical component doesn't arrive, a crew stands idle and costs mount quickly. Lost revenue. Lost reputation. Lost opportunities. The operational problem and the business impact are one.",
+
         transformationLabel: "When this changes",
-        transformationHeading: (
-          <>
-            When materials arrive
-            <br />
-            reli
-            <span className="font-display italic font-normal">a</span>bly
-          </>
-        ),
-        transformationBody: "Crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
-        identityLabel: "Your future",
-        identityHeading: "You become the contractor",
-        identityBody: "Known for on-time delivery. The one general contractors trust. The one that never delays projects.",
+        transformation: "When materials arrive reliably, crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
+
         ctaHeading: "Stop site delays before they cost you",
         ctaSubtext: "Show us your supply chain",
       };
@@ -183,8 +163,8 @@ export default function ProspectBriefingPage({
 
     // Default for unrecognized categories
     return {
-      companyName: business.name,
-      recognitionHeadline: (
+      industry: "Business operations",
+      headline: (
         <>
           Timing is y
           <span className="font-display italic font-normal">o</span>ur
@@ -194,27 +174,22 @@ export default function ProspectBriefingPage({
           advantage.
         </>
       ),
-      subheadline: `For ${business.name}`,
-      observation1: "Your business operates on deadlines.",
-      observation2: "Delays create cascading problems.",
-      observation3: "You've learned to expect some failures.",
-      hiddenCostLabel: "The real cost",
-      hiddenCost: "This isn't just a logistical problem.",
-      hiddenCostEmphasis: "It's a revenue and reputation problem.",
-      hiddenCostSecondary: "Lost opportunities. Lost trust. Lost revenue. The operational problem and the business impact are inseparable.",
+      heroExplanation: "Saint & Story provides same-day collections and deliveries for time-sensitive business operations. When timing matters, we protect what your business depends on.",
+
+      painLabel: "The operational reality",
+      pain1: "Your business operates on deadlines.",
+      pain2: "Delays create cascading problems.",
+      pain3: "You've learned to expect some failures.",
+
+      mechanismLabel: "This is where same-day delivery matters",
+      mechanism: "A reliable same-day courier is more than moving items. It's protecting deadlines. Protecting reputation. Protecting the operational certainty your business needs.",
+
+      costLabel: "The real cost of unreliable delivery",
+      cost: "This isn't just a logistical problem. It's a revenue and reputation problem. Lost opportunities. Lost trust. Lost revenue. The operational problem and the business impact are inseparable.",
+
       transformationLabel: "When this changes",
-      transformationHeading: (
-        <>
-          When reliabil
-          <span className="font-display italic font-normal">i</span>ty
-          <br />
-          becomes n<span className="font-display italic font-normal">o</span>rmal
-        </>
-      ),
-      transformationBody: "Your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
-      identityLabel: "Your future",
-      identityHeading: "You become the business",
-      identityBody: "Known for dependability. The one clients trust. The one that never misses.",
+      transformation: "When reliability becomes normal, your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
+
       ctaHeading: "Let's see what's being missed",
       ctaSubtext: "Schedule a conversation",
     };
@@ -253,115 +228,106 @@ export default function ProspectBriefingPage({
         </div>
       </header>
 
-      {/* STAGE 1: RECOGNITION - Dark hero with generous spacing */}
+      {/* HERO - Industry ID + Headline + Explanation + Service visible */}
       <section className="pt-32 pb-24 px-6 bg-[#0D0D0D] border-b border-white/10">
         <div className="max-w-3xl mx-auto">
           <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
-            {msg.subheadline}
+            {msg.industry}
           </p>
 
           <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-10">
-            {msg.recognitionHeadline}
+            {msg.headline}
           </h1>
 
           <p className="text-white/60 text-base leading-relaxed max-w-2xl font-sans">
-            We've spent time understanding what this means for businesses like yours.
+            {msg.heroExplanation}
           </p>
+
+          <a
+            href="tel:+442082344444"
+            className="inline-block mt-10 bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-4 rounded-full text-sm transition-colors font-sans"
+          >
+            Call us — 0208 234 4444
+          </a>
         </div>
       </section>
 
-      {/* STAGE 2: UNDERSTANDING - White section with generous spacing */}
+      {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
-            What we see
+            {msg.painLabel}
           </p>
 
           <div className="space-y-10">
             <div className="border-b border-[#E8E8E8] pb-10">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-                {msg.observation1}
+                {msg.pain1}
               </p>
             </div>
 
             <div className="border-b border-[#E8E8E8] pb-10">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-                {msg.observation2}
+                {msg.pain2}
               </p>
             </div>
 
             <div>
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-                {msg.observation3}
+                {msg.pain3}
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* STAGE 3: HIDDEN COST - Light background with generous spacing */}
+      {/* MECHANISM - How we solve it */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
-            {msg.hiddenCostLabel}
+            {msg.mechanismLabel}
           </p>
 
-          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-6">
-            {msg.hiddenCost}
-          </h2>
-
-          <p className="text-[#0D0D0D] text-xl leading-relaxed mb-8 font-sans">
-            {msg.hiddenCostEmphasis}
-          </p>
-
-          <p className="text-[#555555] text-base leading-relaxed font-sans">
-            {msg.hiddenCostSecondary}
+          <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans max-w-2xl">
+            {msg.mechanism}
           </p>
         </div>
       </section>
 
-      {/* STAGE 4: TRANSFORMATION - White section */}
+      {/* COST - The real cost */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+            {msg.costLabel}
+          </p>
+
+          <p className="text-[#0D0D0D] text-lg leading-relaxed mb-8 font-sans">
+            {msg.cost}
+          </p>
+        </div>
+      </section>
+
+      {/* TRANSFORMATION - When this changes */}
+      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
             {msg.transformationLabel}
           </p>
 
-          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
-            {msg.transformationHeading}
-          </h2>
-
           <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans max-w-2xl">
-            {msg.transformationBody}
+            {msg.transformation}
           </p>
         </div>
       </section>
 
-      {/* STAGE 5: IDENTITY SHIFT - Light background */}
-      <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-xs font-semibold uppercase tracking-[0.18em] mb-8">
-            {msg.identityLabel}
-          </p>
-
-          <h2 className="text-[#0D0D0D] font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
-            {msg.identityHeading}
-          </h2>
-
-          <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans max-w-2xl">
-            {msg.identityBody}
-          </p>
-        </div>
-      </section>
-
-      {/* STAGE 6: ACTION - Dark section, generous spacing */}
+      {/* CTA - One simple action */}
       <section className="py-32 px-6 bg-[#0D0D0D] border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
             {msg.ctaHeading}
           </h2>
 
-          <p className="text-white/60 text-lg mb-16 max-w-2xl mx-auto font-sans">
+          <p className="text-white/60 text-base mb-12 max-w-2xl mx-auto font-sans">
             {msg.ctaSubtext}
           </p>
 
@@ -378,7 +344,7 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* Footer - homepage style */}
+      {/* Footer */}
       <SiteFooter />
     </main>
   );
