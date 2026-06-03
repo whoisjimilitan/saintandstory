@@ -306,7 +306,7 @@ export default function ProspectBriefingPage({
       {/* Navigation - minimal, homepage style */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 hover:opacity-70 transition-opacity">
+          <Link href="/" className="flex items-center gap-2.5">
             <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
               <rect width="48" height="48" rx="11" fill="#0D0D0D" />
               <path
