@@ -60,7 +60,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When collections happen as expected and deliveries arrive as promised, your team no longer has to wonder where something is. Work flows. Deadlines feel manageable. Clients feel reassured.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Protect our deadlines",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -93,7 +93,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When keys arrive exactly when promised, buyer confidence grows. Your team stops firefighting. Chains complete smoothly. You operate like a business that knows how to execute.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Complete our transactions",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -127,7 +127,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When every collection happens on time, patients get results faster. Your team stops chasing status. Doctors see a practice that knows how to operate.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Protect our specimens",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -160,7 +160,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive reliably, crews stay productive. Projects stay on schedule. Your reputation grows for reliability.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Keep us on schedule",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -192,7 +192,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When documents arrive as promised, your team stops firefighting deadlines. Work flows smoothly. Your clients see a firm that knows how to execute.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Protect our deadlines",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -225,7 +225,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When plans arrive reliably and on time, projects move smoothly. Contractors stay productive. Your clients see a practice that knows how to deliver.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Keep projects moving",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -258,7 +258,7 @@ export default function ProspectBriefingPage({
         transformationLabel: "When this changes",
         transformation: "When materials arrive exactly when promised, transactions complete smoothly. Your team stops firefighting. Your clients see a business that can execute.",
 
-        ctaButtonText: "Start the conversation",
+        ctaButtonText: "Close our deals faster",
         emailSubject: `${business.name}`,
         emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
       };
@@ -293,7 +293,7 @@ export default function ProspectBriefingPage({
       transformationLabel: "When this changes",
       transformation: "When reliability becomes normal, your team stops firefighting. Your reputation grows. Your clients see a business that knows how to execute.",
 
-      ctaButtonText: "Start the conversation",
+      ctaButtonText: "Improve our deliveries",
       emailSubject: `${business.name}`,
       emailBody: `Hello James,\n\nI came across the page you prepared for us.\n\nA few of the points you highlighted felt familiar.\n\nI'd like to understand how Saint & Story could help us improve our urgent deliveries and collections.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
     };
@@ -328,7 +328,7 @@ export default function ProspectBriefingPage({
             {/* Left: Copy (personalized with company name) */}
             <div>
               <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
-                {business.name}
+                FOR {business.name}
               </p>
 
               <h1 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
