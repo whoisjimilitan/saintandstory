@@ -1,7 +1,7 @@
 # Project Overview
 
 @CLAUDE_PROJECT_GUIDE.md
-@PROSPECT_BRIEF_DESIGN_STANDARD.md
+@PROSPECT_PAGE_DOCTRINE.md
 
 Build a lightweight web application. Each feature does one thing, the code is easy to follow, and the app is easy to run locally and deploy.
 
