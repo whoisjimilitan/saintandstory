@@ -26,28 +26,47 @@ export async function findBusinessBySlug(
   try {
     console.log("[PROSPECT] Looking up slug in database:", slug);
 
-    const result = await sql`
+    // Fetch all businesses (limited scope for safety)
+    const allBusinesses = await sql`
       SELECT business_name, business_category, city, website
       FROM b2b_leads
-      WHERE LOWER(REPLACE(REPLACE(REPLACE(business_name, '&', ''), '.', ''), ' ', '-')) = ${slug}
-      LIMIT 1
+      WHERE business_name IS NOT NULL
+      ORDER BY created_at DESC
+      LIMIT 1000
     `;
 
-    console.log("[PROSPECT] Query returned", result.length, "rows for slug:", slug);
+    console.log("[PROSPECT] Fetched", allBusinesses.length, "businesses from database");
 
-    if (result.length === 0) {
-      console.log("[PROSPECT] No business found for slug:", slug);
+    // Find business by matching generated slug
+    // This ensures 100% consistency with the slug generation logic
+    const matchedBusiness = allBusinesses.find((row: any) => {
+      const generatedSlug = generateSlug(row.business_name);
+      return generatedSlug === slug;
+    });
+
+    if (!matchedBusiness) {
+      console.log("[PROSPECT] No business found matching slug:", slug);
+      console.log("[PROSPECT] Searched", allBusinesses.length, "businesses");
+
+      // Debug: log first 3 businesses and their generated slugs
+      if (allBusinesses.length > 0) {
+        console.log("[PROSPECT] Sample business slugs:");
+        allBusinesses.slice(0, 3).forEach((b: any) => {
+          console.log(`  "${b.business_name}" → "${generateSlug(b.business_name)}"`);
+        });
+      }
+
       return null;
     }
 
-    const row = result[0] as any;
-    console.log("[PROSPECT] Found business:", row.business_name);
+    console.log("[PROSPECT] Found business:", matchedBusiness.business_name);
+    console.log("[PROSPECT] Matched slug:", generateSlug(matchedBusiness.business_name));
 
     return {
-      name: row.business_name,
-      category: row.business_category || "Business",
-      city: row.city || "UK",
-      website: row.website || undefined,
+      name: matchedBusiness.business_name,
+      category: matchedBusiness.business_category || "Business",
+      city: matchedBusiness.city || "UK",
+      website: matchedBusiness.website || undefined,
     };
   } catch (error) {
     console.error("[PROSPECT] Error finding business by slug:", slug, error);
