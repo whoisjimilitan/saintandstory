@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const event = await prisma.jobEvent.create({
       data: {
         jobId,
-        eventType,
+        eventType: eventType as any,
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
       },

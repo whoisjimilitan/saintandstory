@@ -70,7 +70,7 @@ async function verifyTables() {
 
     const tables = ['drivers', 'driver_availability', 'jobs', 'ratings', 'earnings', 'driver_location_history'];
     for (const table of tables) {
-      const result = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM "${table}"`);
+      const result = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM "${table}"`) as Array<{ count: number }>;
       console.log(`  ${table}: ${result[0].count} rows`);
     }
 

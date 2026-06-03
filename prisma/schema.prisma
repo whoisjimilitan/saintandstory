@@ -412,3 +412,22 @@ enum ObservationSource {
   conversation
   outcome
 }
+
+// ============================================================================
+// PROSPECT INTELLIGENCE SYSTEM
+// ============================================================================
+
+// Purpose: Feedback on prospect intelligence pages
+// Minimal table: only what we need to learn if movement detection is accurate
+model ProspectFeedback {
+  id              String    @id @default(cuid())
+  slug            String    // Business slug (e.g., "wilson-solicitors")
+  feedbackType    String    // "yes" | "partly" | "no"
+  referrer        String?   // "email" | "dashboard" | "direct"
+  userAgent       String?   @map("user_agent")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([slug])
+  @@index([createdAt])
+  @@map("prospect_feedback")
+}

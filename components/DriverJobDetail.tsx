@@ -39,8 +39,8 @@ export default function DriverJobDetail({ job, timeline }: { job: Job; timeline:
         const formData = new FormData();
         formData.append("jobId", job.id);
         formData.append("eventType", eventType);
-        formData.append("latitude", position?.latitude || "");
-        formData.append("longitude", position?.longitude || "");
+        formData.append("latitude", position?.latitude ? String(position.latitude) : "");
+        formData.append("longitude", position?.longitude ? String(position.longitude) : "");
         formData.append("file", file);
 
         await fetch("/api/driver/job-photo", {

@@ -51,7 +51,7 @@ export function calculateLeadScore(input: LeadScoringInput): ScoringBreakdown {
   // Industry Scoring
   if (
     input.industry &&
-    HIGH_VALUE_INDUSTRIES.some(ind => input.industry?.includes(ind) || ind.includes(input.industry))
+    HIGH_VALUE_INDUSTRIES.some(ind => input.industry!.includes(ind) || ind.includes(input.industry!))
   ) {
     industryScore = 25;
   }

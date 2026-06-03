@@ -23,8 +23,8 @@ export async function recordJobEvent(
       data: {
         jobId,
         eventType,
-        latitude: latitude ? BigInt(Math.floor(latitude * 1e8)) / BigInt(1e8) : null,
-        longitude: longitude ? BigInt(Math.floor(longitude * 1e8)) / BigInt(1e8) : null,
+        latitude: latitude ? parseFloat(latitude.toFixed(8)) : null,
+        longitude: longitude ? parseFloat(longitude.toFixed(8)) : null,
         timestamp: new Date(),
       },
     });
@@ -42,8 +42,8 @@ export async function recordJobEvent(
                 ? "delivery"
                 : "collection",
           photoUrl,
-          latitude: latitude ? BigInt(Math.floor(latitude * 1e8)) / BigInt(1e8) : null,
-          longitude: longitude ? BigInt(Math.floor(longitude * 1e8)) / BigInt(1e8) : null,
+          latitude: latitude ? parseFloat(latitude.toFixed(8)) : null,
+          longitude: longitude ? parseFloat(longitude.toFixed(8)) : null,
         },
       });
     }
@@ -173,7 +173,7 @@ export async function createJobInvoice(
         jobId,
         driverId,
         invoiceNumber,
-        amount: BigInt(Math.floor(amount * 100)) / BigInt(100), // Store as decimal
+        amount: amount,
         status: "pending",
       },
     });

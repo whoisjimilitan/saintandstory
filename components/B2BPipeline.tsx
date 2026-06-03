@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
+import { generateSlug } from "@/lib/prospect-pages";
 
 type Lead = Record<string, unknown>;
 type Order = Record<string, unknown>;
@@ -203,6 +205,16 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
               )}
             </div>
           </div>
+
+          {/* Prospect brief link */}
+          <Link
+            href={`/prospect/${generateSlug(lead.business_name as string)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-2.5 rounded-full text-xs transition-colors mb-4 block text-center border border-[#E8E8E8]"
+          >
+            View Prospect Brief →
+          </Link>
 
           {/* Lead details */}
           <div className="grid grid-cols-2 gap-3 py-4">
