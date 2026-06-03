@@ -346,7 +346,7 @@ export default function ProspectBriefingPage({
           <div className="grid md:grid-cols-2 gap-20 items-center">
             {/* Left: Copy (personalized with company name) */}
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-8">
+              <p className="text-white/80 text-sm font-semibold uppercase tracking-[0.18em] mb-8">
                 FOR {business.name}
               </p>
 
@@ -362,7 +362,7 @@ export default function ProspectBriefingPage({
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
                 className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-black px-8 py-4 rounded-full text-base transition-all hover:shadow-lg duration-200 font-sans"
               >
-                {msg.ctaButtonText}
+                Start a conversation
               </a>
             </div>
 
@@ -377,7 +377,7 @@ export default function ProspectBriefingPage({
       {/* PAIN - Operational reality */}
       <section className="py-32 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
+          <p className="text-[#333333] text-2xl font-black mb-20 font-sans">
             {msg.painLabel}
           </p>
 
@@ -406,7 +406,7 @@ export default function ProspectBriefingPage({
       {/* MECHANISM - How we solve it */}
       <section className="py-32 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
+          <p className="text-[#333333] text-2xl font-black mb-20 font-sans">
             {msg.mechanismLabel}
           </p>
 
@@ -419,7 +419,7 @@ export default function ProspectBriefingPage({
       {/* COST - The real cost */}
       <section className="py-32 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
+          <p className="text-[#333333] text-2xl font-black mb-20 font-sans">
             {msg.costLabel}
           </p>
 
@@ -432,7 +432,7 @@ export default function ProspectBriefingPage({
       {/* TRANSFORMATION - When this changes */}
       <section className="py-32 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#888888] text-sm font-semibold uppercase tracking-[0.18em] mb-16 font-display font-normal">
+          <p className="text-[#333333] text-2xl font-black mb-20 font-sans">
             {msg.transformationLabel}
           </p>
 
@@ -457,7 +457,7 @@ export default function ProspectBriefingPage({
             href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
             className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-black px-8 py-4 rounded-full text-base transition-all hover:shadow-lg duration-200 font-sans"
           >
-            Start a conversation
+            Start a conversation →
           </a>
 
           <p className="text-white/40 text-xs mt-12 font-sans">
