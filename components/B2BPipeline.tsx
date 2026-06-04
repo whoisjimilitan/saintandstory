@@ -50,6 +50,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   const [status, setStatus] = useState(lead.status as string);
   const [showStandingOrder, setShowStandingOrder] = useState(false);
   const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState(lead.email as string || "");
+  const [savingEmail, setSavingEmail] = useState(false);
 
   const hasPainPoint = !!lead.pain_point;
 
@@ -110,6 +113,22 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
       onRefresh();
     } finally {
       setSendingRecognition(false);
+    }
+  }
+
+  async function saveEmail() {
+    if (!newEmail) return;
+    setSavingEmail(true);
+    try {
+      await fetch("/api/b2b/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: lead.id, email: newEmail }),
+      });
+      setEditingEmail(false);
+      onRefresh();
+    } finally {
+      setSavingEmail(false);
     }
   }
 
@@ -298,8 +317,22 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
 
           {/* Email draft */}
           {emailMissing ? (
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl px-4 py-3 mb-4">
-              <p className="text-[#888888] text-xs">No email on file. Add one below to enable outreach.</p>
+            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 mb-4 space-y-2">
+              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em]">Add email</p>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                placeholder="Email address"
+                className="w-full px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D]"
+              />
+              <button
+                onClick={saveEmail}
+                disabled={savingEmail || !newEmail}
+                className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+              >
+                {savingEmail ? "Saving…" : "Save email →"}
+              </button>
             </div>
           ) : draft ? (
             <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 mb-4 space-y-2">

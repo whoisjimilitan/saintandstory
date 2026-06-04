@@ -79,12 +79,13 @@ export async function PATCH(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const sql = neon(process.env.DATABASE_URL!);
-  const { id, status, notes } = await request.json() as { id: string; status?: string; notes?: string };
+  const { id, status, notes, email } = await request.json() as { id: string; status?: string; notes?: string; email?: string };
 
   await sql`
     UPDATE b2b_leads SET
       status = COALESCE(${status ?? null}, status),
       notes = COALESCE(${notes ?? null}, notes),
+      email = COALESCE(${email ?? null}, email),
       updated_at = NOW()
     WHERE id = ${id}
   `;
