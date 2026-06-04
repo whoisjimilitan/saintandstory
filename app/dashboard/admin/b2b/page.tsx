@@ -3,6 +3,7 @@ import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import B2BPipeline from "@/components/B2BPipeline";
+import { type Lead, type StandingOrder } from "@/lib/b2b-types";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -50,7 +51,7 @@ async function getB2BData() {
     inbound: leads.filter(l => l.source === "inbound").length,
   };
 
-  return { leads: leads as Record<string, unknown>[], orders: orders as Record<string, unknown>[], stats };
+  return { leads: leads as Lead[], orders: orders as StandingOrder[], stats };
 }
 
 export default async function B2BAdminPage() {

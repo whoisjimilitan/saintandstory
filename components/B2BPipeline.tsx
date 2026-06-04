@@ -8,7 +8,7 @@ import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
-import { type Lead, type StandingOrder } from "@/lib/b2b-types";
+import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -137,7 +137,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     }
   }
 
-  async function updateStatus(newStatus: string) {
+  async function updateStatus(newStatus: LeadStatus) {
     await fetch("/api/b2b/leads", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

@@ -1,5 +1,7 @@
 import { type LeadState } from "./lead-state-machine";
 
+export type LeadStatus = "new" | "contacted" | "warm" | "inbound" | "closed" | "dead" | "recognized";
+
 export interface Lead {
   id: string | number;
   business_name: string;
@@ -18,7 +20,7 @@ export interface Lead {
   website?: string;
   notes?: string;
   source?: "inbound" | "manual" | "discovery";
-  status: "new" | "contacted" | "warm" | "inbound" | "closed" | "dead" | "recognized";
+  status: LeadStatus;
   lead_state?: LeadState;
   created_at: string;
   updated_at?: string;

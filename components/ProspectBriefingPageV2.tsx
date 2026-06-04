@@ -137,6 +137,57 @@ export default function ProspectBriefingPage({
     }
   }, [momentId, business.category, trigger_event, debug]);
 
+  const isEngagementValid = (): boolean => {
+    return (
+      engagementSignals.tabFocusActive &&
+      (engagementSignals.scrollDepth >= 30 || engagementSignals.sectionVisible)
+    );
+  };
+
+  const confirmSelfIdentification = useCallback(async () => {
+    const isValid = isEngagementValid();
+    debug("Confirmation attempt", {
+      isValid,
+      tabFocusActive: engagementSignals.tabFocusActive,
+      scrollDepth: Math.round(engagementSignals.scrollDepth),
+      sectionVisible: engagementSignals.sectionVisible,
+    });
+
+    if (!isValid || !lead_id || !trigger_event) {
+      debug("Confirmation REJECTED", {
+        reason: !isValid ? "engagement not valid" : !lead_id ? "no lead_id" : "no trigger_event",
+      });
+      return;
+    }
+
+    try {
+      debug("Sending confirmation to API", { lead_id, trigger_event });
+
+      const response = await fetch("/api/b2b/confirm-engagement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: parseInt(lead_id),
+          trigger_event: decodeURIComponent(trigger_event),
+          engagement_type: "hybrid_signal",
+          engagement_signals: engagementSignals,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        debug("SELF-CONFIRMED: API returned success", result);
+        setConfirmationSuccessMessage(true);
+        setTimeout(() => setConfirmationSuccessMessage(false), 4000);
+      } else {
+        debug("SELF-CONFIRMED: API returned error", result);
+      }
+    } catch (error) {
+      debug("SELF-CONFIRMED: Request failed", { error: String(error) });
+    }
+  }, [engagementSignals, lead_id, trigger_event, debug]);
+
   useEffect(() => {
     recordMomentSignal("page_view", {
       business_name: business.name,
@@ -258,57 +309,6 @@ export default function ProspectBriefingPage({
       observer.disconnect();
     };
   }, [pendingConfirmation, engagementSignals.tabFocusActive, debug, recordMomentSignal, confirmSelfIdentification]);
-
-  const isEngagementValid = (): boolean => {
-    return (
-      engagementSignals.tabFocusActive &&
-      (engagementSignals.scrollDepth >= 30 || engagementSignals.sectionVisible)
-    );
-  };
-
-  const confirmSelfIdentification = useCallback(async () => {
-    const isValid = isEngagementValid();
-    debug("Confirmation attempt", {
-      isValid,
-      tabFocusActive: engagementSignals.tabFocusActive,
-      scrollDepth: Math.round(engagementSignals.scrollDepth),
-      sectionVisible: engagementSignals.sectionVisible,
-    });
-
-    if (!isValid || !lead_id || !trigger_event) {
-      debug("Confirmation REJECTED", {
-        reason: !isValid ? "engagement not valid" : !lead_id ? "no lead_id" : "no trigger_event",
-      });
-      return;
-    }
-
-    try {
-      debug("Sending confirmation to API", { lead_id, trigger_event });
-
-      const response = await fetch("/api/b2b/confirm-engagement", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lead_id: parseInt(lead_id),
-          trigger_event: decodeURIComponent(trigger_event),
-          engagement_type: "hybrid_signal",
-          engagement_signals: engagementSignals,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        debug("SELF-CONFIRMED: API returned success", result);
-        setConfirmationSuccessMessage(true);
-        setTimeout(() => setConfirmationSuccessMessage(false), 4000);
-      } else {
-        debug("SELF-CONFIRMED: API returned error", result);
-      }
-    } catch (error) {
-      debug("SELF-CONFIRMED: Request failed", { error: String(error) });
-    }
-  }, [engagementSignals, lead_id, trigger_event, debug]);
 
   const getCategoryMessaging = (category: string) => {
     const lower = category.toLowerCase();
