@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ProspectPageData } from "@/lib/prospect-types";
 import { IndustryIntelligence } from "@/lib/industry-intelligence";
 import SiteFooter from "./SiteFooter";
@@ -117,7 +117,7 @@ export default function ProspectBriefingPage({
     }
   };
 
-  const recordMomentSignal = async (signalType: string, details?: Record<string, any>) => {
+  const recordMomentSignal = useCallback(async (signalType: string, details?: Record<string, any>) => {
     if (!momentId) return;
     try {
       await fetch("/api/b2b/moment-signal", {
@@ -135,14 +135,14 @@ export default function ProspectBriefingPage({
     } catch (error) {
       debug(`Failed to record signal: ${signalType}`, { error: String(error) });
     }
-  };
+  }, [momentId, business.category, trigger_event, debug]);
 
   useEffect(() => {
     recordMomentSignal("page_view", {
       business_name: business.name,
       category: business.category,
     });
-  }, [momentId]);
+  }, [recordMomentSignal, business.name, business.category]);
 
   useEffect(() => {
     if (!pendingConfirmation) {
@@ -210,7 +210,7 @@ export default function ProspectBriefingPage({
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [pendingConfirmation, engagementSignals.tabFocusActive]);
+  }, [pendingConfirmation, engagementSignals.tabFocusActive, debug, confirmSelfIdentification]);
 
   useEffect(() => {
     if (!pendingConfirmation) return;
@@ -257,7 +257,7 @@ export default function ProspectBriefingPage({
     return () => {
       observer.disconnect();
     };
-  }, [pendingConfirmation, engagementSignals.tabFocusActive]);
+  }, [pendingConfirmation, engagementSignals.tabFocusActive, debug, recordMomentSignal, confirmSelfIdentification]);
 
   const isEngagementValid = (): boolean => {
     return (
@@ -266,7 +266,7 @@ export default function ProspectBriefingPage({
     );
   };
 
-  const confirmSelfIdentification = async () => {
+  const confirmSelfIdentification = useCallback(async () => {
     const isValid = isEngagementValid();
     debug("Confirmation attempt", {
       isValid,
@@ -308,7 +308,7 @@ export default function ProspectBriefingPage({
     } catch (error) {
       debug("SELF-CONFIRMED: Request failed", { error: String(error) });
     }
-  };
+  }, [engagementSignals, lead_id, trigger_event, debug]);
 
   const getCategoryMessaging = (category: string) => {
     const lower = category.toLowerCase();
