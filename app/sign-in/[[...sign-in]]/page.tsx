@@ -11,7 +11,7 @@ export default function SignInPage() {
           <div className="border-t border-[#0D0D0D] mt-1 mb-1 mx-auto w-20" />
           <p className="font-sans font-medium text-[#0D0D0D] text-[9px] tracking-[0.3em] uppercase">Driver portal</p>
         </div>
-        <SignIn fallbackRedirectUrl="/dashboard/driver" />
+        <SignIn fallbackRedirectUrl="/dashboard" />
       </div>
     </div>
   );
