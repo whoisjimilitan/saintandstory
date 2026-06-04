@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import B2BPipeline from "@/components/B2BPipeline";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 
 async function getB2BData() {
   if (!process.env.DATABASE_URL) return { leads: [], orders: [], stats: { total: 0, new: 0, warm: 0, closed: 0, inbound: 0 } };

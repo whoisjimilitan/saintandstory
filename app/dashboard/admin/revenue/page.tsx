@@ -3,7 +3,12 @@ import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 const MONTHLY_RATE = 9.99;
 

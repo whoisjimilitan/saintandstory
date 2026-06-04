@@ -8,7 +8,12 @@ import AdminAutoRefresh from "@/components/AdminAutoRefresh";
 import AdminPushSubscribe from "@/components/AdminPushSubscribe";
 import AdminLocationUpdater from "@/components/AdminLocationUpdater";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 async function getPendingJobs() {

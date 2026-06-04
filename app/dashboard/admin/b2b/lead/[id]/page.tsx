@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { BusinessEvidence } from "@/lib/evidence-types";
 import { generateQuestions, prioritizeQuestions } from "@/lib/question-engine";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 
 async function getLead(lead_id: string) {
   const sql = neon(process.env.DATABASE_URL!);
