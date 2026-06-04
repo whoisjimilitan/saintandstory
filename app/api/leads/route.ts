@@ -5,8 +5,6 @@ import { Resend } from "resend";
 import { sendPushToAdmins } from "@/lib/push";
 import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
-const ADMIN_EMAILS = ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"];
-
 function sha256(str: string) {
   return createHash("sha256").update(str.toLowerCase().trim()).digest("hex");
 }
