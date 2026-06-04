@@ -41,6 +41,11 @@ function timeAgo(ts: string) {
   return `${days}d ago`;
 }
 
+function formatTime(ts: string) {
+  const date = new Date(ts);
+  return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
+
 function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
@@ -53,10 +58,10 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email as string || "");
   const [savingEmail, setSavingEmail] = useState(false);
+  const [confirmationSuccessMessage, setConfirmationSuccessMessage] = useState(false);
 
   const hasPainPoint = !!lead.pain_point;
 
-  // Calculate opportunity score
   const scoreBreakdown = calculateLeadScore({
     industry: lead.business_category as string,
     deliveryFrequency: lead.delivery_frequency as string,
@@ -110,6 +115,8 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
         }),
       });
       setStatus("recognized");
+      setConfirmationSuccessMessage(true);
+      setTimeout(() => setConfirmationSuccessMessage(false), 4000);
       onRefresh();
     } finally {
       setSendingRecognition(false);
@@ -210,6 +217,17 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
+          {/* Lead state status line */}
+          {status === "recognized" && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-blue-700 px-2 py-1 bg-blue-100 rounded-full">RECOGNIZED</span>
+                <span className="text-xs text-blue-600">Email sent</span>
+              </div>
+              {lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at as string)}</span>}
+            </div>
+          )}
+
           {/* Opportunity Score Breakdown */}
           <div className={`border rounded-xl p-3 mb-4 ${scoreStyle.containerClass}`}>
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2">Opportunity Score</p>
@@ -246,6 +264,20 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
               )}
             </div>
           </div>
+
+          {/* Recognition email success feedback */}
+          {confirmationSuccessMessage && (
+            <div className={`bg-green-50 border border-green-200 rounded-lg p-3 mb-4 transition-opacity duration-300 ${confirmationSuccessMessage ? "opacity-100" : "opacity-0"}`}>
+              <div className="flex items-start gap-2">
+                <span className="text-green-600 font-bold text-base">✓</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-green-700">Recognition email sent</p>
+                  <p className="text-[10px] text-green-600 mt-0.5">{lead.email}</p>
+                  <p className="text-[10px] text-green-500 mt-1">{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Recognition email button */}
           <button
@@ -559,7 +591,6 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Add lead manually</p>
       <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
 
-      {/* Basic Info */}
       <div className="grid grid-cols-2 gap-3">
         <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
@@ -575,7 +606,6 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
         <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
 
-      {/* Location & Intelligence */}
       <div className="grid grid-cols-2 gap-3">
         <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
         <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
@@ -584,7 +614,6 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
         </select>
       </div>
 
-      {/* Intelligence Fields */}
       <div className="grid grid-cols-2 gap-3">
         <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Avg Deliveries/Month</option>
@@ -694,7 +723,6 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
 
   return (
     <div>
-      {/* Tab toggle */}
       <div className="flex flex-wrap gap-2 mb-6">
         {activeTabs.map(t => (
           <button
@@ -715,7 +743,6 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
             </div>
           ) : (
             (() => {
-              // Sort leads by opportunity score (highest first)
               const sortedLeads = [...pipelineLeads].sort((a, b) => {
                 const scoreA = calculateLeadScore({
                   industry: a.business_category as string,

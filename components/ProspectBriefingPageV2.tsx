@@ -1,20 +1,3 @@
-/**
- * SAINT & STORY PROSPECT BRIEF SYSTEM
- *
- * Implements 10 Non-Negotiable Rules:
- *
- * 1. Service visible in 5 seconds (same-day courier must be obvious)
- * 2. Pain + Mechanism + Transformation (all three always present)
- * 3. Hero immediately understandable (industry ID + headline + explanation + CTA)
- * 4. Inherits Saint & Story design (typography, spacing, rhythm, atmosphere)
- * 5. Less is more (skimmable, not over-explained)
- * 6. Human language only (plain English, conversational)
- * 7. Sell transformation (benefits > features)
- * 8. One primary action (no competing CTAs)
- * 9. Feel expensive (premium, professional, thoughtful)
- * 10. Pages are salespeople (recognize → understand → explain → transform → action)
- */
-
 "use client";
 
 import Link from "next/link";
@@ -115,8 +98,9 @@ export default function ProspectBriefingPage({
     scrollDepth: 0,
     sectionVisible: false,
   });
+  const [trackingBannerVisible, setTrackingBannerVisible] = useState(false);
+  const [confirmationSuccessMessage, setConfirmationSuccessMessage] = useState(false);
 
-  // DEBUG MODE: Enable with ?debug=1 in URL
   const isDebugMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1";
 
   const debug = (message: string, data?: any) => {
@@ -125,7 +109,6 @@ export default function ProspectBriefingPage({
       const logMessage = `[${timestamp}] [DEBUG] ${message}`;
       console.log(logMessage, data || "");
 
-      // Also render in UI corner
       const debugEl = document.getElementById("debug-panel");
       if (debugEl) {
         debugEl.innerHTML += `<div>${logMessage} ${data ? JSON.stringify(data) : ""}</div>`;
@@ -154,7 +137,6 @@ export default function ProspectBriefingPage({
     }
   };
 
-  // PAGE LOAD SIGNAL
   useEffect(() => {
     recordMomentSignal("page_view", {
       business_name: business.name,
@@ -162,7 +144,6 @@ export default function ProspectBriefingPage({
     });
   }, [momentId]);
 
-  // TAB FOCUS DETECTION
   useEffect(() => {
     if (!pendingConfirmation) {
       debug("Pending confirmation not set, skipping engagement tracking");
@@ -170,6 +151,11 @@ export default function ProspectBriefingPage({
     }
 
     debug("Engagement tracking STARTED", { lead_id, trigger_event });
+    setTrackingBannerVisible(true);
+
+    const fadeOutTimer = setTimeout(() => {
+      setTrackingBannerVisible(false);
+    }, 6000);
 
     const handleVisibilityChange = () => {
       const isActive = !document.hidden;
@@ -190,10 +176,10 @@ export default function ProspectBriefingPage({
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearTimeout(fadeOutTimer);
     };
   }, [pendingConfirmation]);
 
-  // SCROLL DEPTH TRACKING (≥30%)
   useEffect(() => {
     if (!pendingConfirmation) return;
 
@@ -209,13 +195,11 @@ export default function ProspectBriefingPage({
         scrollDepth: Math.max(prev.scrollDepth, scrollPercent),
       }));
 
-      // Log at 10% intervals
       if (Math.floor(scrollPercent / 10) > Math.floor(lastLoggedPercent / 10)) {
         debug("Scroll depth", { scrollPercent: Math.round(scrollPercent) });
         lastLoggedPercent = scrollPercent;
       }
 
-      // If scroll depth ≥30% AND tab active, trigger confirmation
       if (scrollPercent >= 30 && engagementSignals.tabFocusActive) {
         debug("CONFIRMATION TRIGGERED: scroll ≥30% + tab active", { scrollPercent: Math.round(scrollPercent) });
         confirmSelfIdentification();
@@ -228,12 +212,11 @@ export default function ProspectBriefingPage({
     };
   }, [pendingConfirmation, engagementSignals.tabFocusActive]);
 
-  // SECTION VISIBILITY (Intersection Observer)
   useEffect(() => {
     if (!pendingConfirmation) return;
 
     const options = {
-      threshold: 0.5, // Section must be 50% visible
+      threshold: 0.5,
     };
 
     const callback = (entries: IntersectionObserverEntry[]) => {
@@ -253,7 +236,6 @@ export default function ProspectBriefingPage({
             sectionVisible: true,
           }));
 
-          // If section visible AND tab focus active, confirm
           if (engagementSignals.tabFocusActive) {
             debug("CONFIRMATION TRIGGERED: section visible + tab active");
             confirmSelfIdentification();
@@ -277,7 +259,6 @@ export default function ProspectBriefingPage({
     };
   }, [pendingConfirmation, engagementSignals.tabFocusActive]);
 
-  // HYBRID ENGAGEMENT VALIDATION
   const isEngagementValid = (): boolean => {
     return (
       engagementSignals.tabFocusActive &&
@@ -285,7 +266,6 @@ export default function ProspectBriefingPage({
     );
   };
 
-  // CONFIRM ONLY AFTER HYBRID VALIDATION
   const confirmSelfIdentification = async () => {
     const isValid = isEngagementValid();
     debug("Confirmation attempt", {
@@ -320,6 +300,8 @@ export default function ProspectBriefingPage({
 
       if (response.ok) {
         debug("SELF-CONFIRMED: API returned success", result);
+        setConfirmationSuccessMessage(true);
+        setTimeout(() => setConfirmationSuccessMessage(false), 4000);
       } else {
         debug("SELF-CONFIRMED: API returned error", result);
       }
@@ -328,7 +310,6 @@ export default function ProspectBriefingPage({
     }
   };
 
-  // Category-specific copy (Pain + Mechanism + Transformation)
   const getCategoryMessaging = (category: string) => {
     const lower = category.toLowerCase();
 
@@ -563,7 +544,6 @@ export default function ProspectBriefingPage({
       };
     }
 
-    // Default for unrecognized categories
     return {
       yourLabel: "Your Delivery",
       headline: (
@@ -602,7 +582,6 @@ export default function ProspectBriefingPage({
 
   return (
     <main className="bg-white">
-      {/* DEBUG PANEL */}
       {isDebugMode && (
         <div
           id="debug-panel"
@@ -616,7 +595,6 @@ export default function ProspectBriefingPage({
         </div>
       )}
 
-      {/* Navigation - matches main Nav structure */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
@@ -634,11 +612,37 @@ export default function ProspectBriefingPage({
         </div>
       </header>
 
-      {/* HERO - Two column layout (like homepage) */}
+      {/* Tracking awareness banner */}
+      {trackingBannerVisible && pendingConfirmation && (
+        <div className={`fixed top-16 left-0 right-0 z-40 bg-blue-50 border-b border-blue-200 transition-opacity duration-300 ${trackingBannerVisible ? "opacity-100" : "opacity-0"}`}>
+          <div className="max-w-6xl mx-auto px-6 py-3">
+            <div className="flex items-start gap-3">
+              <div className="text-blue-600 font-bold text-base">●</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-blue-700">Engaging experience mode active</p>
+                <p className="text-[11px] text-blue-600 mt-1">We're tracking page engagement to verify genuine interest. Tab focus: {engagementSignals.tabFocusActive ? "✓" : "✗"} | Scroll depth: {Math.round(engagementSignals.scrollDepth)}% | Section visibility: {engagementSignals.sectionVisible ? "✓" : "✗"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation success feedback */}
+      {confirmationSuccessMessage && (
+        <div className={`fixed top-16 left-1/2 transform -translate-x-1/2 z-40 bg-green-50 border border-green-200 rounded-lg px-4 py-3 transition-opacity duration-300 ${confirmationSuccessMessage ? "opacity-100" : "opacity-0"}`}>
+          <div className="flex items-center gap-2">
+            <span className="text-green-600 font-bold text-base">✓</span>
+            <div>
+              <p className="text-xs font-semibold text-green-700">Confirmation received</p>
+              <p className="text-[10px] text-green-600">Your engagement has been recorded</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <section className="pt-16 pb-0 px-6 bg-[#0D0D0D] border-b border-white/10 min-h-screen md:min-h-auto flex items-center">
         <div className="max-w-6xl mx-auto w-full py-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Left: Copy (personalized with company name) */}
             <div>
               <p className="text-white/50 text-xs font-semibold uppercase tracking-[0.18em] mb-6">
                 FOR {business.name}
@@ -661,7 +665,6 @@ export default function ProspectBriefingPage({
               </a>
             </div>
 
-            {/* Right: Platform mockup (same as homepage) */}
             <div className="relative">
               <HeroPlatformUI side="customer" />
             </div>
@@ -669,7 +672,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* MIRROR - We see this happen every day in your industry */}
       {intelligence && intelligence.triggerEvents.length > 0 && (
         <section data-section="mirror" className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
           <div className="max-w-3xl mx-auto">
@@ -690,7 +692,6 @@ export default function ProspectBriefingPage({
         </section>
       )}
 
-      {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
@@ -719,7 +720,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* MECHANISM - How we solve it */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
@@ -732,7 +732,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* COST - The real cost (CONSEQUENCE) */}
       <section data-section="consequence" className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
@@ -745,7 +744,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* TRANSFORMATION - When this changes */}
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
@@ -758,7 +756,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* CTA - Email Conversion System */}
       <section className="py-32 px-6 bg-[#0D0D0D] border-t border-white/10">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-white font-sans font-black text-5xl md:text-6xl tracking-tight leading-[1.15] mb-8">
@@ -783,7 +780,6 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* Footer */}
       <SiteFooter />
     </main>
   );
