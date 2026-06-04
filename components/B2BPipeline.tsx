@@ -46,6 +46,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
   const [drafting, setDrafting] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendingRecognition, setSendingRecognition] = useState(false);
   const [status, setStatus] = useState(lead.status as string);
   const [showStandingOrder, setShowStandingOrder] = useState(false);
   const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
@@ -88,6 +89,27 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
       onRefresh();
     } finally {
       setSending(false);
+    }
+  }
+
+  async function sendRecognitionEmail() {
+    if (!lead.email || !lead.business_name || !lead.business_category) return;
+    setSendingRecognition(true);
+    try {
+      await fetch("/api/b2b/send-recognition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          business_name: lead.business_name,
+          industry: lead.business_category,
+          email: lead.email,
+        }),
+      });
+      setStatus("recognized");
+      onRefresh();
+    } finally {
+      setSendingRecognition(false);
     }
   }
 
@@ -205,6 +227,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
               )}
             </div>
           </div>
+
+          {/* Recognition email button */}
+          <button
+            onClick={sendRecognitionEmail}
+            disabled={sendingRecognition || !lead.email}
+            className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-xs transition-colors mb-4"
+          >
+            {sendingRecognition ? "Sending recognition…" : "Send Recognition Email →"}
+          </button>
 
           {/* Prospect brief link */}
           <Link
@@ -610,8 +641,8 @@ interface Props {
 export default function B2BPipeline({ leads: initialLeads, orders: initialOrders }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("pipeline");
-  const [leads] = useState(initialLeads);
-  const [orders] = useState(initialOrders);
+  const leads = initialLeads;
+  const orders = initialOrders;
 
   function refresh() {
     router.refresh();

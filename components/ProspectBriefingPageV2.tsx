@@ -134,6 +134,34 @@ export default function ProspectBriefingPage({
     }
   };
 
+  const recordMomentSignal = async (signalType: string, details?: Record<string, any>) => {
+    if (!momentId) return;
+    try {
+      await fetch("/api/b2b/moment-signal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          moment_id: momentId,
+          industry: business.category,
+          trigger_event_shown: trigger_event,
+          signal_type: signalType,
+          ...details,
+        }),
+      });
+      debug(`Moment signal recorded: ${signalType}`, details);
+    } catch (error) {
+      debug(`Failed to record signal: ${signalType}`, { error: String(error) });
+    }
+  };
+
+  // PAGE LOAD SIGNAL
+  useEffect(() => {
+    recordMomentSignal("page_view", {
+      business_name: business.name,
+      category: business.category,
+    });
+  }, [momentId]);
+
   // TAB FOCUS DETECTION
   useEffect(() => {
     if (!pendingConfirmation) {
@@ -211,8 +239,13 @@ export default function ProspectBriefingPage({
     const callback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          debug(`Section visible: ${entry.target.getAttribute("data-section")}`, {
+          const sectionName = entry.target.getAttribute("data-section");
+          debug(`Section visible: ${sectionName}`, {
             intersectionRatio: Math.round(entry.intersectionRatio * 100),
+          });
+
+          recordMomentSignal("section_viewed", {
+            section: sectionName,
           });
 
           setEngagementSignals((prev) => ({
@@ -620,6 +653,7 @@ export default function ProspectBriefingPage({
               </p>
 
               <a
+                onClick={() => recordMomentSignal("cta_clicked", { location: "hero", cta_text: msg.ctaButtonText })}
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
                 className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
               >
@@ -698,8 +732,8 @@ export default function ProspectBriefingPage({
         </div>
       </section>
 
-      {/* COST - The real cost */}
-      <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+      {/* COST - The real cost (CONSEQUENCE) */}
+      <section data-section="consequence" className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
             {msg.costLabel}
@@ -736,6 +770,7 @@ export default function ProspectBriefingPage({
           </p>
 
           <a
+            onClick={() => recordMomentSignal("cta_clicked", { location: "final_cta", cta_text: msg.ctaButtonText })}
             href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
             className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-bold px-10 py-5 rounded-full text-base transition-colors font-sans"
           >

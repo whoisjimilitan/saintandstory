@@ -4,16 +4,12 @@ import { transitionLeadState } from "@/lib/lead-state-machine";
 interface MomentSignal {
   moment_id: string;
   industry: string;
-  trigger_event_shown: string;
-  section_viewed: string;
-  cta_clicked: boolean;
-  lead_id?: string;
+  trigger_event_shown?: string;
+  section_viewed?: string;
+  cta_clicked?: boolean;
+  signal_type?: string;
   signal_layer?: string;
-  engagement_signals?: {
-    tabFocusActive: boolean;
-    scrollDepth: number;
-    sectionVisible: boolean;
-  };
+  [key: string]: any;
 }
 
 export async function POST(request: Request) {
@@ -26,6 +22,16 @@ export async function POST(request: Request) {
   const sql = neon(process.env.DATABASE_URL);
 
   try {
+    // Map signal_type to database fields
+    let sectionViewed = null;
+    let ctaClicked = false;
+
+    if (signal.signal_type === "section_viewed") {
+      sectionViewed = signal.section;
+    } else if (signal.signal_type === "cta_clicked") {
+      ctaClicked = true;
+    }
+
     // Record raw event
     await sql`
       INSERT INTO b2b_moment_signals (
@@ -40,15 +46,15 @@ export async function POST(request: Request) {
       VALUES (
         ${signal.moment_id},
         ${signal.industry},
-        ${signal.trigger_event_shown},
-        ${signal.section_viewed},
-        ${signal.cta_clicked},
-        ${signal.signal_layer || 'interaction'},
+        ${signal.trigger_event_shown || null},
+        ${sectionViewed},
+        ${ctaClicked},
+        ${signal.signal_type || 'interaction'},
         ${new Date().toISOString()}
       )
     `;
 
-    console.log(`[MOMENT-SIGNAL] ${signal.signal_layer || 'interaction'} event recorded`);
+    console.log(`[MOMENT-SIGNAL] ${signal.signal_type || 'interaction'} event recorded for moment ${signal.moment_id}`);
 
     return Response.json({ success: true });
   } catch (error) {
