@@ -2,12 +2,30 @@ import { type LeadState } from "./lead-state-machine";
 
 export type LeadStatus = "new" | "contacted" | "warm" | "inbound" | "closed" | "dead" | "recognized";
 
+/**
+ * Root Lead Type Contract
+ *
+ * Core required fields that are always present in the system:
+ * - id, business_name, business_category: basic identity
+ * - email, created_at: core data for operations
+ * - status, lead_state: state machine tracking
+ * - transitioned_at: audit trail for state changes
+ *
+ * All other fields optional based on data availability
+ */
 export interface Lead {
+  // Core required fields (always present)
   id: string | number;
   business_name: string;
   business_category: string;
+  email: string;
+  created_at: string;
+  status: LeadStatus;
+  lead_state: LeadState;
+  transitioned_at: string | null;
+
+  // Extended optional fields
   contact_name?: string;
-  email?: string;
   phone?: string;
   city?: string;
   delivery_type?: string;
@@ -20,9 +38,6 @@ export interface Lead {
   website?: string;
   notes?: string;
   source?: "inbound" | "manual" | "discovery";
-  status: LeadStatus;
-  lead_state?: LeadState;
-  created_at: string;
   updated_at?: string;
   self_confirmed?: boolean;
   confirmation_source?: string;
