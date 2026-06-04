@@ -4,7 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 export async function POST(request: NextRequest) {

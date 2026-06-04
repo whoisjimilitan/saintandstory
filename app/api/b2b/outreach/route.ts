@@ -4,7 +4,7 @@ import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 import { generateEmail } from "@/lib/b2b-email";
 
-const ADMIN_EMAILS = ["whoisjimi.today@gmail.com", "oye.van@outlook.com"];
+const ADMIN_EMAILS = ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"];
 const FROM = "Jimi at Saint & Story <hello@saintandstoryltd.co.uk>";
 const BASE_URL = "https://saintandstoryltd.co.uk";
 
