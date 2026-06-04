@@ -173,9 +173,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const emailMissing = !lead.email;
 
   return (
-    <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden">
+    <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
       <button
-        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-[#F5F5F5] transition-colors"
+        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-[#FAFAFA] active:bg-[#F5F5F5] transition-all duration-150"
         onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); }}
       >
         <div className="flex-1 min-w-0">
@@ -215,14 +215,17 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
-          {/* Lead state status line */}
+          {/* Lead state status line - Apple minimal design */}
           {status === "recognized" && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-blue-700 px-2 py-1 bg-blue-100 rounded-full">RECOGNIZED</span>
-                <span className="text-xs text-blue-600">Email sent</span>
+            <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
+              <div className="flex items-center gap-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[11px] font-semibold tracking-widest text-[#0D0D0D] uppercase">Recognized</span>
+                  <span className="text-[10px] text-[#888888]">Email sent</span>
+                </div>
+                {lead.created_at && <span className="text-[10px] text-[#AAAAAA] ml-auto">{formatTime(lead.created_at)}</span>}
               </div>
-              {lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at)}</span>}
+              <div className="h-px bg-gradient-to-r from-[#0D0D0D] via-[#E8E8E8] to-transparent mt-2"></div>
             </div>
           )}
 
@@ -263,37 +266,37 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             </div>
           </div>
 
-          {/* Recognition email success feedback */}
+          {/* Recognition email success feedback - Apple minimal + Linear precision */}
           {confirmationSuccessMessage && (
-            <div className={`bg-green-50 border border-green-200 rounded-lg p-3 mb-4 transition-opacity duration-300 ${confirmationSuccessMessage ? "opacity-100" : "opacity-0"}`}>
-              <div className="flex items-start gap-2">
-                <span className="text-green-600 font-bold text-base">✓</span>
+            <div className={`mb-4 px-4 py-3 rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] animate-in fade-in duration-200 ${!confirmationSuccessMessage && "animate-out fade-out duration-300"}`}>
+              <div className="flex items-start gap-3">
+                <span className="text-[#0D0D0D] font-semibold text-sm mt-0.5">✓</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-green-700">Recognition email sent</p>
-                  <p className="text-[10px] text-green-600 mt-0.5">{lead.email}</p>
-                  <p className="text-[10px] text-green-500 mt-1">{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p className="text-[11px] font-semibold tracking-[0.5px] text-[#0D0D0D]">Recognition sent</p>
+                  <p className="text-[10px] text-[#666666] mt-1.5">{lead.email}</p>
+                  <p className="text-[10px] text-[#AAAAAA] mt-1">{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Recognition email button */}
+          {/* Recognition email button - refined interaction */}
           <button
             onClick={sendRecognitionEmail}
             disabled={sendingRecognition || !lead.email}
-            className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-xs transition-colors mb-4"
+            className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4"
           >
-            {sendingRecognition ? "Sending recognition…" : "Send Recognition Email →"}
+            {sendingRecognition ? "Sending…" : "Send Recognition Email"}
           </button>
 
-          {/* Prospect brief link */}
+          {/* Prospect brief link - refined secondary action */}
           <Link
             href={`/prospect/${generateSlug(lead.business_name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-2.5 rounded-full text-xs transition-colors mb-4 block text-center border border-[#E8E8E8]"
+            className="w-full bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border border-[#E8E8E8]"
           >
-            View Prospect Brief →
+            View Prospect Brief
           </Link>
 
           {/* Lead details */}
@@ -345,32 +348,32 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             )}
           </div>
 
-          {/* Email draft */}
+          {/* Email input section - minimal design */}
           {emailMissing ? (
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 mb-4 space-y-2">
-              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em]">Add email</p>
+            <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded-lg p-4 mb-4 space-y-3">
+              <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.5px]">Add email address</p>
               <input
                 type="email"
                 value={newEmail}
                 onChange={e => setNewEmail(e.target.value)}
-                placeholder="Email address"
-                className="w-full px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D]"
+                placeholder="name@company.co.uk"
+                className="w-full px-3 py-2.5 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all"
               />
               <button
                 onClick={saveEmail}
                 disabled={savingEmail || !newEmail}
-                className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-full text-xs transition-colors"
+                className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150"
               >
-                {savingEmail ? "Saving…" : "Save email →"}
+                {savingEmail ? "Saving…" : "Save email"}
               </button>
             </div>
           ) : draft ? (
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 mb-4 space-y-2">
-              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em]">Draft email</p>
+            <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded-lg p-4 mb-4 space-y-3">
+              <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.5px]">Draft email</p>
               <input
                 value={draft.subject}
                 onChange={e => setDraft(d => d ? { ...d, subject: e.target.value } : d)}
-                className="w-full text-sm font-semibold text-[#0D0D0D] bg-transparent focus:outline-none border-b border-[#E8E8E8] pb-1"
+                className="w-full text-sm font-semibold text-[#0D0D0D] bg-transparent focus:outline-none border-b border-[#E8E8E8] pb-2 transition-colors"
               />
               <textarea
                 value={draft.body}
@@ -378,15 +381,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 rows={4}
                 className="w-full text-sm text-[#0D0D0D] bg-transparent focus:outline-none resize-none"
               />
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-2 pt-2">
                 <button
                   onClick={sendEmail}
                   disabled={sending}
-                  className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-5 py-1.5 rounded-full text-xs transition-colors"
+                  className="bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150"
                 >
-                  {sending ? "Sending…" : "Send →"}
+                  {sending ? "Sending…" : "Send"}
                 </button>
-                <button onClick={getDraft} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors">
+                <button onClick={getDraft} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
                   Regenerate
                 </button>
               </div>
@@ -395,48 +398,48 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <button
               onClick={getDraft}
               disabled={drafting}
-              className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-xs transition-colors mb-4"
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4"
             >
-              {drafting ? "Drafting…" : "Draft email →"}
+              {drafting ? "Drafting…" : "Draft email"}
             </button>
           )}
 
-          {/* Standing order */}
+          {/* Standing order section - refined design */}
           {showStandingOrder ? (
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-4 mb-4 space-y-2">
-              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.15em]">Create standing order</p>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded-lg p-4 mb-4 space-y-3">
+              <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.5px]">Create standing order</p>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Price (£)</label>
-                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full mt-1 px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D]" />
+                  <label className="text-[#666666] text-[10px] uppercase tracking-[0.5px] block mb-1">Price (£)</label>
+                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all" />
                 </div>
                 <div>
-                  <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Day of week</label>
-                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full mt-1 px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D] bg-white">
+                  <label className="text-[#666666] text-[10px] uppercase tracking-[0.5px] block mb-1">Day of week</label>
+                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] bg-white transition-all">
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d, i) => (
                       <option key={d} value={i + 1}>{d}</option>
                     ))}
                   </select>
                 </div>
               </div>
-              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D]" />
-              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-lg text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
-              <div className="flex gap-2">
-                <button onClick={createStandingOrder} className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-5 py-1.5 rounded-full text-xs transition-colors">
-                  Create →
+              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all" />
+              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] resize-none transition-all" />
+              <div className="flex gap-2 pt-1">
+                <button onClick={createStandingOrder} className="bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150">
+                  Create
                 </button>
-                <button onClick={() => setShowStandingOrder(false)} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors">← back</button>
+                <button onClick={() => setShowStandingOrder(false)} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">Back</button>
               </div>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2 border-t border-[#E8E8E8] pt-4">
-              <button onClick={() => updateStatus("warm")} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-4 py-1.5 rounded-full text-xs transition-colors">
+              <button onClick={() => updateStatus("warm")} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
                 Mark warm
               </button>
-              <button onClick={() => setShowStandingOrder(true)} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold px-4 py-1.5 rounded-full text-xs transition-colors">
-                Create standing order
+              <button onClick={() => setShowStandingOrder(true)} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
+                Standing order
               </button>
-              <button onClick={() => updateStatus("dead")} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors">
+              <button onClick={() => updateStatus("dead")} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
                 Not interested
               </button>
             </div>
@@ -726,7 +729,7 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#888888] hover:text-[#0D0D0D] border border-[#E8E8E8]"}`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#666666] hover:text-[#0D0D0D] border border-[#E8E8E8] hover:border-[#0D0D0D]"}`}
           >
             {t.label}
           </button>
