@@ -8,9 +8,7 @@ import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
-
-type Lead = Record<string, unknown>;
-type Order = Record<string, unknown>;
+import { type Lead, type StandingOrder } from "@/lib/b2b-types";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -46,28 +44,28 @@ function formatTime(ts: string) {
   return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
-function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
+function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): React.ReactElement {
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
   const [drafting, setDrafting] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendingRecognition, setSendingRecognition] = useState(false);
-  const [status, setStatus] = useState(lead.status as string);
+  const [status, setStatus] = useState(lead.status);
   const [showStandingOrder, setShowStandingOrder] = useState(false);
   const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
   const [editingEmail, setEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState(lead.email as string || "");
+  const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
   const [confirmationSuccessMessage, setConfirmationSuccessMessage] = useState(false);
 
   const hasPainPoint = !!lead.pain_point;
 
   const scoreBreakdown = calculateLeadScore({
-    industry: lead.business_category as string,
-    deliveryFrequency: lead.delivery_frequency as string,
-    averageDeliveries: lead.average_deliveries as string,
-    courierProvider: lead.courier_provider as string,
-    deliveryChallenge: lead.delivery_challenge as string,
+    industry: lead.business_category,
+    deliveryFrequency: lead.delivery_frequency,
+    averageDeliveries: lead.average_deliveries,
+    courierProvider: lead.courier_provider,
+    deliveryChallenge: lead.delivery_challenge,
   });
   const scoreLabel = getScoreLabel(scoreBreakdown.total);
   const scoreStyle = getScoreStyle(scoreBreakdown.total);
@@ -75,7 +73,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   async function getDraft() {
     setDrafting(true);
     try {
-      const res = await fetch(`/api/b2b/outreach?lead_id=${lead.id as string}`);
+      const res = await fetch(`/api/b2b/outreach?lead_id=${lead.id}`);
       const data = await res.json() as { subject: string; body: string };
       setDraft(data);
     } finally {
@@ -182,7 +180,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <p className="font-sans font-bold text-[#0D0D0D] text-sm">{lead.business_name as string}</p>
+            <p className="font-sans font-bold text-[#0D0D0D] text-sm">{lead.business_name}</p>
             {hasPainPoint && (
               <span className="text-[10px] font-semibold text-white bg-[#0D0D0D] px-2 py-0.5 rounded-full uppercase tracking-[0.1em]">
                 Pain point
@@ -195,11 +193,11 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
             )}
           </div>
           <p className="text-[#888888] text-xs">
-            {lead.business_category as string}{lead.delivery_type ? ` · ${lead.delivery_type as string}` : ""}{lead.city ? ` · ${lead.city as string}` : ""}
-            {lead.email ? ` · ${lead.email as string}` : " · No email"}
+            {lead.business_category}{lead.delivery_type ? ` · ${lead.delivery_type}` : ""}{lead.city ? ` · ${lead.city}` : ""}
+            {lead.email ? ` · ${lead.email}` : " · No email"}
           </p>
           {hasPainPoint && (
-            <p className="text-[#888888] text-xs mt-0.5 italic">&ldquo;{(lead.pain_point_review as string)?.slice(0, 80)}…&rdquo;</p>
+            <p className="text-[#888888] text-xs mt-0.5 italic">&ldquo;{lead.pain_point_review?.slice(0, 80)}…&rdquo;</p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
@@ -211,7 +209,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
               {STATUS_LABELS[status] ?? status}
             </span>
           </div>
-          {!!lead.created_at && <p className="text-[#888888] text-[10px]">{timeAgo(lead.created_at as string)}</p>}
+          {lead.created_at && <p className="text-[#888888] text-[10px]">{timeAgo(lead.created_at)}</p>}
         </div>
       </button>
 
@@ -224,7 +222,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
                 <span className="text-xs font-semibold text-blue-700 px-2 py-1 bg-blue-100 rounded-full">RECOGNIZED</span>
                 <span className="text-xs text-blue-600">Email sent</span>
               </div>
-              {!!lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at as string)}</span>}
+              {lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at)}</span>}
             </div>
           )}
 
@@ -290,7 +288,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
 
           {/* Prospect brief link */}
           <Link
-            href={`/prospect/${generateSlug(lead.business_name as string)}`}
+            href={`/prospect/${generateSlug(lead.business_name)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-2.5 rounded-full text-xs transition-colors mb-4 block text-center border border-[#E8E8E8]"
@@ -303,45 +301,45 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
             {!!lead.phone && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Phone</p>
-                <a href={`tel:${lead.phone as string}`} className="text-[#0D0D0D] text-sm font-semibold hover:underline">{lead.phone as string}</a>
+                <a href={`tel:${lead.phone}`} className="text-[#0D0D0D] text-sm font-semibold hover:underline">{lead.phone}</a>
               </div>
             )}
             {!!lead.website && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Website</p>
-                <a href={lead.website as string} target="_blank" rel="noopener noreferrer" className="text-[#0D0D0D] text-sm hover:underline truncate block">{lead.website as string}</a>
+                <a href={lead.website} target="_blank" rel="noopener noreferrer" className="text-[#0D0D0D] text-sm hover:underline truncate block">{lead.website}</a>
               </div>
             )}
             {!!lead.delivery_frequency && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Frequency</p>
-                <p className="text-[#0D0D0D] text-sm">{lead.delivery_frequency as string}</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.delivery_frequency}</p>
               </div>
             )}
             {!!lead.average_deliveries && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Avg Deliveries/Month</p>
-                <p className="text-[#0D0D0D] text-sm">{lead.average_deliveries as string}</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.average_deliveries}</p>
               </div>
             )}
             {!!lead.courier_provider && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Current Courier</p>
-                <p className="text-[#0D0D0D] text-sm">{lead.courier_provider as string}</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.courier_provider}</p>
               </div>
             )}
             {!!lead.delivery_challenge && (
               <div>
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Main Challenge</p>
-                <p className="text-[#0D0D0D] text-sm">{lead.delivery_challenge as string}</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.delivery_challenge}</p>
               </div>
             )}
             {hasPainPoint && (
               <div className="col-span-2">
                 <p className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Pain point</p>
-                <p className="text-[#0D0D0D] text-sm">{lead.pain_point as string}</p>
+                <p className="text-[#0D0D0D] text-sm">{lead.pain_point}</p>
                 {!!lead.pain_point_review && (
-                  <p className="text-[#888888] text-xs mt-1 italic">&ldquo;{lead.pain_point_review as string}&rdquo;</p>
+                  <p className="text-[#888888] text-xs mt-1 italic">&ldquo;{lead.pain_point_review}&rdquo;</p>
                 )}
               </div>
             )}
@@ -449,7 +447,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
   );
 }
 
-function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
+function DiscoverPanel({ onRefresh }: { onRefresh: () => void }): React.ReactElement {
   const [industry, setIndustry] = useState(Object.values(B2B_INDUSTRIES)[0][0]);
   const [deliveryType, setDeliveryType] = useState(DELIVERY_TYPES[0]);
   const [city, setCity] = useState("Manchester");
@@ -533,7 +531,7 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }) {
   );
 }
 
-function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
+function AddLeadPanel({ onRefresh }: { onRefresh: () => void }): React.ReactElement {
   const defaultIndustry = Object.values(B2B_INDUSTRIES)[0][0];
   const [form, setForm] = useState({
     business_name: "",
@@ -637,7 +635,7 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }) {
   );
 }
 
-function StandingOrdersPanel({ orders, onGenerate }: { orders: Order[]; onGenerate: () => void }) {
+function StandingOrdersPanel({ orders, onGenerate }: { orders: StandingOrder[]; onGenerate: () => void }): React.ReactElement {
   const [generating, setGenerating] = useState(false);
 
   async function generate() {
@@ -669,21 +667,21 @@ function StandingOrdersPanel({ orders, onGenerate }: { orders: Order[]; onGenera
       ) : (
         <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
           {orders.map((order) => (
-            <div key={order.id as string} className="flex items-center justify-between px-5 py-4 gap-4">
+            <div key={order.id} className="flex items-center justify-between px-5 py-4 gap-4">
               <div className="flex-1 min-w-0">
-                <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{order.business_name as string}</p>
+                <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{order.business_name}</p>
                 <p className="text-[#888888] text-xs">
-                  {order.frequency as string}
-                  {order.day_of_week != null ? ` · ${DAYS[(order.day_of_week as number) - 1]}` : ""}
-                  {order.preferred_time ? ` · ${order.preferred_time as string}` : ""}
-                  {order.pickup_postcode ? ` · ${order.pickup_postcode as string}` : ""}
+                  {order.frequency}
+                  {order.day_of_week != null ? ` · ${DAYS[order.day_of_week - 1]}` : ""}
+                  {order.preferred_time ? ` · ${order.preferred_time}` : ""}
+                  {order.pickup_postcode ? ` · ${order.pickup_postcode}` : ""}
                 </p>
               </div>
               <div className="text-right shrink-0">
                 {order.price != null && <p className="font-sans font-black text-[#0D0D0D] text-sm">£{Number(order.price).toFixed(0)}</p>}
                 {!!order.next_scheduled_at && (
                   <p className="text-[#888888] text-[10px]">
-                    Next: {new Date(order.next_scheduled_at as string).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                    Next: {order.next_scheduled_at ? new Date(order.next_scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}
                   </p>
                 )}
               </div>
@@ -695,12 +693,12 @@ function StandingOrdersPanel({ orders, onGenerate }: { orders: Order[]; onGenera
   );
 }
 
-interface Props {
+interface B2BPipelineProps {
   leads: Lead[];
-  orders: Order[];
+  orders: StandingOrder[];
 }
 
-export default function B2BPipeline({ leads: initialLeads, orders: initialOrders }: Props) {
+export default function B2BPipeline({ leads: initialLeads, orders: initialOrders }: B2BPipelineProps): React.ReactElement {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("pipeline");
   const leads = initialLeads;
@@ -711,14 +709,14 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
   }
 
   const activeTabs: { key: Tab; label: string }[] = [
-    { key: "pipeline", label: `Pipeline (${leads.filter(l => !["closed", "dead"].includes(l.status as string)).length})` },
+    { key: "pipeline", label: `Pipeline (${leads.filter(l => !["closed", "dead"].includes(l.status)).length})` },
     { key: "discover", label: "Discover" },
     { key: "add", label: "Add lead" },
     { key: "standing", label: `Standing orders (${orders.length})` },
   ];
 
   const pipelineLeads = tab === "pipeline"
-    ? leads.filter(l => !["closed", "dead"].includes(l.status as string))
+    ? leads.filter(l => !["closed", "dead"].includes(l.status))
     : leads;
 
   return (
@@ -745,23 +743,23 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
             (() => {
               const sortedLeads = [...pipelineLeads].sort((a, b) => {
                 const scoreA = calculateLeadScore({
-                  industry: a.business_category as string,
-                  deliveryFrequency: a.delivery_frequency as string,
-                  averageDeliveries: a.average_deliveries as string,
-                  courierProvider: a.courier_provider as string,
-                  deliveryChallenge: a.delivery_challenge as string,
+                  industry: a.business_category,
+                  deliveryFrequency: a.delivery_frequency,
+                  averageDeliveries: a.average_deliveries,
+                  courierProvider: a.courier_provider,
+                  deliveryChallenge: a.delivery_challenge,
                 }).total;
                 const scoreB = calculateLeadScore({
-                  industry: b.business_category as string,
-                  deliveryFrequency: b.delivery_frequency as string,
-                  averageDeliveries: b.average_deliveries as string,
-                  courierProvider: b.courier_provider as string,
-                  deliveryChallenge: b.delivery_challenge as string,
+                  industry: b.business_category,
+                  deliveryFrequency: b.delivery_frequency,
+                  averageDeliveries: b.average_deliveries,
+                  courierProvider: b.courier_provider,
+                  deliveryChallenge: b.delivery_challenge,
                 }).total;
                 return scoreB - scoreA;
               });
               return sortedLeads.map(lead => (
-                <LeadCard key={lead.id as string} lead={lead} onRefresh={refresh} />
+                <LeadCard key={lead.id} lead={lead} onRefresh={refresh} />
               ));
             })()
           )}
