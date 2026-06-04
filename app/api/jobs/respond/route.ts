@@ -4,7 +4,12 @@ import { Resend } from "resend";
 import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const ADMIN_EMAILS = ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 
 // GET — driver clicks Accept/Decline link from email (no login needed)
 export async function GET(request: NextRequest) {

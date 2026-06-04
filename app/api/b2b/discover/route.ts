@@ -3,7 +3,12 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 
-const ADMIN_EMAILS = ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"];
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
 
 // Logistics pain keywords in reviews
 const PAIN_KEYWORDS = [
