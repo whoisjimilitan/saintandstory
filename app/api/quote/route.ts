@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   const { error } = await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ["whoisjimi.today@gmail.com", "oyedeleagile@gmail.com"],
+    to: ["oye@saintandstoryltd.co.uk", "james@saintandstoryltd.co.uk"],
     subject: `New quote request — ${firstName} ${lastName}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
