@@ -224,7 +224,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }) {
                 <span className="text-xs font-semibold text-blue-700 px-2 py-1 bg-blue-100 rounded-full">RECOGNIZED</span>
                 <span className="text-xs text-blue-600">Email sent</span>
               </div>
-              {lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at as string)}</span>}
+              {!!lead.created_at && <span className="text-[10px] text-blue-500">{formatTime(lead.created_at as string)}</span>}
             </div>
           )}
 
