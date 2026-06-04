@@ -17,15 +17,86 @@
 
 import Link from "next/link";
 import { ProspectPageData } from "@/lib/prospect-types";
+import { IndustryIntelligence } from "@/lib/industry-intelligence";
 import SiteFooter from "./SiteFooter";
 import HeroPlatformUI from "./HeroPlatformUI";
 
+function formatTriggerEvent(event: string): string {
+  const lower = event.toLowerCase();
+
+  if (lower.includes("deadline") && lower.includes("today")) {
+    return `A deadline that arrives today.`;
+  }
+  if (lower.includes("deadline") && lower.includes("tomorrow")) {
+    return `A deadline that arrives tomorrow morning.`;
+  }
+  if (lower.includes("deadline")) {
+    return `A deadline that is approaching.`;
+  }
+
+  if (lower.includes("missing") && lower.includes("hours")) {
+    return `Materials missing just hours before the work must begin.`;
+  }
+  if (lower.includes("missing") && lower.includes("before")) {
+    const match = event.match(/(\w+(?:\s+\w+)?)\s+missing\s+before\s+(\w+)/i);
+    if (match) {
+      return `${match[1]} that must arrive before ${match[2].toLowerCase()}.`;
+    }
+    return `Something critical that is missing and needed urgently.`;
+  }
+
+  if (lower.includes("waiting") && lower.includes("missing")) {
+    const match = event.match(/(\w+)\s+waiting.*?(\w+)\s+missing/i);
+    if (match) {
+      return `${match[1]} waiting because ${match[2].toLowerCase()} hasn't arrived.`;
+    }
+    return `Someone waiting because what they need is missing.`;
+  }
+
+  if (lower.includes("documents") && lower.includes("urgent")) {
+    return `Documents that must arrive urgently to keep work moving.`;
+  }
+
+  if (lower.includes("permits") && lower.includes("missing")) {
+    return `Permits that are missing when the contractor arrives.`;
+  }
+
+  if (lower.includes("stock") && (lower.includes("critical") || lower.includes("urgent"))) {
+    return `Stock levels that have become critical.`;
+  }
+
+  if (lower.includes("urgent") || lower.includes("emergency")) {
+    if (lower.includes("repair")) {
+      return `An equipment failure that requires urgent repair.`;
+    }
+    if (lower.includes("transport")) {
+      return `Time-sensitive materials that require immediate transport.`;
+    }
+    if (lower.includes("supply")) {
+      return `A supply that has become urgently needed.`;
+    }
+    return `A situation that requires immediate attention.`;
+  }
+
+  if (lower.includes("failed") || lower.includes("failure")) {
+    return `A delivery or service that has failed when it mattered most.`;
+  }
+
+  if (lower.includes("minutes") || lower.includes("hours")) {
+    return `A timeline measured in hours, not days.`;
+  }
+
+  return event.charAt(0).toUpperCase() + event.slice(1) + ".";
+}
+
 interface ProspectBriefingPageProps {
   data: ProspectPageData;
+  intelligence?: IndustryIntelligence;
 }
 
 export default function ProspectBriefingPage({
   data,
+  intelligence,
 }: ProspectBriefingPageProps) {
   const { business } = data;
 
@@ -354,6 +425,27 @@ export default function ProspectBriefingPage({
           </div>
         </div>
       </section>
+
+      {/* MIRROR - We see this happen every day in your industry */}
+      {intelligence && intelligence.triggerEvents.length > 0 && (
+        <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+              We see this happen every day in your industry
+            </p>
+
+            <div className="space-y-8">
+              {intelligence.triggerEvents.map((event, index) => (
+                <div key={index} className="border-b border-[#E8E8E8] pb-8 last:border-b-0 last:pb-0">
+                  <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+                    {formatTriggerEvent(event)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* PAIN - Operational reality */}
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">

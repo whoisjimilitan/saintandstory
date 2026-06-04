@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { findBusinessBySlug, buildProspectPageData } from "@/lib/prospect-pages";
+import { getIndustryIntelligence } from "@/lib/industry-intelligence";
 import ProspectBriefingPage from "@/components/ProspectBriefingPageV2";
 
 // Force dynamic rendering: pages are generated on-demand, not statically
@@ -49,5 +50,8 @@ export default async function ProspectPage({ params }: ProspectPageProps) {
     return notFound();
   }
 
-  return <ProspectBriefingPage data={pageData} />;
+  // Fetch industry intelligence for this business category
+  const intelligence = getIndustryIntelligence(business.category) || undefined;
+
+  return <ProspectBriefingPage data={pageData} intelligence={intelligence} />;
 }
