@@ -172,7 +172,7 @@ async function sendAlert(lead: Record<string, unknown>) {
 
   await resend.emails.send({
     from: "Saint & Story <hello@saintandstoryltd.co.uk>",
-    to: ["whoisjimi.today@gmail.com", "oye.van@outlook.com"],
+    to: ["james@saintandstoryltd.co.uk", "oye@saintandstoryltd.co.uk"],
     subject,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
