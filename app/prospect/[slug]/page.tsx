@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { findBusinessBySlug, buildProspectPageData } from "@/lib/prospect-pages";
 import { getIndustryIntelligence } from "@/lib/industry-intelligence";
+import { confirmLeadPain } from "@/lib/lead-state-machine";
 import ProspectBriefingPage from "@/components/ProspectBriefingPageV2";
 
 // Force dynamic rendering: pages are generated on-demand, not statically
@@ -9,6 +10,11 @@ export const dynamic = "force-dynamic";
 
 interface ProspectPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{
+    reply?: string;
+    lead_id?: string;
+    trigger?: string;
+  }>;
 }
 
 export async function generateMetadata({
@@ -30,8 +36,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProspectPage({ params }: ProspectPageProps) {
+export default async function ProspectPage({
+  params,
+  searchParams,
+}: ProspectPageProps) {
   const { slug } = await params;
+  const sp = await searchParams;
 
   console.log("[PROSPECT] Slug requested:", slug);
 
@@ -52,6 +62,29 @@ export default async function ProspectPage({ params }: ProspectPageProps) {
 
   // Fetch industry intelligence for this business category
   const intelligence = getIndustryIntelligence(business.category) || undefined;
+  const momentId = `${business.category}-${Date.now()}`;
 
-  return <ProspectBriefingPage data={pageData} intelligence={intelligence} />;
+  // Handle reply confirmation
+  if (sp?.reply === "confirmed" && sp?.lead_id && sp?.trigger) {
+    const leadId = parseInt(sp.lead_id);
+    const triggerEvent = decodeURIComponent(sp.trigger);
+
+    try {
+      await confirmLeadPain(leadId, triggerEvent);
+      console.log(`[PROSPECT] Reply confirmed for lead ${leadId}`);
+    } catch (error) {
+      console.error("[PROSPECT] Failed to confirm reply:", error);
+    }
+  }
+
+  return (
+    <ProspectBriefingPage
+      data={pageData}
+      intelligence={intelligence}
+      momentId={momentId}
+      pendingConfirmation={sp?.reply === "confirmed"}
+      lead_id={sp?.lead_id}
+      trigger_event={sp?.trigger}
+    />
+  );
 }

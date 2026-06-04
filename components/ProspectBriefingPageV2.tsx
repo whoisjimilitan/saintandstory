@@ -15,7 +15,10 @@
  * 10. Pages are salespeople (recognize → understand → explain → transform → action)
  */
 
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ProspectPageData } from "@/lib/prospect-types";
 import { IndustryIntelligence } from "@/lib/industry-intelligence";
 import SiteFooter from "./SiteFooter";
@@ -92,13 +95,141 @@ function formatTriggerEvent(event: string): string {
 interface ProspectBriefingPageProps {
   data: ProspectPageData;
   intelligence?: IndustryIntelligence;
+  momentId?: string;
+  pendingConfirmation?: boolean;
+  lead_id?: string;
+  trigger_event?: string;
 }
 
 export default function ProspectBriefingPage({
   data,
   intelligence,
+  momentId,
+  pendingConfirmation,
+  lead_id,
+  trigger_event,
 }: ProspectBriefingPageProps) {
   const { business } = data;
+  const [engagementSignals, setEngagementSignals] = useState({
+    tabFocusActive: false,
+    scrollDepth: 0,
+    sectionVisible: false,
+  });
+
+  // TAB FOCUS DETECTION
+  useEffect(() => {
+    if (!pendingConfirmation) return;
+
+    const handleVisibilityChange = () => {
+      setEngagementSignals((prev) => ({
+        ...prev,
+        tabFocusActive: !document.hidden,
+      }));
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    setEngagementSignals((prev) => ({
+      ...prev,
+      tabFocusActive: !document.hidden,
+    }));
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [pendingConfirmation]);
+
+  // SCROLL DEPTH TRACKING (≥30%)
+  useEffect(() => {
+    if (!pendingConfirmation) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+      setEngagementSignals((prev) => ({
+        ...prev,
+        scrollDepth: Math.max(prev.scrollDepth, scrollPercent),
+      }));
+
+      // If scroll depth ≥30% AND tab active, trigger confirmation
+      if (scrollPercent >= 30 && engagementSignals.tabFocusActive) {
+        confirmSelfIdentification();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [pendingConfirmation, engagementSignals.tabFocusActive]);
+
+  // SECTION VISIBILITY (Intersection Observer)
+  useEffect(() => {
+    if (!pendingConfirmation) return;
+
+    const options = {
+      threshold: 0.5, // Section must be 50% visible
+    };
+
+    const callback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setEngagementSignals((prev) => ({
+            ...prev,
+            sectionVisible: true,
+          }));
+
+          // If section visible AND tab focus active, confirm
+          if (engagementSignals.tabFocusActive) {
+            confirmSelfIdentification();
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(callback, options);
+
+    const mirrorSection = document.querySelector('[data-section="mirror"]');
+    const consequenceSection = document.querySelector('[data-section="consequence"]');
+
+    if (mirrorSection) observer.observe(mirrorSection);
+    if (consequenceSection) observer.observe(consequenceSection);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [pendingConfirmation, engagementSignals.tabFocusActive]);
+
+  // HYBRID ENGAGEMENT VALIDATION
+  const isEngagementValid = (): boolean => {
+    return (
+      engagementSignals.tabFocusActive &&
+      (engagementSignals.scrollDepth >= 30 || engagementSignals.sectionVisible)
+    );
+  };
+
+  // CONFIRM ONLY AFTER HYBRID VALIDATION
+  const confirmSelfIdentification = async () => {
+    if (!isEngagementValid() || !lead_id || !trigger_event) return;
+
+    try {
+      await fetch("/api/b2b/confirm-engagement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: parseInt(lead_id),
+          trigger_event: decodeURIComponent(trigger_event),
+          engagement_type: "hybrid_signal",
+          engagement_signals: engagementSignals,
+        }),
+      });
+
+      console.log(`[SELF-CONFIRMED] Lead ${lead_id} confirmed via hybrid signal`);
+    } catch (error) {
+      console.error("[CONFIRMATION] Failed:", error);
+    }
+  };
 
   // Category-specific copy (Pain + Mechanism + Transformation)
   const getCategoryMessaging = (category: string) => {
@@ -428,7 +559,7 @@ export default function ProspectBriefingPage({
 
       {/* MIRROR - We see this happen every day in your industry */}
       {intelligence && intelligence.triggerEvents.length > 0 && (
-        <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+        <section data-section="mirror" className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
           <div className="max-w-3xl mx-auto">
             <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
               We see this happen every day in your industry
