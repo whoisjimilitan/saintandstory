@@ -116,15 +116,40 @@ export default function ProspectBriefingPage({
     sectionVisible: false,
   });
 
+  // DEBUG MODE: Enable with ?debug=1 in URL
+  const isDebugMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("debug") === "1";
+
+  const debug = (message: string, data?: any) => {
+    if (isDebugMode) {
+      const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+      const logMessage = `[${timestamp}] [DEBUG] ${message}`;
+      console.log(logMessage, data || "");
+
+      // Also render in UI corner
+      const debugEl = document.getElementById("debug-panel");
+      if (debugEl) {
+        debugEl.innerHTML += `<div>${logMessage} ${data ? JSON.stringify(data) : ""}</div>`;
+        debugEl.scrollTop = debugEl.scrollHeight;
+      }
+    }
+  };
+
   // TAB FOCUS DETECTION
   useEffect(() => {
-    if (!pendingConfirmation) return;
+    if (!pendingConfirmation) {
+      debug("Pending confirmation not set, skipping engagement tracking");
+      return;
+    }
+
+    debug("Engagement tracking STARTED", { lead_id, trigger_event });
 
     const handleVisibilityChange = () => {
+      const isActive = !document.hidden;
       setEngagementSignals((prev) => ({
         ...prev,
-        tabFocusActive: !document.hidden,
+        tabFocusActive: isActive,
       }));
+      debug("Tab focus changed", { tabFocusActive: isActive });
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -132,6 +157,8 @@ export default function ProspectBriefingPage({
       ...prev,
       tabFocusActive: !document.hidden,
     }));
+
+    debug("Initial tab state", { tabFocusActive: !document.hidden });
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -141,6 +168,8 @@ export default function ProspectBriefingPage({
   // SCROLL DEPTH TRACKING (≥30%)
   useEffect(() => {
     if (!pendingConfirmation) return;
+
+    let lastLoggedPercent = 0;
 
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -152,8 +181,15 @@ export default function ProspectBriefingPage({
         scrollDepth: Math.max(prev.scrollDepth, scrollPercent),
       }));
 
+      // Log at 10% intervals
+      if (Math.floor(scrollPercent / 10) > Math.floor(lastLoggedPercent / 10)) {
+        debug("Scroll depth", { scrollPercent: Math.round(scrollPercent) });
+        lastLoggedPercent = scrollPercent;
+      }
+
       // If scroll depth ≥30% AND tab active, trigger confirmation
       if (scrollPercent >= 30 && engagementSignals.tabFocusActive) {
+        debug("CONFIRMATION TRIGGERED: scroll ≥30% + tab active", { scrollPercent: Math.round(scrollPercent) });
         confirmSelfIdentification();
       }
     };
@@ -175,6 +211,10 @@ export default function ProspectBriefingPage({
     const callback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
+          debug(`Section visible: ${entry.target.getAttribute("data-section")}`, {
+            intersectionRatio: Math.round(entry.intersectionRatio * 100),
+          });
+
           setEngagementSignals((prev) => ({
             ...prev,
             sectionVisible: true,
@@ -182,6 +222,7 @@ export default function ProspectBriefingPage({
 
           // If section visible AND tab focus active, confirm
           if (engagementSignals.tabFocusActive) {
+            debug("CONFIRMATION TRIGGERED: section visible + tab active");
             confirmSelfIdentification();
           }
         }
@@ -195,6 +236,8 @@ export default function ProspectBriefingPage({
 
     if (mirrorSection) observer.observe(mirrorSection);
     if (consequenceSection) observer.observe(consequenceSection);
+
+    debug("Section visibility observer initialized");
 
     return () => {
       observer.disconnect();
@@ -211,10 +254,25 @@ export default function ProspectBriefingPage({
 
   // CONFIRM ONLY AFTER HYBRID VALIDATION
   const confirmSelfIdentification = async () => {
-    if (!isEngagementValid() || !lead_id || !trigger_event) return;
+    const isValid = isEngagementValid();
+    debug("Confirmation attempt", {
+      isValid,
+      tabFocusActive: engagementSignals.tabFocusActive,
+      scrollDepth: Math.round(engagementSignals.scrollDepth),
+      sectionVisible: engagementSignals.sectionVisible,
+    });
+
+    if (!isValid || !lead_id || !trigger_event) {
+      debug("Confirmation REJECTED", {
+        reason: !isValid ? "engagement not valid" : !lead_id ? "no lead_id" : "no trigger_event",
+      });
+      return;
+    }
 
     try {
-      await fetch("/api/b2b/confirm-engagement", {
+      debug("Sending confirmation to API", { lead_id, trigger_event });
+
+      const response = await fetch("/api/b2b/confirm-engagement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -225,9 +283,15 @@ export default function ProspectBriefingPage({
         }),
       });
 
-      console.log(`[SELF-CONFIRMED] Lead ${lead_id} confirmed via hybrid signal`);
+      const result = await response.json();
+
+      if (response.ok) {
+        debug("SELF-CONFIRMED: API returned success", result);
+      } else {
+        debug("SELF-CONFIRMED: API returned error", result);
+      }
     } catch (error) {
-      console.error("[CONFIRMATION] Failed:", error);
+      debug("SELF-CONFIRMED: Request failed", { error: String(error) });
     }
   };
 
@@ -505,6 +569,20 @@ export default function ProspectBriefingPage({
 
   return (
     <main className="bg-white">
+      {/* DEBUG PANEL */}
+      {isDebugMode && (
+        <div
+          id="debug-panel"
+          className="fixed bottom-0 left-0 right-0 z-40 bg-black text-green-400 font-mono text-xs p-3 max-h-32 overflow-y-auto border-t-2 border-green-400"
+        >
+          <div className="font-bold mb-2">🐛 DEBUG MODE ACTIVE</div>
+          <div>lead_id: {lead_id}</div>
+          <div>trigger_event: {trigger_event?.substring(0, 40)}...</div>
+          <div>pendingConfirmation: {String(pendingConfirmation)}</div>
+          <div>---</div>
+        </div>
+      )}
+
       {/* Navigation - matches main Nav structure */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">

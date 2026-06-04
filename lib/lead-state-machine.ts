@@ -71,18 +71,19 @@ export async function confirmLeadPain(
   const sql = neon(process.env.DATABASE_URL);
 
   try {
+    // First transition state (handles validation and logging)
+    await transitionLeadState(lead_id, "self_confirmed", trigger_event);
+
+    // Then update confirmation fields
     await sql`
       UPDATE b2b_leads
       SET
         self_confirmed = true,
         confirmation_source = 'trigger_event_match',
         confirmed_at = ${new Date().toISOString()},
-        trigger_event_matched = ${trigger_event},
-        lead_state = 'self_confirmed'
+        trigger_event_matched = ${trigger_event}
       WHERE id = ${lead_id}
     `;
-
-    await transitionLeadState(lead_id, "self_confirmed", trigger_event);
 
     console.log(`[SELF-CONFIRMED] Lead ${lead_id} confirmed: ${trigger_event}`);
     return true;
