@@ -29,7 +29,7 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "conveyancing firms": {
     behaviourGroup: "Completion Driven",
-    triggerEvents: ["completion documents needed today", "signed paperwork missing from client", "key exchange imminent"],
+    triggerEvents: ["completion date today, documents missing", "signed paperwork missing from client", "key exchange imminent"],
   },
   "litigation firms": {
     behaviourGroup: "Deadline Driven",
@@ -37,37 +37,37 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   notaries: {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["notarized documents needed urgently", "document verification deadline", "client meeting with documents needed"],
+    triggerEvents: ["documents need notarizing before deadline", "document verification deadline", "client meeting with documents needed"],
   },
 
   // HEALTHCARE
   pharmacies: {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["prescription stock critical", "patient waiting for medication", "supplier failed, backup needed"],
+    triggerEvents: ["prescription stock critical, patient waiting", "supplier failed, backup needed", "medication supply emergency"],
   },
   "private hospitals": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["surgical supplies missing before surgery", "blood products urgent delivery", "equipment failure during procedure"],
+    triggerEvents: ["surgical supplies missing before surgery", "blood products urgent delivery", "operating room blocked"],
   },
   "dental practices": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["surgical supplies missing before patient", "dental materials stock critical", "equipment failure during treatment"],
+    triggerEvents: ["patient in chair, materials missing", "bracket supplies urgent", "equipment failure during treatment"],
   },
   orthodontists: {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["patient appointment today, materials missing", "bracket supplies urgent", "equipment failure during treatment"],
+    triggerEvents: ["patient appointment today, materials missing", "bracket supplies urgent", "appointment must be rescheduled"],
   },
   "gp surgeries": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["medication supply critical", "vaccines missing before clinic", "patient waiting, prescription supplies needed"],
+    triggerEvents: ["medication supply critical, clinic at risk", "vaccines missing before clinic", "patient waiting, prescription supplies needed"],
   },
   "veterinary clinics": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["animal in distress, medication urgent", "surgical supplies missing before procedure", "emergency pet owner waiting"],
+    triggerEvents: ["animal suffering, medication urgent", "surgical supplies missing before procedure", "emergency pet owner waiting"],
   },
   "care homes": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["resident medication critical", "medical supplies missing", "emergency transfer needed"],
+    triggerEvents: ["resident medication stock critical", "medical supplies missing", "emergency transfer needed"],
   },
   "medical laboratories": {
     behaviourGroup: "Operational Continuity",
@@ -75,29 +75,29 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "fertility clinics": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["temperature-sensitive samples urgent transport", "treatment window closing", "laboratory equipment failure"],
+    triggerEvents: ["temperature-sensitive samples urgent transport", "treatment window closing", "temperature-sensitive samples urgent"],
   },
   "private healthcare providers": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["patient treatment delayed, supplies needed", "emergency equipment transfer", "medication supply critical"],
+    triggerEvents: ["patient treatment blocked, supplies needed", "emergency equipment transfer", "medication supply critical"],
   },
 
   // PROPERTY & CONSTRUCTION
   "estate agents": {
     behaviourGroup: "Completion Driven",
-    triggerEvents: ["completion date today, keys missing", "documents not signed by completion", "buyer waiting for paperwork"],
+    triggerEvents: ["completion date today, keys missing", "completion date today, documents missing", "buyer waiting for paperwork"],
   },
   "letting agents": {
     behaviourGroup: "Completion Driven",
-    triggerEvents: ["tenancy start date today, keys missing", "tenant waiting, documents unsigned", "access needed for move-in inspection"],
+    triggerEvents: ["tenancy starts today, keys not ready", "tenant waiting, documents unsigned", "access needed for move-in inspection"],
   },
   "property management companies": {
     behaviourGroup: "Completion Driven",
-    triggerEvents: ["tenant arrival today, keys needed", "inspection deadline missed", "compliance paperwork urgent"],
+    triggerEvents: ["inspection deadline today, inventory incomplete", "tenancy deadline, documents missing", "compliance paperwork urgent"],
   },
   surveyors: {
     behaviourGroup: "Completion Driven",
-    triggerEvents: ["valuation report needed before completion", "survey report deadline", "mortgage lender needs valuation today"],
+    triggerEvents: ["valuation report needed before completion", "mortgage lender needs valuation today", "completion deadline approaching"],
   },
   architects: {
     behaviourGroup: "Deadline Driven",
@@ -105,15 +105,15 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "construction firms": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["site halted, materials missing", "crew waiting, equipment not arrived", "delivery failed, replacement urgent"],
+    triggerEvents: ["crew waiting, materials not arrived", "delivery failed, schedule breaks", "site halted, materials missing"],
   },
   "building contractors": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["crew on site, materials missing", "scaffold delivery failed, urgent replacement", "tool shortage halting work"],
+    triggerEvents: ["weather window closing, scaffold missing", "delivery failed, crew idle on site", "crew on site, materials missing"],
   },
   "facilities management companies": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["building system broken, parts urgent", "maintenance emergency at multiple sites", "equipment failure, replacement urgent"],
+    triggerEvents: ["heating system broken, building unusable", "building system failure, business stops", "maintenance emergency at multiple sites"],
   },
 
   // AUTOMOTIVE
@@ -123,85 +123,85 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "mot centres": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["vehicle collection date approaching, repair incomplete", "parts missing for repair", "failed MOT, urgent repairs needed"],
+    triggerEvents: ["vehicle inspection appointment booked, parts missing", "parts missing before scheduled inspection", "failed MOT, urgent repairs needed"],
   },
   "vehicle repair centres": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["customer waiting, parts missing", "repair deadline today", "warranty parts urgent"],
+    triggerEvents: ["customer collection date, repair incomplete", "repair waiting for parts", "warranty parts urgent"],
   },
   "accident repair centres": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["insurance deadline approaching, parts missing", "customer collection date, repair incomplete", "rare parts urgent"],
+    triggerEvents: ["insurance deadline approaching, repair not finished", "customer collection date, repair incomplete", "rare parts urgent"],
   },
   "vehicle dealerships": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["customer collection date, vehicle not ready", "test drive car breakdown, recovery urgent", "parts shortage delaying sale"],
+    triggerEvents: ["customer waiting, vehicle from warehouse", "test drive car breakdown, recovery urgent", "popular model out of stock"],
   },
   "fleet operators": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["vehicle breakdown, fleet grounded", "parts shortage halting operations", "maintenance deadline approaching"],
+    triggerEvents: ["vehicle breakdown, fleet grounded", "lorry breaks down, fleet grounded", "maintenance deadline approaching"],
   },
   "commercial vehicle workshops": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["lorry breakdown, urgent repairs", "maintenance deadline, parts missing", "customer delivery deadline at risk"],
+    triggerEvents: ["urgent repair parts needed", "heavy commercial vehicle waiting for repair", "customer delivery deadline at risk"],
   },
 
   // MANUFACTURING & ENGINEERING
   "engineering companies": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["project deadline approaching, designs missing", "client site visit, documents needed", "approval deadline today"],
+    triggerEvents: ["planning deadline approaching", "design approval deadline", "project submission deadline"],
   },
   "precision manufacturers": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["component shortage halting production", "order deadline approaching, materials missing", "client deadline, delivery urgent"],
+    triggerEvents: ["component urgently needed for client", "custom component needed by client", "client deadline approaching"],
   },
   "electronics manufacturers": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["component stock critical", "production halted waiting for parts", "customer deadline approaching"],
+    triggerEvents: ["component stock critical, order deadline", "production halted waiting for parts", "customer deadline approaching"],
   },
   "industrial suppliers": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["customer production halted, parts missing", "emergency order urgent", "just-in-time delivery failed"],
+    triggerEvents: ["customer production halted, parts urgent", "customer production line stopped", "just-in-time delivery failed"],
   },
   "machine shops": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["custom part deadline approaching", "client collection date, work incomplete", "urgent machine repair needed"],
+    triggerEvents: ["custom part due for collection", "deadline approaching, work incomplete", "customer deadline missed"],
   },
 
   // FINANCE
   accountants: {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["tax deadline tomorrow", "audit documents missing", "year-end filing deadline today"],
+    triggerEvents: ["tax deadline tomorrow", "year-end filing deadline today", "audit documents missing"],
   },
   "financial advisers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["client meeting documents missing", "investment papers needed urgently", "regulatory filing deadline today"],
+    triggerEvents: ["client meeting today, documents needed", "investment papers needed urgently", "regulatory filing deadline today"],
   },
   "mortgage brokers": {
-    behaviourGroup: "Deadline Driven",
-    triggerEvents: ["mortgage deed missing before completion", "document exchange deadline today", "client meeting urgent, papers needed"],
+    behaviourGroup: "Completion Driven",
+    triggerEvents: ["mortgage completion, documents missing", "mortgage deed needed before property completion", "completion deadline today, documents missing"],
   },
   "insurance brokers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["policy documents needed urgently", "claim paperwork deadline today", "renewal documents missing"],
+    triggerEvents: ["policy deadline, documents needed", "claim paperwork deadline today", "renewal deadline approaching"],
   },
 
   // EVENTS & MEDIA
   "event organisers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["event materials missing hours before event", "setup documents needed urgently", "contractor arriving, permits missing"],
+    triggerEvents: ["event today, setup materials missing", "event happening, materials missing", "contractor arriving, permits missing"],
   },
   "exhibition companies": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["exhibition opening today, display missing", "stand materials not arrived", "installation documents missing"],
+    triggerEvents: ["exhibition opens today, materials missing", "display not installed, exhibition opening", "stand materials not arrived"],
   },
   "wedding planners": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["wedding day is today, vendor missing", "decoration materials missing hours before", "contracts missing from client"],
+    triggerEvents: ["wedding day today, vendor missing", "decoration materials missing hours before", "contracts missing from client"],
   },
   "av suppliers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["event today, AV equipment needed", "event happening, equipment missing", "last-minute equipment installation"],
+    triggerEvents: ["event today, AV equipment missing", "event happening, equipment missing", "last-minute equipment installation"],
   },
   "tv production": {
     behaviourGroup: "Deadline Driven",
@@ -209,11 +209,11 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "film production": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["production materials missing", "filming schedule halted waiting for equipment", "location permits missing"],
+    triggerEvents: ["production equipment missing for shoot", "filming schedule halted waiting for equipment", "location permits missing"],
   },
   "photography studios": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["event happening today, equipment needed", "client proofs missing for approval", "print deadline for wedding album"],
+    triggerEvents: ["event today, backup equipment needed", "equipment failure on event day", "print deadline for wedding album"],
   },
   "marketing agencies": {
     behaviourGroup: "Deadline Driven",
@@ -221,39 +221,39 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "print companies": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["print deadline approaching", "final artwork missing from client", "proofs needed for approval"],
+    triggerEvents: ["print deadline approaching, artwork missing", "final artwork missing from client", "proofs needed for approval"],
   },
 
   // TECHNOLOGY
   "it support companies": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["client system emergency", "onsite support needed urgently", "equipment failure, urgent replacement"],
+    triggerEvents: ["client system emergency", "onsite support needed urgently", "equipment failure, replacement urgent"],
   },
   "data centres": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["cooling system failure, emergency", "power backup urgent", "equipment failure, replacement needed"],
+    triggerEvents: ["cooling failure, emergency", "servers overheating, business stops", "power backup urgent"],
   },
   "telecom providers": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["network outage, emergency repair", "infrastructure failure", "customer service disruption"],
+    triggerEvents: ["network outage, emergency repair", "customers cannot operate", "infrastructure failure"],
   },
   "hardware resellers": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["customer waiting, stock missing", "urgent order from client", "competitor has stock, restock needed"],
+    triggerEvents: ["customer waiting, stock missing", "competitor has stock, restock needed", "urgent order from client"],
   },
   "managed service providers": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["client system emergency", "onsite support needed urgently", "equipment failure, urgent replacement"],
+    triggerEvents: ["client system emergency", "onsite emergency support needed", "client system emergency"],
   },
 
   // EDUCATION
   universities: {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["exam deadline approaching", "student event today, supplies needed", "submission deadline, documents needed"],
+    triggerEvents: ["exam today, test papers missing", "submission deadline, documents needed", "graduation date approaching"],
   },
   colleges: {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["course deadline approaching", "student assessment materials missing", "enrollment documents urgent"],
+    triggerEvents: ["course deadline approaching", "assessment date, materials missing", "enrollment deadline approaching"],
   },
   "private schools": {
     behaviourGroup: "Deadline Driven",
@@ -261,139 +261,139 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   "training providers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["course deadline approaching", "certification documents missing", "training materials needed urgently"],
+    triggerEvents: ["course deadline approaching", "certification deadline approaching", "student assessment deadline"],
   },
 
   // RECRUITMENT
   "recruitment agencies": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["candidate interview today, documents missing", "placement deadline, paperwork urgent", "client documents needed for review"],
+    triggerEvents: ["interview today, documents missing", "placement deadline, paperwork urgent", "client documents needed for review"],
   },
   "staffing agencies": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["worker assignment today, documentation missing", "client request urgent, staff needed", "payroll deadline approaching"],
+    triggerEvents: ["assignment date, documents not ready", "client request urgent, staff needed", "payroll deadline approaching"],
   },
 
   // AVIATION
   "aircraft maintenance": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["aircraft grounded, spare parts urgent", "maintenance window closing", "flight schedule at risk"],
+    triggerEvents: ["aircraft grounded, spare parts urgent", "spare parts critical, cannot fly", "maintenance window closing"],
   },
   airports: {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["runway maintenance urgent", "safety equipment missing", "passenger facility failure"],
+    triggerEvents: ["maintenance window closing, equipment needed", "runway maintenance urgent", "flight schedule delayed"],
   },
   "flight operators": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["flight cancelled, passenger rebook documents", "aircraft parts urgent", "crew documentation missing"],
+    triggerEvents: ["flight departure today, docs missing", "aircraft parts urgent", "crew documentation missing"],
   },
 
   // MARITIME
   "shipping agents": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["cargo deadline approaching", "documentation missing for customs", "vessel departure imminent"],
+    triggerEvents: ["cargo deadline, documents missing", "documentation missing for customs", "vessel departure imminent"],
   },
   "port operators": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["vessel loading delayed, equipment urgent", "cargo documentation missing", "port closure imminent"],
+    triggerEvents: ["vessel deadline, equipment needed", "vessel in port with limited time window", "operations blocked"],
   },
   "marine engineering": {
     behaviourGroup: "Operational Continuity",
-    triggerEvents: ["vessel breakdown, emergency parts", "maintenance deadline approaching", "safety inspection urgent"],
+    triggerEvents: ["vessel breakdown, parts urgent", "emergency repair needed", "safety inspection urgent"],
   },
 
   // SECURITY
   "security companies": {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["security breach emergency response", "armed guard needed urgently", "incident evidence transport"],
+    triggerEvents: ["security breach emergency", "immediate response needed", "incident evidence transport"],
   },
   "alarm installers": {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["alarm failure, emergency service needed", "installation deadline", "repair visit urgent"],
+    triggerEvents: ["alarm system failure", "property vulnerable, emergency service call", "repair visit urgent"],
   },
   locksmiths: {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["property locked down, emergency access", "key loss, urgent locksmith visit", "security installation emergency"],
+    triggerEvents: ["property access emergency", "emergency locksmith visit needed", "security installation emergency"],
   },
 
   // LUXURY & SPECIALIST
   jewellers: {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["customer waiting, item from workshop", "repair urgent for customer collection", "stock transfer between locations"],
+    triggerEvents: ["customer collection date, item incomplete", "collection date approaching", "urgent repair for customer"],
   },
   "watch specialists": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["watch repair deadline for customer", "specialist part needed urgently", "collection appointment today"],
+    triggerEvents: ["customer collection date, repair incomplete", "collection appointment today", "specialist part needed urgently"],
   },
   "fashion houses": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["fashion show in days, samples missing", "collection deadline, materials urgent", "customer order urgent"],
+    triggerEvents: ["fashion show deadline approaching", "collection deadline, materials urgent", "customer order urgent"],
   },
   tailors: {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["customer collection date today, alterations incomplete", "special event outfit needed urgently", "wedding dress collection imminent"],
+    triggerEvents: ["customer collection date, alterations incomplete", "wedding dress due today", "special event outfit needed urgently"],
   },
   "luxury retailers": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["vip customer waiting, item from warehouse", "high-value item transfer between locations", "exclusive delivery deadline"],
+    triggerEvents: ["VIP customer waiting, stock missing", "high-value item transfer between locations", "exclusive delivery deadline"],
   },
   "art galleries": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["exhibition opening today, artwork missing", "client viewing scheduled, piece needed", "artwork transfer between galleries"],
+    triggerEvents: ["exhibition opens, artwork not arrived", "client viewing scheduled, piece needed", "artwork transfer between galleries"],
   },
   "auction houses": {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["auction day today, items missing", "lot transport urgent", "item authentication deadline"],
+    triggerEvents: ["auction day, lots missing", "lot transport urgent", "item authentication deadline"],
   },
   museums: {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["exhibition opening, artifacts transport", "loan deadline approaching", "insurance documentation urgent"],
+    triggerEvents: ["exhibition opening, artifacts missing", "loan deadline approaching", "insurance documentation urgent"],
   },
 
   // FUNERAL SERVICES
   "funeral directors": {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["body transfer urgent", "cremation deadline approaching", "family waiting, flowers needed"],
+    triggerEvents: ["funeral date approaching, body transfer", "body transfer urgent", "cremation deadline approaching"],
   },
   "crematorium services": {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["cremation scheduled, documents missing", "ashes delivery urgent", "certification deadline today"],
+    triggerEvents: ["cremation scheduled, paperwork urgent", "cremation scheduled, documentation missing", "certification deadline today"],
   },
   "memorial companies": {
     behaviourGroup: "Emergency Response",
-    triggerEvents: ["memorial stone installation urgent", "engraving deadline", "family gathering, materials needed"],
+    triggerEvents: ["memorial installation urgent", "family gathering, memorial not ready", "engraving deadline"],
   },
 
   // INFRASTRUCTURE & UTILITIES
   "electricity contractors": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["power outage, emergency response needed", "installation scheduled, equipment missing", "inspection deadline today"],
+    triggerEvents: ["power outage emergency", "building cannot operate", "inspection deadline today"],
   },
   "gas contractors": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["gas supply emergency", "boiler failure, urgent replacement parts", "safety inspection deadline"],
+    triggerEvents: ["boiler failure, emergency", "gas supply emergency", "safety inspection deadline"],
   },
   "water contractors": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["water supply emergency", "pipe burst, emergency repair materials", "maintenance deadline urgent"],
+    triggerEvents: ["pipe burst, emergency repair", "water supply emergency", "maintenance deadline urgent"],
   },
   "fibre installers": {
     behaviourGroup: "Deadline Driven",
-    triggerEvents: ["installation scheduled, equipment missing", "connection deadline for customer", "repair needed, parts urgent"],
+    triggerEvents: ["installation deadline, equipment missing", "connection deadline for customer", "repair needed, parts urgent"],
   },
   "rail contractors": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["track work deadline approaching", "safety equipment missing", "inspection paperwork urgent"],
+    triggerEvents: ["track work deadline, equipment needed", "safety equipment missing", "inspection paperwork urgent"],
   },
   "rail maintenance": {
     behaviourGroup: "Site Continuity",
-    triggerEvents: ["track damage, emergency repair", "maintenance deadline approaching", "safety inspection materials needed"],
+    triggerEvents: ["track damage, urgent repair", "maintenance window closing", "safety inspection materials needed"],
   },
 
   // RESTAURANTS & FOOD
   restaurants: {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["service in 2 hours, supplier failed", "ingredient stock critical, emergency run", "market collection missed"],
+    triggerEvents: ["service in 2 hours, supplier failed", "ingredient stock critical, emergency run", "key ingredient missing"],
   },
   cafes: {
     behaviourGroup: "Supply Chain",
@@ -423,7 +423,7 @@ export const INDUSTRY_INTELLIGENCE: Record<string, IndustryIntelligence> = {
   },
   florists: {
     behaviourGroup: "Supply Chain",
-    triggerEvents: ["event today, flowers missing", "market collection missed, stock depleted", "wedding delivery tomorrow"],
+    triggerEvents: ["event today, flowers missing", "wedding delivery tomorrow", "market collection missed, stock depleted"],
   },
 };
 
