@@ -271,7 +271,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   return (
     <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${
       isExpanded
-        ? "bg-[#1a1a1a] border-[#1a1a1a]"
+        ? "bg-[#2a2a2a] border-[#2a2a2a]"
         : `border-[#E8E8E8] ${cardStyle.bg} ${cardStyle.border}`
     }`}>
       <button
