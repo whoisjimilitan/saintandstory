@@ -2,6 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { ProspectPageBusiness, Movement, ProspectPageData } from "./prospect-types";
 import { getMovementsForBusiness } from "./movement-intelligence";
 import { rankMovementsByOpportunity } from "./opportunity-engine";
+import { getMovementCopy } from "./prospect-copy";
 
 // Generate URL slug from business name
 export function generateSlug(businessName: string): string {
@@ -79,100 +80,13 @@ export function buildMovementBrief(
   movement: any,
   business: ProspectPageBusiness
 ): Movement {
-  const category = business.category.toLowerCase();
+  // Fetch copy from configurable copy system
+  const copy = getMovementCopy(business.category, movement.type);
 
-  // Map movements to personalized briefs based on industry
-  const briefs: Record<string, Record<string, { description: string; solution: string }>> = {
-    legal: {
-      "Court Filing Documents": {
-        description:
-          "When documents must reach court before a specific deadline, timing becomes critical.",
-        solution:
-          "Saint & Story provides same-day collection, delivery and proof of delivery.",
-      },
-      "Signed Legal Contracts": {
-        description:
-          "When signatures are obtained, counterparties typically expect documents to arrive promptly.",
-        solution: "We handle contract transfers the same day they are signed.",
-      },
-      "Property Completion Documents": {
-        description:
-          "Completion days often involve keys, signed documents and strict timelines.",
-        solution:
-          "Saint & Story supports these transfers with real-time updates and driver confirmation.",
-      },
-    },
-    "estate agent": {
-      "Property Completion Keys": {
-        description:
-          "Completion days often involve keys, signed documents and strict timelines.",
-        solution:
-          "Saint & Story supports completion-day movements with 15-minute driver confirmation and tracking.",
-      },
-      "Urgent Valuation Documents": {
-        description: "When clients need valuations urgently, delays cost viewings and sales.",
-        solution: "We deliver valuation documents same-day so clients get immediate feedback.",
-      },
-      "Mortgage & Contract Documents": {
-        description:
-          "During transactions, documents are constantly moving between offices and clients.",
-        solution: "Fixed price, same-day movement keeps your sales pipeline moving.",
-      },
-    },
-    construction: {
-      "Emergency Site Materials": {
-        description:
-          "When a critical component doesn't arrive and a crew is standing idle, costs mount quickly.",
-        solution:
-          "Saint & Story provides rapid site rescue deliveries to prevent crew downtime.",
-      },
-      "Revised Specifications": {
-        description:
-          "When site changes occur, updated drawings and specifications must reach crews immediately.",
-        solution: "We deliver updated specs same-day to keep projects on track.",
-      },
-      "Safety Certificates": {
-        description:
-          "Compliance documents often have tight deadlines and inspection windows.",
-        solution: "We ensure safety certificates reach inspection sites on deadline.",
-      },
-    },
-    medical: {
-      "Prescription & Medication Transfers": {
-        description:
-          "Patient emergencies require immediate medication transfers between locations.",
-        solution:
-          "Saint & Story provides same-day emergency medication transfers with tracking.",
-      },
-      "Medical Specimens": {
-        description: "Specimens degrade over time; urgent transfers are critical for test accuracy.",
-        solution:
-          "We handle time-sensitive specimen movement with chain-of-custody documentation.",
-      },
-      "Medical Records": {
-        description: "Patient transfers and consultations require medical records to arrive quickly.",
-        solution: "Same-day record transfers support continuity of care.",
-      },
-    },
-  };
-
-  // Get category-specific brief, or use generic fallback
-  const categoryBrief = briefs[category] || {};
-  const movementBrief = categoryBrief[movement.type];
-
-  if (movementBrief) {
-    return {
-      type: movement.type,
-      briefDescription: movementBrief.description,
-      howWeSolveIt: movementBrief.solution,
-    };
-  }
-
-  // Generic fallback
   return {
     type: movement.type,
-    briefDescription: `This delivery situation is likely common within businesses like ${business.name}.`,
-    howWeSolveIt: "Saint & Story provides same-day delivery with real-time tracking and confirmation.",
+    briefDescription: copy.description,
+    howWeSolveIt: copy.solution,
   };
 }
 
