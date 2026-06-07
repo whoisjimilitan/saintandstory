@@ -45,6 +45,29 @@ function formatTime(ts: string) {
 }
 
 function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): React.ReactElement {
+  // Recognition workflow state descriptions (based on lead_state, not status)
+  const stateDescriptions: Record<string, { description: string; nextStep: string }> = {
+    new: {
+      description: "No recognition email has been sent yet.",
+      nextStep: "Next: Send recognition email to begin outreach."
+    },
+    recognized: {
+      description: "Recognition email sent to this prospect.",
+      nextStep: "Waiting for them to engage with the prospect brief."
+    },
+    engaged: {
+      description: "Prospect engaged with the prospect brief.",
+      nextStep: "Next: Confirm they are ready to work with us."
+    },
+    self_confirmed: {
+      description: "Prospect confirmed interest in working together.",
+      nextStep: "Ready to create a standing order contract."
+    }
+  };
+
+  // Get the recognition workflow state (separate from CRM status)
+  const workflowState = lead.lead_state || "new";
+
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
   const [drafting, setDrafting] = useState(false);
@@ -264,6 +287,42 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Recognition Progress Indicator - visible for all leads */}
+          <div className="mb-4 pt-3 pb-3 border-t border-[#E8E8E8]">
+            <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.5px] mb-2">
+              Recognition Progress
+            </p>
+
+            {/* Progress stages */}
+            <div className="flex items-center gap-2 text-[10px] font-medium mb-3">
+              <span className={workflowState === "new" ? "font-semibold text-[#0D0D0D]" : "text-[#AAAAAA]"}>
+                new
+              </span>
+              <span className="text-[#CCC]">→</span>
+              <span className={workflowState === "recognized" ? "font-semibold text-[#0D0D0D]" : "text-[#AAAAAA]"}>
+                recognized
+              </span>
+              <span className="text-[#CCC]">→</span>
+              <span className={workflowState === "engaged" ? "font-semibold text-[#0D0D0D]" : "text-[#AAAAAA]"}>
+                engaged
+              </span>
+              <span className="text-[#CCC]">→</span>
+              <span className={workflowState === "self_confirmed" ? "font-semibold text-[#0D0D0D]" : "text-[#AAAAAA]"}>
+                confirmed
+              </span>
+            </div>
+
+            {/* State-specific explanation */}
+            <p className="text-[10px] text-[#666666] mb-2">
+              {stateDescriptions[workflowState]?.description || `State: ${workflowState}`}
+            </p>
+
+            {/* Next step guidance */}
+            <p className="text-[10px] text-[#AAAAAA]">
+              {stateDescriptions[workflowState]?.nextStep}
+            </p>
           </div>
 
           {/* Recognition email success feedback - Apple minimal + Linear precision */}
