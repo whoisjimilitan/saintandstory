@@ -35,7 +35,11 @@ export interface Lead {
   delivery_challenge?: string;
   pain_point?: string;
   pain_point_review?: string;
+  review_rating?: number;
   website?: string;
+  google_place_id?: string;
+  niche?: string;
+  landing_page_url?: string;
   notes?: string;
   source?: "inbound" | "manual" | "discovery";
   updated_at?: string;

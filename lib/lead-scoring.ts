@@ -122,3 +122,45 @@ export function getScoreStyle(score: number): { containerClass: string; badgeCla
 export function getScoreLabel(score: number): string {
   return `${score}/100`;
 }
+
+/**
+ * Score discovered leads based on Google Maps review insights
+ * Input: business category, pain points, review rating
+ * Output: 0-100 score indicating lead quality/opportunity
+ */
+export interface DiscoveredLeadScoringInput {
+  industryCategory?: string;
+  painPoint?: string | null;
+  painPointReview?: string | null;
+  reviewRating?: number | null;
+}
+
+export function scoreDiscoveredLead(input: DiscoveredLeadScoringInput): number {
+  let score = 20; // Base score for any discovered lead
+
+  // Pain point presence (strong signal of opportunity)
+  if (input.painPoint) {
+    score += 30;
+  }
+
+  // Review rating indicates dissatisfaction (lower rating = more pain)
+  if (input.reviewRating) {
+    if (input.reviewRating === 1) {
+      score += 25; // 1-star: extreme pain
+    } else if (input.reviewRating === 2) {
+      score += 20; // 2-star: significant pain
+    } else if (input.reviewRating === 3) {
+      score += 10; // 3-star: some dissatisfaction
+    }
+    // 4-5 stars: satisfied, no score boost
+  }
+
+  // Industry category (business_category is broader, but use for additional context)
+  // This keeps the score conservative for discovered leads without form data
+  if (input.industryCategory) {
+    score += 5; // Just acknowledging we know the industry
+  }
+
+  return Math.min(score, 100);
+}
+

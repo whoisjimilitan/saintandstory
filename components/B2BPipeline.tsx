@@ -6,7 +6,7 @@ import Link from "next/link";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
-import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
+import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
@@ -102,13 +102,32 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
   const hasPainPoint = !!lead.pain_point;
 
-  const scoreBreakdown = calculateLeadScore({
-    industry: lead.business_category,
-    deliveryFrequency: lead.delivery_frequency,
-    averageDeliveries: lead.average_deliveries,
-    courierProvider: lead.courier_provider,
-    deliveryChallenge: lead.delivery_challenge,
-  });
+  // Use discovered lead scoring for leads without form data (source="discovery")
+  // Use form-based scoring for leads with explicit delivery data
+  const hasFormData = lead.delivery_frequency || lead.average_deliveries || lead.courier_provider;
+
+  const scoreBreakdown = hasFormData
+    ? calculateLeadScore({
+        industry: lead.business_category,
+        deliveryFrequency: lead.delivery_frequency,
+        averageDeliveries: lead.average_deliveries,
+        courierProvider: lead.courier_provider,
+        deliveryChallenge: lead.delivery_challenge,
+      })
+    : {
+        frequencyScore: 0,
+        industryScore: 0,
+        volumeScore: 0,
+        courierScore: 0,
+        challengeScore: 0,
+        total: scoreDiscoveredLead({
+          industryCategory: lead.business_category,
+          painPoint: lead.pain_point,
+          painPointReview: lead.pain_point_review,
+          reviewRating: lead.review_rating,
+        }),
+      };
+
   const scoreLabel = getScoreLabel(scoreBreakdown.total);
   const scoreStyle = getScoreStyle(scoreBreakdown.total);
 
@@ -594,7 +613,7 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
         self_confirmed: false,
         outreach: null,
         // optional fields left undefined
-      } as Lead);
+      } as Lead));
 
       // Add optimistically to frontend immediately
       setLeads(prev => [...prev, ...newLeads]);
@@ -895,23 +914,27 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
             </div>
           ) : (
             (() => {
-              const sortedLeads = [...pipelineLeads].sort((a, b) => {
-                const scoreA = calculateLeadScore({
-                  industry: a.business_category,
-                  deliveryFrequency: a.delivery_frequency,
-                  averageDeliveries: a.average_deliveries,
-                  courierProvider: a.courier_provider,
-                  deliveryChallenge: a.delivery_challenge,
-                }).total;
-                const scoreB = calculateLeadScore({
-                  industry: b.business_category,
-                  deliveryFrequency: b.delivery_frequency,
-                  averageDeliveries: b.average_deliveries,
-                  courierProvider: b.courier_provider,
-                  deliveryChallenge: b.delivery_challenge,
-                }).total;
-                return scoreB - scoreA;
-              });
+              const getLeadScore = (lead: Lead): number => {
+                const hasFormData = lead.delivery_frequency || lead.average_deliveries || lead.courier_provider;
+                if (hasFormData) {
+                  return calculateLeadScore({
+                    industry: lead.business_category,
+                    deliveryFrequency: lead.delivery_frequency,
+                    averageDeliveries: lead.average_deliveries,
+                    courierProvider: lead.courier_provider,
+                    deliveryChallenge: lead.delivery_challenge,
+                  }).total;
+                } else {
+                  return scoreDiscoveredLead({
+                    industryCategory: lead.business_category,
+                    painPoint: lead.pain_point,
+                    painPointReview: lead.pain_point_review,
+                    reviewRating: lead.review_rating,
+                  });
+                }
+              };
+
+              const sortedLeads = [...pipelineLeads].sort((a, b) => getLeadScore(b) - getLeadScore(a));
               return sortedLeads.map(lead => (
                 <LeadCard key={lead.id} lead={lead} onRefresh={refresh} />
               ));
