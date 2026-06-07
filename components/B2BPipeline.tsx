@@ -160,21 +160,21 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         return;
       }
 
-      const data = await response.json() as { success: boolean; lead?: { status: string } };
+      const data = await response.json() as { success: boolean; trigger_event?: string };
 
-      if (data.success && data.lead) {
-        // Use server-returned state, not optimistic update
-        setStatus(data.lead.status as LeadStatus);
-        console.log("[SEND-RECOGNITION] State updated from server:", data.lead.status);
+      if (data.success) {
+        console.log("[SEND-RECOGNITION] Email sent successfully, trigger:", data.trigger_event);
+        setConfirmationSuccessMessage(true);
+        setTimeout(() => setConfirmationSuccessMessage(false), 4000);
+        // Re-fetch to get updated lead_state from server (not optimistic update)
+        onRefresh();
       } else {
-        console.error("[SEND-RECOGNITION] Response missing lead data");
+        console.error("[SEND-RECOGNITION] API returned success: false");
+        setConfirmationSuccessMessage(false);
       }
-
-      setConfirmationSuccessMessage(true);
-      setTimeout(() => setConfirmationSuccessMessage(false), 4000);
-      onRefresh();
     } catch (error) {
       console.error("[SEND-RECOGNITION] Error:", error);
+      setConfirmationSuccessMessage(false);
     } finally {
       setSendingRecognition(false);
     }
@@ -275,7 +275,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
           {/* Lead state status line - Apple minimal design */}
-          {status === "recognized" && (
+          {workflowState === "recognized" && (
             <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
               <div className="flex items-center gap-3">
                 <div className="flex items-baseline gap-2">
