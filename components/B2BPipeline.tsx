@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
+import { getDeliveryTypeForIndustry } from "@/lib/industry-delivery-mapping";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
@@ -579,6 +580,14 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
   const [running, setRunning] = useState(false);
   const [loadingNewLeads, setLoadingNewLeads] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
+
+  // Auto-set delivery type when industry changes (PRIORITY 4)
+  useEffect(() => {
+    const recommendedType = getDeliveryTypeForIndustry(industry);
+    if (recommendedType && DELIVERY_TYPES.includes(recommendedType)) {
+      setDeliveryType(recommendedType);
+    }
+  }, [industry]);
 
   async function discover() {
     setRunning(true);
