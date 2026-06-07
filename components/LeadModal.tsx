@@ -291,8 +291,8 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
       clearInterval(interval);
       setProgress(100);
       setStepIdx(stepIdx + 1);
-      setTimeout(() => setStepIdx(stepIdx + 2), 1600);
-    }, 4000);
+      setTimeout(() => setStepIdx(stepIdx + 2), 4000);
+    }, 2400);
     return () => { clearInterval(interval); clearTimeout(advance); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.type, stepIdx]);
