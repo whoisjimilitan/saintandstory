@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
+import { isTestDriver } from "@/lib/test-driver";
 
 async function getOrCreateDriver(clerkUserId: string, email: string) {
   const sql = neon(process.env.DATABASE_URL!);
@@ -71,11 +72,18 @@ export default async function DriverDashboardHome() {
     <div className="max-w-2xl mx-auto px-6 py-10">
 
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Driver dashboard</p>
-        <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
-          {displayName.split(" ")[0]}.
-        </h1>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Driver dashboard</p>
+          <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
+            {displayName.split(" ")[0]}.
+          </h1>
+        </div>
+        {isTestDriver(email) && process.env.NODE_ENV === "development" && (
+          <div className="bg-[#FFF3CD] border border-[#FFE082] text-[#856404] px-2.5 py-1 rounded text-[10px] font-semibold">
+            TEST DRIVER
+          </div>
+        )}
       </div>
 
       {/* Status pill */}
