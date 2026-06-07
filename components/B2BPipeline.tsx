@@ -31,12 +31,12 @@ const STATUS_STYLE: Record<string, string> = {
   dead: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
 };
 
-// State-based visual styling for lead cards (left border + background tint)
+// Subtle state-based styling (greyscale only, minimal approach)
 const WORKFLOW_STATE_STYLE: Record<string, { border: string; bg: string }> = {
-  new: { border: "border-l-4 border-l-[#D4D4D4]", bg: "bg-white" },
-  recognized: { border: "border-l-4 border-l-[#1B4F72]", bg: "bg-[#FAFBFC]" },
-  engaged: { border: "border-l-4 border-l-[#2E7A99]", bg: "bg-[#F8FAFC]" },
-  self_confirmed: { border: "border-l-4 border-l-[#1B4F72]", bg: "bg-[#F6FAFB]" },
+  new: { border: "border-l-2 border-l-[#E8E8E8]", bg: "bg-white" },
+  recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
+  engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
+  self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
 };
 
 const UK_CITIES = ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Bristol", "Sheffield", "Glasgow", "Edinburgh", "Cardiff", "Newcastle", "Nottingham", "Leicester", "Southampton", "Brighton", "Oxford", "Cambridge", "Reading", "Derby", "Norwich"];
@@ -260,10 +260,8 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
   const emailMissing = !lead.email;
 
-  const stateStyle = WORKFLOW_STATE_STYLE[workflowState] || WORKFLOW_STATE_STYLE.new;
-
   return (
-    <div className={`${stateStyle.bg} border border-[#E8E8E8] ${stateStyle.border} rounded-xl overflow-hidden transition-all duration-200`}>
+    <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
       <button
         className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-[#F9F9F9] active:bg-[#F5F5F5] transition-all duration-150"
         onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); }}
@@ -415,23 +413,23 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             </div>
           )}
 
-          {/* Recognition email button - primary action */}
+          {/* Recognition email button */}
           <button
             onClick={sendRecognitionEmail}
             disabled={sendingRecognition || !lead.email}
-            className="w-full bg-[#1B4F72] hover:bg-[#143A52] active:bg-[#1B4F72] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-full text-xs transition-all duration-150 mb-4 shadow-sm hover:shadow-md"
+            className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4"
           >
-            {sendingRecognition ? "Sending…" : "Send Recognition Email"}
+            {sendingRecognition ? "Sending…" : "Send recognition email"}
           </button>
 
-          {/* Prospect brief link - secondary action */}
+          {/* Prospect brief link */}
           <Link
             href={`/prospect/${generateSlug(lead.business_name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-white hover:bg-[#FAFAFA] text-[#0D0D0D] font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border border-[#E8E8E8] hover:border-[#D4D4D4]"
+            className="w-full bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border border-[#E8E8E8]"
           >
-            View Prospect Brief
+            View prospect brief
           </Link>
 
           {/* Lead details */}
@@ -497,7 +495,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <button
                 onClick={saveEmail}
                 disabled={savingEmail || !newEmail}
-                className="w-full bg-[#1B4F72] hover:bg-[#143A52] active:bg-[#1B4F72] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150"
+                className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150"
               >
                 {savingEmail ? "Saving…" : "Save email"}
               </button>
@@ -520,11 +518,11 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 <button
                   onClick={sendEmail}
                   disabled={sending}
-                  className="bg-[#1B4F72] hover:bg-[#143A52] active:bg-[#1B4F72] disabled:opacity-30 text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150"
+                  className="bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150"
                 >
                   {sending ? "Sending…" : "Send"}
                 </button>
-                <button onClick={getDraft} className="text-[#666666] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
+                <button onClick={getDraft} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
                   Regenerate
                 </button>
               </div>
@@ -533,7 +531,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <button
               onClick={getDraft}
               disabled={drafting}
-              className="w-full bg-white border border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#FAFAFA] active:bg-[#F5F5F5] disabled:opacity-30 disabled:cursor-not-allowed text-[#0D0D0D] font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4"
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4"
             >
               {drafting ? "Drafting…" : "Draft email"}
             </button>
@@ -560,21 +558,21 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all" />
               <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] resize-none transition-all" />
               <div className="flex gap-2 pt-1">
-                <button onClick={createStandingOrder} className="bg-[#1B4F72] hover:bg-[#143A52] active:bg-[#1B4F72] text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150">
+                <button onClick={createStandingOrder} className="bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150">
                   Create
                 </button>
-                <button onClick={() => setShowStandingOrder(false)} className="text-[#666666] text-xs hover:text-[#0D0D0D] transition-colors font-medium">Back</button>
+                <button onClick={() => setShowStandingOrder(false)} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">Back</button>
               </div>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2 border-t border-[#E8E8E8] pt-4">
-              <button onClick={() => updateStatus("warm")} className="border border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#FAFAFA] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
+              <button onClick={() => updateStatus("warm")} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
                 Mark warm
               </button>
-              <button onClick={() => setShowStandingOrder(true)} className="border border-[#1B4F72] hover:bg-[#F6FAFB] text-[#1B4F72] font-semibold px-4 py-1.5 rounded-full text-xs transition-all duration-150">
+              <button onClick={() => setShowStandingOrder(true)} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
                 Standing order
               </button>
-              <button onClick={() => updateStatus("dead")} className="text-[#999999] text-xs hover:text-[#0D0D0D] transition-colors font-medium ml-auto">
+              <button onClick={() => updateStatus("dead")} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
                 Not interested
               </button>
             </div>
@@ -688,7 +686,7 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
         <button
           onClick={discover}
           disabled={running}
-          className="w-full bg-[#1B4F72] hover:bg-[#143A52] disabled:opacity-40 text-white font-semibold py-3 rounded-full text-sm transition-colors shadow-sm hover:shadow-md"
+          className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors"
         >
           {running ? "Searching Google Maps…" : `Find ${industry} in ${city} →`}
         </button>
