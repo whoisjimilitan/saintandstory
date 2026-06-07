@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "discover": "tsx --env-file=.env.local scripts/discover.ts",
+    "migrate:verify": "tsx --env-file=.env.local migrations/2026_06_07_lead_state_reconciliation.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
