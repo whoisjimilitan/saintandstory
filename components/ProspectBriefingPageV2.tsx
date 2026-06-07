@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { ProspectPageData } from "@/lib/prospect-types";
 import { IndustryIntelligence } from "@/lib/industry-intelligence";
+import type { EnrichedBrief } from "@/lib/brief-enrichment";
 import SiteFooter from "./SiteFooter";
 import HeroPlatformUI from "./HeroPlatformUI";
 
@@ -82,6 +83,33 @@ interface ProspectBriefingPageProps {
   pendingConfirmation?: boolean;
   lead_id?: string;
   trigger_event?: string;
+  enrichedBrief?: EnrichedBrief | null;
+  briefMetadata?: any;
+  debugMode?: boolean;
+}
+
+function mapEnrichedBriefToMessaging(brief: EnrichedBrief, business: any) {
+  // Extract sentences from currentReality to create pain1, pain2, pain3
+  const sentences = brief.currentReality.split(".").map((s) => s.trim()).filter((s) => s.length > 0);
+
+  return {
+    yourLabel: "Your Situation",
+    headline: <>{brief.headline}</>,
+    heroExplanation: brief.currentReality,
+    painLabel: "The Operational Reality",
+    pain1: sentences[0] ? sentences[0] + "." : "Your business operates in a competitive environment.",
+    pain2: sentences[1] ? sentences[1] + "." : "Operational constraints limit your growth potential.",
+    pain3: sentences[2] ? sentences[2] + "." : "When this improves, everything improves.",
+    mechanismLabel: "Why This Matters",
+    mechanism: brief.operationalInsight,
+    costLabel: "The Real Opportunity",
+    cost: "Fixing this isn't just operational. It's transformational for how your business competes and grows.",
+    transformationLabel: "When This Changes",
+    transformation: brief.proofAndSuggestion,
+    ctaButtonText: "Let's Talk",
+    emailSubject: `${business.name} — Delivery Intelligence Briefing`,
+    emailBody: `Hello James,\n\nI read through the briefing you prepared for us.\n\nA few points really stood out.\n\nI'd like to understand how Saint & Story could help us improve what we're doing.\n\nName:\nRole:\nCompany:\nBest contact number:\n\nKind regards,`,
+  };
 }
 
 export default function ProspectBriefingPage({
@@ -91,6 +119,9 @@ export default function ProspectBriefingPage({
   pendingConfirmation,
   lead_id,
   trigger_event,
+  enrichedBrief,
+  briefMetadata,
+  debugMode,
 }: ProspectBriefingPageProps) {
   const { business } = data;
   const [engagementSignals, setEngagementSignals] = useState({
@@ -180,6 +211,8 @@ export default function ProspectBriefingPage({
         debug("SELF-CONFIRMED: API returned success", result);
         setConfirmationSuccessMessage(true);
         setTimeout(() => setConfirmationSuccessMessage(false), 4000);
+        // Audit log for validation
+        console.log("[PROSPECT-AUDIT] engagement_triggered: true", { lead_id, enrichedBriefUsed: !!enrichedBrief });
       } else {
         debug("SELF-CONFIRMED: API returned error", result);
       }
@@ -578,20 +611,44 @@ export default function ProspectBriefingPage({
     };
   };
 
-  const msg = getCategoryMessaging(business.category);
+  const msg = enrichedBrief ? mapEnrichedBriefToMessaging(enrichedBrief, business) : getCategoryMessaging(business.category);
 
   return (
     <main className="bg-white">
-      {isDebugMode && (
+      {(isDebugMode || debugMode) && (
         <div
           id="debug-panel"
-          className="fixed bottom-0 left-0 right-0 z-40 bg-black text-green-400 font-mono text-xs p-3 max-h-32 overflow-y-auto border-t-2 border-green-400"
+          className="fixed bottom-0 left-0 right-0 z-40 bg-black text-green-400 font-mono text-xs p-3 max-h-48 overflow-y-auto border-t-2 border-green-400"
         >
           <div className="font-bold mb-2">🐛 DEBUG MODE ACTIVE</div>
           <div>lead_id: {lead_id}</div>
           <div>trigger_event: {trigger_event?.substring(0, 40)}...</div>
           <div>pendingConfirmation: {String(pendingConfirmation)}</div>
-          <div>---</div>
+          {enrichedBrief && (
+            <>
+              <div className="mt-2 pt-2 border-t border-green-600">Brief Intelligence:</div>
+              <div>Type: Enriched</div>
+              <div>Psychology Triggers: {enrichedBrief.appliedPsychology.length}</div>
+              <div className="mt-1 text-[10px] text-green-300 leading-tight max-h-16 overflow-y-auto">
+                {enrichedBrief.appliedPsychology.slice(0, 5).map((t, i) => (
+                  <div key={i}>✓ {t.substring(0, 40)}</div>
+                ))}
+                {enrichedBrief.appliedPsychology.length > 5 && (
+                  <div>... +{enrichedBrief.appliedPsychology.length - 5} more</div>
+                )}
+              </div>
+            </>
+          )}
+          {briefMetadata && (
+            <>
+              <div className="mt-2 pt-2 border-t border-green-600">Brief Metadata:</div>
+              <div className="text-[10px] text-green-300">Industry: {briefMetadata.industry}</div>
+              <div className="text-[10px] text-green-300">City: {briefMetadata.city}</div>
+              <div className="text-[10px] text-green-300">Pain: {briefMetadata.painPoint ? "✓" : "—"}</div>
+              <div className="text-[10px] text-green-300">Rating: {briefMetadata.reviewRating ? briefMetadata.reviewRating : "—"}</div>
+            </>
+          )}
+          <div className="---"></div>
         </div>
       )}
 
