@@ -713,6 +713,10 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
           </div>
         )}
       </div>
+
+      {/* CSV Import Section */}
+      <CSVImportPanel onRefresh={onRefresh} setLeads={setLeads} />
+
       <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">Review monitoring</p>
         <p className="text-[#0D0D0D] text-sm font-medium mb-1">Pain point detection is automatic.</p>
@@ -720,6 +724,84 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
           When you run a discovery, the system checks each business&apos;s Google reviews for delivery, courier, shipping, or supplier complaints. Leads with pain points are flagged automatically and prioritised in your pipeline.
         </p>
       </div>
+    </div>
+  );
+}
+
+function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLeads: React.Dispatch<React.SetStateAction<Lead[]>> }): React.ReactElement {
+  const [csvText, setCSVText] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
+
+  async function importCSV() {
+    if (!csvText.trim()) return;
+    setImporting(true);
+    try {
+      const res = await fetch("/api/b2b/csv-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csvData: csvText }),
+      });
+
+      const data = await res.json() as { count: number; added: string[]; success: boolean };
+      setResult(data);
+      setCSVText("");
+
+      // Optimistic update
+      const newLeads = data.added.map((name, idx) => ({
+        id: `temp-csv-${Date.now()}-${idx}`,
+        business_name: name,
+        email: "",
+        status: "new" as const,
+        lead_state: "new" as const,
+        transitioned_at: null,
+        source: "csv" as const,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        self_confirmed: false,
+        outreach: null,
+      } as unknown as Lead));
+
+      setLeads(prev => [...prev, ...newLeads]);
+
+      // Refresh server truth
+      await new Promise(r => setTimeout(r, 1000));
+      onRefresh();
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  return (
+    <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5">
+      <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Or import from CSV</p>
+      <textarea
+        value={csvText}
+        onChange={e => setCSVText(e.target.value)}
+        placeholder="business_name,business_category,city,email,website,phone&#10;Acme Corp,Retailers,London,contact@acme.com,www.acme.com,020..."
+        className="w-full px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs font-mono focus:outline-none focus:border-[#0D0D0D] resize-none"
+        rows={5}
+      />
+      <p className="text-[#888888] text-xs mt-2 mb-3">Required: business_name, business_category, city. Optional: email, website, phone, pain_point, review_rating</p>
+      <button
+        onClick={importCSV}
+        disabled={importing || !csvText.trim()}
+        className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150"
+      >
+        {importing ? "Importing…" : `Import leads`}
+      </button>
+      {result && (
+        <div className="mt-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl px-4 py-3">
+          <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} leads imported</p>
+          {result.added.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {result.added.map(name => (
+                <li key={name} className="text-[#888888] text-xs">· {name}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
