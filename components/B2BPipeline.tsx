@@ -271,7 +271,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   return (
     <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${
       isExpanded
-        ? "bg-[#0D0D0D] border-[#0D0D0D]"
+        ? "bg-[#1a1a1a] border-[#1a1a1a]"
         : `border-[#E8E8E8] ${cardStyle.bg} ${cardStyle.border}`
     }`}>
       <button
@@ -288,7 +288,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             {hasPainPoint && (
               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${
                 isExpanded
-                  ? "text-[#0D0D0D] bg-white"
+                  ? "text-white bg-[#0D0D0D]"
                   : "text-white bg-[#0D0D0D]"
               }`}>
                 Pain point
@@ -323,7 +323,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             </span>
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${
               isExpanded
-                ? "bg-white text-[#0D0D0D]"
+                ? "bg-white/15 text-white border border-white/30"
                 : STATUS_STYLE[status] ?? STATUS_STYLE.new
             }`}>
               {STATUS_LABELS[status] ?? status}
