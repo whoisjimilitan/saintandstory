@@ -108,6 +108,8 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
   const [confirmationSuccessMessage, setConfirmationSuccessMessage] = useState(false);
+  const [prospectBriefUrl, setProspectBriefUrl] = useState<string | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   const hasPainPoint = !!lead.pain_point;
 
@@ -189,11 +191,14 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         return;
       }
 
-      const data = await response.json() as { success: boolean; trigger_event?: string };
+      const data = await response.json() as { success: boolean; trigger_event?: string; prospectBriefUrl?: string };
 
       if (data.success) {
         console.log("[SEND-RECOGNITION] Email sent successfully, trigger:", data.trigger_event);
         setConfirmationSuccessMessage(true);
+        if (data.prospectBriefUrl) {
+          setProspectBriefUrl(data.prospectBriefUrl);
+        }
         setTimeout(() => setConfirmationSuccessMessage(false), 4000);
         // Re-fetch to get updated lead_state from server (not optimistic update)
         onRefresh();
@@ -608,6 +613,48 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Prospect Brief URL Modal */}
+      {prospectBriefUrl && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Prospect Brief Ready</h3>
+            <p className="text-sm text-[#666666]">Share this link with the prospect or open it to verify the enriched brief:</p>
+
+            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-3 space-y-2">
+              <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em]">Prospect Brief URL</p>
+              <p className="text-xs text-[#0D0D0D] break-all font-mono">{prospectBriefUrl}</p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(prospectBriefUrl);
+                  setCopiedUrl(true);
+                  setTimeout(() => setCopiedUrl(false), 2000);
+                }}
+                className="flex-1 bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
+              >
+                {copiedUrl ? "Copied!" : "Copy Link"}
+              </button>
+              <a
+                href={prospectBriefUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-2 rounded-full text-sm transition-all text-center"
+              >
+                Open
+              </a>
+              <button
+                onClick={() => setProspectBriefUrl(null)}
+                className="bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

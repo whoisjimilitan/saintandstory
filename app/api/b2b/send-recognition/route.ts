@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { generateRecognitionEmail } from "@/lib/recognition-email";
 import { transitionLeadState } from "@/lib/lead-state-machine";
+import { generateSlug } from "@/lib/prospect-pages";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -44,11 +45,16 @@ export async function POST(request: Request) {
       SELECT * FROM b2b_leads WHERE id = ${lead_id}
     `;
 
+    // Generate prospect brief URL
+    const slug = generateSlug(business_name);
+    const prospectBriefUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://saintandstoryltd.co.uk"}/prospect/${slug}?reply=confirmed&lead_id=${lead_id}&trigger=${encodeURIComponent(recognitionEmail.triggerEvent)}`;
+
     console.log(`[RECOGNITION-EMAIL] Sent to ${email}, lead ${lead_id}, state transitioned to recognized`);
 
     return Response.json({
       success: true,
       trigger_event: recognitionEmail.triggerEvent,
+      prospectBriefUrl,
       lead: updatedLead,
     });
   } catch (error) {
