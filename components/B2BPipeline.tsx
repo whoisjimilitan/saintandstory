@@ -31,12 +31,12 @@ const STATUS_STYLE: Record<string, string> = {
   dead: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
 };
 
-// Subtle state-based styling (greyscale only, minimal approach)
+// Subtle state-based styling (greyscale only, visual feedback for worked leads)
 const WORKFLOW_STATE_STYLE: Record<string, { border: string; bg: string }> = {
   new: { border: "border-l-2 border-l-[#E8E8E8]", bg: "bg-white" },
-  recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
-  engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
-  self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
+  recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#FAFAFA]" },
+  engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F5F5F5]" },
+  self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F0F0F0]" },
 };
 
 const UK_CITIES = ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Bristol", "Sheffield", "Glasgow", "Edinburgh", "Cardiff", "Newcastle", "Nottingham", "Leicester", "Southampton", "Brighton", "Oxford", "Cambridge", "Reading", "Derby", "Norwich"];
@@ -260,10 +260,12 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
   const emailMissing = !lead.email;
 
+  const cardStyle = WORKFLOW_STATE_STYLE[workflowState] || WORKFLOW_STATE_STYLE.new;
+
   return (
-    <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
+    <div className={`border border-[#E8E8E8] rounded-xl overflow-hidden transition-colors duration-200 ${cardStyle.bg} ${cardStyle.border}`}>
       <button
-        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-[#F9F9F9] active:bg-[#F5F5F5] transition-all duration-150"
+        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:opacity-75 active:opacity-60 transition-all duration-150"
         onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); }}
       >
         <div className="flex-1 min-w-0">
