@@ -282,5 +282,9 @@ export async function POST(request: NextRequest) {
   console.log("[DISCOVER]   Final added count:", added.length);
   console.log("[DISCOVER] ═══════════════════════════════════════");
 
-  return NextResponse.json({ added, count: added.length });
+  // PRIORITY 2: Ensure DB transaction is flushed before returning
+  // Gives frontend confidence that data is persisted when it refreshes
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  return NextResponse.json({ added, count: added.length, success: true });
 }

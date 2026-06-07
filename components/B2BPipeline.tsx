@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
@@ -9,6 +9,7 @@ import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_C
 import { calculateLeadScore, getScoreLabel, getScoreStyle } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
+import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -545,27 +546,67 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   );
 }
 
-function DiscoverPanel({ onRefresh }: { onRefresh: () => void }): React.ReactElement {
-  const [industry, setIndustry] = useState(Object.values(B2B_INDUSTRIES)[0][0]);
+interface DiscoverPanelProps {
+  onRefresh: () => void;
+  setLeads: React.Dispatch<React.SetStateAction<Lead[]>>;
+  industry?: string;
+  city?: string;
+}
+
+function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: defaultCity }: DiscoverPanelProps): React.ReactElement {
+  const [industry, setIndustry] = useState(defaultIndustry || Object.values(B2B_INDUSTRIES)[0][0]);
   const [deliveryType, setDeliveryType] = useState(DELIVERY_TYPES[0]);
-  const [city, setCity] = useState("Manchester");
+  const [city, setCity] = useState(defaultCity || "Manchester");
   const [running, setRunning] = useState(false);
+  const [loadingNewLeads, setLoadingNewLeads] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
 
   async function discover() {
     setRunning(true);
     setResult(null);
+    setLoadingNewLeads(true);
+
     try {
       const res = await fetch("/api/b2b/discover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ niche: industry, delivery_type: deliveryType, city }),
       });
-      const data = await res.json() as { count: number; added: string[] };
+
+      const data = await res.json() as { count: number; added: string[]; success: boolean };
       setResult(data);
+
+      // --- PRIORITY 2 TIER 2: OPTIMISTIC UPDATE ---
+      // Create temporary lead objects with placeholder IDs
+      const newLeads = data.added.map((name, idx) => ({
+        id: `temp-${Date.now()}-${idx}`, // temporary ID, will be replaced by refresh
+        business_name: name,
+        business_category: industry,
+        email: "", // placeholder, will be replaced by server data
+        created_at: new Date().toISOString(),
+        status: "new" as const,
+        lead_state: "new" as const,
+        transitioned_at: null,
+        city,
+        delivery_type: deliveryType,
+        source: "discovery" as const,
+        updated_at: new Date().toISOString(),
+        self_confirmed: false,
+        outreach: null,
+        // optional fields left undefined
+      } as Lead);
+
+      // Add optimistically to frontend immediately
+      setLeads(prev => [...prev, ...newLeads]);
+
+      // Give DB time to commit before refresh
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Refresh server truth - this will fetch real leads and onRefresh triggers parent re-render
       onRefresh();
     } finally {
       setRunning(false);
+      setLoadingNewLeads(false);
     }
   }
 
@@ -605,16 +646,25 @@ function DiscoverPanel({ onRefresh }: { onRefresh: () => void }): React.ReactEle
           {running ? "Searching Google Maps…" : `Find ${industry} in ${city} →`}
         </button>
         {result && (
-          <div className="mt-4 bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
-            <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} new leads added</p>
-            {result.added.length > 0 && (
-              <ul className="mt-2 space-y-1">
-                {result.added.map(name => (
-                  <li key={name} className="text-[#888888] text-xs">· {name}</li>
-                ))}
-              </ul>
+          <div className="mt-4">
+            {loadingNewLeads ? (
+              <div className="bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
+                <p className="text-[#888888] text-sm font-medium mb-3">Adding {result.count} leads to pipeline…</p>
+                <SkeletonLeadCards count={result.count} />
+              </div>
+            ) : (
+              <div className="bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
+                <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} new leads added</p>
+                {result.added.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {result.added.map(name => (
+                      <li key={name} className="text-[#888888] text-xs">· {name}</li>
+                    ))}
+                  </ul>
+                )}
+                {result.count === 0 && <p className="text-[#888888] text-xs mt-1">All businesses in this search are already in your pipeline.</p>}
+              </div>
             )}
-            {result.count === 0 && <p className="text-[#888888] text-xs mt-1">All businesses in this search are already in your pipeline.</p>}
           </div>
         )}
       </div>
@@ -799,12 +849,18 @@ interface B2BPipelineProps {
 export default function B2BPipeline({ leads: initialLeads, orders: initialOrders }: B2BPipelineProps): React.ReactElement {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("pipeline");
-  const leads = initialLeads;
+  const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const orders = initialOrders;
 
   function refresh() {
     router.refresh();
   }
+
+  // Sync server data (from refresh) with local state
+  // This allows optimistic updates to merge with server truth
+  useEffect(() => {
+    setLeads(initialLeads);
+  }, [initialLeads]);
 
   const activeTabs: { key: Tab; label: string }[] = [
     { key: "pipeline", label: `Pipeline (${leads.filter(l => !["closed", "dead"].includes(l.status)).length})` },
@@ -864,7 +920,7 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
         </div>
       )}
 
-      {tab === "discover" && <DiscoverPanel onRefresh={refresh} />}
+      {tab === "discover" && <DiscoverPanel onRefresh={refresh} setLeads={setLeads} />}
       {tab === "add" && <AddLeadPanel onRefresh={refresh} />}
       {tab === "standing" && <StandingOrdersPanel orders={orders} onGenerate={refresh} />}
     </div>
