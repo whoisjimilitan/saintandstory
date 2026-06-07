@@ -45,7 +45,10 @@ function formatTime(ts: string) {
 }
 
 function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): React.ReactElement {
-  // Recognition workflow state descriptions (based on lead_state, not status)
+  // Recognition workflow state descriptions
+  // This is an explanation layer, not a truth model. Backend state is authoritative.
+  // If a state is not in this map, it will show a safe fallback instead of guessing.
+  // Future states (e.g., "disqualified", "recycled") will render safely without changes here.
   const stateDescriptions: Record<string, { description: string; nextStep: string }> = {
     new: {
       description: "No recognition email has been sent yet.",
@@ -65,8 +68,23 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     }
   };
 
+  // Default fallback for unknown or future states
+  const defaultStateDescription = {
+    description: "Recognition workflow state recorded in system.",
+    nextStep: "Review lead details and take appropriate action."
+  };
+
   // Get the recognition workflow state (separate from CRM status)
+  // Fallback to "new" if lead_state is missing (defensive)
   const workflowState = lead.lead_state || "new";
+
+  // Get description, using fallback for unmapped states
+  const currentStateDescription = stateDescriptions[workflowState] || defaultStateDescription;
+
+  // Development warning if state is not recognized (helps catch future states early)
+  if (typeof window !== "undefined" && process.env.NODE_ENV === "development" && !stateDescriptions[workflowState] && workflowState !== "new") {
+    console.warn(`[LeadCard] Unmapped workflow state: "${workflowState}". Using fallback. Add to stateDescriptions if this is a new state.`);
+  }
 
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
@@ -314,14 +332,14 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </span>
             </div>
 
-            {/* State-specific explanation */}
+            {/* State-specific explanation (fallback-safe) */}
             <p className="text-[10px] text-[#666666] mb-2">
-              {stateDescriptions[workflowState]?.description || `State: ${workflowState}`}
+              {currentStateDescription.description}
             </p>
 
             {/* Next step guidance */}
             <p className="text-[10px] text-[#AAAAAA]">
-              {stateDescriptions[workflowState]?.nextStep}
+              {currentStateDescription.nextStep}
             </p>
           </div>
 
