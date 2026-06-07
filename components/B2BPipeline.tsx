@@ -486,19 +486,20 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             {sendingRecognition ? "Sending…" : "Send recognition email"}
           </button>
 
-          {/* Prospect brief link */}
-          <Link
-            href={`/prospect/${generateSlug(lead.business_name)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
-              isExpanded
-                ? "bg-white/15 hover:bg-white/20 text-white border-white/30"
-                : "bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#E8E8E8]"
-            }`}
-          >
-            View prospect brief
-          </Link>
+          {/* Prospect brief status - shown when URL is available */}
+          {prospectBriefUrl && (
+            <button
+              onClick={() => {}}
+              disabled
+              className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
+                isExpanded
+                  ? "bg-white/15 text-white border-white/30"
+                  : "bg-[#F9F9F9] text-[#0D0D0D] border-[#E8E8E8]"
+              }`}
+            >
+              ✓ Prospect brief ready
+            </button>
+          )}
 
           {/* Lead details */}
           <div className="grid grid-cols-2 gap-3 py-4">
@@ -715,6 +716,55 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Debug Panel - Development Only */}
+      {typeof window !== "undefined" && process.env.NODE_ENV === "development" && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            color: "#fff",
+            padding: "12px 16px",
+            fontSize: "11px",
+            zIndex: 9999,
+            borderRadius: "6px",
+            fontFamily: "monospace",
+            maxWidth: "300px",
+          }}
+        >
+          <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+            📋 Brief Modal Debug
+          </div>
+          <div style={{ marginBottom: "4px" }}>
+            prospectBriefUrl:{" "}
+            <span style={{ color: prospectBriefUrl ? "#0f0" : "#f00" }}>
+              {prospectBriefUrl ? "SET" : "null"}
+            </span>
+          </div>
+          {prospectBriefUrl && (
+            <div style={{ marginBottom: "4px", color: "#0f0", fontSize: "10px", wordBreak: "break-all" }}>
+              {prospectBriefUrl.substring(0, 50)}...
+            </div>
+          )}
+          <button
+            onClick={() => setProspectBriefUrl(null)}
+            style={{
+              marginTop: "6px",
+              padding: "4px 8px",
+              backgroundColor: "#f00",
+              color: "#fff",
+              border: "none",
+              borderRadius: "3px",
+              cursor: "pointer",
+              fontSize: "10px",
+            }}
+          >
+            Clear URL
+          </button>
         </div>
       )}
     </div>
