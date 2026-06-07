@@ -7,7 +7,7 @@ import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
 import { DELIVERY_TYPES } from "@/lib/delivery-types";
 import { getDeliveryTypeForIndustry } from "@/lib/industry-delivery-mapping";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
-import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead } from "@/lib/lead-scoring";
+import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead, getLeadSignalLabel } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
@@ -309,41 +309,50 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             </div>
           )}
 
-          {/* Opportunity Score Breakdown */}
+          {/* Opportunity Score / Signal Label */}
           <div className={`border rounded-xl p-3 mb-4 ${scoreStyle.containerClass}`}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2">Opportunity Score</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {scoreBreakdown.frequencyScore > 0 && (
-                <div>
-                  <span className="font-semibold">{scoreBreakdown.frequencyScore}pts</span>
-                  <span className="text-[#888888]"> Frequency</span>
-                </div>
-              )}
-              {scoreBreakdown.industryScore > 0 && (
-                <div>
-                  <span className="font-semibold">{scoreBreakdown.industryScore}pts</span>
-                  <span className="text-[#888888]"> Industry</span>
-                </div>
-              )}
-              {scoreBreakdown.volumeScore > 0 && (
-                <div>
-                  <span className="font-semibold">{scoreBreakdown.volumeScore}pts</span>
-                  <span className="text-[#888888]"> Volume</span>
-                </div>
-              )}
-              {scoreBreakdown.courierScore > 0 && (
-                <div>
-                  <span className="font-semibold">{scoreBreakdown.courierScore}pts</span>
-                  <span className="text-[#888888]"> Courier</span>
-                </div>
-              )}
-              {scoreBreakdown.challengeScore > 0 && (
-                <div>
-                  <span className="font-semibold">{scoreBreakdown.challengeScore}pts</span>
-                  <span className="text-[#888888]"> Challenge</span>
-                </div>
-              )}
-            </div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2">Lead Signal</p>
+            {hasFormData ? (
+              // Form-based leads: show detailed score breakdown
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {scoreBreakdown.frequencyScore > 0 && (
+                  <div>
+                    <span className="font-semibold">{scoreBreakdown.frequencyScore}pts</span>
+                    <span className="text-[#888888]"> Frequency</span>
+                  </div>
+                )}
+                {scoreBreakdown.industryScore > 0 && (
+                  <div>
+                    <span className="font-semibold">{scoreBreakdown.industryScore}pts</span>
+                    <span className="text-[#888888]"> Industry</span>
+                  </div>
+                )}
+                {scoreBreakdown.volumeScore > 0 && (
+                  <div>
+                    <span className="font-semibold">{scoreBreakdown.volumeScore}pts</span>
+                    <span className="text-[#888888]"> Volume</span>
+                  </div>
+                )}
+                {scoreBreakdown.courierScore > 0 && (
+                  <div>
+                    <span className="font-semibold">{scoreBreakdown.courierScore}pts</span>
+                    <span className="text-[#888888]"> Courier</span>
+                  </div>
+                )}
+                {scoreBreakdown.challengeScore > 0 && (
+                  <div>
+                    <span className="font-semibold">{scoreBreakdown.challengeScore}pts</span>
+                    <span className="text-[#888888]"> Challenge</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Discovered leads: show semantic signal label
+              <div className="text-sm text-[#0D0D0D]">
+                <p className="font-medium">{getLeadSignalLabel(lead)}</p>
+                <p className="text-[#888888] text-xs mt-1">Score: {scoreLabel}</p>
+              </div>
+            )}
           </div>
 
           {/* Recognition Progress Indicator - visible for all leads */}

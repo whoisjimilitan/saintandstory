@@ -124,6 +124,28 @@ export function getScoreLabel(score: number): string {
 }
 
 /**
+ * Get semantic meaning of a score for discovered leads
+ * Interprets NULL pain signals as "clean business" not "bad lead"
+ */
+export function getLeadSignalLabel(lead: {
+  review_rating?: number | null;
+  pain_point?: string | null;
+}): string {
+  // No negative signals found = clean business profile
+  if (!lead.review_rating && !lead.pain_point) {
+    return "No operational friction detected";
+  }
+
+  // Pain point identified = opportunity signal
+  if (lead.pain_point) {
+    return "Operational friction detected";
+  }
+
+  // Default case
+  return "Clean business profile";
+}
+
+/**
  * Score discovered leads based on Google Maps review insights
  * Input: business category, pain points, review rating
  * Output: 0-100 score indicating lead quality/opportunity
@@ -159,6 +181,17 @@ export function scoreDiscoveredLead(input: DiscoveredLeadScoringInput): number {
   // This keeps the score conservative for discovered leads without form data
   if (input.industryCategory) {
     score += 5; // Just acknowledging we know the industry
+  }
+
+  // Debug logging for transparency (optional)
+  if (process.env.NODE_ENV === "development") {
+    console.log("[SCORING CONTEXT] Discovered Lead", {
+      industry: input.industryCategory,
+      review_rating: input.reviewRating ?? "NULL",
+      pain_point: input.painPoint ?? "NULL",
+      interpretation: !input.painPoint && !input.reviewRating ? "baseline_clean_business" : "friction_detected",
+      final_score: Math.min(score, 100),
+    });
   }
 
   return Math.min(score, 100);
