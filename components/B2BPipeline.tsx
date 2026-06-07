@@ -635,40 +635,40 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
           {/* Standing order section - refined design */}
           {showStandingOrder ? (
-            <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded-lg p-4 mb-4 space-y-3">
-              <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.5px]">Create standing order</p>
+            <div className={`rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 ${expanded ? 'bg-[#1a1a1a] border border-white' : 'bg-[#FAFAFA] border border-[#E8E8E8]'}`}>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Create standing order</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[#666666] text-[10px] uppercase tracking-[0.5px] block mb-1">Price (£)</label>
-                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all" />
+                  <label className={`text-[10px] uppercase tracking-[0.5px] block mb-1 transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Price (£)</label>
+                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#0D0D0D] border border-white text-white focus:border-white focus:ring-1 focus:ring-white' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
                 </div>
                 <div>
-                  <label className="text-[#666666] text-[10px] uppercase tracking-[0.5px] block mb-1">Day of week</label>
-                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] bg-white transition-all">
+                  <label className={`text-[10px] uppercase tracking-[0.5px] block mb-1 transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Day of week</label>
+                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#0D0D0D] border border-white text-white focus:border-white focus:ring-1 focus:ring-white' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`}>
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d, i) => (
                       <option key={d} value={i + 1}>{d}</option>
                     ))}
                   </select>
                 </div>
               </div>
-              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] transition-all" />
-              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 border border-[#E8E8E8] rounded-md text-sm focus:outline-none focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] resize-none transition-all" />
+              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#0D0D0D] border border-white text-white focus:border-white focus:ring-1 focus:ring-white' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
+              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all ${expanded ? 'bg-[#0D0D0D] border border-white text-white focus:border-white focus:ring-1 focus:ring-white' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
               <div className="flex gap-2 pt-1">
-                <button onClick={createStandingOrder} className="bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150">
+                <button onClick={createStandingOrder} className={`font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 ${expanded ? 'bg-white hover:bg-[#E8E8E8] active:bg-white text-[#0D0D0D]' : 'bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white'}`}>
                   Create
                 </button>
-                <button onClick={() => setShowStandingOrder(false)} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">Back</button>
+                <button onClick={() => setShowStandingOrder(false)} className={`text-xs transition-colors font-medium ${expanded ? 'text-white hover:text-[#CCCCCC]' : 'text-[#888888] hover:text-[#0D0D0D]'}`}>Back</button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-2 border-t border-[#E8E8E8] pt-4">
-              <button onClick={() => updateStatus("warm")} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
+            <div className={`flex flex-wrap gap-2 pt-4 transition-all ${expanded ? 'border-t border-white' : 'border-t border-[#E8E8E8]'}`}>
+              <button onClick={() => updateStatus("warm")} className={`font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 ${expanded ? 'border border-white text-white hover:border-[#CCCCCC] hover:text-[#CCCCCC]' : 'border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]'}`}>
                 Mark warm
               </button>
-              <button onClick={() => setShowStandingOrder(true)} className="border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150">
+              <button onClick={() => setShowStandingOrder(true)} className={`font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 ${expanded ? 'border border-white text-white hover:border-[#CCCCCC] hover:text-[#CCCCCC]' : 'border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]'}`}>
                 Standing order
               </button>
-              <button onClick={() => updateStatus("dead")} className="text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors font-medium">
+              <button onClick={() => updateStatus("dead")} className={`text-xs transition-colors font-medium ${expanded ? 'text-white hover:text-[#CCCCCC]' : 'text-[#888888] hover:text-[#0D0D0D]'}`}>
                 Not interested
               </button>
             </div>
