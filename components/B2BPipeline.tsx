@@ -486,20 +486,19 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             {sendingRecognition ? "Sending…" : "Send recognition email"}
           </button>
 
-          {/* Prospect brief status - shown when URL is available */}
-          {prospectBriefUrl && (
-            <button
-              onClick={() => {}}
-              disabled
-              className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
-                isExpanded
-                  ? "bg-white/15 text-white border-white/30"
-                  : "bg-[#F9F9F9] text-[#0D0D0D] border-[#E8E8E8]"
-              }`}
-            >
-              ✓ Prospect brief ready
-            </button>
-          )}
+          {/* Prospect brief link */}
+          <Link
+            href={`/prospect/${generateSlug(lead.business_name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
+              isExpanded
+                ? "bg-white/15 hover:bg-white/20 text-white border-white/30"
+                : "bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#E8E8E8]"
+            }`}
+          >
+            View prospect brief
+          </Link>
 
           {/* Lead details */}
           <div className="grid grid-cols-2 gap-3 py-4">
