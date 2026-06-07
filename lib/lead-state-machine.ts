@@ -24,9 +24,13 @@ export async function transitionLeadState(
       SELECT lead_state FROM b2b_leads WHERE id = ${lead_id}
     `;
 
-    if (!lead) return false;
+    if (!lead) {
+      console.warn(`[STATE-MACHINE] Lead not found: ${lead_id}`);
+      return false;
+    }
 
     const fromState = (lead.lead_state as LeadState) || "new";
+    console.log(`[STATE-MACHINE] Current state for ${lead_id}: ${fromState}`);
 
     // Validate transition path
     const validTransitions: Record<LeadState, LeadState[]> = {
@@ -37,27 +41,28 @@ export async function transitionLeadState(
     };
 
     if (!validTransitions[fromState]?.includes(toState)) {
-      console.log(`[STATE-MACHINE] Invalid transition: ${fromState} → ${toState}`);
+      console.warn(`[STATE-MACHINE] Invalid transition: ${fromState} → ${toState}`);
       return false;
     }
 
     // Update lead state
-    await sql`
+    const updateResult = await sql`
       UPDATE b2b_leads
-      SET lead_state = ${toState}
+      SET lead_state = ${toState}, transitioned_at = NOW()
       WHERE id = ${lead_id}
     `;
+    console.log(`[STATE-MACHINE] UPDATE executed for ${lead_id}: ${fromState} → ${toState}`);
 
-    // Log transition
+    // Log transition to audit trail
     await sql`
       INSERT INTO lead_state_transitions (lead_id, from_state, to_state, trigger_event)
       VALUES (${lead_id}, ${fromState}, ${toState}, ${triggerEvent || null})
     `;
+    console.log(`[STATE-MACHINE] Transition logged for ${lead_id}: ${fromState} → ${toState} (trigger: ${triggerEvent})`);
 
-    console.log(`[STATE-MACHINE] ${lead_id}: ${fromState} → ${toState}`);
     return true;
   } catch (error) {
-    console.error("[STATE-MACHINE] Transition failed:", error);
+    console.error("[STATE-MACHINE] Transition failed for lead", lead_id, ":", error instanceof Error ? error.message : String(error));
     return false;
   }
 }

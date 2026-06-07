@@ -83,7 +83,29 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS business_timeline JSONB DEFAULT NULL
   `;
 
+  // Add state machine columns (workflow state tracking)
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS lead_state TEXT DEFAULT 'new' CHECK (lead_state IN ('new', 'recognized', 'engaged', 'self_confirmed'))
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS transitioned_at TIMESTAMPTZ DEFAULT NULL
+  `;
+
+  // Create lead_state_transitions table if not exists
+  await sql`
+    CREATE TABLE IF NOT EXISTS lead_state_transitions (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      from_state TEXT NOT NULL,
+      to_state TEXT NOT NULL,
+      trigger_event TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_status ON b2b_leads(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_lead_state ON b2b_leads(lead_state)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_created ON b2b_leads(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
 }

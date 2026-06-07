@@ -54,6 +54,13 @@ enum JobInvoiceStatus {
   cancelled
 }
 
+enum LeadState {
+  new
+  recognized
+  engaged
+  self_confirmed
+}
+
 // ============================================================================
 // DISPATCH PLATFORM MODELS
 // ============================================================================
@@ -285,6 +292,8 @@ model B2bLead {
   reviewRating          Decimal?  @map("review_rating") @db.Decimal(2, 1)
   source                String?   @default("discovery") // discovery, inbound, manual
   status                String?   @default("new") // new, contacted, warm, closed, dead
+  leadState             LeadState @default(new) @map("lead_state")
+  transitionedAt        DateTime? @map("transitioned_at")
   notes                 String?
   niche                 String?
   landingPageUrl        String?   @map("landing_page_url")

@@ -29,13 +29,27 @@ export async function POST(request: Request) {
     });
 
     // Transition state: new → recognized
-    await transitionLeadState(lead_id, "recognized", recognitionEmail.triggerEvent);
+    const stateTransitioned = await transitionLeadState(lead_id, "recognized", recognitionEmail.triggerEvent);
 
-    console.log(`[RECOGNITION-EMAIL] Sent to ${email}, lead ${lead_id}`);
+    if (!stateTransitioned) {
+      console.error(`[RECOGNITION-EMAIL] State transition failed for lead ${lead_id}`);
+      return Response.json({
+        error: "Email sent but state transition failed"
+      }, { status: 500 });
+    }
+
+    // Fetch updated lead to return to frontend
+    const sql = neon(process.env.DATABASE_URL!);
+    const [updatedLead] = await sql`
+      SELECT * FROM b2b_leads WHERE id = ${lead_id}
+    `;
+
+    console.log(`[RECOGNITION-EMAIL] Sent to ${email}, lead ${lead_id}, state transitioned to recognized`);
 
     return Response.json({
       success: true,
       trigger_event: recognitionEmail.triggerEvent,
+      lead: updatedLead,
     });
   } catch (error) {
     console.error("[RECOGNITION-EMAIL] Failed:", error);

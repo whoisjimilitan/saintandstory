@@ -143,7 +143,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     if (!lead.email || !lead.business_name || !lead.business_category) return;
     setSendingRecognition(true);
     try {
-      await fetch("/api/b2b/send-recognition", {
+      const response = await fetch("/api/b2b/send-recognition", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -153,10 +153,28 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           email: lead.email,
         }),
       });
-      setStatus("recognized");
+
+      if (!response.ok) {
+        console.error("[SEND-RECOGNITION] API error:", response.status);
+        setConfirmationSuccessMessage(false);
+        return;
+      }
+
+      const data = await response.json() as { success: boolean; lead?: { status: string } };
+
+      if (data.success && data.lead) {
+        // Use server-returned state, not optimistic update
+        setStatus(data.lead.status as LeadStatus);
+        console.log("[SEND-RECOGNITION] State updated from server:", data.lead.status);
+      } else {
+        console.error("[SEND-RECOGNITION] Response missing lead data");
+      }
+
       setConfirmationSuccessMessage(true);
       setTimeout(() => setConfirmationSuccessMessage(false), 4000);
       onRefresh();
+    } catch (error) {
+      console.error("[SEND-RECOGNITION] Error:", error);
     } finally {
       setSendingRecognition(false);
     }
