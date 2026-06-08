@@ -73,7 +73,7 @@ function JobCard({
         {job.price ? (
           <div>
             <p className={`text-[10px] uppercase tracking-[0.1em] ${isOffered ? "text-white/50" : "text-[#888888]"}`}>Price</p>
-            <p className={`font-sans font-black text-sm ${isOffered ? "text-white" : "text-[#0D0D0D]"}`}>£{job.price as number}</p>
+            <p className={`font-sans font-black text-sm ${isOffered ? "text-white" : "text-[#0D0D0D]"}`}>£{Number(job.price as number).toFixed(2)}</p>
           </div>
         ) : null}
       </div>

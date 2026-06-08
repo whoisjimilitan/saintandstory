@@ -126,7 +126,7 @@ function FomoPreview({ data }: { data: FomoData }) {
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-sans font-black text-[#0D0D0D] text-base">£{job.price}</p>
+                  <p className="font-sans font-black text-[#0D0D0D] text-base">£{Number(job.price).toFixed(2)}</p>
                   <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em]">
                     Completed
                   </span>
