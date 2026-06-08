@@ -150,7 +150,7 @@ function StepEmail({ answers, setAnswers, onEnter }: { answers: Answers; setAnsw
 function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswers: (a: Answers) => void }) {
   return (
     <div className="space-y-4">
-      <p className="text-[#888888] text-sm">A quick call often means a more accurate quote.</p>
+      <p className="text-[#888888] text-sm">A quick call often means a more accurate quote. Oftentimes cheaper.</p>
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"
@@ -210,20 +210,26 @@ function StepSuccess({ answers, onClose }: { answers: Answers; onClose: () => vo
   return (
     <div className="py-4 space-y-5">
       <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 space-y-3">
-        {phone ? (
+        {firstName ? (
           <div>
+            <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">For</p>
+            <p className="font-sans font-black text-[#0D0D0D] text-base">{firstName}</p>
+          </div>
+        ) : null}
+        {phone ? (
+          <div className={firstName ? "border-t border-[#E8E8E8] pt-3" : ""}>
             <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">We&apos;ll call you on</p>
             <p className="font-sans font-black text-[#0D0D0D] text-base">{phone}</p>
           </div>
         ) : null}
-        <div className={phone ? "border-t border-[#E8E8E8] pt-3" : ""}>
+        <div className={phone || firstName ? "border-t border-[#E8E8E8] pt-3" : ""}>
           <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Quotes sent to</p>
           <p className="font-sans font-black text-[#0D0D0D] text-base">{email}</p>
         </div>
       </div>
       <p className="text-[#888888] text-sm leading-relaxed">
         {phone
-          ? `${firstName ? `${firstName}, we` : "We"}'re matching your job to verified drivers near you. Expect our call within 15 minutes.`
+          ? `${firstName ? `<strong>${firstName}</strong>, we` : "We"}'re matching your job to verified drivers near you. Expect our call within 15 minutes.`
           : "We're matching your job to verified drivers near you. Quotes will arrive in your inbox within the hour."}
       </p>
       <button
@@ -234,8 +240,8 @@ function StepSuccess({ answers, onClose }: { answers: Answers; onClose: () => vo
       </button>
       <p className="text-[#888888] text-xs text-center">
         Need us sooner?{" "}
-        <a href="tel:+442082344444" className="text-[#0D0D0D] font-semibold underline-offset-2 hover:underline">
-          0208 234 4444
+        <a href="tel:+442030517408" className="text-[#0D0D0D] font-semibold underline-offset-2 hover:underline">
+          0203 051 7408
         </a>
       </p>
     </div>

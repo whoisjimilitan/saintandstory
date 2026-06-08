@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import B2BPipeline from "@/components/B2BPipeline";
 import { type Lead, type StandingOrder } from "@/lib/b2b-types";
@@ -65,10 +66,15 @@ export default async function B2BAdminPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
-      <div className="flex items-center gap-3 mb-1">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Admin</p>
-        <span className="text-[#E8E8E8] text-xs">·</span>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">B2B Pipeline</p>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-3">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Admin</p>
+          <span className="text-[#E8E8E8] text-xs">·</span>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">B2B Pipeline</p>
+        </div>
+        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          Admin ↻
+        </Link>
       </div>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         Morning brief.

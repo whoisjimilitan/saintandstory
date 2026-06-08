@@ -389,7 +389,7 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
   const [showDrivers, setShowDrivers] = useState(false);
   const [showAssignPanel, setShowAssignPanel] = useState(false);
   const [assigning, setAssigning] = useState<string | null>(null);
-  const [price, setPrice] = useState(String(job.price ?? ""));
+  const [price, setPrice] = useState(job.price ? String(Number(job.price).toFixed(2)) : "");
 
   async function reassign() {
     setReassigning(true);

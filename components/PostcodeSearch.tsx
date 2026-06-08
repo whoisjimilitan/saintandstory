@@ -62,30 +62,6 @@ export default function PostcodeSearch({
     onChange(postcode);
     setSuggestions([]);
     setSelectedPostcode(postcode);
-
-    // Fetch address details for this postcode
-    setLoading(true);
-    try {
-      const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode.replace(/\s/g, ''))}`);
-      const data = await res.json();
-
-      if (data.result) {
-        const result = data.result;
-        const addressData: AddressData = {
-          postcode: postcode,
-          address: `${result.outward_code ?? postcode}`,
-          city: result.admin_district ?? "",
-          county: result.admin_county ?? result.admin_district ?? "",
-          latitude: result.latitude ?? 0,
-          longitude: result.longitude ?? 0,
-        };
-        setAddresses([addressData]);
-      }
-    } catch {
-      setAddresses([]);
-    } finally {
-      setLoading(false);
-    }
   }
 
   function selectAddress(address: AddressData) {
@@ -133,25 +109,6 @@ export default function PostcodeSearch({
         </div>
       )}
 
-      {selectedPostcode && addresses.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em]">Select address</p>
-          <div className="border border-[#E8E8E8] rounded-2xl overflow-hidden">
-            {addresses.map((addr) => (
-              <button
-                key={`${addr.postcode}-${addr.address}`}
-                type="button"
-                onMouseDown={(e) => { e.preventDefault(); selectAddress(addr); }}
-                onTouchStart={() => selectAddress(addr)}
-                className="w-full text-left px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] last:border-b-0 transition-colors"
-              >
-                <p className="font-semibold">{addr.postcode}</p>
-                <p className="text-xs text-[#888888] mt-0.5">{addr.city}{addr.county && `, ${addr.county}`}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
     </div>
   );
