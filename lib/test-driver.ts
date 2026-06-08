@@ -8,7 +8,7 @@ export const TEST_DRIVER_NAME = "Test Driver";
  * Initialize test driver in database (dev-only)
  * Call this once during setup or on first dev load
  */
-export async function initializeTestDriver() {
+export async function initializeTestDriver(): Promise<{ success: boolean; message: string }> {
   try {
     const sql = neon(process.env.DATABASE_URL!);
 
@@ -17,10 +17,13 @@ export async function initializeTestDriver() {
       SELECT id FROM drivers WHERE email = ${TEST_DRIVER_EMAIL} LIMIT 1
     `;
 
-    if (existing.length > 0) return; // Already exists
+    if (existing.length > 0) {
+      console.log("[TEST-DRIVER] ✓ Test driver already exists");
+      return { success: true, message: "Test driver already exists" };
+    }
 
     // Create test driver
-    await sql`
+    const result = await sql`
       INSERT INTO drivers (
         email,
         name,
@@ -42,11 +45,14 @@ export async function initializeTestDriver() {
         NOW(),
         NOW()
       )
+      RETURNING id, email
     `;
 
-    console.log("[TEST-DRIVER] ✓ Test driver initialized");
+    console.log("[TEST-DRIVER] ✓ Test driver initialized", result);
+    return { success: true, message: "Test driver initialized" };
   } catch (error) {
     console.error("[TEST-DRIVER] ✗ Failed to initialize:", error);
+    return { success: false, message: error instanceof Error ? error.message : "Failed to initialize" };
   }
 }
 

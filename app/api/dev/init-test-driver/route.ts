@@ -3,7 +3,12 @@ import { initializeTestDriver } from "@/lib/test-driver";
 
 async function init() {
   try {
-    await initializeTestDriver();
+    const result = await initializeTestDriver();
+    if (!result.success) {
+      return {
+        error: result.message,
+      };
+    }
     return {
       success: true,
       message: "Test driver initialized ✅",
