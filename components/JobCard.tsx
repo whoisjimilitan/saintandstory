@@ -53,6 +53,7 @@ export default function JobCard({
             {job.distance_miles ? ` · ${job.distance_miles as number} mi` : ""}
           </p>
         </div>
+        {/* StatusIndicator: semantic color badge showing job status */}
         <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] shrink-0 ${
           isOffered ? "bg-white/15 text-white" : STATUS_STYLE[status]
         }`}>
@@ -132,11 +133,17 @@ export default function JobCard({
         </div>
       )}
 
-      {/* Expandable detail view (Phase 1: placeholder) */}
+      {/* Expandable job detail view (Phase 1: placeholder) */}
       {isExpanded && (onToggleExpand || (status !== "offered" && status !== "completed")) && (
-        <div className="border-t border-[#E8E8E8] pt-4">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-3">Details</p>
-          <p className="text-[#888888] text-xs">Job details will load here. (Phase 1: placeholder)</p>
+        <div className="border-t border-[#E8E8E8] pt-4 space-y-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Status Timeline</p>
+            <p className="text-[#888888] text-xs">(Phase 1: Status progression will display here)</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Location Tracking</p>
+            <p className="text-[#888888] text-xs">(Phase 1: Live location indicator ready for integration)</p>
+          </div>
         </div>
       )}
 
