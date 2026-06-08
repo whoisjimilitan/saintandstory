@@ -635,6 +635,8 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedSearch, setCompletedSearch] = useState("");
   const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(true);
+  const [expandedFleet, setExpandedFleet] = useState(true);
+  const [expandedConfirmed, setExpandedConfirmed] = useState(true);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
@@ -735,87 +737,121 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       {/* Confirmed ─────────────────────────────────────────────────────────── */}
       {confirmedJobs.length > 0 && (
         <div id="section-confirmed">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Confirmed ({confirmedJobs.length})
-          </p>
-          <div className="space-y-2">
-            {(confirmedJobs as unknown as Job[]).map((job: Job) => (
-              <ActiveJobRow
-                key={job.id}
-                job={job}
-                type="confirmed"
-                onCancelled={() => router.refresh()}
+          <button
+            onClick={() => setExpandedConfirmed(v => !v)}
+            className="w-full flex items-center justify-between mb-3"
+          >
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+              Confirmed
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[#888888]">
+                {confirmedJobs.length}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-[#888888] transition-transform ${
+                  expandedConfirmed ? "rotate-180" : ""
+                }`}
               />
-            ))}
-          </div>
+            </div>
+          </button>
+          {expandedConfirmed && (
+            <div className="space-y-2">
+              {(confirmedJobs as unknown as Job[]).map((job: Job) => (
+                <ActiveJobRow
+                  key={job.id}
+                  job={job}
+                  type="confirmed"
+                  onCancelled={() => router.refresh()}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Fleet ─────────────────────────────────────────────────────────────── */}
       <div id="section-fleet">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-            Fleet ({typedDrivers.length})
-          </p>
-          {onlineCount > 0 && (
-            <p className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.12em]">
-              {onlineCount} online
-            </p>
-          )}
-        </div>
-        {typedDrivers.length === 0 ? (
-          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
-            <p className="text-[#888888] text-sm">No active drivers yet.</p>
+        <button
+          onClick={() => setExpandedFleet(v => !v)}
+          className="w-full flex items-center justify-between mb-3"
+        >
+          <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+            Fleet
+          </span>
+          <div className="flex items-center gap-2">
+            {onlineCount > 0 && (
+              <span className="text-[10px] text-green-600 font-semibold uppercase tracking-[0.12em]">
+                {onlineCount} online
+              </span>
+            )}
+            <span className="text-[10px] text-[#888888]">
+              {typedDrivers.length}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 text-[#888888] transition-transform ${
+                expandedFleet ? "rotate-180" : ""
+              }`}
+            />
           </div>
-        ) : (
-          <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
-            {typedDrivers.map(driver => {
-              const online = isOnline(driver.last_seen_at);
-              return (
-                <div key={driver.id} className="flex items-start gap-3 px-5 py-3.5">
-                  <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${online ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
-                      <span className="text-[#888888] text-xs">{driver.vehicle_type}</span>
-                      <span className="text-[#D0D0D0] text-xs">·</span>
-                      <span className="text-[#888888] text-xs">{driver.area}</span>
-                      {driver.rating_avg != null && Number(driver.rating_avg) > 0 && (
-                        <>
+        </button>
+        {expandedFleet && (
+          <>
+            {typedDrivers.length === 0 ? (
+              <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
+                <p className="text-[#888888] text-sm">No active drivers yet.</p>
+              </div>
+            ) : (
+              <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+                {typedDrivers.map(driver => {
+                  const online = isOnline(driver.last_seen_at);
+                  return (
+                    <div key={driver.id} className="flex items-start gap-3 px-5 py-3.5">
+                      <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${online ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                          <span className="text-[#888888] text-xs">{driver.vehicle_type}</span>
                           <span className="text-[#D0D0D0] text-xs">·</span>
-                          <span className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</span>
-                        </>
-                      )}
-                    </div>
-                    <p className={`text-[10px] mt-0.5 ${online ? "text-green-600 font-semibold" : "text-[#888888]"}`}>
-                      {lastSeenLabel(driver.last_seen_at)}
-                      {driver.avg_response_mins != null && (
-                        <span className="text-[#888888] font-normal ml-2">avg {driver.avg_response_mins}min response</span>
-                      )}
-                    </p>
-                    {driver.current_job_ref && (
-                      <p className="text-[10px] text-[#888888] mt-0.5">
-                        On job{" "}
-                        <span className="font-mono text-[#0D0D0D]">{driver.current_job_ref}</span>
-                        {" · "}{driver.current_job_from}{driver.current_job_to ? ` → ${driver.current_job_to}` : ""}
-                        {driver.current_job_status === "in_progress" && (
-                          <span className="ml-1 text-green-600 font-semibold">· En route</span>
+                          <span className="text-[#888888] text-xs">{driver.area}</span>
+                          {driver.rating_avg != null && Number(driver.rating_avg) > 0 && (
+                            <>
+                              <span className="text-[#D0D0D0] text-xs">·</span>
+                              <span className="text-[#888888] text-xs">★ {Number(driver.rating_avg).toFixed(1)}{driver.rating_count ? ` (${driver.rating_count})` : ""}</span>
+                            </>
+                          )}
+                        </div>
+                        <p className={`text-[10px] mt-0.5 ${online ? "text-green-600 font-semibold" : "text-[#888888]"}`}>
+                          {lastSeenLabel(driver.last_seen_at)}
+                          {driver.avg_response_mins != null && (
+                            <span className="text-[#888888] font-normal ml-2">avg {driver.avg_response_mins}min response</span>
+                          )}
+                        </p>
+                        {driver.current_job_ref && (
+                          <p className="text-[10px] text-[#888888] mt-0.5">
+                            On job{" "}
+                            <span className="font-mono text-[#0D0D0D]">{driver.current_job_ref}</span>
+                            {" · "}{driver.current_job_from}{driver.current_job_to ? ` → ${driver.current_job_to}` : ""}
+                            {driver.current_job_status === "in_progress" && (
+                              <span className="ml-1 text-green-600 font-semibold">· En route</span>
+                            )}
+                          </p>
                         )}
-                      </p>
-                    )}
-                  </div>
-                  {driver.phone && (
-                    <div className="flex items-center gap-3 shrink-0">
-                      <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline whitespace-nowrap">
-                        {driver.phone}
-                      </a>
-                      <SmsButton phone={driver.phone} driverName={driver.full_name} />
+                      </div>
+                      {driver.phone && (
+                        <div className="flex items-center gap-3 shrink-0">
+                          <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline whitespace-nowrap">
+                            {driver.phone}
+                          </a>
+                          <SmsButton phone={driver.phone} driverName={driver.full_name} />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -824,12 +860,21 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         <div id="section-completed">
           <button
             onClick={() => setCompletedOpen(o => !o)}
-            className="flex items-center justify-between w-full mb-3 group"
+            className="w-full flex items-center justify-between mb-3"
           >
-            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-              Completed ({completedJobs.length})
-            </p>
-            <span className={`text-[#888888] text-xs transition-transform ${completedOpen ? "rotate-180" : ""}`}>▾</span>
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+              Completed
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[#888888]">
+                {completedJobs.length}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-[#888888] transition-transform ${
+                  completedOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
           </button>
           {completedOpen && (
             <>
