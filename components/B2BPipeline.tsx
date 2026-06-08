@@ -23,17 +23,17 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  new: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
-  contacted: "bg-[#F5F5F5] text-[#0D0D0D] border border-[#E8E8E8]",
+  new: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
+  contacted: "bg-[#F5F5F5] text-[#0D0D0D] border border-[#EAE6E0]",
   warm: "bg-[#0D0D0D] text-white",
   inbound: "bg-[#0D0D0D] text-white",
-  closed: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
-  dead: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
+  closed: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
+  dead: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
 };
 
 // Subtle state-based styling (greyscale only, visual feedback for worked leads)
 const WORKFLOW_STATE_STYLE: Record<string, { border: string; bg: string }> = {
-  new: { border: "border-l-2 border-l-[#E8E8E8]", bg: "bg-white" },
+  new: { border: "border-l-2 border-l-[#EAE6E0]", bg: "bg-white" },
   recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#FAFAFA]" },
   engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F5F5F5]" },
   self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F0F0F0]" },
@@ -272,7 +272,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${
       isExpanded
         ? "bg-[#3a3a3a] border-[#3a3a3a]"
-        : `border-[#E8E8E8] ${cardStyle.bg} ${cardStyle.border}`
+        : `border-[#EAE6E0] ${cardStyle.bg} ${cardStyle.border}`
     }`}>
       <button
         className={`w-full text-left px-5 py-4 flex items-start justify-between gap-4 transition-all duration-300 ${
@@ -298,7 +298,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] border transition-colors duration-300 ${
                 isExpanded
                   ? "text-white border-white/30 bg-white/10"
-                  : "text-[#0D0D0D] bg-[#F5F5F5] border-[#E8E8E8]"
+                  : "text-[#0D0D0D] bg-[#F5F5F5] border-[#EAE6E0]"
               }`}>
                 Inbound
               </span>
@@ -334,7 +334,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       </button>
 
       {expanded && (
-        <div className={`px-5 pb-5 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#E8E8E8]"}`}>
+        <div className={`px-5 pb-5 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#EAE6E0]"}`}>
           {/* Lead state status line - Apple minimal design */}
           {workflowState === "recognized" && (
             <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
@@ -348,7 +348,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <div className={`h-px bg-gradient-to-r mt-2 transition-colors duration-300 ${
                 isExpanded
                   ? "from-white via-white/20 to-transparent"
-                  : "from-[#0D0D0D] via-[#E8E8E8] to-transparent"
+                  : "from-[#0D0D0D] via-[#EAE6E0] to-transparent"
               }`}></div>
             </div>
           )}
@@ -404,7 +404,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           </div>
 
           {/* Recognition Progress Indicator - visible for all leads */}
-          <div className={`mb-4 pt-3 pb-3 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#E8E8E8]"}`}>
+          <div className={`mb-4 pt-3 pb-3 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#EAE6E0]"}`}>
             <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] mb-2 transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>
               Recognition Progress
             </p>
@@ -460,7 +460,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className={`mb-4 px-4 py-3 rounded-lg border animate-in fade-in duration-200 transition-colors duration-300 ${
               isExpanded
                 ? "border-white/20 bg-white/10"
-                : "border-[#E8E8E8] bg-[#FAFAFA]"
+                : "border-[#EAE6E0] bg-[#FAFAFA]"
             } ${!confirmationSuccessMessage && "animate-out fade-out duration-300"}`}>
               <div className="flex items-start gap-3">
                 <span className={`font-semibold text-sm mt-0.5 transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>✓</span>
@@ -494,7 +494,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
               isExpanded
                 ? "bg-white/15 hover:bg-white/20 text-white border-white/30"
-                : "bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#E8E8E8]"
+                : "bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#EAE6E0]"
             }`}
           >
             View prospect brief
@@ -554,7 +554,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
               isExpanded
                 ? "bg-white/10 border-white/20"
-                : "bg-[#FAFAFA] border-[#E8E8E8]"
+                : "bg-[#FAFAFA] border-[#EAE6E0]"
             }`}>
               <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>Add email address</p>
               <input
@@ -565,7 +565,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 className={`w-full px-3 py-2.5 rounded-md text-sm focus:outline-none transition-all ${
                   isExpanded
                     ? "border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-white focus:ring-1 focus:ring-white"
-                    : "border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                    : "border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
                 }`}
               />
               <button
@@ -584,7 +584,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
               isExpanded
                 ? "bg-white/10 border-white/20"
-                : "bg-[#FAFAFA] border-[#E8E8E8]"
+                : "bg-[#FAFAFA] border-[#EAE6E0]"
             }`}>
               <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>Draft email</p>
               <input
@@ -593,7 +593,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 className={`w-full text-sm font-semibold focus:outline-none pb-2 transition-colors ${
                   isExpanded
                     ? "text-white bg-transparent border-b border-white/20"
-                    : "text-[#0D0D0D] bg-transparent border-b border-[#E8E8E8]"
+                    : "text-[#0D0D0D] bg-transparent border-b border-[#EAE6E0]"
                 }`}
               />
               <textarea
@@ -635,40 +635,40 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
           {/* Standing order section - refined design */}
           {showStandingOrder ? (
-            <div className={`rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 ${expanded ? 'bg-[#3a3a3a] border border-black/20' : 'bg-[#FAFAFA] border border-[#E8E8E8]'}`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Create standing order</p>
+            <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={`text-[10px] uppercase tracking-[0.5px] block mb-1 transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Price (£)</label>
-                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#1a1a1a] border border-black/20 text-white focus:border-black/20 focus:ring-1 focus:ring-black/20' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
+                  <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Price (£)</label>
+                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
                 </div>
                 <div>
-                  <label className={`text-[10px] uppercase tracking-[0.5px] block mb-1 transition-colors duration-200 ${expanded ? 'text-white' : 'text-[#666666]'}`}>Day of week</label>
-                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#1a1a1a] border border-black/20 text-white focus:border-black/20 focus:ring-1 focus:ring-black/20' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`}>
+                  <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Day of week</label>
+                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]">
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d, i) => (
                       <option key={d} value={i + 1}>{d}</option>
                     ))}
                   </select>
                 </div>
               </div>
-              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all ${expanded ? 'bg-[#1a1a1a] border border-black/20 text-white focus:border-black/20 focus:ring-1 focus:ring-black/20' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
-              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all ${expanded ? 'bg-[#1a1a1a] border border-black/20 text-white focus:border-black/20 focus:ring-1 focus:ring-black/20' : 'bg-white border border-[#E8E8E8] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'}`} />
+              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
               <div className="flex gap-2 pt-1">
-                <button onClick={createStandingOrder} className={`font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 ${expanded ? 'bg-white hover:bg-[#E8E8E8] active:bg-white text-[#0D0D0D]' : 'bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white'}`}>
+                <button onClick={createStandingOrder} className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white">
                   Create
                 </button>
-                <button onClick={() => setShowStandingOrder(false)} className={`text-xs transition-colors font-medium ${expanded ? 'text-white hover:text-[#CCCCCC]' : 'text-[#888888] hover:text-[#0D0D0D]'}`}>Back</button>
+                <button onClick={() => setShowStandingOrder(false)} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">Back</button>
               </div>
             </div>
           ) : (
-            <div className={`flex flex-wrap gap-2 pt-4 transition-all ${expanded ? 'border-t border-black/20' : 'border-t border-[#E8E8E8]'}`}>
-              <button onClick={() => updateStatus("warm")} className={`font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 ${expanded ? 'border border-black/20 text-white hover:border-black/40 hover:text-white' : 'border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]'}`}>
+            <div className="flex flex-wrap gap-2 pt-4 transition-all border-t border-[#EAE6E0]">
+              <button onClick={() => updateStatus("warm")} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Mark warm
               </button>
-              <button onClick={() => setShowStandingOrder(true)} className={`font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 ${expanded ? 'border border-black/20 text-white hover:border-black/40 hover:text-white' : 'border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]'}`}>
+              <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Standing order
               </button>
-              <button onClick={() => updateStatus("dead")} className={`text-xs transition-colors font-medium ${expanded ? 'text-white hover:text-[#CCCCCC]' : 'text-[#888888] hover:text-[#0D0D0D]'}`}>
+              <button onClick={() => updateStatus("dead")} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">
                 Not interested
               </button>
             </div>
@@ -683,7 +683,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Prospect Brief Ready</h3>
             <p className="text-sm text-[#666666]">Share this link with the prospect or open it to verify the enriched brief:</p>
 
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-3 space-y-2">
+            <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-lg p-3 space-y-2">
               <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em]">Prospect Brief URL</p>
               <p className="text-xs text-[#0D0D0D] break-all font-mono">{prospectBriefUrl}</p>
             </div>
@@ -703,13 +703,13 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 href={prospectBriefUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-2 rounded-full text-sm transition-all text-center"
+                className="flex-1 bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold py-2 rounded-full text-sm transition-all text-center"
               >
                 Open
               </a>
               <button
                 onClick={() => setProspectBriefUrl(null)}
-                className="bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+                className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
               >
                 Close
               </button>
@@ -844,12 +844,12 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-5">
+      <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Discover leads via Google Maps</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Industry</label>
-            <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
                 <optgroup key={category} label={category}>
                   {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
@@ -859,13 +859,13 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
           </div>
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Delivery Type</label>
-            <select value={deliveryType} onChange={e => setDeliveryType(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={deliveryType} onChange={e => setDeliveryType(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">City</label>
-            <select value={city} onChange={e => setCity(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={city} onChange={e => setCity(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {UK_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -880,12 +880,12 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
         {result && (
           <div className="mt-4">
             {loadingNewLeads ? (
-              <div className="bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
+              <div className="bg-white border border-[#EAE6E0] rounded-xl px-4 py-3">
                 <p className="text-[#888888] text-sm font-medium mb-3">Adding {result.count} leads to pipeline…</p>
                 <SkeletonLeadCards count={result.count} />
               </div>
             ) : (
-              <div className="bg-white border border-[#E8E8E8] rounded-xl px-4 py-3">
+              <div className="bg-white border border-[#EAE6E0] rounded-xl px-4 py-3">
                 <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} new leads added</p>
                 {result.added.length > 0 && (
                   <ul className="mt-2 space-y-1">
@@ -904,7 +904,7 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
       {/* CSV Import Section */}
       <CSVImportPanel onRefresh={onRefresh} setLeads={setLeads} />
 
-      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-5">
+      <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">Review monitoring</p>
         <p className="text-[#0D0D0D] text-sm font-medium mb-1">Pain point detection is automatic.</p>
         <p className="text-[#888888] text-sm leading-relaxed">
@@ -960,13 +960,13 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
   }
 
   return (
-    <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5">
+    <div className="bg-white border border-[#EAE6E0] rounded-2xl p-5">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Or import from CSV</p>
       <textarea
         value={csvText}
         onChange={e => setCSVText(e.target.value)}
         placeholder="business_name,business_category,city,email,website,phone&#10;Acme Corp,Retailers,London,contact@acme.com,www.acme.com,020..."
-        className="w-full px-4 py-3 border border-[#E8E8E8] rounded-xl text-xs font-mono focus:outline-none focus:border-[#0D0D0D] resize-none"
+        className="w-full px-4 py-3 border border-[#EAE6E0] rounded-xl text-xs font-mono focus:outline-none focus:border-[#0D0D0D] resize-none"
         rows={5}
       />
       <p className="text-[#888888] text-xs mt-2 mb-3">Required: business_name, business_category, city. Optional: email, website, phone, pain_point, review_rating</p>
@@ -978,7 +978,7 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
         {importing ? "Importing…" : `Import leads`}
       </button>
       {result && (
-        <div className="mt-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl px-4 py-3">
+        <div className="mt-4 bg-[#F5F5F5] border border-[#EAE6E0] rounded-xl px-4 py-3">
           <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} leads imported</p>
           {result.added.length > 0 && (
             <ul className="mt-2 space-y-1">
@@ -1047,49 +1047,49 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }): React.ReactElem
   }
 
   return (
-    <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5 space-y-3">
+    <div className="bg-white border border-[#EAE6E0] rounded-2xl p-5 space-y-3">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Add lead manually</p>
-      <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+      <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
 
       <div className="grid grid-cols-2 gap-3">
-        <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
             <optgroup key={category} label={category}>
               {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
             </optgroup>
           ))}
         </select>
-        <select value={form.deliveryType} onChange={e => setForm(f => ({ ...f, deliveryType: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.deliveryType} onChange={e => setForm(f => ({ ...f, deliveryType: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
         </select>
-        <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
-        <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
-        <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Delivery Frequency</option>
           {DELIVERY_FREQUENCIES.map(df => <option key={df} value={df}>{df}</option>)}
         </select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Avg Deliveries/Month</option>
           {AVERAGE_DELIVERIES.map(ad => <option key={ad} value={ad}>{ad}</option>)}
         </select>
-        <select value={form.courierProvider} onChange={e => setForm(f => ({ ...f, courierProvider: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.courierProvider} onChange={e => setForm(f => ({ ...f, courierProvider: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Current Courier</option>
           {COURIER_PROVIDERS.map(cp => <option key={cp} value={cp}>{cp}</option>)}
         </select>
-        <select value={form.deliveryChallenge} onChange={e => setForm(f => ({ ...f, deliveryChallenge: e.target.value }))} className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.deliveryChallenge} onChange={e => setForm(f => ({ ...f, deliveryChallenge: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Biggest Challenge</option>
           {DELIVERY_CHALLENGES.map(dc => <option key={dc} value={dc}>{dc}</option>)}
         </select>
       </div>
 
-      <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#E8E8E8] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
+      <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
       <button onClick={save} disabled={saving || !form.business_name} className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors">
         {saving ? "Adding…" : "Add to pipeline →"}
       </button>
@@ -1123,11 +1123,11 @@ function StandingOrdersPanel({ orders, onGenerate }: { orders: StandingOrder[]; 
         </button>
       </div>
       {orders.length === 0 ? (
-        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
+        <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-8 text-center">
           <p className="text-[#888888] text-sm">No standing orders yet. Close a lead to create one.</p>
         </div>
       ) : (
-        <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden divide-y divide-[#E8E8E8]">
+        <div className="bg-white border border-[#EAE6E0] rounded-2xl overflow-hidden divide-y divide-[#EAE6E0]">
           {orders.map((order) => (
             <div key={order.id} className="flex items-center justify-between px-5 py-4 gap-4">
               <div className="flex-1 min-w-0">
@@ -1194,7 +1194,7 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#666666] hover:text-[#0D0D0D] border border-[#E8E8E8] hover:border-[#0D0D0D]"}`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#666666] hover:text-[#0D0D0D] border border-[#EAE6E0] hover:border-[#0D0D0D]"}`}
           >
             {t.label}
           </button>
@@ -1204,7 +1204,7 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
       {tab === "pipeline" && (
         <div className="space-y-3">
           {pipelineLeads.length === 0 ? (
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
+            <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-8 text-center">
               <p className="text-[#888888] text-sm">No active leads. Use Discover to find your first batch.</p>
             </div>
           ) : (
