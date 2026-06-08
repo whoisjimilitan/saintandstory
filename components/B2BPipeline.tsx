@@ -307,7 +307,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-2">
             <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
-              {scoreLabel}
+              {scoreBreakdown.total === 20 ? "Discovered" : scoreLabel}
             </span>
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
               {STATUS_LABELS[status] ?? status}
@@ -378,7 +378,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               // Discovered leads: show semantic signal label
               <div className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>
                 <p className="font-medium">{getLeadSignalLabel(lead)}</p>
-                <p className={`text-xs mt-1 transition-colors duration-300 text-[#888888]`}>Score: {scoreLabel}</p>
+                <p className={`text-xs mt-1 transition-colors duration-300 text-[#888888]`}>
+                  {scoreBreakdown.total === 20 ? "No pain signals detected yet" : `Score: ${scoreLabel}`}
+                </p>
               </div>
             )}
           </div>
@@ -462,16 +464,12 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             {sendingRecognition ? "Sending…" : "Send recognition email"}
           </button>
 
-          {/* Prospect brief link */}
+          {/* Prospect brief link - always visible */}
           <Link
             href={`/prospect/${generateSlug(lead.business_name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={`w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border ${
-              isExpanded
-                ? "bg-white/15 hover:bg-white/20 text-white border-white/30"
-                : "bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#EAE6E0]"
-            }`}
+            className="w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#EAE6E0]"
           >
             View prospect brief
           </Link>
