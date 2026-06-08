@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { TEST_DRIVER_EMAIL } from "@/lib/test-driver";
-
-const prisma = new PrismaClient();
 
 async function activate() {
   // First check if driver exists

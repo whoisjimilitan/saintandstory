@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export const TEST_DRIVER_ID = "test-driver-001";
 export const TEST_DRIVER_EMAIL = "mz_kay2006@hotmail.co.uk";
