@@ -849,12 +849,14 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                           <p className="text-[#888888] text-[10px]">{timeAgo(job.updated_at as string)}</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-[#888888]">
-                        {job.customer_name && <span><span className="text-[#0D0D0D] font-medium">{job.customer_name}</span></span>}
-                        {job.customer_phone && <a href={`tel:${job.customer_phone}`} className="text-[#0D0D0D] font-medium hover:underline">{job.customer_phone}</a>}
-                        {job.customer_email && <a href={`mailto:${job.customer_email}`} className="col-span-2 text-[#888888] hover:text-[#0D0D0D] hover:underline truncate">{job.customer_email}</a>}
-                        {job.timeframe && <span>Timeframe: {job.timeframe}</span>}
-                        {job.duration && <span>Duration: {job.duration}</span>}
+                      <div className="space-y-1 text-xs text-[#888888]">
+                        {job.customer_name && <div><span className="text-[#0D0D0D] font-medium">{job.customer_name}</span></div>}
+                        {job.customer_phone && <div><a href={`tel:${job.customer_phone}`} className="text-[#0D0D0D] font-medium hover:underline">{job.customer_phone}</a></div>}
+                        {job.customer_email && <div className="truncate"><a href={`mailto:${job.customer_email}`} className="text-[#888888] hover:text-[#0D0D0D] hover:underline truncate">{job.customer_email}</a></div>}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                          {job.timeframe && <span>Timeframe: {job.timeframe}</span>}
+                          {job.duration && <span>Duration: {job.duration}</span>}
+                        </div>
                       </div>
                       <JobTimeline job={job} />
                     </div>

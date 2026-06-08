@@ -14,9 +14,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_STYLE: Record<string, string> = {
   offered: "bg-[#0D0D0D] text-white",
-  confirmed: "bg-[#FFF3CD] text-[#856404] border border-[#FFE082]",
+  confirmed: "bg-[#F5F5F5] text-[#0D0D0D] border border-[#0D0D0D]",
   in_progress: "bg-[#0D0D0D] text-white",
-  completed: "bg-[#27AE60] text-white",
+  completed: "bg-[#888888] text-white border border-[#0D0D0D]",
   cancelled: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
 };
 

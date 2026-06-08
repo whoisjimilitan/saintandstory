@@ -133,7 +133,7 @@ export default async function AdminPage() {
 
   const statLinks = [
     inProgressJobs.length > 0 && { label: `${inProgressJobs.length} en route`, href: "#section-enroute", bold: true },
-    pendingJobs.length > 0 && { label: `${pendingJobs.length} order${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
+    pendingJobs.length > 0 && { label: `${pendingJobs.length} customer${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
     offeredJobs.length > 0 && { label: `${offeredJobs.length} awaiting`, href: "#section-awaiting", bold: false },
     confirmedJobs.length > 0 && { label: `${confirmedJobs.length} confirmed`, href: "#section-confirmed", bold: false },
     { label: `${onlineCount} online`, href: "#section-fleet", bold: false },
@@ -146,8 +146,8 @@ export default async function AdminPage() {
       <AdminPushSubscribe />
       <AdminLocationUpdater />
       <div className="flex items-center justify-between mb-1">
-        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors">
-          Admin
+        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          Admin ↻
         </Link>
         <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
           B2B Pipeline →

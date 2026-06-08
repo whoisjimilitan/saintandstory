@@ -928,7 +928,7 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">Review monitoring</p>
         <p className="text-[#0D0D0D] text-sm font-medium mb-1">Pain point detection is automatic.</p>
         <p className="text-[#888888] text-sm leading-relaxed">
-          System detects operational friction signals in business reviews and flags high-intent leads automatically.
+          We scan business reviews to find companies struggling with delivery issues, shipping complaints, or supply chain friction. When we spot these pain points, we flag them so you can reach out at the right time.
         </p>
       </div>
     </div>
