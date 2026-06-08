@@ -23,15 +23,16 @@ const CONTENT = {
     source: "hero_customer",
   },
   driver: {
-    badge: "Post. Get booked. Keep it all.",
+    badge: "Verified drivers · Real jobs · No cold leads",
     headline: (
       <>
-        P<span className="font-display italic font-normal">o</span>st.
+        G<span className="font-display italic font-normal">o</span> online.
         <br />G<span className="font-display italic font-normal">e</span>t b
         <span className="font-display italic font-normal">o</span>oked.
+        <br />G<span className="font-display italic font-normal">e</span>t moving.
       </>
     ),
-    sub: "Your availability. Your area. Customers come to you.",
+    sub: "Your availability. Your area. Jobs come to you.",
     cta: "Join as driver →",
     source: "hero_driver",
   },
@@ -50,15 +51,15 @@ const ST = {
     secondaryCta: "border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D]",
   },
   driver: {
-    section: "bg-[#0D0D0D] border-white/10",
-    pill: "bg-white/10",
-    activeBtn: "bg-white text-[#0D0D0D]",
-    inactiveBtn: "text-white/50 hover:text-white",
-    badge: "text-white/60",
-    h1: "text-white",
-    sub: "text-white/70",
-    primaryCta: "bg-white hover:bg-[#F5F5F5] text-[#0D0D0D]",
-    secondaryCta: "border border-white/20 hover:border-white text-white",
+    section: "bg-white border-[#E8E8E8]",
+    pill: "bg-[#F5F5F5]",
+    activeBtn: "bg-[#0D0D0D] text-white",
+    inactiveBtn: "text-[#888888] hover:text-[#0D0D0D]",
+    badge: "text-[#888888]",
+    h1: "text-[#0D0D0D]",
+    sub: "text-[#888888]",
+    primaryCta: "bg-[#0D0D0D] hover:bg-[#333333] text-white",
+    secondaryCta: "border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D]",
   },
 };
 
