@@ -94,7 +94,7 @@ export default function PostcodeSearch({
       </div>
 
       {suggestions.length > 0 && (
-        <div className="border border-[#E8E8E8] rounded-2xl overflow-hidden">
+        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s}
