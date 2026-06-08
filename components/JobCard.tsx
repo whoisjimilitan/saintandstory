@@ -113,12 +113,27 @@ export default function JobCard({
         </div>
       )}
 
+      {/* DriverLocationShare: Activates when confirmed → in_progress */}
       {status === "confirmed" && onUpdateStatus && (
         <DriverLocationShare
           job={job}
           onArrived={() => onUpdateStatus("in_progress")}
           arriving={updating}
         />
+      )}
+
+      {/* LocationIndicator: Shows live status when in_progress (driver is delivering) */}
+      {status === "in_progress" && (
+        <div className="border-t border-[#E8E8E8] pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <p className="text-[#0D0D0D] text-sm font-medium">Sharing location</p>
+            </div>
+            <p className="text-[#888888] text-[10px]">Live</p>
+          </div>
+          <p className="text-[#888888] text-xs">(Phase 1: Last updated timestamp will display here)</p>
+        </div>
       )}
 
       {status === "in_progress" && onUpdateStatus && (
