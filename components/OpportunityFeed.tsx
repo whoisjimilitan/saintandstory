@@ -46,23 +46,27 @@ export default function OpportunityFeed({
       className="block bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-4 hover:border-[#0D0D0D] transition-colors"
     >
       <div className="flex justify-between items-start gap-3 mb-2">
-        <p className="font-semibold text-[#0D0D0D] text-sm">{job.customer_name}</p>
+        <p className="font-semibold text-[#0D0D0D] text-sm">{job.customer_name || "Job"}</p>
         {job.price && (
           <p className="font-semibold text-[#0D0D0D] text-sm whitespace-nowrap">
-            £{job.price.toFixed(0)}
+            £{Number(job.price).toFixed(0)}
           </p>
         )}
       </div>
-      <p className="text-[#888888] text-xs mb-1">
-        {job.postcode_from} → {job.postcode_to}
-      </p>
-      <p className="text-[#888888] text-[10px]">
-        {new Date(job.created_at).toLocaleDateString()} at{" "}
-        {new Date(job.created_at).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </p>
+      {job.postcode_from && job.postcode_to && (
+        <p className="text-[#888888] text-xs mb-1">
+          {job.postcode_from} → {job.postcode_to}
+        </p>
+      )}
+      {job.created_at && (
+        <p className="text-[#888888] text-[10px]">
+          {new Date(job.created_at).toLocaleDateString()} at{" "}
+          {new Date(job.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </p>
+      )}
     </Link>
   );
 
