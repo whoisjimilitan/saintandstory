@@ -23,16 +23,15 @@ const CONTENT = {
     source: "hero_customer",
   },
   driver: {
-    badge: "Verified drivers · Real jobs · No cold leads",
+    badge: "Verified drivers only. Jobs are sent directly to you.",
     headline: (
       <>
         G<span className="font-display italic font-normal">o</span> online.
         <br />G<span className="font-display italic font-normal">e</span>t b
         <span className="font-display italic font-normal">o</span>oked.
-        <br />G<span className="font-display italic font-normal">e</span>t moving.
       </>
     ),
-    sub: "Your availability. Your area. Jobs come to you.",
+    sub: "Activate your availability. We match you with jobs in your area.",
     cta: "Join as driver →",
     source: "hero_driver",
   },
