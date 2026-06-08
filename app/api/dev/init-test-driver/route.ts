@@ -1,19 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { initializeTestDriver } from "@/lib/test-driver";
 
-export async function POST(request: NextRequest) {
+async function init() {
   try {
     await initializeTestDriver();
-    return NextResponse.json({
+    return {
       success: true,
-      message: "Test driver initialized",
-      email: "test-driver@local.test",
-      instructions: "Log in with your normal auth provider using email: test-driver@local.test. The test driver dashboard will be available.",
-    });
+      message: "Test driver initialized ✅",
+      email: "mz_kay2006@hotmail.co.uk",
+      next_step: "Visit /api/dev/activate-test-driver to activate the profile",
+    };
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to initialize" },
-      { status: 500 }
-    );
+    return {
+      error: error instanceof Error ? error.message : "Failed to initialize",
+    };
   }
+}
+
+export async function GET() {
+  const result = await init();
+  return NextResponse.json(result);
+}
+
+export async function POST(request: NextRequest) {
+  const result = await init();
+  return NextResponse.json(result);
 }
