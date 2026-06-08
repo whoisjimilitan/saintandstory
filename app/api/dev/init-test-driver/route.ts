@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { initializeTestDriver } from "@/lib/test-driver";
 
 export async function POST(request: NextRequest) {
-  // Only allow in development
-  if (process.env.NODE_ENV !== "development") {
-    return NextResponse.json({ error: "Not available in production" }, { status: 403 });
-  }
-
   try {
     await initializeTestDriver();
     return NextResponse.json({

@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 
 export const TEST_DRIVER_ID = "test-driver-001";
-export const TEST_DRIVER_EMAIL = "test-driver@local.test";
+export const TEST_DRIVER_EMAIL = "mz_kay2006@hotmail.co.uk";
 export const TEST_DRIVER_NAME = "Test Driver";
 
 /**
@@ -9,8 +9,6 @@ export const TEST_DRIVER_NAME = "Test Driver";
  * Call this once during setup or on first dev load
  */
 export async function initializeTestDriver() {
-  if (process.env.NODE_ENV !== "development") return;
-
   try {
     const sql = neon(process.env.DATABASE_URL!);
 
@@ -53,9 +51,8 @@ export async function initializeTestDriver() {
 }
 
 /**
- * Check if current user is test driver (dev-only)
+ * Check if current user is test driver
  */
 export function isTestDriver(email?: string): boolean {
-  if (process.env.NODE_ENV !== "development") return false;
   return email === TEST_DRIVER_EMAIL;
 }
