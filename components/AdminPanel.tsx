@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import SmsButton from "@/components/SmsButton";
 import AdminEtaBadge from "@/components/AdminEtaBadge";
 
@@ -633,6 +634,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
   const [offered, setOffered] = useState(offeredJobs as unknown as Job[]);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedSearch, setCompletedSearch] = useState("");
+  const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(true);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
@@ -702,14 +704,31 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       {/* Awaiting driver ───────────────────────────────────────────────────── */}
       {offered.length > 0 && (
         <div id="section-awaiting">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Awaiting driver ({offered.length})
-          </p>
-          <div className="space-y-2">
-            {offered.map(job => (
-              <OfferedJobRow key={job.id} job={job} drivers={typedDrivers} onReassigned={removeOffered} />
-            ))}
-          </div>
+          <button
+            onClick={() => setExpandedAwaitingDrivers(v => !v)}
+            className="w-full flex items-center justify-between mb-3"
+          >
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+              Awaiting Driver
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[#888888]">
+                {offered.length}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-[#888888] transition-transform ${
+                  expandedAwaitingDrivers ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </button>
+          {expandedAwaitingDrivers && (
+            <div className="space-y-2">
+              {offered.map(job => (
+                <OfferedJobRow key={job.id} job={job} drivers={typedDrivers} onReassigned={removeOffered} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
