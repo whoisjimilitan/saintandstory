@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { B2B_INDUSTRIES } from "@/lib/b2b-industries";
@@ -457,11 +457,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           <button
             onClick={sendRecognitionEmail}
             disabled={sendingRecognition || !lead.email}
-            className={`w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed ${
-              isExpanded
-                ? "bg-white hover:bg-white/90 active:bg-white text-[#0D0D0D]"
-                : "bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
-            }`}
+            className="w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
           >
             {sendingRecognition ? "Sending…" : "Send recognition email"}
           </button>
@@ -551,11 +547,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <button
                 onClick={saveEmail}
                 disabled={savingEmail || !newEmail}
-                className={`w-full font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed ${
-                  isExpanded
-                    ? "bg-white hover:bg-white/90 active:bg-white text-[#0D0D0D]"
-                    : "bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
-                }`}
+                className="w-full font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
               >
                 {savingEmail ? "Saving…" : "Save email"}
               </button>
@@ -896,11 +888,12 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
 }
 
 function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLeads: React.Dispatch<React.SetStateAction<Lead[]>> }): React.ReactElement {
-  const [csvText, setCSVText] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);
 
-  async function importCSV() {
+  async function importCSV(csvText: string) {
     if (!csvText.trim()) return;
     setImporting(true);
     try {
@@ -912,7 +905,7 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
 
       const data = await res.json() as { count: number; added: string[]; success: boolean };
       setResult(data);
-      setCSVText("");
+      setFileName(null);
 
       // Optimistic update
       const newLeads = data.added.map((name, idx) => ({
@@ -939,24 +932,37 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
     }
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const csvText = event.target?.result as string;
+      await importCSV(csvText);
+    };
+    reader.readAsText(file);
+  }
+
   return (
     <div className="bg-white border border-[#EAE6E0] rounded-2xl p-5">
-      <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Or import from CSV</p>
-      <textarea
-        value={csvText}
-        onChange={e => setCSVText(e.target.value)}
-        placeholder="business_name,business_category,city,email,website,phone&#10;Acme Corp,Retailers,London,contact@acme.com,www.acme.com,020..."
-        className="w-full px-4 py-3 border border-[#EAE6E0] rounded-xl text-xs font-mono focus:outline-none focus:border-[#0D0D0D] resize-none"
-        rows={5}
+      <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Or upload CSV</p>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileSelect}
+        className="hidden"
       />
-      <p className="text-[#888888] text-xs mt-2 mb-3">Required: business_name, business_category, city. Optional: email, website, phone, pain_point, review_rating</p>
       <button
-        onClick={importCSV}
-        disabled={importing || !csvText.trim()}
-        className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-full text-xs transition-all duration-150"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={importing}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#EAE6E0] rounded-xl text-[#0D0D0D] font-semibold text-sm transition-all duration-150 hover:border-[#0D0D0D] hover:bg-[#F5F5F5] active:bg-[#E8E8E8] disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {importing ? "Importing…" : `Import leads`}
+        <span>📎</span>
+        {importing ? "Processing…" : fileName ? `✓ ${fileName}` : "Upload CSV file"}
       </button>
+      <p className="text-[#888888] text-xs mt-3">Required columns: business_name, business_category, city. Optional: email, website, phone, pain_point, review_rating</p>
       {result && (
         <div className="mt-4 bg-[#F5F5F5] border border-[#EAE6E0] rounded-xl px-4 py-3">
           <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} leads imported</p>

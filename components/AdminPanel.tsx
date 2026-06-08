@@ -200,7 +200,7 @@ function CancelButton({ jobId, onCancelled }: { jobId: string; onCancelled: (id:
   }
 
   return (
-    <button onClick={() => setConfirm(true)} className="text-[#888888] hover:text-[#0D0D0D] text-xs transition-colors">
+    <button onClick={() => setConfirm(true)} className="text-[#888888] hover:text-[#0D0D0D] hover:bg-[#F5F5F5] text-xs transition-all px-2 py-1 rounded-md">
       Cancel job
     </button>
   );
@@ -363,7 +363,7 @@ function JobRow({ job, drivers, onAssigned }: { job: Job; drivers: Driver[]; onA
               ))}
             </div>
             {!showAll && drivers.length > suggested.length && (
-              <button onClick={() => setShowAll(true)} className="mt-2 text-[#888888] text-xs hover:text-[#0D0D0D] transition-colors">
+              <button onClick={() => setShowAll(true)} className="mt-2 text-[#888888] text-xs hover:text-[#0D0D0D] hover:bg-[#F5F5F5] transition-all px-2 py-1 rounded-md">
                 Show all {drivers.length} drivers →
               </button>
             )}
