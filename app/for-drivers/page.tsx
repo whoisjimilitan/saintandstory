@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 
 const STEPS = [
   { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Transit, Luton, Sprinter. All welcome. Live in minutes." },
-  { num: "02", title: "Post your availability", desc: "Tell us when you're free. Customers in your area see you." },
-  { num: "03", title: "Get booked and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
+  { num: "02", title: "Post your availability", desc: "Tell us when you're free. Receive relevant opportunities in your area." },
+  { num: "03", title: "Accept bookings and deliver", desc: "Show up, do what you do best. Every job builds your rating." },
   { num: "04", title: "Get paid", desc: "Finish a job at 3pm. Money in your account before 4pm." },
 ];
 
@@ -45,12 +45,12 @@ const WEEK = [
 ];
 
 const FEATURES = [
-  { title: "Your profile, live 24/7.", desc: "Searchable by every customer in your area. No cold calling. No ad spend." },
-  { title: "You set the calendar.", desc: "Post when you're free. Customers book around you, not the other way round." },
-  { title: "Founding rate — £9.99/month.", desc: "Locked forever. Weekly billing launches at 100 drivers. You're grandfathered." },
+  { title: "Your profile, live 24/7.", desc: "Stay active in the Saint & Story network. Receive relevant opportunities when available. No cold calling. No ad spend." },
+  { title: "You set the calendar.", desc: "Post when you're free. Opportunities fit your availability, not the other way round." },
+  { title: "Founding rate — £9.99/month.", desc: "Locked forever for the first 100 drivers. You're grandfathered for life." },
   { title: "All van sizes welcome.", desc: "Transit, Luton, Sprinter — whatever you drive, there's work for you here." },
   { title: "Your own driver dashboard.", desc: "Earnings breakdown, ratings history, availability calendar — everything in one place. Solo drivers don't normally get this." },
-  { title: "Build your name.", desc: "Higher rating means you appear first when customers search your area." },
+  { title: "Better opportunities with better ratings.", desc: "As you complete more work, we understand what opportunities fit you best." },
   { title: "Paid within the hour.", desc: "Finish a job at 3pm. Money in your account before 4pm. No chasing, no delays." },
 ];
 
@@ -92,7 +92,7 @@ export default function ForDriversPage() {
             <br />Y<span className="font-display italic font-normal">o</span>ur inc<span className="font-display italic font-normal">o</span>me.
           </h1>
           <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Post your availability. Customers find you. <DriverCount /> removal and man-and-van drivers already earning.
+            Post your availability. Receive relevant work. <DriverCount /> removal and man-and-van drivers already earning.
           </p>
           <div className="flex flex-wrap gap-3">
             <DriverModalCTA

@@ -23,7 +23,7 @@ const CONTENT = {
     source: "hero_customer",
   },
   driver: {
-    badge: "Verified drivers only. Jobs are sent directly to you.",
+    badge: "Verified drivers. Real work. Real pay.",
     headline: (
       <>
         G<span className="font-display italic font-normal">o</span> online.
@@ -31,7 +31,7 @@ const CONTENT = {
         <span className="font-display italic font-normal">o</span>oked.
       </>
     ),
-    sub: "Activate your availability. We match you with jobs in your area.",
+    sub: "Post your availability. Stay active for work. Receive relevant opportunities when available.",
     cta: "Join as driver →",
     source: "hero_driver",
   },

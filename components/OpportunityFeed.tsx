@@ -138,14 +138,14 @@ export default function OpportunityFeed({
         </div>
       )}
 
-      {/* Awaiting Drivers */}
+      {/* Opportunities */}
       <div className="bg-white border border-[#E8E8E8] rounded-lg overflow-hidden">
         <button
           onClick={() => toggleSection("awaiting")}
           className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F5F5F5] transition-colors"
         >
           <div className="flex items-center gap-3">
-            <p className="font-semibold text-[#0D0D0D]">Awaiting drivers</p>
+            <p className="font-semibold text-[#0D0D0D]">Opportunities</p>
             <p className="bg-[#0D0D0D] text-white text-[10px] font-semibold px-2 py-1 rounded-full">
               {awaitingJobs.length}
             </p>
@@ -164,7 +164,7 @@ export default function OpportunityFeed({
         )}
         {expandedSections.awaiting && awaitingJobs.length === 0 && (
           <div className="border-t border-[#E8E8E8] px-4 py-3 text-center">
-            <p className="text-[#888888] text-sm">No jobs awaiting drivers yet.</p>
+            <p className="text-[#888888] text-sm">No opportunities available right now.</p>
           </div>
         )}
       </div>
