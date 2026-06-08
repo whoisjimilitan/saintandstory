@@ -269,11 +269,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const isExpanded = expanded;
 
   return (
-    <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${
-      isExpanded
-        ? "bg-[#3a3a3a] border-[#3a3a3a]"
-        : `border-[#EAE6E0] ${cardStyle.bg} ${cardStyle.border}`
-    }`}>
+    <div className={`border rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px' }}>
       <button
         className={`w-full text-left px-5 py-4 flex items-start justify-between gap-4 transition-all duration-300 ${
           isExpanded
@@ -284,7 +280,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <p className={`font-sans font-bold text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.business_name}</p>
+            <p className="font-sans font-bold text-sm transition-colors duration-300 text-[#0D0D0D]">{lead.business_name}</p>
             {hasPainPoint && (
               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${
                 isExpanded
@@ -295,61 +291,45 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </span>
             )}
             {lead.source === "inbound" && (
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] border transition-colors duration-300 ${
-                isExpanded
-                  ? "text-white border-white/30 bg-white/10"
-                  : "text-[#0D0D0D] bg-[#F5F5F5] border-[#EAE6E0]"
-              }`}>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] border transition-colors duration-300 text-[#0D0D0D] bg-[#F5F5F5] border-[#EAE6E0]">
                 Inbound
               </span>
             )}
           </div>
-          <p className={`text-xs transition-colors duration-300 ${isExpanded ? "text-white/65" : "text-[#888888]"}`}>
+          <p className="text-xs transition-colors duration-300 text-[#888888]">
             {lead.business_category}{lead.delivery_type ? ` · ${lead.delivery_type}` : ""}{lead.city ? ` · ${lead.city}` : ""}
             {lead.email ? ` · ${lead.email}` : " · No email"}
           </p>
           {hasPainPoint && (
-            <p className={`text-xs mt-0.5 italic transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#888888]"}`}>&ldquo;{lead.pain_point_review?.slice(0, 80)}…&rdquo;</p>
+            <p className="text-xs mt-0.5 italic transition-colors duration-300 text-[#888888]">&ldquo;{lead.pain_point_review?.slice(0, 80)}…&rdquo;</p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white text-[#0D0D0D]"
-                : `${scoreStyle.containerClass} ${scoreStyle.badgeClass}`
-            }`}>
+            <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
               {scoreLabel}
             </span>
-            <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white/15 text-white border border-white/30"
-                : STATUS_STYLE[status] ?? STATUS_STYLE.new
-            }`}>
+            <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
               {STATUS_LABELS[status] ?? status}
             </span>
           </div>
-          {lead.created_at && <p className={`text-[10px] transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#888888]"}`}>{timeAgo(lead.created_at)}</p>}
+          {lead.created_at && <p className="text-[10px] transition-colors duration-300 text-[#888888]">{timeAgo(lead.created_at)}</p>}
         </div>
       </button>
 
       {expanded && (
-        <div className={`px-5 pb-5 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#EAE6E0]"}`}>
+        <div className="px-5 pb-5 border-t transition-colors duration-300 border-[#EAE6E0]">
           {/* Lead state status line - Apple minimal design */}
           {workflowState === "recognized" && (
             <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
               <div className="flex items-center gap-3">
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-[11px] font-semibold tracking-widest uppercase transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>Recognized</span>
-                  <span className={`text-[10px] transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#888888]"}`}>Email sent</span>
+                  <span className="text-[11px] font-semibold tracking-widest uppercase transition-colors duration-300 text-[#0D0D0D]">Recognized</span>
+                  <span className="text-[10px] transition-colors duration-300 text-[#888888]">Email sent</span>
                 </div>
-                {lead.created_at && <span className={`text-[10px] ml-auto transition-colors duration-300 ${isExpanded ? "text-white/40" : "text-[#AAAAAA]"}`}>{formatTime(lead.created_at)}</span>}
+                {lead.created_at && <span className="text-[10px] ml-auto transition-colors duration-300 text-[#AAAAAA]">{formatTime(lead.created_at)}</span>}
               </div>
-              <div className={`h-px bg-gradient-to-r mt-2 transition-colors duration-300 ${
-                isExpanded
-                  ? "from-white via-white/20 to-transparent"
-                  : "from-[#0D0D0D] via-[#EAE6E0] to-transparent"
-              }`}></div>
+              <div className="h-px bg-gradient-to-r mt-2 transition-colors duration-300 from-[#0D0D0D] via-[#EAE6E0] to-transparent"></div>
             </div>
           )}
 
@@ -359,7 +339,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               ? "bg-white/10 border-white/20"
               : scoreStyle.containerClass
           }`}>
-            <p className={`text-[10px] font-semibold uppercase tracking-[0.1em] mb-2 transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>Lead Signal</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2 transition-colors duration-300 text-[#0D0D0D]">Lead Signal</p>
             {hasFormData ? (
               // Form-based leads: show detailed score breakdown
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -396,16 +376,16 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </div>
             ) : (
               // Discovered leads: show semantic signal label
-              <div className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>
+              <div className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>
                 <p className="font-medium">{getLeadSignalLabel(lead)}</p>
-                <p className={`text-xs mt-1 transition-colors duration-300 ${isExpanded ? "text-white/65" : "text-[#888888]"}`}>Score: {scoreLabel}</p>
+                <p className={`text-xs mt-1 transition-colors duration-300 text-[#888888]`}>Score: {scoreLabel}</p>
               </div>
             )}
           </div>
 
           {/* Recognition Progress Indicator - visible for all leads */}
-          <div className={`mb-4 pt-3 pb-3 border-t transition-colors duration-300 ${isExpanded ? "border-white/20" : "border-[#EAE6E0]"}`}>
-            <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] mb-2 transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>
+          <div className="mb-4 pt-3 pb-3 border-t transition-colors duration-300 border-[#EAE6E0]">
+            <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] mb-2 transition-colors duration-300 text-[#666666]`}>
               Recognition Progress
             </p>
 
@@ -413,44 +393,44 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className="flex items-center gap-2 text-[10px] font-medium mb-3">
               <span className={`transition-colors duration-300 ${
                 workflowState === "new"
-                  ? (isExpanded ? "font-semibold text-white" : "font-semibold text-[#0D0D0D]")
-                  : (isExpanded ? "text-white/40" : "text-[#AAAAAA]")
+                  ? "font-semibold text-[#0D0D0D]"
+                  : "text-[#AAAAAA]"
               }`}>
                 new
               </span>
-              <span className={`transition-colors duration-300 ${isExpanded ? "text-white/30" : "text-[#CCC]"}`}>→</span>
+              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
                 workflowState === "recognized"
-                  ? (isExpanded ? "font-semibold text-white" : "font-semibold text-[#0D0D0D]")
-                  : (isExpanded ? "text-white/40" : "text-[#AAAAAA]")
+                  ? "font-semibold text-[#0D0D0D]"
+                  : "text-[#AAAAAA]"
               }`}>
                 recognized
               </span>
-              <span className={`transition-colors duration-300 ${isExpanded ? "text-white/30" : "text-[#CCC]"}`}>→</span>
+              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
                 workflowState === "engaged"
-                  ? (isExpanded ? "font-semibold text-white" : "font-semibold text-[#0D0D0D]")
-                  : (isExpanded ? "text-white/40" : "text-[#AAAAAA]")
+                  ? "font-semibold text-[#0D0D0D]"
+                  : "text-[#AAAAAA]"
               }`}>
                 engaged
               </span>
-              <span className={`transition-colors duration-300 ${isExpanded ? "text-white/30" : "text-[#CCC]"}`}>→</span>
+              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
                 workflowState === "self_confirmed"
-                  ? (isExpanded ? "font-semibold text-white" : "font-semibold text-[#0D0D0D]")
-                  : (isExpanded ? "text-white/40" : "text-[#AAAAAA]")
+                  ? "font-semibold text-[#0D0D0D]"
+                  : "text-[#AAAAAA]"
               }`}>
                 confirmed
               </span>
             </div>
 
             {/* State-specific explanation (fallback-safe) */}
-            <p className={`text-[10px] mb-2 transition-colors duration-300 ${isExpanded ? "text-white/65" : "text-[#666666]"}`}>
+            <p className={`text-[10px] mb-2 transition-colors duration-300 text-[#666666]`}>
               {currentStateDescription.description}
             </p>
 
             {/* Next step guidance */}
-            <p className={`text-[10px] transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#AAAAAA]"}`}>
+            <p className={`text-[10px] transition-colors duration-300 text-[#AAAAAA]`}>
               {currentStateDescription.nextStep}
             </p>
           </div>
@@ -463,11 +443,11 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 : "border-[#EAE6E0] bg-[#FAFAFA]"
             } ${!confirmationSuccessMessage && "animate-out fade-out duration-300"}`}>
               <div className="flex items-start gap-3">
-                <span className={`font-semibold text-sm mt-0.5 transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>✓</span>
+                <span className={`font-semibold text-sm mt-0.5 transition-colors duration-300 text-[#0D0D0D]`}>✓</span>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[11px] font-semibold tracking-[0.5px] transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>Recognition sent</p>
-                  <p className={`text-[10px] mt-1.5 transition-colors duration-300 ${isExpanded ? "text-white/65" : "text-[#666666]"}`}>{lead.email}</p>
-                  <p className={`text-[10px] mt-1 transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#AAAAAA]"}`}>{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p className={`text-[11px] font-semibold tracking-[0.5px] transition-colors duration-300 text-[#0D0D0D]`}>Recognition sent</p>
+                  <p className={`text-[10px] mt-1.5 transition-colors duration-300 text-[#666666]`}>{lead.email}</p>
+                  <p className={`text-[10px] mt-1 transition-colors duration-300 text-[#AAAAAA]`}>{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
               </div>
             </div>
@@ -504,46 +484,46 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           <div className="grid grid-cols-2 gap-3 py-4">
             {!!lead.phone && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Phone</p>
-                <a href={`tel:${lead.phone}`} className={`text-sm font-semibold hover:underline transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.phone}</a>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Phone</p>
+                <a href={`tel:${lead.phone}`} className={`text-sm font-semibold hover:underline transition-colors duration-300 text-[#0D0D0D]`}>{lead.phone}</a>
               </div>
             )}
             {!!lead.website && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Website</p>
-                <a href={lead.website} target="_blank" rel="noopener noreferrer" className={`text-sm hover:underline truncate block transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.website}</a>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Website</p>
+                <a href={lead.website} target="_blank" rel="noopener noreferrer" className={`text-sm hover:underline truncate block transition-colors duration-300 text-[#0D0D0D]`}>{lead.website}</a>
               </div>
             )}
             {!!lead.delivery_frequency && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Frequency</p>
-                <p className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.delivery_frequency}</p>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Frequency</p>
+                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.delivery_frequency}</p>
               </div>
             )}
             {!!lead.average_deliveries && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Avg Deliveries/Month</p>
-                <p className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.average_deliveries}</p>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Avg Deliveries/Month</p>
+                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.average_deliveries}</p>
               </div>
             )}
             {!!lead.courier_provider && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Current Courier</p>
-                <p className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.courier_provider}</p>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Current Courier</p>
+                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.courier_provider}</p>
               </div>
             )}
             {!!lead.delivery_challenge && (
               <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Main Challenge</p>
-                <p className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.delivery_challenge}</p>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Main Challenge</p>
+                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.delivery_challenge}</p>
               </div>
             )}
             {hasPainPoint && (
               <div className="col-span-2">
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 ${isExpanded ? "text-white/60" : "text-[#888888]"}`}>Pain point</p>
-                <p className={`text-sm transition-colors duration-300 ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}>{lead.pain_point}</p>
+                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Pain point</p>
+                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.pain_point}</p>
                 {!!lead.pain_point_review && (
-                  <p className={`text-xs mt-1 italic transition-colors duration-300 ${isExpanded ? "text-white/50" : "text-[#888888]"}`}>&ldquo;{lead.pain_point_review}&rdquo;</p>
+                  <p className="text-xs mt-1 italic transition-colors duration-300 text-[#888888]">&ldquo;{lead.pain_point_review}&rdquo;</p>
                 )}
               </div>
             )}
@@ -556,7 +536,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 ? "bg-white/10 border-white/20"
                 : "bg-[#FAFAFA] border-[#EAE6E0]"
             }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>Add email address</p>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Add email address</p>
               <input
                 type="email"
                 value={newEmail}
@@ -586,7 +566,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 ? "bg-white/10 border-white/20"
                 : "bg-[#FAFAFA] border-[#EAE6E0]"
             }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 ${isExpanded ? "text-white/70" : "text-[#666666]"}`}>Draft email</p>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Draft email</p>
               <input
                 value={draft.subject}
                 onChange={e => setDraft(d => d ? { ...d, subject: e.target.value } : d)}
@@ -600,7 +580,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 value={draft.body}
                 onChange={e => setDraft(d => d ? { ...d, body: e.target.value } : d)}
                 rows={4}
-                className={`w-full text-sm bg-transparent focus:outline-none resize-none transition-colors ${isExpanded ? "text-white" : "text-[#0D0D0D]"}`}
+                className={`w-full text-sm bg-transparent focus:outline-none resize-none transition-colors text-[#0D0D0D]`}
               />
               <div className="flex gap-2 pt-2">
                 <button
@@ -614,7 +594,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 >
                   {sending ? "Sending…" : "Send"}
                 </button>
-                <button onClick={getDraft} className={`text-xs font-medium transition-colors ${isExpanded ? "text-white/60 hover:text-white" : "text-[#888888] hover:text-[#0D0D0D]"}`}>
+                <button onClick={getDraft} className="text-xs font-medium transition-colors text-[#888888] hover:text-[#0D0D0D]">
                   Regenerate
                 </button>
               </div>
