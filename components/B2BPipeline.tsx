@@ -287,7 +287,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const isExpanded = expanded;
 
   return (
-    <div className={`border rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px' }}>
+    <div className={`border rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] hover:border-[#0D0D0D] ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px' }}>
       <button
         className={`w-full text-left px-5 py-4 flex items-start justify-between gap-4 transition-all duration-300 ${
           isExpanded

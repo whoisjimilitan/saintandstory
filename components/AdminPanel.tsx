@@ -665,6 +665,21 @@ function ActiveJobRow({
 
           <JobTimeline job={job} />
 
+          {type === "confirmed" && job.driver_phone && (
+            <div className="mt-4 pt-4 border-t border-[#E8E8E8]">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-3 font-semibold">Follow-up</p>
+              <div className="flex gap-2">
+                <a
+                  href={`tel:${job.driver_phone}`}
+                  className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-4 py-2 rounded-full text-xs transition-colors text-center"
+                >
+                  Call driver
+                </a>
+                {job.driver_phone && <SmsButton phone={job.driver_phone} driverName={job.driver_name || "Driver"} />}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 pt-4 border-t border-[#E8E8E8]">
             <CancelButton jobId={job.id} onCancelled={onCancelled} />
           </div>
