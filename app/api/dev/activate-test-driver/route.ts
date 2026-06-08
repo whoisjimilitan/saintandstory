@@ -1,21 +1,21 @@
-import { neon } from "@neondatabase/serverless";
+import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { TEST_DRIVER_EMAIL } from "@/lib/test-driver";
 
+const prisma = new PrismaClient();
+
 async function activate() {
-  const sql = neon(process.env.DATABASE_URL!);
-
   // First check if driver exists
-  const existing = await sql`
-    SELECT id, email, profile_live FROM drivers
-    WHERE email = ${TEST_DRIVER_EMAIL}
-  `;
+  const existing = await prisma.driver.findUnique({
+    where: { email: TEST_DRIVER_EMAIL },
+  });
 
-  if (existing.length === 0) {
-    // Debug: check all drivers to see what exists
-    const allDrivers = await sql`
-      SELECT id, email FROM drivers LIMIT 5
-    `;
+  if (!existing) {
+    // Debug: check what drivers exist
+    const allDrivers = await prisma.driver.findMany({
+      select: { id: true, email: true },
+      take: 5,
+    });
     return {
       error: "Test driver not found",
       hint: "Run /api/dev/init-test-driver first",
@@ -25,17 +25,18 @@ async function activate() {
   }
 
   // Activate the driver
-  const result = await sql`
-    UPDATE drivers
-    SET profile_live = true, subscription_status = 'active'
-    WHERE email = ${TEST_DRIVER_EMAIL}
-    RETURNING id, email, profile_live, subscription_status
-  `;
+  const result = await prisma.driver.update({
+    where: { email: TEST_DRIVER_EMAIL },
+    data: {
+      profileLive: true,
+      subscriptionStatus: "active",
+    },
+  });
 
   return {
     success: true,
     message: "Test driver activated ✅",
-    driver: result[0],
+    driver: result,
   };
 }
 

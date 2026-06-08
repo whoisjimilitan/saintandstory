@@ -1,4 +1,6 @@
-import { neon } from "@neondatabase/serverless";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const TEST_DRIVER_ID = "test-driver-001";
 export const TEST_DRIVER_EMAIL = "mz_kay2006@hotmail.co.uk";
@@ -10,41 +12,28 @@ export const TEST_DRIVER_NAME = "Test Driver";
  */
 export async function initializeTestDriver(): Promise<{ success: boolean; message: string }> {
   try {
-    const sql = neon(process.env.DATABASE_URL!);
-
     // Check if test driver exists
-    const existing = await sql`
-      SELECT id FROM drivers WHERE email = ${TEST_DRIVER_EMAIL} LIMIT 1
-    `;
+    const existing = await prisma.driver.findUnique({
+      where: { email: TEST_DRIVER_EMAIL },
+    });
 
-    if (existing.length > 0) {
+    if (existing) {
       console.log("[TEST-DRIVER] ✓ Test driver already exists");
       return { success: true, message: "Test driver already exists" };
     }
 
     // Create test driver
-    const result = await sql`
-      INSERT INTO drivers (
-        email,
-        full_name,
-        phone,
-        area,
-        vehicle_type,
-        created_at,
-        updated_at
-      ) VALUES (
-        ${TEST_DRIVER_EMAIL},
-        ${TEST_DRIVER_NAME},
-        '07000 TEST 000',
-        'London',
-        'Van',
-        NOW(),
-        NOW()
-      )
-      RETURNING id, email
-    `;
+    const result = await prisma.driver.create({
+      data: {
+        email: TEST_DRIVER_EMAIL,
+        fullName: TEST_DRIVER_NAME,
+        phone: "07000 TEST 000",
+        area: "London",
+        vehicleType: "Van",
+      },
+    });
 
-    console.log("[TEST-DRIVER] ✓ Test driver initialized", result);
+    console.log("[TEST-DRIVER] ✓ Test driver initialized", result.id);
     return { success: true, message: "Test driver initialized" };
   } catch (error) {
     console.error("[TEST-DRIVER] ✗ Failed to initialize:", error);
