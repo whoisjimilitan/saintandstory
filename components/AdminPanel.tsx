@@ -387,6 +387,7 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
   const [expanded, setExpanded] = useState(false);
   const [reassigning, setReassigning] = useState(false);
   const [showDrivers, setShowDrivers] = useState(false);
+  const [showAssignPanel, setShowAssignPanel] = useState(false);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [price, setPrice] = useState(String(job.price ?? ""));
 
@@ -420,17 +421,17 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
 
   return (
     <div className="bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden">
-      <button
-        className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-[#F5F5F5] transition-colors"
-        onClick={() => setExpanded(e => !e)}
-      >
-        <div>
+      <div className="px-5 py-4 flex items-center justify-between gap-4 border-b border-[#E8E8E8]">
+        <button
+          className="flex-1 text-left hover:bg-[#F5F5F5] -mx-4 -my-4 px-4 py-4 rounded-tl-xl transition-colors"
+          onClick={() => setExpanded(e => !e)}
+        >
           <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{job.service_type || "Removal"}</p>
           <p className="text-[#888888] text-xs">
             {job.postcode_from}{job.postcode_to ? ` → ${job.postcode_to}` : ""}
             {job.driver_name ? ` · ${job.driver_name}` : ""}
           </p>
-        </div>
+        </button>
         <div className="flex items-center gap-2 shrink-0">
           {job.driver_phone && <QuickDial phone={job.driver_phone} />}
           {isStaleOffered(job.updated_at) ? (
@@ -443,7 +444,63 @@ function OfferedJobRow({ job, drivers, onReassigned }: { job: Job; drivers: Driv
             </span>
           )}
         </div>
-      </button>
+      </div>
+      <div className="px-5 py-2 flex items-center gap-2 bg-[#F5F5F5]">
+        <button
+          onClick={() => setShowAssignPanel(v => !v)}
+          className="bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-4 py-2 rounded-full text-xs transition-colors"
+        >
+          Assign driver →
+        </button>
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="text-[#888888] hover:text-[#0D0D0D] text-xs font-medium transition-colors"
+        >
+          {expanded ? "Hide details ↑" : "Show details ↓"}
+        </button>
+      </div>
+
+      {showAssignPanel && (
+        <div className="px-5 py-4 border-t border-[#E8E8E8] bg-[#F5F5F5]">
+          <div className="mb-3">
+            <label className="block text-[#888888] text-[10px] uppercase tracking-[0.1em] mb-2">Job price</label>
+            <div className="relative w-36">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888] text-sm">£</span>
+              <input
+                type="number"
+                value={price}
+                onChange={e => setPrice(e.target.value)}
+                placeholder="e.g. 180"
+                className="w-full pl-7 pr-3 py-2 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D]"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            {drivers.length === 0 ? (
+              <p className="text-[#888888] text-xs italic">No drivers available.</p>
+            ) : (
+              drivers.map(driver => (
+                <div key={driver.id} className="flex items-center justify-between gap-3 bg-white rounded-xl px-4 py-3 border border-[#E8E8E8]">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline(driver.last_seen_at) ? "bg-green-500" : "bg-[#D0D0D0]"}`} />
+                    <div className="min-w-0">
+                      <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.full_name}</p>
+                      <p className="text-[#888888] text-xs">{driver.area} · {driver.vehicle_type}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => assignTo(driver.id)}
+                    disabled={!!assigning}
+                    className="bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold px-4 py-1.5 rounded-full text-xs transition-colors shrink-0"
+                  >
+                    {assigning === driver.id ? "Assigning…" : "Assign"}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E8E8E8]">
