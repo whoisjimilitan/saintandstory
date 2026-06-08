@@ -110,6 +110,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [confirmationSuccessMessage, setConfirmationSuccessMessage] = useState(false);
   const [prospectBriefUrl, setProspectBriefUrl] = useState<string | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [recognitionDraft, setRecognitionDraft] = useState<{ subject: string; body: string; triggerEvent: string } | null>(null);
 
   const hasPainPoint = !!lead.pain_point;
 
@@ -170,8 +171,24 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     }
   }
 
+  // Step 1: Preview recognition email
+  async function previewRecognitionEmail() {
+    if (!lead.email || !lead.business_name || !lead.business_category || !lead.id) return;
+    setSendingRecognition(true);
+    try {
+      const response = await fetch(
+        `/api/b2b/send-recognition?business_name=${encodeURIComponent(lead.business_name)}&industry=${encodeURIComponent(lead.business_category)}&email=${encodeURIComponent(lead.email)}&lead_id=${lead.id}`
+      );
+      const data = await response.json() as { subject: string; body: string; triggerEvent: string };
+      setRecognitionDraft(data);
+    } finally {
+      setSendingRecognition(false);
+    }
+  }
+
+  // Step 2: Send recognition email after preview approval
   async function sendRecognitionEmail() {
-    if (!lead.email || !lead.business_name || !lead.business_category) return;
+    if (!recognitionDraft) return;
     setSendingRecognition(true);
     try {
       const response = await fetch("/api/b2b/send-recognition", {
@@ -196,6 +213,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       if (data.success) {
         console.log("[SEND-RECOGNITION] Email sent successfully, trigger:", data.trigger_event);
         setConfirmationSuccessMessage(true);
+        setRecognitionDraft(null);
         if (data.prospectBriefUrl) {
           setProspectBriefUrl(data.prospectBriefUrl);
         }
@@ -455,14 +473,46 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             </div>
           )}
 
-          {/* Recognition email button */}
-          <button
-            onClick={sendRecognitionEmail}
-            disabled={sendingRecognition || !lead.email}
-            className="w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
-          >
-            {sendingRecognition ? "Sending…" : "Send recognition email"}
-          </button>
+          {/* Recognition email button or draft preview */}
+          {recognitionDraft ? (
+            <div className="bg-[#FAFAFA] border border-[#EAE6E0] rounded-lg p-4 mb-4 space-y-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.5px] text-[#666666]">Recognition email preview</p>
+              <input
+                value={recognitionDraft.subject}
+                onChange={e => setRecognitionDraft(d => d ? { ...d, subject: e.target.value } : d)}
+                className="w-full text-sm font-semibold focus:outline-none pb-2 text-[#0D0D0D] bg-transparent border-b border-[#EAE6E0]"
+              />
+              <textarea
+                value={recognitionDraft.body}
+                onChange={e => setRecognitionDraft(d => d ? { ...d, body: e.target.value } : d)}
+                rows={4}
+                className="w-full text-sm bg-transparent focus:outline-none resize-none text-[#0D0D0D]"
+              />
+              <div className="flex gap-2 pt-2">
+                <button
+                  onClick={sendRecognitionEmail}
+                  disabled={sendingRecognition}
+                  className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 disabled:opacity-30 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
+                >
+                  {sendingRecognition ? "Sending…" : "Send"}
+                </button>
+                <button
+                  onClick={() => setRecognitionDraft(null)}
+                  className="text-xs font-medium transition-colors text-[#888888] hover:text-[#0D0D0D]"
+                >
+                  Back
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={previewRecognitionEmail}
+              disabled={sendingRecognition || !lead.email}
+              className="w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
+            >
+              {sendingRecognition ? "Previewing…" : "Send recognition email"}
+            </button>
+          )}
 
           {/* Prospect brief link - always visible */}
           <Link

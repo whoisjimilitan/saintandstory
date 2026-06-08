@@ -6,6 +6,36 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// GET: Preview recognition email without sending
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const business_name = searchParams.get("business_name");
+  const industry = searchParams.get("industry");
+  const email = searchParams.get("email");
+  const lead_id = searchParams.get("lead_id");
+
+  if (!business_name || !industry || !email || !lead_id) {
+    return Response.json({ error: "Missing required parameters" }, { status: 400 });
+  }
+
+  const recognitionEmail = generateRecognitionEmail({
+    business_name,
+    industry,
+    email,
+    lead_id: parseInt(lead_id),
+  });
+
+  if (!recognitionEmail) {
+    return Response.json({ error: "No trigger events found" }, { status: 400 });
+  }
+
+  return Response.json({
+    subject: recognitionEmail.subject,
+    body: recognitionEmail.body,
+    triggerEvent: recognitionEmail.triggerEvent,
+  });
+}
+
 export async function POST(request: Request) {
   const { lead_id, business_name, industry, email } = await request.json();
 
