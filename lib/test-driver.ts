@@ -28,11 +28,8 @@ export async function initializeTestDriver(): Promise<{ success: boolean; messag
         email,
         full_name,
         phone,
-        city,
-        bio,
-        availability,
-        vehicle_type,
         area,
+        vehicle_type,
         created_at,
         updated_at
       ) VALUES (
@@ -40,10 +37,7 @@ export async function initializeTestDriver(): Promise<{ success: boolean; messag
         ${TEST_DRIVER_NAME},
         '07000 TEST 000',
         'London',
-        'Test driver account for development. Not a real driver.',
-        'Available',
         'Van',
-        'London',
         NOW(),
         NOW()
       )
