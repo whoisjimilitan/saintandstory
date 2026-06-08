@@ -127,7 +127,7 @@ export default async function DriverDashboardHome() {
         <h1 className="font-sans font-black text-[#0D0D0D] text-3xl sm:text-4xl tracking-tight mb-2">
           Go online. Get booked.
         </h1>
-        <p className="text-[#888888] text-sm">Relevant opportunities are presented to you based on your availability.</p>
+        <p className="text-[#888888] text-sm">Jobs available when you're free to work.</p>
       </div>
 
       {/* Status pill */}

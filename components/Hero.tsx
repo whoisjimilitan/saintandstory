@@ -23,15 +23,15 @@ const CONTENT = {
     source: "hero_customer",
   },
   driver: {
-    badge: "Verified drivers. Real work. Real pay.",
+    badge: "Get booked. Keep 100%. Get paid same day.",
     headline: (
       <>
-        G<span className="font-display italic font-normal">o</span> online.
-        <br />G<span className="font-display italic font-normal">e</span>t b
-        <span className="font-display italic font-normal">o</span>oked.
+        G<span className="font-display italic font-normal">o</span>t a van?
+        <br />W<span className="font-display italic font-normal">a</span>nt m
+        <span className="font-display italic font-normal">o</span>re w<span className="font-display italic font-normal">o</span>rk?
       </>
     ),
-    sub: "Post your availability. Stay active for work. Receive relevant opportunities when available.",
+    sub: "Get booked for jobs when you're available. No chasing. No cold leads.",
     cta: "Join as driver →",
     source: "hero_driver",
   },
