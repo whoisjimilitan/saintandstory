@@ -1,190 +1,287 @@
-# DRIVER POSITIONING AUDIT
-**Status:** Audit Complete · Awaiting Approval
+# DRIVER POSITIONING AUDIT v2.0
+**Reference:** DRIVER POSITIONING LOCK v1.0
+**Status:** Audit Only · Awaiting Approval
 **Date:** 2026-06-08
-**Scope:** Homepage driver toggle, driver dashboard, for-drivers landing page, pricing language
+
+---
+
+## LOCKED POSITIONING REFERENCE
+
+**The Driver Proposition:**
+> Got a van? Got time to earn? Stay active for work. Choose your area and availability. Active drivers receive relevant opportunities as they become available. Accept what works for you. Keep what you earn.
+
+**The Mental Model:**
+> I pay the founding rate to stay active in the Saint & Story network. I tell them where I work and when I am available. When suitable opportunities arise they are presented to me. I choose what I accept. I keep what I earn.
 
 ---
 
 ## 1. HOMEPAGE DRIVER TOGGLE (Hero.tsx)
 
-### Current Wording
+### Current Copy
 - **Badge:** "Verified drivers only. Jobs are sent directly to you."
 - **Headline:** "Go online. Get booked."
-- **Supporting line:** "Activate your availability. We match you with jobs in your area."
+- **Sub:** "Activate your availability. We match you with jobs in your area."
 - **CTA:** "Join as driver →"
 
-### Positioning Issues
-1. **"Jobs are sent directly to you."**
-   - ❌ Implies automatic job delivery/guaranteed assignments
-   - ❌ Contradicts network model (opportunities presented, driver chooses)
-   - ❌ Sets false expectation of exclusive dispatch
+### Conflicts with Positioning Lock
+1. **"Jobs are sent directly to you"**
+   - ❌ Implies exclusive assignment/guaranteed dispatch
+   - ❌ Contradicts "active drivers receive relevant opportunities" (plural, optional)
+   - ❌ Creates expectation of Uber-style automatic allocation
 
-2. **"We match you with jobs in your area."**
-   - ❌ Implies algorithmic matching guarantee
-   - ❌ Overstates system capability
-   - ❌ Conflicts with "network where opportunities are offered to multiple available drivers"
+2. **"We match you with jobs in your area"**
+   - ❌ "Match" implies deterministic pairing
+   - ❌ Suggests backend algorithm guarantees work
+   - ❌ Avoids driver agency ("you choose")
 
-### Proposed Replacement
-- **Badge:** "Verified drivers. Real opportunities in your area."
-- **Headline:** "Go online. Get booked." ✓ (Keep as-is)
-- **Supporting line:** "Set your availability. See opportunities in your area. Choose what you accept."
-- **CTA:** "Join as driver →" ✓ (Keep as-is)
+### Proposed Copy
+- **Badge:** "Verified drivers in your area."
+- **Headline:** "Got a van? Got time to earn?" ✓ (Or keep "Go online. Get booked." if preferred for brevity)
+- **Sub:** "Stay active for work. Choose your area and availability. Relevant opportunities are presented to you."
+- **CTA:** "Join as driver →" ✓
 
 ### Reasoning
-- "Verified drivers" emphasizes quality network, removes "sent directly" guarantee language
-- "Real opportunities" replaces promise of job delivery
-- "Set availability → See opportunities → Choose" reframes as active network participation, not passive job receipt
-- Aligns with: join network, set availability, receive opportunities, choose work
+- Removes "sent directly" (no exclusivity implied)
+- "Relevant opportunities are presented" aligns with locked language (plural, optional, driver-presented)
+- "Stay active" reinforces what £9.99 buys (participation, not leads)
+- "Choose area and availability" emphasizes driver control
+- Matches locked: "Got van? Got time? Stay active. Choose area/availability. Opportunities presented. Accept what works."
 
 ---
 
 ## 2. DRIVER DASHBOARD HERO (app/dashboard/driver/page.tsx)
 
-### Current Wording
-- **Headline:** "Go online. Get booked." ✓ (Acceptable)
-- **Trust signal:** "Jobs are assigned in real time based on availability."
+### Current Copy
+- **Headline:** "Go online. Get booked."
+- **Signal:** "Jobs are assigned in real time based on availability."
 
-### Positioning Issue
-1. **"Jobs are assigned in real time based on availability."**
-   - ❌ Implies automatic assignment/guaranteed dispatch
-   - ❌ "assigned" suggests algorithmic decision, not driver choice
-   - ❌ Sets false expectation of passive income if availability is set
+### Conflicts with Positioning Lock
+1. **"Jobs are assigned in real time"**
+   - ❌ "Assigned" implies system decision, not driver choice
+   - ❌ "In real time" suggests immediate/automatic dispatch
    - ❌ Contradicts "driver chooses what to accept" model
+   - ❌ Sets false expectation of passive income if availability is set
 
-### Proposed Replacement
-- **Trust signal:** "Opportunities in your area appear when you're available. You choose what to accept."
+### Proposed Copy
+- **Headline:** "Go online. Get booked." ✓ (Keep - activates driver)
+- **Signal:** "Relevant opportunities appear when you're available. You choose what to accept."
 
 ### Reasoning
-- "Appear" is neutral (no guarantee, no matching algorithm implied)
-- "When you're available" reinforces driver control through availability setting
-- "You choose" explicitly states driver agency
-- Aligns with active network model: availability → opportunities visible → driver decision
+- "Appear" is neutral (no guarantee, no matching implied)
+- "When you're available" reinforces that driver controls visibility through availability
+- "You choose what to accept" explicitly restates driver agency
+- Aligns with: "Opportunities presented. Driver chooses. Driver accepts."
+- Dashboard reinforces: Availability → Opportunities → Choice → Work → Earnings
 
 ---
 
 ## 3. FOR-DRIVERS LANDING PAGE (app/for-drivers/page.tsx)
 
-### Current Wording
+### Current Copy
 
-**Steps Section:**
-- Step 02: "Tell us when you're free. Customers in your area see you."
-- Step 03: "Show up, do what you do best. Every job builds your rating."
+**Hero Section:**
+- "Post your availability. Customers find you. [Driver count] removal and man-and-van drivers already earning."
+
+**Steps:**
+- Step 01: "Create your profile. Set your area, van size, and rate."
+- Step 02: "Post your availability. Tell us when you're free. Customers in your area see you."
+- Step 03: "Get booked and deliver. Show up, do what you do best."
+- Step 04: "Get paid. Finish a job at 3pm. Money in your account before 4pm."
 
 **Features:**
 - "Your profile, live 24/7. Searchable by every customer in your area. No cold calling. No ad spend."
-- "Higher rating means you appear first when customers search your area."
 - "You set the calendar. Customers book around you, not the other way round."
+- "Higher rating means you appear first when customers search your area."
+- "Build your name. Higher rating means you appear first when customers search your area."
 
-**Hero Subtitle:**
-- "Post your availability. Customers find you. [Driver count] removal and man-and-van drivers already earning."
+**Reviews:**
+- "Posted my availability Sunday night. Had two bookings by Monday morning."
+- "Profile went live Monday. Three jobs booked by Wednesday."
 
-### Positioning Issues
+### Conflicts with Positioning Lock
 
-1. **"Customers in your area see you" / "Searchable by every customer"**
-   - ❌ Implies customer-driven search/discovery
-   - ❌ Positions driver as passive profile in a search index
-   - ❌ Contradicts network model (system presents opportunities to drivers, not customers searching drivers)
+**Marketplace Drift (Multiple):**
+1. "Customers find you" — ❌ Reverses agency (system should push to driver, not customer pull)
+2. "Customers in your area see you" — ❌ Positions driver as searchable profile
+3. "Searchable by every customer" — ❌ Implies customer-driven discovery, not system dispatch
+4. "Higher rating means you appear first when customers search" — ❌ Implies ranking/visibility competition, zero-sum game
+5. "Customers book around you" — ❌ Implies customer decision drives workflow (contradicts driver control)
 
-2. **"Higher rating means you appear first when customers search your area."**
-   - ❌ Implies ranking/visibility competition
-   - ❌ Creates scarcity mindset ("appear first" suggests others don't)
-   - ❌ Suggests customer preference drives dispatch, not system availability matching
-   - ❌ Conflicts with "choose what to accept" model (implies customer choice controls visibility)
+**Dispatch Drift:**
+1. "Get booked" — ⚠️ Ambiguous agency (system books? customer books? driver books?)
+2. "Had two bookings by Monday morning" — ⚠️ Implies guaranteed early bookings
+3. "Three jobs booked by Wednesday" — ⚠️ Same issue
 
-3. **"Customers find you"**
-   - ❌ Reverses agency (system should push opportunities to drivers, not have customers pull drivers)
-   - ❌ Implies customer as active hunter, driver as passive listing
-   - ❌ Contradicts subscription model (driver pays to be available, not to be found)
+**Missing Network Framing:**
+- No mention of "staying active"
+- No mention of "remaining available"
+- No mention of "choosing what to accept"
+- Page emphasizes passive benefits, not active participation
 
-4. **"Get booked and deliver"**
-   - ⚠️ Slightly ambiguous (unclear if driver or system does the "booking")
-   - Prefer: "Accept bookings and deliver" or "Receive bookings, accept, deliver"
+### Proposed Copy
 
-### Proposed Replacement
+**Hero Section:**
+- "Choose your area. Set your availability. Stay active for work. Opportunities come to you. [Driver count] removal and man-and-van drivers already earning."
 
-**Steps Section:**
-- Step 02: "Tell us when you're free. Relevant opportunities appear on your dashboard."
-- Step 03: "Accept bookings, show up, and do what you do best. Every job builds your rating."
+**Steps:**
+- Step 01: "Create your profile. Set your area, van size, and rate."
+- Step 02: "Stay active for work. Tell us when you're available. Relevant opportunities are presented to you."
+- Step 03: "Accept bookings and deliver. Choose what works for you. Every job builds your rating."
+- Step 04: "Get paid. Finish a job at 3pm. Money in your account before 4pm."
 
-**Features:**
+**Features (Revised):**
 - "Your profile, live 24/7. Opportunities in your area reach you when you're available. No cold calling. No ad spend."
-- "Higher rating means you get better-matched opportunities in your area." 
-  - *OR* "Your rating improves how well we match you with relevant work."
-- "You set the calendar. Opportunities fit your availability, not the other way round." ✓ (Concept sound, reworded)
-- *Add:* "Receive opportunities. Accept what works. Decline the rest."
+- "You choose your calendar. Opportunities fit your availability, not the other way round."
+- "Higher rating means better opportunities in your area. The more jobs you complete, the better we understand your fit."
+- "Keep 100% of earnings. £9.99/month founding rate. One booking typically covers it."
+- "Stay active, stay visible. Relevant opportunities are presented to available drivers."
 
-**Hero Subtitle:**
-- "Set your availability. Receive relevant opportunities. Keep 100%. [Driver count] removal and man-and-van drivers already earning."
+**Reviews (Revised - if keeping testimonials):**
+- "Posted my availability. Within days, relevant work started appearing. I choose what I accept."
+- "Set my availability once. Now I get presented with work that fits. Much better than cold calling."
+- "I post my week. Opportunities appear. I accept the ones that work. Simple."
 
 ### Reasoning
-- "Relevant opportunities appear on your dashboard" repositions as system-driven dispatch, not customer search
-- "Accept bookings" clarifies driver agency (not passive "get booked")
-- Removes "customers find you" language that implies passive listing status
-- "Better-matched opportunities" reframes rating value as quality matching, not visibility ranking
-- "Fit your availability" vs "You set calendar" is more direct about driver control
-- Emphasizes the actual flow: availability → opportunities → accept → earn
+- "Opportunities come to you" replaces "customers find you" (system→driver push, not customer pull)
+- "Relevant opportunities are presented" uses locked language (plural, optional)
+- "Choose what works" emphasizes driver agency over passive "get booked"
+- "Accept bookings" clarifies active driver choice
+- Removes all "customers search/find/see you" language (marketplace drift)
+- Removes "appear first" ranking language (removes scarcity/competition framing)
+- Reframes rating as matching quality, not visibility ranking
+- Emphasizes "stay active" (what £9.99 actually buys)
 
 ---
 
-## 4. PRICING & EARNINGS LANGUAGE
+## 4. DRIVER ONBOARDING (app/sign-up path - if applicable)
 
-### Current Wording (Generally Good)
+### Current Copy
+*(Not audited - need to locate)*
+
+### Assumption Based on Landing Page
+- Likely emphasizes "create profile to get discovered"
+- May imply "post availability and get booked"
+
+### Proposed Copy Direction
+Should communicate:
+- You're joining the Saint & Story network
+- £9.99/month keeps you active and visible
+- Set your area and availability
+- Opportunities will be presented to you
+- You choose what to accept
+- You keep what you earn
+
+---
+
+## 5. DRIVER PRICING (Dashboard + Landing Page)
+
+### Current Copy
 - "£9.99/month founding rate — locked forever"
 - "Keep 100% of every job"
-- "First booking covers your £9.99 this month"
+- "Founding rate. Locked for the first 100 drivers."
 
-### Positioning Issues (Minor)
+### Conflicts with Positioning Lock
+1. **Unclear value proposition**
+   - Not explicit that £9.99 = "stay active in network"
+   - Reads like profile activation fee, not participation cost
+   - Doesn't reinforce "what you're buying"
 
-1. **"First booking covers your £9.99 this month"**
-   - ⚠️ Slightly implies guaranteed first booking ("will cover")
-   - Better framing: "One typical booking more than covers your £9.99 monthly fee"
-
-### Proposed Replacement
-- "£9.99/month — locked forever. One booking typically covers it."
+### Proposed Copy
+- "£9.99/month founding rate. Locked forever for the first 100 drivers."
+- **Add clarity:** "Stay active in the Saint & Story network. Receive relevant opportunities in your area."
+- "Keep 100% of every job. One booking typically covers your monthly fee."
 
 ### Reasoning
-- "Typically covers" is realistic (doesn't guarantee assignment)
-- Removes "first" (implies certainty of early booking)
-- Honest about value without overpromising
+- Explicitly ties £9.99 to network participation (not leads, not advertising)
+- "Receive relevant opportunities" reinforces what rate buys
+- "One booking typically covers it" is realistic (not "first booking guarantees")
+- Aligns with: £9.99 = active participation, not outcome guarantee
 
 ---
 
-## SUMMARY TABLE
+## MENTAL MODEL TEST
 
-| Surface | Issue | Fix |
-|---------|-------|-----|
-| **Homepage Toggle Badge** | "Jobs are sent directly to you" | "Verified drivers. Real opportunities." |
-| **Homepage Toggle Sub** | "We match you with jobs" | "Set availability. See opportunities. Choose." |
-| **Dashboard Hero Signal** | "Jobs are assigned in real time" | "Opportunities appear when available. You choose." |
-| **For-Drivers Hero** | "Customers find you" | "Receive relevant opportunities" |
-| **For-Drivers Feature** | "Searchable by customers" | "Opportunities reach you when available" |
-| **For-Drivers Ranking** | "Appear first in search" | "Get better-matched opportunities" |
-| **For-Drivers Step 3** | "Get booked" | "Accept bookings" |
-| **Pricing Signal** | "First booking covers fee" | "One booking typically covers fee" |
+**Does each page make drivers believe this?**
 
----
+> "I pay £9.99/month to stay active in the Saint & Story network. I tell them where I work and when I'm available. When suitable opportunities arise they are presented to me. I choose what I accept. I keep what I earn."
 
-## MENTAL MODEL ALIGNMENT CHECK
+### Current State
+- ❌ Homepage toggle: Creates "we send you jobs" expectation (dispatch drift)
+- ❌ For-drivers page: Creates "customers find you" expectation (marketplace drift)
+- ❌ Dashboard signal: Creates "jobs are assigned" expectation (dispatch drift)
+- ⚠️ Pricing: Unclear what £9.99 actually buys
 
-**Desired Flow:**
-1. Driver joins network → ✓ "Join as driver"
-2. Driver sets availability → ✓ "Set your availability"
-3. Driver receives opportunities → ❌ Currently implies "assignment/matching" instead of "visibility"
-4. Driver chooses to accept → ✓ "You choose / Accept"
-5. Driver completes work → ✓ "Deliver / Complete"
-6. Driver gets paid → ✓ "Keep 100%"
-
-**Current copy conflates steps 3-4:** Implies system assigns jobs, driver passively receives.
-**Proposed copy separates steps 3-4:** System shows opportunities, driver actively chooses.
+### After Proposed Changes
+- ✅ Homepage toggle: "Stay active. Choose availability. Opportunities presented."
+- ✅ For-drivers page: "Set availability. Relevant opportunities reach you. You choose."
+- ✅ Dashboard signal: "Opportunities appear when available. You choose what to accept."
+- ✅ Pricing: "£9.99 = Stay active. Receive opportunities."
 
 ---
 
-## RECOMMENDATION
+## SUMMARY: Copy Changes Required
 
-**APPROVE:** All proposed changes align positioning with clarified concierge network model.
-**DO NOT IMPLEMENT YET:** Awaiting explicit approval.
+| Page | Current | Proposed | Category |
+|------|---------|----------|----------|
+| **Homepage Badge** | "Jobs are sent directly" | "Verified drivers in your area" | Remove dispatch drift |
+| **Homepage Sub** | "We match you with jobs" | "Stay active. Choose area/availability. Relevant opportunities presented." | Remove dispatch drift |
+| **Dashboard Signal** | "Jobs are assigned in real time" | "Opportunities appear when available. You choose what to accept." | Remove dispatch drift |
+| **For-Drivers Hero** | "Customers find you" | "Choose area. Set availability. Opportunities come to you." | Remove marketplace drift |
+| **For-Drivers Step 2** | "Customers in your area see you" | "Relevant opportunities are presented to you" | Remove marketplace drift |
+| **For-Drivers Step 3** | "Get booked and deliver" | "Accept bookings and deliver" | Clarify driver agency |
+| **For-Drivers Feature** | "Searchable by every customer" | "Opportunities reach you when available" | Remove marketplace drift |
+| **For-Drivers Feature** | "Appear first when customers search" | "Better opportunities through better matching" | Remove ranking language |
+| **For-Drivers Feature** | (Add) | "Stay active, stay visible. Opportunities presented to available drivers." | Add network framing |
+| **Pricing** | "£9.99/month founding rate" | "£9.99/month founding rate. Stay active in network. Receive relevant opportunities." | Clarify value |
 
 ---
 
-**Prepared by:** Claude Code
-**Status:** Ready for Review
+## CONSISTENCY MATRIX
+
+**All surfaces must reinforce the same flow:**
+
+| Stage | Locked Language | Homepage | Landing | Dashboard | Pricing |
+|-------|-----------------|----------|---------|-----------|---------|
+| **Join** | Join network | "Join as driver" ✓ | Step 01 ✓ | N/A | N/A |
+| **Pay** | £9.99/month | N/A | Mentioned ✓ | "Founding rate" ✓ | "£9.99/month" ✓ |
+| **Activate** | Stay active | "Go online" ✓ | "Stay active for work" ✓ | "Go online" ✓ | "Stay active" (add) |
+| **Set** | Choose area/availability | "Choose area/availability" (add) | Step 02 ✓ | "Go online" ✓ | N/A |
+| **Receive** | Relevant opportunities presented | "Opportunities presented" (add) | "Opportunities presented" ✓ | "Opportunities appear" ✓ | "Receive opportunities" (add) |
+| **Choose** | You choose what to accept | (add) | "Choose what works" ✓ | "You choose" ✓ | N/A |
+| **Work** | Accept, complete | Step 03 ✓ | Step 03 ✓ | "In Progress" section ✓ | N/A |
+| **Earn** | Keep earnings | "Keep 100%" ✓ | "Keep 100%" ✓ | Earnings section ✓ | "Keep 100%" ✓ |
+
+---
+
+## COPY TEST RESULT
+
+**Current State:** ❌ FAILS
+- Marketplace drift on for-drivers page (customers finding drivers)
+- Dispatch drift on homepage and dashboard (jobs sent/assigned)
+- Pricing unclear (what does £9.99 actually buy?)
+
+**After Proposed Changes:** ✅ PASSES
+- Consistent network framing across all surfaces
+- Driver agency explicit ("you choose")
+- Participation model clear (stay active → receive → choose)
+- Pricing reinforces value (network access, opportunity access)
+
+---
+
+## NEXT STEP
+
+**DO NOT IMPLEMENT.**
+
+Wait for approval of proposed copy changes.
+
+Only after approval proceed to implementation.
+
+All changes are copy/messaging only.
+
+No layout changes.
+
+No new components.
+
+No workflow changes.
+
+No design system changes.
