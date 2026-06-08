@@ -41,7 +41,7 @@ async function notifyCustomerEnRoute(job: Record<string, unknown>) {
         <a href="${BASE_URL}/track/${job.tracking_token as string}" style="display:inline-block;background:#0D0D0D;color:#fff;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;font-size:14px;margin-bottom:24px;">
           Track your job →
         </a>
-        <p style="color:#888;font-size:13px;">Questions? Call <a href="tel:02082344444" style="color:#0D0D0D;">0208 234 4444</a></p>
+        <p style="color:#888;font-size:13px;">Questions? Call <a href="tel:02030517408" style="color:#0D0D0D;">0203 051 7408</a></p>
       </div>
     `,
   });
@@ -81,7 +81,7 @@ async function notifyCustomerComplete(job: Record<string, unknown>) {
           <p style="margin:0;color:#888;font-size:13px;">Share <a href="${BASE_URL}" style="color:#0D0D0D;font-weight:600;">saintandstoryltd.co.uk</a> — fixed price, verified driver, done properly.</p>
         </div>
         <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e8e8e8;">
-          <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London · <a href="tel:02082344444" style="color:#bbb;">0208 234 4444</a></p>
+          <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London · <a href="tel:02030517408" style="color:#bbb;">0203 051 7408</a></p>
         </div>
       </div>
     `,

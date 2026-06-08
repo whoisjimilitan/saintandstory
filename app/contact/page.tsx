@@ -4,12 +4,12 @@ import MobileBar from "@/components/MobileBar";
 import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {
-  title: "Contact Saint & Story | UK Removal Company | 0208 234 4444",
-  description: "Get a free removal quote from Saint & Story. We call back within 15 minutes, seven days a week. Call 0208 234 4444 or tell us about your move online.",
+  title: "Contact Saint & Story | UK Removal Company | 0203 051 7408",
+  description: "Get a free removal quote from Saint & Story. We call back within 15 minutes, seven days a week. Call 0203 051 7408 or tell us about your move online.",
 };
 
 const DETAILS = [
-  { label: "Phone", value: "0208 234 4444", href: "tel:+442082344444" },
+  { label: "Phone", value: "0203 051 7408", href: "tel:+442030517408" },
   { label: "Email", value: "hello@saintandstoryltd.co.uk", href: "mailto:hello@saintandstoryltd.co.uk" },
   { label: "Hours", value: "Mon–Sun, 7am–10pm", href: null },
 ];

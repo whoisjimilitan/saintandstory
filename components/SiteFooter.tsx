@@ -118,8 +118,8 @@ export default function SiteFooter() {
             <h3 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Contact</h3>
             <ul className="space-y-2.5">
               <li>
-                <a href="tel:+442082344444" className="text-sm text-[#0D0D0D] hover:text-[#888888] transition-colors">
-                  0208 234 4444
+                <a href="tel:+442030517408" className="text-sm text-[#0D0D0D] hover:text-[#888888] transition-colors">
+                  0203 051 7408
                 </a>
               </li>
               <li>

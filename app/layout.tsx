@@ -71,7 +71,7 @@ export default function RootLayout({
     "@type": "MovingCompany",
     "name": "Saint & Story Logistics",
     "url": BASE_URL,
-    "telephone": "+442082344444",
+    "telephone": "+442030517408",
     "email": "hello@saintandstoryltd.co.uk",
     "priceRange": "££",
     "openingHoursSpecification": {

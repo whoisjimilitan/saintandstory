@@ -117,7 +117,7 @@ export const B2B_NICHES: Record<string, B2BNiche> = {
     ],
     faqs: [
       { q: "Can you handle confidential documents?", a: "Yes. Every driver is verified and background-checked. For sensitive deliveries, we can arrange sealed-envelope confirmation on collection and delivery." },
-      { q: "Can you meet court deadlines?", a: "Driver confirmed in 15 minutes. We operate 7am to 10pm, seven days a week. For urgent court runs, call us directly: 0208 234 4444." },
+      { q: "Can you meet court deadlines?", a: "Driver confirmed in 15 minutes. We operate 7am to 10pm, seven days a week. For urgent court runs, call us directly: 0203 051 7408." },
       { q: "Do you provide proof of delivery?", a: "Yes — confirmation with timestamp on delivery. We keep records on every run." },
       { q: "Can we set up a regular inter-office run?", a: "Yes — standing orders automate the weekly run. Same driver, same time, same price." },
     ],

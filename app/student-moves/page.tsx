@@ -82,7 +82,7 @@ export default function StudentMoves() {
       "@type": "MovingCompany",
       "name": "Saint & Story Logistics",
       "url": "https://saintandstoryltd.co.uk",
-      "telephone": "+442082344444",
+      "telephone": "+442030517408",
     },
     "areaServed": { "@type": "Country", "name": "United Kingdom" },
     "offers": {

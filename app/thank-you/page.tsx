@@ -52,10 +52,10 @@ export default function ThankYou() {
         </div>
 
         <a
-          href="tel:+442082344444"
+          href="tel:+442030517408"
           className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-8 py-3.5 rounded-full text-sm transition-colors mb-10"
         >
-          Call 0208 234 4444
+          Call 0203 051 7408
         </a>
 
         <div className="border border-white/10 rounded-2xl p-6 mb-10 text-left">
