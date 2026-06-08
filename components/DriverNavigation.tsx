@@ -8,7 +8,8 @@ export default function DriverNavigation() {
 
   const navItems = [
     { href: "/dashboard/driver", label: "Dashboard", icon: "📊" },
-    { href: "/dashboard/driver/jobs", label: "Active Jobs", icon: "📍" },
+    { href: "/dashboard/driver/active-jobs", label: "Active Jobs", icon: "📍" },
+    { href: "/dashboard/driver/jobs", label: "Job History", icon: "📋" },
     { href: "/dashboard/driver/earnings", label: "Earnings", icon: "💰" },
     { href: "/dashboard/driver/availability", label: "Availability", icon: "📅" },
   ];
