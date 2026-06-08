@@ -156,7 +156,7 @@ function StepPhoneConsent({ answers, setAnswers }: { answers: Answers; setAnswer
           type="checkbox"
           checked={(answers.phoneConsent as boolean) ?? true}
           onChange={(e) => setAnswers({ ...answers, phoneConsent: e.target.checked })}
-          className="mt-0.5 w-4 h-4 shrink-0"
+          className="mt-0.5 w-4 h-4 shrink-0 accent-[#0D0D0D]"
         />
         <span className="text-sm text-[#0D0D0D]">
           It&apos;s OK to contact me by phone about this quote
@@ -192,7 +192,7 @@ function StepName({ answers, setAnswers, onEnter }: { answers: Answers; setAnswe
           type="checkbox"
           checked={(answers.marketing as boolean) ?? false}
           onChange={(e) => setAnswers({ ...answers, marketing: e.target.checked })}
-          className="mt-0.5 w-4 h-4 shrink-0"
+          className="mt-0.5 w-4 h-4 shrink-0 accent-[#0D0D0D]"
         />
         <span className="text-sm text-[#888888]">
           I am happy to receive occasional marketing emails.
