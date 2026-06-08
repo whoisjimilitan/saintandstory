@@ -26,12 +26,10 @@ export async function initializeTestDriver(): Promise<{ success: boolean; messag
     const result = await sql`
       INSERT INTO drivers (
         email,
-        name,
+        full_name,
         phone,
-        city,
+        area,
         vehicle_type,
-        availability,
-        bio,
         created_at,
         updated_at
       ) VALUES (
@@ -40,8 +38,6 @@ export async function initializeTestDriver(): Promise<{ success: boolean; messag
         '07000 TEST 000',
         'London',
         'Van',
-        'Available',
-        'Test driver account for development. Not a real driver.',
         NOW(),
         NOW()
       )
