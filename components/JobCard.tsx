@@ -148,16 +148,88 @@ export default function JobCard({
         </div>
       )}
 
-      {/* Expandable job detail view (Phase 1: placeholder) */}
+      {/* Expandable job detail view */}
       {isExpanded && (onToggleExpand || (status !== "offered" && status !== "completed")) && (
-        <div className="border-t border-[#E8E8E8] pt-4 space-y-3">
+        <div className="border-t border-[#E8E8E8] pt-4 space-y-4">
+          {/* Customer Information */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Status Timeline</p>
-            <p className="text-[#888888] text-xs">(Phase 1: Status progression will display here)</p>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Customer</p>
+            <div className="space-y-1 text-sm">
+              <p className="text-[#0D0D0D] font-medium">{job.customer_name ? String(job.customer_name) : "—"}</p>
+              <p className="text-[#888888] text-xs">{job.customer_email ? String(job.customer_email) : "—"}</p>
+              <p className="text-[#888888] text-xs">{job.customer_phone ? String(job.customer_phone) : "—"}</p>
+            </div>
           </div>
+
+          {/* Job Details */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Location Tracking</p>
-            <p className="text-[#888888] text-xs">(Phase 1: Live location indicator ready for integration)</p>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Job Details</p>
+            <div className="space-y-1.5 text-sm">
+              <div className="flex justify-between">
+                <span className="text-[#888888]">From</span>
+                <span className="text-[#0D0D0D] font-medium">{job.postcode_from ? String(job.postcode_from) : "—"}</span>
+              </div>
+              {job.postcode_to ? (
+                <div className="flex justify-between">
+                  <span className="text-[#888888]">To</span>
+                  <span className="text-[#0D0D0D] font-medium">{String(job.postcode_to)}</span>
+                </div>
+              ) : null}
+              {job.price ? (
+                <div className="flex justify-between">
+                  <span className="text-[#888888]">Price</span>
+                  <span className="text-[#0D0D0D] font-medium">£{Number(job.price).toFixed(2)}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Special Instructions */}
+          {job.notes ? (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Instructions</p>
+              <p className="text-[#0D0D0D] text-xs leading-relaxed">{String(job.notes)}</p>
+            </div>
+          ) : null}
+
+          {/* Status Timeline */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Status Progress</p>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${status === "offered" || ["confirmed", "in_progress", "completed"].includes(status) ? "bg-[#888888]" : "bg-[#E8E8E8]"}`} />
+                <span className="text-[#888888]">Offered</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${status === "confirmed" || ["in_progress", "completed"].includes(status) ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"}`} />
+                <span className="text-[#888888]">Confirmed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${status === "in_progress" || status === "completed" ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"}`} />
+                <span className="text-[#888888]">In Progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${status === "completed" ? "bg-[#888888]" : "bg-[#E8E8E8]"}`} />
+                <span className="text-[#888888]">Completed</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Location Preview (Phase 1: placeholder) */}
+          {status === "in_progress" && (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Location</p>
+              <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-3 text-center">
+                <p className="text-[#888888] text-xs">(Phase 1: Map preview placeholder)</p>
+                <p className="text-[#888888] text-[10px] mt-1">Live location will display here in Phase 2</p>
+              </div>
+            </div>
+          )}
+
+          {/* Admin Contact (Phase 1: placeholder) */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Assigned By</p>
+            <p className="text-[#888888] text-xs">(Phase 1: Admin contact will display here)</p>
           </div>
         </div>
       )}
