@@ -99,20 +99,21 @@ export function generateRecognitionEmail(params: RecognitionEmailParams) {
 
   return {
     to: params.email,
-    subject: `${params.business_name} — we see what's happening`,
+    subject: `${params.business_name} — pattern we're tracking`,
     body: `Hello,
 
-We came across your business.
+We've been tracking operational patterns in your industry.
 
-We see something specific happening in your operation right now:
+We're seeing something specific that affects businesses like ${params.business_name}:
 
 ${recognitionStatement}
 
-Is this something you're dealing with right now?
+This is becoming a defining challenge for operations your size. We've documented how this is playing out.
 
-[Yes, this is us] → ${replyYesLink}
+You might find this useful:
+[See what we're tracking] → ${replyYesLink}
 
-No pitch. Just recognition.
+No pitch. Just observation.
 
 James
 Saint & Story`,

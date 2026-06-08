@@ -1,6 +1,8 @@
 "use client";
 
 import DriverLocationShare from "@/components/DriverLocationShare";
+import AdminTrackingMapCard from "@/components/AdminTrackingMapCard";
+import AdminDispatchControls from "@/components/AdminDispatchControls";
 
 const STATUS_LABEL: Record<string, string> = {
   offered: "Offered to you",
@@ -27,6 +29,13 @@ export default function JobCard({
   updating,
   isExpanded,
   onToggleExpand,
+  adminMode = false,
+  driverLocations = [],
+  jobRoutes = [],
+  onDispatchStart,
+  onDispatchComplete,
+  onDispatchCancel,
+  driverId,
 }: {
   job: Record<string, unknown>;
   onAccept?: () => void;
@@ -36,6 +45,27 @@ export default function JobCard({
   updating?: boolean;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  adminMode?: boolean;
+  driverLocations?: Array<{
+    driverId: string;
+    driverName: string;
+    latitude: number;
+    longitude: number;
+    status: "confirmed" | "in_progress" | "completed";
+    currentJobId?: string;
+  }>;
+  jobRoutes?: Array<{
+    jobId: string;
+    pickupLat: number;
+    pickupLng: number;
+    deliveryLat: number;
+    deliveryLng: number;
+    status: "confirmed" | "in_progress" | "completed";
+  }>;
+  onDispatchStart?: (jobId: string) => Promise<void>;
+  onDispatchComplete?: (jobId: string) => Promise<void>;
+  onDispatchCancel?: (jobId: string) => Promise<void>;
+  driverId?: string;
 }) {
   const status = (job.status as string) ?? "offered";
   const isOffered = status === "offered";
@@ -192,6 +222,16 @@ export default function JobCard({
             </div>
           ) : null}
 
+          {/* Admin: Live Tracking Map (Phase 2) */}
+          {adminMode && status === "in_progress" && (
+            <div>
+              <AdminTrackingMapCard
+                drivers={driverLocations.filter((d) => d.currentJobId === (job.id as string))}
+                routes={jobRoutes.filter((r) => r.jobId === (job.id as string))}
+              />
+            </div>
+          )}
+
           {/* Status Timeline */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Status Progress</p>
@@ -231,6 +271,22 @@ export default function JobCard({
             <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Assigned By</p>
             <p className="text-[#888888] text-xs">(Phase 1: Admin contact will display here)</p>
           </div>
+
+          {/* Admin: Dispatch Controls (Phase 2) */}
+          {adminMode && (
+            <AdminDispatchControls
+              job={{
+                id: String(job.id),
+                status: status as "offered" | "confirmed" | "in_progress" | "completed" | "cancelled",
+                driverId: driverId,
+              }}
+              onStart={onDispatchStart}
+              onComplete={onDispatchComplete}
+              onCancel={onDispatchCancel}
+              assignedDriverId={driverId}
+              compact={false}
+            />
+          )}
         </div>
       )}
 

@@ -2,16 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BarChart3, MapPin, List, DollarSign, Calendar } from "lucide-react";
+
+const navIcons = {
+  dashboard: BarChart3,
+  activeJobs: MapPin,
+  jobHistory: List,
+  earnings: DollarSign,
+  availability: Calendar,
+};
 
 export default function DriverNavigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/dashboard/driver", label: "Dashboard", icon: "📊" },
-    { href: "/dashboard/driver/active-jobs", label: "Active Jobs", icon: "📍" },
-    { href: "/dashboard/driver/jobs", label: "Job History", icon: "📋" },
-    { href: "/dashboard/driver/earnings", label: "Earnings", icon: "💰" },
-    { href: "/dashboard/driver/availability", label: "Availability", icon: "📅" },
+    { href: "/dashboard/driver", label: "Dashboard", iconKey: "dashboard" },
+    { href: "/dashboard/driver/active-jobs", label: "Active Jobs", iconKey: "activeJobs" },
+    { href: "/dashboard/driver/jobs", label: "Job History", iconKey: "jobHistory" },
+    { href: "/dashboard/driver/earnings", label: "Earnings", iconKey: "earnings" },
+    { href: "/dashboard/driver/availability", label: "Availability", iconKey: "availability" },
   ];
 
   return (
@@ -26,6 +35,7 @@ export default function DriverNavigation() {
         <nav className="space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/dashboard/driver");
+            const Icon = navIcons[item.iconKey as keyof typeof navIcons];
             return (
               <Link
                 key={item.href}
@@ -36,7 +46,7 @@ export default function DriverNavigation() {
                     : "text-[#6B7280] hover:text-[#0D0D0D] hover:bg-white"
                 }`}
               >
-                <span className="text-base">{item.icon}</span>
+                <Icon size={20} strokeWidth={2} className={isActive ? "text-white" : "text-[#6B7280]"} />
                 <span>{item.label}</span>
               </Link>
             );
