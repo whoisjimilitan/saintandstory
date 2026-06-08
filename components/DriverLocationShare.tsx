@@ -37,6 +37,19 @@ export default function DriverLocationShare({ job, onArrived, arriving = false }
     };
   }, []);
 
+  // Check if location permission is already granted
+  async function checkPermission(): Promise<"granted" | "denied" | "prompt"> {
+    if (!navigator.permissions) {
+      return "prompt"; // Fallback if Permissions API unavailable
+    }
+    try {
+      const result = await navigator.permissions.query({ name: "geolocation" });
+      return result.state as "granted" | "denied" | "prompt";
+    } catch {
+      return "prompt";
+    }
+  }
+
   async function sendLocation(lat: number, lng: number, accuracy: number) {
     try {
       const res = await fetch("/api/location/update", {
@@ -50,12 +63,17 @@ export default function DriverLocationShare({ job, onArrived, arriving = false }
     } catch { /* non-fatal — retry next interval */ }
   }
 
-  function startSharing() {
+  async function startSharing() {
     if (!navigator.geolocation) {
       setStatus("error");
       return;
     }
-    setStatus("requesting");
+
+    // Check if permission already granted to skip "requesting" UI
+    const permissionState = await checkPermission();
+    if (permissionState !== "granted") {
+      setStatus("requesting");
+    }
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
