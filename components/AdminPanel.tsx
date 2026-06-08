@@ -709,6 +709,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
   const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(true);
   const [expandedFleet, setExpandedFleet] = useState(true);
   const [expandedConfirmed, setExpandedConfirmed] = useState(true);
+  const [expandedCustomers, setExpandedCustomers] = useState(true);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
@@ -757,23 +758,36 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Orders ────────────────────────────────────────────────────────────── */}
-      <div id="section-orders">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Orders ({pending.length})
-        </p>
-        {pending.length === 0 ? (
-          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-8 text-center">
-            <p className="text-[#888888] text-sm">All clear — no pending jobs.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {pending.map(job => (
-              <JobRow key={job.id} job={job} drivers={typedDrivers} onAssigned={removeJob} />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Customers ──────────────────────────────────────────────────────────── */}
+      {pending.length > 0 && (
+        <div id="section-orders">
+          <button
+            onClick={() => setExpandedCustomers(v => !v)}
+            className="w-full flex items-center justify-between mb-3"
+          >
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+              Customer{pending.length !== 1 ? "s" : ""}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[#888888]">
+                {pending.length}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-[#888888] transition-transform ${
+                  expandedCustomers ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </button>
+          {expandedCustomers && (
+            <div className="space-y-3">
+              {pending.map(job => (
+                <JobRow key={job.id} job={job} drivers={typedDrivers} onAssigned={removeJob} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Awaiting driver ───────────────────────────────────────────────────── */}
       {offered.length > 0 && (
