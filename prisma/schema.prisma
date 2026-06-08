@@ -71,6 +71,9 @@ model Driver {
   fullName              String?   @map("full_name")
   email                 String?   @unique
   phone                 String?
+  city                  String?
+  bio                   String?
+  availability          String?
   vehicleType           String?   @map("vehicle_type")
   area                  String?
   daysPreference        String?   @map("days_preference")
