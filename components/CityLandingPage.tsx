@@ -3,18 +3,196 @@ import Nav from "@/components/Nav";
 import ModalCTA from "@/components/ModalCTA";
 import SiteFooter from "@/components/SiteFooter";
 
+/**
+ * SAINT & STORY — CITY PAGE DATA TEMPLATE (CONSTRAINT-LOCKED)
+ *
+ * All city pages must conform to these rules. No exceptions.
+ * Deviations break the system coherence.
+ */
 export interface CityPageData {
+  /** City name only. Format: "London", "Bristol", "Manchester" */
   city: string;
+
+  /**
+   * HERO STRUCTURE RULE (MANDATORY)
+   * Must follow this pattern with HTML spans for italics:
+   *
+   * "[City] rem<span>o</span>vals. / D<span>o</span>ne right."
+   *
+   * Rules:
+   * - Line 1: City + "removals" + outcome (max 6 words)
+   * - Line 2: Emotional clarity (max 4 words, e.g., "Done right", "Done properly")
+   * - Use <br /> for line break
+   * - Use <span className="font-display italic font-normal">[letter]</span> for italics ONLY
+   * - NO marketplace language
+   * - NO system explanation
+   */
   headline: string;
+
+  /**
+   * SUB COPY RULE (MANDATORY)
+   * Max 2 sentences. Max 12 words per sentence.
+   *
+   * Pattern: [Outcome]. [Outcome]. [Optional clarification].
+   * Example: "Fixed price. Verified driver. We call within 15 minutes."
+   *
+   * Forbidden:
+   * - "marketplace", "platform", "algorithm"
+   * - Repeating headline concepts
+   * - Marketing exaggeration
+   * - Time promises (unless verified system metric)
+   */
   sub: string;
+
+  /**
+   * STATS SECTION (BRAND CONSISTENCY)
+   * Keep exactly 4 stats in this order:
+   * 1. Rating (e.g., "4.9★")
+   * 2. Response time (e.g., "< 15m")
+   * 3. Price guarantee (always "Fixed")
+   * 4. Coverage area (postcodes or regions)
+   */
   stats: { stat: string; label: string }[];
+
+  /**
+   * HOW IT WORKS STEPS (NO CHANGES)
+   * Always 4 steps. Follow the universal pattern.
+   * Do not deviate from established flow.
+   */
   steps: { num: string; title: string; desc: string }[];
+
+  /**
+   * TESTIMONIALS (DATA ONLY)
+   * Real customer quotes from this city.
+   * Max 3 testimonials. Keep quotes under 20 words if possible.
+   */
   testimonials: { initials: string; name: string; location: string; quote: string }[];
+
+  /**
+   * FAQ SECTION (LOCAL VARIATION)
+   * City-specific questions only. Max 5 FAQs.
+   * Answers must be clear, direct, no marketing language.
+   */
   faq: { q: string; a: string }[];
+
+  /**
+   * SOURCE TRACKING (REQUIRED)
+   * Format: "city_removals" or "city_service"
+   * Used for analytics. Keep consistent.
+   */
   source: string;
 }
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
+
+/**
+ * CITY PAGE DATA VALIDATOR — HARD ENFORCEMENT
+ *
+ * This validator enforces three locked rules:
+ * 1. GLOBAL LANGUAGE BAN: "match", "matched", "matching", "algorithm" forbidden everywhere
+ * 2. SUB COPY CONSTRAINT: Must be outcome-focused only, no process/system explanation
+ * 3. TRUST SIGNAL NON-DUPLICATION: Each trust signal appears only once per hero
+ *
+ * Violations = HARD FAIL. No warnings. No silent passes. No auto-fixes.
+ */
+export function validateCityPageData(data: CityPageData): { valid: boolean; issues: string[] } {
+  const issues: string[] = [];
+
+  // ENFORCEMENT RULE #1: GLOBAL LANGUAGE BAN
+  // Block: "match", "matched", "matching", "algorithm"
+  const bannedTerms = ["match", "matched", "matching", "algorithm"];
+  const allCopyText = [
+    data.headline,
+    data.sub,
+    ...data.steps.map(s => s.title + " " + s.desc),
+    ...data.testimonials.map(t => t.quote),
+    ...data.faq.map(f => f.q + " " + f.a),
+  ].join(" ").toLowerCase();
+
+  for (const term of bannedTerms) {
+    if (allCopyText.includes(term)) {
+      issues.push(
+        `HARD FAIL — Rule #1 Violation: Banned term "${term}" detected in copy. ` +
+        `This term is permanently forbidden. Use outcome language instead.`
+      );
+    }
+  }
+
+  // ENFORCEMENT RULE #2: SUB COPY OUTCOME-FOCUS CONSTRAINT
+  // Sub must be outcome-focused only. Block process/system explanation.
+  const processLanguagePatterns = [
+    "we ",        // "we verify", "we match", "we find"
+    "our team",   // "our team finds", "our team matches"
+    "verify",     // system action
+    "assign",     // system action
+    "allocate",   // system action
+    "route",      // system action
+    "process",    // system action
+    "system",     // direct system reference
+  ];
+
+  const subLower = data.sub.toLowerCase();
+  for (const pattern of processLanguagePatterns) {
+    if (subLower.includes(pattern)) {
+      issues.push(
+        `HARD FAIL — Rule #2 Violation: Sub copy contains process language "${pattern}". ` +
+        `Sub must answer ONLY: "What do I get? When? Why is it reliable?" ` +
+        `Process/system explanation is NOT allowed.`
+      );
+    }
+  }
+
+  // ENFORCEMENT RULE #3: TRUST SIGNAL NON-DUPLICATION
+  // Each trust signal can only appear ONCE per hero section (headline + sub combined)
+  const trustSignals = [
+    "fixed price",
+    "fixed",
+    "verified",
+    "verified drivers",
+    "no surprises",
+    "no fuss",
+    "reliable",
+    "done properly",
+    "done right",
+  ];
+
+  const heroText = (data.headline + " " + data.sub).toLowerCase();
+  for (const signal of trustSignals) {
+    const occurrences = (heroText.match(new RegExp(signal, "g")) || []).length;
+    if (occurrences > 1) {
+      issues.push(
+        `HARD FAIL — Rule #3 Violation: Trust signal "${signal}" appears ${occurrences} times in hero. ` +
+        `Each trust signal can only appear ONCE per hero section.`
+      );
+    }
+  }
+
+  // STRUCTURAL REQUIREMENTS (non-violation but required)
+  if (!data.headline.includes("removals")) {
+    issues.push(`Headline must include "removals" keyword`);
+  }
+
+  if (data.stats.length !== 4) {
+    issues.push(`Stats must be exactly 4 items (found ${data.stats.length})`);
+  }
+
+  if (data.steps.length !== 4) {
+    issues.push(`Steps must be exactly 4 (found ${data.steps.length})`);
+  }
+
+  if (data.testimonials.length !== 3) {
+    issues.push(`Testimonials must be exactly 3 (found ${data.testimonials.length})`);
+  }
+
+  if (data.faq.length > 5) {
+    issues.push(`FAQ must have max 5 items (found ${data.faq.length})`);
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+  };
+}
 
 export function buildMetadata(data: CityPageData): Metadata {
   const title = `${data.city} Removals | Fixed Price, Verified Drivers | Saint & Story`;
@@ -39,6 +217,17 @@ export function buildMetadata(data: CityPageData): Metadata {
 }
 
 export default function CityLandingPage({ data }: { data: CityPageData }) {
+  // HARD ENFORCEMENT: Runtime validation
+  // If validation fails, component will not render. Error is thrown.
+  const validation = validateCityPageData(data);
+
+  if (!validation.valid) {
+    const errorDetails = validation.issues.map(issue => `  ✗ ${issue}`).join("\n");
+    throw new Error(
+      `CITY PAGE VALIDATION FAILURE (${data.city})\n\n${errorDetails}\n\nFix source data. Do not bypass.`
+    );
+  }
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
