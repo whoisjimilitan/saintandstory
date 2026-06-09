@@ -26,9 +26,10 @@ const CONTENT = {
     badge: "Get booked. Keep 100%. Get paid same day.",
     headline: (
       <>
+        Two things.
+        <br />
         M<span className="font-display italic font-normal">a</span>n and V
-        <span className="font-display italic font-normal">a</span>n?
-        <br />G<span className="font-display italic font-normal">e</span>t booked this week.
+        <span className="font-display italic font-normal">a</span>n
       </>
     ),
     sub: "Get booked for jobs when you're available. No chasing. No cold leads.",
