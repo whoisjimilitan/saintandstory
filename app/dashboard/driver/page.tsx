@@ -114,19 +114,15 @@ export default async function DriverDashboardHome() {
       </div>
 
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-8">
-        <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-center">
-          <p className="font-sans font-black text-[#0D0D0D] text-xl sm:text-2xl tracking-tight">{completedJobs}</p>
-          <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Jobs done</p>
-        </div>
-        <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-center">
-          <p className="font-sans font-black text-[#0D0D0D] text-xl sm:text-2xl tracking-tight">
+      {/* Driver rating */}
+      {driver && (
+        <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 text-center mb-6 sm:mb-8">
+          <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-3">Rating</p>
+          <p className="font-sans font-black text-[#0D0D0D] text-3xl sm:text-4xl tracking-tight">
             {driver?.rating_avg ? Number(driver.rating_avg).toFixed(1) : "—"}
           </p>
-          <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Rating</p>
         </div>
-      </div>
+      )}
 
       {/* Jobs section */}
       <Link href="/dashboard/driver/jobs" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 hover:border-[#0D0D0D] transition-colors">
