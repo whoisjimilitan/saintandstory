@@ -144,7 +144,32 @@ export default async function DriverDashboardHome() {
         </div>
       )}
 
-      {/* Availability section — FIRST, drives matching */}
+      {/* Jobs section — single source of truth */}
+      <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8">
+        <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-4">Jobs</p>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <Link href="/dashboard/driver/jobs" className="text-center hover:opacity-70 transition-opacity">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{offeredJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
+            <p className="text-[#888888] text-[7px] sm:text-[8px] mt-1.5">
+              {offeredJobs > 0 ? "Available to you now" : "No current offers"}
+            </p>
+          </Link>
+          <Link href="/dashboard/driver/jobs" className="text-center hover:opacity-70 transition-opacity">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{activeJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Active</p>
+          </Link>
+          <div className="text-center">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{completedJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Done</p>
+          </div>
+        </div>
+        <Link href="/dashboard/driver/jobs" className="text-[#0D0D0D] text-xs font-semibold inline-flex items-center gap-1 hover:underline">
+          Show job details →
+        </Link>
+      </div>
+
+      {/* Availability section */}
       {driver?.days_preference && (
         <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 mb-6 sm:mb-8">
           <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-3">Availability</p>
@@ -154,31 +179,6 @@ export default async function DriverDashboardHome() {
           </Link>
         </div>
       )}
-
-      {/* Your Jobs — operational workspace */}
-      <Link href="/dashboard/driver/jobs" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 mb-6 sm:mb-8 hover:border-[#0D0D0D] transition-colors">
-        <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-3">Your Jobs</p>
-        <p className="font-sans font-semibold text-[#0D0D0D] text-sm">View job details →</p>
-      </Link>
-
-      {/* Job Activity — operational metrics */}
-      <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8">
-        <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-4">Job Activity</p>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center">
-            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{offeredJobs}</p>
-            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
-          </div>
-          <div className="text-center">
-            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{activeJobs}</p>
-            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Active</p>
-          </div>
-          <div className="text-center">
-            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{completedJobs}</p>
-            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Done</p>
-          </div>
-        </div>
-      </div>
 
       {/* Earnings section link */}
       <Link href="/dashboard/driver/earnings" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 text-center hover:border-[#0D0D0D] transition-colors">
