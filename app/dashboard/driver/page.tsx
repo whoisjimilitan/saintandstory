@@ -151,6 +151,9 @@ export default async function DriverDashboardHome() {
           <Link href="/dashboard/driver/jobs" className="text-center hover:opacity-70 transition-opacity">
             <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{offeredJobs}</p>
             <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
+            <p className="text-[#888888] text-[7px] sm:text-[8px] mt-1.5">
+              {offeredJobs > 0 ? "Available to you now" : "No current offers"}
+            </p>
           </Link>
           <Link href="/dashboard/driver/jobs" className="text-center hover:opacity-70 transition-opacity">
             <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{activeJobs}</p>
