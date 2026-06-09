@@ -271,12 +271,12 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
       </section>
 
       {/* Stats */}
-      <section className="bg-[#0D0D0D] py-14 px-6">
+      <section className="bg-[#F5F5F5] py-16 px-6 border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {data.stats.map(({ stat, label }) => (
             <div key={label}>
-              <p className="font-sans font-black text-white text-3xl md:text-4xl tracking-tight mb-1">{stat}</p>
-              <p className="text-white/60 text-xs uppercase tracking-[0.15em]">{label}</p>
+              <p className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl tracking-tight mb-1">{stat}</p>
+              <p className="text-[#888888] text-xs uppercase tracking-[0.15em]">{label}</p>
             </div>
           ))}
         </div>
@@ -346,19 +346,19 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0D0D0D] py-24 px-6">
+      <section className="bg-white py-24 px-6 border-t border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <h2 className="font-sans font-black text-white text-4xl md:text-5xl leading-tight tracking-tight">
+          <h2 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl leading-tight tracking-tight">
             Ready t<span className="font-display italic font-normal">o</span> m<span className="font-display italic font-normal">o</span>ve?
           </h2>
           <div>
-            <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
+            <p className="font-sans font-medium text-[#888888] text-lg leading-relaxed mb-8">
               Fixed price. Verified driver. Done properly.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"
               source={`${data.source}_cta`}
-              className="inline-block bg-white hover:bg-[#F5F5F5] text-[#0D0D0D] font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
+              className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors"
             />
           </div>
         </div>
@@ -370,7 +370,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
         <ModalCTA
           label="Get a fixed price — free →"
           source={`${data.source}_mobile`}
-          className="block w-full bg-[#0D0D0D] hover:bg-[#333333] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
+          className="block w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white text-center font-semibold py-3.5 rounded-full text-sm transition-colors"
         />
       </div>
     </main>
