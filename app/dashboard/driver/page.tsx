@@ -48,6 +48,15 @@ async function getOfferedJobCount(driverId: string) {
   return Number(rows[0]?.count ?? 0);
 }
 
+async function getActiveJobCount(driverId: string) {
+  const sql = neon(process.env.DATABASE_URL!);
+  const rows = await sql`
+    SELECT COUNT(*) as count FROM jobs
+    WHERE driver_id = ${driverId} AND status IN ('confirmed', 'in_progress')
+  `;
+  return Number(rows[0]?.count ?? 0);
+}
+
 export default async function DriverDashboardHome() {
   const { userId } = await auth();
   const user = await currentUser();
@@ -60,10 +69,9 @@ export default async function DriverDashboardHome() {
   const clerkName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
   const driver = await getOrCreateDriver(userId, email);
 
-  const monthEarned = driver ? await getMonthEarnings(driver.id) : 0;
   const completedJobs = driver ? await getCompletedJobCount(driver.id) : 0;
   const offeredJobs = driver ? await getOfferedJobCount(driver.id) : 0;
-  const roi = monthEarned > 0 ? Math.round(monthEarned / 9.99) : 0;
+  const activeJobs = driver ? await getActiveJobCount(driver.id) : 0;
 
   const displayName = driver?.full_name ?? clerkName ?? "Driver";
   const isLive = driver?.profile_live === true;
@@ -87,43 +95,24 @@ export default async function DriverDashboardHome() {
       </div>
 
       {/* Status pill */}
+      <style>{`
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.6; }
+        }
+        .pulse-indicator {
+          animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      `}</style>
       <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold mb-6 sm:mb-8 ${
         isLive
           ? "bg-[#0D0D0D] border-[#0D0D0D] text-white"
           : "bg-[#F5F5F5] border-[#E8E8E8] text-[#888888]"
       }`}>
-        <div className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-green-400" : "bg-[#888888]"}`} />
+        <div className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-green-400 pulse-indicator" : "bg-[#888888]"}`} />
         {isLive ? "Live — accepting bookings" : "Profile inactive"}
       </div>
 
-      {/* ROI counter — main event */}
-      <div className="bg-[#0D0D0D] rounded-xl sm:rounded-2xl px-4 sm:px-6 py-6 sm:py-7 mb-4">
-        <p className="text-[9px] sm:text-[10px] text-white/65 uppercase tracking-[0.2em] mb-3 sm:mb-4">This month</p>
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-4 sm:mb-5 gap-4">
-          <div>
-            <p className="font-sans font-black text-white text-4xl sm:text-5xl tracking-tight">£{monthEarned.toFixed(0)}</p>
-            <p className="text-white/70 text-xs uppercase tracking-[0.12em] mt-1">earned</p>
-          </div>
-          <div className="text-left sm:text-right">
-            <p className="font-sans font-black text-white text-xl sm:text-2xl tracking-tight">£9.99</p>
-            <p className="text-white/70 text-xs uppercase tracking-[0.12em] mt-0.5">per month</p>
-            <p className="text-white/45 text-[9px] sm:text-[10px] tracking-[0.08em]">founding rate</p>
-          </div>
-        </div>
-        {roi > 0 && (
-          <div className="border-t border-white/15 pt-4">
-            <p className="font-sans font-black text-white text-base sm:text-lg tracking-tight">
-              {roi}× your monthly fee.
-            </p>
-            <p className="text-white/70 text-xs mt-1">Every job from here is pure profit.</p>
-          </div>
-        )}
-        {roi === 0 && (
-          <div className="border-t border-white/15 pt-4">
-            <p className="text-white/70 text-xs">Complete your first job to see your ROI here.</p>
-          </div>
-        )}
-      </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-8">
@@ -137,11 +126,26 @@ export default async function DriverDashboardHome() {
           </p>
           <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Rating</p>
         </div>
-        <Link href="/dashboard/driver/jobs" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-center hover:border-[#0D0D0D] transition-colors col-span-2 sm:col-span-1">
-          <p className="font-sans font-black text-[#0D0D0D] text-xl sm:text-2xl tracking-tight">{offeredJobs}</p>
-          <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
-        </Link>
       </div>
+
+      {/* Jobs section */}
+      <Link href="/dashboard/driver/jobs" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 hover:border-[#0D0D0D] transition-colors">
+        <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-4">Jobs</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="text-center">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{offeredJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
+          </div>
+          <div className="text-center">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{activeJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Active</p>
+          </div>
+          <div className="text-center">
+            <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{completedJobs}</p>
+            <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Done</p>
+          </div>
+        </div>
+      </Link>
 
       {/* Driver details */}
       {driver && (
