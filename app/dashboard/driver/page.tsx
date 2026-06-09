@@ -147,7 +147,7 @@ export default async function DriverDashboardHome() {
       {/* Jobs section — single source of truth */}
       <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8">
         <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-4">Jobs</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           <Link href="/dashboard/driver/jobs" className="text-center hover:opacity-70 transition-opacity">
             <p className="font-sans font-black text-[#0D0D0D] text-lg sm:text-xl tracking-tight">{offeredJobs}</p>
             <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Offered</p>
@@ -161,6 +161,9 @@ export default async function DriverDashboardHome() {
             <p className="text-[#888888] text-[8px] sm:text-[10px] uppercase tracking-[0.12em] mt-1">Done</p>
           </Link>
         </div>
+        <Link href="/dashboard/driver/jobs" className="text-[#0D0D0D] text-xs inline-flex items-center gap-1 hover:underline">
+          Show job details →
+        </Link>
       </div>
 
       {/* Availability section */}
