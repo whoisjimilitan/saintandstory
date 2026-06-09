@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { isTestDriver } from "@/lib/test-driver";
+import { Calendar } from "lucide-react";
 
 async function getOrCreateDriver(clerkUserId: string, email: string) {
   const sql = neon(process.env.DATABASE_URL!);
@@ -147,7 +148,10 @@ export default async function DriverDashboardHome() {
       {/* Availability section — FIRST, drives matching */}
       {driver?.days_preference && (
         <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 mb-6 sm:mb-8">
-          <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-3">Availability</p>
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar size={16} className="text-[#888888]" />
+            <p className="text-[#888888] text-xs uppercase tracking-[0.12em]">Availability</p>
+          </div>
           <p className="font-sans font-semibold text-[#0D0D0D] text-sm">{driver.days_preference}</p>
           <Link href="/dashboard/driver/availability" className="text-[#0D0D0D] text-xs mt-3 inline-flex items-center gap-1 hover:underline">
             Edit schedule →
