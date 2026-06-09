@@ -147,12 +147,19 @@ export default async function DriverDashboardHome() {
         </div>
       </Link>
 
-      {/* Driver details */}
+      {/* Availability section */}
       {driver && (
-        <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 space-y-3">
-          {driver.area && (
+        <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 space-y-3 mb-6 sm:mb-8">
+          <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-3">Availability</p>
+          {driver.days_preference && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] flex-shrink-0">Covering</p>
+              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] flex-shrink-0">Working days</p>
+              <p className="font-sans font-semibold text-[#0D0D0D] text-sm text-right">{driver.days_preference}</p>
+            </div>
+          )}
+          {driver.area && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-[#E8E8E8] pt-3">
+              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] flex-shrink-0">Coverage area</p>
               <p className="font-sans font-semibold text-[#0D0D0D] text-sm text-right">{driver.area}</p>
             </div>
           )}
@@ -162,20 +169,26 @@ export default async function DriverDashboardHome() {
               <p className="font-sans font-semibold text-[#0D0D0D] text-sm text-right">{driver.vehicle_type}</p>
             </div>
           )}
-          {driver.days_preference && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-[#E8E8E8] pt-3">
-              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] flex-shrink-0">Availability</p>
-              <p className="font-sans font-semibold text-[#0D0D0D] text-sm text-right">{driver.days_preference}</p>
-            </div>
-          )}
         </div>
       )}
 
+      {/* Earnings section link */}
+      <Link href="/dashboard/driver/earnings" className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 text-center hover:border-[#0D0D0D] transition-colors">
+        <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-2">Earnings</p>
+        <p className="font-sans font-semibold text-[#0D0D0D] text-sm">View earnings & payouts →</p>
+      </Link>
+
       {!driver && (
-        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 sm:py-5 text-center">
-          <p className="text-[#888888] text-sm mb-3">No driver profile found for this account.</p>
-          <p className="text-[#888888] text-xs">Make sure you registered with this email address.</p>
-        </div>
+        <>
+          <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 sm:py-5 text-center mb-6 sm:mb-8">
+            <p className="text-[#888888] text-sm mb-3">No driver profile found for this account.</p>
+            <p className="text-[#888888] text-xs">Make sure you registered with this email address.</p>
+          </div>
+          <Link href="/dashboard/driver/earnings" className="block bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 text-center hover:border-[#0D0D0D] transition-colors">
+            <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-2">Earnings</p>
+            <p className="font-sans font-semibold text-[#0D0D0D] text-sm">View earnings & payouts →</p>
+          </Link>
+        </>
       )}
 
     </div>
