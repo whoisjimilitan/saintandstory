@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 const STEPS = [
   { num: "01", title: "Create your profile", desc: "Set your area, van size, and rate. Transit, Luton, Sprinter. All welcome. Live in minutes." },
-  { num: "02", title: "Tell us when you're available", desc: "Choose your working days and area. That's it." },
+  { num: "02", title: "Tell us when you're available", desc: "Choose your working days and area. That's our matching foundation." },
   { num: "03", title: "Get booked and deliver", desc: "We send you jobs that fit. You choose what to take. Show up and earn." },
   { num: "04", title: "Get paid", desc: "Finish a job at 3pm. Money in your account before 4pm." },
 ];
@@ -45,7 +45,7 @@ const WEEK = [
 ];
 
 const FEATURES = [
-  { title: "Get more consistent work.", desc: "Tell us when you're free. We send you jobs that fit. No more chasing leads or cold calling." },
+  { title: "Get more consistent work.", desc: "Tell us when you're available. We match you with jobs consistently. No chasing. No cold calling." },
   { title: "You control your calendar.", desc: "Work the days you want. Skip what doesn't fit. You're always in control." },
   { title: "Founding rate — £9.99/month.", desc: "Locked forever for the first 100 drivers. Most drivers cover this with their first job." },
   { title: "All van sizes welcome.", desc: "Transit, Luton, Sprinter — whatever you drive, there's work for you here." },
@@ -91,7 +91,7 @@ export default function ForDriversPage() {
             <br />Less chasing.
           </h1>
           <p className="text-[#888888] text-base mb-10 max-w-sm">
-            Tell us when you're available. We send you jobs that fit your area. <DriverCount /> removal and man-and-van drivers already earning.
+            Post your availability. We match you reliably. <DriverCount /> removal and man-and-van drivers already earning consistently.
           </p>
           <div className="flex flex-wrap gap-3">
             <DriverModalCTA
