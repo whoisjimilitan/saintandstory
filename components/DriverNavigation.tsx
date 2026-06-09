@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, List, DollarSign, Calendar } from "lucide-react";
+import { BarChart3, MapPin, List, DollarSign, Calendar } from "lucide-react";
 
 const navIcons = {
   dashboard: BarChart3,
-  jobs: List,
+  activeJobs: MapPin,
+  jobHistory: List,
   earnings: DollarSign,
   availability: Calendar,
 };
@@ -16,7 +17,8 @@ export default function DriverNavigation() {
 
   const navItems = [
     { href: "/dashboard/driver", label: "Dashboard", iconKey: "dashboard" },
-    { href: "/dashboard/driver/jobs", label: "Jobs", iconKey: "jobs" },
+    { href: "/dashboard/driver/active-jobs", label: "Active Jobs", iconKey: "activeJobs" },
+    { href: "/dashboard/driver/jobs", label: "Job History", iconKey: "jobHistory" },
     { href: "/dashboard/driver/earnings", label: "Earnings", iconKey: "earnings" },
     { href: "/dashboard/driver/availability", label: "Availability", iconKey: "availability" },
   ];
