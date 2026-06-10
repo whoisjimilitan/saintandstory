@@ -1,4 +1,5 @@
 import { type LeadState } from "./lead-state-machine";
+import { type BusinessEvidence } from "./evidence-types";
 
 export type LeadStatus = "new" | "contacted" | "warm" | "inbound" | "closed" | "dead" | "recognized";
 
@@ -47,6 +48,9 @@ export interface Lead {
   confirmation_source?: string;
   confirmed_at?: string;
   trigger_event_matched?: string;
+  email_sent_at?: string;
+  human_observations?: Record<string, unknown>[];
+  business_evidence?: BusinessEvidence;
 }
 
 export interface StandingOrder {

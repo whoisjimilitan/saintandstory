@@ -706,7 +706,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 <p className={`text-[10px] font-black uppercase tracking-[0.5px] text-[#2ECC71]`}>Suggested Opening</p>
               </div>
               <div className={`px-4 py-3 rounded-md text-base font-semibold bg-white border-l-2 border-l-[#2ECC71] text-[#0D0D0D] italic`}>
-                "Are you personally handling {lead.pain_point.toLowerCase()} when volume peaks?"
+                "Are you personally handling {(lead.pain_point || 'your needs').toLowerCase()} when volume peaks?"
               </div>
               <p className="text-[11px] text-[#0D0D0D] font-medium">Use this exact question to continue recognition → validation → standing order conversation.</p>
             </div>
@@ -815,7 +815,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           )}
 
           {/* Standing order section - refined design */}
-          {showStandingOrder ? (
+          {showStandingOrder && (
             <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
 
@@ -1181,7 +1181,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   <div>
                     <p className="text-sm text-[#0D0D0D] font-semibold mb-2">From Google:</p>
                     {((lead.business_evidence as BusinessEvidence).facts || []).slice(0, 3).map((fact, i) => (
-                      <p key={i} className="text-sm text-[#0D0D0D] ml-4">✓ {(fact as Record<string, unknown>).fact as string}</p>
+                      <p key={i} className="text-sm text-[#0D0D0D] ml-4">✓ {fact.fact}</p>
                     ))}
                   </div>
                 )}

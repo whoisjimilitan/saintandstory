@@ -119,7 +119,7 @@ export default async function LeadIntelligencePage({
                 <div key={idx} className="bg-white rounded-md p-3 border-l-2 border-l-[#F39C12]">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <p className="text-[10px] font-semibold text-[#F39C12] uppercase tracking-[0.5px]">
-                      {obsData.context || "Note"}
+                      {(obsData.context as string) || "Note"}
                     </p>
                     <p className="text-[9px] text-[#888888]">{recordedAt}</p>
                   </div>
