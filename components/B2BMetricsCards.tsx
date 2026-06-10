@@ -5,56 +5,11 @@ import { useEffect, useState } from "react";
 interface MetricsData {
   timestamp: string;
   metrics: {
-    knowledge_capture_adoption: {
-      value: string;
-      unit: string;
-      target: string;
-      status: "success" | "warning" | "pending";
-      leads_with_observations: number;
-      total_leads: number;
-    };
-    standing_order_completeness: {
-      value: string;
-      unit: string;
-      target: string;
-      status: "success" | "warning" | "pending";
-      complete_orders: number;
-      total_orders: number;
-    };
-    fulfillment_readiness: {
-      value: string;
-      unit: string;
-      target: string;
-      status: "success" | "warning" | "pending";
-      generated_orders: number;
-      total_orders: number;
-    };
-    observation_usage: {
-      value: string;
-      unit: string;
-      target: string;
-      status: "success" | "warning" | "pending";
-      leads_with_observations: number;
-      total_leads: number;
-      latest_observation: string | null;
-    };
-    revenue_flow_completeness: {
-      jobs_generated_percent: string;
-      jobs_completed_percent: string;
-      jobs_cancelled_percent: string;
-      total_standing_orders: number;
-      target: string;
-      status: "success" | "warning" | "pending";
-    };
-    operational_efficiency: {
-      avg_time: string;
-      median_time: string;
-      fastest_time: string;
-      slowest_time: string;
-      completed_jobs: number;
-      target: string;
-      status: "success" | "warning" | "pending";
-    };
+    leads_discovered: { value: number; target: string; status: string };
+    leads_with_pain: { value: number; target: string; status: string };
+    pain_penetration: { value: number; unit: string; target: string; status: string };
+    standing_orders: { value: number; target: string; status: string };
+    jobs_generated: { value: number; target: string; status: string };
   };
 }
 
@@ -64,34 +19,30 @@ function MetricCard({
   unit,
   target,
   status,
-  details,
-  tooltip,
 }: {
   title: string;
-  value: string;
-  unit: string;
+  value: number | string;
+  unit?: string;
   target: string;
-  status: "success" | "warning" | "pending";
-  details?: React.ReactNode;
-  tooltip?: string;
+  status: string;
 }) {
   const statusColor = {
     success: "bg-[#E8F5E9] border-l-4 border-l-[#2ECC71]",
     warning: "bg-[#FFF3E0] border-l-4 border-l-[#F39C12]",
     pending: "bg-[#F5F5F5] border-l-4 border-l-[#BDBDBD]",
-  }[status];
+  }[status] || "bg-[#F5F5F5] border-l-4 border-l-[#BDBDBD]";
 
   const statusIcon = {
     success: "✓",
     warning: "⚠",
     pending: "—",
-  }[status];
+  }[status] || "—";
 
   const statusTextColor = {
     success: "text-[#2ECC71]",
     warning: "text-[#F39C12]",
     pending: "text-[#888888]",
-  }[status];
+  }[status] || "text-[#888888]";
 
   return (
     <div className={`${statusColor} rounded-lg p-6 hover:shadow-sm transition-shadow`}>
@@ -100,11 +51,6 @@ function MetricCard({
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
             {title}
           </p>
-          {tooltip && (
-            <p className="text-[9px] text-[#999999] mt-1 italic">
-              {tooltip}
-            </p>
-          )}
         </div>
         <span className={`text-lg font-bold ${statusTextColor} ml-3`}>
           {statusIcon}
@@ -113,14 +59,12 @@ function MetricCard({
 
       <div className="flex items-baseline gap-2 mb-3">
         <p className="text-4xl font-black text-[#0D0D0D]">{value}</p>
-        <p className="text-sm text-[#888888]">{unit}</p>
+        {unit && <p className="text-sm text-[#888888]">{unit}</p>}
       </div>
 
-      <p className="text-[10px] text-[#888888] uppercase tracking-[0.5px] mb-3">
+      <p className="text-[10px] text-[#888888] uppercase tracking-[0.5px]">
         Target: {target}
       </p>
-
-      {details && <div className="text-[11px] text-[#666666] space-y-1 mt-4">{details}</div>}
     </div>
   );
 }
@@ -128,21 +72,26 @@ function MetricCard({
 export default function B2BMetricsCards() {
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMetrics() {
       try {
         const response = await fetch("/api/b2b/metrics/knowledge-loop");
-        if (!response.ok) throw new Error("Failed to fetch metrics");
         const data = await response.json();
-        if (!data?.metrics) {
-          console.error("Metrics API returned invalid response", data);
-          throw new Error("Invalid metrics response");
-        }
         setMetrics(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        console.error("Failed to fetch metrics:", err);
+        // Fallback to empty metrics (always display something)
+        setMetrics({
+          timestamp: new Date().toISOString(),
+          metrics: {
+            leads_discovered: { value: 0, target: "10+", status: "pending" },
+            leads_with_pain: { value: 0, target: "5+", status: "pending" },
+            pain_penetration: { value: 0, unit: "%", target: "50%+", status: "pending" },
+            standing_orders: { value: 0, target: "2+", status: "pending" },
+            jobs_generated: { value: 0, target: "1+", status: "pending" }
+          }
+        });
       } finally {
         setLoading(false);
       }
@@ -159,176 +108,45 @@ export default function B2BMetricsCards() {
     );
   }
 
-  if (error || !metrics) {
-    return (
-      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-6">
-        <p className="text-[#888888] text-sm mb-2">Metrics unavailable</p>
-        <p className="text-[#AAAAAA] text-xs">Check back shortly or refresh the page. Pipeline data is still visible below.</p>
-      </div>
-    );
+  if (!metrics) {
+    return null;
   }
 
   const m = metrics.metrics;
 
-  // Health status
-  const healthScore =
-    (m.knowledge_capture_adoption.status === "success" ? 1 : 0) +
-    (m.standing_order_completeness.status === "success" ? 1 : 0) +
-    (m.fulfillment_readiness.status === "success" ? 1 : 0);
-
-  const healthStatus =
-    healthScore >= 2.5 ? "success" : healthScore >= 1.5 ? "warning" : "pending";
-  const healthLabel =
-    healthScore >= 2.5 ? "Healthy" : healthScore >= 1.5 ? "Attention needed" : "Starting up";
-
   return (
-    <div className="space-y-6">
-      {/* Health Status */}
-      <div className="bg-white border border-[#E8E8E8] rounded-xl p-6 mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
-              Knowledge Loop Health
-            </p>
-            <p className="text-2xl font-black text-[#0D0D0D]">{healthLabel}</p>
-          </div>
-          <div
-            className={`text-4xl font-bold ${
-              healthStatus === "success"
-                ? "text-[#2ECC71]"
-                : healthStatus === "warning"
-                  ? "text-[#F39C12]"
-                  : "text-[#888888]"
-            }`}
-          >
-            ●
-          </div>
-        </div>
-        <p className="text-[10px] text-[#888888] mt-4">
-          Last updated: {new Date(metrics.timestamp).toLocaleTimeString()}
-        </p>
-      </div>
-
-      {/* KPI Cards Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Metric 1 */}
-        <MetricCard
-          title="Knowledge Capture Adoption"
-          value={m.knowledge_capture_adoption.value}
-          unit={m.knowledge_capture_adoption.unit}
-          target={m.knowledge_capture_adoption.target}
-          status={m.knowledge_capture_adoption.status}
-          tooltip="% of qualified leads with at least one recorded observation"
-          details={
-            <>
-              <p>
-                {m.knowledge_capture_adoption.leads_with_observations} of{" "}
-                {m.knowledge_capture_adoption.total_leads} leads recorded observations
-              </p>
-            </>
-          }
-        />
-
-        {/* Metric 2 */}
-        <MetricCard
-          title="Standing Order Completeness"
-          value={m.standing_order_completeness.value}
-          unit={m.standing_order_completeness.unit}
-          target={m.standing_order_completeness.target}
-          status={m.standing_order_completeness.status}
-          tooltip="% of standing orders with both pickup and delivery postcodes"
-          details={
-            <>
-              <p>
-                {m.standing_order_completeness.complete_orders} of{" "}
-                {m.standing_order_completeness.total_orders} orders have postcodes
-              </p>
-            </>
-          }
-        />
-
-        {/* Metric 3 */}
-        <MetricCard
-          title="Fulfillment Readiness"
-          value={m.fulfillment_readiness.value}
-          unit={m.fulfillment_readiness.unit}
-          target={m.fulfillment_readiness.target}
-          status={m.fulfillment_readiness.status}
-          tooltip="% of standing orders that have generated jobs"
-          details={
-            <>
-              <p>
-                {m.fulfillment_readiness.generated_orders} of{" "}
-                {m.fulfillment_readiness.total_orders} orders generated jobs
-              </p>
-            </>
-          }
-        />
-
-        {/* Metric 4 */}
-        <MetricCard
-          title="Observation Usage"
-          value={m.observation_usage.value}
-          unit={m.observation_usage.unit}
-          target={m.observation_usage.target}
-          status={m.observation_usage.status}
-          tooltip="Average observations recorded per engaged lead"
-          details={
-            <>
-              <p>
-                Average per self-confirmed lead
-              </p>
-              {m.observation_usage.latest_observation && (
-                <p className="text-[10px] mt-2 italic">
-                  Latest: {new Date(m.observation_usage.latest_observation).toLocaleDateString()}
-                </p>
-              )}
-            </>
-          }
-        />
-
-        {/* Metric 5 */}
-        <MetricCard
-          title="Revenue Flow Completeness"
-          value={`${m.revenue_flow_completeness.jobs_generated_percent}%`}
-          unit="jobs generated"
-          target={m.revenue_flow_completeness.target}
-          status={m.revenue_flow_completeness.status}
-          tooltip="% of standing orders that have converted to generated jobs"
-          details={
-            <>
-              <p>Generated: {m.revenue_flow_completeness.jobs_generated_percent}%</p>
-              <p>Completed: {m.revenue_flow_completeness.jobs_completed_percent}%</p>
-              <p>Cancelled: {m.revenue_flow_completeness.jobs_cancelled_percent}%</p>
-            </>
-          }
-        />
-
-        {/* Metric 6 */}
-        <MetricCard
-          title="Operational Efficiency"
-          value={m.operational_efficiency.completed_jobs > 0 ? "✓" : "—"}
-          unit={`${m.operational_efficiency.completed_jobs} completed`}
-          target={m.operational_efficiency.target}
-          status={m.operational_efficiency.status}
-          tooltip="Time from standing order creation to job completion"
-          details={
-            <>
-              {m.operational_efficiency.completed_jobs > 0 ? (
-                <>
-                  <p>Median: {m.operational_efficiency.median_time}</p>
-                  <p>Average: {m.operational_efficiency.avg_time}</p>
-                  <p className="text-[9px]">
-                    Range: {m.operational_efficiency.fastest_time} — {m.operational_efficiency.slowest_time}
-                  </p>
-                </>
-              ) : (
-                <p>No completed jobs yet</p>
-              )}
-            </>
-          }
-        />
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <MetricCard
+        title="Leads Discovered"
+        value={m.leads_discovered.value}
+        target={m.leads_discovered.target}
+        status={m.leads_discovered.status}
+      />
+      <MetricCard
+        title="With Pain Signals"
+        value={m.leads_with_pain.value}
+        target={m.leads_with_pain.target}
+        status={m.leads_with_pain.status}
+      />
+      <MetricCard
+        title="Pain Penetration"
+        value={m.pain_penetration.value}
+        unit={m.pain_penetration.unit}
+        target={m.pain_penetration.target}
+        status={m.pain_penetration.status}
+      />
+      <MetricCard
+        title="Standing Orders"
+        value={m.standing_orders.value}
+        target={m.standing_orders.target}
+        status={m.standing_orders.status}
+      />
+      <MetricCard
+        title="Jobs Generated"
+        value={m.jobs_generated.value}
+        target={m.jobs_generated.target}
+        status={m.jobs_generated.status}
+      />
     </div>
   );
 }
