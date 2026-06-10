@@ -152,6 +152,48 @@ async function saveToDb(lead: Record<string, unknown>) {
   console.log("[leads] Saved to DB:", lead.id);
 }
 
+async function createDriverRecord(lead: Record<string, unknown>) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl || !lead.email) return;
+  const sql = neon(dbUrl);
+  try {
+    // Add postcode/radius columns if they don't exist (safe migration)
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS postcode VARCHAR(20) DEFAULT NULL`;
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,8) DEFAULT NULL`;
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS longitude DECIMAL(11,8) DEFAULT NULL`;
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS radius_miles INT DEFAULT 10`;
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS available_days TEXT[] DEFAULT NULL`;
+    await sql`ALTER TABLE drivers ADD COLUMN IF NOT EXISTS b2b_opt_in BOOLEAN DEFAULT false`;
+
+    // Create or update driver record
+    await sql`
+      INSERT INTO drivers (full_name, email, phone, postcode, radius_miles, vehicle_type, b2b_opt_in, created_at, updated_at)
+      VALUES (
+        ${(lead.fullName as string) || null},
+        ${(lead.email as string) || null},
+        ${(lead.phone as string) || null},
+        ${(lead.postcode as string) || null},
+        ${(lead.radius_miles as number) || 10},
+        ${(lead.vehicle as string) || null},
+        ${(lead.b2b_opt_in as boolean) || false},
+        NOW(),
+        NOW()
+      )
+      ON CONFLICT (email) DO UPDATE SET
+        full_name = ${(lead.fullName as string) || null},
+        phone = ${(lead.phone as string) || null},
+        postcode = ${(lead.postcode as string) || null},
+        radius_miles = ${(lead.radius_miles as number) || 10},
+        vehicle_type = ${(lead.vehicle as string) || null},
+        b2b_opt_in = ${(lead.b2b_opt_in as boolean) || false},
+        updated_at = NOW()
+    `;
+    console.log("[leads] Driver record created/updated:", lead.email);
+  } catch (err) {
+    console.error("[leads] Driver record creation failed:", err);
+  }
+}
+
 async function sendAlert(lead: Record<string, unknown>) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return;
@@ -167,7 +209,7 @@ async function sendAlert(lead: Record<string, unknown>) {
   const isDriver = lead.is_driver === true;
 
   const subject = isDriver
-    ? `New driver: ${name} — ${(lead.area as string) || "area TBC"}`
+    ? `New driver: ${name} — ${(lead.postcode as string) || "postcode TBC"} (${(lead.radius_miles as number) || 10}mi)`
     : `New lead: ${name} — ${from}${to !== "—" ? ` → ${to}` : ""}`;
 
   await resend.emails.send({
@@ -191,8 +233,10 @@ async function sendAlert(lead: Record<string, unknown>) {
           <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Timeframe</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.timeframe as string) || "—"}</td></tr>
           <tr><td style="padding:12px 16px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Items</td><td style="padding:12px 16px;color:#0D0D0D;font-size:14px;">${items}</td></tr>
           ` : `
-          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Area</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.area as string) || "—"}</td></tr>
-          <tr><td style="padding:12px 16px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Vehicle</td><td style="padding:12px 16px;color:#0D0D0D;font-size:14px;">${(lead.vehicle as string) || "—"}</td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Postcode</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;font-family:monospace;letter-spacing:0.1em;">${(lead.postcode as string) || "—"}</td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Service Radius</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.radius_miles as number) || 10} miles</td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Vehicle</td><td style="padding:12px 16px;border-bottom:1px solid #e8e8e8;color:#0D0D0D;font-size:14px;">${(lead.vehicle as string) || "—"}</td></tr>
+          <tr><td style="padding:12px 16px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">B2B Opt-In</td><td style="padding:12px 16px;color:#0D0D0D;font-size:14px;font-weight:600;">${(lead.b2b_opt_in as boolean) ? "✓ Yes" : "—"}</td></tr>
           `}
         </table>
         ${phone !== "—" ? `<a href="tel:${phone}" style="display:inline-block;margin-top:20px;background:#0D0D0D;color:#fff;font-weight:700;padding:13px 28px;border-radius:999px;text-decoration:none;font-size:14px;">Call ${name} now →</a>` : ""}
@@ -236,12 +280,19 @@ export async function POST(request: NextRequest) {
     is_driver: isDriver,
     area: body.area ?? "",
     vehicle: body.vehicle ?? "",
+    postcode: body.postcode ?? "",
+    radius_miles: body.radius_miles ?? 10,
+    b2b_opt_in: body.b2b_opt_in ?? false,
   };
 
   console.log("[leads] New lead:", lead.id, lead.email, isDriver ? "DRIVER" : lead.serviceType);
 
+  // For driver signups: create driver record with postcode, radius, B2B opt-in
+  if (isDriver) {
+    await createDriverRecord(lead);
+  }
   // For customer leads: create a job entry and email the customer their tracking link
-  if (!isDriver) {
+  else {
     const trackingToken = await createJob(lead);
     if (trackingToken) {
       await sendCustomerConfirmation(lead, trackingToken);
