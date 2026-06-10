@@ -121,6 +121,13 @@ export async function ensureB2BSchema() {
   await sql`
     ALTER TABLE drivers ADD COLUMN IF NOT EXISTS available_days TEXT[] DEFAULT NULL
   `;
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS b2b_opt_in BOOLEAN DEFAULT false
+  `;
+  // Add last_seen_at for admin dashboard activity tracking (required by admin/page.tsx)
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ DEFAULT NULL
+  `;
 
   // Add driver-related columns to b2b_leads
   await sql`
