@@ -326,25 +326,26 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       }),
     });
 
-    // Record standing order details as observation for future reference
-    const observationParts = [];
-    if (soForm.pickup_postcode) observationParts.push(`Pickup: ${soForm.pickup_postcode}`);
-    if (soForm.delivery_postcode) observationParts.push(`Delivery: ${soForm.delivery_postcode}`);
-    if (soForm.preferred_time) observationParts.push(`Preferred time: ${soForm.preferred_time}`);
+    // Record standing order details as structured observation for future reference
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    observationParts.push(`Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`);
+    const observationDetails = [
+      `Pickup postcode: ${soForm.pickup_postcode}`,
+      `Delivery postcode: ${soForm.delivery_postcode}`,
+      `Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`,
+      `Time: ${soForm.preferred_time}`
+    ];
 
-    if (observationParts.length > 0) {
-      await fetch("/api/b2b/observations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lead_id: lead.id,
-          observation: `Standing order created: ${observationParts.join(", ")}`,
-          context: "standing_order",
-        }),
-      });
-    }
+    const observationText = `Standing order confirmed\n\n${observationDetails.join("\n")}`;
+
+    await fetch("/api/b2b/observations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lead_id: lead.id,
+        observation: observationText,
+        context: "standing_order",
+      }),
+    });
 
     setStatus("closed");
     setShowStandingOrder(false);
@@ -1079,6 +1080,41 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 ×
               </button>
             </div>
+
+            {/* Operational Readiness Score */}
+            {(() => {
+              const criticalFields = {
+                pickup_postcode: !!soForm.pickup_postcode,
+                delivery_postcode: !!soForm.delivery_postcode,
+                preferred_time: !!soForm.preferred_time,
+                day_of_week: !!soForm.day_of_week
+              };
+              const completeness = Object.values(criticalFields).filter(Boolean).length;
+              const total = Object.keys(criticalFields).length;
+
+              return (
+                <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#EAE6E0]">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Operational Readiness</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <div className="w-full bg-[#EAE6E0] rounded-full h-2">
+                        <div
+                          className="bg-[#0D0D0D] h-2 rounded-full transition-all"
+                          style={{ width: `${(completeness / total) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-sm font-bold text-[#0D0D0D] min-w-fit">{completeness}/{total}</p>
+                  </div>
+                  <div className="text-[9px] text-[#888888] mt-2 space-y-1">
+                    {!soForm.pickup_postcode && <p>○ Pickup postcode</p>}
+                    {!soForm.delivery_postcode && <p>○ Delivery postcode</p>}
+                    {!soForm.preferred_time && <p>○ Preferred time</p>}
+                    {!soForm.day_of_week && <p>○ Day of week</p>}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* What we know */}
             <div>
