@@ -752,37 +752,43 @@ export default function ProspectBriefingPage({
       {enrichedBrief && briefMetadata?.painPoint && (
         <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
           <div className="max-w-3xl mx-auto">
-            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
-              One thing that stood out
-            </p>
+            <div className="bg-white border-l-4 border-l-[#0D0D0D] rounded-lg p-8 shadow-sm">
+              <p className="text-[#0D0D0D] text-xs font-semibold uppercase tracking-[0.3em] mb-4 font-display text-[#666666]">
+                One thing that stood out
+              </p>
 
-            <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-              Your customers mention {briefMetadata.painPoint.toLowerCase()}. That's what matters most to businesses like {business.name}. When this gets solved, everything else becomes easier.
-            </p>
+              <p className="text-[#0D0D0D] text-xl leading-relaxed font-sans font-semibold mb-4">
+                Your customers mention <span className="font-black text-[#0D0D0D]">{briefMetadata.painPoint.toLowerCase()}</span>.
+              </p>
+
+              <p className="text-[#0D0D0D] text-base leading-relaxed font-sans">
+                That's what matters most to businesses like {business.name}. When this gets solved, everything else becomes easier.
+              </p>
+            </div>
           </div>
         </section>
       )}
 
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+          <p className="text-[#0D0D0D] text-xs font-semibold uppercase tracking-[0.3em] mb-12 font-display text-[#666666]">
             {msg.painLabel}
           </p>
 
-          <div className="space-y-10">
-            <div className="border-b border-[#E8E8E8] pb-10">
+          <div className="space-y-12">
+            <div className="bg-[#FAFAFA] border border-[#EAE6E0] rounded-lg p-6">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.pain1}
               </p>
             </div>
 
-            <div className="border-b border-[#E8E8E8] pb-10">
+            <div className="bg-[#FAFAFA] border border-[#EAE6E0] rounded-lg p-6">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.pain2}
               </p>
             </div>
 
-            <div>
+            <div className="bg-[#FAFAFA] border border-[#EAE6E0] rounded-lg p-6">
               <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
                 {msg.pain3}
               </p>
@@ -794,30 +800,31 @@ export default function ProspectBriefingPage({
       {enrichedBrief && briefMetadata?.painPoint && (
         <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
           <div className="max-w-3xl mx-auto">
-            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
-              This might sound familiar
-            </p>
+            <div className="space-y-8">
+              <div>
+                <p className="text-[#0D0D0D] text-xs font-semibold uppercase tracking-[0.3em] mb-4 font-display text-[#666666]">
+                  This might sound familiar
+                </p>
+                <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+                  Businesses like yours often end up managing <span className="font-semibold">{briefMetadata.painPoint.toLowerCase()}</span> personally when volume grows. It's not on the org chart. It just happens.
+                </p>
+              </div>
 
-            <div className="space-y-8 mb-10">
-              <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-                Businesses like yours often end up managing {briefMetadata.painPoint.toLowerCase()} personally when volume grows. It's not on the org chart. It just happens.
-              </p>
+              <div className="bg-[#F9F9F9] border-l-4 border-l-[#F39C12] rounded-lg p-6 mt-8">
+                <p className="text-[#333333] text-xs font-semibold uppercase tracking-[0.18em] mb-3 font-display text-[#666666]">
+                  Quick question
+                </p>
+                <p className="text-[#0D0D0D] text-lg font-semibold leading-relaxed font-sans">
+                  When volume or pressure peaks, does {briefMetadata.painPoint.toLowerCase()} become your bottleneck?
+                </p>
+              </div>
             </div>
 
-            <div className="border-t border-[#E8E8E8] pt-10">
-              <p className="text-[#333333] text-sm font-semibold uppercase tracking-[0.18em] mb-6 font-display">
-                Quick question
-              </p>
-              <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
-                When volume or pressure peaks, does {briefMetadata.painPoint.toLowerCase()} become your bottleneck?
-              </p>
-            </div>
-
-            <div className="mt-10">
+            <div className="mt-12">
               <a
                 onClick={() => recordMomentSignal("cta_clicked", { location: "recognition_section", cta_text: "Let's talk" })}
                 href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
-                className="inline-block bg-[#0D0D0D] hover:bg-[#222222] text-white font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
+                className="inline-block bg-[#0D0D0D] hover:bg-[#222222] text-white font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans shadow-sm hover:shadow-md"
               >
                 Let's talk
               </a>
