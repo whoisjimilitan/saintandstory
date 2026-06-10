@@ -675,12 +675,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
           {/* Suggested Opening - recognition/relief/trust layer for operator */}
           {hasPainPoint && (
-            <div className={`border-2 border-[#0D0D0D] rounded-lg p-5 mb-4 space-y-3 transition-colors duration-300 bg-[#F9F9F9]`}>
-              <p className={`text-[10px] font-black uppercase tracking-[0.5px] transition-colors duration-300 text-[#0D0D0D]`}>How to start</p>
-              <div className={`px-4 py-3 rounded-md text-base font-semibold transition-colors bg-white border border-[#EAE6E0] text-[#0D0D0D]`}>
+            <div className={`border-l-4 border-l-[#2ECC71] bg-[#E8F5E9] rounded-lg p-5 mb-4 space-y-3 transition-colors duration-300`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">✓</span>
+                <p className={`text-[10px] font-black uppercase tracking-[0.5px] text-[#2ECC71]`}>Suggested Opening</p>
+              </div>
+              <div className={`px-4 py-3 rounded-md text-base font-semibold bg-white border-l-2 border-l-[#2ECC71] text-[#0D0D0D] italic`}>
                 "Are you personally handling {lead.pain_point.toLowerCase()} when volume peaks?"
               </div>
-              <p className="text-[11px] transition-colors duration-300 text-[#666666] font-medium">Lead with recognition. Let them confirm.</p>
+              <p className="text-[11px] text-[#0D0D0D] font-medium">Use this exact question to continue recognition → validation → standing order conversation.</p>
             </div>
           )}
 
@@ -801,33 +804,32 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               )}
 
               {/* Known vs Unknown Panel */}
-              <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+              <div className="border-b border-[#EAE6E0] pb-4 -mx-4 px-4">
                 <div className="grid grid-cols-2 gap-4">
                   {/* Known */}
-                  <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Known</p>
-                    <div className="space-y-1">
-                      {lead.business_name && <p className="text-[11px] text-[#0D0D0D]">✓ Business: {lead.business_name}</p>}
-                      {lead.business_category && <p className="text-[11px] text-[#0D0D0D]">✓ Category: {lead.business_category}</p>}
-                      {lead.email && <p className="text-[11px] text-[#0D0D0D]">✓ Email: {lead.email}</p>}
-                      {soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Pickup: {soForm.pickup_postcode}</p>}
-                      {soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Delivery: {soForm.delivery_postcode}</p>}
-                      {soForm.preferred_time && <p className="text-[11px] text-[#0D0D0D]">✓ Time: {soForm.preferred_time}</p>}
+                  <div className="bg-[#E8F5E9] rounded-lg p-3 border-l-3 border-l-[#2ECC71]">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#2ECC71] mb-2">✓ Known</p>
+                    <div className="space-y-1.5">
+                      {lead.business_name && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.business_name}</p>}
+                      {lead.business_category && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.business_category}</p>}
+                      {lead.email && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.email}</p>}
+                      {soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Pickup: {soForm.pickup_postcode}</p>}
+                      {soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Delivery: {soForm.delivery_postcode}</p>}
+                      {soForm.preferred_time && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Time: {soForm.preferred_time}</p>}
                       {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
-                        <p className="text-[11px] text-[#0D0D0D]">✓ {(lead.human_observations as Record<string, unknown>[]).length} observations recorded</p>
+                        <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {(lead.human_observations as Record<string, unknown>[]).length} observations</p>
                       )}
                     </div>
                   </div>
 
                   {/* Unknown */}
-                  <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Unknown</p>
-                    <div className="space-y-1">
-                      {!soForm.pickup_postcode && <p className="text-[11px] text-[#888888]">? Pickup postcode</p>}
-                      {!soForm.delivery_postcode && <p className="text-[11px] text-[#888888]">? Delivery postcode</p>}
-                      <p className="text-[11px] text-[#888888]">? Load characteristics</p>
-                      <p className="text-[11px] text-[#888888]">? Special constraints</p>
-                      <p className="text-[11px] text-[#888888]">? Decision maker confirmation</p>
+                  <div className="bg-[#FFF3E0] rounded-lg p-3 border-l-3 border-l-[#F39C12]">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#F39C12] mb-2">⚠ Still needed</p>
+                    <div className="space-y-1.5">
+                      {!soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Pickup postcode</p>}
+                      {!soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Delivery postcode</p>}
+                      <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Load details</p>
+                      <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Special constraints</p>
                     </div>
                   </div>
                 </div>
