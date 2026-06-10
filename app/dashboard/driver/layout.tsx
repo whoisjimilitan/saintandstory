@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import DriverHeartbeat from "@/components/DriverHeartbeat";
 import DriverNavigation from "@/components/DriverNavigation";
+
+export const metadata: Metadata = {
+  icons: {
+    icon: "/favicon.svg",
+  },
+};
 
 export default function DriverLayout({ children }: { children: React.ReactNode }) {
   return (
