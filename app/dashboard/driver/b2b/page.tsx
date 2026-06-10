@@ -12,7 +12,7 @@ async function getDriverDiscoveryMetrics(driverId: string) {
     const result = await sql`
       SELECT
         d.id,
-        d.name,
+        d.full_name,
         d.email,
         d.postcode,
         d.latitude,
@@ -31,7 +31,7 @@ async function getDriverDiscoveryMetrics(driverId: string) {
       LEFT JOIN b2b_standing_orders so ON so.lead_id = bl.id
       LEFT JOIN jobs j ON j.lead_id = bl.id
       WHERE d.id = ${driverId}
-      GROUP BY d.id, d.name, d.email, d.postcode, d.latitude, d.longitude, d.radius_miles, d.vehicle_type, d.available_days, d.created_at
+      GROUP BY d.id, d.full_name, d.email, d.postcode, d.latitude, d.longitude, d.radius_miles, d.vehicle_type, d.available_days, d.created_at
     `;
 
     return result[0];
@@ -106,7 +106,7 @@ export default async function B2BDiscoveryDashboard() {
           ← Back to job dispatch
         </Link>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">B2B Lead Discovery</p>
-        <h1 className="font-sans font-black text-3xl text-[#0D0D0D]">{driver.name}</h1>
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D]">{driver.full_name}</h1>
       </div>
 
       <div className="mb-8 border border-[#E8E8E8] rounded-xl p-6">

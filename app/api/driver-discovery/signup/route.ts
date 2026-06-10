@@ -39,11 +39,20 @@ export async function POST(request: Request) {
     const latitude = 0;
     const longitude = 0;
 
-    // Insert new driver
+    // Insert new driver (use full_name for consistency with existing drivers table)
     const result = await sql`
-      INSERT INTO drivers (name, email, postcode, latitude, longitude, radius_miles, vehicle_type, available_days, created_at, updated_at)
-      VALUES (${name}, ${email}, ${postcode}, ${latitude}, ${longitude}, ${radiusMiles}, ${vehicleType}, ${availableDays}, NOW(), NOW())
-      RETURNING id, name, email, postcode, radius_miles
+      INSERT INTO drivers (full_name, email, postcode, latitude, longitude, radius_miles, vehicle_type, available_days)
+      VALUES (${name}, ${email}, ${postcode}, ${latitude}, ${longitude}, ${radiusMiles}, ${vehicleType}, ${availableDays})
+      ON CONFLICT (email) DO UPDATE SET
+        full_name = ${name},
+        postcode = ${postcode},
+        latitude = ${latitude},
+        longitude = ${longitude},
+        radius_miles = ${radiusMiles},
+        vehicle_type = ${vehicleType},
+        available_days = ${availableDays},
+        updated_at = NOW()
+      RETURNING id, full_name, email, postcode, radius_miles
     `;
 
     if (!result.length) {

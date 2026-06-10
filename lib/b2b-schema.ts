@@ -103,22 +103,23 @@ export async function ensureB2BSchema() {
     )
   `;
 
-  // Create drivers table for driver-triggered lead discovery
+  // Add B2B discovery columns to existing drivers table
+  // (drivers table already exists from job dispatch system)
+  // Add new columns for B2B discovery if they don't exist
   await sql`
-    CREATE TABLE IF NOT EXISTS drivers (
-      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT,
-      phone TEXT,
-      postcode VARCHAR(20) NOT NULL,
-      latitude DECIMAL(10,8),
-      longitude DECIMAL(11,8),
-      radius_miles INT DEFAULT 10,
-      vehicle_type TEXT,
-      available_days TEXT[],
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    )
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS postcode VARCHAR(20) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,8) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS longitude DECIMAL(11,8) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS radius_miles INT DEFAULT 10
+  `;
+  await sql`
+    ALTER TABLE drivers ADD COLUMN IF NOT EXISTS available_days TEXT[] DEFAULT NULL
   `;
 
   // Add driver-related columns to b2b_leads
