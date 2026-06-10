@@ -49,6 +49,9 @@ export interface Lead {
   confirmed_at?: string;
   trigger_event_matched?: string;
   email_sent_at?: string;
+  driver_id?: string;
+  latitude?: number;
+  longitude?: number;
   human_observations?: Record<string, unknown>[];
   business_evidence?: BusinessEvidence;
 }
@@ -68,4 +71,19 @@ export interface StandingOrder {
   notes?: string;
   pickup_postcode?: string;
   next_scheduled_at?: string;
+}
+
+export interface Driver {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  postcode: string;
+  latitude?: number;
+  longitude?: number;
+  radius_miles: number;
+  vehicle_type?: string;
+  available_days?: string[];
+  created_at: string;
+  updated_at?: string;
 }

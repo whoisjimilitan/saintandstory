@@ -103,9 +103,48 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // Create drivers table for driver-triggered lead discovery
+  await sql`
+    CREATE TABLE IF NOT EXISTS drivers (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT,
+      phone TEXT,
+      postcode VARCHAR(20) NOT NULL,
+      latitude DECIMAL(10,8),
+      longitude DECIMAL(11,8),
+      radius_miles INT DEFAULT 10,
+      vehicle_type TEXT,
+      available_days TEXT[],
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Add driver-related columns to b2b_leads
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS driver_id UUID REFERENCES drivers(id) ON DELETE SET NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,8) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS longitude DECIMAL(11,8) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
+  `;
+
+  // Enable PostGIS for geospatial queries
+  await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
+  await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
+
+  // Indexes for performance
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_status ON b2b_leads(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_lead_state ON b2b_leads(lead_state)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_created ON b2b_leads(created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_driver ON b2b_leads(driver_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_drivers_postcode ON drivers(postcode)`;
 }
