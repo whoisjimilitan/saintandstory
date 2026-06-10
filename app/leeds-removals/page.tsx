@@ -4,7 +4,7 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 const data: CityPageData = {
   city: "Leeds",
   headline: "Leeds rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.<br />N<span class=\"font-display italic font-normal\">o</span> dr<span class=\"font-display italic font-normal\">a</span>m<span class=\"font-display italic font-normal\">a</span>.",
-  sub: "Tell us about your Leeds removal. Verified driver matched and confirmed. Fixed price guaranteed.",
+  sub: "Fixed price. Verified driver confirmed. Same-day available. No surprises.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },
@@ -13,7 +13,7 @@ const data: CityPageData = {
   ],
   steps: [
     { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-    { num: "02", title: "We find your driver", desc: "Verified Leeds driver, matched and confirmed by our team." },
+    { num: "02", title: "Verified driver confirmed", desc: "Background-checked, insured, rated by customers. You know who's coming." },
     { num: "03", title: "Confirm your price", desc: "Fixed before anything moves. Locked on the call." },
     { num: "04", title: "Move day", desc: "On time. Professional. Exactly as confirmed." },
   ],
@@ -38,10 +38,10 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Leeds postcodes?", a: "We cover all LS postcodes from the city centre to Otley, Wetherby, and beyond. Seven days a week, 7am to 10pm." },
+    { q: "Do you cover all Leeds postcodes?", a: "All LS postcodes from the city centre to Otley, Wetherby, and beyond. Seven days a week, 7am to 10pm." },
     { q: "Is the price fixed or an estimate?", a: "Fixed. Always. The number on the call is the number you pay. No additions on move day." },
     { q: "Can I book a student move in Leeds?", a: "Student moves are a speciality. End of term, halls to flat, Leeds to any UK city. Fixed price, no van hire." },
-    { q: "How quickly do you respond?", a: "Our team calls within 15 minutes of you posting. Driver matched and price locked before we hang up." },
+    { q: "How quickly do you respond?", a: "Response within 15 minutes of posting. Driver confirmed and price locked on the call." },
     { q: "Are drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers. You always know who's coming." },
   ],
   source: "leeds_removals",

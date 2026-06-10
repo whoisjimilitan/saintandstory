@@ -2,7 +2,7 @@ import type { CityPageData } from "@/components/CityLandingPage";
 
 const STEPS = [
   { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-  { num: "02", title: "We find your driver", desc: "Verified local driver, matched and confirmed by our team." },
+  { num: "02", title: "Driver confirmed", desc: "Background-checked, insured, rated by customers. You know who's coming." },
   { num: "03", title: "Confirm your price", desc: "Fixed on the call before anything moves." },
   { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },
 ];
@@ -12,7 +12,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "nottingham-removals",
     city: "Nottingham",
     headline: "N<span class=\"font-display italic font-normal\">o</span>ttingh<span class=\"font-display italic font-normal\">a</span>m rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Tell us about your Nottingham removal. Verified driver matched and confirmed by our team.",
+    sub: "Tell us about your Nottingham removal. Verified driver confirmed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -26,11 +26,11 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "CO", name: "Claire O.", location: "Mapperley → Clifton", quote: "3-bed move. Two vans, team of three. Everything placed in the right room. Wouldn't use anyone else." },
     ],
     faq: [
-      { q: "Do you cover all Nottingham postcodes?", a: "We cover all NG postcodes including West Bridgford, Arnold, Beeston, and surrounding areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Nottingham postcodes?", a: "All NG postcodes including West Bridgford, Arnold, Beeston, and surrounding areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on move day without your approval." },
       { q: "Can I book same-day in Nottingham?", a: "Same-day is available most days. Post before 10am for the best slots." },
       { q: "Are your drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers before being assigned any job." },
-      { q: "How quickly do you respond?", a: "We call within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Response within 15 minutes of posting. Driver and price confirmed before we hang up." },
     ],
     source: "nottingham_removals",
   },
@@ -52,9 +52,9 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "MO", name: "Mike O.", location: "Styvechale → Tile Hill", quote: "4-bed house, student stuff included. Everything handled perfectly. Worth every penny." },
     ],
     faq: [
-      { q: "Do you cover all Coventry postcodes?", a: "We cover all CV postcodes. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Coventry postcodes?", a: "All CV postcodes. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. The number confirmed on the call is the number you pay." },
-      { q: "How fast is the response?", a: "We call within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How fast is the response?", a: "Response within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day in Coventry?", a: "Same-day is available most days. Post before 10am." },
       { q: "Are drivers background-checked?", a: "Every driver is verified, insured, and rated by real customers before assignment." },
     ],
@@ -78,7 +78,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "SL", name: "Selina L.", location: "City Centre → Birstall", quote: "Student move from halls. Fixed price, no van hire stress. Done in three hours. Brilliant service." },
     ],
     faq: [
-      { q: "Do you cover all Leicester postcodes?", a: "We cover all LE postcodes including Oadby, Wigston, Birstall, and surrounding areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Leicester postcodes?", a: "All LE postcodes including Oadby, Wigston, Birstall, and surrounding areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on the day." },
       { q: "Can you do student moves in Leicester?", a: "De Montfort and Leicester University students, end of term, halls to flat. Fixed price, no van hire." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
@@ -104,7 +104,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "GR", name: "Graeme R.", location: "Bruntsfield → Corstorphine", quote: "Fixed price. Professional team. Done by lunchtime. Edinburgh removals rarely go this smoothly." },
     ],
     faq: [
-      { q: "Do you cover all Edinburgh postcodes?", a: "We cover all EH postcodes from the Old Town to Livingston and beyond. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Edinburgh postcodes?", a: "All EH postcodes from the Old Town to Livingston and beyond. Seven days a week, 7am to 10pm." },
       { q: "Can you handle Edinburgh tenement flats?", a: "Tenement stairs are something we deal with every day. High floors and narrow access at no extra charge." },
       { q: "Is the price fixed?", a: "Completely fixed. The price confirmed on the call is what you pay. No additions without your approval." },
       { q: "Can you move same-day in Edinburgh?", a: "Same-day is available most days. Post before 10am for the best slots." },
@@ -116,7 +116,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "cardiff-removals",
     city: "Cardiff",
     headline: "C<span class=\"font-display italic font-normal\">a</span>rdiff rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Tell us about your Cardiff removal. Verified driver confirmed by our team. Fixed price guaranteed.",
+    sub: "Tell us about your Cardiff removal. Verified driver confirmed. Fixed price guaranteed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -130,7 +130,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "NP", name: "Nia P.", location: "Splott → Llandaff", quote: "Fixed price is what made me choose them. No vague estimate — a number, and that number was what I paid. Brilliant." },
     ],
     faq: [
-      { q: "Do you cover all Cardiff postcodes?", a: "We cover all CF postcodes including Penarth, Barry, and surrounding South Wales areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Cardiff postcodes?", a: "All CF postcodes including Penarth, Barry, and surrounding South Wales areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Always fixed. Confirmed on the call before anything moves. Nothing added on the day." },
       { q: "Can you do student moves in Cardiff?", a: "Cardiff University and Cardiff Met students, end of term, accommodation moves. Fixed price, no van hire." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
@@ -141,7 +141,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
   {
     slug: "newcastle-removals",
     city: "Newcastle",
-    headline: "Newc<span class=\"font-display italic font-normal\">a</span>stle rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Pr<span class=\"font-display italic font-normal\">o</span>per j<span class=\"font-display italic font-normal\">o</span>b.",
+    headline: "Newc<span class=\"font-display italic font-normal\">a</span>stle removals.<br />Pr<span class=\"font-display italic font-normal\">o</span>per job.",
     sub: "Tell us about your Newcastle removal. Verified driver. Fixed price. Done right.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
@@ -156,10 +156,10 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "SS", name: "Sam S.", location: "Gateshead → Quayside", quote: "Student move, lots of stuff, tight budget. Fixed price meant I knew exactly what I was spending. Worth every penny." },
     ],
     faq: [
-      { q: "Do you cover all Newcastle postcodes?", a: "We cover all NE postcodes including Gateshead, Sunderland, and the wider Tyne & Wear area. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Newcastle postcodes?", a: "All NE postcodes including Gateshead, Sunderland, and the wider Tyne & Wear area. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on the day without your approval." },
       { q: "Can you do student moves in Newcastle?", a: "Newcastle University and Northumbria students, end of term moves. Fixed price, no van hire." },
-      { q: "How fast is the response?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How fast is the response?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Are drivers verified?", a: "Every driver is background-checked, insured, and rated by real customers." },
     ],
     source: "newcastle_removals",
@@ -168,7 +168,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "reading-removals",
     city: "Reading",
     headline: "Re<span class=\"font-display italic font-normal\">a</span>ding rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Tell us about your Reading removal. Verified driver confirmed by our team. No surprises.",
+    sub: "Tell us about your Reading removal. Verified driver confirmed. No surprises.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -182,7 +182,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "EP", name: "Emma P.", location: "Reading → Windsor", quote: "Short move but lots of furniture. Fixed price, no fuss, everything placed exactly where asked. Highly recommend." },
     ],
     faq: [
-      { q: "Do you cover all Reading postcodes?", a: "We cover all RG postcodes including Bracknell, Wokingham, and surrounding Berkshire areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Reading postcodes?", a: "All RG postcodes including Bracknell, Wokingham, and surrounding Berkshire areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on the day." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day in Reading?", a: "Same-day is available most days. Post before 10am for the best slots." },
@@ -208,7 +208,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "YA", name: "Yasmin A.", location: "Rose Hill → Botley", quote: "Posted Sunday, driver confirmed Sunday, moved Monday. That kind of turnaround is unheard of for Oxford." },
     ],
     faq: [
-      { q: "Do you cover all Oxford postcodes?", a: "We cover all OX postcodes including Abingdon, Witney, and surrounding areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Oxford postcodes?", a: "All OX postcodes including Abingdon, Witney, and surrounding areas. Seven days a week, 7am to 10pm." },
       { q: "Can you handle Oxford parking and access challenges?", a: "Permit zones, narrow roads, and college restrictions are all assessed upfront and factored into your fixed price." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on the day." },
       { q: "Can you do student moves in Oxford?", a: "Oxford and Oxford Brookes student moves, end of term, halls to house. Fixed price, no van hire." },
@@ -234,7 +234,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "OA", name: "Oliver A.", location: "Arbury → Trumpington", quote: "3-bed house. Two careful movers, two hours, done by noon. The fixed price is what makes this service genuinely different." },
     ],
     faq: [
-      { q: "Do you cover all Cambridge postcodes?", a: "We cover all CB postcodes including Ely, St Ives, and surrounding Cambridgeshire areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Cambridge postcodes?", a: "All CB postcodes including Ely, St Ives, and surrounding Cambridgeshire areas. Seven days a week, 7am to 10pm." },
       { q: "Can you do student moves in Cambridge?", a: "Cambridge University and Anglia Ruskin student moves, end of term, any accommodation. Fixed price, no van hire." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on move day." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
@@ -260,10 +260,10 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "NW", name: "Natasha W.", location: "Shirley → Hedge End", quote: "Posted the job and called back in under a minute. That level of response time had me confident before the move even started." },
     ],
     faq: [
-      { q: "Do you cover all Southampton postcodes?", a: "We cover all SO postcodes including Portsmouth, Eastleigh, and surrounding Hampshire areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Southampton postcodes?", a: "All SO postcodes including Portsmouth, Eastleigh, and surrounding Hampshire areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on move day." },
       { q: "Can you do student moves in Southampton?", a: "University of Southampton and Solent students, end of term moves. Fixed price, no van hire." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Are drivers verified?", a: "Every driver is background-checked, insured, and rated by real customers before assignment." },
     ],
     source: "southampton_removals",
@@ -286,7 +286,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "PF", name: "Pete F.", location: "Hanover → Fiveways", quote: "Posted on a Saturday, confirmed on a Saturday, moved Sunday morning. That's the kind of service that gets referrals." },
     ],
     faq: [
-      { q: "Do you cover all Brighton postcodes?", a: "We cover all BN postcodes including Hove, Worthing, and the Sussex coast. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Brighton postcodes?", a: "All BN postcodes including Hove, Worthing, and the Sussex coast. Seven days a week, 7am to 10pm." },
       { q: "Can you handle Brighton's narrow streets?", a: "Brighton's parking and access challenges are assessed upfront and included in your fixed price. No surprises." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on the day." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
@@ -298,7 +298,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
     slug: "derby-removals",
     city: "Derby",
     headline: "Derby rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed price.",
-    sub: "Tell us about your Derby removal. Verified driver matched and confirmed by our team.",
+    sub: "Tell us about your Derby removal. Verified driver confirmed.",
     stats: [
       { stat: "4.9★", label: "Verified reviews" },
       { stat: "< 15m", label: "Response time" },
@@ -312,9 +312,9 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "BM", name: "Ben M.", location: "Chaddesden → Oakwood", quote: "3-bed house, two vans, done by 3pm. Fixed price paid, no extras. Outstanding service." },
     ],
     faq: [
-      { q: "Do you cover all Derby postcodes?", a: "We cover all DE postcodes including Burton upon Trent, Long Eaton, and surrounding areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Derby postcodes?", a: "All DE postcodes including Burton upon Trent, Long Eaton, and surrounding areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on move day." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day in Derby?", a: "Same-day is available most days. Post before 10am for the best slots." },
       { q: "Are drivers verified?", a: "Every driver is background-checked, insured, and rated by real customers before assignment." },
     ],
@@ -338,7 +338,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "CH", name: "Claire H.", location: "Whitmore Reans → Finchfield", quote: "2-bed flat, professional team, done in three hours. Worth every penny and then some." },
     ],
     faq: [
-      { q: "Do you cover all Wolverhampton postcodes?", a: "We cover all WV postcodes including Walsall, Dudley, and surrounding West Midlands areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Wolverhampton postcodes?", a: "All WV postcodes including Walsall, Dudley, and surrounding West Midlands areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves. Nothing added on move day." },
       { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day?", a: "Same-day is available most days. Post before 10am for the best slots." },
@@ -364,10 +364,10 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "MN", name: "Mark N.", location: "Aylsham → Norwich", quote: "Cross-county move, lots of furniture, awkward staircase. Driver and assistant handled everything without complaint." },
     ],
     faq: [
-      { q: "Do you cover all Norwich postcodes?", a: "We cover all NR postcodes including Great Yarmouth, Dereham, and surrounding Norfolk areas. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Norwich postcodes?", a: "All NR postcodes including Great Yarmouth, Dereham, and surrounding Norfolk areas. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on move day without your approval." },
       { q: "Can you do student moves in Norwich?", a: "UEA student moves, end of term, halls to flat. Fixed price, no van hire." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Are drivers verified?", a: "Every driver is background-checked, insured, and rated by real customers." },
     ],
     source: "norwich_removals",
@@ -393,7 +393,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { q: "Which South London postcodes do you cover?", a: "All SE and SW postcodes — Brixton, Clapham, Peckham, Lewisham, Croydon, Wimbledon, Tooting and beyond. 7 days a week." },
       { q: "Do you handle ULEZ and congestion zones?", a: "All South London ULEZ charges and parking costs are included in your fixed price. Nothing added on the day." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day in South London?", a: "Same-day is a speciality. Post before 10am for same-day availability." },
     ],
     source: "south_london_removals",
@@ -419,7 +419,7 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { q: "Which East London postcodes do you cover?", a: "All E postcodes — Hackney, Shoreditch, Stratford, Walthamstow, Bethnal Green, Bow, and beyond. 7 days a week." },
       { q: "Do you handle ULEZ and congestion charges?", a: "All charges are factored into your fixed price upfront. Nothing added on move day." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed on the call before anything moves." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Can I book same-day in East London?", a: "Same-day is a speciality. Post before 10am for same-day availability." },
     ],
     source: "east_london_removals",
@@ -442,10 +442,10 @@ export const PROGRAMMATIC_CITIES: (CityPageData & { slug: string })[] = [
       { initials: "RA", name: "Riya A.", location: "Ancoats → Hulme", quote: "Posted Sunday morning. Confirmed Sunday morning. Moved Sunday afternoon. Exceptional turnaround." },
     ],
     faq: [
-      { q: "Do you cover all Manchester postcodes?", a: "We cover all M postcodes including Salford, Stockport, Oldham, and Greater Manchester. Seven days a week, 7am to 10pm." },
+      { q: "Do you cover all Manchester postcodes?", a: "All M postcodes including Salford, Stockport, Oldham, and Greater Manchester. Seven days a week, 7am to 10pm." },
       { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on the day without your approval." },
       { q: "Can you do student moves in Manchester?", a: "Manchester University and Manchester Met student moves. Fixed price, end of term, no van hire." },
-      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver matched and price locked before we hang up." },
+      { q: "How quickly do you respond?", a: "Within 15 minutes of posting. Driver and price confirmed before we hang up." },
       { q: "Are drivers verified?", a: "Every driver is background-checked, insured, and rated by real customers before assignment." },
     ],
     source: "manchester_removals",
