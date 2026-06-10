@@ -194,7 +194,7 @@ export default async function JobsPage() {
     <div className="max-w-2xl mx-auto px-6 py-10">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Jobs</p>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
-        Y<span className="font-display italic font-normal">o</span>ur jobs.
+        H<span className="font-display italic font-normal">i</span>story.
       </h1>
 
       {!isLive && fomoData ? (
