@@ -25,9 +25,7 @@ export default function ActiveJobPhotos({
         <div className="flex items-center justify-between">
           <p className="font-sans font-semibold text-[#0D0D0D] text-sm">Pickup Photo</p>
           {pickupPhotoUrl && (
-            <span className="text-[10px] font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full uppercase tracking-[0.1em] flex items-center gap-1.5">
-              <Check size={12} /> Done
-            </span>
+            <Check size={16} className="text-[#0D0D0D]" strokeWidth={3} />
           )}
         </div>
 
@@ -48,9 +46,7 @@ export default function ActiveJobPhotos({
         <div className="flex items-center justify-between">
           <p className="font-sans font-semibold text-[#0D0D0D] text-sm">Delivery Photo</p>
           {deliveryPhotoUrl && (
-            <span className="text-[10px] font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full uppercase tracking-[0.1em] flex items-center gap-1.5">
-              <Check size={12} /> Done
-            </span>
+            <Check size={16} className="text-[#0D0D0D]" strokeWidth={3} />
           )}
         </div>
 
@@ -72,18 +68,14 @@ export default function ActiveJobPhotos({
 
       {/* Completion Status */}
       {pickupPhotoUrl && deliveryPhotoUrl && (
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-center">
-          <p className="text-green-700 text-sm font-semibold">
-            Job ready to complete ✓
-          </p>
+        <div className="border-l-2 border-[#0D0D0D] bg-white px-4 py-3 mt-4">
+          <p className="text-[#0D0D0D] text-sm font-semibold">Ready to complete</p>
         </div>
       )}
 
       {(!pickupPhotoUrl || !deliveryPhotoUrl) && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-center">
-          <p className="text-yellow-700 text-sm font-semibold">
-            Photos required to complete job
-          </p>
+        <div className="border-l-2 border-[#888888] bg-[#F5F5F5] px-4 py-3 mt-4">
+          <p className="text-[#888888] text-sm font-semibold">{!pickupPhotoUrl ? "Pickup photo needed" : "Delivery photo needed"}</p>
         </div>
       )}
     </div>
