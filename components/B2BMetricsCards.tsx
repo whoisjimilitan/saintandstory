@@ -136,6 +136,10 @@ export default function B2BMetricsCards() {
         const response = await fetch("/api/b2b/metrics/knowledge-loop");
         if (!response.ok) throw new Error("Failed to fetch metrics");
         const data = await response.json();
+        if (!data?.metrics) {
+          console.error("Metrics API returned invalid response", data);
+          throw new Error("Invalid metrics response");
+        }
         setMetrics(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");

@@ -215,9 +215,11 @@ export default function ProspectBriefingPage({
         console.log("[PROSPECT-AUDIT] engagement_triggered: true", { lead_id, enrichedBriefUsed: !!enrichedBrief });
       } else {
         debug("SELF-CONFIRMED: API returned error", result);
+        alert("We couldn't save your response. Please try again.");
       }
     } catch (error) {
       debug("SELF-CONFIRMED: Request failed", { error: String(error) });
+      alert("Validation could not be saved. Please try again.");
     }
   }, [engagementSignals, lead_id, trigger_event, debug]);
 
