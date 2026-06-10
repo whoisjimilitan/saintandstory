@@ -9,7 +9,9 @@ import { getDeliveryTypeForIndustry } from "@/lib/industry-delivery-mapping";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead, getLeadSignalLabel } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
+import { generateQuestions, prioritizeQuestions } from "@/lib/question-engine";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
+import { type BusinessEvidence } from "@/lib/evidence-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
@@ -721,6 +723,40 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           {showStandingOrder ? (
             <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
+
+              {/* Known vs Unknown Panel */}
+              <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Known */}
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Known</p>
+                    <div className="space-y-1">
+                      {lead.business_name && <p className="text-[11px] text-[#0D0D0D]">✓ Business: {lead.business_name}</p>}
+                      {lead.business_category && <p className="text-[11px] text-[#0D0D0D]">✓ Category: {lead.business_category}</p>}
+                      {lead.email && <p className="text-[11px] text-[#0D0D0D]">✓ Email: {lead.email}</p>}
+                      {soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Pickup: {soForm.pickup_postcode}</p>}
+                      {soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Delivery: {soForm.delivery_postcode}</p>}
+                      {soForm.preferred_time && <p className="text-[11px] text-[#0D0D0D]">✓ Time: {soForm.preferred_time}</p>}
+                      {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
+                        <p className="text-[11px] text-[#0D0D0D]">✓ {(lead.human_observations as Record<string, unknown>[]).length} observations recorded</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Unknown */}
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Unknown</p>
+                    <div className="space-y-1">
+                      {!soForm.pickup_postcode && <p className="text-[11px] text-[#888888]">? Pickup postcode</p>}
+                      {!soForm.delivery_postcode && <p className="text-[11px] text-[#888888]">? Delivery postcode</p>}
+                      <p className="text-[11px] text-[#888888]">? Load characteristics</p>
+                      <p className="text-[11px] text-[#888888]">? Special constraints</p>
+                      <p className="text-[11px] text-[#888888]">? Decision maker confirmation</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Price (£)</label>
