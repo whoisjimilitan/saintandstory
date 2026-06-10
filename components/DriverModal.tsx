@@ -331,8 +331,8 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                         className="w-5 h-5 mt-0.5 rounded border-2 border-[#0D0D0D] cursor-pointer accent-[#0D0D0D]"
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">Unlock recurring contracts from nearby businesses</p>
-                        <p className="text-xs text-[#888888]">Discover local businesses needing regular help. Earn from steady contracts — toggle on or off anytime from your dashboard.</p>
+                        <p className="text-sm font-semibold text-[#0D0D0D]">Find local businesses for regular pickups</p>
+                        <p className="text-xs text-[#888888]">We'll show you nearby businesses that need help every week. You can turn this on or off anytime.</p>
                       </div>
                     </label>
                   </div>
@@ -342,24 +342,28 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
               {step.type === "earnings" && (
                 <div className="space-y-4">
                   <div className="bg-[#0D0D0D] rounded-2xl px-6 py-5">
-                    <p className="text-[10px] text-white/70 uppercase tracking-[0.15em] mb-3">
-                      Based on {answers.days ?? "your availability"}
+                    <p className="text-[10px] text-white/70 uppercase tracking-[0.15em] mb-4">
+                      What others are earning
                     </p>
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <p className="font-sans font-black text-white text-4xl tracking-tight">£{weekly}</p>
-                        <p className="text-white/65 text-xs uppercase tracking-[0.12em] mt-1">per week</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-sans font-black text-white text-2xl tracking-tight">£{monthly}</p>
-                        <p className="text-white/65 text-xs uppercase tracking-[0.12em] mt-1">per month</p>
-                      </div>
+                    <div className="mb-6">
+                      <p className="font-sans font-black text-white text-3xl tracking-tight mb-1">£202</p>
+                      <p className="text-white/65 text-xs uppercase tracking-[0.12em]">per day</p>
+                      <p className="text-white/50 text-xs mt-3">Example: 15 days/month = £3,030</p>
                     </div>
+
+                    {answers.days && (
+                      <div className="border-t border-white/15 pt-4 space-y-1">
+                        <p className="text-white/70 text-xs mb-2">Your estimate ({answers.days}):</p>
+                        <p className="font-sans font-black text-white text-2xl tracking-tight">£{weekly}/week</p>
+                        <p className="text-white/65 text-xs uppercase tracking-[0.12em] mt-1">~£{monthly}/month</p>
+                      </div>
+                    )}
+
                     <div className="border-t border-white/15 mt-4 pt-4 space-y-1">
                       <p className="text-white/70 text-xs leading-relaxed">
-                        Your £9.99 monthly fee is covered in your first 2 hours of work.
+                        Your £9.99 monthly fee is covered on your first day.
                       </p>
-                      <p className="text-white/50 text-xs">Finish at 3pm. Paid before 4pm.</p>
+                      <p className="text-white/50 text-xs">Payments processed daily.</p>
                     </div>
                   </div>
 
@@ -411,7 +415,7 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                   <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4">
                     <p className="text-[#888888] text-[10px] uppercase tracking-[0.12em] mb-2">Your earnings estimate</p>
                     <p className="font-sans font-black text-[#0D0D0D] text-base">£{weekly}/week · £{monthly}/month</p>
-                    <p className="text-[#888888] text-xs mt-1">Fee covered in your first 2 hours.</p>
+                    <p className="text-[#888888] text-xs mt-1">Fee covered on your first day. Paid daily.</p>
                   </div>
 
                   {!stripeOpened ? (
