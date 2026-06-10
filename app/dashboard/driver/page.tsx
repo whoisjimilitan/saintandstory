@@ -48,10 +48,21 @@ export default async function DriverDashboard() {
 
   const userEmail = user?.emailAddresses[0]?.emailAddress;
 
-  if (!process.env.DATABASE_URL || !userEmail) {
+  // If DATABASE_URL not set, render empty state instead of crashing
+  if (!process.env.DATABASE_URL) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <p className="text-[#888888]">Unable to load dashboard</p>
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">Driver Dashboard</h1>
+        <p className="text-[#888888] mb-6">Database connection not configured. Contact support.</p>
+      </div>
+    );
+  }
+
+  if (!userEmail) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">Driver Dashboard</h1>
+        <p className="text-[#888888] mb-6">Unable to determine your email. Please sign in again.</p>
       </div>
     );
   }
@@ -64,10 +75,23 @@ export default async function DriverDashboard() {
       SELECT id FROM drivers WHERE email = ${userEmail} LIMIT 1
     `;
     if (driverData.length > 0) {
-      driver = await getDriverMetrics(driverData[0].id);
+      try {
+        driver = await getDriverMetrics(driverData[0].id);
+      } catch (metricsError) {
+        console.error("[Driver Dashboard] Error fetching metrics:", metricsError);
+        // Return null - will show "not registered" fallback
+        driver = null;
+      }
     }
   } catch (error) {
     console.error("[Driver Dashboard] Error finding driver:", error);
+    // If DB query fails, show error state instead of crashing
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">Driver Dashboard</h1>
+        <p className="text-[#888888] mb-6">Unable to load driver data. Please try again later.</p>
+      </div>
+    );
   }
 
   if (!driver) {
