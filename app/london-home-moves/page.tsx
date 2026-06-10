@@ -7,7 +7,7 @@ import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "London Home Moves | Post Your Job. We Find Your Driver. | Saint & Story",
-  description: "Tell us about your London home move. We call back with a fixed price and a verified local driver. Fully insured, all 33 boroughs. Free to post.",
+  description: "Tell us about your London home move. Response to call back with a fixed price and a verified local driver. Fully insured, all 33 boroughs. Free to post.",
 };
 
 const STATS = [
@@ -19,7 +19,7 @@ const STATS = [
 
 const STEPS = [
   { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-  { num: "02", title: "We find your driver", desc: "Verified London driver, matched and confirmed." },
+  { num: "02", title: "Driver confirmed", desc: "Verified London driver, confirmed and confirmed." },
   { num: "03", title: "Confirm your price", desc: "Fixed. Locked. No surprises on the day." },
   { num: "04", title: "Move day", desc: "On time. Professional. Done." },
 ];
@@ -52,10 +52,10 @@ const FEATURES = [
 ];
 
 const FAQS = [
-  { q: "How quickly can you match me in London?", a: "Within 15 minutes of posting your job, our team calls to confirm a verified driver near you — name, quote, and job reference before we hang up." },
+  { q: "How quickly do you respond me in London?", a: "Within 15 minutes of posting your job, our team calls to confirm a verified driver near you — name, quote, and job reference before we hang up." },
   { q: "Do you cover all 33 London boroughs?", a: "Yes. Every borough, 7 days a week from 7am to 10pm. Congestion zone, ULEZ, and parking are all factored into your fixed price upfront." },
   { q: "Is the price fixed or an estimate?", a: "Always fixed. The number confirmed on the call is the number you pay. Nothing is added on the day without your explicit approval." },
-  { q: "What happens after I post my job?", a: "We call within 15 minutes to confirm your fixed price and the name of your driver. Locked quote before we hang up — nothing changes on the day." },
+  { q: "What happens after I post my job?", a: "Response to call within 15 minutes to confirm your fixed price and the name of your driver. Locked quote before we hang up — nothing changes on the day." },
   { q: "Are there hidden charges — congestion, ULEZ, parking?", a: "None. Congestion charge, ULEZ, and parking permits are all included in your quote. We don't spring extras on you on moving day." },
   { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly. No complicated claims process, no argument." },
   { q: "Do I need to be present during the move?", a: "Present at the start and end. During transit you're free to travel ahead. We keep you updated throughout via text or call." },
@@ -112,7 +112,7 @@ export default function LondonHomeMoves() {
             <br />D<span className="font-display italic font-normal">o</span>ne right.
           </h1>
           <p className="text-white/70 text-base mb-10 max-w-sm">
-            Tell us about your London move. We match you to a verified local driver. Fixed price. No surprises.
+            Tell us about your London move. Verified driver. Fixed price. No surprises. Fixed price. No surprises.
           </p>
           <LandingHeroSearch city="London" />
           <p className="text-white/40 text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
@@ -234,7 +234,7 @@ export default function LondonHomeMoves() {
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
               Fixed price confirmed in minutes.
-              <br />We find y<span className="font-display italic font-normal">o</span>ur London driver.
+              <br />Response to find y<span className="font-display italic font-normal">o</span>ur London driver.
               <br />Fixed price. N<span className="font-display italic font-normal">o</span> surprises.
             </p>
             <ModalCTA

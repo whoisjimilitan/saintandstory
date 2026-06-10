@@ -18,8 +18,8 @@ const STATS = [
 
 const STEPS = [
   { num: "01", title: "Tell us what's moving.", desc: "Pickup, drop-off, and date. 60 seconds. Free." },
-  { num: "02", title: "We match your driver", desc: "Verified driver confirmed. Fixed price locked. No nasty surprises." },
-  { num: "03", title: "Pack your stuff", desc: "We handle the heavy lifting. You handle the boxes." },
+  { num: "02", title: "Response to match your driver", desc: "Verified driver confirmed. Fixed price locked. No nasty surprises." },
+  { num: "03", title: "Pack your stuff", desc: "Response to handle the heavy lifting. You handle the boxes." },
   { num: "04", title: "Moved", desc: "New place, zero stress. Done properly." },
 ];
 
@@ -58,7 +58,7 @@ const FAQS = [
   { q: "Can you do end-of-term moves?", a: "End of term is one of our busiest periods. Book early for the best slots. Fixed price confirmed before you commit." },
   { q: "Do you move between cities?", a: "Leeds to London, Sheffield to Manchester, Bristol to Birmingham. Any UK city to any UK city. Fixed price, no mileage surprises." },
   { q: "Is the price really fixed?", a: "Completely fixed. The number confirmed on the call is the number you pay. Nothing added without your approval." },
-  { q: "What if I have a lot of stuff?", a: "Tell us the approximate volume when you post. We match you to the right vehicle: van, long wheelbase, or Luton as needed." },
+  { q: "What if I have a lot of stuff?", a: "Tell us the approximate volume when you post. We verified driver for the right vehicle: van, long wheelbase, or Luton as needed." },
 ];
 
 export default function StudentMoves() {

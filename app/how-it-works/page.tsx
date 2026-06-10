@@ -6,7 +6,7 @@ import MobileBar from "@/components/MobileBar";
 
 export const metadata: Metadata = {
   title: "How UK Removals Work | Fixed Price. Verified Driver. | Saint & Story",
-  description: "Tell us what's moving. We call within 15 minutes with a fixed price and a named driver. No estimates, no surprises. Here's exactly how it works.",
+  description: "Tell us what's moving. Response to call within 15 minutes with a fixed price and a named driver. No estimates, no surprises. Here's exactly how it works.",
 };
 
 const CUSTOMER_STEPS = [
@@ -18,7 +18,7 @@ const CUSTOMER_STEPS = [
   },
   {
     num: "02",
-    title: "We call within 15 minutes",
+    title: "Response to call within 15 minutes",
     desc: "Our team calls you back with a fixed price and a verified driver already matched.",
     detail: "No shortlist to wade through. One call, one price, one driver. Already matched and briefed before we hang up.",
   },
@@ -57,16 +57,16 @@ const GUARANTEES = [
   },
   {
     title: "Full insurance.",
-    desc: "Every move is fully insured in transit and on the job. We handle any claim directly.",
+    desc: "Every move is fully insured in transit and on the job. Response to handle any claim directly.",
   },
 ];
 
 const FAQS = [
-  { q: "Do I need to create an account?", a: "No. Fill in your details and get your confirmation without creating an account. We handle everything." },
-  { q: "How does the matching work?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing, then confirm availability before calling you back. You don't browse or choose from a list." },
-  { q: "What if I need to change the date?", a: "Call or email us. We handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
+  { q: "Do I need to create an account?", a: "No. Fill in your details and get your confirmation without creating an account. Response to handle everything." },
+  { q: "How does the driver confirmation process?", a: "We select a verified driver based on your location, job type, vehicle requirement, and timing, then confirm availability before calling you back. You don't browse or choose from a list." },
+  { q: "What if I need to change the date?", a: "Call or email us. Response to handle changes directly. If a date change affects the price, we confirm it with you before anything moves." },
   { q: "What if I need to cancel?", a: "You can cancel without charge up to 24 hours before the move. Within 24 hours, a cancellation fee may apply. This is confirmed when you book." },
-  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time, from driver match to completion." },
+  { q: "How do I track my job?", a: "Once confirmed, you receive a tracking link by email. It shows your job status in real time, from driver arrival to completion." },
   { q: "What areas do you cover?", a: "London, Manchester, Birmingham, Leeds, Liverpool, Bristol, Sheffield, Glasgow, and growing. Tell us your move and if we can't cover it, we'll say so straight away." },
 ];
 

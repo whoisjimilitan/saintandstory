@@ -3,8 +3,8 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 
 const data: CityPageData = {
   city: "Glasgow",
-  headline: "Glasg<span class=\"font-display italic font-normal\">o</span>w rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />N<span class=\"font-display italic font-normal\">o</span> fuss.<br />Fixed price.",
-  sub: "Tell us about your Glasgow removal. Verified driver matched by our team. Fixed price from the first call.",
+  headline: "Glasg<span class=\"font-display italic font-normal\">o</span>w removals.<br />N<span class=\"font-display italic font-normal\">o</span> fuss.<br />Fixed price.",
+sub: "Tell us about your Glasgow removal. Verified driver confirmed. from the first call.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },
@@ -13,7 +13,7 @@ const data: CityPageData = {
   ],
   steps: [
     { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-    { num: "02", title: "We find your driver", desc: "Verified Glasgow driver, matched and confirmed by our team." },
+    { num: "02", title: "Driver confirmed", desc: "Verified Glasgow driver, confirmed." },
     { num: "03", title: "Confirm your price", desc: "Fixed on the call before anything moves." },
     { num: "04", title: "Move day", desc: "On time. Professional. Done properly." },
   ],
@@ -39,7 +39,7 @@ const data: CityPageData = {
   ],
   faq: [
     { q: "Do you cover all Glasgow postcodes?", a: "We cover all G postcodes including Paisley, Rutherglen, and surrounding areas. Seven days a week, 7am to 10pm." },
-    { q: "Can you handle tenement flats?", a: "Tenements are something we deal with every day in Glasgow. Narrow stairs and high floors at no extra charge." },
+    { q: "Can you handle tenement flats?", a: "Tenements are something Handling deal with every day in Glasgow. Narrow stairs and high floors at no extra charge." },
     { q: "Is the price fixed?", a: "Completely fixed. Confirmed before anything moves. Nothing added on move day without your approval." },
     { q: "Can you move the same day?", a: "Same-day is available most days. Post before 10am for the best slots." },
     { q: "Are your drivers vetted?", a: "Every driver is background-checked, insured, and rated by real customers before being assigned any job." },

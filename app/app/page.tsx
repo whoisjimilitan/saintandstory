@@ -147,7 +147,7 @@ export default function AppPage() {
           </h2>
           <div>
             <p className="font-sans font-medium text-white/80 text-lg leading-relaxed mb-8">
-              Tell us your move. We call back with a fixed price.
+              Tell us your move. Response to call back with a fixed price.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"

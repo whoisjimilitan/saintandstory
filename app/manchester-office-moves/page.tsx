@@ -16,7 +16,7 @@ const STATS = [
 
 const STEPS = [
   { num: "01", title: "Tell us about your office.", desc: "Size, both postcodes, and your preferred date. Takes 60 seconds." },
-  { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked. Team assigned." },
+  { num: "02", title: "Fixed price confirmed", desc: "Response to call within 15 minutes. Price locked. Team assigned." },
   { num: "03", title: "Monday, fully operational", desc: "We move everything over the weekend. Your team walks in ready." },
 ];
 
@@ -49,9 +49,9 @@ const REVIEWS = [
 
 const FAQS = [
   { q: "Can you move our office over a weekend?", a: "Weekend and out-of-hours moves are our speciality for offices. Your team arrives Monday to a fully operational workspace." },
-  { q: "How do you handle IT equipment?", a: "We treat IT as specialist cargo: wrapped, boxed, and tracked. We work with your IT team to ensure correct labelling and placement." },
+  { q: "How do you handle IT equipment?", a: "We treat IT as specialist cargo: wrapped, boxed, and tracked. Handling work with your IT team to ensure correct labelling and placement." },
   { q: "Is the price fixed?", a: "Always. Confirmed on the call before anything moves. No additions without your approval." },
-  { q: "How large a move can you handle?", a: "From single-person offices to 50+ desk corporate relocations. We scale the team and vehicles to match." },
+  { q: "How large a move can you handle?", a: "From single-person offices to 50+ desk corporate relocations. Handling scale the team and vehicles to match." },
 ];
 
 function Stars() {
@@ -226,7 +226,7 @@ export default function ManchesterOfficeMoves() {
               <br />get m<span className="font-display italic font-normal">o</span>ving?
             </h2>
             <p className="text-white/50 text-base mb-8 max-w-xs">
-              We call within 15 minutes with a fixed price.
+              Response to call within 15 minutes with a fixed price.
             </p>
             <div className="border border-white/10 rounded-2xl px-6 py-5">
               <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.2em] mb-2">Response time</p>

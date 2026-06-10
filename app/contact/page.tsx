@@ -5,7 +5,7 @@ import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {
   title: "Contact Saint & Story | UK Removal Company | 0203 051 7408",
-  description: "Get a free removal quote from Saint & Story. We call back within 15 minutes, seven days a week. Call 0203 051 7408 or tell us about your move online.",
+  description: "Get a free removal quote from Saint & Story. Response to call back within 15 minutes, seven days a week. Call 0203 051 7408 or tell us about your move online.",
 };
 
 const DETAILS = [
@@ -29,7 +29,7 @@ export default function ContactPage() {
             <br />y<span className="font-display italic font-normal">o</span>ur move.
           </h1>
           <p className="text-[#888888] text-base max-w-sm">
-            Fill in the form. We call back within 15 minutes.
+            Fill in the form. Response to call back within 15 minutes.
           </p>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function ContactPage() {
           <div className="bg-white rounded-2xl p-8 border border-[#E8E8E8] flex flex-col gap-6">
             <div>
               <h2 className="font-sans font-black text-[#0D0D0D] text-lg mb-1">Request a free quote</h2>
-              <p className="text-[#888888] text-sm">Tell us about your move. We call back within 15 minutes.</p>
+              <p className="text-[#888888] text-sm">Tell us about your move. Response to call back within 15 minutes.</p>
             </div>
             <ModalCTA
               label="Get a fixed price — free →"

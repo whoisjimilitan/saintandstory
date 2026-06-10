@@ -32,7 +32,7 @@ const STATS = [
 
 const STEPS = [
   { num: "01", title: "Tell us what's going", desc: "Rooms, contents, access. 60 seconds. Free to post." },
-  { num: "02", title: "Fixed price confirmed", desc: "We call within 15 minutes. Price locked before we arrive." },
+  { num: "02", title: "Fixed price confirmed", desc: "Response to call within 15 minutes. Price locked before we arrive." },
   { num: "03", title: "We clear it", desc: "Professional team. Everything removed. Property left clean." },
   { num: "04", title: "Responsible disposal", desc: "Sorted for donation, recycling, and responsible disposal. Not just landfill." },
 ];

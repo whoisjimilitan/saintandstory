@@ -3,8 +3,8 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 
 const data: CityPageData = {
   city: "Liverpool",
-  headline: "Liverp<span class=\"font-display italic font-normal\">o</span><span class=\"font-display italic font-normal\">o</span>l rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Fixed. Fast.<br />Pr<span class=\"font-display italic font-normal\">o</span>per.",
-  sub: "Tell us about your Liverpool removal. Verified driver matched and confirmed. No guesswork, no surprises.",
+  headline: "Liverpool removals.<br />Fixed. Fast.<br />Proper.",
+sub: "Tell us about your Liverpool removal. Verified driver confirmed. No guesswork.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },
@@ -13,7 +13,7 @@ const data: CityPageData = {
   ],
   steps: [
     { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-    { num: "02", title: "We find your driver", desc: "Verified Liverpool driver selected and briefed by our team." },
+    { num: "02", title: "Driver confirmed", desc: "Verified Liverpool driver. Background-checked, insured, rated by customers." },
     { num: "03", title: "Confirm your price", desc: "Fixed on the call. Locked before anything moves." },
     { num: "04", title: "Move day", desc: "Professional, punctual, properly done." },
   ],
@@ -38,11 +38,11 @@ const data: CityPageData = {
     },
   ],
   faq: [
-    { q: "Do you cover all Liverpool postcodes?", a: "We cover all L postcodes from the city centre to Southport and the Wirral. Seven days a week, 7am to 10pm." },
+    { q: "Do you cover all Liverpool postcodes?", a: "All L postcodes from the city centre to Southport and the Wirral. Seven days a week, 7am to 10pm." },
     { q: "Is the price truly fixed?", a: "Absolutely. The price confirmed on our call is what you pay. Nothing is added on move day without your approval." },
-    { q: "How fast is the response?", a: "We call within 15 minutes of you posting. Driver assigned and price locked before we hang up." },
+    { q: "How fast is the response?", a: "Response within 15 minutes of you posting. Driver and price confirmed before we hang up." },
     { q: "Can you move same-day in Liverpool?", a: "Same-day availability most days. Post before 10am. Urgent? Call us directly." },
-    { q: "What if something gets damaged?", a: "Every move is fully insured. We handle any damage claim directly. No complicated process." },
+    { q: "What if something gets damaged?", a: "Every move is fully insured. Damage claims handled directly. No complicated process." },
   ],
   source: "liverpool_removals",
 };

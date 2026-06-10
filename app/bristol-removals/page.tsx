@@ -3,8 +3,8 @@ import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/
 
 const data: CityPageData = {
   city: "Bristol",
-  headline: "Brist<span class=\"font-display italic font-normal\">o</span>l rem<span class=\"font-display italic font-normal\">o</span>v<span class=\"font-display italic font-normal\">a</span>ls.<br />Pr<span class=\"font-display italic font-normal\">o</span>perly d<span class=\"font-display italic font-normal\">o</span>ne.",
-  sub: "Fixed price. Verified driver. We call within 15 minutes of posting. No surprises.",
+  headline: "Brist<span class=\"font-display italic font-normal\">o</span>l removals.<br />Pr<span class=\"font-display italic font-normal\">o</span>perly d<span class=\"font-display italic font-normal\">o</span>ne.",
+sub: "Fixed price. Verified driver. Response to call within 15 minutes of posting.",
   stats: [
     { stat: "4.9★", label: "Verified reviews" },
     { stat: "< 15m", label: "Response time" },
@@ -13,7 +13,7 @@ const data: CityPageData = {
   ],
   steps: [
     { num: "01", title: "Tell us what's moving.", desc: "Fill in the basics. 60 seconds. No account needed." },
-    { num: "02", title: "We find your driver", desc: "Verified Bristol driver, matched, confirmed, and briefed by us." },
+    { num: "02", title: "Driver confirmed", desc: "Verified Bristol driver, confirmed, confirmed, and briefed by us." },
     { num: "03", title: "Confirm your price", desc: "Fixed before anything moves. No surprises on move day." },
     { num: "04", title: "Move day", desc: "Professional, on time, done properly." },
   ],

@@ -36,7 +36,7 @@ const SERVICES = [
   {
     title: "Office relocations",
     context: "10-desk office from £210",
-    desc: "Desks, IT, filing. We work weekends so your team walks in Monday morning ready to go.",
+    desc: "Desks, IT, filing. Handling work weekends so your team walks in Monday morning ready to go.",
     from: "From £210",
     source: "services_office",
     pageHref: "/office-moves",
@@ -141,7 +141,7 @@ export default function ServicesPage() {
           </h2>
           <div>
             <p className="text-white/60 text-base mb-8">
-              Tell us what needs moving. We ask the right questions on the call and match you to the right driver.
+              Tell us what needs moving. We ask the right questions on the call and verified driver for the right driver.
             </p>
             <ModalCTA
               label="Get a fixed price — free →"

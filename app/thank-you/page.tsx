@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { num: "01", text: "We call within 15 minutes to discuss your move" },
+  { num: "01", text: "Response to call within 15 minutes to discuss your move" },
   { num: "02", text: "Fixed price confirmed on the call — no changes on the day" },
   { num: "03", text: "Your team arrives and handles everything" },
 ];
