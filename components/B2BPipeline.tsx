@@ -516,23 +516,54 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 )}
               </div>
             ) : (
-              // Discovered leads: show semantic signal label with context and score
+              // Discovered leads: Score + Priority + Signals
               <div className={`text-sm transition-colors duration-300`}>
-                <div className="flex items-baseline justify-between gap-3 mb-2">
-                  <p className="font-semibold text-[#0D0D0D]">{getLeadSignalLabel(lead)}</p>
-                  <span className={`text-xs font-bold shrink-0 px-2 py-1 rounded ${
+                {/* Score and Priority Label */}
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-2xl font-black ${
+                      scoreBreakdown.total >= 60 ? "text-[#2ECC71]" :
+                      scoreBreakdown.total >= 40 ? "text-[#F39C12]" :
+                      "text-[#888888]"
+                    }`}>
+                      {scoreBreakdown.total}
+                    </span>
+                    <span className="text-[#AAAAAA]">/100</span>
+                  </div>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shrink-0 ${
                     scoreBreakdown.total >= 60 ? "bg-[#E8F5E9] text-[#2ECC71]" :
                     scoreBreakdown.total >= 40 ? "bg-[#FFF3E0] text-[#F39C12]" :
-                    "bg-[#F5F5F5] text-[#888888]"
+                    "bg-[#F5F5F5] text-[#666666]"
                   }`}>
-                    {scoreBreakdown.total}/100
+                    {scoreBreakdown.total >= 60 ? "High Priority" :
+                     scoreBreakdown.total >= 40 ? "Medium Priority" :
+                     "Baseline Opportunity"}
                   </span>
                 </div>
-                <p className={`text-xs transition-colors duration-300 text-[#666666]`}>
-                  {hasPainPoint
-                    ? "Multiple negative mentions of delivery/logistics friction in recent reviews."
-                    : "No negative reviews detected. Lower priority, but still opportunity."}
-                </p>
+
+                {/* Signals */}
+                <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em] mb-2">Signals:</p>
+                  <div className="space-y-1">
+                    {hasPainPoint ? (
+                      <>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-[#2ECC71] font-bold">✓</span>
+                          <span className="text-[#0D0D0D]">Customer complaint in reviews</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-[#2ECC71] font-bold">✓</span>
+                          <span className="text-[#0D0D0D]">Delivery/service issue detected</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-[#AAAAAA]">—</span>
+                        <span className="text-[#666666]">No operational friction detected</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
