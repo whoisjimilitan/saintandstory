@@ -777,6 +777,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
 
+              {/* Continuity note: seamless transition from prospect validation question */}
+              {hasPainPoint && (
+                <div className="bg-white border border-[#E8E8E8] rounded p-3 -mx-4 px-4 mb-2">
+                  <p className="text-[10px] text-[#666666]">
+                    Prospect confirmed: {lead.pain_point?.toLowerCase()} coordination is their bottleneck when volume peaks. Capture their standing order requirements.
+                  </p>
+                </div>
+              )}
+
               {/* Known vs Unknown Panel */}
               <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
                 <div className="grid grid-cols-2 gap-4">
