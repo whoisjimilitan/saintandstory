@@ -228,14 +228,28 @@ git status
 
 ### Database Migration
 
+**CRITICAL:** Check if migration already applied before running.
+
 ```sql
--- Run against production database (one-time)
+-- Step 1: Check if column already exists
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'b2b_leads' 
+AND column_name = 'email_sent_at';
+
+-- If query returns a row → column already exists → DO NOTHING
+-- If query returns no rows → column missing → run migration below
+
+-- Step 2: If column missing, apply migration (one-time only)
 ALTER TABLE b2b_leads ADD COLUMN email_sent_at TIMESTAMP NULL;
 
--- Verify column added
-SELECT column_name, data_type FROM information_schema.columns 
+-- Step 3: Verify success
+SELECT column_name FROM information_schema.columns 
 WHERE table_name = 'b2b_leads' AND column_name = 'email_sent_at';
+-- Should return exactly one row
 ```
+
+**Why:** If you already merged and deployed migration code (migrations/2026_06_10_add_email_sent_at.ts), manually running ALTER TABLE will fail with "column already exists" error. Always check first.
 
 ### Deployment
 
@@ -273,96 +287,165 @@ ALTER TABLE b2b_leads DROP COLUMN email_sent_at;
 
 ## STAGING VERIFICATION JOURNEY
 
-Run exactly one complete prospect journey before production:
+**CRITICAL:** These are the three places where revenue disappears. Verify them actually work, not via code review.
 
-### Step 1: Lead Discovery
-```
-✅ Discover lead via Google Places API
-✅ Verify: business_name, category, email, pain_point stored
-```
+### The Three Critical Revenue Verification Points
 
-### Step 2: Recognition Email
+#### 1️⃣ RECOGNITION EMAIL ACTUALLY SENDS
 ```
-✅ Send recognition email via Resend
-✅ Verify: email_sent_at populated in database
-✅ Verify: Continuity Card timestamp displays correctly
-```
+Step 1: Discover a lead in staging
+Step 2: Trigger recognition email send
+Step 3: ACTUALLY CHECK YOUR EMAIL INBOX
+        (Not the database, not the logs, not the code)
+        
+✅ Email arrived in inbox
+✅ Email displays without errors
+✅ From/To/Subject correct
+✅ Body shows business name and pain point
 
-### Step 3: Landing Page
-```
-✅ Open prospect landing page
-✅ Verify: Title shows business name
-✅ Verify: H1 shows pain point question
-✅ Verify: Current Reality shows recognition context
-✅ Verify: Page renders fully without errors
+FAIL CONDITION: Email did not arrive, or arrived corrupted
+ROLLBACK: git checkout v2.0-prelaunch-stable
 ```
 
-### Step 4: Prospect Validation
+#### 2️⃣ LANDING PAGE LOADS FROM EMAIL LINK
 ```
-✅ Click "Let's Talk" button as prospect
-✅ Verify: Engagement signals captured (scroll, tab focus)
-✅ Verify: Validation API call succeeds
-✅ Verify: confirmed_at timestamp stored
+Step 1: Open the email from Step 1
+Step 2: Click the "Let's Talk" link
+Step 3: ACTUALLY LOAD THE PAGE IN BROWSER
+        (Not the code, not the preview, not the test)
+        
+✅ Page loads (no 404, no timeout)
+✅ Page displays business name
+✅ Page shows pain point question
+✅ Page is fully interactive
+✅ Current Reality section renders
+✅ Validation button works
+
+FAIL CONDITION: Page doesn't load, 404, or renders broken
+ROLLBACK: git checkout v2.0-prelaunch-stable
 ```
 
-### Step 5: Operator Pipeline
+#### 3️⃣ STANDING ORDER CREATES JOB RECORD
 ```
-✅ Load operator dashboard
-✅ Verify: Lead appears in pipeline
-✅ Verify: Continuity Card visible with email timestamp
-✅ Verify: Suggested Opening displayed
-✅ Verify: Known vs Unknown panel shows data completeness
+Step 1: Fill Standing Order form (from operator dashboard)
+Step 2: Submit form
+Step 3: ACTUALLY QUERY THE DATABASE
+        SELECT * FROM jobs 
+        WHERE standing_order_id = ?
+        
+✅ Job record exists
+✅ Job has pickup_postcode and delivery_postcode
+✅ Job has service_type and price
+✅ Job status is "pending" (not error, not null)
+
+FAIL CONDITION: Job not created, missing fields, or error status
+ROLLBACK: git checkout v2.0-prelaunch-stable
 ```
 
-### Step 6: Standing Order
-```
-✅ Fill Standing Order form (postcodes, day, time, price)
-✅ Verify: Form validates (requires both postcodes)
-✅ Verify: API save succeeds
-✅ Verify: Modal closes on success
-✅ Verify: Observation logged
-```
+### Complete 8-Step Journey (After 3 Critical Points Pass)
 
-### Step 7: Job Generation
-```
-✅ Verify: Job created in jobs table
-✅ Verify: Job has postcodes, service type, price
-✅ Verify: Job ready for dispatch
-```
+If the three critical verifications pass, run the full journey:
 
-### Step 8: Metrics Dashboard
-```
-✅ Load metrics dashboard
-✅ Verify: All 6 metrics display
-✅ Verify: Calculations accurate (lead counted in knowledge_capture_adoption)
-✅ Verify: Standing order counted in standing_order_completeness
-✅ Verify: Job counted in fulfillment_readiness
-```
+1. Lead discovery via Google Places
+2. Recognition email sent (✅ verified it arrived)
+3. Landing page opened from email (✅ verified it loaded)
+4. Prospect validates pain point (simulated click)
+5. Continuity Card populated with timestamp
+6. Standing Order created with valid postcodes
+7. Job generated (✅ verified in database)
+8. Metrics dashboard updated with new lead/SO/job counts
 
-**Result:** If all 8 steps pass without errors → APPROVE FOR PRODUCTION
+**Result:** If all 8 steps pass AND three critical verifications pass → APPROVE FOR PRODUCTION
 
 ---
 
-## MONITORING & ALERTS (First 24 Hours)
+## LAUNCH DASHBOARD (First 24 Hours)
 
-### Critical Metrics
-- Email delivery rate (target: > 95%)
-- Prospect page load time (target: < 2s)
-- Validation completion rate (target: > 30%)
-- Standing order creation rate (target: > 20%)
-- Job generation success rate (target: > 95%)
+**Track these metrics on a simple dashboard. Update every hour.**
 
-### Error Logs
-- Check for any exceptions in send-recognition route
-- Check for any exceptions in confirm-engagement route
-- Check for any exceptions in standing-orders route
-- Check for database connection errors
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Leads discovered | — | > 0 | |
+| Recognition emails sent | — | > 0 | |
+| Landing pages opened | — | > 0 | |
+| Prospect self-validations | — | > 0 | |
+| Standing orders created | — | > 0 | |
+| Jobs generated | — | > 0 | |
 
-### Alerts to Set
-- Email delivery failure > 5%
-- Page validation drop > 10% from baseline
-- Job generation failure > 2%
-- Any unhandled exception
+### The Most Important Metric
+
+```
+Commercial Intent Ratio = Standing Orders Created ÷ Recognition Emails Sent
+
+Target: > 10% (1 standing order per 10 recognition emails)
+
+This is the first proof that the system creates commercial value.
+```
+
+### Where to Monitor
+
+1. **Database Queries**
+   ```sql
+   -- Recognition emails sent (last 24h)
+   SELECT COUNT(*) FROM b2b_leads 
+   WHERE email_sent_at > NOW() - INTERVAL '24 hours';
+   
+   -- Landing pages opened (last 24h)
+   SELECT COUNT(DISTINCT lead_id) FROM b2b_moment_signals 
+   WHERE signal_type = 'page_view' 
+   AND created_at > NOW() - INTERVAL '24 hours';
+   
+   -- Validations completed (last 24h)
+   SELECT COUNT(DISTINCT lead_id) FROM b2b_leads 
+   WHERE confirmed_at > NOW() - INTERVAL '24 hours';
+   
+   -- Standing orders created (last 24h)
+   SELECT COUNT(*) FROM b2b_standing_orders 
+   WHERE created_at > NOW() - INTERVAL '24 hours';
+   
+   -- Jobs generated (last 24h)
+   SELECT COUNT(*) FROM jobs 
+   WHERE created_at > NOW() - INTERVAL '24 hours';
+   ```
+
+2. **Error Logs**
+   - Watch send-recognition route for email failures
+   - Watch confirm-engagement route for validation errors
+   - Watch standing-orders route for creation failures
+   - Watch database connection errors
+
+### What to DO If Numbers Drop
+
+1. Recognition emails sent = 0?
+   - Check Resend API key is configured
+   - Check leads are being discovered
+   - Check send-recognition route logs
+
+2. Landing pages opened = 0?
+   - Check email URLs are correct
+   - Check prospect emails are valid
+   - Check page server is running
+
+3. Standing orders created = 0?
+   - Check operator is logged in
+   - Check form validation isn't blocking
+   - Check API isn't returning errors
+
+4. Jobs generated = 0?
+   - Check postcodes are being validated
+   - Check job creation API is working
+   - Check database is reachable
+
+### What to NOT Do
+
+- Do NOT fix lint warnings
+- Do NOT refactor code
+- Do NOT audit architecture
+- Do NOT add new features
+- Do NOT rewrite prompts
+- Do NOT optimize prematurely
+
+**Real prospects will tell you more than internal review.**
 
 ---
 
