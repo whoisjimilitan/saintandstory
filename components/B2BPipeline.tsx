@@ -306,52 +306,62 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       return;
     }
 
-    await fetch("/api/b2b/standing-orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lead_id: lead.id,
-        business_name: lead.business_name,
-        contact_name: lead.contact_name,
-        contact_phone: lead.phone,
-        contact_email: lead.email,
-        service_type: `${lead.business_category ?? "Logistics"} run`,
-        frequency: "weekly",
-        day_of_week: parseInt(soForm.day_of_week),
-        preferred_time: soForm.preferred_time,
-        pickup_address: soForm.pickup_address || undefined,
-        pickup_postcode: soForm.pickup_postcode || undefined,
-        delivery_address: soForm.delivery_address || undefined,
-        delivery_postcode: soForm.delivery_postcode || undefined,
-        price: soForm.price ? parseFloat(soForm.price) : undefined,
-        notes: soForm.notes,
-      }),
-    });
+    try {
+      const response = await fetch("/api/b2b/standing-orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          business_name: lead.business_name,
+          contact_name: lead.contact_name,
+          contact_phone: lead.phone,
+          contact_email: lead.email,
+          service_type: `${lead.business_category ?? "Logistics"} run`,
+          frequency: "weekly",
+          day_of_week: parseInt(soForm.day_of_week),
+          preferred_time: soForm.preferred_time,
+          pickup_address: soForm.pickup_address || undefined,
+          pickup_postcode: soForm.pickup_postcode || undefined,
+          delivery_address: soForm.delivery_address || undefined,
+          delivery_postcode: soForm.delivery_postcode || undefined,
+          price: soForm.price ? parseFloat(soForm.price) : undefined,
+          notes: soForm.notes,
+        }),
+      });
 
-    // Record standing order details as structured observation for future reference
-    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const observationDetails = [
-      `Pickup postcode: ${soForm.pickup_postcode}`,
-      `Delivery postcode: ${soForm.delivery_postcode}`,
-      `Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`,
-      `Time: ${soForm.preferred_time}`
-    ];
+      if (!response.ok) {
+        alert("Standing order could not be saved. Please check your input and try again.");
+        return;
+      }
 
-    const observationText = `Standing order confirmed\n\n${observationDetails.join("\n")}`;
+      // Record standing order details as structured observation for future reference
+      const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const observationDetails = [
+        `Pickup postcode: ${soForm.pickup_postcode}`,
+        `Delivery postcode: ${soForm.delivery_postcode}`,
+        `Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`,
+        `Time: ${soForm.preferred_time}`
+      ];
 
-    await fetch("/api/b2b/observations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lead_id: lead.id,
-        observation: observationText,
-        context: "standing_order",
-      }),
-    });
+      const observationText = `Standing order confirmed\n\n${observationDetails.join("\n")}`;
 
-    setStatus("closed");
-    setShowStandingOrder(false);
-    onRefresh();
+      await fetch("/api/b2b/observations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          observation: observationText,
+          context: "standing_order",
+        }),
+      });
+
+      setStatus("closed");
+      setShowStandingOrder(false);
+      onRefresh();
+    } catch (error) {
+      console.error("Error creating standing order:", error);
+      alert("Standing order could not be saved. Please try again.");
+    }
   }
 
   async function recordObservation() {
@@ -680,7 +690,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
               {lead.email_sent_at && (
                 <p className="text-[10px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">Email sent:</span> {new Date(lead.email_sent_at as string).toLocaleDateString()} {new Date(lead.email_sent_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} → {lead.pain_point || 'prospect need'}
+                  <span className="font-semibold">Email sent:</span> {lead.email_sent_at ? new Date(lead.email_sent_at as string).toLocaleString() : "Not sent yet"} → {lead.pain_point || 'prospect need'}
                 </p>
               )}
 
