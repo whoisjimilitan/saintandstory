@@ -328,7 +328,7 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                         type="checkbox"
                         checked={(answers.b2b_opt_in as boolean) ?? false}
                         onChange={(e) => setAnswers({ ...answers, b2b_opt_in: e.target.checked })}
-                        className="w-5 h-5 mt-0.5 rounded border border-[#E8E8E8] cursor-pointer"
+                        className="w-5 h-5 mt-0.5 rounded border-2 border-[#0D0D0D] cursor-pointer accent-[#0D0D0D]"
                       />
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[#0D0D0D]">Unlock recurring contracts from nearby businesses</p>
