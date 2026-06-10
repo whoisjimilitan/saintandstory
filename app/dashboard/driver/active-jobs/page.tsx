@@ -36,9 +36,9 @@ export default async function ActiveJobsPage() {
   return (
     <div>
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Active Jobs</p>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">Status</p>
         <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
-          Y<span className="font-display italic font-normal">o</span>ur jobs.
+          A<span className="font-display italic font-normal">c</span>tive.
         </h1>
       </div>
       <ActiveJobsList jobs={activeJobs as any[]} driverId={driver?.id ?? null} driverName={driver?.full_name} />

@@ -15,8 +15,7 @@ export default function JobsFeed({ driverId, myJobs, driverName }: Props) {
   const offered = myJobs.filter(j => j.status === "offered");
   const active = myJobs.filter(j => ["confirmed", "in_progress"].includes(j.status as string));
 
-  const defaultTab: Tab = offered.length > 0 ? "offered" : active.length > 0 ? "active" : "done";
-  const [tab, setTab] = useState<Tab>(defaultTab);
+  const [tab, setTab] = useState<Tab>("offered");
   const [jobs, setJobs] = useState(myJobs);
   const [responding, setResponding] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
