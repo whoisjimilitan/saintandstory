@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
             Unfortunately your booking (<strong>${job.reference as string}</strong>) has been cancelled. We're sorry for any inconvenience.
           </p>
           <p style="color:#555;font-size:14px;line-height:1.6;margin-bottom:20px;">
-            If you'd like to rebook or have any questions, please call us on <a href="tel:02030517408" style="color:#0D0D0D;">0203 051 7408</a> or reply to this email.
+            If you'd like to rebook or have any questions, please call us on <a href="tel:02030519243" style="color:#0D0D0D;">0203 051 9243</a> or reply to this email.
           </p>
           <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e8e8e8;">
-            <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London · <a href="tel:02030517408" style="color:#bbb;">0203 051 7408</a></p>
+            <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London · <a href="tel:02030519243" style="color:#bbb;">0203 051 9243</a></p>
           </div>
         </div>
       `,

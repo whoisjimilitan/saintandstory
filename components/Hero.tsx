@@ -29,10 +29,10 @@ const CONTENT = {
         Two things.
         <br />
         M<span className="font-display italic font-normal">a</span>n and V
-        <span className="font-display italic font-normal">a</span>n
+        <span className="font-display italic font-normal">a</span>n.
       </>
     ),
-    sub: "Get booked for jobs when you're available. No chasing. No cold leads.",
+    sub: "Get booked anytime you're available. No chasing. No cold leads.",
     cta: "Join as driver →",
     source: "hero_driver",
   },

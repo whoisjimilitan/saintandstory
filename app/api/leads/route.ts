@@ -87,7 +87,7 @@ async function sendCustomerConfirmation(lead: Record<string, unknown>, trackingT
           Track your booking →
         </a>
         <p style="color:#888;font-size:13px;line-height:1.6;">
-          You can check the status of your job at any time using the link above. Questions? Call us on <a href="tel:02030517408" style="color:#0D0D0D;">0203 051 7408</a>.
+          You can check the status of your job at any time using the link above. Questions? Call us on <a href="tel:02030519243" style="color:#0D0D0D;">0203 051 9243</a>.
         </p>
         <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e8e8e8;">
           <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London</p>

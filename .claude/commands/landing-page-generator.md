@@ -111,7 +111,7 @@ Font sans:    font-sans font-black  (Inter — headings, CTAs)
 Font display: font-display italic font-normal  (Cormorant Garamond — vowel spans in headings)
 CTA primary:  bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold rounded-full
 CTA ghost:    border border-[#E8E8E8] hover:border-[#0D0D0D] text-[#0D0D0D] font-semibold rounded-full
-Phone:        0203 051 7408  /  tel:+442030517408
+Phone:        0203 051 9243  /  tel:+442030517408
 ```
 
 ### Typography rule — NON-NEGOTIABLE
@@ -639,7 +639,7 @@ Then confirm:
 - Preview URL: `http://localhost:3000/[SLUG]`
 - Modal behaviour: auto-opens after 2 seconds (test this)
 - Type of page generated: customer or driver
-- Phone number on page (if shown): 0203 051 7408
+- Phone number on page (if shown): 0203 051 9243
 
 ---
 

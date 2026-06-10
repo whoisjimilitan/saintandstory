@@ -197,7 +197,7 @@ export default async function B2BLandingPage({
               No contract. No obligation. Fixed price confirmed before anything moves.
             </p>
             <a href="tel:+442030517408" className="text-white font-semibold text-sm hover:text-white/80 transition-colors">
-              Or call directly: 0203 051 7408
+              Or call directly: 0203 051 9243
             </a>
           </div>
 

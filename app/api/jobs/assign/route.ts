@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
           </div>
 
           <p style="color:#bbb;font-size:11px;border-top:1px solid #e8e8e8;padding-top:20px;margin:0;">
-            Saint &amp; Story Ltd · Questions? Call 0203 051 7408
+            Saint &amp; Story Ltd · Questions? Call 0203 051 9243
           </p>
         </div>
       `,

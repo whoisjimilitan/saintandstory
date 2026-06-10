@@ -71,7 +71,7 @@ async function sendOnTheWayEmail(job: Record<string, unknown>, etaMins: number) 
            style="display:inline-block;background:#0D0D0D;color:#fff;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;font-size:14px;margin-bottom:24px;">
           See live ETA →
         </a>
-        <p style="color:#888;font-size:13px;">Questions? Call <a href="tel:+442030517408" style="color:#0D0D0D;">0203 051 7408</a></p>
+        <p style="color:#888;font-size:13px;">Questions? Call <a href="tel:+442030517408" style="color:#0D0D0D;">0203 051 9243</a></p>
       </div>
     `,
   });
