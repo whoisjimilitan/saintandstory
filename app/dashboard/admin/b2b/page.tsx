@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import B2BPipeline from "@/components/B2BPipeline";
+import B2BMetricsCards from "@/components/B2BMetricsCards";
 import { type Lead, type StandingOrder } from "@/lib/b2b-types";
 
 const ADMIN_EMAILS = [
@@ -89,6 +90,13 @@ export default async function B2BAdminPage() {
           <span className="text-sm text-[#0D0D0D] font-semibold">{stats.inbound} inbound</span>
         )}
         <span className="text-sm text-[#888888]">{orders.length} standing order{orders.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      <div className="mb-12">
+        <div className="mb-4">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Knowledge Loop Metrics</p>
+        </div>
+        <B2BMetricsCards />
       </div>
 
       <B2BPipeline leads={leads} orders={orders} />

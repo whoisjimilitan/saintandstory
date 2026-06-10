@@ -63,6 +63,21 @@ export async function POST(request: NextRequest) {
     notes?: string;
   };
 
+  // Validate required operational fields
+  if (!body.pickup_postcode || !body.pickup_postcode.trim()) {
+    return NextResponse.json(
+      { error: "pickup_postcode is required for job routing" },
+      { status: 400 }
+    );
+  }
+
+  if (!body.delivery_postcode || !body.delivery_postcode.trim()) {
+    return NextResponse.json(
+      { error: "delivery_postcode is required for job routing" },
+      { status: 400 }
+    );
+  }
+
   const nextDate = body.day_of_week != null
     ? nextOccurrence(body.day_of_week).toISOString()
     : null;
@@ -105,8 +120,21 @@ export async function PUT() {
   ` as Record<string, unknown>[];
 
   const created: string[] = [];
+  const skipped: string[] = [];
 
   for (const order of orders) {
+    // Validate required routing information before job creation
+    const pickupPostcode = order.pickup_postcode as string | null;
+    const deliveryPostcode = order.delivery_postcode as string | null;
+
+    if (!pickupPostcode || !pickupPostcode.trim() || !deliveryPostcode || !deliveryPostcode.trim()) {
+      console.warn(
+        `[Standing Orders Job Generation] Skipped: missing routing postcode for standing order ${order.id as string} (${order.business_name as string}). Pickup: ${pickupPostcode || 'null'}, Delivery: ${deliveryPostcode || 'null'}`
+      );
+      skipped.push(`${order.id as string} (missing postcode)`);
+      continue;
+    }
+
     // Create a job in the existing jobs table
     const reference = `B2B-${Date.now().toString(36).toUpperCase()}`;
     await sql`
@@ -118,8 +146,8 @@ export async function PUT() {
         ${order.contact_email as string ?? null},
         ${order.contact_phone as string ?? null},
         ${order.service_type as string ?? "Standing order"},
-        ${order.pickup_postcode as string ?? ""},
-        ${order.delivery_postcode as string ?? null},
+        ${pickupPostcode},
+        ${deliveryPostcode},
         'pending_review',
         ${reference},
         ${order.price as number ?? null},
@@ -145,5 +173,13 @@ export async function PUT() {
     created.push(reference);
   }
 
-  return NextResponse.json({ created, count: created.length });
+  return NextResponse.json({
+    created,
+    skipped,
+    count: created.length,
+    skippedCount: skipped.length,
+    message: skipped.length > 0
+      ? `Created ${created.length} jobs, skipped ${skipped.length} standing orders due to missing routing information`
+      : `Created ${created.length} jobs successfully`
+  });
 }

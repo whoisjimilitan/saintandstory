@@ -9,7 +9,11 @@ import { getDeliveryTypeForIndustry } from "@/lib/industry-delivery-mapping";
 import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_CHALLENGES } from "@/lib/business-intelligence";
 import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead, getLeadSignalLabel } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
+import { generateQuestions, prioritizeQuestions } from "@/lib/question-engine";
+import { generateRevelatoryAnalysis } from "@/lib/revelatory-engine";
+import { getOperatorGuidance, getOpeningPrompt, handleObjection } from "@/lib/b2b-conversation-prompts";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
+import { type BusinessEvidence } from "@/lib/evidence-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
@@ -103,7 +107,23 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [sendingRecognition, setSendingRecognition] = useState(false);
   const [status, setStatus] = useState(lead.status);
   const [showStandingOrder, setShowStandingOrder] = useState(false);
-  const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
+  const [soForm, setSoForm] = useState({
+    price: "",
+    day_of_week: "1",
+    preferred_time: "",
+    pickup_address: "",
+    pickup_postcode: "",
+    delivery_address: "",
+    delivery_postcode: "",
+    notes: ""
+  });
+  const [showObservationModal, setShowObservationModal] = useState(false);
+  const [observationForm, setObservationForm] = useState({ observation: "", context: "phone_call" });
+  const [recordingObservation, setRecordingObservation] = useState(false);
+  const [showHypotheses, setShowHypotheses] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showConversationGuidance, setShowConversationGuidance] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -258,7 +278,34 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     onRefresh();
   }
 
+  function validateStandingOrder(): boolean {
+    const errors: Record<string, string> = {};
+
+    if (!soForm.pickup_postcode || !soForm.pickup_postcode.trim()) {
+      errors.pickup_postcode = "Pickup postcode required for job routing";
+    }
+
+    if (!soForm.delivery_postcode || !soForm.delivery_postcode.trim()) {
+      errors.delivery_postcode = "Delivery postcode required for job routing";
+    }
+
+    if (!soForm.preferred_time || !soForm.preferred_time.trim()) {
+      errors.preferred_time = "Preferred time required";
+    }
+
+    if (!soForm.price) {
+      errors.price = "Price required";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
   async function createStandingOrder() {
+    if (!validateStandingOrder()) {
+      return;
+    }
+
     await fetch("/api/b2b/standing-orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -272,13 +319,66 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         frequency: "weekly",
         day_of_week: parseInt(soForm.day_of_week),
         preferred_time: soForm.preferred_time,
+        pickup_address: soForm.pickup_address || undefined,
+        pickup_postcode: soForm.pickup_postcode || undefined,
+        delivery_address: soForm.delivery_address || undefined,
+        delivery_postcode: soForm.delivery_postcode || undefined,
         price: soForm.price ? parseFloat(soForm.price) : undefined,
         notes: soForm.notes,
       }),
     });
+
+    // Record standing order details as structured observation for future reference
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const observationDetails = [
+      `Pickup postcode: ${soForm.pickup_postcode}`,
+      `Delivery postcode: ${soForm.delivery_postcode}`,
+      `Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`,
+      `Time: ${soForm.preferred_time}`
+    ];
+
+    const observationText = `Standing order confirmed\n\n${observationDetails.join("\n")}`;
+
+    await fetch("/api/b2b/observations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lead_id: lead.id,
+        observation: observationText,
+        context: "standing_order",
+      }),
+    });
+
     setStatus("closed");
     setShowStandingOrder(false);
     onRefresh();
+  }
+
+  async function recordObservation() {
+    if (!observationForm.observation.trim()) return;
+
+    setRecordingObservation(true);
+    try {
+      const response = await fetch("/api/b2b/observations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          observation: observationForm.observation,
+          context: observationForm.context,
+        }),
+      });
+
+      if (response.ok) {
+        setObservationForm({ observation: "", context: "phone_call" });
+        setShowObservationModal(false);
+        onRefresh();
+      }
+    } catch (error) {
+      console.error("Error recording observation:", error);
+    } finally {
+      setRecordingObservation(false);
+    }
   }
 
   const emailMissing = !lead.email;
@@ -573,6 +673,25 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             )}
           </div>
 
+          {/* Suggested Opening - recognition/relief/trust layer for operator */}
+          {hasPainPoint && (
+            <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
+              isExpanded
+                ? "bg-white/10 border-white/20"
+                : "bg-[#F9F9F9] border-[#EAE6E0]"
+            }`}>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Suggested Opening</p>
+              <div className={`px-3 py-2.5 rounded-md text-sm italic transition-colors ${
+                isExpanded
+                  ? "bg-white/10 text-white"
+                  : "bg-[#FFFFFF] text-[#0D0D0D]"
+              }`}>
+                "Are you personally handling {lead.pain_point.toLowerCase()} coordination when volume peaks?"
+              </div>
+              <p className="text-[10px] transition-colors duration-300 text-[#888888]">Lead with recognition, not hypothesis. Get them confirming their own situation.</p>
+            </div>
+          )}
+
           {/* Email input section - minimal design */}
           {emailMissing ? (
             <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
@@ -657,6 +776,117 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
           {showStandingOrder ? (
             <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
               <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
+
+              {/* Continuity note: seamless transition from prospect validation question */}
+              {hasPainPoint && (
+                <div className="bg-white border border-[#E8E8E8] rounded p-3 -mx-4 px-4 mb-2">
+                  <p className="text-[10px] text-[#666666]">
+                    Prospect confirmed: {lead.pain_point?.toLowerCase()} coordination is their bottleneck when volume peaks. Capture their standing order requirements.
+                  </p>
+                </div>
+              )}
+
+              {/* Known vs Unknown Panel */}
+              <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Known */}
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Known</p>
+                    <div className="space-y-1">
+                      {lead.business_name && <p className="text-[11px] text-[#0D0D0D]">✓ Business: {lead.business_name}</p>}
+                      {lead.business_category && <p className="text-[11px] text-[#0D0D0D]">✓ Category: {lead.business_category}</p>}
+                      {lead.email && <p className="text-[11px] text-[#0D0D0D]">✓ Email: {lead.email}</p>}
+                      {soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Pickup: {soForm.pickup_postcode}</p>}
+                      {soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]">✓ Delivery: {soForm.delivery_postcode}</p>}
+                      {soForm.preferred_time && <p className="text-[11px] text-[#0D0D0D]">✓ Time: {soForm.preferred_time}</p>}
+                      {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
+                        <p className="text-[11px] text-[#0D0D0D]">✓ {(lead.human_observations as Record<string, unknown>[]).length} observations recorded</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Unknown */}
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Unknown</p>
+                    <div className="space-y-1">
+                      {!soForm.pickup_postcode && <p className="text-[11px] text-[#888888]">? Pickup postcode</p>}
+                      {!soForm.delivery_postcode && <p className="text-[11px] text-[#888888]">? Delivery postcode</p>}
+                      <p className="text-[11px] text-[#888888]">? Load characteristics</p>
+                      <p className="text-[11px] text-[#888888]">? Special constraints</p>
+                      <p className="text-[11px] text-[#888888]">? Decision maker confirmation</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conversation Ideas (Revelatory Hypotheses) */}
+              {lead.business_evidence && (() => {
+                const evidence = lead.business_evidence as BusinessEvidence;
+                if (!evidence.reviews || evidence.reviews.length === 0) return null;
+
+                const analysis = generateRevelatoryAnalysis(evidence);
+                const allHypotheses = [
+                  ...analysis.hypotheses.pressureHypotheses,
+                  ...analysis.hypotheses.constraintHypotheses,
+                  ...analysis.hypotheses.opportunityHypotheses
+                ];
+
+                if (allHypotheses.length === 0) return null;
+
+                return (
+                  <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowHypotheses(!showHypotheses)}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D]">Conversation Ideas</p>
+                      <span className={`text-[#888888] transition-transform ${showHypotheses ? 'rotate-180' : ''}`}>▼</span>
+                    </button>
+
+                    {showHypotheses && (
+                      <div className="mt-2 space-y-2">
+                        {analysis.hypotheses.pressureHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Pressures</p>
+                            {analysis.hypotheses.pressureHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {analysis.hypotheses.constraintHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Constraints</p>
+                            {analysis.hypotheses.constraintHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {analysis.hypotheses.opportunityHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Opportunities</p>
+                            {analysis.hypotheses.opportunityHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Price (£)</label>
@@ -672,9 +902,75 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </div>
               </div>
               <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+
+              <div className="border-t border-[#EAE6E0] pt-3 mt-2">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#888888] mb-2">Service locations (from prospect)</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Pickup postcode <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={soForm.pickup_postcode}
+                      onChange={e => setSoForm(f => ({ ...f, pickup_postcode: e.target.value }))}
+                      placeholder="e.g. SW1A 1AA"
+                      className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
+                        validationErrors.pickup_postcode
+                          ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                      }`}
+                    />
+                    {validationErrors.pickup_postcode && (
+                      <p className="text-[9px] text-red-500 mt-1">{validationErrors.pickup_postcode}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Delivery postcode <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={soForm.delivery_postcode}
+                      onChange={e => setSoForm(f => ({ ...f, delivery_postcode: e.target.value }))}
+                      placeholder="e.g. N1 1AA"
+                      className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
+                        validationErrors.delivery_postcode
+                          ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                      }`}
+                    />
+                    {validationErrors.delivery_postcode && (
+                      <p className="text-[9px] text-red-500 mt-1">{validationErrors.delivery_postcode}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <input type="text" value={soForm.pickup_address} onChange={e => setSoForm(f => ({ ...f, pickup_address: e.target.value }))} placeholder="Pickup address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  <input type="text" value={soForm.delivery_address} onChange={e => setSoForm(f => ({ ...f, delivery_address: e.target.value }))} placeholder="Delivery address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                </div>
+              </div>
+
               <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+
+              {Object.keys(validationErrors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <p className="text-[9px] font-semibold text-red-700 uppercase tracking-[0.5px]">Cannot submit standing order</p>
+                  <ul className="text-[10px] text-red-600 mt-2 space-y-1">
+                    {Object.values(validationErrors).map((error, i) => (
+                      <li key={i}>• {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="flex gap-2 pt-1">
-                <button onClick={createStandingOrder} className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white">
+                <button
+                  onClick={createStandingOrder}
+                  disabled={!soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim()}
+                  title={!soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim() ? "Postcodes required before standing order can be created" : ""}
+                  className={`font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 ${
+                    !soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim()
+                      ? 'bg-[#CCC] text-[#666] cursor-not-allowed opacity-50'
+                      : 'bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white'
+                  }`}
+                >
                   Create
                 </button>
                 <button onClick={() => setShowStandingOrder(false)} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">Back</button>
@@ -687,6 +983,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </button>
               <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Standing order
+              </button>
+              <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                Record observation
+              </button>
+              <button onClick={() => setShowConversationGuidance(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                Conversation guide
+              </button>
+              <button onClick={() => setShowProfileModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                View profile
               </button>
               <button onClick={() => updateStatus("dead")} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">
                 Not interested
@@ -734,6 +1039,258 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Record Observation Modal */}
+      {showObservationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Record Observation</h3>
+            <p className="text-sm text-[#666666]">What did you learn from this prospect?</p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.5px] block mb-2 text-[#666666]">Observation</label>
+                <textarea
+                  value={observationForm.observation}
+                  onChange={e => setObservationForm(f => ({ ...f, observation: e.target.value }))}
+                  placeholder="E.g., 'Handles 5+ deliveries per week across London' or 'Decision maker is the owner, not manager'"
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.5px] block mb-2 text-[#666666]">Context</label>
+                <select
+                  value={observationForm.context}
+                  onChange={e => setObservationForm(f => ({ ...f, context: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                >
+                  <option value="phone_call">Phone Call</option>
+                  <option value="email">Email Reply</option>
+                  <option value="meeting">Meeting</option>
+                  <option value="standing_order">Standing Order Setup</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={recordObservation}
+                disabled={recordingObservation || !observationForm.observation.trim()}
+                className="flex-1 bg-[#0D0D0D] hover:bg-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-full text-sm transition-all"
+              >
+                {recordingObservation ? "Saving…" : "Save"}
+              </button>
+              <button
+                onClick={() => setShowObservationModal(false)}
+                className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lead Knowledge Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 my-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">{lead.business_name}</h3>
+                <p className="text-sm text-[#888888]">{lead.business_category || "Business"} · {lead.email}</p>
+              </div>
+              <button
+                onClick={() => setShowProfileModal(false)}
+                className="text-[#888888] hover:text-[#0D0D0D] text-2xl font-light"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Operational Readiness Score */}
+            {(() => {
+              const criticalFields = {
+                pickup_postcode: !!soForm.pickup_postcode,
+                delivery_postcode: !!soForm.delivery_postcode,
+                preferred_time: !!soForm.preferred_time,
+                day_of_week: !!soForm.day_of_week
+              };
+              const completeness = Object.values(criticalFields).filter(Boolean).length;
+              const total = Object.keys(criticalFields).length;
+
+              return (
+                <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#EAE6E0]">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Operational Readiness</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <div className="w-full bg-[#EAE6E0] rounded-full h-2">
+                        <div
+                          className="bg-[#0D0D0D] h-2 rounded-full transition-all"
+                          style={{ width: `${(completeness / total) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-sm font-bold text-[#0D0D0D] min-w-fit">{completeness}/{total}</p>
+                  </div>
+                  <div className="text-[9px] text-[#888888] mt-2 space-y-1">
+                    {!soForm.pickup_postcode && <p>○ Pickup postcode</p>}
+                    {!soForm.delivery_postcode && <p>○ Delivery postcode</p>}
+                    {!soForm.preferred_time && <p>○ Preferred time</p>}
+                    {!soForm.day_of_week && <p>○ Day of week</p>}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* What we know */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">What we know</h4>
+              <div className="space-y-2">
+                {lead.business_name && <p className="text-sm text-[#0D0D0D]">✓ Business name: {lead.business_name}</p>}
+                {lead.business_category && <p className="text-sm text-[#0D0D0D]">✓ Category: {lead.business_category}</p>}
+                {lead.email && <p className="text-sm text-[#0D0D0D]">✓ Email: {lead.email}</p>}
+                {lead.phone && <p className="text-sm text-[#0D0D0D]">✓ Phone: {lead.phone}</p>}
+                {lead.business_evidence && (lead.business_evidence as BusinessEvidence).facts.length > 0 && (
+                  <div>
+                    <p className="text-sm text-[#0D0D0D] font-semibold mb-2">From Google:</p>
+                    {((lead.business_evidence as BusinessEvidence).facts || []).slice(0, 3).map((fact, i) => (
+                      <p key={i} className="text-sm text-[#0D0D0D] ml-4">✓ {(fact as Record<string, unknown>).fact as string}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* From conversations */}
+            {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
+              <div>
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">From conversations</h4>
+                <div className="space-y-2">
+                  {(lead.human_observations as Record<string, unknown>[]).slice(-5).map((obs, i) => (
+                    <p key={i} className="text-sm text-[#0D0D0D]">
+                      ✓ {(obs as Record<string, unknown>).observation as string}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Standing order details */}
+            {status === "closed" && (
+              <div>
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">Standing order</h4>
+                <div className="space-y-2 text-sm text-[#0D0D0D]">
+                  {soForm.pickup_postcode && <p>✓ Pickup: {soForm.pickup_postcode}</p>}
+                  {soForm.delivery_postcode && <p>✓ Delivery: {soForm.delivery_postcode}</p>}
+                  {soForm.preferred_time && <p>✓ Preferred time: {soForm.preferred_time}</p>}
+                </div>
+              </div>
+            )}
+
+            {/* What we don't know */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">What we still need</h4>
+              <div className="space-y-2">
+                {!soForm.pickup_postcode && <p className="text-sm text-[#888888]">? Pickup postcode</p>}
+                {!soForm.delivery_postcode && <p className="text-sm text-[#888888]">? Delivery postcode</p>}
+                {!soForm.preferred_time && <p className="text-sm text-[#888888]">? Preferred service time</p>}
+                <p className="text-sm text-[#888888]">? Load characteristics</p>
+                <p className="text-sm text-[#888888]">? Special constraints</p>
+                <p className="text-sm text-[#888888]">? Decision maker verification</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Conversation Guidance Modal */}
+      {showConversationGuidance && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 my-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Conversation Guide</h3>
+                <p className="text-sm text-[#888888]">Psychology-based prompts for {lead.business_name}</p>
+              </div>
+              <button
+                onClick={() => setShowConversationGuidance(false)}
+                className="text-[#888888] hover:text-[#0D0D0D] text-2xl font-light"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Opening Prompt */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">How to start</h4>
+              <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#E8E8E8]">
+                <p className="text-sm text-[#0D0D0D] italic">
+                  "{getOpeningPrompt({ businessName: lead.business_name, category: lead.business_category || "business", painPoint: lead.pain_point, hasEngaged: false, hasPartialOrder: false })}"
+                </p>
+                <p className="text-[9px] text-[#888888] mt-2">Lead with their situation. Get them talking.</p>
+              </div>
+            </div>
+
+            {/* Discovery Questions */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">Discovery questions</h4>
+              <div className="space-y-2">
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Frequency trigger</p>
+                  <p className="text-[11px] text-[#666666]">"How often do you handle pickups or deliveries like this?"</p>
+                </div>
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Current pain</p>
+                  <p className="text-[11px] text-[#666666]">"What's your biggest headache with logistics right now?"</p>
+                </div>
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Timeline</p>
+                  <p className="text-[11px] text-[#666666]">"When would you want to get started?"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Objection Handler */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">When they object</h4>
+              <div className="bg-[#FEF5E7] border border-[#E8E8E8] rounded-lg p-4">
+                <p className="text-[10px] font-semibold text-[#0D0D0D] mb-2">Price concern?</p>
+                <p className="text-[11px] text-[#666666] mb-3">"{handleObjection("cost").acknowledge} {handleObjection("cost").reframe}"</p>
+                <p className="text-[10px] text-[#888888]">Then add: {handleObjection("cost").proof}</p>
+              </div>
+            </div>
+
+            {/* Closing Prompt */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">How to close</h4>
+              <div className="bg-[#E8F8F5] rounded-lg p-4 border border-[#E8E8E8]">
+                <p className="text-sm text-[#0D0D0D] italic">
+                  "So if I can get your driver in 15 minutes and same-day delivery, that solves [their pain point]?"
+                </p>
+                <p className="text-[9px] text-[#888888] mt-2">Confirm value. Then move to standing order details.</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowConversationGuidance(false)}
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

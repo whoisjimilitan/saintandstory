@@ -226,11 +226,15 @@ function summarizeCurrentReality(context: SignalContext): { text: string; trigge
   }
 
   // Name the specific operational reality
+  // This section is critical: prospect sees the SAME insight on email, page, and in operator brief
   if (context.painPoint) {
+    // Frame pain point as insight, not problem
+    // Ensure brief narrative matches prospect page experience
     parts.push(
-      `The specific friction point: ${context.painPoint}. This is where your best customers are experiencing friction—and where fixing it creates the biggest impact.`
+      `What stands out: Your customers mention ${context.painPoint.toLowerCase()}. This is where your best customers are experiencing friction—and where fixing it creates the biggest impact.`
     );
     triggers.push(EMOTIONAL_TRIGGERS.FRUSTRATION_WASTED_TIME);
+    triggers.push(ESTEEM_DRIVERS.ACCOMPLISHMENT); // They can fix this and feel accomplished
   } else {
     parts.push(
       `Your operations are already clean—no major friction signals. This is actually a position of strength.`

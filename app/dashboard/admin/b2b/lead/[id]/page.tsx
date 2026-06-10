@@ -100,22 +100,40 @@ export default async function LeadIntelligencePage({
               <p className="text-[#0D0D0D] text-sm">✓ {fact.fact}</p>
             </div>
           ))}
-
-        {humanObservations.length > 0 && (
-          <div className="border-t border-[#E8E8E8] pt-4 mt-4">
-            <p className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.2em] mb-3">
-              From conversations
-            </p>
-            {humanObservations.map((obs, idx) => (
-              <div key={idx} className="mb-2">
-                <p className="text-[#0D0D0D] text-sm">
-                  ✓ {(obs as Record<string, unknown>).observation as string}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Observation Activity Card */}
+      {humanObservations.length > 0 && (
+        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-6 mb-6">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            Observation Activity
+          </p>
+          <div className="space-y-3">
+            {humanObservations.slice(0, 5).map((obs, idx) => {
+              const obsData = obs as Record<string, unknown>;
+              const recordedAt = obsData.recorded_at ? new Date(obsData.recorded_at as string).toLocaleDateString() : "Unknown date";
+              return (
+                <div key={idx} className="bg-white rounded-lg p-3 border border-[#E8E8E8]">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.5px]">
+                      {obsData.context || "Note"}
+                    </p>
+                    <p className="text-[9px] text-[#888888]">{recordedAt}</p>
+                  </div>
+                  <p className="text-[#0D0D0D] text-sm whitespace-pre-wrap">
+                    {obsData.observation as string}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          {humanObservations.length > 5 && (
+            <p className="text-[10px] text-[#888888] mt-3">
+              +{humanObservations.length - 5} more observations
+            </p>
+          )}
+        </div>
+      )}
 
       {/* What we don't know (questions) */}
       {questions.length > 0 && (

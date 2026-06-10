@@ -749,6 +749,20 @@ export default function ProspectBriefingPage({
         </section>
       )}
 
+      {enrichedBrief && briefMetadata?.painPoint && (
+        <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+              One thing that stood out
+            </p>
+
+            <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+              Your customers mention {briefMetadata.painPoint.toLowerCase()}. That's what matters most to businesses like {business.name}. When this gets solved, everything else becomes easier.
+            </p>
+          </div>
+        </section>
+      )}
+
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
@@ -776,6 +790,41 @@ export default function ProspectBriefingPage({
           </div>
         </div>
       </section>
+
+      {enrichedBrief && briefMetadata?.painPoint && (
+        <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+              This might sound familiar
+            </p>
+
+            <div className="space-y-8 mb-10">
+              <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+                Businesses like yours often end up managing {briefMetadata.painPoint.toLowerCase()} personally when volume grows. It's not on the org chart. It just happens.
+              </p>
+            </div>
+
+            <div className="border-t border-[#E8E8E8] pt-10">
+              <p className="text-[#333333] text-sm font-semibold uppercase tracking-[0.18em] mb-6 font-display">
+                Quick question
+              </p>
+              <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+                When volume or pressure peaks, does {briefMetadata.painPoint.toLowerCase()} become your bottleneck?
+              </p>
+            </div>
+
+            <div className="mt-10">
+              <a
+                onClick={() => recordMomentSignal("cta_clicked", { location: "recognition_section", cta_text: "Let's talk" })}
+                href={`mailto:james@saintandstory.co.uk?subject=${encodeURIComponent(msg.emailSubject)}&body=${encodeURIComponent(msg.emailBody)}`}
+                className="inline-block bg-[#0D0D0D] hover:bg-[#222222] text-white font-semibold px-10 py-5 rounded-full text-base transition-colors font-sans"
+              >
+                Let's talk
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
