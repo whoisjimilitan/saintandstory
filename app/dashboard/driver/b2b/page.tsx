@@ -80,15 +80,15 @@ export default async function B2BDiscoveryDashboard() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-10">
         <Link href="/dashboard/driver" className="text-sm text-[#0D0D0D] hover:text-[#888888] mb-4 inline-block">
-          ← Back to driver dashboard
+          ← Back to jobs
         </Link>
-        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">B2B Lead Discovery</h1>
-        <p className="text-[#888888] mb-6">You haven't signed up yet. Register as a driver first to enable B2B lead discovery.</p>
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">Local Steady Work</h1>
+        <p className="text-[#888888] mb-6">Sign up as a driver to get started.</p>
         <Link
           href="/dashboard/driver"
           className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-6 py-3 rounded-full transition-colors"
         >
-          Go to driver dashboard →
+          Back to dashboard →
         </Link>
       </div>
     );
@@ -98,15 +98,15 @@ export default async function B2BDiscoveryDashboard() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-10">
         <Link href="/dashboard/driver" className="text-sm text-[#0D0D0D] hover:text-[#888888] mb-4 inline-block">
-          ← Back to driver dashboard
+          ← Back to jobs
         </Link>
-        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">B2B Lead Discovery</h1>
-        <p className="text-[#888888] mb-6">B2B lead discovery is disabled. Enable it in your driver dashboard to start discovering local business opportunities.</p>
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">Local Steady Work</h1>
+        <p className="text-[#888888] mb-6">Enable LSW during signup to discover local business opportunities.</p>
         <Link
           href="/dashboard/driver"
           className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-6 py-3 rounded-full transition-colors"
         >
-          Enable B2B discovery →
+          Back to dashboard →
         </Link>
       </div>
     );
@@ -121,9 +121,9 @@ export default async function B2BDiscoveryDashboard() {
     <div className="max-w-3xl mx-auto px-6 py-10">
       <div className="mb-8">
         <Link href="/dashboard/driver" className="text-sm text-[#0D0D0D] hover:text-[#888888] mb-4 inline-block">
-          ← Back to job dispatch
+          ← Back to jobs
         </Link>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">B2B Lead Discovery</p>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Local Steady Work</p>
         <h1 className="font-sans font-black text-3xl text-[#0D0D0D]">{driver.full_name}</h1>
       </div>
 
