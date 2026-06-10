@@ -103,7 +103,16 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [sendingRecognition, setSendingRecognition] = useState(false);
   const [status, setStatus] = useState(lead.status);
   const [showStandingOrder, setShowStandingOrder] = useState(false);
-  const [soForm, setSoForm] = useState({ price: "", day_of_week: "1", preferred_time: "", notes: "" });
+  const [soForm, setSoForm] = useState({
+    price: "",
+    day_of_week: "1",
+    preferred_time: "",
+    pickup_address: "",
+    pickup_postcode: "",
+    delivery_address: "",
+    delivery_postcode: "",
+    notes: ""
+  });
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -272,6 +281,10 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         frequency: "weekly",
         day_of_week: parseInt(soForm.day_of_week),
         preferred_time: soForm.preferred_time,
+        pickup_address: soForm.pickup_address || undefined,
+        pickup_postcode: soForm.pickup_postcode || undefined,
+        delivery_address: soForm.delivery_address || undefined,
+        delivery_postcode: soForm.delivery_postcode || undefined,
         price: soForm.price ? parseFloat(soForm.price) : undefined,
         notes: soForm.notes,
       }),
@@ -672,6 +685,25 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </div>
               </div>
               <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+
+              <div className="border-t border-[#EAE6E0] pt-3 mt-2">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#888888] mb-2">Service locations (from prospect)</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Pickup postcode</label>
+                    <input type="text" value={soForm.pickup_postcode} onChange={e => setSoForm(f => ({ ...f, pickup_postcode: e.target.value }))} placeholder="e.g. SW1A 1AA" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Delivery postcode</label>
+                    <input type="text" value={soForm.delivery_postcode} onChange={e => setSoForm(f => ({ ...f, delivery_postcode: e.target.value }))} placeholder="e.g. N1 1AA" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <input type="text" value={soForm.pickup_address} onChange={e => setSoForm(f => ({ ...f, pickup_address: e.target.value }))} placeholder="Pickup address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  <input type="text" value={soForm.delivery_address} onChange={e => setSoForm(f => ({ ...f, delivery_address: e.target.value }))} placeholder="Delivery address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                </div>
+              </div>
+
               <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
               <div className="flex gap-2 pt-1">
                 <button onClick={createStandingOrder} className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white">
