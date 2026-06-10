@@ -182,20 +182,20 @@ export default async function DriverDashboardHome() {
         <div className="bg-white border border-[#E8E8E8] rounded-lg sm:rounded-2xl px-4 sm:px-5 py-4 mb-6 sm:mb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-2">B2B Lead Discovery</p>
-              <p className="font-sans font-semibold text-[#0D0D0D] text-sm mb-3">Discover businesses in your area and earn standing orders</p>
+              <p className="text-[#888888] text-xs uppercase tracking-[0.12em] mb-2">Recurring Business Contracts</p>
+              <p className="font-sans font-semibold text-[#0D0D0D] text-sm mb-3">Earn from steady work with nearby businesses</p>
               {driver.b2b_opt_in && driver.postcode ? (
                 <>
                   <p className="text-[#888888] text-xs mb-3">
-                    Status: <span className="font-semibold text-[#0D0D0D]">Enabled</span> — {driver.postcode} ({driver.radius_miles || 10} miles)
+                    Status: <span className="font-semibold text-[#0D0D0D]">Active</span> — Discovering in {driver.postcode} ({driver.radius_miles || 10} miles)
                   </p>
-                  <Link href="/dashboard/driver/b2b" className="text-[#0D0D0D] text-xs inline-flex items-center gap-1 hover:underline">
-                    View discovered leads →
+                  <Link href="/dashboard/driver/b2b" className="text-[#0D0D0D] text-xs inline-flex items-center gap-1 hover:underline font-medium">
+                    View your opportunities →
                   </Link>
                 </>
               ) : (
                 <p className="text-[#888888] text-xs">
-                  {driver.b2b_opt_in ? "Set up your postcode to get started" : "Enable discovery to start earning from B2B leads"}
+                  {driver.b2b_opt_in ? "Set up your postcode to get started" : "Enable to unlock recurring contracts from local businesses"}
                 </p>
               )}
             </div>
@@ -207,7 +207,7 @@ export default async function DriverDashboardHome() {
               <div className={`w-4 h-4 rounded-full bg-white transition-transform ${driver.b2b_opt_in ? "translate-x-6" : ""}`} />
             </div>
           </div>
-          <p className="text-[#888888] text-[10px] mt-3">Toggle managed via dashboard — changes take effect immediately</p>
+          <p className="text-[#888888] text-[10px] mt-3">Opt-in during signup. Change anytime from here.</p>
         </div>
       )}
 

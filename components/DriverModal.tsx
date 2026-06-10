@@ -331,8 +331,8 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                         className="w-5 h-5 mt-0.5 rounded border border-[#E8E8E8] cursor-pointer"
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">Earn from local business leads</p>
-                        <p className="text-xs text-[#888888]">Automatically discover nearby businesses and earn standing orders. You can toggle this anytime.</p>
+                        <p className="text-sm font-semibold text-[#0D0D0D]">Unlock recurring contracts from nearby businesses</p>
+                        <p className="text-xs text-[#888888]">Discover local businesses needing regular help. Earn from steady contracts — toggle on or off anytime from your dashboard.</p>
                       </div>
                     </label>
                   </div>
