@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { isTestDriver } from "@/lib/test-driver";
+import VerificationBanner from "@/components/VerificationBanner";
 
 async function getOrCreateDriver(clerkUserId: string, email: string) {
   const sql = neon(process.env.DATABASE_URL!);
@@ -88,6 +89,9 @@ export default async function DriverDashboardHome() {
           animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
+
+      {/* Verification Banner */}
+      {driver && <VerificationBanner status={driver.verification_status} />}
 
       {/* Overview card — identity & status */}
       {driver && (

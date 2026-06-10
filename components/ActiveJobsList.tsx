@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import JobCard from "@/components/JobCard";
+import ActiveJobPhotos from "@/components/ActiveJobPhotos";
 import { useCallback } from "react";
 
 interface Job {
@@ -23,6 +24,10 @@ interface Job {
   recipient_name?: string;
   pickup_lat?: number;
   pickup_lng?: number;
+  pickup_photo_url?: string;
+  pickup_photo_taken_at?: string;
+  delivery_photo_url?: string;
+  delivery_photo_taken_at?: string;
   confirmed_at?: string;
   in_progress_at?: string;
   created_at?: string;
@@ -72,20 +77,32 @@ export default function ActiveJobsList({ jobs, driverId, onStatusUpdate }: Props
     <div className="max-w-2xl mx-auto px-6 py-10">
       <div className="space-y-3">
         {activeJobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job as unknown as Record<string, unknown>}
-            isExpanded={expandedJobId === job.id}
-            onToggleExpand={() =>
-              setExpandedJobId(expandedJobId === job.id ? null : job.id)
-            }
-            onUpdateStatus={
-              job.status === "confirmed"
-                ? (status) => handleStatusUpdate(job.id, status)
-                : undefined
-            }
-            updating={updating === job.id}
-          />
+          <div key={job.id} className="space-y-3">
+            <JobCard
+              job={job as unknown as Record<string, unknown>}
+              isExpanded={expandedJobId === job.id}
+              onToggleExpand={() =>
+                setExpandedJobId(expandedJobId === job.id ? null : job.id)
+              }
+              onUpdateStatus={
+                job.status === "confirmed"
+                  ? (status) => handleStatusUpdate(job.id, status)
+                  : undefined
+              }
+              updating={updating === job.id}
+            />
+            {expandedJobId === job.id && (
+              <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5">
+                <ActiveJobPhotos
+                  jobId={job.id}
+                  pickupPhotoUrl={job.pickup_photo_url ?? null}
+                  deliveryPhotoUrl={job.delivery_photo_url ?? null}
+                  pickupPhotoTakenAt={job.pickup_photo_taken_at ?? null}
+                  deliveryPhotoTakenAt={job.delivery_photo_taken_at ?? null}
+                />
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>
