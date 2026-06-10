@@ -63,59 +63,62 @@ export default async function LeadIntelligencePage({
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-1">
-          B2B Lead Intelligence
+      <div className="mb-10">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+          Lead Intelligence Briefing
         </p>
-        <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-3">
           {lead.business_name as string}
         </h1>
-        <p className="text-[#888888] text-sm mt-2">
-          {lead.niche as string} · {lead.city as string}
-        </p>
+        <div className="flex items-center gap-4 text-sm">
+          <span className="bg-[#F5F5F5] px-3 py-1.5 rounded-full font-medium text-[#0D0D0D]">
+            {lead.niche as string}
+          </span>
+          <span className="bg-[#F5F5F5] px-3 py-1.5 rounded-full font-medium text-[#0D0D0D]">
+            {lead.city as string}
+          </span>
+        </div>
       </div>
 
-      {/* What we know */}
-      <div className="bg-white border border-[#E8E8E8] rounded-2xl p-6 mb-6">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          What we know
+      {/* Business Profile */}
+      <div className="bg-[#E8F5E9] border-l-4 border-l-[#2ECC71] rounded-lg p-6 mb-8">
+        <p className="text-[10px] font-semibold text-[#2ECC71] uppercase tracking-[0.2em] mb-3">
+          ✓ Business Profile
         </p>
 
         {evidence.review_count > 0 && (
           <div className="mb-4">
             <p className="text-[#0D0D0D] text-sm font-semibold">
-              ✓ {evidence.review_count} customer reviews
+              {evidence.review_count} customers {evidence.rating_average ? `(${evidence.rating_average.toFixed(1)}★)` : ""}
             </p>
-            {evidence.rating_average && (
-              <p className="text-[#888888] text-xs mt-1">
-                Average rating: {evidence.rating_average.toFixed(1)} stars
-              </p>
-            )}
+            <p className="text-[#666666] text-xs mt-1">
+              Active customer feedback indicates engagement
+            </p>
           </div>
         )}
 
         {evidence.facts.length > 0 &&
           evidence.facts.map(fact => (
-            <div key={fact.id} className="mb-3">
-              <p className="text-[#0D0D0D] text-sm">✓ {fact.fact}</p>
+            <div key={fact.id} className="mb-2">
+              <p className="text-[#0D0D0D] text-sm"><span className="text-[#2ECC71] font-bold">•</span> {fact.fact}</p>
             </div>
           ))}
       </div>
 
-      {/* Observation Activity Card */}
+      {/* What We Observed */}
       {humanObservations.length > 0 && (
-        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-6 mb-6">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            Observation Activity
+        <div className="bg-[#FFF3E0] border-l-4 border-l-[#F39C12] rounded-lg p-6 mb-8">
+          <p className="text-[10px] font-semibold text-[#F39C12] uppercase tracking-[0.2em] mb-4">
+            ⚠ What We Observed
           </p>
           <div className="space-y-3">
             {humanObservations.slice(0, 5).map((obs, idx) => {
               const obsData = obs as Record<string, unknown>;
               const recordedAt = obsData.recorded_at ? new Date(obsData.recorded_at as string).toLocaleDateString() : "Unknown date";
               return (
-                <div key={idx} className="bg-white rounded-lg p-3 border border-[#E8E8E8]">
+                <div key={idx} className="bg-white rounded-md p-3 border-l-2 border-l-[#F39C12]">
                   <div className="flex items-start justify-between gap-3 mb-2">
-                    <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.5px]">
+                    <p className="text-[10px] font-semibold text-[#F39C12] uppercase tracking-[0.5px]">
                       {obsData.context || "Note"}
                     </p>
                     <p className="text-[9px] text-[#888888]">{recordedAt}</p>
@@ -128,42 +131,46 @@ export default async function LeadIntelligencePage({
             })}
           </div>
           {humanObservations.length > 5 && (
-            <p className="text-[10px] text-[#888888] mt-3">
-              +{humanObservations.length - 5} more observations
+            <p className="text-[10px] text-[#888888] mt-4 font-medium">
+              +{humanObservations.length - 5} more observations recorded
             </p>
           )}
         </div>
       )}
 
-      {/* What we don't know (questions) */}
+      {/* What We Still Need */}
       {questions.length > 0 && (
-        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl p-6 mb-6">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            What we don&apos;t know
+        <div className="bg-[#F0F0F0] border-l-4 border-l-[#BDBDBD] rounded-lg p-6 mb-8">
+          <p className="text-[10px] font-semibold text-[#666666] uppercase tracking-[0.2em] mb-4">
+            ? What We Still Need
           </p>
 
-          <div className="space-y-3">
-            {questions.slice(0, 5).map(q => (
-              <div key={q.id} className="bg-white rounded-lg p-3 border border-[#E8E8E8]">
-                <p className="text-[#0D0D0D] text-sm font-semibold">? {q.text}</p>
-                <p className="text-[#888888] text-xs mt-1">{q.relevance}</p>
+          <div className="space-y-2">
+            {questions.slice(0, 3).map(q => (
+              <div key={q.id} className="bg-white rounded-md p-3 border-l-2 border-l-[#BDBDBD]">
+                <p className="text-[#0D0D0D] text-sm font-medium">{q.text}</p>
               </div>
             ))}
           </div>
+          {questions.length > 3 && (
+            <p className="text-[10px] text-[#888888] mt-4">
+              +{questions.length - 3} more questions to explore
+            </p>
+          )}
         </div>
       )}
 
-      {/* Suggested next step */}
+      {/* Priority Question */}
       {questions.length > 0 && (
-        <div className="bg-white border border-[#0D0D0D] rounded-2xl p-6 mb-6">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            Suggested next step
+        <div className="bg-white border-2 border-[#0D0D0D] rounded-lg p-6 mb-8">
+          <p className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.2em] mb-3">
+            → Ask First
           </p>
-          <p className="text-[#0D0D0D] text-sm font-semibold">
-            {questions[0].text}
+          <p className="text-[#0D0D0D] text-base font-semibold mb-2">
+            "{questions[0].text}"
           </p>
-          <p className="text-[#888888] text-xs mt-2">
-            Why: {questions[0].relevance}
+          <p className="text-[#666666] text-sm">
+            {questions[0].relevance}
           </p>
         </div>
       )}
