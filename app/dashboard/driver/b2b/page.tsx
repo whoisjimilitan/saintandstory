@@ -79,17 +79,35 @@ export default async function B2BDiscoveryDashboard() {
   if (!driver) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-10">
+        <Link href="/dashboard/driver" className="text-sm text-[#0D0D0D] hover:text-[#888888] mb-4 inline-block">
+          ← Back to driver dashboard
+        </Link>
         <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">B2B Lead Discovery</h1>
-        <p className="text-[#888888] mb-6">You're not registered for B2B lead discovery yet.</p>
+        <p className="text-[#888888] mb-6">You haven't signed up yet. Register as a driver first to enable B2B lead discovery.</p>
         <Link
-          href="/driver-discovery/signup"
+          href="/dashboard/driver"
           className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-6 py-3 rounded-full transition-colors"
         >
-          Sign up for lead discovery →
+          Go to driver dashboard →
         </Link>
-        <p className="text-sm text-[#888888] mt-6">
-          Discover B2B prospects in your area, send recognition emails, and earn standing orders.
-        </p>
+      </div>
+    );
+  }
+
+  if (!driver.b2b_opt_in) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <Link href="/dashboard/driver" className="text-sm text-[#0D0D0D] hover:text-[#888888] mb-4 inline-block">
+          ← Back to driver dashboard
+        </Link>
+        <h1 className="font-sans font-black text-3xl text-[#0D0D0D] mb-4">B2B Lead Discovery</h1>
+        <p className="text-[#888888] mb-6">B2B lead discovery is disabled. Enable it in your driver dashboard to start discovering local business opportunities.</p>
+        <Link
+          href="/dashboard/driver"
+          className="inline-block bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold px-6 py-3 rounded-full transition-colors"
+        >
+          Enable B2B discovery →
+        </Link>
       </div>
     );
   }
