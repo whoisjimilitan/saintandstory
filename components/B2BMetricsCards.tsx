@@ -161,8 +161,9 @@ export default function B2BMetricsCards() {
 
   if (error || !metrics) {
     return (
-      <div className="bg-[#FEF5E7] border border-[#E8E8E8] rounded-xl p-6">
-        <p className="text-[#888888]">Unable to load metrics. Try refreshing.</p>
+      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl p-6">
+        <p className="text-[#888888] text-sm mb-2">Metrics unavailable</p>
+        <p className="text-[#AAAAAA] text-xs">Check back shortly or refresh the page. Pipeline data is still visible below.</p>
       </div>
     );
   }

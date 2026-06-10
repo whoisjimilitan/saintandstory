@@ -158,42 +158,46 @@ export interface DiscoveredLeadScoringInput {
 }
 
 export function scoreDiscoveredLead(input: DiscoveredLeadScoringInput): number {
-  let score = 20; // Base score for any discovered lead
+  let score = 0;
 
-  // Pain point presence (strong signal of opportunity)
+  // Negative review mentions (delivery/logistics friction)
+  // +40 per unique friction theme detected
   if (input.painPoint) {
-    score += 30;
+    score += 40;
   }
 
-  // Review rating indicates dissatisfaction (lower rating = more pain)
+  // Review severity (lower rating = worse experience)
   if (input.reviewRating) {
     if (input.reviewRating === 1) {
-      score += 25; // 1-star: extreme pain
+      score += 30; // 1-star: extreme dissatisfaction
     } else if (input.reviewRating === 2) {
-      score += 20; // 2-star: significant pain
+      score += 20; // 2-star: significant issues
     } else if (input.reviewRating === 3) {
-      score += 10; // 3-star: some dissatisfaction
+      score += 10; // 3-star: some friction
     }
-    // 4-5 stars: satisfied, no score boost
+    // 4-5 stars: satisfied, no boost (but not penalized)
   }
 
-  // Industry category (business_category is broader, but use for additional context)
-  // This keeps the score conservative for discovered leads without form data
+  // Baseline: if no negative signals, still a discovery opportunity but lower priority
+  if (!input.painPoint && !input.reviewRating) {
+    score = 15; // Lower baseline for leads without known friction
+  }
+
+  // Industry context adds confidence
   if (input.industryCategory) {
-    score += 5; // Just acknowledging we know the industry
+    score += 5;
   }
 
-  // Debug logging for transparency (optional)
+  // Debug logging for transparency
   if (process.env.NODE_ENV === "development") {
-    console.log("[SCORING CONTEXT] Discovered Lead", {
+    console.log("[SCORING] Discovered Lead", {
       industry: input.industryCategory,
       review_rating: input.reviewRating ?? "NULL",
       pain_point: input.painPoint ?? "NULL",
-      interpretation: !input.painPoint && !input.reviewRating ? "baseline_clean_business" : "friction_detected",
       final_score: Math.min(score, 100),
     });
   }
 
-  return Math.min(score, 100);
+  return Math.min(Math.max(score, 0), 100); // Clamp to 0-100
 }
 

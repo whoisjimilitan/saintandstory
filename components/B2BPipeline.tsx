@@ -434,9 +434,22 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
-              {scoreBreakdown.total === 20 ? "Discovered" : scoreLabel}
-            </span>
+            {/* Meaningful score badge for discovered leads */}
+            {!hasFormData && (
+              <span className={`px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors duration-300 ${
+                scoreBreakdown.total >= 60 ? "bg-[#E8F5E9] text-[#2ECC71]" :
+                scoreBreakdown.total >= 40 ? "bg-[#FFF3E0] text-[#F39C12]" :
+                "bg-[#F5F5F5] text-[#888888]"
+              }`}>
+                {scoreBreakdown.total}/100
+              </span>
+            )}
+            {/* Form-based lead score */}
+            {hasFormData && (
+              <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
+                {scoreLabel}
+              </span>
+            )}
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
               {STATUS_LABELS[status] ?? status}
             </span>
@@ -503,13 +516,22 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 )}
               </div>
             ) : (
-              // Discovered leads: show semantic signal label with context
+              // Discovered leads: show semantic signal label with context and score
               <div className={`text-sm transition-colors duration-300`}>
-                <p className="font-semibold text-[#0D0D0D]">{getLeadSignalLabel(lead)}</p>
-                <p className={`text-xs mt-2 transition-colors duration-300 text-[#888888]`}>
+                <div className="flex items-baseline justify-between gap-3 mb-2">
+                  <p className="font-semibold text-[#0D0D0D]">{getLeadSignalLabel(lead)}</p>
+                  <span className={`text-xs font-bold shrink-0 px-2 py-1 rounded ${
+                    scoreBreakdown.total >= 60 ? "bg-[#E8F5E9] text-[#2ECC71]" :
+                    scoreBreakdown.total >= 40 ? "bg-[#FFF3E0] text-[#F39C12]" :
+                    "bg-[#F5F5F5] text-[#888888]"
+                  }`}>
+                    {scoreBreakdown.total}/100
+                  </span>
+                </div>
+                <p className={`text-xs transition-colors duration-300 text-[#666666]`}>
                   {hasPainPoint
-                    ? "This business mentioned delivery/logistics friction in customer reviews."
-                    : "No negative reviews detected. Baseline discovery opportunity."}
+                    ? "Multiple negative mentions of delivery/logistics friction in recent reviews."
+                    : "No negative reviews detected. Lower priority, but still opportunity."}
                 </p>
               </div>
             )}
