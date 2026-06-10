@@ -116,7 +116,7 @@ export default async function DriverDashboardHome() {
               : "bg-[#F5F5F5] border-[#E8E8E8] text-[#888888]"
           }`}>
             <div className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-green-400 pulse-indicator" : "bg-[#888888]"}`} />
-            {isLive ? "Live — accepting bookings" : "Profile inactive"}
+            {isLive ? "Live — accepting jobs" : "Profile inactive"}
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-3">
