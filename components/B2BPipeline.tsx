@@ -120,6 +120,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [observationForm, setObservationForm] = useState({ observation: "", context: "phone_call" });
   const [recordingObservation, setRecordingObservation] = useState(false);
   const [showHypotheses, setShowHypotheses] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -880,6 +881,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Record observation
               </button>
+              <button onClick={() => setShowProfileModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                View profile
+              </button>
               <button onClick={() => updateStatus("dead")} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">
                 Not interested
               </button>
@@ -980,6 +984,91 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lead Knowledge Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 my-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">{lead.business_name}</h3>
+                <p className="text-sm text-[#888888]">{lead.business_category || "Business"} · {lead.email}</p>
+              </div>
+              <button
+                onClick={() => setShowProfileModal(false)}
+                className="text-[#888888] hover:text-[#0D0D0D] text-2xl font-light"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* What we know */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">What we know</h4>
+              <div className="space-y-2">
+                {lead.business_name && <p className="text-sm text-[#0D0D0D]">✓ Business name: {lead.business_name}</p>}
+                {lead.business_category && <p className="text-sm text-[#0D0D0D]">✓ Category: {lead.business_category}</p>}
+                {lead.email && <p className="text-sm text-[#0D0D0D]">✓ Email: {lead.email}</p>}
+                {lead.phone && <p className="text-sm text-[#0D0D0D]">✓ Phone: {lead.phone}</p>}
+                {lead.business_evidence && (lead.business_evidence as BusinessEvidence).facts.length > 0 && (
+                  <div>
+                    <p className="text-sm text-[#0D0D0D] font-semibold mb-2">From Google:</p>
+                    {((lead.business_evidence as BusinessEvidence).facts || []).slice(0, 3).map((fact, i) => (
+                      <p key={i} className="text-sm text-[#0D0D0D] ml-4">✓ {(fact as Record<string, unknown>).fact as string}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* From conversations */}
+            {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
+              <div>
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">From conversations</h4>
+                <div className="space-y-2">
+                  {(lead.human_observations as Record<string, unknown>[]).slice(-5).map((obs, i) => (
+                    <p key={i} className="text-sm text-[#0D0D0D]">
+                      ✓ {(obs as Record<string, unknown>).observation as string}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Standing order details */}
+            {status === "closed" && (
+              <div>
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">Standing order</h4>
+                <div className="space-y-2 text-sm text-[#0D0D0D]">
+                  {soForm.pickup_postcode && <p>✓ Pickup: {soForm.pickup_postcode}</p>}
+                  {soForm.delivery_postcode && <p>✓ Delivery: {soForm.delivery_postcode}</p>}
+                  {soForm.preferred_time && <p>✓ Preferred time: {soForm.preferred_time}</p>}
+                </div>
+              </div>
+            )}
+
+            {/* What we don't know */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">What we still need</h4>
+              <div className="space-y-2">
+                {!soForm.pickup_postcode && <p className="text-sm text-[#888888]">? Pickup postcode</p>}
+                {!soForm.delivery_postcode && <p className="text-sm text-[#888888]">? Delivery postcode</p>}
+                {!soForm.preferred_time && <p className="text-sm text-[#888888]">? Preferred service time</p>}
+                <p className="text-sm text-[#888888]">? Load characteristics</p>
+                <p className="text-sm text-[#888888]">? Special constraints</p>
+                <p className="text-sm text-[#888888]">? Decision maker verification</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
