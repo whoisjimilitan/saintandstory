@@ -9,6 +9,41 @@ interface EmailContext {
   landingPageUrl: string;
 }
 
+/**
+ * Generate relief layer implication from pain point and business context.
+ * Transforms raw pain point into operational burden insight.
+ * Example: "delivery delays" → "you end up managing pickups personally"
+ */
+export function generatePainPointImplication(painPoint: string | null | undefined, category: string | null | undefined): string | null {
+  if (!painPoint) return null;
+
+  const lower = painPoint.toLowerCase();
+
+  // Recognition pattern: "[pain] becomes something you manage personally"
+  if (lower.includes("delivery") || lower.includes("logistics") || lower.includes("transport")) {
+    return "delivery coordination personally when volume grows";
+  }
+
+  if (lower.includes("stock") || lower.includes("inventory") || lower.includes("supply")) {
+    return "inventory management personally instead of focusing on growth";
+  }
+
+  if (lower.includes("deadline") || lower.includes("timing") || lower.includes("schedule")) {
+    return "timeline management personally becomes your responsibility";
+  }
+
+  if (lower.includes("dispatch") || lower.includes("coordination") || lower.includes("scheduling")) {
+    return "operational coordination personally when you should be selling";
+  }
+
+  if (lower.includes("collection") || lower.includes("pickup")) {
+    return "collection logistics personally when volume increases";
+  }
+
+  // Fallback: generic burden framing
+  return `${painPoint.toLowerCase()} becomes something you manage personally`;
+}
+
 // 10 human-written variants — assigned by business name hash so each lead gets a consistent email style
 const COLD_TEMPLATES = [
   (ctx: EmailContext, jobs: number) =>

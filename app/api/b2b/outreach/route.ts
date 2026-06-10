@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
-import { generateEmail } from "@/lib/b2b-email";
+import { generateEmail, generatePainPointImplication } from "@/lib/b2b-email";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -33,11 +33,17 @@ export async function GET(request: NextRequest) {
   const lead = rows[0];
   if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const painPointImplication = generatePainPointImplication(
+    lead.pain_point as string | null,
+    lead.business_category as string | null
+  );
+
   const { subject, body } = await generateEmail({
     businessName: lead.business_name as string,
     category: (lead.business_category as string) ?? "business",
     city: (lead.city as string) ?? "your area",
     painPoint: lead.pain_point as string | null,
+    painPointImplication,
     landingPageUrl: (lead.landing_page_url as string) ?? `${BASE_URL}/b2b/${lead.niche ?? "retailers"}`,
   });
 
