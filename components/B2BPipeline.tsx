@@ -673,6 +673,25 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             )}
           </div>
 
+          {/* Suggested Opening - recognition/relief/trust layer for operator */}
+          {hasPainPoint && (
+            <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
+              isExpanded
+                ? "bg-white/10 border-white/20"
+                : "bg-[#F9F9F9] border-[#EAE6E0]"
+            }`}>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Suggested Opening</p>
+              <div className={`px-3 py-2.5 rounded-md text-sm italic transition-colors ${
+                isExpanded
+                  ? "bg-white/10 text-white"
+                  : "bg-[#FFFFFF] text-[#0D0D0D]"
+              }`}>
+                "Are you personally handling {lead.pain_point.toLowerCase()} coordination when volume peaks?"
+              </div>
+              <p className="text-[10px] transition-colors duration-300 text-[#888888]">Lead with recognition, not hypothesis. Get them confirming their own situation.</p>
+            </div>
+          )}
+
           {/* Email input section - minimal design */}
           {emailMissing ? (
             <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
