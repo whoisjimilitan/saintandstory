@@ -183,7 +183,7 @@ export default async function DriverDashboardHome() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <h3 className="font-sans font-black text-[#0D0D0D] text-base mb-1">Local Steady Work</h3>
-              <p className="text-[#888888] text-xs mb-3">Earn from nearby businesses needing regular help.</p>
+              <p className="text-[#888888] text-xs mb-3">Find nearby businesses needing regular help.</p>
               {driver.b2b_opt_in && driver.postcode ? (
                 <>
                   <p className="text-[#888888] text-xs mb-2">
