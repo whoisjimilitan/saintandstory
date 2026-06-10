@@ -17,94 +17,136 @@ const ADMIN_EMAILS = [
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
 
 async function getPendingJobs() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT j.*,
-      (SELECT COUNT(*) FROM jobs j2 WHERE j2.customer_email = j.customer_email AND j2.id != j.id) as previous_jobs
-    FROM jobs j
-    WHERE j.status = 'pending_review'
-    ORDER BY j.created_at DESC
-    LIMIT 50
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT j.*,
+        (SELECT COUNT(*) FROM jobs j2 WHERE j2.customer_email = j.customer_email AND j2.id != j.id) as previous_jobs
+      FROM jobs j
+      WHERE j.status = 'pending_review'
+      ORDER BY j.created_at DESC
+      LIMIT 50
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getPendingJobs error:", error);
+    return [];
+  }
 }
 
 async function getOfferedJobs() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
-    FROM jobs j
-    LEFT JOIN drivers d ON d.id = j.driver_id
-    WHERE j.status = 'offered'
-    ORDER BY j.created_at DESC
-    LIMIT 20
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+      FROM jobs j
+      LEFT JOIN drivers d ON d.id = j.driver_id
+      WHERE j.status = 'offered'
+      ORDER BY j.created_at DESC
+      LIMIT 20
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getOfferedJobs error:", error);
+    return [];
+  }
 }
 
 async function getCompletedJobs() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT j.*, d.full_name as driver_name,
-      COALESCE(j.price, e.amount) as display_price
-    FROM jobs j
-    LEFT JOIN drivers d ON d.id = j.driver_id
-    LEFT JOIN earnings e ON e.job_id = j.id
-    WHERE j.status = 'completed'
-    ORDER BY j.updated_at DESC
-    LIMIT 30
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT j.*, d.full_name as driver_name,
+        COALESCE(j.price, e.amount) as display_price
+      FROM jobs j
+      LEFT JOIN drivers d ON d.id = j.driver_id
+      LEFT JOIN earnings e ON e.job_id = j.id
+      WHERE j.status = 'completed'
+      ORDER BY j.updated_at DESC
+      LIMIT 30
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getCompletedJobs error:", error);
+    return [];
+  }
 }
 
 async function getConfirmedJobs() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
-    FROM jobs j
-    LEFT JOIN drivers d ON d.id = j.driver_id
-    WHERE j.status = 'confirmed'
-    ORDER BY j.updated_at DESC
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+      FROM jobs j
+      LEFT JOIN drivers d ON d.id = j.driver_id
+      WHERE j.status = 'confirmed'
+      ORDER BY j.updated_at DESC
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getConfirmedJobs error:", error);
+    return [];
+  }
 }
 
 async function getInProgressJobs() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
-    FROM jobs j
-    LEFT JOIN drivers d ON d.id = j.driver_id
-    WHERE j.status = 'in_progress'
-    ORDER BY j.updated_at DESC
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT j.*, d.full_name as driver_name, d.phone as driver_phone
+      FROM jobs j
+      LEFT JOIN drivers d ON d.id = j.driver_id
+      WHERE j.status = 'in_progress'
+      ORDER BY j.updated_at DESC
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getInProgressJobs error:", error);
+    return [];
+  }
 }
 
 async function getActiveDrivers() {
-  const sql = neon(process.env.DATABASE_URL!);
-  return await sql`
-    SELECT d.id, d.full_name, d.area, d.vehicle_type, d.phone, d.rating_avg, d.rating_count, d.last_seen_at,
-      (
-        SELECT AVG(EXTRACT(EPOCH FROM (j.updated_at - j.offered_at)) / 60)::int
-        FROM jobs j
-        WHERE j.driver_id = d.id
-          AND j.status IN ('confirmed', 'in_progress', 'completed')
-          AND j.offered_at IS NOT NULL
-      ) as avg_response_mins,
-      (SELECT reference FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_ref,
-      (SELECT postcode_from FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_from,
-      (SELECT postcode_to FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_to,
-      (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status
-    FROM drivers d
-    WHERE d.profile_live = true
-    ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
-  ` as Record<string, unknown>[];
+  if (!process.env.DATABASE_URL) return [];
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    return await sql`
+      SELECT d.id, d.full_name, d.area, d.vehicle_type, d.phone, d.rating_avg, d.rating_count, d.last_seen_at,
+        (
+          SELECT AVG(EXTRACT(EPOCH FROM (j.updated_at - j.offered_at)) / 60)::int
+          FROM jobs j
+          WHERE j.driver_id = d.id
+            AND j.status IN ('confirmed', 'in_progress', 'completed')
+            AND j.offered_at IS NOT NULL
+        ) as avg_response_mins,
+        (SELECT reference FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_ref,
+        (SELECT postcode_from FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_from,
+        (SELECT postcode_to FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_to,
+        (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status
+      FROM drivers d
+      WHERE d.profile_live = true
+      ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
+    ` as Record<string, unknown>[];
+  } catch (error) {
+    console.error("[Admin] getActiveDrivers error:", error);
+    return [];
+  }
 }
 
 async function getTodayRevenue() {
-  const sql = neon(process.env.DATABASE_URL!);
-  const rows = await sql`
-    SELECT COALESCE(SUM(amount), 0) as total
-    FROM earnings
-    WHERE created_at >= DATE_TRUNC('day', NOW() AT TIME ZONE 'Europe/London') AT TIME ZONE 'Europe/London'
-  `;
-  return Number(rows[0]?.total ?? 0);
+  if (!process.env.DATABASE_URL) return 0;
+  const sql = neon(process.env.DATABASE_URL);
+  try {
+    const rows = await sql`
+      SELECT COALESCE(SUM(amount), 0) as total
+      FROM earnings
+      WHERE created_at >= DATE_TRUNC('day', NOW() AT TIME ZONE 'Europe/London') AT TIME ZONE 'Europe/London'
+    `;
+    return Number(rows[0]?.total ?? 0);
+  } catch (error) {
+    console.error("[Admin] getTodayRevenue error:", error);
+    return 0;
+  }
 }
 
 export default async function AdminPage() {
