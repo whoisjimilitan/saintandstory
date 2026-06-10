@@ -396,8 +396,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const cardStyle = WORKFLOW_STATE_STYLE[workflowState] || WORKFLOW_STATE_STYLE.new;
   const isExpanded = expanded;
 
+  // Determine priority accent color for card border
+  const priorityAccent = !hasFormData
+    ? (scoreBreakdown.total >= 60 ? "border-l-[#2ECC71]" :
+       scoreBreakdown.total >= 40 ? "border-l-[#F39C12]" :
+       "border-l-[#BDBDBD]")
+    : "border-l-[#BDBDBD]";
+
   return (
-    <div className={`border rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] hover:border-[#0D0D0D] ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px' }}>
+    <div className={`border border-l-4 rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] hover:border-[#0D0D0D] ${priorityAccent} ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px', borderLeftWidth: '4px' }}>
       <button
         className={`w-full text-left px-5 py-4 flex items-start justify-between gap-4 transition-all duration-300 ${
           isExpanded
@@ -434,15 +441,20 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-2">
-            {/* Meaningful score badge for discovered leads */}
+            {/* Priority label + score for discovered leads (priority first) */}
             {!hasFormData && (
-              <span className={`px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors duration-300 ${
-                scoreBreakdown.total >= 60 ? "bg-[#E8F5E9] text-[#2ECC71]" :
-                scoreBreakdown.total >= 40 ? "bg-[#FFF3E0] text-[#F39C12]" :
-                "bg-[#F5F5F5] text-[#888888]"
-              }`}>
-                {scoreBreakdown.total}/100
-              </span>
+              <div className="flex flex-col items-end gap-0.5">
+                <span className={`text-[10px] font-black uppercase tracking-wider ${
+                  scoreBreakdown.total >= 60 ? "text-[#2ECC71]" :
+                  scoreBreakdown.total >= 40 ? "text-[#F39C12]" :
+                  "text-[#888888]"
+                }`}>
+                  {scoreBreakdown.total >= 60 ? "High Priority" :
+                   scoreBreakdown.total >= 40 ? "Medium Priority" :
+                   "Baseline"}
+                </span>
+                <span className="text-[9px] text-[#AAAAAA]">{scoreBreakdown.total}/100</span>
+              </div>
             )}
             {/* Form-based lead score */}
             {hasFormData && (
@@ -544,7 +556,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 {/* Signals */}
                 <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
                   <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em] mb-2">Signals:</p>
-                  <div className="space-y-1">
+                  <div className="space-y-1 mb-4">
                     {hasPainPoint ? (
                       <>
                         <div className="flex items-center gap-2 text-xs">
@@ -562,6 +574,18 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                         <span className="text-[#666666]">No operational friction detected</span>
                       </div>
                     )}
+                  </div>
+
+                  {/* Recommended Action */}
+                  <div className="pt-3 border-t border-[#E8E8E8]">
+                    <p className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-2">Recommended next step:</p>
+                    <p className="text-xs text-[#0D0D0D] font-medium">
+                      {scoreBreakdown.total >= 60
+                        ? "Send recognition email"
+                        : scoreBreakdown.total >= 40
+                          ? "Investigate reviews further"
+                          : "Archive for lower priority"}
+                    </p>
                   </div>
                 </div>
               </div>
