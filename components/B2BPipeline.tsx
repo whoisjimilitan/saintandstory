@@ -675,20 +675,12 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
           {/* Suggested Opening - recognition/relief/trust layer for operator */}
           {hasPainPoint && (
-            <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white/10 border-white/20"
-                : "bg-[#F9F9F9] border-[#EAE6E0]"
-            }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Suggested Opening</p>
-              <div className={`px-3 py-2.5 rounded-md text-sm italic transition-colors ${
-                isExpanded
-                  ? "bg-white/10 text-white"
-                  : "bg-[#FFFFFF] text-[#0D0D0D]"
-              }`}>
-                "Are you personally handling {lead.pain_point.toLowerCase()} coordination when volume peaks?"
+            <div className={`border-2 border-[#0D0D0D] rounded-lg p-5 mb-4 space-y-3 transition-colors duration-300 bg-[#F9F9F9]`}>
+              <p className={`text-[10px] font-black uppercase tracking-[0.5px] transition-colors duration-300 text-[#0D0D0D]`}>How to start</p>
+              <div className={`px-4 py-3 rounded-md text-base font-semibold transition-colors bg-white border border-[#EAE6E0] text-[#0D0D0D]`}>
+                "Are you personally handling {lead.pain_point.toLowerCase()} when volume peaks?"
               </div>
-              <p className="text-[10px] transition-colors duration-300 text-[#888888]">Lead with recognition, not hypothesis. Get them confirming their own situation.</p>
+              <p className="text-[11px] transition-colors duration-300 text-[#666666] font-medium">Lead with recognition. Let them confirm.</p>
             </div>
           )}
 
@@ -770,6 +762,28 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             >
               {drafting ? "Drafting…" : "Draft email"}
             </button>
+          )}
+
+          {/* Action menu - condensed button layout */}
+          {!showStandingOrder && (
+            <div className={`pt-4 border-t transition-all border-[#EAE6E0]`}>
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 bg-[#0D0D0D] text-white hover:bg-[#1a1a1a]">
+                  Create order
+                </button>
+                <button onClick={() => updateStatus("warm")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                  Mark warm
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                  Add note
+                </button>
+                <button onClick={() => updateStatus("dead")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 text-[#888888] hover:text-[#0D0D0D]">
+                  Not interested
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Standing order section - refined design */}
@@ -975,27 +989,6 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </button>
                 <button onClick={() => setShowStandingOrder(false)} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">Back</button>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2 pt-4 transition-all border-t border-[#EAE6E0]">
-              <button onClick={() => updateStatus("warm")} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                Mark warm
-              </button>
-              <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                Standing order
-              </button>
-              <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                Record observation
-              </button>
-              <button onClick={() => setShowConversationGuidance(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                Conversation guide
-              </button>
-              <button onClick={() => setShowProfileModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                View profile
-              </button>
-              <button onClick={() => updateStatus("dead")} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">
-                Not interested
-              </button>
             </div>
           )}
         </div>
