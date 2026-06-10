@@ -113,6 +113,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     delivery_postcode: "",
     notes: ""
   });
+  const [showObservationModal, setShowObservationModal] = useState(false);
+  const [observationForm, setObservationForm] = useState({ observation: "", context: "phone_call" });
+  const [recordingObservation, setRecordingObservation] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -289,9 +292,57 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
         notes: soForm.notes,
       }),
     });
+
+    // Record standing order details as observation for future reference
+    const observationParts = [];
+    if (soForm.pickup_postcode) observationParts.push(`Pickup: ${soForm.pickup_postcode}`);
+    if (soForm.delivery_postcode) observationParts.push(`Delivery: ${soForm.delivery_postcode}`);
+    if (soForm.preferred_time) observationParts.push(`Preferred time: ${soForm.preferred_time}`);
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    observationParts.push(`Day: ${dayNames[parseInt(soForm.day_of_week) - 1]}`);
+
+    if (observationParts.length > 0) {
+      await fetch("/api/b2b/observations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          observation: `Standing order created: ${observationParts.join(", ")}`,
+          context: "standing_order",
+        }),
+      });
+    }
+
     setStatus("closed");
     setShowStandingOrder(false);
     onRefresh();
+  }
+
+  async function recordObservation() {
+    if (!observationForm.observation.trim()) return;
+
+    setRecordingObservation(true);
+    try {
+      const response = await fetch("/api/b2b/observations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          observation: observationForm.observation,
+          context: observationForm.context,
+        }),
+      });
+
+      if (response.ok) {
+        setObservationForm({ observation: "", context: "phone_call" });
+        setShowObservationModal(false);
+        onRefresh();
+      }
+    } catch (error) {
+      console.error("Error recording observation:", error);
+    } finally {
+      setRecordingObservation(false);
+    }
   }
 
   const emailMissing = !lead.email;
@@ -720,6 +771,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Standing order
               </button>
+              <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                Record observation
+              </button>
               <button onClick={() => updateStatus("dead")} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">
                 Not interested
               </button>
@@ -764,6 +818,60 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Record Observation Modal */}
+      {showObservationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Record Observation</h3>
+            <p className="text-sm text-[#666666]">What did you learn from this prospect?</p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.5px] block mb-2 text-[#666666]">Observation</label>
+                <textarea
+                  value={observationForm.observation}
+                  onChange={e => setObservationForm(f => ({ ...f, observation: e.target.value }))}
+                  placeholder="E.g., 'Handles 5+ deliveries per week across London' or 'Decision maker is the owner, not manager'"
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-[0.5px] block mb-2 text-[#666666]">Context</label>
+                <select
+                  value={observationForm.context}
+                  onChange={e => setObservationForm(f => ({ ...f, context: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                >
+                  <option value="phone_call">Phone Call</option>
+                  <option value="email">Email Reply</option>
+                  <option value="meeting">Meeting</option>
+                  <option value="standing_order">Standing Order Setup</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={recordObservation}
+                disabled={recordingObservation || !observationForm.observation.trim()}
+                className="flex-1 bg-[#0D0D0D] hover:bg-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 rounded-full text-sm transition-all"
+              >
+                {recordingObservation ? "Saving…" : "Save"}
+              </button>
+              <button
+                onClick={() => setShowObservationModal(false)}
+                className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+              >
+                Cancel
               </button>
             </div>
           </div>
