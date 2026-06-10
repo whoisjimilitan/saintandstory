@@ -16,8 +16,8 @@ interface ConversationContext {
   businessName: string;
   category: string;
   painPoint?: string | null;
-  hasEngaged: boolean; // read brief?
-  hasPartialOrder: boolean; // started but didn't finish?
+  hasEngaged?: boolean; // read brief?
+  hasPartialOrder?: boolean; // started but didn't finish?
 }
 
 /**
