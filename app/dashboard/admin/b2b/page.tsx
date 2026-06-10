@@ -15,45 +15,59 @@ const ADMIN_EMAILS = [
 ];
 
 async function getB2BData() {
-  if (!process.env.DATABASE_URL) return { leads: [], orders: [], stats: { total: 0, new: 0, warm: 0, closed: 0, inbound: 0 } };
+  if (!process.env.DATABASE_URL) {
+    console.warn("[B2B Admin] DATABASE_URL not configured");
+    return { leads: [], orders: [], stats: { total: 0, new: 0, warm: 0, closed: 0, inbound: 0 } };
+  }
 
-  await ensureB2BSchema();
+  try {
+    await ensureB2BSchema();
+  } catch (schemaError) {
+    console.error("[B2B Admin] Schema initialization failed:", schemaError);
+    return { leads: [], orders: [], stats: { total: 0, new: 0, warm: 0, closed: 0, inbound: 0 } };
+  }
+
   const sql = neon(process.env.DATABASE_URL);
 
-  const [leads, orders] = await Promise.all([
-    sql`
-      SELECT l.*,
-        o.last_sent, o.email_count, o.replied
-      FROM b2b_leads l
-      LEFT JOIN LATERAL (
-        SELECT MAX(sent_at) as last_sent, COUNT(*) as email_count, bool_or(replied) as replied
-        FROM b2b_outreach WHERE lead_id = l.id
-      ) o ON true
-      ORDER BY
-        CASE l.status
-          WHEN 'warm' THEN 1
-          WHEN 'new' THEN 2
-          WHEN 'contacted' THEN 3
-          WHEN 'closed' THEN 4
-          ELSE 5
-        END,
-        l.created_at DESC
-      LIMIT 200
-    `,
-    sql`
-      SELECT * FROM b2b_standing_orders WHERE active = true ORDER BY created_at DESC
-    `,
-  ]);
+  try {
+    const [leads, orders] = await Promise.all([
+      sql`
+        SELECT l.*,
+          o.last_sent, o.email_count, o.replied
+        FROM b2b_leads l
+        LEFT JOIN LATERAL (
+          SELECT MAX(sent_at) as last_sent, COUNT(*) as email_count, bool_or(replied) as replied
+          FROM b2b_outreach WHERE lead_id = l.id
+        ) o ON true
+        ORDER BY
+          CASE l.status
+            WHEN 'warm' THEN 1
+            WHEN 'new' THEN 2
+            WHEN 'contacted' THEN 3
+            WHEN 'closed' THEN 4
+            ELSE 5
+          END,
+          l.created_at DESC
+        LIMIT 200
+      `,
+      sql`
+        SELECT * FROM b2b_standing_orders WHERE active = true ORDER BY created_at DESC
+      `,
+    ]);
 
-  const stats = {
-    total: leads.length,
-    new: leads.filter(l => l.status === "new").length,
-    warm: leads.filter(l => (l.status === "warm" || l.status === "inbound")).length,
-    closed: leads.filter(l => l.status === "closed").length,
-    inbound: leads.filter(l => l.source === "inbound").length,
-  };
+    const stats = {
+      total: leads.length,
+      new: leads.filter(l => l.status === "new").length,
+      warm: leads.filter(l => (l.status === "warm" || l.status === "inbound")).length,
+      closed: leads.filter(l => l.status === "closed").length,
+      inbound: leads.filter(l => l.source === "inbound").length,
+    };
 
-  return { leads: leads as Lead[], orders: orders as StandingOrder[], stats };
+    return { leads: leads as Lead[], orders: orders as StandingOrder[], stats };
+  } catch (queryError) {
+    console.error("[B2B Admin] Query failed:", queryError);
+    return { leads: [], orders: [], stats: { total: 0, new: 0, warm: 0, closed: 0, inbound: 0 } };
+  }
 }
 
 export default async function B2BAdminPage() {
