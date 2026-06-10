@@ -11,6 +11,7 @@ import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead, 
 import { generateSlug } from "@/lib/prospect-pages";
 import { generateQuestions, prioritizeQuestions } from "@/lib/question-engine";
 import { generateRevelatoryAnalysis } from "@/lib/revelatory-engine";
+import { getOperatorGuidance, getOpeningPrompt, handleObjection } from "@/lib/b2b-conversation-prompts";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
 import { type BusinessEvidence } from "@/lib/evidence-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
@@ -121,6 +122,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [recordingObservation, setRecordingObservation] = useState(false);
   const [showHypotheses, setShowHypotheses] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showConversationGuidance, setShowConversationGuidance] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
@@ -957,6 +959,9 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 Record observation
               </button>
+              <button onClick={() => setShowConversationGuidance(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
+                Conversation guide
+              </button>
               <button onClick={() => setShowProfileModal(true)} className="font-medium px-4 py-1.5 rounded-full text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
                 View profile
               </button>
@@ -1176,6 +1181,84 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
             <button
               onClick={() => setShowProfileModal(false)}
+              className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Conversation Guidance Modal */}
+      {showConversationGuidance && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 my-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Conversation Guide</h3>
+                <p className="text-sm text-[#888888]">Psychology-based prompts for {lead.business_name}</p>
+              </div>
+              <button
+                onClick={() => setShowConversationGuidance(false)}
+                className="text-[#888888] hover:text-[#0D0D0D] text-2xl font-light"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Opening Prompt */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">How to start</h4>
+              <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#E8E8E8]">
+                <p className="text-sm text-[#0D0D0D] italic">
+                  "{getOpeningPrompt({ businessName: lead.business_name, category: lead.business_category || "business", painPoint: lead.pain_point, hasEngaged: false, hasPartialOrder: false })}"
+                </p>
+                <p className="text-[9px] text-[#888888] mt-2">Lead with their situation. Get them talking.</p>
+              </div>
+            </div>
+
+            {/* Discovery Questions */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">Discovery questions</h4>
+              <div className="space-y-2">
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Frequency trigger</p>
+                  <p className="text-[11px] text-[#666666]">"How often do you handle pickups or deliveries like this?"</p>
+                </div>
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Current pain</p>
+                  <p className="text-[11px] text-[#666666]">"What's your biggest headache with logistics right now?"</p>
+                </div>
+                <div className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Timeline</p>
+                  <p className="text-[11px] text-[#666666]">"When would you want to get started?"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Objection Handler */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">When they object</h4>
+              <div className="bg-[#FEF5E7] border border-[#E8E8E8] rounded-lg p-4">
+                <p className="text-[10px] font-semibold text-[#0D0D0D] mb-2">Price concern?</p>
+                <p className="text-[11px] text-[#666666] mb-3">"{handleObjection("cost").acknowledge} {handleObjection("cost").reframe}"</p>
+                <p className="text-[10px] text-[#888888]">Then add: {handleObjection("cost").proof}</p>
+              </div>
+            </div>
+
+            {/* Closing Prompt */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">How to close</h4>
+              <div className="bg-[#E8F8F5] rounded-lg p-4 border border-[#E8E8E8]">
+                <p className="text-sm text-[#0D0D0D] italic">
+                  "So if I can get your driver in 15 minutes and same-day delivery, that solves [their pain point]?"
+                </p>
+                <p className="text-[9px] text-[#888888] mt-2">Confirm value. Then move to standing order details.</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowConversationGuidance(false)}
               className="w-full bg-[#0D0D0D] hover:bg-[#1a1a1a] text-white font-semibold py-2 rounded-full text-sm transition-all"
             >
               Close
