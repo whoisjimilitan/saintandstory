@@ -16,9 +16,14 @@ const STEPS = [
     opts: ["Small van (e.g. Ford Connect)", "Transit-size van", "Luton van", "Curtainsider / flatbed", "Other"],
   },
   {
-    id: "area", type: "input" as const,
-    q: "Which area do you want to cover?",
-    placeholder: "Town or city",
+    id: "postcode", type: "input" as const,
+    q: "What’s your postcode?",
+    placeholder: "e.g., M1 5AE",
+  },
+  {
+    id: "radius", type: "input" as const,
+    q: "How many miles can you travel?",
+    placeholder: "e.g., 15",
   },
   {
     id: "start", type: "options" as const,
@@ -111,7 +116,12 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
 
   function validate(): boolean {
     if (step.type === "options") return !!answers[step.id];
-    if (step.type === "input") return ((answers[step.id] as string) ?? "").trim().length >= 2;
+    if (step.type === "input") {
+      const value = ((answers[step.id] as string) ?? "").trim();
+      if (step.id === "postcode") return value.length >= 2;
+      if (step.id === "radius") return !isNaN(Number(value)) && Number(value) > 0 && Number(value) <= 100;
+      return value.length >= 2;
+    }
     if (step.type === "details") {
       const digits = ((answers.phone as string) ?? "").replace(/\D/g, "");
       return ((answers.full_name as string) ?? "").trim().length >= 2 &&
@@ -234,13 +244,13 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
               <br />live.
             </h2>
             <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-2xl px-5 py-4 space-y-3 mb-5">
-              {answers.area ? (
+              {answers.postcode ? (
                 <div>
-                  <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Covering</p>
-                  <p className="font-sans font-black text-[#0D0D0D] text-base">{answers.area as string}</p>
+                  <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Service area</p>
+                  <p className="font-sans font-black text-[#0D0D0D] text-base">{answers.postcode as string} ({answers.radius as string} miles)</p>
                 </div>
               ) : null}
-              <div className={answers.area ? "border-t border-[#E8E8E8] pt-3" : ""}>
+              <div className={answers.postcode ? "border-t border-[#E8E8E8] pt-3" : ""}>
                 <p className="text-[#888888] text-[11px] uppercase tracking-[0.1em] mb-0.5">Est. weekly earnings</p>
                 <p className="font-sans font-black text-[#0D0D0D] text-base">£{weekly}</p>
               </div>
@@ -310,7 +320,22 @@ export default function DriverModal({ isOpen, onClose }: DriverModalProps) {
                     placeholder="Email address (optional)"
                     className={inputCls}
                   />
-                  <p className="text-[#888888] text-xs pt-1">No spam, ever.</p>
+                  <p className="text-[#888888] text-xs">No spam, ever.</p>
+
+                  <div className="border-t border-[#E8E8E8] pt-4 mt-4">
+                    <label className="flex items-start gap-3 cursor-pointer hover:bg-[#F5F5F5] p-2 rounded-lg transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={(answers.b2b_opt_in as boolean) ?? false}
+                        onChange={(e) => setAnswers({ ...answers, b2b_opt_in: e.target.checked })}
+                        className="w-5 h-5 mt-0.5 rounded border border-[#E8E8E8] cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-[#0D0D0D]">Earn from local business leads</p>
+                        <p className="text-xs text-[#888888]">Automatically discover nearby businesses and earn standing orders. You can toggle this anytime.</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               )}
 
