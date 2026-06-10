@@ -69,7 +69,7 @@ function DriverView() {
         <div className="h-8 w-px bg-white/15" />
         <div className="text-right">
           <p className="text-[10px] text-white/65 uppercase tracking-widest mb-0.5">Jobs done</p>
-          <p className="text-white font-black text-xl leading-none">4</p>
+          <p className="text-white font-black text-xl leading-none">1</p>
         </div>
         <div className="h-8 w-px bg-white/15" />
         <div className="text-right">
