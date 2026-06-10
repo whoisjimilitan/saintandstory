@@ -65,6 +65,7 @@ function MetricCard({
   target,
   status,
   details,
+  tooltip,
 }: {
   title: string;
   value: string;
@@ -72,30 +73,46 @@ function MetricCard({
   target: string;
   status: "success" | "warning" | "pending";
   details?: React.ReactNode;
+  tooltip?: string;
 }) {
   const statusColor = {
+    success: "bg-[#E8F5E9] border-l-4 border-l-[#2ECC71]",
+    warning: "bg-[#FFF3E0] border-l-4 border-l-[#F39C12]",
+    pending: "bg-[#F5F5F5] border-l-4 border-l-[#BDBDBD]",
+  }[status];
+
+  const statusIcon = {
+    success: "✓",
+    warning: "⚠",
+    pending: "—",
+  }[status];
+
+  const statusTextColor = {
     success: "text-[#2ECC71]",
     warning: "text-[#F39C12]",
     pending: "text-[#888888]",
   }[status];
 
-  const bgColor = {
-    success: "bg-[#E8F8F5]",
-    warning: "bg-[#FEF5E7]",
-    pending: "bg-[#F5F5F5]",
-  }[status];
-
   return (
-    <div className={`${bgColor} border border-[#E8E8E8] rounded-xl p-6`}>
+    <div className={`${statusColor} rounded-lg p-6 hover:shadow-sm transition-shadow`}>
       <div className="flex items-start justify-between mb-4">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          {title}
-        </p>
-        <span className={`text-xl font-bold ${statusColor}`}>●</span>
+        <div className="flex-1">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+            {title}
+          </p>
+          {tooltip && (
+            <p className="text-[9px] text-[#999999] mt-1 italic">
+              {tooltip}
+            </p>
+          )}
+        </div>
+        <span className={`text-lg font-bold ${statusTextColor} ml-3`}>
+          {statusIcon}
+        </span>
       </div>
 
       <div className="flex items-baseline gap-2 mb-3">
-        <p className="text-3xl font-black text-[#0D0D0D]">{value}</p>
+        <p className="text-4xl font-black text-[#0D0D0D]">{value}</p>
         <p className="text-sm text-[#888888]">{unit}</p>
       </div>
 
@@ -103,7 +120,7 @@ function MetricCard({
         Target: {target}
       </p>
 
-      {details && <div className="text-[11px] text-[#666666] space-y-1">{details}</div>}
+      {details && <div className="text-[11px] text-[#666666] space-y-1 mt-4">{details}</div>}
     </div>
   );
 }
@@ -196,6 +213,7 @@ export default function B2BMetricsCards() {
           unit={m.knowledge_capture_adoption.unit}
           target={m.knowledge_capture_adoption.target}
           status={m.knowledge_capture_adoption.status}
+          tooltip="% of qualified leads with at least one recorded observation"
           details={
             <>
               <p>
@@ -213,6 +231,7 @@ export default function B2BMetricsCards() {
           unit={m.standing_order_completeness.unit}
           target={m.standing_order_completeness.target}
           status={m.standing_order_completeness.status}
+          tooltip="% of standing orders with both pickup and delivery postcodes"
           details={
             <>
               <p>
@@ -230,6 +249,7 @@ export default function B2BMetricsCards() {
           unit={m.fulfillment_readiness.unit}
           target={m.fulfillment_readiness.target}
           status={m.fulfillment_readiness.status}
+          tooltip="% of standing orders that have generated jobs"
           details={
             <>
               <p>
@@ -247,10 +267,11 @@ export default function B2BMetricsCards() {
           unit={m.observation_usage.unit}
           target={m.observation_usage.target}
           status={m.observation_usage.status}
+          tooltip="Average observations recorded per engaged lead"
           details={
             <>
               <p>
-                Average per self-confirmed lead:
+                Average per self-confirmed lead
               </p>
               {m.observation_usage.latest_observation && (
                 <p className="text-[10px] mt-2 italic">
@@ -268,12 +289,12 @@ export default function B2BMetricsCards() {
           unit="jobs generated"
           target={m.revenue_flow_completeness.target}
           status={m.revenue_flow_completeness.status}
+          tooltip="% of standing orders that have converted to generated jobs"
           details={
             <>
-              <p>Jobs generated: {m.revenue_flow_completeness.jobs_generated_percent}%</p>
-              <p>Jobs completed: {m.revenue_flow_completeness.jobs_completed_percent}%</p>
-              <p>Jobs cancelled: {m.revenue_flow_completeness.jobs_cancelled_percent}%</p>
-              <p>Total standing orders: {m.revenue_flow_completeness.total_standing_orders}</p>
+              <p>Generated: {m.revenue_flow_completeness.jobs_generated_percent}%</p>
+              <p>Completed: {m.revenue_flow_completeness.jobs_completed_percent}%</p>
+              <p>Cancelled: {m.revenue_flow_completeness.jobs_cancelled_percent}%</p>
             </>
           }
         />
@@ -285,6 +306,7 @@ export default function B2BMetricsCards() {
           unit={`${m.operational_efficiency.completed_jobs} completed`}
           target={m.operational_efficiency.target}
           status={m.operational_efficiency.status}
+          tooltip="Time from standing order creation to job completion"
           details={
             <>
               {m.operational_efficiency.completed_jobs > 0 ? (
@@ -292,10 +314,7 @@ export default function B2BMetricsCards() {
                   <p>Median: {m.operational_efficiency.median_time}</p>
                   <p>Average: {m.operational_efficiency.avg_time}</p>
                   <p className="text-[9px]">
-                    Fastest: {m.operational_efficiency.fastest_time}
-                  </p>
-                  <p className="text-[9px]">
-                    Slowest: {m.operational_efficiency.slowest_time}
+                    Range: {m.operational_efficiency.fastest_time} — {m.operational_efficiency.slowest_time}
                   </p>
                 </>
               ) : (

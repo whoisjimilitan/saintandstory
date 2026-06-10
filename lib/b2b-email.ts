@@ -81,10 +81,12 @@ const PAIN_TEMPLATES = [
 
 // RELIEF-LAYER TEMPLATES: Recognition + Relief + Trust + Action
 // These create understanding (recognition), acknowledge burden (relief), build trust, and invite conversation
-// Mobile-first: 60 chars per line max, line breaks for breathing room
+// Mobile-first: 65 chars per line max, line breaks for breathing room between sections
 const RELIEF_TEMPLATES = [
   (ctx: EmailContext, jobs: number) =>
-    `One thing that stood out about ${ctx.businessName}: customers mention ${ctx.painPointImplication || "delivery timing"}.
+    `One thing that stood out about ${ctx.businessName}:
+
+Customers mention ${ctx.painPointImplication || "delivery timing"}.
 
 ${ctx.painPointImplication ? `Businesses like yours often end up managing that personally when volume peaks.
 
@@ -95,9 +97,17 @@ Quick question — is that something you're dealing with?
 ${ctx.landingPageUrl}`,
 
   (ctx: EmailContext, jobs: number) =>
-    `This might sound familiar. ${ctx.businessName}'s customers value ${ctx.painPointImplication || "reliability"}.
+    `This might sound familiar.
 
-And when you grow, that becomes something you coordinate personally.
+${ctx.businessName}'s customers consistently value ${ctx.painPointImplication || "reliability"}.
+
+And when you grow, that's the thing that ends up on your plate personally.
+
+We've built our process specifically for this.
+
+Is that your experience?
+
+${ctx.landingPageUrl}
 
 We handle exactly that for ${ctx.category} businesses.
 
