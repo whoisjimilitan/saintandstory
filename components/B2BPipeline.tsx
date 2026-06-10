@@ -10,6 +10,7 @@ import { DELIVERY_FREQUENCIES, AVERAGE_DELIVERIES, COURIER_PROVIDERS, DELIVERY_C
 import { calculateLeadScore, getScoreLabel, getScoreStyle, scoreDiscoveredLead, getLeadSignalLabel } from "@/lib/lead-scoring";
 import { generateSlug } from "@/lib/prospect-pages";
 import { generateQuestions, prioritizeQuestions } from "@/lib/question-engine";
+import { generateRevelatoryAnalysis } from "@/lib/revelatory-engine";
 import { type Lead, type StandingOrder, type LeadStatus } from "@/lib/b2b-types";
 import { type BusinessEvidence } from "@/lib/evidence-types";
 import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
@@ -118,6 +119,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [showObservationModal, setShowObservationModal] = useState(false);
   const [observationForm, setObservationForm] = useState({ observation: "", context: "phone_call" });
   const [recordingObservation, setRecordingObservation] = useState(false);
+  const [showHypotheses, setShowHypotheses] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -756,6 +758,74 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   </div>
                 </div>
               </div>
+
+              {/* Conversation Ideas (Revelatory Hypotheses) */}
+              {lead.business_evidence && (() => {
+                const evidence = lead.business_evidence as BusinessEvidence;
+                if (!evidence.reviews || evidence.reviews.length === 0) return null;
+
+                const analysis = generateRevelatoryAnalysis(evidence);
+                const allHypotheses = [
+                  ...analysis.hypotheses.pressureHypotheses,
+                  ...analysis.hypotheses.constraintHypotheses,
+                  ...analysis.hypotheses.opportunityHypotheses
+                ];
+
+                if (allHypotheses.length === 0) return null;
+
+                return (
+                  <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowHypotheses(!showHypotheses)}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D]">Conversation Ideas</p>
+                      <span className={`text-[#888888] transition-transform ${showHypotheses ? 'rotate-180' : ''}`}>▼</span>
+                    </button>
+
+                    {showHypotheses && (
+                      <div className="mt-2 space-y-2">
+                        {analysis.hypotheses.pressureHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Pressures</p>
+                            {analysis.hypotheses.pressureHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {analysis.hypotheses.constraintHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Constraints</p>
+                            {analysis.hypotheses.constraintHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {analysis.hypotheses.opportunityHypotheses.length > 0 && (
+                          <div>
+                            <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Opportunities</p>
+                            {analysis.hypotheses.opportunityHypotheses.slice(0, 2).map((h, i) => (
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                                <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
+                                <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
