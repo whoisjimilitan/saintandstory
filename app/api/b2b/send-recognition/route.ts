@@ -69,8 +69,15 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
 
-    // Fetch updated lead to return to frontend
+    // Store email sent timestamp for operator memory
     const sql = neon(process.env.DATABASE_URL!);
+    await sql`
+      UPDATE b2b_leads
+      SET email_sent_at = ${new Date().toISOString()}
+      WHERE id = ${lead_id}
+    `;
+
+    // Fetch updated lead to return to frontend
     const [updatedLead] = await sql`
       SELECT * FROM b2b_leads WHERE id = ${lead_id}
     `;

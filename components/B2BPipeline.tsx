@@ -673,6 +673,31 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             )}
           </div>
 
+          {/* Prospect Memory / Continuity Card - shows operator what prospect experienced */}
+          {(lead.email_sent_at || lead.confirmed_at) && (
+            <div className="border-l-2 border-gray-300 p-4 mb-4 bg-gray-50 rounded-lg space-y-2">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-gray-600 mb-2">Prospect Memory</p>
+
+              {lead.email_sent_at && (
+                <p className="text-[10px] text-gray-700 leading-relaxed">
+                  <span className="font-semibold">Email sent:</span> {new Date(lead.email_sent_at as string).toLocaleDateString()} {new Date(lead.email_sent_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} → {lead.pain_point || 'prospect need'}
+                </p>
+              )}
+
+              {lead.confirmed_at && (
+                <p className="text-[10px] text-gray-700 leading-relaxed">
+                  <span className="font-semibold">Prospect validated:</span> {new Date(lead.confirmed_at as string).toLocaleDateString()} {new Date(lead.confirmed_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} → Yes
+                </p>
+              )}
+
+              {(soForm.pickup_postcode || soForm.delivery_postcode || soForm.day_of_week || soForm.price) && (
+                <p className="text-[10px] text-gray-700 leading-relaxed">
+                  <span className="font-semibold">Standing order:</span> {lead.pain_point || 'prospect need'} {soForm.day_of_week && `| Every ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][parseInt(soForm.day_of_week) - 1]}`} {soForm.price && `| £${soForm.price}`}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Suggested Opening - recognition/relief/trust layer for operator */}
           {hasPainPoint && (
             <div className={`border-l-4 border-l-[#2ECC71] bg-[#E8F5E9] rounded-lg p-5 mb-4 space-y-3 transition-colors duration-300`}>
