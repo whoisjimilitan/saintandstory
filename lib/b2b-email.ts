@@ -81,22 +81,49 @@ const PAIN_TEMPLATES = [
 
 // RELIEF-LAYER TEMPLATES: Recognition + Relief + Trust + Action
 // These create understanding (recognition), acknowledge burden (relief), build trust, and invite conversation
+// Mobile-first: 60 chars per line max, line breaks for breathing room
 const RELIEF_TEMPLATES = [
   (ctx: EmailContext, jobs: number) =>
-    `One thing that stood out about ${ctx.businessName}: customers mention ${ctx.painPointImplication || "delivery timing"}. ${
-      ctx.painPointImplication
-        ? `Businesses like yours often end up managing that personally. `
-        : ``
-    }We've built our process around removing that pressure. Quick question — is that something you're dealing with? ${ctx.landingPageUrl}`,
+    `One thing that stood out about ${ctx.businessName}: customers mention ${ctx.painPointImplication || "delivery timing"}.
+
+${ctx.painPointImplication ? `Businesses like yours often end up managing that personally when volume peaks.
+
+` : ``}We've built our process around removing that pressure.
+
+Quick question — is that something you're dealing with?
+
+${ctx.landingPageUrl}`,
 
   (ctx: EmailContext, jobs: number) =>
-    `This might sound familiar: ${ctx.businessName}'s customers value ${ctx.painPointImplication || "reliability"}. And when you grow, that becomes something you coordinate personally. We handle exactly that for ${ctx.category} businesses. Worth exploring? ${ctx.landingPageUrl}`,
+    `This might sound familiar. ${ctx.businessName}'s customers value ${ctx.painPointImplication || "reliability"}.
+
+And when you grow, that becomes something you coordinate personally.
+
+We handle exactly that for ${ctx.category} businesses.
+
+Worth exploring?
+
+${ctx.landingPageUrl}`,
 
   (ctx: EmailContext, jobs: number) =>
-    `One thing that stood out from customer reviews at ${ctx.businessName} — they consistently mention ${ctx.painPointImplication || "timing"} as critical. Businesses like yours find that's what ends up on your plate personally. We've solved this for ${jobs}+ deliveries. Quick question — does that resonate? ${ctx.landingPageUrl}`,
+    `One thing that stood out from customer reviews at ${ctx.businessName} — they consistently mention ${ctx.painPointImplication || "timing"} as critical.
+
+Businesses like yours find that's what ends up on your plate personally.
+
+We've solved this for ${jobs}+ deliveries. Quick question — does that resonate?
+
+${ctx.landingPageUrl}`,
 
   (ctx: EmailContext, jobs: number) =>
-    `Customers of ${ctx.businessName} are clear about what matters: ${ctx.painPointImplication || "delivery reliability"}}. The challenge most businesses face: as volume grows, that becomes something you manage personally. We remove that layer. Worth a conversation? ${ctx.landingPageUrl}`,
+    `Customers of ${ctx.businessName} are clear about what matters: ${ctx.painPointImplication || "delivery reliability"}.
+
+The challenge most businesses face: as volume grows, that becomes something you manage personally.
+
+We remove that layer.
+
+Worth a conversation?
+
+${ctx.landingPageUrl}`,
 ];
 
 function hashString(str: string): number {
