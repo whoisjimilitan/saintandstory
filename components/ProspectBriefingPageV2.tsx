@@ -749,6 +749,20 @@ export default function ProspectBriefingPage({
         </section>
       )}
 
+      {enrichedBrief && briefMetadata?.painPoint && (
+        <section className="py-24 px-6 bg-[#F5F5F5] border-b border-[#E8E8E8]">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
+              One thing that stood out
+            </p>
+
+            <p className="text-[#0D0D0D] text-lg leading-relaxed font-sans">
+              Your customers mention {briefMetadata.painPoint.toLowerCase()}. That's what matters most to businesses like {business.name}. When this gets solved, everything else becomes easier.
+            </p>
+          </div>
+        </section>
+      )}
+
       <section className="py-24 px-6 bg-white border-b border-[#E8E8E8]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#333333] text-lg font-semibold uppercase tracking-[0.2em] mb-12 font-display">
