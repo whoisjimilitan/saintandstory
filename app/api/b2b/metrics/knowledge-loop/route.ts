@@ -28,13 +28,12 @@ export async function GET(request: NextRequest) {
     // METRIC 1: Knowledge Capture Adoption
     const adoptionData = await sql`
       SELECT
-        COUNT(*) FILTER (WHERE array_length(human_observations, 1) > 0)::float /
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0)::float /
         NULLIF(COUNT(*), 0)::float * 100 as adoption_rate,
-        COUNT(*) FILTER (WHERE array_length(human_observations, 1) > 0) as leads_with_observations,
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0) as leads_with_observations,
         COUNT(*) as total_leads
       FROM b2b_leads
-      WHERE lead_state = 'self_confirmed'
-        AND created_at >= DATE_TRUNC('month', NOW())
+      WHERE created_at >= DATE_TRUNC('month', NOW())
     `;
 
     // METRIC 2: Standing Order Operational Completeness
@@ -62,13 +61,12 @@ export async function GET(request: NextRequest) {
     // METRIC 4: Observation Usage
     const observationData = await sql`
       SELECT
-        AVG(array_length(human_observations, 1))::float as avg_observations,
-        COUNT(*) FILTER (WHERE array_length(human_observations, 1) > 0) as leads_with_observations,
+        AVG(array_length(human_observations, 1)) FILTER (WHERE human_observations IS NOT NULL)::float as avg_observations,
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0) as leads_with_observations,
         COUNT(*) as total_leads,
         MAX((human_observations)[array_length(human_observations, 1)]->>'recorded_at') as latest_observation_time
       FROM b2b_leads
-      WHERE lead_state = 'self_confirmed'
-        AND created_at >= DATE_TRUNC('month', NOW())
+      WHERE created_at >= DATE_TRUNC('month', NOW())
     `;
 
     // METRIC 5: Revenue Flow Completeness

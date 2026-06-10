@@ -503,11 +503,13 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 )}
               </div>
             ) : (
-              // Discovered leads: show semantic signal label
-              <div className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>
-                <p className="font-medium">{getLeadSignalLabel(lead)}</p>
-                <p className={`text-xs mt-1 transition-colors duration-300 text-[#888888]`}>
-                  {scoreBreakdown.total === 20 ? "No pain signals detected yet" : `Score: ${scoreLabel}`}
+              // Discovered leads: show semantic signal label with context
+              <div className={`text-sm transition-colors duration-300`}>
+                <p className="font-semibold text-[#0D0D0D]">{getLeadSignalLabel(lead)}</p>
+                <p className={`text-xs mt-2 transition-colors duration-300 text-[#888888]`}>
+                  {hasPainPoint
+                    ? "This business mentioned delivery/logistics friction in customer reviews."
+                    : "No negative reviews detected. Baseline discovery opportunity."}
                 </p>
               </div>
             )}
