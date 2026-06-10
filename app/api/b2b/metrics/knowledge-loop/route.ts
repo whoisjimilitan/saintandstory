@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     const revenueData = await sql`
       SELECT
         COUNT(DISTINCT so.id)::float as total_standing_orders,
-        COUNT(DISTINCT CASE WHEN j.id IS NOT NULL THEN j.id END)::float as orders_with_jobs,
+        COUNT(DISTINCT CASE WHEN j.id IS NOT NULL THEN so.id END)::float as orders_with_jobs,
         COUNT(DISTINCT CASE WHEN j.status = 'completed' THEN j.id END)::float as completed_jobs,
         COUNT(DISTINCT CASE WHEN j.status = 'cancelled' THEN j.id END)::float as cancelled_jobs
       FROM b2b_standing_orders so
