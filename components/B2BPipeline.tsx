@@ -121,6 +121,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [recordingObservation, setRecordingObservation] = useState(false);
   const [showHypotheses, setShowHypotheses] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [editingEmail, setEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(lead.email || "");
   const [savingEmail, setSavingEmail] = useState(false);
@@ -275,7 +276,34 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     onRefresh();
   }
 
+  function validateStandingOrder(): boolean {
+    const errors: Record<string, string> = {};
+
+    if (!soForm.pickup_postcode || !soForm.pickup_postcode.trim()) {
+      errors.pickup_postcode = "Pickup postcode required for job routing";
+    }
+
+    if (!soForm.delivery_postcode || !soForm.delivery_postcode.trim()) {
+      errors.delivery_postcode = "Delivery postcode required for job routing";
+    }
+
+    if (!soForm.preferred_time || !soForm.preferred_time.trim()) {
+      errors.preferred_time = "Preferred time required";
+    }
+
+    if (!soForm.price) {
+      errors.price = "Price required";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
   async function createStandingOrder() {
+    if (!validateStandingOrder()) {
+      return;
+    }
+
     await fetch("/api/b2b/standing-orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -848,12 +876,38 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#888888] mb-2">Service locations (from prospect)</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Pickup postcode</label>
-                    <input type="text" value={soForm.pickup_postcode} onChange={e => setSoForm(f => ({ ...f, pickup_postcode: e.target.value }))} placeholder="e.g. SW1A 1AA" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Pickup postcode <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={soForm.pickup_postcode}
+                      onChange={e => setSoForm(f => ({ ...f, pickup_postcode: e.target.value }))}
+                      placeholder="e.g. SW1A 1AA"
+                      className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
+                        validationErrors.pickup_postcode
+                          ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                      }`}
+                    />
+                    {validationErrors.pickup_postcode && (
+                      <p className="text-[9px] text-red-500 mt-1">{validationErrors.pickup_postcode}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Delivery postcode</label>
-                    <input type="text" value={soForm.delivery_postcode} onChange={e => setSoForm(f => ({ ...f, delivery_postcode: e.target.value }))} placeholder="e.g. N1 1AA" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                    <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Delivery postcode <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={soForm.delivery_postcode}
+                      onChange={e => setSoForm(f => ({ ...f, delivery_postcode: e.target.value }))}
+                      placeholder="e.g. N1 1AA"
+                      className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
+                        validationErrors.delivery_postcode
+                          ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                      }`}
+                    />
+                    {validationErrors.delivery_postcode && (
+                      <p className="text-[9px] text-red-500 mt-1">{validationErrors.delivery_postcode}</p>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-2">
@@ -863,8 +917,29 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </div>
 
               <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+
+              {Object.keys(validationErrors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <p className="text-[9px] font-semibold text-red-700 uppercase tracking-[0.5px]">Cannot submit standing order</p>
+                  <ul className="text-[10px] text-red-600 mt-2 space-y-1">
+                    {Object.values(validationErrors).map((error, i) => (
+                      <li key={i}>• {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="flex gap-2 pt-1">
-                <button onClick={createStandingOrder} className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white">
+                <button
+                  onClick={createStandingOrder}
+                  disabled={!soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim()}
+                  title={!soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim() ? "Postcodes required before standing order can be created" : ""}
+                  className={`font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 ${
+                    !soForm.pickup_postcode?.trim() || !soForm.delivery_postcode?.trim()
+                      ? 'bg-[#CCC] text-[#666] cursor-not-allowed opacity-50'
+                      : 'bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white'
+                  }`}
+                >
                   Create
                 </button>
                 <button onClick={() => setShowStandingOrder(false)} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">Back</button>
