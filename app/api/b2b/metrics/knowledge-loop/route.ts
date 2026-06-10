@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
     // METRIC 1: Knowledge Capture Adoption
     const adoptionData = await sql`
       SELECT
-        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0)::float /
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND jsonb_array_length(human_observations) > 0)::float /
         NULLIF(COUNT(*), 0)::float * 100 as adoption_rate,
-        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0) as leads_with_observations,
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND jsonb_array_length(human_observations) > 0) as leads_with_observations,
         COUNT(*) as total_leads
       FROM b2b_leads
       WHERE created_at >= DATE_TRUNC('month', NOW())
@@ -61,10 +61,10 @@ export async function GET(request: NextRequest) {
     // METRIC 4: Observation Usage
     const observationData = await sql`
       SELECT
-        AVG(array_length(human_observations, 1)) FILTER (WHERE human_observations IS NOT NULL)::float as avg_observations,
-        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND array_length(human_observations, 1) > 0) as leads_with_observations,
+        AVG(jsonb_array_length(human_observations)) FILTER (WHERE human_observations IS NOT NULL)::float as avg_observations,
+        COUNT(*) FILTER (WHERE human_observations IS NOT NULL AND jsonb_array_length(human_observations) > 0) as leads_with_observations,
         COUNT(*) as total_leads,
-        MAX((human_observations)[array_length(human_observations, 1)]->>'recorded_at') as latest_observation_time
+        MAX((human_observations->>(jsonb_array_length(human_observations)-1))->>'recorded_at') as latest_observation_time
       FROM b2b_leads
       WHERE created_at >= DATE_TRUNC('month', NOW())
     `;
