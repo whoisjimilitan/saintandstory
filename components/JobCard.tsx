@@ -306,9 +306,10 @@ export default function JobCard({
         <div className="border-t border-[#E8E8E8] pt-4">
           <button
             onClick={onToggleExpand}
-            className="text-[#888888] hover:text-[#0D0D0D] text-xs font-medium transition-colors"
+            className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-between px-4"
           >
-            {isExpanded ? "Hide details ↑" : "Show details ↓"}
+            <span>{isExpanded ? "Hide details" : "Show details"}</span>
+            <span className="text-xs">{isExpanded ? "↑" : "↓"}</span>
           </button>
         </div>
       )}
