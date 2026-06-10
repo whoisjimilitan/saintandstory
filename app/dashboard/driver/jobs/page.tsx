@@ -203,6 +203,7 @@ export default async function JobsPage() {
         <JobsFeed
           driverId={driver?.id ?? null}
           myJobs={myJobs as Record<string, unknown>[]}
+          driverName={driver?.full_name}
         />
       )}
     </div>

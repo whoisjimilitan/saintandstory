@@ -41,7 +41,7 @@ export default async function ActiveJobsPage() {
           Y<span className="font-display italic font-normal">o</span>ur jobs.
         </h1>
       </div>
-      <ActiveJobsList jobs={activeJobs as any[]} driverId={driver?.id ?? null} />
+      <ActiveJobsList jobs={activeJobs as any[]} driverId={driver?.id ?? null} driverName={driver?.full_name} />
     </div>
   );
 }

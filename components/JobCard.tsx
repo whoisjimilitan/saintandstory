@@ -20,6 +20,14 @@ const STATUS_STYLE: Record<string, string> = {
   cancelled: "bg-[#F5F5F5] text-[#888888] border border-[#E8E8E8]",
 };
 
+const STATUS_COLORS: Record<string, Record<string, string>> = {
+  offered: { offered: "bg-blue-500", confirmed: "bg-[#E8E8E8]", in_progress: "bg-[#E8E8E8]", completed: "bg-[#E8E8E8]" },
+  confirmed: { offered: "bg-blue-500", confirmed: "bg-green-500", in_progress: "bg-[#E8E8E8]", completed: "bg-[#E8E8E8]" },
+  in_progress: { offered: "bg-blue-500", confirmed: "bg-green-500", in_progress: "bg-orange-500", completed: "bg-[#E8E8E8]" },
+  completed: { offered: "bg-blue-500", confirmed: "bg-green-500", in_progress: "bg-orange-500", completed: "bg-purple-500" },
+  cancelled: { offered: "bg-blue-500", confirmed: "bg-[#E8E8E8]", in_progress: "bg-[#E8E8E8]", completed: "bg-[#E8E8E8]" },
+};
+
 export default function JobCard({
   job,
   onAccept,
@@ -36,6 +44,7 @@ export default function JobCard({
   onDispatchComplete,
   onDispatchCancel,
   driverId,
+  driverName,
 }: {
   job: Record<string, unknown>;
   onAccept?: () => void;
@@ -66,9 +75,11 @@ export default function JobCard({
   onDispatchComplete?: (jobId: string) => Promise<void>;
   onDispatchCancel?: (jobId: string) => Promise<void>;
   driverId?: string;
+  driverName?: string;
 }) {
   const status = (job.status as string) ?? "offered";
   const isOffered = status === "offered";
+  const colors = STATUS_COLORS[status] || STATUS_COLORS.offered;
 
   return (
     <div className={`rounded-2xl p-5 border ${isOffered ? "bg-[#0D0D0D] border-[#0D0D0D]" : "bg-white border-[#E8E8E8]"}`}>
@@ -237,19 +248,19 @@ export default function JobCard({
             <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Status Progress</p>
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${status === "offered" || ["confirmed", "in_progress", "completed"].includes(status) ? "bg-[#888888]" : "bg-[#E8E8E8]"}`} />
+                <span className={`w-2 h-2 rounded-full ${colors.offered}`} />
                 <span className="text-[#888888]">Offered</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${status === "confirmed" || ["in_progress", "completed"].includes(status) ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"}`} />
+                <span className={`w-2 h-2 rounded-full ${colors.confirmed}`} />
                 <span className="text-[#888888]">Confirmed</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${status === "in_progress" || status === "completed" ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"}`} />
+                <span className={`w-2 h-2 rounded-full ${colors.in_progress}`} />
                 <span className="text-[#888888]">In Progress</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${status === "completed" ? "bg-[#888888]" : "bg-[#E8E8E8]"}`} />
+                <span className={`w-2 h-2 rounded-full ${colors.completed}`} />
                 <span className="text-[#888888]">Completed</span>
               </div>
             </div>
@@ -266,10 +277,10 @@ export default function JobCard({
             </div>
           )}
 
-          {/* Admin Contact (Phase 1: placeholder) */}
+          {/* Driver Name */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Assigned By</p>
-            <p className="text-[#888888] text-xs">(Phase 1: Admin contact will display here)</p>
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#888888] mb-2">Assigned To</p>
+            <p className="text-[#0D0D0D] text-sm font-medium">{driverName ? driverName.split(" ")[0] : "—"}</p>
           </div>
 
           {/* Admin: Dispatch Controls (Phase 2) */}

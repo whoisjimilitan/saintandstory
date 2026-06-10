@@ -8,9 +8,10 @@ type Tab = "offered" | "active" | "done";
 interface Props {
   driverId: string | null;
   myJobs: Record<string, unknown>[];
+  driverName?: string;
 }
 
-export default function JobsFeed({ driverId, myJobs }: Props) {
+export default function JobsFeed({ driverId, myJobs, driverName }: Props) {
   const offered = myJobs.filter(j => j.status === "offered");
   const active = myJobs.filter(j => ["confirmed", "in_progress"].includes(j.status as string));
 
@@ -116,6 +117,7 @@ export default function JobsFeed({ driverId, myJobs }: Props) {
             onUpdateStatus={tab === "active" ? (s) => updateStatus(job.id as string, s) : undefined}
             responding={responding === (job.id as string)}
             updating={updating === (job.id as string)}
+            driverName={driverName}
           />
         ))}
       </div>

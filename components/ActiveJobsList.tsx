@@ -36,10 +36,11 @@ interface Job {
 interface Props {
   jobs: Job[];
   driverId: string | null;
+  driverName?: string;
   onStatusUpdate?: (jobId: string, newStatus: string) => Promise<void>;
 }
 
-export default function ActiveJobsList({ jobs, driverId, onStatusUpdate }: Props) {
+export default function ActiveJobsList({ jobs, driverId, driverName, onStatusUpdate }: Props) {
   // Filter to confirmed + in_progress only
   const activeJobs = jobs.filter(
     (j) => j.status === "confirmed" || j.status === "in_progress"
@@ -90,6 +91,7 @@ export default function ActiveJobsList({ jobs, driverId, onStatusUpdate }: Props
                   : undefined
               }
               updating={updating === job.id}
+              driverName={driverName}
             />
             {expandedJobId === job.id && (
               <div className="bg-white border border-[#E8E8E8] rounded-2xl p-5">
