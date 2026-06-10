@@ -47,9 +47,20 @@ export async function GET() {
       WHERE created_at >= DATE_TRUNC('month', NOW())
     `;
 
+    // Driver-triggered discovery metrics
+    const driverData = await sql`
+      SELECT
+        COUNT(DISTINCT driver_id) as total_drivers,
+        COUNT(*) FILTER (WHERE driver_id IS NOT NULL) as leads_discovered_by_drivers,
+        COUNT(*) FILTER (WHERE driver_id IS NOT NULL AND email_sent_at IS NOT NULL) as emails_sent_by_drivers
+      FROM b2b_leads
+      WHERE created_at >= DATE_TRUNC('month', NOW())
+    `;
+
     const leads_result = leadsData[0] as any || { total_leads: 0, leads_with_pain: 0 };
     const so_result = standaloneOrdersData[0] as any || { total_standing_orders: 0 };
     const jobs_result = jobsData[0] as any || { total_jobs: 0 };
+    const driver_result = driverData[0] as any || { total_drivers: 0, leads_discovered_by_drivers: 0, emails_sent_by_drivers: 0 };
 
     const leads_discovered = Number(leads_result.total_leads || 0);
     const leads_with_pain = Number(leads_result.leads_with_pain || 0);
@@ -60,6 +71,10 @@ export async function GET() {
     const avg_pain_penetration = leads_discovered > 0
       ? Math.round((leads_with_pain / leads_discovered) * 100)
       : 0;
+
+    const drivers_active = Number(driver_result.total_drivers || 0);
+    const leads_by_drivers = Number(driver_result.leads_discovered_by_drivers || 0);
+    const emails_sent = Number(driver_result.emails_sent_by_drivers || 0);
 
     return NextResponse.json({
       timestamp: new Date().toISOString(),
@@ -89,6 +104,23 @@ export async function GET() {
           value: jobs_generated,
           target: "1+",
           status: jobs_generated >= 1 ? "success" : "pending"
+        },
+        drivers_active: {
+          value: drivers_active,
+          target: "1+",
+          status: drivers_active >= 1 ? "success" : "pending"
+        },
+        driver_discovery: {
+          value: leads_by_drivers,
+          label: "Leads discovered by drivers",
+          target: "5+",
+          status: leads_by_drivers >= 5 ? "success" : "pending"
+        },
+        driver_emails_sent: {
+          value: emails_sent,
+          label: "Recognition emails sent",
+          target: "5+",
+          status: emails_sent >= 5 ? "success" : "pending"
         }
       }
     });
@@ -102,7 +134,10 @@ export async function GET() {
         leads_with_pain: { value: 0, target: "5+", status: "pending" },
         pain_penetration: { value: 0, unit: "%", target: "50%+", status: "pending" },
         standing_orders: { value: 0, target: "2+", status: "pending" },
-        jobs_generated: { value: 0, target: "1+", status: "pending" }
+        jobs_generated: { value: 0, target: "1+", status: "pending" },
+        drivers_active: { value: 0, target: "1+", status: "pending" },
+        driver_discovery: { value: 0, label: "Leads discovered by drivers", target: "5+", status: "pending" },
+        driver_emails_sent: { value: 0, label: "Recognition emails sent", target: "5+", status: "pending" }
       }
     });
   }
