@@ -189,7 +189,7 @@ export default async function DriverDashboardHome() {
                   <p className="text-[#888888] text-xs mb-2">
                     <span className="font-semibold text-[#0D0D0D]">Active</span> • {driver.postcode} • {driver.radius_miles || 10}mi
                   </p>
-                  <Link href="/dashboard/driver/b2b" className="text-[#0D0D0D] text-xs inline-flex items-center gap-1 hover:underline font-semibold">
+                  <Link href="/dashboard/driver/lsw" className="text-[#0D0D0D] text-xs inline-flex items-center gap-1 hover:underline font-semibold">
                     View →
                   </Link>
                 </>
