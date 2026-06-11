@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -27,6 +28,7 @@ export default function AvailabilityCalendar({ driverId, initialDates }: Props) 
   const [month, setMonth] = useState(today.getMonth());
   const [selected, setSelected] = useState<Set<string>>(new Set(initialDates));
   const [saving, setSaving] = useState<string | null>(null);
+  const [saved, setSaved] = useState<Set<string>>(new Set());
 
   const { offset, daysInMonth } = getMonthDays(year, month);
   const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
@@ -60,6 +62,16 @@ export default function AvailabilityCalendar({ driverId, initialDates }: Props) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId, date: dateStr }),
       });
+
+      // Show success indicator for 1.5s
+      setSaved(prev => new Set([...prev, dateStr]));
+      setTimeout(() => {
+        setSaved(prev => {
+          const next = new Set(prev);
+          next.delete(dateStr);
+          return next;
+        });
+      }, 1500);
     } catch {
       // revert on failure
       setSelected(prev => {
@@ -106,13 +118,14 @@ export default function AvailabilityCalendar({ driverId, initialDates }: Props) 
           const isSelected = selected.has(dateStr);
           const isToday = dateStr === todayStr;
           const isSaving = saving === dateStr;
+          const justSaved = saved.has(dateStr);
 
           return (
             <button
               key={dateStr}
               onClick={() => toggleDate(dateStr)}
               disabled={isPast || isSaving}
-              className={`aspect-square flex items-center justify-center rounded-full text-sm font-medium transition-all ${
+              className={`aspect-square flex items-center justify-center rounded-full text-sm font-medium transition-all relative ${
                 isPast
                   ? "text-[#E8E8E8] cursor-not-allowed"
                   : isSelected
@@ -120,9 +133,13 @@ export default function AvailabilityCalendar({ driverId, initialDates }: Props) 
                   : isToday
                   ? "border-2 border-[#0D0D0D] text-[#0D0D0D] hover:bg-[#F5F5F5]"
                   : "text-[#0D0D0D] hover:bg-[#F5F5F5]"
-              } ${isSaving ? "opacity-50" : ""}`}
+              } ${isSaving ? "opacity-50" : ""} ${justSaved ? "ring-2 ring-[#0D0D0D] ring-offset-1" : ""}`}
             >
-              {day}
+              {justSaved && isSelected ? (
+                <Check size={16} strokeWidth={3} />
+              ) : (
+                day
+              )}
             </button>
           );
         })}
