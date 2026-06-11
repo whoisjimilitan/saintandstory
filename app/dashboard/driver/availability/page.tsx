@@ -32,7 +32,7 @@ export default async function AvailabilityPage() {
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
         When are y<span className="font-display italic font-normal">o</span>u free?
       </h1>
-      <p className="text-[#888888] text-sm mb-8">Tap a date to mark yourself available. Customers in your area will see you on those days.</p>
+      <p className="text-[#888888] text-sm mb-8">Tap a date to mark yourself available. Our customers get your profile on those days.</p>
 
       {driverId ? (
         <AvailabilityCalendar driverId={driverId} initialDates={dates} />
