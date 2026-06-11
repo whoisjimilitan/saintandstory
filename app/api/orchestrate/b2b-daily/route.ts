@@ -71,11 +71,11 @@ export async function POST(req: NextRequest) {
           ${result.stages.driverMatching.succeeded},
           ${result.stages.standingOrders.created},
           ${result.stages.standingOrders.created},
-          ${JSON.stringify([
+          ${[
             ...result.stages.discovery.errors,
             ...result.stages.driverMatching.failed,
             ...result.stages.standingOrders.failed,
-          ])}
+          ]}
         )
       `;
     } catch (logError) {
