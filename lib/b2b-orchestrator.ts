@@ -1,0 +1,305 @@
+/**
+ * B2B Daily Orchestration Service
+ *
+ * Coordinates autonomous execution of all B2B discovery and fulfillment processes.
+ * Does NOT implement business logic - calls existing proven functions only.
+ * Failure-isolated: each stage can fail independently without stopping others.
+ * Fully idempotent: designed to be safely run multiple times.
+ */
+
+import { runDiscoveryPipeline } from "./discovery/pipeline";
+import { neon } from "@neondatabase/serverless";
+import { OrchestrationLogger } from "./orchestration-logger";
+import type { Driver } from "./b2b-types";
+
+// Lazy-load recognition to avoid initialization errors from Resend
+let triggerDriverLeadDiscovery: any;
+
+/**
+ * Configured discovery parameters
+ * These are the niche/location combinations the system discovers
+ */
+const DISCOVERY_PARAMS = [
+  { niche: "florists", location: "london" },
+  { niche: "florists", location: "manchester" },
+  { niche: "florists", location: "sheffield" },
+  { niche: "accountants", location: "london" },
+  { niche: "accountants", location: "manchester" },
+];
+
+interface OrchestrationResult {
+  success: boolean;
+  executionId: string;
+  timestamp: string;
+  stages: {
+    discovery: { count: number; skipped: number; errors: string[] };
+    driverMatching: { attempted: number; succeeded: number; failed: string[] };
+    standingOrders: { created: number; failed: string[] };
+    metrics: { calculated: boolean };
+  };
+  totalDurationMs: number;
+}
+
+export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
+  const logger = new OrchestrationLogger();
+  const sql = neon(process.env.DATABASE_URL!);
+
+  const result: OrchestrationResult = {
+    success: false,
+    executionId: "",
+    timestamp: new Date().toISOString(),
+    stages: {
+      discovery: { count: 0, skipped: 0, errors: [] },
+      driverMatching: { attempted: 0, succeeded: 0, failed: [] },
+      standingOrders: { created: 0, failed: [] },
+      metrics: { calculated: false },
+    },
+    totalDurationMs: 0,
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // STAGE 1: DISCOVERY PIPELINE
+  // ─────────────────────────────────────────────────────────────
+  const stage1Runner = logger.startStage("Discovery Pipeline").start();
+
+  try {
+    let totalDiscovered = 0;
+    let totalStored = 0;
+    const errors: string[] = [];
+
+    for (const { niche, location } of DISCOVERY_PARAMS) {
+      try {
+        console.log(`  → Discovering ${niche} in ${location}`);
+        const discoveryResult = await runDiscoveryPipeline({
+          niche,
+          location,
+        });
+
+        totalDiscovered += discoveryResult.discovered;
+        totalStored += discoveryResult.stored;
+        console.log(`    ✓ Stored ${discoveryResult.stored} new businesses`);
+      } catch (err) {
+        const errorMsg = `${niche} @ ${location}: ${err instanceof Error ? err.message : String(err)}`;
+        errors.push(errorMsg);
+        console.error(`    ✗ ${errorMsg}`);
+      }
+    }
+
+    stage1Runner.success(totalDiscovered, totalStored, errors);
+    result.stages.discovery = {
+      count: totalStored,
+      skipped: totalDiscovered - totalStored,
+      errors,
+    };
+  } catch (err) {
+    stage1Runner.failure(
+      err instanceof Error ? err.message : String(err)
+    );
+    result.stages.discovery.errors.push(
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // STAGE 2: DRIVER MATCHING & RECOGNITION
+  // ─────────────────────────────────────────────────────────────
+  const stage2Runner = logger.startStage("Driver Matching").start();
+
+  try {
+    // Lazy-load recognition email module
+    if (!triggerDriverLeadDiscovery) {
+      const module = await import("./recognition-email");
+      triggerDriverLeadDiscovery = module.triggerDriverLeadDiscovery;
+    }
+
+    const drivers = (await sql`
+      SELECT id, name, email, postcode, latitude, longitude, radius_miles
+      FROM drivers
+      WHERE b2b_opt_in = true
+    `) as Driver[];
+
+    console.log(`  → Found ${drivers.length} B2B opt-in drivers`);
+
+    let succeeded = 0;
+    const failed: string[] = [];
+
+    for (const driver of drivers) {
+      try {
+        console.log(`  → Matching for ${driver.name}`);
+        const matchResult = await triggerDriverLeadDiscovery(driver);
+
+        if (matchResult.emailsSent && matchResult.emailsSent > 0) {
+          succeeded++;
+          console.log(
+            `    ✓ Sent ${matchResult.emailsSent} recognition emails`
+          );
+        } else {
+          console.log(`    ℹ No nearby leads found`);
+        }
+      } catch (err) {
+        const errorMsg = `Driver ${driver.id}: ${err instanceof Error ? err.message : String(err)}`;
+        failed.push(errorMsg);
+        console.error(`    ✗ ${errorMsg}`);
+      }
+    }
+
+    stage2Runner.success(drivers.length, succeeded, failed);
+    result.stages.driverMatching = {
+      attempted: drivers.length,
+      succeeded,
+      failed,
+    };
+  } catch (err) {
+    stage2Runner.failure(
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // STAGE 3: STANDING ORDER PROCESSING & JOB GENERATION
+  // ─────────────────────────────────────────────────────────────
+  const stage3Runner = logger.startStage("Standing Order Processing").start();
+
+  try {
+    // Get standing orders that need job generation
+    const orders = (await sql`
+      SELECT id, business_name, next_scheduled_at
+      FROM b2b_standing_orders
+      WHERE active = true
+        AND (next_scheduled_at IS NULL OR next_scheduled_at <= NOW())
+    `) as Array<{
+      id: string;
+      business_name: string;
+      next_scheduled_at: string | null;
+    }>;
+
+    console.log(`  → Found ${orders.length} standing orders due for processing`);
+
+    let created = 0;
+    const errors: string[] = [];
+
+    for (const order of orders) {
+      try {
+        // Get full order details for job creation
+        const fullOrderResult = await sql`
+          SELECT * FROM b2b_standing_orders WHERE id = ${order.id}
+        `;
+
+        if (fullOrderResult.length === 0) {
+          throw new Error("Order not found");
+        }
+
+        const fullOrder = fullOrderResult[0] as Record<string, unknown>;
+        const pickupPostcode = fullOrder.pickup_postcode as string | null;
+        const deliveryPostcode = fullOrder.delivery_postcode as string | null;
+
+        if (!pickupPostcode?.trim() || !deliveryPostcode?.trim()) {
+          errors.push(
+            `${order.id}: Missing routing postcode (pickup: ${pickupPostcode || "null"}, delivery: ${deliveryPostcode || "null"})`
+          );
+          console.log(
+            `    ⚠ Skipped ${order.business_name} - missing postcode`
+          );
+          continue;
+        }
+
+        // Create job
+        const reference = `B2B-${Date.now().toString(36).toUpperCase()}`;
+        const trackingToken = Math.random().toString(36).substring(2, 15);
+
+        await sql`
+          INSERT INTO jobs (
+            id, customer_name, customer_email, customer_phone,
+            service_type, postcode_from, postcode_to, status, reference,
+            price, notes, timeframe, created_at, updated_at, tracking_token
+          ) VALUES (
+            gen_random_uuid(),
+            ${fullOrder.business_name as string},
+            ${(fullOrder.contact_email as string) || null},
+            ${(fullOrder.contact_phone as string) || null},
+            ${(fullOrder.service_type as string) || "Standing order"},
+            ${pickupPostcode},
+            ${deliveryPostcode},
+            'pending_review',
+            ${reference},
+            ${(fullOrder.price as number) || null},
+            'Recurring: ' || ${fullOrder.frequency as string},
+            'Standing order',
+            NOW(),
+            NOW(),
+            ${trackingToken}
+          )
+        `;
+
+        // Update next scheduled date
+        const now = new Date();
+        const dayOfWeek = fullOrder.day_of_week as number | null;
+        let nextDate: Date;
+
+        if (dayOfWeek != null) {
+          const diff = (dayOfWeek - now.getDay() + 7) % 7 || 7;
+          nextDate = new Date(now);
+          nextDate.setDate(now.getDate() + diff);
+          nextDate.setHours(9, 0, 0, 0);
+        } else {
+          nextDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        }
+
+        await sql`
+          UPDATE b2b_standing_orders
+          SET last_generated_at = NOW(), next_scheduled_at = ${nextDate.toISOString()}
+          WHERE id = ${order.id}
+        `;
+
+        created++;
+        console.log(`    ✓ Job created for ${order.business_name}`);
+      } catch (err) {
+        const errorMsg = `${order.id}: ${err instanceof Error ? err.message : String(err)}`;
+        errors.push(errorMsg);
+        console.error(`    ✗ ${errorMsg}`);
+      }
+    }
+
+    stage3Runner.success(orders.length, created, errors);
+    result.stages.standingOrders = { created, failed: errors };
+  } catch (err) {
+    stage3Runner.failure(
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // STAGE 4: METRICS CALCULATION
+  // ─────────────────────────────────────────────────────────────
+  const stage4Runner = logger.startStage("Metrics Calculation").start();
+
+  try {
+    // Metrics are calculated on-demand by the dashboard API
+    // This stage just logs that metrics are ready to be refreshed
+    const leadsCount = await sql`SELECT COUNT(*) as count FROM b2b_leads`;
+    const jobsCount = await sql`SELECT COUNT(*) as count FROM jobs`;
+
+    console.log(
+      `  → Leads in system: ${leadsCount[0].count}, Jobs: ${jobsCount[0].count}`
+    );
+
+    stage4Runner.success();
+    result.stages.metrics.calculated = true;
+  } catch (err) {
+    stage4Runner.failure(
+      err instanceof Error ? err.message : String(err)
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // FINAL REPORT
+  // ─────────────────────────────────────────────────────────────
+  const report = logger.generateReport();
+  logger.logReport(report);
+
+  result.success = report.success;
+  result.executionId = report.executionId;
+  result.totalDurationMs = report.summary.totalDurationMs;
+
+  return result;
+}

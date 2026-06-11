@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/orchestrate/b2b-daily",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}
