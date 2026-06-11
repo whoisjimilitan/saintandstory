@@ -33,32 +33,31 @@ export async function POST(req: NextRequest) {
 
     try {
       await sql`
-        CREATE TABLE IF NOT EXISTS b2b_orchestration_runs (
+        CREATE TABLE IF NOT EXISTS b2b_orchestration_logs (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          run_id TEXT NOT NULL UNIQUE,
+          run_id TEXT NOT NULL,
           started_at TIMESTAMPTZ NOT NULL,
           completed_at TIMESTAMPTZ NOT NULL,
-          discovery_count INTEGER DEFAULT 0,
-          businesses_found INTEGER DEFAULT 0,
-          leads_created INTEGER DEFAULT 0,
-          drivers_matched INTEGER DEFAULT 0,
-          emails_sent INTEGER DEFAULT 0,
-          standing_orders_processed INTEGER DEFAULT 0,
-          jobs_created INTEGER DEFAULT 0,
-          failures TEXT[] DEFAULT ARRAY[]::TEXT[],
-          status TEXT NOT NULL CHECK (status IN ('success', 'partial_failure', 'failure')),
-          duration_ms INTEGER,
+          discovery_count INTEGER,
+          businesses_found INTEGER,
+          leads_created INTEGER,
+          drivers_matched INTEGER,
+          emails_sent INTEGER,
+          standing_orders_processed INTEGER,
+          jobs_created INTEGER,
+          failures TEXT[],
+          status TEXT NOT NULL,
           execution_details JSONB,
           created_at TIMESTAMPTZ DEFAULT NOW()
         )
       `;
 
       await sql`
-        INSERT INTO b2b_orchestration_runs (
+        INSERT INTO b2b_orchestration_logs (
           run_id, started_at, completed_at, status, execution_details,
           discovery_count, businesses_found, leads_created,
           drivers_matched, emails_sent, standing_orders_processed,
-          jobs_created, failures, duration_ms
+          jobs_created, failures
         ) VALUES (
           ${result.executionId},
           ${new Date(result.timestamp).toISOString()},
@@ -76,8 +75,7 @@ export async function POST(req: NextRequest) {
             ...result.stages.discovery.errors,
             ...result.stages.driverMatching.failed,
             ...result.stages.standingOrders.failed,
-          ])},
-          ${result.totalDurationMs}
+          ])}
         )
       `;
     } catch (logError) {
