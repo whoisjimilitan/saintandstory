@@ -143,18 +143,81 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
   `;
 
-  // Phase 3: Opportunity Scoring & Discovery Config
+  // Phase 3: Four-Layer Pipeline Architecture
+  // Layer 1: Raw Discoveries (persisted, never discarded)
   await sql`
-    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS opportunity_score DECIMAL(5,2) DEFAULT NULL
+    CREATE TABLE IF NOT EXISTS discovered_businesses (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      google_place_id TEXT UNIQUE,
+      business_name TEXT NOT NULL,
+      address TEXT,
+      postcode TEXT,
+      category TEXT,
+      source TEXT DEFAULT 'discovery', -- discovery, operator_search, csv_upload
+      discovered_at TIMESTAMPTZ DEFAULT NOW(),
+      raw_data JSONB -- full Google Places response
+    )
+  `;
+
+  // Layer 2: Enriched Businesses (intelligence extracted)
+  await sql`
+    CREATE TABLE IF NOT EXISTS enriched_businesses (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      discovered_business_id UUID REFERENCES discovered_businesses(id) ON DELETE CASCADE,
+      google_place_id TEXT REFERENCES discovered_businesses(google_place_id),
+      website TEXT,
+      phone TEXT,
+      email TEXT,
+      review_count INT,
+      average_rating DECIMAL(3,2),
+      review_summary JSONB, -- { pain_points: [], themes: [], sentiment: [] }
+      digital_signals JSONB, -- { has_website, has_contact_form, has_booking, website_quality: score }
+      transport_signals JSONB, -- { keywords_found: [], relevance_score: 0-100 }
+      ai_observations TEXT, -- Claude-generated insights
+      enriched_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Layer 3: Qualified Businesses (scored, ranked, promotion-ready)
+  await sql`
+    CREATE TABLE IF NOT EXISTS qualified_businesses (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      enriched_business_id UUID REFERENCES enriched_businesses(id) ON DELETE CASCADE,
+      discovered_business_id UUID REFERENCES discovered_businesses(id) ON DELETE CASCADE,
+      google_place_id TEXT,
+      opportunity_score DECIMAL(5,2) NOT NULL,
+      score_breakdown JSONB NOT NULL, -- { business_type: 25, maturity: 10, ... }
+      confidence TEXT CHECK (confidence IN ('high', 'medium', 'low')),
+      qualification_reason TEXT,
+      estimated_monthly_value DECIMAL(10,2),
+      qualified_at TIMESTAMPTZ DEFAULT NOW(),
+      promoted_to_lead_at TIMESTAMPTZ,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Layer 3.5: Lead Promotion Status (tracks when/why qualified became lead)
+  await sql`
+    CREATE TABLE IF NOT EXISTS lead_promotions (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      qualified_business_id UUID REFERENCES qualified_businesses(id) ON DELETE CASCADE,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      promoted_at TIMESTAMPTZ DEFAULT NOW(),
+      promotion_reason TEXT,
+      promoted_by TEXT
+    )
+  `;
+
+  // Update b2b_leads to reference the new architecture
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS qualified_business_id UUID REFERENCES qualified_businesses(id)
   `;
   await sql`
-    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS score_breakdown JSONB DEFAULT NULL
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS discovered_business_id UUID REFERENCES discovered_businesses(id)
   `;
   await sql`
-    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS discovery_mode TEXT DEFAULT 'autonomous'
-  `;
-  await sql`
-    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS estimated_monthly_value DECIMAL(10,2) DEFAULT NULL
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS promoted_from_qualified_at TIMESTAMPTZ
   `;
 
   // Discovery configuration (operator-controlled parameters)
@@ -197,15 +260,30 @@ export async function ensureB2BSchema() {
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
 
   // Indexes for performance
+  // b2b_leads
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_status ON b2b_leads(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_lead_state ON b2b_leads(lead_state)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_created ON b2b_leads(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_driver ON b2b_leads(driver_id)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_score ON b2b_leads(opportunity_score DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_qualified_business ON b2b_leads(qualified_business_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_drivers_postcode ON drivers(postcode)`;
+
+  // Four-layer pipeline
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_place_id ON discovered_businesses(google_place_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_postcode ON discovered_businesses(postcode)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_created ON discovered_businesses(discovered_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_enriched_businesses_discovered ON enriched_businesses(discovered_business_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_enriched_businesses_google_place ON enriched_businesses(google_place_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_qualified_businesses_score ON qualified_businesses(opportunity_score DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_qualified_businesses_promoted ON qualified_businesses(promoted_to_lead_at)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_lead_promotions_qualified ON lead_promotions(qualified_business_id)`;
+
+  // Config & jobs
   await sql`CREATE INDEX IF NOT EXISTS idx_discovery_config_niche ON discovery_config(niche)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_status ON postcode_discovery_jobs(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_created ON postcode_discovery_jobs(created_at DESC)`;
+
+  // Other
+  await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_drivers_postcode ON drivers(postcode)`;
 }

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
-import { scoreOpportunity } from "@/lib/lead-scoring";
+import { runFullPipeline } from "@/lib/four-layer-pipeline";
+import type { RawBusinessDiscovery } from "@/lib/four-layer-pipeline";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -185,7 +186,8 @@ async function runDiscoveryJob(
     ];
 
     let totalDiscovered = 0;
-    let leadsCreated = 0;
+    let totalQualified = 0;
+    let totalPromoted = 0;
     const allResults: any[] = [];
 
     for (let i = 0; i < postcodes.length; i++) {
@@ -199,57 +201,39 @@ async function runDiscoveryJob(
         );
 
         for (const result of results) {
-          const score = scoreOpportunity({
-            businessName: result.name,
+          const business: RawBusinessDiscovery = {
+            placeId: result.place_id,
+            name: result.name,
+            address: result.formatted_address || "",
+            postcode,
             category: businessType,
-            reviewCount: result.user_ratings_total || 0,
+            source: "operator_search",
+            reviews: result.reviews?.map((r) => ({
+              rating: r.rating,
+              text: r.text,
+              author: r.author_name,
+              time: r.time,
+            })),
+            website: result.website,
+            phone: result.formatted_phone_number,
             rating: result.rating,
-            hasWebsite: !!result.website,
-          });
+            reviewCount: result.user_ratings_total,
+            rawData: result,
+          };
 
-          totalDiscovered++;
+          // Run four-layer pipeline (discover → enrich → qualify → promote if score >= minScore)
+          const pipelineResult = await runFullPipeline(sql, business, minScore);
 
-          if (score.total >= minScore) {
-            // Check if already exists
-            try {
-              const existing = (await sql`
-                SELECT id FROM b2b_leads WHERE google_place_id = ${result.place_id}
-              `) as Array<any>;
-
-              if (existing.length === 0) {
-                try {
-                  await sql`
-                    INSERT INTO b2b_leads (
-                      business_name, business_category, email, phone, city,
-                      website, google_place_id, opportunity_score, score_breakdown,
-                      discovery_mode, estimated_monthly_value, source, status, niche,
-                      created_at, updated_at
-                    ) VALUES (
-                      ${result.name}, ${businessType}, null, ${result.formatted_phone_number || null},
-                      ${result.formatted_address?.split(",").slice(-2, -1)[0]?.trim() || ""},
-                      ${result.website || null}, ${result.place_id},
-                      ${score.total}, ${JSON.stringify(score.breakdown)},
-                      'operator', ${score.estimatedMonthlyValue},
-                      'discovery_operator', 'new', ${businessType},
-                      NOW(), NOW()
-                    )
-                  `;
-
-                  leadsCreated++;
-                } catch (e) {
-                  console.error("Error creating lead:", e);
-                }
-              }
-            } catch (e) {
-              console.error("Error checking existing lead:", e);
-            }
-          }
+          if (pipelineResult.discovered) totalDiscovered++;
+          if (pipelineResult.qualified) totalQualified++;
+          if (pipelineResult.promoted) totalPromoted++;
 
           allResults.push({
             name: result.name,
-            score: score.total,
             address: result.formatted_address,
-            created: score.total >= minScore && leadsCreated > 0,
+            discovered: pipelineResult.discovered,
+            qualified: pipelineResult.qualified,
+            promoted: pipelineResult.promoted,
           });
         }
       } catch (e) {
@@ -260,7 +244,9 @@ async function runDiscoveryJob(
       try {
         await sql`
           UPDATE postcode_discovery_jobs
-          SET processed_postcodes = ${i + 1}, discoveries_found = ${totalDiscovered}, leads_created = ${leadsCreated}
+          SET processed_postcodes = ${i + 1},
+              discoveries_found = ${totalDiscovered},
+              leads_created = ${totalPromoted}
           WHERE id = ${jobId}
         `;
       } catch (e) {
@@ -271,7 +257,13 @@ async function runDiscoveryJob(
     // Mark job complete
     await sql`
       UPDATE postcode_discovery_jobs
-      SET status = 'completed', completed_at = NOW(), results = ${JSON.stringify(allResults)}
+      SET status = 'completed', completed_at = NOW(),
+          results = ${JSON.stringify({
+            total_discovered: totalDiscovered,
+            total_qualified: totalQualified,
+            total_promoted: totalPromoted,
+            details: allResults,
+          })}
       WHERE id = ${jobId}
     `;
   } catch (error) {
