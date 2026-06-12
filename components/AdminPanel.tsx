@@ -763,9 +763,9 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         <div id="section-orders">
           <button
             onClick={() => setExpandedCustomers(v => !v)}
-            className="w-full flex items-center justify-between mb-3"
+            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D]">
+            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
               Lead{pending.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
@@ -794,9 +794,9 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         <div id="section-awaiting">
           <button
             onClick={() => setExpandedAwaitingDrivers(v => !v)}
-            className="w-full flex items-center justify-between mb-3"
+            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D]">
+            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
               Searching
             </span>
             <div className="flex items-center gap-2">
@@ -825,10 +825,10 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         <div id="section-confirmed">
           <button
             onClick={() => setExpandedConfirmed(v => !v)}
-            className="w-full flex items-center justify-between mb-3"
+            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D]">
-              Confirmed
+            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+              Driving
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -860,9 +860,9 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       <div id="section-fleet">
         <button
           onClick={() => setExpandedFleet(v => !v)}
-          className="w-full flex items-center justify-between mb-3"
+          className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
         >
-          <span className="text-sm font-semibold text-[#0D0D0D]">
+          <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
             Fleet
           </span>
           <div className="flex items-center gap-2">
