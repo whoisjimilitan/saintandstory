@@ -208,7 +208,7 @@ export default async function AdminPage() {
                 s.bold
                   ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
                   : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
-              } text-sm font-medium`}
+              } text-[10px] font-semibold uppercase tracking-[0.2em]`}
             >
               {s.label}
             </a>
