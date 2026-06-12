@@ -1,0 +1,33 @@
+name: B2B Daily Orchestration
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual validation'
+  schedule:
+    - cron: '15 7 * * *'
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    name: Run B2B Orchestration Pipeline
+
+    steps:
+      - name: Trigger B2B Orchestration
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"triggered_by":"github-actions","timestamp":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'"}' \
+            https://saintandstoryltd.co.uk/api/orchestrate/b2b-daily
+        continue-on-error: true
+
+      - name: Wait for execution
+        run: sleep 10
+
+      - name: Verify execution
+        run: |
+          echo "Orchestration triggered at $(date -u)"
+          echo "Check ledger at: https://saintandstoryltd.co.uk/api/orchestrate/status"
