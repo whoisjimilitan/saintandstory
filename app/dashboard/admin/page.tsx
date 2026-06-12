@@ -199,17 +199,19 @@ export default async function AdminPage() {
         Dashboard.
       </h1>
       <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-wrap gap-x-3 gap-y-1">
-          {statLinks.map((s, i) => (
-            <span key={s.href} className="flex items-center gap-3">
-              {i > 0 && <span className="text-[#E8E8E8] text-xs">·</span>}
-              <a
-                href={s.href}
-                className={`text-sm transition-colors hover:text-[#0D0D0D] ${s.bold ? "font-semibold text-[#0D0D0D]" : "text-[#888888]"}`}
-              >
-                {s.label}
-              </a>
-            </span>
+        <div className="flex flex-wrap gap-2">
+          {statLinks.map((s) => (
+            <a
+              key={s.href}
+              href={s.href}
+              className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all ${
+                s.bold
+                  ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
+                  : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
+              } text-sm font-medium`}
+            >
+              {s.label}
+            </a>
           ))}
         </div>
         <IndexNowButton />
