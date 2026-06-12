@@ -97,47 +97,53 @@ export default async function B2BAdminPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
         {stats.warm > 0 && (
           <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Warm Leads</p>
+            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Active Conversations</p>
             <p className="text-2xl font-bold text-[#1A1A1A]">{stats.warm}</p>
           </div>
         )}
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">New</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Uncontacted</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
         </div>
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Closed</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Activated</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{stats.closed}</p>
         </div>
         {stats.inbound > 0 && (
           <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Inbound</p>
+            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Inbound Leads</p>
             <p className="text-2xl font-bold text-[#1A1A1A]">{stats.inbound}</p>
           </div>
         )}
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Standing Orders</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">In-Journey Orders</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{orders.length}</p>
         </div>
       </div>
 
       <div className="mb-16">
         <div className="mb-6">
-          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery & Performance</h2>
-          <p className="text-xs text-[#999999] mt-1">Real-time metrics across your pipeline</p>
+          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Acquisition Pipeline</h2>
+          <p className="text-xs text-[#999999] mt-1">Discovery → enrichment → qualification → activation</p>
         </div>
         <B2BMetricsCards />
       </div>
 
       <div className="mb-16">
         <div className="mb-6">
-          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery Configuration</h2>
-          <p className="text-xs text-[#999999] mt-1">Manage autonomous and research-driven discovery</p>
+          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery Management</h2>
+          <p className="text-xs text-[#999999] mt-1">Configure discovery sources and research missions</p>
         </div>
         <DiscoveryConfig />
       </div>
 
-      <B2BPipeline leads={leads} orders={orders} />
+      <div className="mb-16">
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Opportunities Pipeline</h2>
+          <p className="text-xs text-[#999999] mt-1">Manage conversations, standing orders, and activations</p>
+        </div>
+        <B2BPipeline leads={leads} orders={orders} />
+      </div>
     </div>
   );
 }

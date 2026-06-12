@@ -78,7 +78,7 @@ export function DiscoveryConfig() {
     <div className="space-y-8">
       <div className="bg-white border border-[#E8E8E8] rounded-xl p-8">
         <h3 className="text-sm font-semibold text-[#1A1A1A] mb-6 uppercase tracking-[0.1em] text-[11px]">
-          New Discovery Mission
+          New Acquisition Research
         </h3>
         <div className="space-y-4">
           <div>
@@ -116,11 +116,11 @@ export function DiscoveryConfig() {
 
       <div>
         <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4 uppercase tracking-[0.1em] text-[11px]">
-          Active Missions
+          Active Research
         </h3>
         <div className="space-y-3">
           {configs.length === 0 ? (
-            <p className="text-sm text-[#999999]">No missions yet. Using autonomous defaults.</p>
+            <p className="text-sm text-[#999999]">No research tasks yet. Using autonomous discovery defaults.</p>
           ) : (
             configs.map((config) => (
               <div
