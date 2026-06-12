@@ -8,7 +8,7 @@ on:
         required: false
         default: 'Manual validation'
   schedule:
-    - cron: '15 7 * * *'
+    - cron: '0 2 * * *'
 
 jobs:
   orchestrate:
