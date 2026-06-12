@@ -1466,7 +1466,7 @@ interface DiscoverPanelProps {
 function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: defaultCity }: DiscoverPanelProps): React.ReactElement {
   const [industry, setIndustry] = useState(defaultIndustry || Object.values(B2B_INDUSTRIES)[0][0]);
   const [deliveryType, setDeliveryType] = useState(DELIVERY_TYPES[0]);
-  const [city, setCity] = useState(defaultCity || "Manchester");
+  const [city, setCity] = useState(defaultCity || "London");
   const [running, setRunning] = useState(false);
   const [loadingNewLeads, setLoadingNewLeads] = useState(false);
   const [result, setResult] = useState<{ count: number; added: string[] } | null>(null);

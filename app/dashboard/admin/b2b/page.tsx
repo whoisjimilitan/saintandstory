@@ -94,7 +94,11 @@ export default async function B2BAdminPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Uncontacted</p>
+          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
+        </div>
         {stats.warm > 0 && (
           <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
             <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Active Conversations</p>
@@ -102,21 +106,11 @@ export default async function B2BAdminPage() {
           </div>
         )}
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Uncontacted</p>
-          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
-        </div>
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
           <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Converted</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{stats.closed}</p>
         </div>
-        {stats.inbound > 0 && (
-          <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Inbound Leads</p>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{stats.inbound}</p>
-          </div>
-        )}
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">In-Journey Orders</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Journeys</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{orders.length}</p>
         </div>
       </div>
