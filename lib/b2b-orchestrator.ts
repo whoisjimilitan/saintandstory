@@ -16,16 +16,49 @@ import type { Driver } from "./b2b-types";
 let triggerDriverLeadDiscovery: any;
 
 /**
- * Configured discovery parameters
- * These are the niche/location combinations the system discovers
+ * Phase 3: Dynamic discovery configuration
+ * Loads from discovery_config table (operator-controlled)
+ * Falls back to defaults if no config exists
  */
-const DISCOVERY_PARAMS = [
+const DEFAULT_DISCOVERY_PARAMS = [
   { niche: "florists", location: "london" },
   { niche: "florists", location: "manchester" },
   { niche: "florists", location: "sheffield" },
   { niche: "accountants", location: "london" },
   { niche: "accountants", location: "manchester" },
 ];
+
+async function getDiscoveryParams(
+  sql: any
+): Promise<Array<{ niche: string; location: string }>> {
+  try {
+    const configs = (await sql`
+      SELECT niche, locations, enabled
+      FROM discovery_config
+      WHERE enabled = true
+      ORDER BY priority DESC
+    `) as Array<{ niche: string; locations: string[]; enabled: boolean }>;
+
+    if (!configs || configs.length === 0) {
+      console.log("[orchestration] No discovery_config found, using defaults");
+      return DEFAULT_DISCOVERY_PARAMS;
+    }
+
+    const params: Array<{ niche: string; location: string }> = [];
+    for (const config of configs) {
+      const locations = config.locations || [];
+      for (const location of locations) {
+        params.push({ niche: config.niche, location });
+      }
+    }
+
+    console.log(`[orchestration] Loaded ${params.length} discovery params from config`);
+    return params;
+  } catch (error) {
+    console.error("[orchestration] Error loading discovery_config:", error);
+    return DEFAULT_DISCOVERY_PARAMS;
+  }
+}
 
 interface OrchestrationResult {
   success: boolean;
@@ -67,7 +100,10 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
     let totalStored = 0;
     const errors: string[] = [];
 
-    for (const { niche, location } of DISCOVERY_PARAMS) {
+    // Phase 3: Load dynamic discovery params
+    const discoveryParams = await getDiscoveryParams(sql);
+
+    for (const { niche, location } of discoveryParams) {
       try {
         console.log(`  → Discovering ${niche} in ${location}`);
         const discoveryResult = await runDiscoveryPipeline({

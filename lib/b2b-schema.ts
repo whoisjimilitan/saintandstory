@@ -143,6 +143,55 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
   `;
 
+  // Phase 3: Opportunity Scoring & Discovery Config
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS opportunity_score DECIMAL(5,2) DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS score_breakdown JSONB DEFAULT NULL
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS discovery_mode TEXT DEFAULT 'autonomous'
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS estimated_monthly_value DECIMAL(10,2) DEFAULT NULL
+  `;
+
+  // Discovery configuration (operator-controlled parameters)
+  await sql`
+    CREATE TABLE IF NOT EXISTS discovery_config (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      mode TEXT NOT NULL, -- 'national', 'regional', 'operator'
+      niche TEXT NOT NULL,
+      locations TEXT[] NOT NULL, -- cities or postcodes
+      enabled BOOLEAN DEFAULT TRUE,
+      priority INT DEFAULT 50,
+      min_score DECIMAL(5,2) DEFAULT 40, -- minimum opportunity score to create lead
+      created_by TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Operator-initiated discovery jobs (postcode uploads)
+  await sql`
+    CREATE TABLE IF NOT EXISTS postcode_discovery_jobs (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      created_by TEXT NOT NULL,
+      status TEXT DEFAULT 'pending', -- pending, running, completed, failed
+      total_postcodes INT,
+      processed_postcodes INT DEFAULT 0,
+      discoveries_found INT DEFAULT 0,
+      leads_created INT DEFAULT 0,
+      postcode_data JSONB, -- { postcodes: [], business_type: string, notes: string }
+      results JSONB DEFAULT NULL,
+      error_message TEXT DEFAULT NULL,
+      started_at TIMESTAMPTZ,
+      completed_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
@@ -152,7 +201,11 @@ export async function ensureB2BSchema() {
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_lead_state ON b2b_leads(lead_state)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_created ON b2b_leads(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_driver ON b2b_leads(driver_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_score ON b2b_leads(opportunity_score DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_drivers_postcode ON drivers(postcode)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovery_config_niche ON discovery_config(niche)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_status ON postcode_discovery_jobs(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_created ON postcode_discovery_jobs(created_at DESC)`;
 }

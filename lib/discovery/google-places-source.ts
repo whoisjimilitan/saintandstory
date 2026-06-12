@@ -34,13 +34,8 @@ export class GooglePlacesSource implements IDiscoverySource {
         const details = await getPlaceDetails(result.place_id);
         if (!details) continue;
 
-        // Skip businesses with no reviews
-        if (!details.reviews || details.reviews.length === 0) {
-          console.log(
-            `[discovery] Skipping ${details.name} — no reviews available`
-          );
-          continue;
-        }
+        // Phase 3: Reviews are optional (collect if available, proceed without)
+        const reviewCount = details.reviews?.length || 0;
 
         const payload: RawBusinessPayload = {
           sourceType: "google_places",
@@ -50,18 +45,18 @@ export class GooglePlacesSource implements IDiscoverySource {
           address: details.formatted_address,
           phone: details.formatted_phone_number,
           website: details.website,
-          reviews: details.reviews.map((r) => ({
+          reviews: details.reviews?.map((r) => ({
             author: r.author_name,
             rating: r.rating,
             text: r.text,
             time: r.time,
-          })),
+          })) || [],
           rawPayload: { ...details },  // Full details object as raw payload
         };
 
         payloads.push(payload);
         console.log(
-          `[discovery] Added ${details.name} (${details.reviews.length} reviews)`
+          `[discovery] Added ${details.name} (${reviewCount > 0 ? reviewCount + " reviews" : "no reviews - new discovery"})`
         );
       } catch (error) {
         console.error(
