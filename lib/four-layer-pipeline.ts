@@ -225,20 +225,14 @@ export async function qualifyBusiness(
 
 /**
  * LAYER 4: PROMOTION
- * Move qualified business to active lead (only when threshold crossed)
+ * Move ALL qualified businesses to leads (tiered by score, outreach gated separately)
  */
 export async function promoteToLead(
   sql: any,
   qualifiedBusinessId: string,
-  qualifiedBusiness: QualifiedBusiness,
-  minScore: number = 40
+  qualifiedBusiness: QualifiedBusiness
 ): Promise<{ success: boolean; leadId?: string }> {
   try {
-    // Check if score meets threshold
-    if (qualifiedBusiness.opportunity_score < minScore) {
-      return { success: false };
-    }
-
     // Get the underlying discovered and enriched data
     const enrichedResult = (await sql`
       SELECT db.business_name, db.address, db.postcode, db.google_place_id, db.category,
@@ -255,42 +249,28 @@ export async function promoteToLead(
 
     const data = enrichedResult[0];
 
-    // Determine outreach eligibility based on tier
+    // Assign tier based on opportunity score (all qualified become leads, tiered for outreach control)
     const tier = getQualificationTier(qualifiedBusiness.opportunity_score);
-    const outreachEligible = tier === 'A' ? true : false; // Tier A auto-eligible, B/C/D requires approval
 
     // Create lead in b2b_leads
     const leadResult = (await sql`
       INSERT INTO b2b_leads (
         business_name, business_category, email, phone, city, website,
-        google_place_id, opportunity_score, score_breakdown,
-        qualified_business_id, discovered_business_id,
-        promoted_from_qualified_at, source, status, niche, outreach_eligible, created_at, updated_at
+        google_place_id, qualified_business_id, discovered_business_id,
+        promoted_from_qualified_at, source, status, niche, lead_tier, created_at, updated_at
       ) VALUES (
         ${data.business_name}, ${data.category}, null, ${data.phone || null},
         ${extractCityFromAddress(data.address)},
         ${data.website || null}, ${data.google_place_id},
-        ${qualifiedBusiness.opportunity_score},
-        ${JSON.stringify(qualifiedBusiness.score_breakdown)},
         ${qualifiedBusinessId}, ${qualifiedBusiness.discovered_business_id},
-        NOW(), 'discovery_promoted', 'new', ${data.category}, ${outreachEligible},
+        NOW(), 'discovery_promoted', 'new', ${data.category}, ${tier},
         NOW(), NOW()
       )
+      ON CONFLICT (google_place_id) DO NOTHING
       RETURNING id
     `) as Array<{ id: string }>;
 
     if (leadResult.length > 0) {
-      // Record promotion
-      await sql`
-        INSERT INTO lead_promotions (
-          qualified_business_id, lead_id, promotion_reason, promoted_by
-        ) VALUES (
-          ${qualifiedBusinessId}, ${leadResult[0].id},
-          'Score exceeded threshold (' || ${qualifiedBusiness.opportunity_score} || ' >= ' || ${minScore} || ')',
-          'system'
-        )
-      `;
-
       // Mark as promoted
       await sql`
         UPDATE qualified_businesses SET promoted_to_lead_at = NOW()
@@ -312,8 +292,7 @@ export async function promoteToLead(
  */
 export async function runFullPipeline(
   sql: any,
-  business: RawBusinessDiscovery,
-  promoteIfScoreAbove: number = 40
+  business: RawBusinessDiscovery
 ): Promise<{ discovered: boolean; qualified: boolean; promoted: boolean }> {
   // Layer 1: Discovery
   const discovered = await persistDiscovery(sql, business);
@@ -345,12 +324,11 @@ export async function runFullPipeline(
     return { discovered: true, qualified: false, promoted: false };
   }
 
-  // Layer 4: Promotion (if score meets threshold)
+  // Layer 4: Promotion (all qualified businesses become leads, tiered for outreach control)
   const promotion = await promoteToLead(
     sql,
     qualified.id,
-    qualified,
-    promoteIfScoreAbove
+    qualified
   );
 
   return {

@@ -28,11 +28,14 @@ export async function GET(request: NextRequest) {
 
   try {
     // Count by discovery stage
-    const [discovered, enriched, qualified, activeLeads, unqualified] = await Promise.all([
+    const [discovered, enriched, qualified, totalLeads, activeLeads, tierC, tierD, unqualified] = await Promise.all([
       sql`SELECT COUNT(*) as count FROM discovered_businesses`,
       sql`SELECT COUNT(*) as count FROM enriched_businesses`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses`,
       sql`SELECT COUNT(*) as count FROM b2b_leads WHERE source IN ('discovery_promoted', 'discovery')`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE source IN ('discovery_promoted', 'discovery') AND (lead_tier IS NULL OR lead_tier IN ('A', 'B'))`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE source IN ('discovery_promoted', 'discovery') AND lead_tier = 'C'`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE source IN ('discovery_promoted', 'discovery') AND lead_tier = 'D'`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses WHERE promoted_to_lead_at IS NULL`,
     ]);
 
@@ -102,7 +105,10 @@ export async function GET(request: NextRequest) {
         discovered: (discovered[0] as any).count,
         enriched: (enriched[0] as any).count,
         qualified: (qualified[0] as any).count,
-        active_leads: (activeLeads[0] as any).count,
+        leads_total: (totalLeads[0] as any).count,
+        leads_active: (activeLeads[0] as any).count,
+        leads_tier_c: (tierC[0] as any).count,
+        leads_tier_d: (tierD[0] as any).count,
         unqualified_reserve: (unqualified[0] as any).count,
       },
       sources: sourceStats,
@@ -113,7 +119,8 @@ export async function GET(request: NextRequest) {
       metrics: {
         discovery_to_enrichment_ratio: (enriched[0] as any).count / Math.max((discovered[0] as any).count, 1),
         enrichment_to_qualification_ratio: (qualified[0] as any).count / Math.max((enriched[0] as any).count, 1),
-        qualification_to_lead_ratio: (activeLeads[0] as any).count / Math.max((qualified[0] as any).count, 1),
+        qualification_to_active_lead_ratio: (activeLeads[0] as any).count / Math.max((qualified[0] as any).count, 1),
+        qualification_to_total_lead_ratio: (totalLeads[0] as any).count / Math.max((qualified[0] as any).count, 1),
         unqualified_percentage: (
           ((unqualified[0] as any).count / Math.max((qualified[0] as any).count, 1)) *
           100
