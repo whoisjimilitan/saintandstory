@@ -765,7 +765,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedCustomers(v => !v)}
             className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
               Lead{pending.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
@@ -796,7 +796,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedAwaitingDrivers(v => !v)}
             className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
               Searching
             </span>
             <div className="flex items-center gap-2">
@@ -827,7 +827,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedConfirmed(v => !v)}
             className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
               Driving
             </span>
             <div className="flex items-center gap-2">
@@ -862,7 +862,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
           onClick={() => setExpandedFleet(v => !v)}
           className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
         >
-          <span className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+          <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
             Fleet
           </span>
           <div className="flex items-center gap-2">
