@@ -706,10 +706,10 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
   const [offered, setOffered] = useState(offeredJobs as unknown as Job[]);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedSearch, setCompletedSearch] = useState("");
-  const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(true);
-  const [expandedFleet, setExpandedFleet] = useState(true);
-  const [expandedConfirmed, setExpandedConfirmed] = useState(true);
-  const [expandedCustomers, setExpandedCustomers] = useState(true);
+  const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(false);
+  const [expandedFleet, setExpandedFleet] = useState(false);
+  const [expandedConfirmed, setExpandedConfirmed] = useState(false);
+  const [expandedCustomers, setExpandedCustomers] = useState(false);
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
