@@ -152,8 +152,15 @@ export async function ensureB2BSchema() {
       business_name TEXT NOT NULL,
       address TEXT,
       postcode TEXT,
+      city TEXT,
+      region TEXT,
       category TEXT,
-      source TEXT DEFAULT 'discovery', -- discovery, operator_search, csv_upload
+      website TEXT,
+      phone TEXT,
+      email TEXT,
+      source TEXT DEFAULT 'discovery', -- discovery, operator_search, csv_upload, research_mission, ai_research
+      source_id TEXT, -- reference to postcode_discovery_job, research_mission, etc.
+      mission_id UUID REFERENCES research_missions(id) ON DELETE SET NULL,
       discovered_at TIMESTAMPTZ DEFAULT NOW(),
       raw_data JSONB -- full Google Places response
     )
@@ -255,6 +262,56 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // Phase 4: Research Missions (operator-defined discovery tasks)
+  await sql`
+    CREATE TABLE IF NOT EXISTS research_missions (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      name TEXT NOT NULL,
+      mission_type TEXT NOT NULL, -- geography, sector, postcode, custom, ai_research
+      prompt TEXT, -- natural language instruction for AI missions
+      discovery_strategy JSONB, -- { search_terms: [], locations: [], filters: {} }
+      source TEXT DEFAULT 'operator', -- operator, ai_agent, system
+      status TEXT DEFAULT 'pending', -- pending, running, completed, failed, archived
+      created_by TEXT,
+      discoveries_found INT DEFAULT 0,
+      businesses_qualified INT DEFAULT 0,
+      leads_created INT DEFAULT 0,
+      results_summary JSONB,
+      error_message TEXT,
+      started_at TIMESTAMPTZ,
+      completed_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Discovery sources tracking (where businesses came from)
+  await sql`
+    CREATE TABLE IF NOT EXISTS discovery_sources (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      source_type TEXT NOT NULL, -- google_places, postcode_search, csv_upload, research_agent, claude_research, operator_manual, etc.
+      source_name TEXT,
+      description TEXT,
+      enabled BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Opportunity signals (events that increase lead score)
+  await sql`
+    CREATE TABLE IF NOT EXISTS opportunity_signals (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      discovered_business_id UUID REFERENCES discovered_businesses(id) ON DELETE CASCADE,
+      signal_type TEXT NOT NULL, -- new_branch, hiring_campaign, funding, expansion, new_location, staff_growth, transport_complaint, shift_workforce
+      signal_description TEXT,
+      score_impact INT DEFAULT 5, -- points to add to opportunity score
+      detected_at TIMESTAMPTZ DEFAULT NOW(),
+      source TEXT, -- how was this detected (mission, ai_analysis, operator_input, public_data)
+      metadata JSONB, -- signal-specific details
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
@@ -268,9 +325,11 @@ export async function ensureB2BSchema() {
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_qualified_business ON b2b_leads(qualified_business_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_lead ON b2b_outreach(lead_id)`;
 
-  // Four-layer pipeline
+  // Four-layer pipeline and research missions
   await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_place_id ON discovered_businesses(google_place_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_postcode ON discovered_businesses(postcode)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_mission ON discovered_businesses(mission_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_source ON discovered_businesses(source)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_discovered_businesses_created ON discovered_businesses(discovered_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_enriched_businesses_discovered ON enriched_businesses(discovered_business_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_enriched_businesses_google_place ON enriched_businesses(google_place_id)`;
@@ -282,6 +341,20 @@ export async function ensureB2BSchema() {
   await sql`CREATE INDEX IF NOT EXISTS idx_discovery_config_niche ON discovery_config(niche)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_status ON postcode_discovery_jobs(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_postcode_discovery_created ON postcode_discovery_jobs(created_at DESC)`;
+
+  // Research missions
+  await sql`CREATE INDEX IF NOT EXISTS idx_research_missions_status ON research_missions(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_research_missions_type ON research_missions(mission_type)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_research_missions_created ON research_missions(created_at DESC)`;
+
+  // Opportunity signals
+  await sql`CREATE INDEX IF NOT EXISTS idx_opportunity_signals_business ON opportunity_signals(discovered_business_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_opportunity_signals_type ON opportunity_signals(signal_type)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_opportunity_signals_detected ON opportunity_signals(detected_at DESC)`;
+
+  // Discovery sources
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovery_sources_type ON discovery_sources(source_type)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discovery_sources_enabled ON discovery_sources(enabled)`;
 
   // Other
   await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;

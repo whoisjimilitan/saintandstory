@@ -100,3 +100,50 @@ export async function getPlaceDetails(placeId: string): Promise<PlacesDetails | 
   }
 }
 
+// Search for businesses by location and terms (expanding radius)
+export async function searchByLocationAndTerms(
+  location: string,
+  searchTerms: string[],
+  apiKey: string
+): Promise<PlacesDetails[]> {
+  const results: Map<string, PlacesDetails> = new Map();
+
+  for (let radius = 0.5; radius <= 10; radius += 1.5) {
+    for (const term of searchTerms) {
+      try {
+        const searchQuery = `${term} near ${location}`;
+        const response = await fetch(
+          `${BASE_URL}/textsearch/json?query=${encodeURIComponent(
+            searchQuery
+          )}&key=${apiKey}&language=en&region=gb`
+        );
+
+        const data = (await response.json()) as {
+          results?: Array<{ place_id: string; name: string }>;
+        };
+
+        if (!data.results) continue;
+
+        for (const result of data.results.slice(0, 5)) {
+          if (results.has(result.place_id)) continue;
+
+          try {
+            const details = await getPlaceDetails(result.place_id);
+            if (details) {
+              results.set(result.place_id, details);
+            }
+          } catch (e) {
+            // Skip failed details
+          }
+
+          await new Promise((r) => setTimeout(r, 100));
+        }
+      } catch (e) {
+        // Skip failed search
+      }
+    }
+  }
+
+  return Array.from(results.values());
+}
+
