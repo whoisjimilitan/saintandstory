@@ -312,6 +312,12 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // PHASE 4: Minimal Schema Addition
+  // Outreach Eligibility — only field that cannot be derived
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS outreach_eligible BOOLEAN DEFAULT FALSE
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;

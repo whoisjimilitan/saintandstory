@@ -10,6 +10,77 @@ interface EmailContext {
 }
 
 /**
+ * BUSINESS CARD EMAIL SYSTEM
+ *
+ * Purpose: Create familiarity and curiosity, not conversion.
+ * Not a sales email. Not a recognition email.
+ * A psychological bridge that creates an unresolved thought.
+ *
+ * Psychology:
+ * 1. Business Card establishes identity + observation
+ * 2. Creates unresolved thought
+ * 3. Prospect Brief resolves that thought
+ * 4. Landing provides next step
+ * 5. No repetition between stages
+ */
+export function generateBusinessCardEmail(context: {
+  businessName: string;
+  category: string;
+  city: string;
+}): { subject: string; body: string } {
+  const templates = [
+    {
+      subject: `${context.businessName} — Transport Coordination`,
+      body: `As operations grow, transport coordination becomes harder to manage.
+
+We've prepared a brief for businesses like yours.
+
+${context.businessName} — Transport Brief`
+    },
+    {
+      subject: `Transport Brief — ${context.businessName}`,
+      body: `Managing movement in ${context.category} changes as you scale.
+
+We work with organisations like yours in ${context.city}.
+
+This brief explains how.`
+    },
+    {
+      subject: `${context.businessName}: A Short Transport Brief`,
+      body: `When transport coordination becomes a bottleneck, relief is possible.
+
+We've researched organisations like yours.
+
+This is what we found.`
+    },
+    {
+      subject: `Transport — ${context.businessName}`,
+      body: `Reliable transport matters more than people realise.
+
+Until you need it urgently.
+
+We've built this brief for you.`
+    },
+    {
+      subject: `Brief: Transport for ${context.businessName}`,
+      body: `${context.businessName} — most organisations in your sector find transport complexity emerges exactly when it matters most.
+
+We've prepared something for this.
+
+Short. Specific. Worth reading.`
+    }
+  ];
+
+  const hash = context.businessName.split('').reduce((h, c) => h + c.charCodeAt(0), 0);
+  const selected = templates[hash % templates.length];
+
+  return {
+    subject: selected.subject,
+    body: selected.body
+  };
+}
+
+/**
  * Generate relief layer implication from pain point and business context.
  * Transforms raw pain point into operational burden insight.
  * Example: "delivery delays" → "you end up managing pickups personally"

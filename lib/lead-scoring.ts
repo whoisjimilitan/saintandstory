@@ -96,6 +96,81 @@ export function getScoreTier(score: number): "hot" | "warm" | "cool" {
   return "cool";
 }
 
+export function getQualificationTier(score: number): "A" | "B" | "C" | "D" {
+  if (score >= 80) return "A";
+  if (score >= 60) return "B";
+  if (score >= 40) return "C";
+  return "D";
+}
+
+// ENGINE C: Opportunity Expansion Intelligence
+// Identifies multi-site, branch, decision-maker, partnership and referral opportunities
+export function extractExpansionSignals(input: {
+  businessName: string;
+  address?: string;
+  reviews?: Array<{ text: string }>;
+  category?: string;
+}) {
+  const signals = {
+    multisite_potential: 0,
+    branch_potential: 0,
+    referral_potential: 0,
+    partnership_potential: 0,
+    decision_maker_density: 0,
+    expansion_tags: [] as string[]
+  };
+
+  const lowerName = input.businessName.toLowerCase();
+  const reviewText = (input.reviews || []).map(r => r.text.toLowerCase()).join(" ");
+  const addressText = (input.address || "").toLowerCase();
+
+  // Multisite indicators
+  if (lowerName.includes("group") || lowerName.includes("network") || lowerName.includes("chain")) {
+    signals.multisite_potential = 15;
+    signals.expansion_tags.push("multi_site");
+  }
+  if (reviewText.includes("multiple") || reviewText.includes("several locations") || reviewText.includes("branches")) {
+    signals.multisite_potential = Math.min(20, signals.multisite_potential + 10);
+  }
+
+  // Branch indicators
+  if (lowerName.includes("branch") || addressText.includes("branch") || lowerName.includes("office")) {
+    signals.branch_potential = 12;
+    signals.expansion_tags.push("franchise");
+  }
+
+  // Healthcare/Education network potential
+  if (input.category && (input.category.includes("healthcare") || input.category.includes("education"))) {
+    signals.partnership_potential = 10;
+    signals.expansion_tags.push("healthcare_network");
+    if (input.category.includes("school")) {
+      signals.expansion_tags.push("school_group");
+    }
+  }
+
+  // Referral potential (language indicating recommendations)
+  if (reviewText.includes("recommend") || reviewText.includes("referred") || reviewText.includes("word of mouth")) {
+    signals.referral_potential = 8;
+    signals.expansion_tags.push("referral_source");
+  }
+
+  // Decision-maker density (organizational signals)
+  if (lowerName.includes("group") || lowerName.includes("corporate") || lowerName.includes("association")) {
+    signals.decision_maker_density = 10;
+  }
+  if (input.reviews && input.reviews.length > 20) {
+    signals.decision_maker_density = Math.min(15, signals.decision_maker_density + 5);
+  }
+
+  // Council/government connected
+  if (lowerName.includes("council") || input.category?.includes("council")) {
+    signals.partnership_potential = Math.min(18, signals.partnership_potential + 8);
+    signals.expansion_tags.push("council_connected");
+  }
+
+  return signals;
+}
+
 export function getScoreStyle(score: number): { containerClass: string; badgeClass: string } {
   const tier = getScoreTier(score);
 

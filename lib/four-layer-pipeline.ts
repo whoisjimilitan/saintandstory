@@ -10,7 +10,7 @@
  * All candidates preserved. Qualification happens separately.
  */
 
-import { scoreOpportunity } from "./lead-scoring";
+import { scoreOpportunity, extractExpansionSignals, getQualificationTier } from "./lead-scoring";
 import type { DiscoveredLeadScoringInput } from "./lead-scoring";
 
 export interface RawBusinessDiscovery {
@@ -179,6 +179,23 @@ export async function qualifyBusiness(
       painPoint: scoringInput.painPoint,
     });
 
+    // ENGINE C: Extract opportunity expansion signals
+    const expansionSignals = extractExpansionSignals({
+      businessName: business.name,
+      address: business.address,
+      reviews: business.reviews,
+      category: business.category,
+    });
+
+    // Enhance score_breakdown with Engine C signals
+    const enhancedBreakdown = {
+      ...score.breakdown,
+      expansion: expansionSignals,
+    };
+
+    // Qualification tier based on score
+    const tier = getQualificationTier(score.total);
+
     const qualificationReason = generateQualificationReason(
       score,
       business,
@@ -192,7 +209,7 @@ export async function qualifyBusiness(
         estimated_monthly_value
       ) VALUES (
         ${enrichedId}, ${discoveredId}, ${googlePlaceId},
-        ${score.total}, ${JSON.stringify(score.breakdown)},
+        ${score.total}, ${JSON.stringify(enhancedBreakdown)},
         ${score.confidence}, ${qualificationReason}, ${score.estimatedMonthlyValue}
       )
       ON CONFLICT DO NOTHING
@@ -238,13 +255,17 @@ export async function promoteToLead(
 
     const data = enrichedResult[0];
 
+    // Determine outreach eligibility based on tier
+    const tier = getQualificationTier(qualifiedBusiness.opportunity_score);
+    const outreachEligible = tier === 'A' ? true : false; // Tier A auto-eligible, B/C/D requires approval
+
     // Create lead in b2b_leads
     const leadResult = (await sql`
       INSERT INTO b2b_leads (
         business_name, business_category, email, phone, city, website,
         google_place_id, opportunity_score, score_breakdown,
         qualified_business_id, discovered_business_id,
-        promoted_from_qualified_at, source, status, niche, created_at, updated_at
+        promoted_from_qualified_at, source, status, niche, outreach_eligible, created_at, updated_at
       ) VALUES (
         ${data.business_name}, ${data.category}, null, ${data.phone || null},
         ${extractCityFromAddress(data.address)},
@@ -252,7 +273,7 @@ export async function promoteToLead(
         ${qualifiedBusiness.opportunity_score},
         ${JSON.stringify(qualifiedBusiness.score_breakdown)},
         ${qualifiedBusinessId}, ${qualifiedBusiness.discovered_business_id},
-        NOW(), 'discovery_promoted', 'new', ${data.category},
+        NOW(), 'discovery_promoted', 'new', ${data.category}, ${outreachEligible},
         NOW(), NOW()
       )
       RETURNING id
