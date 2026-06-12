@@ -527,3 +527,19 @@ model ProspectFeedback {
   @@index([createdAt])
   @@map("prospect_feedback")
 }
+
+// ============================================================================
+// CRON SCHEDULER DIAGNOSTICS
+// ============================================================================
+
+// Purpose: Minimal diagnostic to verify Vercel cron execution
+// Records every cron diagnostic ping to confirm scheduler is working
+model CronDiagnosticLog {
+  id        String   @id @default(cuid())
+  timestamp String   @unique // ISO timestamp of cron execution
+  message   String   // Log message
+  createdAt DateTime @default(now())
+
+  @@index([timestamp])
+  @@map("cron_diagnostic_log")
+}
