@@ -18,11 +18,22 @@ jobs:
     steps:
       - name: Trigger B2B Orchestration
         run: |
-          curl -X POST \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -d '{"triggered_by":"github-actions","timestamp":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'"}' \
-            https://saintandstoryltd.co.uk/api/orchestrate/b2b-daily
-        continue-on-error: true
+            https://saintandstoryltd.co.uk/api/orchestrate/b2b-daily)
+
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response Body: $RESPONSE_BODY"
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Error: Expected HTTP 200, got $HTTP_STATUS"
+            exit 1
+          fi
 
       - name: Wait for execution
         run: sleep 10
