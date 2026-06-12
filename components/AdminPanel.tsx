@@ -765,7 +765,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedCustomers(v => !v)}
             className="w-full flex items-center justify-between mb-3"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+            <span className="text-sm font-semibold text-[#0D0D0D]">
               Customer{pending.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
@@ -796,8 +796,8 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedAwaitingDrivers(v => !v)}
             className="w-full flex items-center justify-between mb-3"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-              Awaiting Driver
+            <span className="text-sm font-semibold text-[#0D0D0D]">
+              Awaiting driver
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -827,7 +827,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             onClick={() => setExpandedConfirmed(v => !v)}
             className="w-full flex items-center justify-between mb-3"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+            <span className="text-sm font-semibold text-[#0D0D0D]">
               Confirmed
             </span>
             <div className="flex items-center gap-2">
@@ -862,7 +862,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
           onClick={() => setExpandedFleet(v => !v)}
           className="w-full flex items-center justify-between mb-3"
         >
-          <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          <span className="text-sm font-semibold text-[#0D0D0D]">
             Fleet
           </span>
           <div className="flex items-center gap-2">
