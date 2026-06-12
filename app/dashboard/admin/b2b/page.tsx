@@ -81,44 +81,60 @@ export default async function B2BAdminPage() {
   const { leads, orders, stats } = await getB2BData();
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-3">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Admin</p>
-          <span className="text-[#E8E8E8] text-xs">·</span>
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">B2B Pipeline</p>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <p className="text-[11px] font-medium text-[#666666] uppercase tracking-[0.15em] mb-2">Admin</p>
+          <h1 className="font-black text-[#1A1A1A] text-4xl tracking-tight">
+            B2B Pipeline
+          </h1>
         </div>
-        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          Admin ↻
+        <Link href="/dashboard/admin" className="text-xs font-semibold text-[#1A1A1A] hover:text-[#666666] uppercase tracking-[0.1em] transition-colors border border-[#E8E8E8] px-4 py-2 rounded-lg hover:border-[#999999]">
+          ↻ Admin
         </Link>
       </div>
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
-        Morning brief.
-      </h1>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 mb-8">
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
         {stats.warm > 0 && (
-          <span className="text-sm font-semibold text-[#0D0D0D]">{stats.warm} warm</span>
+          <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Warm Leads</p>
+            <p className="text-2xl font-bold text-[#1A1A1A]">{stats.warm}</p>
+          </div>
         )}
-        <span className="text-sm text-[#888888]">{stats.new} new</span>
-        <span className="text-sm text-[#888888]">{stats.closed} closed</span>
-        {stats.inbound > 0 && (
-          <span className="text-sm text-[#0D0D0D] font-semibold">{stats.inbound} inbound</span>
-        )}
-        <span className="text-sm text-[#888888]">{orders.length} standing order{orders.length !== 1 ? "s" : ""}</span>
-      </div>
-
-      <div className="mb-12">
-        <div className="mb-4">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Discovery Configuration</p>
+        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">New</p>
+          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
         </div>
-        <DiscoveryConfig />
+        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Closed</p>
+          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.closed}</p>
+        </div>
+        {stats.inbound > 0 && (
+          <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Inbound</p>
+            <p className="text-2xl font-bold text-[#1A1A1A]">{stats.inbound}</p>
+          </div>
+        )}
+        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Standing Orders</p>
+          <p className="text-2xl font-bold text-[#1A1A1A]">{orders.length}</p>
+        </div>
       </div>
 
-      <div className="mb-12">
-        <div className="mb-4">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Knowledge Loop Metrics</p>
+      <div className="mb-16">
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery & Performance</h2>
+          <p className="text-xs text-[#999999] mt-1">Real-time metrics across your pipeline</p>
         </div>
         <B2BMetricsCards />
+      </div>
+
+      <div className="mb-16">
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery Configuration</h2>
+          <p className="text-xs text-[#999999] mt-1">Manage autonomous and research-driven discovery</p>
+        </div>
+        <DiscoveryConfig />
       </div>
 
       <B2BPipeline leads={leads} orders={orders} />

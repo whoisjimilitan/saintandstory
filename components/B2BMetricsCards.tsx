@@ -27,10 +27,10 @@ function MetricCard({
   status: string;
 }) {
   const statusColor = {
-    success: "bg-[#E8F5E9] border-l-4 border-l-[#2ECC71]",
-    warning: "bg-[#FFF3E0] border-l-4 border-l-[#F39C12]",
-    pending: "bg-[#F5F5F5] border-l-4 border-l-[#BDBDBD]",
-  }[status] || "bg-[#F5F5F5] border-l-4 border-l-[#BDBDBD]";
+    success: "bg-[#F0F9F7] border border-[#D1E8E4]",
+    warning: "bg-[#FBF7F2] border border-[#E8DACC]",
+    pending: "bg-white border border-[#E8E8E8]",
+  }[status] || "bg-white border border-[#E8E8E8]";
 
   const statusIcon = {
     success: "✓",
@@ -39,31 +39,29 @@ function MetricCard({
   }[status] || "—";
 
   const statusTextColor = {
-    success: "text-[#2ECC71]",
-    warning: "text-[#F39C12]",
-    pending: "text-[#888888]",
-  }[status] || "text-[#888888]";
+    success: "text-[#1B6B54]",
+    warning: "text-[#A86B2E]",
+    pending: "text-[#999999]",
+  }[status] || "text-[#999999]";
 
   return (
-    <div className={`${statusColor} rounded-lg p-6 hover:shadow-sm transition-shadow`}>
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-            {title}
-          </p>
-        </div>
-        <span className={`text-lg font-bold ${statusTextColor} ml-3`}>
+    <div className={`${statusColor} rounded-xl p-8 hover:shadow-md transition-all duration-200`}>
+      <div className="flex items-baseline justify-between mb-6">
+        <p className="text-[11px] font-medium text-[#666666] uppercase tracking-[0.15em] letter-spacing">
+          {title}
+        </p>
+        <span className={`text-lg font-semibold ${statusTextColor}`}>
           {statusIcon}
         </span>
       </div>
 
-      <div className="flex items-baseline gap-2 mb-3">
-        <p className="text-4xl font-black text-[#0D0D0D]">{value}</p>
-        {unit && <p className="text-sm text-[#888888]">{unit}</p>}
+      <div className="flex items-baseline gap-3 mb-6">
+        <p className="text-5xl font-bold text-[#1A1A1A]">{value}</p>
+        {unit && <p className="text-sm font-medium text-[#999999]">{unit}</p>}
       </div>
 
-      <p className="text-[10px] text-[#888888] uppercase tracking-[0.5px]">
-        Target: {target}
+      <p className="text-xs text-[#999999]">
+        <span className="font-medium">Target:</span> {target}
       </p>
     </div>
   );
@@ -102,8 +100,8 @@ export default function B2BMetricsCards() {
 
   if (loading) {
     return (
-      <div className="bg-[#F5F5F5] rounded-xl p-6 text-center">
-        <p className="text-[#888888]">Loading metrics…</p>
+      <div className="bg-white rounded-xl p-8 border border-[#E8E8E8] text-center">
+        <p className="text-[#999999] text-sm">Loading metrics…</p>
       </div>
     );
   }
@@ -115,7 +113,7 @@ export default function B2BMetricsCards() {
   const m = metrics.metrics;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
       <MetricCard
         title="Leads Discovered"
         value={m.leads_discovered.value}
