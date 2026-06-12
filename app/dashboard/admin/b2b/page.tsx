@@ -106,7 +106,7 @@ export default async function B2BAdminPage() {
           <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
         </div>
         <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Activated</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Converted</p>
           <p className="text-2xl font-bold text-[#1A1A1A]">{stats.closed}</p>
         </div>
         {stats.inbound > 0 && (
