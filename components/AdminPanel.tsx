@@ -758,7 +758,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Customers ──────────────────────────────────────────────────────────── */}
+      {/* Leads ──────────────────────────────────────────────────────────────────*/}
       {pending.length > 0 && (
         <div id="section-orders">
           <button
@@ -766,7 +766,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             className="w-full flex items-center justify-between mb-3"
           >
             <span className="text-sm font-semibold text-[#0D0D0D]">
-              Customer{pending.length !== 1 ? "s" : ""}
+              Lead{pending.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -789,7 +789,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Awaiting driver ───────────────────────────────────────────────────── */}
+      {/* Searching ──────────────────────────────────────────────────────────────*/}
       {offered.length > 0 && (
         <div id="section-awaiting">
           <button
@@ -797,7 +797,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             className="w-full flex items-center justify-between mb-3"
           >
             <span className="text-sm font-semibold text-[#0D0D0D]">
-              Awaiting driver
+              Searching
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -820,7 +820,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Confirmed ─────────────────────────────────────────────────────────── */}
+      {/* Driving ────────────────────────────────────────────────────────────────*/}
       {confirmedJobs.length > 0 && (
         <div id="section-confirmed">
           <button

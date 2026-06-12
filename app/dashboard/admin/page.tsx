@@ -174,10 +174,10 @@ export default async function AdminPage() {
   }).length;
 
   const statLinks = [
-    inProgressJobs.length > 0 && { label: `${inProgressJobs.length} en route`, href: "#section-enroute", bold: true },
-    pendingJobs.length > 0 && { label: `${pendingJobs.length} customer${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
-    offeredJobs.length > 0 && { label: `${offeredJobs.length} awaiting`, href: "#section-awaiting", bold: false },
-    confirmedJobs.length > 0 && { label: `${confirmedJobs.length} confirmed`, href: "#section-confirmed", bold: false },
+    inProgressJobs.length > 0 && { label: `${inProgressJobs.length} driving`, href: "#section-enroute", bold: true },
+    pendingJobs.length > 0 && { label: `${pendingJobs.length} lead${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
+    offeredJobs.length > 0 && { label: `${offeredJobs.length} searching`, href: "#section-awaiting", bold: false },
+    confirmedJobs.length > 0 && { label: `${confirmedJobs.length} driving`, href: "#section-confirmed", bold: false },
     { label: `${onlineCount} online`, href: "#section-fleet", bold: false },
     todayRevenue > 0 && { label: `£${todayRevenue.toFixed(0)} today`, href: "#section-completed", bold: false },
   ].filter(Boolean) as { label: string; href: string; bold: boolean }[];
