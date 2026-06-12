@@ -18,12 +18,12 @@ import { SkeletonLeadCards } from "@/components/SkeletonLeadCards";
 type Tab = "pipeline" | "discover" | "standing" | "add";
 
 const STATUS_LABELS: Record<string, string> = {
-  new: "New",
-  contacted: "Contacted",
-  warm: "Warm",
+  new: "Uncontacted",
+  contacted: "Engaged",
+  warm: "Active",
   inbound: "Inbound",
-  closed: "Closed",
-  dead: "Dead",
+  closed: "Activated",
+  dead: "Archived",
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -65,20 +65,20 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   // Future states (e.g., "disqualified", "recycled") will render safely without changes here.
   const stateDescriptions: Record<string, { description: string; nextStep: string }> = {
     new: {
-      description: "No recognition email has been sent yet.",
-      nextStep: "Next: Send recognition email to begin outreach."
+      description: "Opportunity discovered. No initial contact sent yet.",
+      nextStep: "Next: Send recognition email to begin conversation."
     },
     recognized: {
-      description: "Recognition email sent to this prospect.",
-      nextStep: "Waiting for them to engage with the prospect brief."
+      description: "Recognition email sent. Opportunity learning about your service.",
+      nextStep: "Awaiting engagement with transport brief and response."
     },
     engaged: {
-      description: "Prospect engaged with the prospect brief.",
-      nextStep: "Next: Confirm they are ready to work with us."
+      description: "Opportunity actively engaged. Shown interest in your service.",
+      nextStep: "Next: Validate their need and move toward standing order."
     },
     self_confirmed: {
-      description: "Prospect confirmed interest in working together.",
-      nextStep: "Ready to create a standing order contract."
+      description: "Opportunity confirmed interest. Ready for activation.",
+      nextStep: "Create standing order contract and begin fulfilment."
     }
   };
 
@@ -492,7 +492,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               ? "bg-white/10 border-white/20"
               : scoreStyle.containerClass
           }`}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2 transition-colors duration-300 text-[#0D0D0D]">Lead Signal</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2 transition-colors duration-300 text-[#0D0D0D]">Opportunity Signal</p>
             {hasFormData ? (
               // Form-based leads: show detailed score breakdown
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -592,10 +592,10 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             )}
           </div>
 
-          {/* Recognition Progress Indicator - visible for all leads */}
+          {/* Conversation Progress Indicator - visible for all leads */}
           <div className="mb-4 pt-3 pb-3 border-t transition-colors duration-300 border-[#EAE6E0]">
             <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] mb-2 transition-colors duration-300 text-[#666666]`}>
-              Recognition Progress
+              Conversation Progress
             </p>
 
             {/* Progress stages */}
@@ -605,7 +605,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   ? "font-semibold text-[#0D0D0D]"
                   : "text-[#AAAAAA]"
               }`}>
-                new
+                Discover
               </span>
               <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
@@ -613,7 +613,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   ? "font-semibold text-[#0D0D0D]"
                   : "text-[#AAAAAA]"
               }`}>
-                recognized
+                Recognize
               </span>
               <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
@@ -621,7 +621,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   ? "font-semibold text-[#0D0D0D]"
                   : "text-[#AAAAAA]"
               }`}>
-                engaged
+                Engage
               </span>
               <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
               <span className={`transition-colors duration-300 ${
@@ -629,7 +629,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   ? "font-semibold text-[#0D0D0D]"
                   : "text-[#AAAAAA]"
               }`}>
-                confirmed
+                Activate
               </span>
             </div>
 
@@ -886,18 +886,18 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <div className={`pt-4 border-t transition-all border-[#EAE6E0]`}>
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 bg-[#0D0D0D] text-white hover:bg-[#1a1a1a]">
-                  Create order
+                  Create Standing Order
                 </button>
                 <button onClick={() => updateStatus("warm")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                  Mark warm
+                  Mark Active
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                  Add note
+                  Add Note
                 </button>
                 <button onClick={() => updateStatus("dead")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 text-[#888888] hover:text-[#0D0D0D]">
-                  Not interested
+                  Archive
                 </button>
               </div>
             </div>
