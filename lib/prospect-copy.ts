@@ -18,75 +18,75 @@ export const PROSPECT_PAGE_COPY: IndustryCopyMap = {
   legal: {
     "Court Filing Documents": {
       description:
-        "When documents must reach court before a specific deadline, timing becomes critical.",
+        "Court deadlines don't negotiate. If documents don't arrive, hearings stall. Entire cases hinge on timing.",
       solution:
-        "Saint & Story provides same-day collection, delivery and proof of delivery.",
+        "We collect and deliver court documents the same day. Proof of delivery included. No excuses.",
     },
     "Signed Legal Contracts": {
       description:
-        "When signatures are obtained, counterparties typically expect documents to arrive promptly.",
-      solution: "We handle contract transfers the same day they are signed.",
+        "Once signatures are on the page, counterparties expect the document to arrive that day. Delays create friction and suspicion.",
+      solution: "We move signed contracts between offices same-day. Both parties get confirmation when it arrives.",
     },
     "Property Completion Documents": {
       description:
-        "Completion days often involve keys, signed documents and strict timelines.",
+        "Completion day is orchestrated down to the minute. Keys, documents, funds — everything moves at once. One delay derails the whole transaction.",
       solution:
-        "Saint & Story supports these transfers with real-time updates and driver confirmation.",
+        "We handle completion-day movements. Driver confirms arrival in minutes. You close on time.",
     },
   },
 
   "estate agent": {
     "Property Completion Keys": {
       description:
-        "Completion days often involve keys, signed documents and strict timelines.",
+        "Completion days move fast. Keys, contracts, funds — all on the same day. A missed window can kill a sale.",
       solution:
-        "Saint & Story supports completion-day movements with 15-minute driver confirmation and tracking.",
+        "We collect and deliver all completion documents and keys same-day. Real-time updates. Confirmed delivery within 15 minutes.",
     },
     "Urgent Valuation Documents": {
-      description: "When clients need valuations urgently, delays cost viewings and sales.",
-      solution: "We deliver valuation documents same-day so clients get immediate feedback.",
+      description: "Buyers want valuations immediately. If the valuation report doesn't reach them today, they'll find another agent.",
+      solution: "Same-day valuation delivery. Your clients get feedback immediately. That's how you win viewings.",
     },
     "Mortgage & Contract Documents": {
       description:
-        "During transactions, documents are constantly moving between offices and clients.",
-      solution: "Fixed price, same-day movement keeps your sales pipeline moving.",
+        "During a transaction, documents move constantly between offices and clients. Every day something's in transit. Every delay kills momentum.",
+      solution: "Fixed price movements. Same-day delivery. Your transaction keeps moving forward.",
     },
   },
 
   construction: {
     "Emergency Site Materials": {
       description:
-        "When a critical component doesn't arrive and a crew is standing idle, costs mount quickly.",
+        "A critical component doesn't arrive and your crew stands idle. Costs spiral. Other jobs slip. One delayed delivery cascades into lost days.",
       solution:
-        "Saint & Story provides rapid site rescue deliveries to prevent crew downtime.",
+        "We collect and deliver site materials same-day. You stay on schedule. Your crew keeps working.",
     },
     "Revised Specifications": {
       description:
-        "When site changes occur, updated drawings and specifications must reach crews immediately.",
-      solution: "We deliver updated specs same-day to keep projects on track.",
+        "Site changes happen. New drawings and specs need to reach the crew immediately or they're working from old plans.",
+      solution: "Updated specs delivered same-day. Crew gets the changes before the morning shift.",
     },
     "Safety Certificates": {
       description:
-        "Compliance documents often have tight deadlines and inspection windows.",
-      solution: "We ensure safety certificates reach inspection sites on deadline.",
+        "Inspection windows are tight. Certificate doesn't arrive before inspection time and you fail. That's a costly rework.",
+      solution: "We ensure safety certificates reach the inspector before the deadline. Compliance met. Project moves on.",
     },
   },
 
   medical: {
     "Prescription & Medication Transfers": {
       description:
-        "Patient emergencies require immediate medication transfers between locations.",
+        "Patient emergencies don't wait. Medication transfers between hospitals or clinics need to happen now, not tomorrow.",
       solution:
-        "Saint & Story provides same-day emergency medication transfers with tracking.",
+        "Same-day emergency medication transfers with full tracking and chain-of-custody. Patient care continues without gaps.",
     },
     "Medical Specimens": {
-      description: "Specimens degrade over time; urgent transfers are critical for test accuracy.",
+      description: "Specimens degrade. Every hour without movement reduces test accuracy. Delays mean retests, delays, costs.",
       solution:
-        "We handle time-sensitive specimen movement with chain-of-custody documentation.",
+        "Time-sensitive specimen movement with proper handling and documentation. Results ready on time.",
     },
     "Medical Records": {
-      description: "Patient transfers and consultations require medical records to arrive quickly.",
-      solution: "Same-day record transfers support continuity of care.",
+      description: "Patient transfers require records to arrive same-day or treatment continuity breaks. Information gaps = patient risk.",
+      solution: "Records delivered same-day. No information gaps. Continuity of care maintained.",
     },
   },
 };

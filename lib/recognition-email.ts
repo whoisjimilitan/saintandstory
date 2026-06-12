@@ -10,10 +10,10 @@ export function generateRecognitionEmailTemplate(
 ): { subject: string; html: string } {
   const businessName = lead.business_name || "Business";
   const painContext = lead.pain_point
-    ? `We noticed customers mentioning ${lead.pain_point.toLowerCase()} in recent reviews.`
-    : `We've identified ${lead.business_category} as an area where we can help.`;
+    ? `We've watched your reviews. Multiple customers mention struggling with ${lead.pain_point.toLowerCase()}. That's the friction point we fix.`
+    : `Managing transport for a ${lead.business_category} operation is complex. Gaps in coverage create chaos when demand peaks.`;
 
-  const subject = `${businessName}: Delivery opportunity (${driver.radius_miles}mi radius)`;
+  const subject = `Transport continuity for ${businessName}`;
 
   const html = `
 <!DOCTYPE html>
@@ -32,19 +32,19 @@ export function generateRecognitionEmailTemplate(
 <body>
   <div class="container">
     <div class="header">
-      <h1>Hi there, ${businessName}</h1>
+      <h1>${businessName}</h1>
     </div>
     <div class="body">
       <p>${painContext}</p>
       <div class="highlight">
-        <p><strong>We deliver in your area:</strong> ${driver.radius_miles} miles from ${driver.postcode}</p>
-        <p><strong>What makes us different:</strong> Fixed price. Verified driver. Same-day available.</p>
+        <p>We operate drivers within ${driver.radius_miles} miles of your location (${driver.postcode}). Same-day scheduling. Verified team. No gimmicks.</p>
       </div>
-      <p>Rather than a generic pitch, we wanted to reach out directly. If you'd like to explore how we handle ${lead.business_category} logistics, we're happy to talk through your specific needs.</p>
+      <p>Most businesses in your sector manage transport sporadically until demand peaks. Then it becomes everyone's problem. We specialise in replacing that chaos with certainty.</p>
+      <p>This brief is designed to help you understand if we're a fit for what you do. Read it. See if it rings true. Reply only if you want to explore further.</p>
       <div class="cta">
-        <a href="https://saintandstoryltd.co.uk/lead/${lead.id}" class="button">Let's Talk →</a>
+        <a href="https://saintandstoryltd.co.uk/lead/${lead.id}" class="button">View Your Transport Brief →</a>
       </div>
-      <p>Not interested right now? That's fine. We'll follow up only if something changes.</p>
+      <p style="color: #999; font-size: 14px;">No pressure. No follow-up unless you respond.</p>
     </div>
     <div class="footer">
       <p>Saint & Story Ltd · Removal & Logistics Partner</p>
