@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
+import { getCategoryLearnings } from "@/lib/learning-outcomes";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -76,6 +77,29 @@ export async function GET() {
     const leads_by_drivers = Number(driver_result.leads_discovered_by_drivers || 0);
     const emails_sent = Number(driver_result.emails_sent_by_drivers || 0);
 
+    // Get category-specific learning outcomes
+    const topCategories = await sql`
+      SELECT DISTINCT business_category
+      FROM b2b_learning_outcomes
+      WHERE created_at >= DATE_TRUNC('month', NOW())
+      ORDER BY business_category
+    `;
+
+    const categoryLearnings: Record<string, any> = {};
+    for (const row of topCategories) {
+      const category = row.business_category as string;
+      const learning = await getCategoryLearnings(sql, category);
+      if (learning.totalOutcomes > 0) {
+        categoryLearnings[category] = {
+          outcomes: learning.totalOutcomes,
+          conversion_rate: Math.round(learning.conversionRate * 100),
+          avg_winning_score: learning.averageScoreForConversion,
+          avg_days_to_convert: learning.averageDaysToConversion,
+          score_ranges: learning.scoreRanges,
+        };
+      }
+    }
+
     return NextResponse.json({
       timestamp: new Date().toISOString(),
       metrics: {
@@ -122,7 +146,9 @@ export async function GET() {
           target: "5+",
           status: emails_sent >= 5 ? "success" : "pending"
         }
-      }
+      },
+      learning_insights: categoryLearnings,
+      learning_status: Object.keys(categoryLearnings).length > 0 ? "active" : "initializing"
     });
   } catch (err) {
     console.error("[Knowledge Loop Metrics] Error:", err);

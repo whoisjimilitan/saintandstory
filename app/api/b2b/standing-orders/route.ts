@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
+import { recordOutcome } from "@/lib/learning-outcomes";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -102,6 +103,38 @@ export async function POST(request: NextRequest) {
   // Update lead status to closed
   if (body.lead_id) {
     await sql`UPDATE b2b_leads SET status = 'closed', updated_at = NOW() WHERE id = ${body.lead_id}`;
+
+    // Record conversion outcome for learning loop
+    try {
+      const lead = await sql`
+        SELECT qualified_business_id, business_category, opportunity_score, created_at
+        FROM b2b_leads
+        WHERE id = ${body.lead_id}
+      `;
+
+      if (lead.length > 0) {
+        const leadData = lead[0];
+        const daysToConversion = leadData.created_at
+          ? Math.floor(
+              (new Date().getTime() - new Date(leadData.created_at).getTime()) / (1000 * 60 * 60 * 24)
+            )
+          : 0;
+
+        await recordOutcome(
+          sql,
+          leadData.qualified_business_id as string,
+          body.lead_id,
+          "converted",
+          leadData.business_category as string,
+          (leadData.opportunity_score as number) || 0,
+          daysToConversion,
+          { standing_order_created: true, price: body.price }
+        );
+      }
+    } catch (err) {
+      console.error("[Standing Order] Failed to record conversion outcome:", err);
+      // Don't fail the standing order creation if outcome recording fails
+    }
   }
 
   return NextResponse.json({ order: rows[0] });

@@ -326,6 +326,22 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS outreach_eligible BOOLEAN DEFAULT FALSE
   `;
 
+  // LEARNING LOOP: Capture outcomes for continuous improvement
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_learning_outcomes (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      qualified_business_id UUID REFERENCES qualified_businesses(id) ON DELETE CASCADE,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      outcome_type TEXT NOT NULL, -- converted, replied, engaged, ignored, disqualified
+      outcome_value INT DEFAULT 1, -- 1 for positive (converted, replied), 0 for neutral (ignored), -1 for negative (unsubscribed)
+      business_category TEXT,
+      opportunity_score_at_outcome DECIMAL(5, 2),
+      days_to_outcome INT,
+      engagement_signals JSONB, -- email opens, clicks, etc.
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
