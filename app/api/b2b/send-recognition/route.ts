@@ -52,12 +52,17 @@ export async function POST(request: Request) {
 
   try {
     // Send email
-    await resend.emails.send({
+    const { data, error: sendError } = await resend.emails.send({
       from: "james@saintandstory.co.uk",
       to: email,
       subject: recognitionEmail.subject,
       text: recognitionEmail.body,
     });
+
+    if (sendError) {
+      console.error(`[RECOGNITION-EMAIL] Resend error: ${sendError.message}`);
+      return Response.json({ error: sendError.message }, { status: 500 });
+    }
 
     // Transition state: new → recognized
     const stateTransitioned = await transitionLeadState(lead_id, "recognized", recognitionEmail.triggerEvent);
@@ -69,8 +74,18 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
 
-    // Store email sent timestamp for operator memory
+    // Store email sent timestamp and resend message ID for operator memory + webhook tracking
     const sql = neon(process.env.DATABASE_URL!);
+
+    // Get or create outreach record
+    const followUp1At = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+    const followUp2At = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    await sql`
+      INSERT INTO b2b_outreach (lead_id, subject, body, sent_at, follow_up_1_at, follow_up_2_at, email_type, resend_message_id)
+      VALUES (${lead_id}, ${recognitionEmail.subject}, ${recognitionEmail.body}, NOW(), ${followUp1At}, ${followUp2At}, 'recognition', ${data?.id ?? null})
+    `;
+
     await sql`
       UPDATE b2b_leads
       SET email_sent_at = ${new Date().toISOString()}

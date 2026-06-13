@@ -132,6 +132,8 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const [prospectBriefUrl, setProspectBriefUrl] = useState<string | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [recognitionDraft, setRecognitionDraft] = useState<{ subject: string; body: string; triggerEvent: string } | null>(null);
+  const [engagementMetrics, setEngagementMetrics] = useState<any>(null);
+  const [loadingEngagement, setLoadingEngagement] = useState(false);
 
   const hasPainPoint = !!lead.pain_point;
 
@@ -175,6 +177,19 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
       }
     } finally {
       setDrafting(false);
+    }
+  }
+
+  async function loadEngagementMetrics() {
+    setLoadingEngagement(true);
+    try {
+      const res = await fetch(`/api/b2b/engagement-metrics?lead_id=${lead.id}`);
+      const data = await res.json();
+      setEngagementMetrics(data);
+    } catch (error) {
+      console.error("Failed to load engagement metrics:", error);
+    } finally {
+      setLoadingEngagement(false);
     }
   }
 
@@ -415,7 +430,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             ? "hover:opacity-75 active:opacity-60"
             : "hover:opacity-75 active:opacity-60"
         }`}
-        onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); }}
+        onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); if (!expanded && !engagementMetrics) loadEngagementMetrics(); }}
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -469,6 +484,15 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
               {STATUS_LABELS[status] ?? status}
             </span>
+            {lead.engagement_score > 0 && (
+              <span className={`text-[10px] font-black px-2 py-0.5 rounded transition-colors duration-300 ${
+                lead.engagement_score >= 50 ? "bg-[#2ECC71] text-white" :
+                lead.engagement_score >= 20 ? "bg-[#F39C12] text-white" :
+                "bg-[#95A5A6] text-white"
+              }`}>
+                {lead.engagement_score}
+              </span>
+            )}
           </div>
           {lead.created_at && <p className="text-[10px] transition-colors duration-300 text-[#888888]">{timeAgo(lead.created_at)}</p>}
         </div>
@@ -487,6 +511,46 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 {lead.created_at && <span className="text-[10px] ml-auto transition-colors duration-300 text-[#AAAAAA]">{formatTime(lead.created_at)}</span>}
               </div>
               <div className="h-px bg-gradient-to-r mt-2 transition-colors duration-300 from-[#0D0D0D] via-[#EAE6E0] to-transparent"></div>
+            </div>
+          )}
+
+          {/* Email Engagement Score */}
+          {engagementMetrics && (
+            <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-[#F9F7F4] to-[#FAFAFA] border border-[#EAE6E0] animate-in fade-in duration-200">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666]">Email Engagement</p>
+                <span className={`px-2 py-1 rounded text-[10px] font-black ${
+                  engagementMetrics.engagement_score >= 50 ? "bg-[#2ECC71] text-white" :
+                  engagementMetrics.engagement_score >= 20 ? "bg-[#F39C12] text-white" :
+                  "bg-[#95A5A6] text-white"
+                }`}>
+                  {engagementMetrics.engagement_score}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-[9px]">
+                <div>
+                  <p className="text-[#888888]">Opens</p>
+                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.opens}</p>
+                </div>
+                <div>
+                  <p className="text-[#888888]">Clicks</p>
+                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.clicks}</p>
+                </div>
+                <div>
+                  <p className="text-[#888888]">Last Activity</p>
+                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.time_since_activity}</p>
+                </div>
+              </div>
+              {engagementMetrics.engagement.clicked_links && engagementMetrics.engagement.clicked_links.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-[#EAE6E0]">
+                  <p className="text-[9px] text-[#666666] mb-1">Clicked:</p>
+                  <div className="text-[8px] text-[#0D0D0D] space-y-0.5">
+                    {engagementMetrics.engagement.clicked_links.map((link: string, i: number) => (
+                      <p key={i} className="truncate">→ {new URL(link).pathname}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

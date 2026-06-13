@@ -342,6 +342,41 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // PHASE 5: Email Engagement Tracking
+  // Track opens, clicks, bounces, complaints from Resend webhooks
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_email_events (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      outreach_id UUID REFERENCES b2b_outreach(id) ON DELETE CASCADE,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      event_type TEXT NOT NULL, -- opened, clicked, bounced, complained, delivered
+      timestamp TIMESTAMPTZ NOT NULL,
+      metadata JSONB, -- {"ip": "...", "user_agent": "...", "link_url": "...", "link_text": "..."}
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Track which links were clicked in emails
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_email_link_clicks (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      event_id UUID REFERENCES b2b_email_events(id) ON DELETE CASCADE,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      link_url TEXT,
+      link_text TEXT,
+      clicked_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Engagement score snapshot (denormalized for performance)
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS engagement_score INT DEFAULT 0
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS last_engagement_at TIMESTAMPTZ
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
