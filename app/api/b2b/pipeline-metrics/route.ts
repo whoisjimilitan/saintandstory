@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   const sql = neon(process.env.DATABASE_URL!);
 
   try {
-    const [discovered, enriched, qualified, totalLeads, activeLeads, tierA, tierB, tierC, tierD, unqualified] = await Promise.all([
+    const [discovered, enriched, qualified, totalLeads, activeLeads, tierA, tierB, tierC, tierD, unqualified, standingOrders] = await Promise.all([
       sql`SELECT COUNT(*) as count FROM discovered_businesses`,
       sql`SELECT COUNT(*) as count FROM enriched_businesses`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses`,
@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'C'`,
       sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'D'`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses WHERE promoted_to_lead_at IS NULL`,
+      sql`SELECT COUNT(*) as count FROM b2b_standing_orders WHERE active = true`,
     ]);
 
     // Score distribution
@@ -81,6 +82,9 @@ export async function GET(request: NextRequest) {
         promoted_to_leads_tier_c: (tierC[0] as any).count,
         promoted_to_leads_tier_d: (tierD[0] as any).count,
         unqualified_but_scored: (unqualified[0] as any).count,
+      },
+      revenue: {
+        active_standing_orders: (standingOrders[0] as any).count,
       },
       score_distribution: scoreDistribution,
       top_unqualified_opportunities: topUnqualified,
