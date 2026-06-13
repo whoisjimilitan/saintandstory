@@ -377,6 +377,29 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS last_engagement_at TIMESTAMPTZ
   `;
 
+  // PHASE 5: AI Prospect Brief Cache
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_prospect_brief_cache (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      lead_id UUID UNIQUE REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      brief_data JSONB NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // PHASE 5: Mission ROI Tracking
+  await sql`
+    ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS (
+      discovered_count INT DEFAULT 0,
+      qualified_count INT DEFAULT 0,
+      leads_created_count INT DEFAULT 0,
+      converted_count INT DEFAULT 0,
+      revenue_generated DECIMAL(10, 2) DEFAULT 0,
+      last_updated TIMESTAMPTZ
+    )
+  `;
+
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
   await sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`;
