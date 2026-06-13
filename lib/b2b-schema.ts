@@ -388,6 +388,21 @@ export async function ensureB2BSchema() {
     )
   `;
 
+  // PHASE 5: Heat Score Timeline
+  // Track heat score changes over time to see what's warming up or cooling down
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_heat_score_history (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      heat_score INT NOT NULL,
+      engagement_score INT,
+      qualification_score INT,
+      intent_score INT,
+      recorded_at TIMESTAMPTZ DEFAULT NOW(),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // PHASE 5: Mission ROI Tracking
   await sql`
     ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS (

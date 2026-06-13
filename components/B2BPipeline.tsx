@@ -500,6 +500,48 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
       {expanded && (
         <div className="px-5 pb-5 border-t transition-colors duration-300 border-[#EAE6E0]">
+          {/* Heat Score Composition */}
+          {engagementMetrics && (
+            <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-[#F5F1EB] to-[#FAFAFA] border border-[#EAE6E0] animate-in fade-in duration-200">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666]">Heat Score Breakdown</p>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black ${
+                  lead.engagement_score >= 75 ? "bg-[#FF4444] text-white" :
+                  lead.engagement_score >= 50 ? "bg-[#FF9500] text-white" :
+                  lead.engagement_score >= 25 ? "bg-[#FFCC00] text-[#0D0D0D]" :
+                  "bg-[#D0D0D0] text-[#0D0D0D]"
+                }`}>
+                  {lead.engagement_score >= 75 ? "🔥 HOT" :
+                   lead.engagement_score >= 50 ? "🔥 WARM" :
+                   lead.engagement_score >= 25 ? "🟡 COOL" :
+                   "⚪ COLD"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-[9px]">
+                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
+                  <p className="text-[#888888] mb-0.5">Qualification</p>
+                  <p className="font-bold text-[#0D0D0D]">{Math.round((lead.opportunity_score || 0) * 0.4)}/40</p>
+                </div>
+                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
+                  <p className="text-[#888888] mb-0.5">Engagement</p>
+                  <p className="font-bold text-[#0D0D0D]">{Math.round((lead.engagement_score || 0) * 0.4)}/40</p>
+                </div>
+                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
+                  <p className="text-[#888888] mb-0.5">Intent</p>
+                  <p className="font-bold text-[#0D0D0D]">0/20</p>
+                </div>
+              </div>
+
+              <div className="mt-2 pt-2 border-t border-[#EAE6E0]">
+                <div className="flex items-center justify-between">
+                  <p className="text-[9px] text-[#666666]">Total Heat Score:</p>
+                  <p className="text-[10px] font-bold text-[#0D0D0D]">{lead.engagement_score}/100</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Lead state status line - Apple minimal design */}
           {workflowState === "recognized" && (
             <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
@@ -2029,7 +2071,14 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
                 }
               };
 
-              const sortedLeads = [...pipelineLeads].sort((a, b) => getLeadScore(b) - getLeadScore(a));
+              const sortedLeads = [...pipelineLeads].sort((a, b) => {
+                // Sort by heat score (engagement_score) first
+                const aHeat = a.engagement_score || 0;
+                const bHeat = b.engagement_score || 0;
+                if (bHeat !== aHeat) return bHeat - aHeat;
+                // Fallback to qualification score
+                return getLeadScore(b) - getLeadScore(a);
+              });
               return sortedLeads.map(lead => (
                 <LeadCard key={lead.id} lead={lead} onRefresh={refresh} />
               ));

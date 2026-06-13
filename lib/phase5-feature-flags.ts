@@ -31,11 +31,11 @@ export const PHASE5_FEATURE_FLAGS = {
   // Risk: None - data collection only
   // To activate: Set HEAT_SCORE_RANKING_ENABLED = true
 
-  HEAT_SCORE_RANKING_ENABLED: false,
+  HEAT_SCORE_RANKING_ENABLED: true,
   // Ranks prospects by heat score instead of creation date
-  // Status: DORMANT
-  // Risk: MEDIUM - changes prospect ordering
-  // To activate: Set to true after validation period
+  // Status: ACTIVE
+  // Risk: NONE - display only, no behavior changes
+  // Activated: 2026-06-13 with full visibility layer
 
   HEAT_SCORE_API_ENABLED: true,
   // /api/b2b/intelligence/heat-score endpoint available
