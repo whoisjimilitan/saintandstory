@@ -50,18 +50,17 @@ model ApprovedInsight {
   validationId      String    @unique
   validationLog     ValidationLog @relation(
     fields: [validationId],
-    references: [validationId]
+    references: [validationId],
+    onDelete: Restrict
   )
   
   // LIFECYCLE METADATA ONLY
   approvalStatus    String    @default("new")
   // States: new → active → promoted → archived
   
-  // TIMESTAMPS
+  // APPROVAL TIMESTAMP (ONLY)
   approvedAt        DateTime  @default(now())
-  activatedAt       DateTime?
-  promotedAt        DateTime?
-  archivedAt        DateTime?
+  // Lifecycle timestamps derived from ApprovalPromotion (no duplication)
   
   // AUDIT TRAIL
   promotionHistory  ApprovalPromotion[]
@@ -71,6 +70,7 @@ model ApprovedInsight {
   
   @@index([approvalStatus])
   @@index([approvedAt])
+  @@index([approvalStatus, approvedAt])
   @@unique([validationId])
 }
 
@@ -91,15 +91,32 @@ model ApprovalPromotion {
   
   @@index([approvedInsightId])
   @@index([decidedAt])
+  @@index([toStatus])
+  @@index([approvedInsightId, decidedAt])
 }
 ```
 
 **Guarantees**:
-- ✅ ApprovedInsight stores ONLY approval metadata
-- ✅ No insight data is duplicated
-- ✅ ValidationLog is immutable source
-- ✅ All decisions are logged in ApprovalPromotion
-- ✅ Queries join to ValidationLog for insight details
+- ✅ ApprovedInsight stores ONLY approval metadata (no duplication)
+- ✅ No insight data is duplicated from ValidationLog
+- ✅ No lifecycle timestamps duplicated from ApprovalPromotion
+- ✅ ValidationLog is immutable source of insight data
+- ✅ ApprovalPromotion is authoritative audit trail
+- ✅ All state transitions logged with full history
+- ✅ onDelete: Restrict prevents orphaned records
+- ✅ Lifecycle timestamps derived when needed (activatedAt, promotedAt, archivedAt)
+
+**Lifecycle Timestamp Derivation**:
+```typescript
+// activatedAt = first ApprovalPromotion where toStatus="active"
+const activated = promotionHistory.find(p => p.toStatus === "active")?.decidedAt
+
+// promotedAt = first ApprovalPromotion where toStatus="promoted"
+const promoted = promotionHistory.find(p => p.toStatus === "promoted")?.decidedAt
+
+// archivedAt = first ApprovalPromotion where toStatus="archived"
+const archived = promotionHistory.find(p => p.toStatus === "archived")?.decidedAt
+```
 
 ---
 

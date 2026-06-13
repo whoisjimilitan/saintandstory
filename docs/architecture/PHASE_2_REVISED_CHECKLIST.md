@@ -232,24 +232,32 @@
 
 ## Database Migration
 
-### Schema Changes
+### Schema Changes (REVISED)
 
 **File**: `prisma/schema.prisma`
 
 **Checklist**:
 - [ ] Add ApprovedInsight model after ValidationLog
-- [ ] Define all fields (id, validationId, approvalStatus, timestamps, etc.)
-- [ ] Add relationship to ValidationLog (fields, references)
+- [ ] Define fields ONLY: id, validationId, approvalStatus, approvedAt
+- [ ] ⚠️ DO NOT add: activatedAt, promotedAt, archivedAt (derive from ApprovalPromotion)
+- [ ] Add relationship to ValidationLog with onDelete: Restrict
 - [ ] Add @@unique([validationId])
-- [ ] Add @@index decorators (approvalStatus, approvedAt, validationId)
+- [ ] Add indexes:
+  - [ ] @@index([approvalStatus])
+  - [ ] @@index([approvedAt])
+  - [ ] @@index([approvalStatus, approvedAt]) ← NEW
 - [ ] Add ApprovalPromotion model
-- [ ] Define all fields (id, approvedInsightId, fromStatus, toStatus, etc.)
-- [ ] Add relationship to ApprovedInsight (fields, references)
-- [ ] Add @@index decorators (approvedInsightId, decidedAt)
+- [ ] Define fields: id, approvedInsightId, fromStatus, toStatus, promotionReason, decidedAt, decidedBy
+- [ ] Add relationship to ApprovedInsight
+- [ ] Add indexes:
+  - [ ] @@index([approvedInsightId])
+  - [ ] @@index([decidedAt])
+  - [ ] @@index([toStatus]) ← NEW
+  - [ ] @@index([approvedInsightId, decidedAt]) ← NEW
 - [ ] Validate schema: `npx prisma validate`
 - [ ] Generate client: `npx prisma generate`
 
-**Est. LOC**: 60  
+**Est. LOC**: 70  
 **Completed**: ☐
 
 ---
