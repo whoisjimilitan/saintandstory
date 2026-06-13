@@ -56,6 +56,8 @@ export async function findNearbyLeads(
         AND l.status NOT IN ('closed', 'dead')
         -- Prioritize leads with pain signals
         AND l.pain_point IS NOT NULL
+        -- Gate outreach to active tiers (A/B only)
+        AND (l.lead_tier IS NULL OR l.lead_tier IN ('A', 'B'))
       ORDER BY
         l.pain_point DESC,
         l.review_rating ASC,

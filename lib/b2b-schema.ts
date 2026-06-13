@@ -142,6 +142,14 @@ export async function ensureB2BSchema() {
   await sql`
     ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ DEFAULT NULL
   `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS lead_tier TEXT CHECK (lead_tier IN ('A', 'B', 'C', 'D')) DEFAULT NULL
+  `;
+
+  // Create index on lead_tier for efficient outreach filtering
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_b2b_leads_tier ON b2b_leads(lead_tier)
+  `;
 
   // Phase 3: Four-Layer Pipeline Architecture
   // Layer 1: Raw Discoveries (persisted, never discarded)

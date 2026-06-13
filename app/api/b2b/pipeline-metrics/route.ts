@@ -27,11 +27,16 @@ export async function GET(request: NextRequest) {
   const sql = neon(process.env.DATABASE_URL!);
 
   try {
-    const [discovered, enriched, qualified, leads, unqualified] = await Promise.all([
+    const [discovered, enriched, qualified, totalLeads, activeLeads, tierA, tierB, tierC, tierD, unqualified] = await Promise.all([
       sql`SELECT COUNT(*) as count FROM discovered_businesses`,
       sql`SELECT COUNT(*) as count FROM enriched_businesses`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses`,
       sql`SELECT COUNT(*) as count FROM b2b_leads WHERE source = 'discovery_promoted' OR source = 'discovery'`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND (lead_tier IS NULL OR lead_tier IN ('A', 'B'))`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'A'`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'B'`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'C'`,
+      sql`SELECT COUNT(*) as count FROM b2b_leads WHERE (source = 'discovery_promoted' OR source = 'discovery') AND lead_tier = 'D'`,
       sql`SELECT COUNT(*) as count FROM qualified_businesses WHERE promoted_to_lead_at IS NULL`,
     ]);
 
@@ -69,7 +74,12 @@ export async function GET(request: NextRequest) {
         discovered: (discovered[0] as any).count,
         enriched: (enriched[0] as any).count,
         qualified: (qualified[0] as any).count,
-        promoted_to_leads: (leads[0] as any).count,
+        promoted_to_leads_total: (totalLeads[0] as any).count,
+        promoted_to_leads_active: (activeLeads[0] as any).count,
+        promoted_to_leads_tier_a: (tierA[0] as any).count,
+        promoted_to_leads_tier_b: (tierB[0] as any).count,
+        promoted_to_leads_tier_c: (tierC[0] as any).count,
+        promoted_to_leads_tier_d: (tierD[0] as any).count,
         unqualified_but_scored: (unqualified[0] as any).count,
       },
       score_distribution: scoreDistribution,

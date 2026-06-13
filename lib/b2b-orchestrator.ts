@@ -197,12 +197,14 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
   const stage3Runner = logger.startStage("Standing Order Processing").start();
 
   try {
-    // Get standing orders that need job generation
+    // Get standing orders that need job generation (only from active tiers A/B/C)
     const orders = (await sql`
-      SELECT id, business_name, next_scheduled_at
-      FROM b2b_standing_orders
-      WHERE active = true
-        AND (next_scheduled_at IS NULL OR next_scheduled_at <= NOW())
+      SELECT so.id, so.business_name, so.next_scheduled_at
+      FROM b2b_standing_orders so
+      JOIN b2b_leads bl ON so.lead_id = bl.id
+      WHERE so.active = true
+        AND (so.next_scheduled_at IS NULL OR so.next_scheduled_at <= NOW())
+        AND (bl.lead_tier IS NULL OR bl.lead_tier IN ('A', 'B', 'C'))
     `) as Array<{
       id: string;
       business_name: string;
@@ -311,12 +313,16 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
 
   try {
     // Metrics are calculated on-demand by the dashboard API
-    // This stage just logs that metrics are ready to be refreshed
-    const leadsCount = await sql`SELECT COUNT(*) as count FROM b2b_leads`;
+    // Split: total qualified (learning inventory) vs. active outreach (conversion target)
+    const totalLeads = await sql`SELECT COUNT(*) as count FROM b2b_leads`;
+    const activeLeads = await sql`
+      SELECT COUNT(*) as count FROM b2b_leads
+      WHERE lead_tier IS NULL OR lead_tier IN ('A', 'B')
+    `;
     const jobsCount = await sql`SELECT COUNT(*) as count FROM jobs`;
 
     console.log(
-      `  → Leads in system: ${leadsCount[0].count}, Jobs: ${jobsCount[0].count}`
+      `  → Leads: ${activeLeads[0].count} active, ${totalLeads[0].count} total qualified | Jobs: ${jobsCount[0].count}`
     );
 
     stage4Runner.success();
