@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
+import { runFullPipeline } from "@/lib/four-layer-pipeline";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -248,25 +249,48 @@ export async function POST(request: NextRequest) {
         insertAttempts++;
         console.log(`[DISCOVER] INSERT ATTEMPT #${insertAttempts}: ${place.name}`);
 
-        await sql`
-          INSERT INTO b2b_leads (
-            business_name, business_category, email, phone, city,
-            website, google_place_id, pain_point, pain_point_review, review_rating,
-            source, status, niche, landing_page_url, created_at, updated_at
-          ) VALUES (
-            ${place.name}, ${niche}, null, ${place.formatted_phone_number ?? null}, ${addressCity},
-            ${place.website ?? null}, ${place.place_id}, ${painPoint}, ${reviewText ?? null},
-            ${rating ?? null}, 'discovery', 'new', ${niche},
-            ${`${BASE_URL}/b2b/${niche}`}, NOW(), NOW()
-          )
-        `;
+        // Run through four-layer pipeline: discover → enrich → qualify → promote
+        const pipelineResult = await runFullPipeline(sql, {
+          placeId: place.place_id,
+          name: place.name,
+          address: place.formatted_address ?? "",
+          postcode: undefined,
+          category: niche,
+          source: "discovery",
+          reviews: (place.reviews || []).map(r => ({
+            rating: r.rating,
+            text: r.text,
+            author: "Google Reviews",
+            time: r.time,
+          })),
+          website: place.website,
+          phone: place.formatted_phone_number,
+          rating: place.rating,
+          reviewCount: place.reviews?.length ?? 0,
+          rawData: {
+            city: addressCity,
+            painPoint,
+            painPointReview: reviewText,
+          },
+        });
 
-        insertSuccesses++;
-        console.log(`[DISCOVER]   ✓ INSERT SUCCESS: ${place.name}`);
-        added.push(place.name);
+        if (pipelineResult.promoted) {
+          insertSuccesses++;
+          console.log(`[DISCOVER]   ✓ PROMOTED TO LEAD: ${place.name}`);
+          added.push(place.name);
+        } else if (pipelineResult.qualified) {
+          insertSuccesses++;
+          console.log(`[DISCOVER]   ✓ QUALIFIED (awaiting score threshold): ${place.name}`);
+          added.push(place.name);
+        } else if (pipelineResult.discovered) {
+          console.log(`[DISCOVER]   ⚠ DISCOVERED (not yet enriched): ${place.name}`);
+          added.push(place.name);
+        } else {
+          console.log(`[DISCOVER]   ✗ PIPELINE FAILED: ${place.name}`);
+        }
       } catch (error) {
         insertFailures++;
-        console.error(`[DISCOVER]   ✗ INSERT FAILED: ${place.name}`);
+        console.error(`[DISCOVER]   ✗ PIPELINE ERROR: ${place.name}`);
         console.error(`[DISCOVER]   Error:`, error);
       }
     }
