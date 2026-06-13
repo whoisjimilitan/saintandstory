@@ -130,9 +130,9 @@ export async function getCategoryStats(
     const createdCount = (created[0] as any).count || 0;
     const convertedCount = (converted[0] as any).count || 0;
     const revenueGenerated = parseFloat((revenue[0] as any).total || 0);
-    const engagementAvg = parseFloat((engagementAvg[0] as any).avg || 0);
-    const scoreAvg = parseFloat((scoreAvg[0] as any).avg || 0);
-    const daysAvg = parseFloat((daysToConversion[0] as any).avg_days || 0);
+    const engagementAvgValue = parseFloat((engagementAvg[0] as any).avg || 0);
+    const scoreAvgValue = parseFloat((scoreAvg[0] as any).avg || 0);
+    const daysAvgValue = parseFloat((daysToConversion[0] as any).avg_days || 0);
 
     return {
       category,
@@ -147,9 +147,9 @@ export async function getCategoryStats(
         discoveredCount > 0 ? qualifiedCount / discoveredCount : 0,
       lead_creation_rate:
         qualifiedCount > 0 ? createdCount / qualifiedCount : 0,
-      average_days_to_conversion: daysAvg,
-      engagement_score_avg: engagementAvg,
-      opportunity_score_avg: scoreAvg,
+      average_days_to_conversion: daysAvgValue,
+      engagement_score_avg: engagementAvgValue,
+      opportunity_score_avg: scoreAvgValue,
     };
   } catch (error) {
     console.error(

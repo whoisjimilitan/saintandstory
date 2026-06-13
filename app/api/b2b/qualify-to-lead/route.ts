@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Promote to lead
-    const result = await promoteToLead(sql, qualified_business_id, qb[0], 0); // No minimum threshold for manual promotion
+    const result = await promoteToLead(sql, qualified_business_id, qb[0]);
 
     if (result.success) {
       return NextResponse.json({

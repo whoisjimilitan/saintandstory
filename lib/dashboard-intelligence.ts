@@ -121,7 +121,7 @@ export async function generateDashboardIntelligence(
     `;
 
     // Build hottest prospects list
-    const hottestProspects = await Promise.all(
+    const hottestProspectsRaw = await Promise.all(
       hotProspects.map(async (item: any, index: number) => {
         const lead = await sql`
           SELECT business_name, engagement_score, last_engagement_at
@@ -144,9 +144,10 @@ export async function generateDashboardIntelligence(
         };
       })
     );
+    const hottestProspects = (hottestProspectsRaw.filter((p: any) => p !== null) as any[]);
 
     // Build pending followups list
-    const followupsList = await Promise.all(
+    const followupsListRaw = await Promise.all(
       pendingFollowups.slice(0, 5).map(async (item: any) => {
         const lead = await sql`
           SELECT business_name
@@ -166,6 +167,7 @@ export async function generateDashboardIntelligence(
         };
       })
     );
+    const followupsList = (followupsListRaw.filter((f: any) => f !== null) as any[]);
 
     // Build AI recommendations
     const recommendations: string[] = [];
@@ -173,16 +175,17 @@ export async function generateDashboardIntelligence(
     const opportunities: string[] = [];
 
     // Hot prospects
-    if (hottestProspects.filter((p: any) => p).length > 0) {
+    if (hottestProspects.length > 0 && hottestProspects[0]) {
+      const hottest = hottestProspects[0];
       recommendations.push(
-        `Contact ${hottestProspects.filter((p: any) => p)[0].business_name} today (heat score: ${hottestProspects.filter((p: any) => p)[0].heat_score})`
+        `Contact ${hottest.business_name} today (heat score: ${hottest.heat_score})`
       );
     }
 
     // Follow-ups
-    if (followupsList.filter((f: any) => f).length > 0) {
+    if (followupsList.length > 0) {
       recommendations.push(
-        `${followupsList.filter((f: any) => f).length} prospects need follow-ups`
+        `${followupsList.length} prospects need follow-ups`
       );
     }
 
@@ -215,8 +218,8 @@ export async function generateDashboardIntelligence(
         : 0;
 
     return {
-      hottest_prospects: hottestProspects.filter((p: any) => p !== null),
-      pending_followups: followupsList.filter((f: any) => f !== null),
+      hottest_prospects: hottestProspects,
+      pending_followups: followupsList,
       recent_engagement: recentEvents.map((e: any) => ({
         business_name: e.business_name,
         event_type: e.event_type,

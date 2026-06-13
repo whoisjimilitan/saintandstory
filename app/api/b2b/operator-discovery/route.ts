@@ -221,8 +221,8 @@ async function runDiscoveryJob(
             rawData: result,
           };
 
-          // Run four-layer pipeline (discover → enrich → qualify → promote if score >= minScore)
-          const pipelineResult = await runFullPipeline(sql, business, minScore);
+          // Run four-layer pipeline (discover → enrich → qualify → promote)
+          const pipelineResult = await runFullPipeline(sql, business);
 
           if (pipelineResult.discovered) totalDiscovered++;
           if (pipelineResult.qualified) totalQualified++;

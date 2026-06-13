@@ -54,6 +54,9 @@ export interface Lead {
   longitude?: number;
   human_observations?: Record<string, unknown>[];
   business_evidence?: BusinessEvidence;
+  engagement_score?: number;
+  last_engagement_at?: string | null;
+  opportunity_score?: number;
 }
 
 export interface StandingOrder {

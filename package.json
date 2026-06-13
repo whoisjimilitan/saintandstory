@@ -12,6 +12,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@clerk/nextjs": "^7.4.2",
     "@neondatabase/serverless": "^1.1.0",
     "leaflet": "^1.9.4",

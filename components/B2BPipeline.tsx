@@ -484,13 +484,13 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
               {STATUS_LABELS[status] ?? status}
             </span>
-            {lead.engagement_score > 0 && (
+            {(lead.engagement_score ?? 0) > 0 && (
               <span className={`text-[10px] font-black px-2 py-0.5 rounded transition-colors duration-300 ${
-                lead.engagement_score >= 50 ? "bg-[#2ECC71] text-white" :
-                lead.engagement_score >= 20 ? "bg-[#F39C12] text-white" :
+                (lead.engagement_score ?? 0) >= 50 ? "bg-[#2ECC71] text-white" :
+                (lead.engagement_score ?? 0) >= 20 ? "bg-[#F39C12] text-white" :
                 "bg-[#95A5A6] text-white"
               }`}>
-                {lead.engagement_score}
+                {lead.engagement_score ?? 0}
               </span>
             )}
           </div>
@@ -506,14 +506,14 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666]">Heat Score Breakdown</p>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black ${
-                  lead.engagement_score >= 75 ? "bg-[#FF4444] text-white" :
-                  lead.engagement_score >= 50 ? "bg-[#FF9500] text-white" :
-                  lead.engagement_score >= 25 ? "bg-[#FFCC00] text-[#0D0D0D]" :
+                  (lead.engagement_score ?? 0) >= 75 ? "bg-[#FF4444] text-white" :
+                  (lead.engagement_score ?? 0) >= 50 ? "bg-[#FF9500] text-white" :
+                  (lead.engagement_score ?? 0) >= 25 ? "bg-[#FFCC00] text-[#0D0D0D]" :
                   "bg-[#D0D0D0] text-[#0D0D0D]"
                 }`}>
-                  {lead.engagement_score >= 75 ? "🔥 HOT" :
-                   lead.engagement_score >= 50 ? "🔥 WARM" :
-                   lead.engagement_score >= 25 ? "🟡 COOL" :
+                  {(lead.engagement_score ?? 0) >= 75 ? "🔥 HOT" :
+                   (lead.engagement_score ?? 0) >= 50 ? "🔥 WARM" :
+                   (lead.engagement_score ?? 0) >= 25 ? "🟡 COOL" :
                    "⚪ COLD"}
                 </span>
               </div>
@@ -525,7 +525,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </div>
                 <div className="p-2 bg-white rounded border border-[#E8E8E8]">
                   <p className="text-[#888888] mb-0.5">Engagement</p>
-                  <p className="font-bold text-[#0D0D0D]">{Math.round((lead.engagement_score || 0) * 0.4)}/40</p>
+                  <p className="font-bold text-[#0D0D0D]">{Math.round(((lead.engagement_score ?? 0) || 0) * 0.4)}/40</p>
                 </div>
                 <div className="p-2 bg-white rounded border border-[#E8E8E8]">
                   <p className="text-[#888888] mb-0.5">Intent</p>
@@ -536,7 +536,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <div className="mt-2 pt-2 border-t border-[#EAE6E0]">
                 <div className="flex items-center justify-between">
                   <p className="text-[9px] text-[#666666]">Total Heat Score:</p>
-                  <p className="text-[10px] font-bold text-[#0D0D0D]">{lead.engagement_score}/100</p>
+                  <p className="text-[10px] font-bold text-[#0D0D0D]">{(lead.engagement_score ?? 0)}/100</p>
                 </div>
               </div>
             </div>

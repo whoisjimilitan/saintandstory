@@ -135,8 +135,7 @@ export async function executeResearchMission(
             // Run four-layer pipeline
             const pipelineResult = await runFullPipeline(
               sql,
-              business,
-              promoteIfScoreAbove
+              business
             );
 
             if (pipelineResult.discovered) totalDiscovered++;
@@ -193,8 +192,7 @@ export async function executeResearchMission(
 
             const pipelineResult = await runFullPipeline(
               sql,
-              business,
-              promoteIfScoreAbove
+              business
             );
 
             if (pipelineResult.discovered) totalDiscovered++;
