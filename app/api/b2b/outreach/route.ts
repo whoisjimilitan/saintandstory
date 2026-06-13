@@ -104,6 +104,11 @@ export async function POST(request: NextRequest) {
     VALUES (${leadId}, ${subject}, ${body}, NOW(), ${followUp1At}, ${followUp2At}, ${emailType ?? "initial"}, ${data?.id ?? null})
   `;
 
+  // Schedule automatic follow-ups
+  // Follow-up 1: 3 days after initial send
+  // Follow-up 2: 7 days after initial send
+  // Follow-ups stop if prospect replies
+
   // Update lead status
   await sql`
     UPDATE b2b_leads SET status = 'contacted', updated_at = NOW() WHERE id = ${leadId}
