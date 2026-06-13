@@ -102,6 +102,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
 
   const [expanded, setExpanded] = useState(false);
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null);
+  const [outreachHistory, setOutreachHistory] = useState<Array<{ id: string; sent_at: string; email_type: string; replied: boolean; replied_at: string | null }>>([]);
   const [drafting, setDrafting] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendingRecognition, setSendingRecognition] = useState(false);
@@ -167,8 +168,11 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
     setDrafting(true);
     try {
       const res = await fetch(`/api/b2b/outreach?lead_id=${lead.id}`);
-      const data = await res.json() as { subject: string; body: string };
-      setDraft(data);
+      const data = await res.json() as { subject: string; body: string; outreach_history: Array<{ id: string; sent_at: string; email_type: string; replied: boolean; replied_at: string | null }> };
+      setDraft({ subject: data.subject, body: data.body });
+      if (data.outreach_history) {
+        setOutreachHistory(data.outreach_history);
+      }
     } finally {
       setDrafting(false);
     }
@@ -879,6 +883,38 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             >
               {drafting ? "Drafting…" : "Draft email"}
             </button>
+          )}
+
+          {/* Engagement History - Show all outreach attempts and responses */}
+          {outreachHistory.length > 0 && (
+            <div className={`border rounded-lg p-4 mb-4 space-y-2 transition-colors duration-300 ${
+              isExpanded
+                ? "bg-white/10 border-white/20"
+                : "bg-[#F9F7F4] border-[#EAE6E0]"
+            }`}>
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Engagement History</p>
+              <div className="space-y-1.5">
+                {outreachHistory.map((email) => (
+                  <div key={email.id} className={`flex items-start justify-between text-xs p-2 rounded transition-colors ${
+                    email.replied
+                      ? "bg-[#E8F5E9] border border-[#C8E6C9]"
+                      : "bg-white/50 border border-[#EAE6E0]"
+                  }`}>
+                    <div className="flex-1">
+                      <p className={`font-semibold ${email.replied ? "text-[#2ECC71]" : "text-[#666666]"}`}>
+                        {email.email_type === "initial" ? "Initial" : email.email_type === "follow_up_1" ? "Follow-up 1" : "Follow-up 2"}
+                      </p>
+                      <p className="text-[#888888] text-[10px] mt-0.5">
+                        Sent {new Date(email.sent_at).toLocaleDateString()} at {new Date(email.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    {email.replied && (
+                      <span className="text-[#2ECC71] font-semibold whitespace-nowrap ml-2">✓ Replied</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Action menu - condensed button layout */}

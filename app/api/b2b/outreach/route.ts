@@ -20,7 +20,7 @@ async function isAdmin() {
   return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
 }
 
-// Generate draft for a lead (no send)
+// Generate draft for a lead (no send) + show outreach history
 export async function GET(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -47,7 +47,15 @@ export async function GET(request: NextRequest) {
     landingPageUrl: (lead.landing_page_url as string) ?? `${BASE_URL}/b2b/${lead.niche ?? "retailers"}`,
   });
 
-  return NextResponse.json({ subject, body, lead });
+  // Fetch full outreach history for engagement tracking
+  const outreach = await sql`
+    SELECT id, subject, sent_at, email_type, replied, replied_at
+    FROM b2b_outreach
+    WHERE lead_id = ${leadId}
+    ORDER BY sent_at DESC
+  `;
+
+  return NextResponse.json({ subject, body, lead, outreach_history: outreach });
 }
 
 // Send email
