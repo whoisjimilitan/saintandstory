@@ -462,4 +462,53 @@ export async function ensureB2BSchema() {
   // Other
   await sql`CREATE INDEX IF NOT EXISTS idx_lead_state_transitions_lead ON lead_state_transitions(lead_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_drivers_postcode ON drivers(postcode)`;
+
+  // WAVE 3: Outreach Control & Audit Log
+  // Add engagement_score to b2b_leads (for Wave 2+ compatibility)
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS engagement_score INT DEFAULT 0
+  `;
+
+  // Add last_contacted_at and lead_status for operator workflow
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS last_contacted_at TIMESTAMPTZ DEFAULT NULL
+  `;
+
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS lead_status TEXT DEFAULT 'new'
+    CHECK (lead_status IN ('new', 'ready', 'contacted', 'engaged', 'qualified', 'active', 'archived'))
+  `;
+
+  // Audit log for all outreach events
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_outreach_events (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      lead_id UUID NOT NULL REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      event_type TEXT NOT NULL CHECK (
+        event_type IN (
+          'email_generated',
+          'email_approved',
+          'email_sent',
+          'email_opened',
+          'email_clicked',
+          'email_replied',
+          'contact_marked',
+          'status_changed'
+        )
+      ),
+      operator TEXT,
+      event_data JSONB,
+      metadata JSONB,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Index for efficient queries
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_events_lead ON b2b_outreach_events(lead_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_events_type ON b2b_outreach_events(event_type)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_outreach_events_created ON b2b_outreach_events(created_at DESC)`;
+
+  // Index for engagement tracking
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_engagement ON b2b_leads(engagement_score DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_b2b_leads_status ON b2b_leads(lead_status)`;
 }
