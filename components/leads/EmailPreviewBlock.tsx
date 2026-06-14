@@ -2,26 +2,76 @@
 
 import { useState } from "react";
 import { Copy, Mail } from "lucide-react";
+import { SendEmailModal } from "./SendEmailModal";
 
 interface EmailPreviewBlockProps {
   subject: string;
   body: string;
+  leadId?: string;
+  businessName?: string;
+  recipientEmail?: string;
+  lastSentAt?: string;
   onCopy?: () => void;
-  onSend?: () => void;
+  onSend?: (success: boolean) => void;
 }
 
 export function EmailPreviewBlock({
   subject,
   body,
+  leadId,
+  businessName,
+  recipientEmail,
+  lastSentAt,
   onCopy,
   onSend,
 }: EmailPreviewBlockProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const handleCopy = () => {
     const email = `${subject}\n\n${body}`;
     navigator.clipboard.writeText(email);
     onCopy?.();
+  };
+
+  const handleSendClick = () => {
+    if (leadId && recipientEmail && businessName) {
+      setShowModal(true);
+    } else {
+      console.error("Missing required fields for send");
+    }
+  };
+
+  const handleSendConfirm = async () => {
+    if (!leadId || !recipientEmail) return;
+
+    setSending(true);
+    try {
+      const response = await fetch("/api/b2b/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: leadId,
+          subject,
+          body,
+          operator: "operator", // TODO: Get from auth context
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Send failed");
+      }
+
+      setShowModal(false);
+      onSend?.(true);
+    } catch (error) {
+      console.error("Send error:", error);
+      onSend?.(false);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -64,16 +114,30 @@ export function EmailPreviewBlock({
           Copy
         </button>
 
-        {onSend && (
+        {leadId && recipientEmail && (
           <button
-            onClick={onSend}
-            className="text-xs px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded transition flex items-center gap-1"
+            onClick={handleSendClick}
+            disabled={sending}
+            className="text-xs px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded transition flex items-center gap-1 disabled:opacity-50"
           >
             <Mail size={14} />
-            Send
+            {sending ? "Sending..." : "Send"}
           </button>
         )}
       </div>
+
+      {leadId && recipientEmail && businessName && (
+        <SendEmailModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleSendConfirm}
+          businessName={businessName}
+          recipientEmail={recipientEmail}
+          subject={subject}
+          body={body}
+          lastSentAt={lastSentAt}
+        />
+      )}
     </div>
   );
 }

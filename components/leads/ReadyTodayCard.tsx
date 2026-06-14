@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { EmailPreviewBlock } from "./EmailPreviewBlock";
 import { Mail, Phone, CheckCircle } from "lucide-react";
 
@@ -13,8 +14,10 @@ interface ReadyTodayCardProps {
   primaryHook?: string;
   emailSubject?: string;
   emailBody?: string;
-  onSendEmail?: () => void;
+  lastSentAt?: string;
+  onSendEmail?: (success: boolean) => void;
   onMarkContacted?: () => void;
+  onRefresh?: () => void;
 }
 
 export function ReadyTodayCard({
@@ -27,9 +30,40 @@ export function ReadyTodayCard({
   primaryHook,
   emailSubject,
   emailBody,
+  lastSentAt,
   onSendEmail,
   onMarkContacted,
+  onRefresh,
 }: ReadyTodayCardProps) {
+  const [marking, setMarking] = useState(false);
+
+  const handleMarkContacted = async () => {
+    setMarking(true);
+    try {
+      const response = await fetch("/api/b2b/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: id,
+          status: "contacted",
+          operator: "operator", // TODO: Get from auth context
+        }),
+      });
+
+      if (response.ok) {
+        onMarkContacted?.();
+        onRefresh?.();
+      } else {
+        const error = await response.json();
+        console.error("Failed to mark contacted:", error);
+      }
+    } catch (error) {
+      console.error("Error marking contacted:", error);
+    } finally {
+      setMarking(false);
+    }
+  };
+
   return (
     <div className="border-2 border-green-400 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 space-y-3 shadow-md">
       {/* PRIORITY BADGE */}
@@ -91,21 +125,29 @@ export function ReadyTodayCard({
         <EmailPreviewBlock
           subject={emailSubject}
           body={emailBody}
+          leadId={id}
+          businessName={businessName}
+          recipientEmail={email}
+          lastSentAt={lastSentAt}
           onCopy={() => console.log("Email copied")}
-          onSend={onSendEmail}
+          onSend={(success) => {
+            if (success) {
+              onRefresh?.();
+            }
+            onSendEmail?.(success);
+          }}
         />
       )}
 
       {/* ACTION BUTTON */}
-      {onMarkContacted && (
-        <button
-          onClick={onMarkContacted}
-          className="w-full text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-bold flex items-center justify-center gap-1"
-        >
-          <CheckCircle size={16} />
-          Mark as Contacted
-        </button>
-      )}
+      <button
+        onClick={handleMarkContacted}
+        disabled={marking}
+        className="w-full text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-bold flex items-center justify-center gap-1 disabled:opacity-50"
+      >
+        <CheckCircle size={16} />
+        {marking ? "Marking..." : "Mark as Contacted"}
+      </button>
     </div>
   );
 }

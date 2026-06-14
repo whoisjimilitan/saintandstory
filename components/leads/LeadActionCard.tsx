@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { EmailPreviewBlock } from "./EmailPreviewBlock";
 import { ProspectInsightBlock } from "./ProspectInsightBlock";
 import { OutreachStrategyBlock } from "./OutreachStrategyBlock";
+import { ContactHistoryPanel } from "./ContactHistoryPanel";
 import { CheckCircle2, Phone, Globe, Mail } from "lucide-react";
 
 interface LeadActionCardProps {
@@ -25,9 +27,13 @@ interface LeadActionCardProps {
   angleReasoning?: string;
   emailSubject?: string;
   emailBody?: string;
-  onSendEmail?: () => void;
+  leadStatus?: string;
+  lastContactedAt?: string;
+  lastSentAt?: string;
+  onSendEmail?: (success: boolean) => void;
   onMarkContacted?: () => void;
   onViewBrief?: () => void;
+  onRefresh?: () => void;
 }
 
 const tierColors = {
@@ -62,11 +68,43 @@ export function LeadActionCard({
   angleReasoning,
   emailSubject,
   emailBody,
+  leadStatus,
+  lastContactedAt,
+  lastSentAt,
   onSendEmail,
   onMarkContacted,
   onViewBrief,
+  onRefresh,
 }: LeadActionCardProps) {
+  const [marking, setMarking] = useState(false);
   const scorePercentage = Math.min(100, Math.max(0, score));
+
+  const handleMarkContacted = async () => {
+    setMarking(true);
+    try {
+      const response = await fetch("/api/b2b/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: id,
+          status: "contacted",
+          operator: "operator", // TODO: Get from auth context
+        }),
+      });
+
+      if (response.ok) {
+        onMarkContacted?.();
+        onRefresh?.();
+      } else {
+        const error = await response.json();
+        console.error("Failed to mark contacted:", error);
+      }
+    } catch (error) {
+      console.error("Error marking contacted:", error);
+    } finally {
+      setMarking(false);
+    }
+  };
 
   return (
     <div
@@ -164,27 +202,66 @@ export function LeadActionCard({
         </div>
       )}
 
+      {/* STATUS + LAST CONTACT */}
+      {(leadStatus || lastContactedAt) && (
+        <div className="pt-3 border-t flex gap-4 text-xs">
+          {leadStatus && (
+            <div>
+              <span className="text-gray-600">Status:</span>{" "}
+              <span className="font-semibold text-gray-900 capitalize">
+                {leadStatus}
+              </span>
+            </div>
+          )}
+          {lastContactedAt && (
+            <div>
+              <span className="text-gray-600">Last contacted:</span>{" "}
+              <span className="font-semibold text-gray-900">
+                {new Date(lastContactedAt).toLocaleDateString("en-GB")}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* EMAIL PREVIEW */}
       {emailSubject && emailBody && (
         <div className="pt-3 border-t">
           <EmailPreviewBlock
             subject={emailSubject}
             body={emailBody}
+            leadId={id}
+            businessName={businessName}
+            recipientEmail={email}
+            lastSentAt={lastSentAt}
             onCopy={() => console.log("Email copied")}
-            onSend={onSendEmail}
+            onSend={(success) => {
+              if (success) {
+                onRefresh?.();
+              }
+              onSendEmail?.(success);
+            }}
           />
+        </div>
+      )}
+
+      {/* CONTACT HISTORY */}
+      {id && (
+        <div className="pt-3 border-t">
+          <ContactHistoryPanel leadId={id} />
         </div>
       )}
 
       {/* ACTIONS */}
       <div className="pt-3 border-t flex gap-2">
-        {onMarkContacted && (
+        {leadStatus !== "contacted" && (
           <button
-            onClick={onMarkContacted}
-            className="flex-1 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-medium flex items-center justify-center gap-1"
+            onClick={handleMarkContacted}
+            disabled={marking}
+            className="flex-1 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
           >
             <CheckCircle2 size={16} />
-            Mark Contacted
+            {marking ? "Marking..." : "Mark Contacted"}
           </button>
         )}
         {onViewBrief && (

@@ -14,6 +14,8 @@ interface Lead {
   pain_point?: string;
   review_rating?: number;
   status?: string;
+  lead_status?: string;
+  last_contacted_at?: string;
 }
 
 interface OutreachRecord {
@@ -29,6 +31,7 @@ interface EnrichedLead extends Lead {
   primaryAngle?: string;
   primaryHook?: string;
   secondaryAngle?: string;
+  lastSentAt?: string | null;
 }
 
 async function getAllLeads(): Promise<EnrichedLead[]> {
@@ -52,7 +55,9 @@ async function getAllLeads(): Promise<EnrichedLead[]> {
         engagement_score,
         pain_point,
         review_rating,
-        status
+        status,
+        lead_status,
+        last_contacted_at
       FROM b2b_leads
       ORDER BY engagement_score DESC, created_at ASC
     `) as Lead[];
@@ -70,6 +75,16 @@ async function getAllLeads(): Promise<EnrichedLead[]> {
             ORDER BY created_at DESC
             LIMIT 1
           `) as OutreachRecord[];
+
+          // Get last sent time
+          const lastSent = (await sql`
+            SELECT created_at FROM b2b_outreach_events
+            WHERE lead_id = ${lead.id} AND event_type = 'email_sent'
+            ORDER BY created_at DESC
+            LIMIT 1
+          `) as Array<{ created_at: string}>;
+
+          const lastSentAt = lastSent.length > 0 ? lastSent[0].created_at : null;
 
           // Mock challenges/opportunities based on category
           const categoryData: Record<
@@ -148,6 +163,7 @@ async function getAllLeads(): Promise<EnrichedLead[]> {
 
           return {
             ...lead,
+            lastSentAt,
             emailSubject: outreach[0]?.subject || "Ready for outreach",
             emailBody:
               outreach[0]?.body ||
@@ -242,9 +258,12 @@ export default async function LeadsPage() {
                   primaryHook={lead.primaryHook}
                   emailSubject={lead.emailSubject}
                   emailBody={lead.emailBody}
+                  lastSentAt={lead.lastSentAt || undefined}
                   onMarkContacted={() => {
                     console.log("Mark contacted:", lead.id);
-                    // Will be implemented in Wave 3
+                  }}
+                  onRefresh={() => {
+                    window.location.reload();
                   }}
                 />
               ))}
@@ -291,11 +310,17 @@ export default async function LeadsPage() {
                   primaryHook={lead.primaryHook}
                   emailSubject={lead.emailSubject}
                   emailBody={lead.emailBody}
+                  leadStatus={lead.lead_status}
+                  lastContactedAt={lead.last_contacted_at}
+                  lastSentAt={lead.lastSentAt || undefined}
                   onMarkContacted={() => {
                     console.log("Mark contacted:", lead.id);
                   }}
                   onViewBrief={() => {
                     console.log("View brief:", lead.id);
+                  }}
+                  onRefresh={() => {
+                    window.location.reload();
                   }}
                 />
               ))}
@@ -336,11 +361,17 @@ export default async function LeadsPage() {
                   primaryHook={lead.primaryHook}
                   emailSubject={lead.emailSubject}
                   emailBody={lead.emailBody}
+                  leadStatus={lead.lead_status}
+                  lastContactedAt={lead.last_contacted_at}
+                  lastSentAt={lead.lastSentAt || undefined}
                   onMarkContacted={() => {
                     console.log("Mark contacted:", lead.id);
                   }}
                   onViewBrief={() => {
                     console.log("View brief:", lead.id);
+                  }}
+                  onRefresh={() => {
+                    window.location.reload();
                   }}
                 />
               ))}
@@ -378,8 +409,14 @@ export default async function LeadsPage() {
                   primaryHook={lead.primaryHook}
                   emailSubject={lead.emailSubject}
                   emailBody={lead.emailBody}
+                  leadStatus={lead.lead_status}
+                  lastContactedAt={lead.last_contacted_at}
+                  lastSentAt={lead.lastSentAt || undefined}
                   onMarkContacted={() => {
                     console.log("Mark contacted:", lead.id);
+                  }}
+                  onRefresh={() => {
+                    window.location.reload();
                   }}
                 />
               ))}
