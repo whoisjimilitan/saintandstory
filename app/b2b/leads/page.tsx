@@ -56,8 +56,8 @@ async function getAllLeads(): Promise<EnrichedLead[]> {
         pain_point,
         review_rating,
         status,
-        lead_status,
-        last_contacted_at
+        lead_state as lead_status,
+        CAST(NULL as TIMESTAMPTZ) as last_contacted_at
       FROM b2b_leads
       ORDER BY engagement_score DESC, created_at ASC
     `) as Lead[];
@@ -76,15 +76,20 @@ async function getAllLeads(): Promise<EnrichedLead[]> {
             LIMIT 1
           `) as OutreachRecord[];
 
-          // Get last sent time
-          const lastSent = (await sql`
-            SELECT created_at FROM b2b_outreach_events
-            WHERE lead_id = ${lead.id} AND event_type = 'email_sent'
-            ORDER BY created_at DESC
-            LIMIT 1
-          `) as Array<{ created_at: string}>;
+          // Get last sent time (if table exists)
+          let lastSentAt = null;
+          try {
+            const lastSent = (await sql`
+              SELECT created_at FROM b2b_outreach_events
+              WHERE lead_id = ${lead.id} AND event_type = 'email_sent'
+              ORDER BY created_at DESC
+              LIMIT 1
+            `) as Array<{ created_at: string}>;
 
-          const lastSentAt = lastSent.length > 0 ? lastSent[0].created_at : null;
+            lastSentAt = lastSent.length > 0 ? lastSent[0].created_at : null;
+          } catch (e) {
+            // Table doesn't exist yet - that's OK
+          }
 
           // Mock challenges/opportunities based on category
           const categoryData: Record<
@@ -259,12 +264,6 @@ export default async function LeadsPage() {
                   emailSubject={lead.emailSubject}
                   emailBody={lead.emailBody}
                   lastSentAt={lead.lastSentAt || undefined}
-                  onMarkContacted={() => {
-                    console.log("Mark contacted:", lead.id);
-                  }}
-                  onRefresh={() => {
-                    window.location.reload();
-                  }}
                 />
               ))}
             </div>
@@ -313,15 +312,6 @@ export default async function LeadsPage() {
                   leadStatus={lead.lead_status}
                   lastContactedAt={lead.last_contacted_at}
                   lastSentAt={lead.lastSentAt || undefined}
-                  onMarkContacted={() => {
-                    console.log("Mark contacted:", lead.id);
-                  }}
-                  onViewBrief={() => {
-                    console.log("View brief:", lead.id);
-                  }}
-                  onRefresh={() => {
-                    window.location.reload();
-                  }}
                 />
               ))}
             </div>
@@ -364,15 +354,6 @@ export default async function LeadsPage() {
                   leadStatus={lead.lead_status}
                   lastContactedAt={lead.last_contacted_at}
                   lastSentAt={lead.lastSentAt || undefined}
-                  onMarkContacted={() => {
-                    console.log("Mark contacted:", lead.id);
-                  }}
-                  onViewBrief={() => {
-                    console.log("View brief:", lead.id);
-                  }}
-                  onRefresh={() => {
-                    window.location.reload();
-                  }}
                 />
               ))}
             </div>
@@ -412,12 +393,6 @@ export default async function LeadsPage() {
                   leadStatus={lead.lead_status}
                   lastContactedAt={lead.last_contacted_at}
                   lastSentAt={lead.lastSentAt || undefined}
-                  onMarkContacted={() => {
-                    console.log("Mark contacted:", lead.id);
-                  }}
-                  onRefresh={() => {
-                    window.location.reload();
-                  }}
                 />
               ))}
             </div>

@@ -148,10 +148,6 @@ export default async function ReadyTodayPage() {
                     (lead as any).emailSubject || "Ready for outreach"
                   }
                   emailBody={(lead as any).emailBody || "Email body pending"}
-                  onMarkContacted={() => {
-                    console.log("Mark contacted:", lead.id);
-                    // Will be implemented in Wave 3
-                  }}
                 />
               ))}
             </div>
