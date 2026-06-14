@@ -27,20 +27,20 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  new: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
-  contacted: "bg-[#F5F5F5] text-[#0D0D0D] border border-[#EAE6E0]",
-  warm: "bg-[#0D0D0D] text-white",
-  inbound: "bg-[#0D0D0D] text-white",
-  closed: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
-  dead: "bg-[#F5F5F5] text-[#888888] border border-[#EAE6E0]",
+  new: "text-[#666666]",
+  contacted: "text-[#0D0D0D]",
+  warm: "text-[#0D0D0D]",
+  inbound: "text-[#0D0D0D]",
+  closed: "text-[#666666]",
+  dead: "text-[#666666]",
 };
 
-// Subtle state-based styling (greyscale only, visual feedback for worked leads)
+// Minimal state-based styling (white background, consistent borders)
 const WORKFLOW_STATE_STYLE: Record<string, { border: string; bg: string }> = {
-  new: { border: "border-l-2 border-l-[#EAE6E0]", bg: "bg-white" },
-  recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#FAFAFA]" },
-  engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F5F5F5]" },
-  self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-[#F0F0F0]" },
+  new: { border: "border-l-2 border-l-[#CCCCCC]", bg: "bg-white" },
+  recognized: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
+  engaged: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
+  self_confirmed: { border: "border-l-2 border-l-[#0D0D0D]", bg: "bg-white" },
 };
 
 const UK_CITIES = ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Bristol", "Sheffield", "Glasgow", "Edinburgh", "Cardiff", "Newcastle", "Nottingham", "Leicester", "Southampton", "Brighton", "Oxford", "Cambridge", "Reading", "Derby", "Norwich"];
@@ -415,681 +415,133 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
   const cardStyle = WORKFLOW_STATE_STYLE[workflowState] || WORKFLOW_STATE_STYLE.new;
   const isExpanded = expanded;
 
-  // Determine priority accent color for card border
-  const priorityAccent = !hasFormData
-    ? (scoreBreakdown.total >= 60 ? "border-l-[#2ECC71]" :
-       scoreBreakdown.total >= 40 ? "border-l-[#F39C12]" :
-       "border-l-[#BDBDBD]")
-    : "border-l-[#BDBDBD]";
-
   return (
-    <div className={`border border-l-4 rounded-xl overflow-hidden transition-all duration-300 border-[#EAE6E0] hover:border-[#0D0D0D] ${priorityAccent} ${cardStyle.bg} ${cardStyle.border}`} style={{ borderWidth: isExpanded ? '1.5px' : '1px', borderLeftWidth: '4px' }}>
+    <div className={`border rounded-lg overflow-hidden transition-all ${cardStyle.bg} ${cardStyle.border} border-[#CCCCCC]`} style={{ borderWidth: '1px' }}>
       <button
-        className={`w-full text-left px-5 py-4 flex items-start justify-between gap-4 transition-all duration-300 ${
+        className={`w-full text-left px-6 py-5 flex items-start justify-between gap-4 transition-colors ${
           isExpanded
-            ? "hover:opacity-75 active:opacity-60"
-            : "hover:opacity-75 active:opacity-60"
+            ? "hover:bg-[#F9F9F9]"
+            : "hover:bg-[#F9F9F9]"
         }`}
         onClick={() => { setExpanded(e => !e); if (!expanded && !draft && lead.email) getDraft(); if (!expanded && !engagementMetrics) loadEngagementMetrics(); }}
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <p className="font-sans font-bold text-sm transition-colors duration-300 text-[#0D0D0D]">{lead.business_name}</p>
-            {hasPainPoint && (
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${
-                isExpanded
-                  ? "text-white bg-[#0D0D0D]"
-                  : "text-white bg-[#0D0D0D]"
-              }`}>
-                Pain point
-              </span>
-            )}
-            {lead.source === "inbound" && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.1em] border transition-colors duration-300 text-[#0D0D0D] bg-[#F5F5F5] border-[#EAE6E0]">
-                Inbound
-              </span>
-            )}
-          </div>
-          <p className="text-xs transition-colors duration-300 text-[#888888]">
-            {lead.business_category}{lead.delivery_type ? ` · ${lead.delivery_type}` : ""}{lead.city ? ` · ${lead.city}` : ""}
-            {lead.email ? ` · ${lead.email}` : " · No email"}
+          <p className="font-sans font-semibold text-sm text-[#0D0D0D]">{lead.business_name}</p>
+          <p className="text-xs text-[#666666] mt-0.5">
+            {lead.business_category}{lead.city ? ` · ${lead.city}` : ""}
           </p>
           {hasPainPoint && (
-            <p className="text-xs mt-0.5 italic transition-colors duration-300 text-[#888888]">&ldquo;{lead.pain_point_review?.slice(0, 80)}…&rdquo;</p>
+            <p className="text-xs mt-1.5 text-[#666666]">{lead.pain_point_review?.slice(0, 100) || lead.pain_point}</p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <div className="flex items-center gap-2">
-            {/* Priority label + score for discovered leads (priority first) */}
-            {!hasFormData && (
-              <div className="flex flex-col items-end gap-0.5">
-                <span className={`text-[10px] font-black uppercase tracking-wider ${
-                  scoreBreakdown.total >= 60 ? "text-[#2ECC71]" :
-                  scoreBreakdown.total >= 40 ? "text-[#F39C12]" :
-                  "text-[#888888]"
-                }`}>
-                  {scoreBreakdown.total >= 60 ? "High Priority" :
-                   scoreBreakdown.total >= 40 ? "Medium Priority" :
-                   "Baseline"}
-                </span>
-                <span className="text-[9px] text-[#AAAAAA]">{scoreBreakdown.total}/100</span>
-              </div>
-            )}
-            {/* Form-based lead score */}
-            {hasFormData && (
-              <span className={`px-2.5 py-1 rounded text-[10px] font-semibold transition-colors duration-300 ${scoreStyle.containerClass} ${scoreStyle.badgeClass}`}>
-                {scoreLabel}
-              </span>
-            )}
-            <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-[0.1em] transition-colors duration-300 ${STATUS_STYLE[status] ?? STATUS_STYLE.new}`}>
-              {STATUS_LABELS[status] ?? status}
-            </span>
-            {(lead.engagement_score ?? 0) > 0 && (
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded transition-colors duration-300 ${
-                (lead.engagement_score ?? 0) >= 50 ? "bg-[#2ECC71] text-white" :
-                (lead.engagement_score ?? 0) >= 20 ? "bg-[#F39C12] text-white" :
-                "bg-[#95A5A6] text-white"
-              }`}>
-                {lead.engagement_score ?? 0}
-              </span>
-            )}
-          </div>
-          {lead.created_at && <p className="text-[10px] transition-colors duration-300 text-[#888888]">{timeAgo(lead.created_at)}</p>}
+        <div className="shrink-0 text-right">
+          <p className={`text-xs font-semibold ${STATUS_STYLE[status]}`}>
+            {STATUS_LABELS[status] ?? status}
+          </p>
         </div>
       </button>
 
       {expanded && (
-        <div className="px-5 pb-5 border-t transition-colors duration-300 border-[#EAE6E0]">
-          {/* Heat Score Composition */}
-          {engagementMetrics && (
-            <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-[#F5F1EB] to-[#FAFAFA] border border-[#EAE6E0] animate-in fade-in duration-200">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666]">Heat Score Breakdown</p>
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black ${
-                  (lead.engagement_score ?? 0) >= 75 ? "bg-[#FF4444] text-white" :
-                  (lead.engagement_score ?? 0) >= 50 ? "bg-[#FF9500] text-white" :
-                  (lead.engagement_score ?? 0) >= 25 ? "bg-[#FFCC00] text-[#0D0D0D]" :
-                  "bg-[#D0D0D0] text-[#0D0D0D]"
-                }`}>
-                  {(lead.engagement_score ?? 0) >= 75 ? "🔥 HOT" :
-                   (lead.engagement_score ?? 0) >= 50 ? "🔥 WARM" :
-                   (lead.engagement_score ?? 0) >= 25 ? "🟡 COOL" :
-                   "⚪ COLD"}
-                </span>
-              </div>
+        <div className="px-6 py-6 border-t border-[#CCCCCC]">
 
-              <div className="grid grid-cols-3 gap-2 text-[9px]">
-                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
-                  <p className="text-[#888888] mb-0.5">Qualification</p>
-                  <p className="font-bold text-[#0D0D0D]">{Math.round((lead.opportunity_score || 0) * 0.4)}/40</p>
-                </div>
-                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
-                  <p className="text-[#888888] mb-0.5">Engagement</p>
-                  <p className="font-bold text-[#0D0D0D]">{Math.round(((lead.engagement_score ?? 0) || 0) * 0.4)}/40</p>
-                </div>
-                <div className="p-2 bg-white rounded border border-[#E8E8E8]">
-                  <p className="text-[#888888] mb-0.5">Intent</p>
-                  <p className="font-bold text-[#0D0D0D]">0/20</p>
-                </div>
-              </div>
 
-              <div className="mt-2 pt-2 border-t border-[#EAE6E0]">
-                <div className="flex items-center justify-between">
-                  <p className="text-[9px] text-[#666666]">Total Heat Score:</p>
-                  <p className="text-[10px] font-bold text-[#0D0D0D]">{(lead.engagement_score ?? 0)}/100</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* INSIGHT Section */}
+          <div className="mb-6">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D0D0D] mb-3">Insight</p>
+            <p className="text-sm leading-relaxed text-[#333333]">
+              {hasPainPoint
+                ? lead.pain_point_review || lead.pain_point
+                : "Business identified through discovery research."}
+            </p>
+          </div>
 
-          {/* Lead state status line - Apple minimal design */}
-          {workflowState === "recognized" && (
-            <div className="mb-4 pt-2 pb-3 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[11px] font-semibold tracking-widest uppercase transition-colors duration-300 text-[#0D0D0D]">Recognized</span>
-                  <span className="text-[10px] transition-colors duration-300 text-[#888888]">Email sent</span>
-                </div>
-                {lead.created_at && <span className="text-[10px] ml-auto transition-colors duration-300 text-[#AAAAAA]">{formatTime(lead.created_at)}</span>}
-              </div>
-              <div className="h-px bg-gradient-to-r mt-2 transition-colors duration-300 from-[#0D0D0D] via-[#EAE6E0] to-transparent"></div>
-            </div>
-          )}
+          {/* STRATEGY Section */}
+          <div className="mb-6 pt-6 border-t border-[#CCCCCC]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D0D0D] mb-3">Strategy</p>
+            <p className="text-sm leading-relaxed text-[#333333]">
+              {hasPainPoint
+                ? `Ask about ${lead.pain_point?.toLowerCase() || 'their primary pressure'}.`
+                : "Introduce service and gauge interest in recurring logistics support."}
+            </p>
+          </div>
 
-          {/* Email Engagement Score */}
-          {engagementMetrics && (
-            <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-[#F9F7F4] to-[#FAFAFA] border border-[#EAE6E0] animate-in fade-in duration-200">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666]">Email Engagement</p>
-                <span className={`px-2 py-1 rounded text-[10px] font-black ${
-                  engagementMetrics.engagement_score >= 50 ? "bg-[#2ECC71] text-white" :
-                  engagementMetrics.engagement_score >= 20 ? "bg-[#F39C12] text-white" :
-                  "bg-[#95A5A6] text-white"
-                }`}>
-                  {engagementMetrics.engagement_score}
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-[9px]">
+
+          {/* DRAFT EMAIL Section - Primary Artifact */}
+          <div className="mb-6 pt-6 pb-6 border-t border-[#CCCCCC]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D0D0D] mb-4">Email</p>
+            {draft ? (
+              <div className="space-y-4">
                 <div>
-                  <p className="text-[#888888]">Opens</p>
-                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.opens}</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">{draft.subject}</p>
+                  <p className="text-sm text-[#333333] leading-relaxed whitespace-pre-wrap">{draft.body}</p>
                 </div>
-                <div>
-                  <p className="text-[#888888]">Clicks</p>
-                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.clicks}</p>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={sendEmail}
+                    disabled={sending}
+                    className="font-semibold px-5 py-2 rounded-lg text-sm transition-all bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] disabled:opacity-50"
+                  >
+                    {sending ? "Sending…" : "Send"}
+                  </button>
+                  <button
+                    onClick={getDraft}
+                    disabled={drafting}
+                    className="font-medium px-5 py-2 rounded-lg text-sm text-[#666666] hover:text-[#0D0D0D] transition-colors"
+                  >
+                    Regenerate
+                  </button>
                 </div>
-                <div>
-                  <p className="text-[#888888]">Last Activity</p>
-                  <p className="font-bold text-[#0D0D0D]">{engagementMetrics.engagement.time_since_activity}</p>
-                </div>
-              </div>
-              {engagementMetrics.engagement.clicked_links && engagementMetrics.engagement.clicked_links.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-[#EAE6E0]">
-                  <p className="text-[9px] text-[#666666] mb-1">Clicked:</p>
-                  <div className="text-[8px] text-[#0D0D0D] space-y-0.5">
-                    {engagementMetrics.engagement.clicked_links.map((link: string, i: number) => (
-                      <p key={i} className="truncate">→ {new URL(link).pathname}</p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Opportunity Score / Signal Label */}
-          <div className={`border rounded-xl p-3 mb-4 transition-colors duration-300 ${
-            isExpanded
-              ? "bg-white/10 border-white/20"
-              : scoreStyle.containerClass
-          }`}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-2 transition-colors duration-300 text-[#0D0D0D]">Opportunity Signal</p>
-            {hasFormData ? (
-              // Form-based leads: show detailed score breakdown
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {scoreBreakdown.frequencyScore > 0 && (
-                  <div>
-                    <span className="font-semibold">{scoreBreakdown.frequencyScore}pts</span>
-                    <span className="text-[#888888]"> Frequency</span>
-                  </div>
-                )}
-                {scoreBreakdown.industryScore > 0 && (
-                  <div>
-                    <span className="font-semibold">{scoreBreakdown.industryScore}pts</span>
-                    <span className="text-[#888888]"> Industry</span>
-                  </div>
-                )}
-                {scoreBreakdown.volumeScore > 0 && (
-                  <div>
-                    <span className="font-semibold">{scoreBreakdown.volumeScore}pts</span>
-                    <span className="text-[#888888]"> Volume</span>
-                  </div>
-                )}
-                {scoreBreakdown.courierScore > 0 && (
-                  <div>
-                    <span className="font-semibold">{scoreBreakdown.courierScore}pts</span>
-                    <span className="text-[#888888]"> Courier</span>
-                  </div>
-                )}
-                {scoreBreakdown.challengeScore > 0 && (
-                  <div>
-                    <span className="font-semibold">{scoreBreakdown.challengeScore}pts</span>
-                    <span className="text-[#888888]"> Challenge</span>
-                  </div>
-                )}
               </div>
             ) : (
-              // Discovered leads: Score + Priority + Signals
-              <div className={`text-sm transition-colors duration-300`}>
-                {/* Score and Priority Label */}
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-2xl font-black ${
-                      scoreBreakdown.total >= 60 ? "text-[#2ECC71]" :
-                      scoreBreakdown.total >= 40 ? "text-[#F39C12]" :
-                      "text-[#888888]"
-                    }`}>
-                      {scoreBreakdown.total}
-                    </span>
-                    <span className="text-[#AAAAAA]">/100</span>
-                  </div>
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shrink-0 ${
-                    scoreBreakdown.total >= 60 ? "bg-[#E8F5E9] text-[#2ECC71]" :
-                    scoreBreakdown.total >= 40 ? "bg-[#FFF3E0] text-[#F39C12]" :
-                    "bg-[#F5F5F5] text-[#666666]"
-                  }`}>
-                    {scoreBreakdown.total >= 60 ? "High Priority" :
-                     scoreBreakdown.total >= 40 ? "Medium Priority" :
-                     "Baseline Opportunity"}
-                  </span>
-                </div>
-
-                {/* Signals */}
-                <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
-                  <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em] mb-2">Signals:</p>
-                  <div className="space-y-1 mb-4">
-                    {hasPainPoint ? (
-                      <>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-[#2ECC71] font-bold">✓</span>
-                          <span className="text-[#0D0D0D]">Customer complaint in reviews</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-[#2ECC71] font-bold">✓</span>
-                          <span className="text-[#0D0D0D]">Delivery/service issue detected</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-[#AAAAAA]">—</span>
-                        <span className="text-[#666666]">No operational friction detected</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Recommended Action */}
-                  <div className="pt-3 border-t border-[#E8E8E8]">
-                    <p className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-2">Recommended next step:</p>
-                    <p className="text-xs text-[#0D0D0D] font-medium">
-                      {scoreBreakdown.total >= 60
-                        ? "Send recognition email"
-                        : scoreBreakdown.total >= 40
-                          ? "Investigate reviews further"
-                          : "Archive for lower priority"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Conversation Progress Indicator - visible for all leads */}
-          <div className="mb-4 pt-3 pb-3 border-t transition-colors duration-300 border-[#EAE6E0]">
-            <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] mb-2 transition-colors duration-300 text-[#666666]`}>
-              Conversation Progress
-            </p>
-
-            {/* Progress stages */}
-            <div className="flex items-center gap-2 text-[10px] font-medium mb-3">
-              <span className={`transition-colors duration-300 ${
-                workflowState === "new"
-                  ? "font-semibold text-[#0D0D0D]"
-                  : "text-[#AAAAAA]"
-              }`}>
-                Discover
-              </span>
-              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
-              <span className={`transition-colors duration-300 ${
-                workflowState === "recognized"
-                  ? "font-semibold text-[#0D0D0D]"
-                  : "text-[#AAAAAA]"
-              }`}>
-                Recognize
-              </span>
-              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
-              <span className={`transition-colors duration-300 ${
-                workflowState === "engaged"
-                  ? "font-semibold text-[#0D0D0D]"
-                  : "text-[#AAAAAA]"
-              }`}>
-                Engage
-              </span>
-              <span className={`transition-colors duration-300 text-[#CCC]`}>→</span>
-              <span className={`transition-colors duration-300 ${
-                workflowState === "self_confirmed"
-                  ? "font-semibold text-[#0D0D0D]"
-                  : "text-[#AAAAAA]"
-              }`}>
-                Activate
-              </span>
-            </div>
-
-            {/* State-specific explanation (fallback-safe) */}
-            <p className={`text-[10px] mb-2 transition-colors duration-300 text-[#666666]`}>
-              {currentStateDescription.description}
-            </p>
-
-            {/* Next step guidance */}
-            <p className={`text-[10px] transition-colors duration-300 text-[#AAAAAA]`}>
-              {currentStateDescription.nextStep}
-            </p>
-          </div>
-
-          {/* Recognition email success feedback - Apple minimal + Linear precision */}
-          {confirmationSuccessMessage && (
-            <div className={`mb-4 px-4 py-3 rounded-lg border animate-in fade-in duration-200 transition-colors duration-300 ${
-              isExpanded
-                ? "border-white/20 bg-white/10"
-                : "border-[#EAE6E0] bg-[#FAFAFA]"
-            } ${!confirmationSuccessMessage && "animate-out fade-out duration-300"}`}>
-              <div className="flex items-start gap-3">
-                <span className={`font-semibold text-sm mt-0.5 transition-colors duration-300 text-[#0D0D0D]`}>✓</span>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-[11px] font-semibold tracking-[0.5px] transition-colors duration-300 text-[#0D0D0D]`}>Recognition sent</p>
-                  <p className={`text-[10px] mt-1.5 transition-colors duration-300 text-[#666666]`}>{lead.email}</p>
-                  <p className={`text-[10px] mt-1 transition-colors duration-300 text-[#AAAAAA]`}>{new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Recognition email button or draft preview */}
-          {recognitionDraft ? (
-            <div className="bg-[#FAFAFA] border border-[#EAE6E0] rounded-lg p-4 mb-4 space-y-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.5px] text-[#666666]">Recognition email preview</p>
-              <input
-                value={recognitionDraft.subject}
-                onChange={e => setRecognitionDraft(d => d ? { ...d, subject: e.target.value } : d)}
-                className="w-full text-sm font-semibold focus:outline-none pb-2 text-[#0D0D0D] bg-transparent border-b border-[#EAE6E0]"
-              />
-              <textarea
-                value={recognitionDraft.body}
-                onChange={e => setRecognitionDraft(d => d ? { ...d, body: e.target.value } : d)}
-                rows={4}
-                className="w-full text-sm bg-transparent focus:outline-none resize-none text-[#0D0D0D]"
-              />
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={sendRecognitionEmail}
-                  disabled={sendingRecognition}
-                  className="font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 disabled:opacity-30 bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
-                >
-                  {sendingRecognition ? "Sending…" : "Send"}
-                </button>
-                <button
-                  onClick={() => setRecognitionDraft(null)}
-                  className="text-xs font-medium transition-colors text-[#888888] hover:text-[#0D0D0D]"
-                >
-                  Back
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={previewRecognitionEmail}
-              disabled={sendingRecognition || !lead.email}
-              className="w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
-            >
-              {sendingRecognition ? "Previewing…" : "Send recognition email"}
-            </button>
-          )}
-
-          {/* Prospect brief link - always visible */}
-          <Link
-            href={`/prospect/${generateSlug(lead.business_name)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full font-medium py-2.5 rounded-full text-xs transition-all duration-150 mb-4 block text-center border bg-[#F9F9F9] hover:bg-[#F0F0F0] text-[#0D0D0D] border-[#EAE6E0]"
-          >
-            View prospect brief
-          </Link>
-
-          {/* Lead details */}
-          <div className="grid grid-cols-2 gap-3 py-4">
-            {!!lead.phone && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Phone</p>
-                <a href={`tel:${lead.phone}`} className={`text-sm font-semibold hover:underline transition-colors duration-300 text-[#0D0D0D]`}>{lead.phone}</a>
-              </div>
-            )}
-            {!!lead.website && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Website</p>
-                <a href={lead.website} target="_blank" rel="noopener noreferrer" className={`text-sm hover:underline truncate block transition-colors duration-300 text-[#0D0D0D]`}>{lead.website}</a>
-              </div>
-            )}
-            {!!lead.delivery_frequency && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Frequency</p>
-                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.delivery_frequency}</p>
-              </div>
-            )}
-            {!!lead.average_deliveries && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Avg Deliveries/Month</p>
-                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.average_deliveries}</p>
-              </div>
-            )}
-            {!!lead.courier_provider && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Current Courier</p>
-                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.courier_provider}</p>
-              </div>
-            )}
-            {!!lead.delivery_challenge && (
-              <div>
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Main Challenge</p>
-                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.delivery_challenge}</p>
-              </div>
-            )}
-            {hasPainPoint && (
-              <div className="col-span-2">
-                <p className={`text-[10px] uppercase tracking-[0.1em] transition-colors duration-300 text-[#888888]`}>Pain point</p>
-                <p className={`text-sm transition-colors duration-300 text-[#0D0D0D]`}>{lead.pain_point}</p>
-                {!!lead.pain_point_review && (
-                  <p className="text-xs mt-1 italic transition-colors duration-300 text-[#888888]">&ldquo;{lead.pain_point_review}&rdquo;</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Prospect Memory / Continuity Card - shows operator what prospect experienced */}
-          {(lead.email_sent_at || lead.confirmed_at) && (
-            <div className="border-l-2 border-gray-300 p-4 mb-4 bg-gray-50 rounded-lg space-y-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-gray-600 mb-2">Prospect Memory</p>
-
-              {(lead.email_sent_at || lead.confirmed_at) && (
-                <p className="text-[10px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">Email sent:</span> {lead.email_sent_at ? `${new Date(lead.email_sent_at as string).toLocaleDateString()} ${new Date(lead.email_sent_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : "Not sent yet"} → {lead.pain_point || 'prospect need'}
-                </p>
-              )}
-
-              {lead.confirmed_at && (
-                <p className="text-[10px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">Prospect validated:</span> {new Date(lead.confirmed_at as string).toLocaleDateString()} {new Date(lead.confirmed_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} → Yes
-                </p>
-              )}
-
-              {(soForm.pickup_postcode || soForm.delivery_postcode || soForm.day_of_week || soForm.price) && (
-                <p className="text-[10px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">Standing order:</span> {lead.pain_point || 'prospect need'} {soForm.day_of_week && `| Every ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][parseInt(soForm.day_of_week) - 1]}`} {soForm.price && `| £${soForm.price}`}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Suggested Opening - recognition/relief/trust layer for operator */}
-          {hasPainPoint && (
-            <div className={`border-l-4 border-l-[#2ECC71] bg-[#E8F5E9] rounded-lg p-5 mb-4 space-y-3 transition-colors duration-300`}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">✓</span>
-                <p className={`text-[10px] font-black uppercase tracking-[0.5px] text-[#2ECC71]`}>Suggested Opening</p>
-              </div>
-              <div className={`px-4 py-3 rounded-md text-base font-semibold bg-white border-l-2 border-l-[#2ECC71] text-[#0D0D0D] italic`}>
-                "Are you personally handling {(lead.pain_point || 'your needs').toLowerCase()} when volume peaks?"
-              </div>
-              <p className="text-[11px] text-[#0D0D0D] font-medium">Use this exact question to continue recognition → validation → standing order conversation.</p>
-            </div>
-          )}
-
-          {/* Email input section - minimal design */}
-          {emailMissing ? (
-            <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white/10 border-white/20"
-                : "bg-[#FAFAFA] border-[#EAE6E0]"
-            }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Add email address</p>
-              <input
-                type="email"
-                value={newEmail}
-                onChange={e => setNewEmail(e.target.value)}
-                placeholder="name@company.co.uk"
-                className={`w-full px-3 py-2.5 rounded-md text-sm focus:outline-none transition-all ${
-                  isExpanded
-                    ? "border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-white focus:ring-1 focus:ring-white"
-                    : "border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
-                }`}
-              />
               <button
-                onClick={saveEmail}
-                disabled={savingEmail || !newEmail}
-                className="w-full font-semibold px-5 py-2.5 rounded-full text-xs transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] active:scale-98 hover:shadow-sm"
+                onClick={getDraft}
+                disabled={drafting}
+                className="w-full font-semibold py-3 rounded-lg text-sm bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] disabled:opacity-50 transition-all"
               >
-                {savingEmail ? "Saving…" : "Save email"}
+                {drafting ? "Drafting…" : "Draft email"}
               </button>
-            </div>
-          ) : draft ? (
-            <div className={`border rounded-lg p-4 mb-4 space-y-3 transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white/10 border-white/20"
-                : "bg-[#FAFAFA] border-[#EAE6E0]"
-            }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Draft email</p>
-              <input
-                value={draft.subject}
-                onChange={e => setDraft(d => d ? { ...d, subject: e.target.value } : d)}
-                className={`w-full text-sm font-semibold focus:outline-none pb-2 transition-colors ${
-                  isExpanded
-                    ? "text-white bg-transparent border-b border-white/20"
-                    : "text-[#0D0D0D] bg-transparent border-b border-[#EAE6E0]"
-                }`}
-              />
-              <textarea
-                value={draft.body}
-                onChange={e => setDraft(d => d ? { ...d, body: e.target.value } : d)}
-                rows={4}
-                className={`w-full text-sm bg-transparent focus:outline-none resize-none transition-colors text-[#0D0D0D]`}
-              />
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={sendEmail}
-                  disabled={sending}
-                  className={`font-semibold px-5 py-2 rounded-full text-xs transition-all duration-150 disabled:opacity-30 ${
-                    isExpanded
-                      ? "bg-white hover:bg-white/90 active:bg-white text-[#0D0D0D]"
-                      : "bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
-                  }`}
-                >
-                  {sending ? "Sending…" : "Send"}
-                </button>
-                <button onClick={getDraft} className="text-xs font-medium transition-colors text-[#888888] hover:text-[#0D0D0D]">
-                  Regenerate
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={getDraft}
-              disabled={drafting}
-              className={`w-full font-semibold py-2.5 rounded-full text-xs transition-all duration-150 mb-4 disabled:opacity-30 disabled:cursor-not-allowed ${
-                isExpanded
-                  ? "bg-white hover:bg-white/90 active:bg-white text-[#0D0D0D]"
-                  : "bg-[#0D0D0D] hover:bg-[#1a1a1a] active:bg-[#0D0D0D] text-white"
-              }`}
-            >
-              {drafting ? "Drafting…" : "Draft email"}
-            </button>
-          )}
+            )}
+          </div>
 
-          {/* Engagement History - Show all outreach attempts and responses */}
-          {outreachHistory.length > 0 && (
-            <div className={`border rounded-lg p-4 mb-4 space-y-2 transition-colors duration-300 ${
-              isExpanded
-                ? "bg-white/10 border-white/20"
-                : "bg-[#F9F7F4] border-[#EAE6E0]"
-            }`}>
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-300 text-[#666666]`}>Engagement History</p>
-              <div className="space-y-1.5">
-                {outreachHistory.map((email) => (
-                  <div key={email.id} className={`flex items-start justify-between text-xs p-2 rounded transition-colors ${
-                    email.replied
-                      ? "bg-[#E8F5E9] border border-[#C8E6C9]"
-                      : "bg-white/50 border border-[#EAE6E0]"
-                  }`}>
-                    <div className="flex-1">
-                      <p className={`font-semibold ${email.replied ? "text-[#2ECC71]" : "text-[#666666]"}`}>
-                        {email.email_type === "initial" ? "Initial" : email.email_type === "follow_up_1" ? "Follow-up 1" : "Follow-up 2"}
-                      </p>
-                      <p className="text-[#888888] text-[10px] mt-0.5">
-                        Sent {new Date(email.sent_at).toLocaleDateString()} at {new Date(email.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </div>
-                    {email.replied && (
-                      <span className="text-[#2ECC71] font-semibold whitespace-nowrap ml-2">✓ Replied</span>
-                    )}
-                  </div>
+          {/* HISTORY Section */}
+          <div className="mb-6 pt-6 border-t border-[#CCCCCC]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D0D0D] mb-3">History</p>
+            {outreachHistory.length > 0 ? (
+              <div className="space-y-2 text-xs text-[#666666]">
+                {outreachHistory.slice(0, 3).map((email) => (
+                  <p key={email.id}>
+                    {new Date(email.sent_at).toLocaleDateString()} {email.email_type === "initial" ? "— Initial" : "— Follow-up"} {email.replied ? "✓" : ""}
+                  </p>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs text-[#999999]">No contact yet.</p>
+            )}
+          </div>
 
-          {/* Action menu - condensed button layout */}
+          {/* Primary Action + More Menu */}
           {!showStandingOrder && (
-            <div className={`pt-4 border-t transition-all border-[#EAE6E0]`}>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <button onClick={() => setShowStandingOrder(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 bg-[#0D0D0D] text-white hover:bg-[#1a1a1a]">
-                  Create Standing Order
-                </button>
-                <button onClick={() => updateStatus("warm")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                  Mark Active
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setShowObservationModal(true)} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 border border-[#EAE6E0] text-[#0D0D0D] hover:border-[#0D0D0D]">
-                  Add Note
-                </button>
-                <button onClick={() => updateStatus("dead")} className="font-medium px-4 py-2 rounded-lg text-xs transition-all duration-150 text-[#888888] hover:text-[#0D0D0D]">
-                  Archive
-                </button>
-              </div>
+            <div className="flex gap-3 pt-6 border-t border-[#CCCCCC]">
+              <button
+                onClick={() => setShowStandingOrder(true)}
+                className="flex-1 font-semibold px-5 py-3 rounded-lg text-sm bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] transition-all"
+              >
+                Create Standing Order
+              </button>
+              <button
+                onClick={() => setShowObservationModal(true)}
+                className="font-medium px-5 py-3 rounded-lg text-sm border border-[#CCCCCC] text-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+              >
+                More
+              </button>
             </div>
           )}
 
-          {/* Standing order section - refined design */}
+          {/* Standing order section */}
           {showStandingOrder && (
-            <div className="rounded-lg p-4 mb-4 space-y-3 transition-all duration-200 bg-[#FAFAFA] border border-[#EAE6E0]" style={{ borderWidth: expanded ? '1.5px' : '1px' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 text-[#666666]">Create standing order</p>
-
-              {/* Continuity note: seamless transition from prospect validation question */}
-              {hasPainPoint && (
-                <div className="bg-white border border-[#E8E8E8] rounded p-3 -mx-4 px-4 mb-2">
-                  <p className="text-[10px] text-[#666666]">
-                    Prospect confirmed: {lead.pain_point?.toLowerCase()} coordination is their bottleneck when volume peaks. Capture their standing order requirements.
-                  </p>
-                </div>
-              )}
-
-              {/* Known vs Unknown Panel */}
-              <div className="border-b border-[#EAE6E0] pb-4 -mx-4 px-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Known */}
-                  <div className="bg-[#E8F5E9] rounded-lg p-3 border-l-3 border-l-[#2ECC71]">
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#2ECC71] mb-2">✓ Known</p>
-                    <div className="space-y-1.5">
-                      {lead.business_name && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.business_name}</p>}
-                      {lead.business_category && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.business_category}</p>}
-                      {lead.email && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {lead.email}</p>}
-                      {soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Pickup: {soForm.pickup_postcode}</p>}
-                      {soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Delivery: {soForm.delivery_postcode}</p>}
-                      {soForm.preferred_time && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> Time: {soForm.preferred_time}</p>}
-                      {lead.human_observations && (lead.human_observations as Record<string, unknown>[]).length > 0 && (
-                        <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#2ECC71] font-bold">✓</span> {(lead.human_observations as Record<string, unknown>[]).length} observations</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Unknown */}
-                  <div className="bg-[#FFF3E0] rounded-lg p-3 border-l-3 border-l-[#F39C12]">
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#F39C12] mb-2">⚠ Still needed</p>
-                    <div className="space-y-1.5">
-                      {!soForm.pickup_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Pickup postcode</p>}
-                      {!soForm.delivery_postcode && <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Delivery postcode</p>}
-                      <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Load details</p>
-                      <p className="text-[11px] text-[#0D0D0D]"><span className="text-[#F39C12] font-bold">→</span> Special constraints</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="rounded-lg p-6 mb-6 space-y-6 transition-all bg-white border border-[#CCCCCC]">
+              <p className="text-sm font-semibold uppercase tracking-widest text-[#0D0D0D]">Create Standing Order</p>
+              <div className="space-y-6">
 
               {/* Conversation Ideas (Revelatory Hypotheses) */}
               {lead.business_evidence && (() => {
@@ -1106,7 +558,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 if (allHypotheses.length === 0) return null;
 
                 return (
-                  <div className="border-b border-[#EAE6E0] pb-3 -mx-4 px-4">
+                  <div className="border-b border-[#CCCCCC] pb-3 -mx-4 px-4">
                     <button
                       type="button"
                       onClick={() => setShowHypotheses(!showHypotheses)}
@@ -1122,7 +574,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                           <div>
                             <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Pressures</p>
                             {analysis.hypotheses.pressureHypotheses.slice(0, 2).map((h, i) => (
-                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#CCCCCC]">
                                 <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
                                 <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
                               </div>
@@ -1134,7 +586,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                           <div>
                             <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Possible Constraints</p>
                             {analysis.hypotheses.constraintHypotheses.slice(0, 2).map((h, i) => (
-                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#CCCCCC]">
                                 <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
                                 <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
                               </div>
@@ -1146,7 +598,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                           <div>
                             <p className="text-[9px] font-semibold text-[#0D0D0D] mb-1">Opportunities</p>
                             {analysis.hypotheses.opportunityHypotheses.slice(0, 2).map((h, i) => (
-                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#EAE6E0]">
+                              <div key={i} className="bg-white rounded-md p-2 mb-2 border border-[#CCCCCC]">
                                 <p className="text-[10px] text-[#0D0D0D] mb-1">{h.statement}</p>
                                 <p className="text-[9px] text-[#888888] italic">Ask: "{h.howToValidate}"</p>
                               </div>
@@ -1162,20 +614,20 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Price (£)</label>
-                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  <input type="number" value={soForm.price} onChange={e => setSoForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. 120" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase tracking-[0.5px] block mb-1 text-[#666666]">Day of week</label>
-                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]">
+                  <select value={soForm.day_of_week} onChange={e => setSoForm(f => ({ ...f, day_of_week: e.target.value }))} className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]">
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d, i) => (
                       <option key={d} value={i + 1}>{d}</option>
                     ))}
                   </select>
                 </div>
               </div>
-              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+              <input type="text" value={soForm.preferred_time} onChange={e => setSoForm(f => ({ ...f, preferred_time: e.target.value }))} placeholder="Preferred time (e.g. 9am)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
 
-              <div className="border-t border-[#EAE6E0] pt-3 mt-2">
+              <div className="border-t border-[#CCCCCC] pt-3 mt-2">
                 <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#888888] mb-2">Service locations (from prospect)</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -1188,7 +640,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                       className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
                         validationErrors.pickup_postcode
                           ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                          : 'border-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
                       }`}
                     />
                     {validationErrors.pickup_postcode && (
@@ -1205,7 +657,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                       className={`w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border text-[#0D0D0D] ${
                         validationErrors.delivery_postcode
                           ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                          : 'border-[#EAE6E0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
+                          : 'border-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]'
                       }`}
                     />
                     {validationErrors.delivery_postcode && (
@@ -1214,12 +666,12 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-2">
-                  <input type="text" value={soForm.pickup_address} onChange={e => setSoForm(f => ({ ...f, pickup_address: e.target.value }))} placeholder="Pickup address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
-                  <input type="text" value={soForm.delivery_address} onChange={e => setSoForm(f => ({ ...f, delivery_address: e.target.value }))} placeholder="Delivery address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  <input type="text" value={soForm.pickup_address} onChange={e => setSoForm(f => ({ ...f, pickup_address: e.target.value }))} placeholder="Pickup address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+                  <input type="text" value={soForm.delivery_address} onChange={e => setSoForm(f => ({ ...f, delivery_address: e.target.value }))} placeholder="Delivery address (optional)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
                 </div>
               </div>
 
-              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
+              <textarea value={soForm.notes} onChange={e => setSoForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes (route, special requirements…)" className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]" />
 
               {Object.keys(validationErrors).length > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-md p-3">
@@ -1247,6 +699,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 </button>
                 <button onClick={() => setShowStandingOrder(false)} className="text-xs transition-colors font-medium text-[#888888] hover:text-[#0D0D0D]">Back</button>
               </div>
+              </div>
             </div>
           )}
         </div>
@@ -1259,7 +712,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             <h3 className="font-sans font-bold text-[#0D0D0D] text-lg">Prospect Brief Ready</h3>
             <p className="text-sm text-[#666666]">Share this link with the prospect or open it to verify the enriched brief:</p>
 
-            <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-lg p-3 space-y-2">
+            <div className="bg-white border border-[#CCCCCC] rounded-lg p-3 space-y-2">
               <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.1em]">Prospect Brief URL</p>
               <p className="text-xs text-[#0D0D0D] break-all font-mono">{prospectBriefUrl}</p>
             </div>
@@ -1279,13 +732,13 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 href={prospectBriefUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold py-2 rounded-full text-sm transition-all text-center"
+                className="flex-1 bg-white hover:bg-[#F0F0F0] text-[#0D0D0D] font-semibold py-2 rounded-full text-sm transition-all text-center"
               >
                 Open
               </a>
               <button
                 onClick={() => setProspectBriefUrl(null)}
-                className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+                className="bg-white hover:bg-[#F0F0F0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
               >
                 Close
               </button>
@@ -1309,7 +762,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                   onChange={e => setObservationForm(f => ({ ...f, observation: e.target.value }))}
                   placeholder="E.g., 'Handles 5+ deliveries per week across London' or 'Decision maker is the owner, not manager'"
                   rows={3}
-                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none resize-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
                 />
               </div>
 
@@ -1318,7 +771,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
                 <select
                   value={observationForm.context}
                   onChange={e => setObservationForm(f => ({ ...f, context: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#EAE6E0] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                  className="w-full px-3 py-2 rounded-md text-sm focus:outline-none transition-all bg-white border border-[#CCCCCC] text-[#0D0D0D] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
                 >
                   <option value="phone_call">Phone Call</option>
                   <option value="email">Email Reply</option>
@@ -1339,7 +792,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               </button>
               <button
                 onClick={() => setShowObservationModal(false)}
-                className="bg-[#F5F5F5] hover:bg-[#EAE6E0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
+                className="bg-white hover:bg-[#F0F0F0] text-[#0D0D0D] font-semibold px-4 py-2 rounded-full text-sm transition-all"
               >
                 Cancel
               </button>
@@ -1377,11 +830,11 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
               const total = Object.keys(criticalFields).length;
 
               return (
-                <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#EAE6E0]">
+                <div className="bg-white rounded-lg p-4 border border-[#CCCCCC]">
                   <p className="text-[9px] font-semibold uppercase tracking-[0.5px] text-[#0D0D0D] mb-2">Operational Readiness</p>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <div className="w-full bg-[#EAE6E0] rounded-full h-2">
+                      <div className="w-full bg-[#F0F0F0] rounded-full h-2">
                         <div
                           className="bg-[#0D0D0D] h-2 rounded-full transition-all"
                           style={{ width: `${(completeness / total) * 100}%` }}
@@ -1488,7 +941,7 @@ function LeadCard({ lead, onRefresh }: { lead: Lead; onRefresh: () => void }): R
             {/* Opening Prompt */}
             <div>
               <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0D0D0D] mb-3">How to start</h4>
-              <div className="bg-[#F5F5F5] rounded-lg p-4 border border-[#E8E8E8]">
+              <div className="bg-white rounded-lg p-4 border border-[#E8E8E8]">
                 <p className="text-sm text-[#0D0D0D] italic">
                   "{getOpeningPrompt({ businessName: lead.business_name, category: lead.business_category || "business", painPoint: lead.pain_point, hasEngaged: false, hasPartialOrder: false })}"
                 </p>
@@ -1672,12 +1125,12 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-5">
+      <div className="bg-white border border-[#CCCCCC] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Discover leads via Google Maps</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Industry</label>
-            <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
                 <optgroup key={category} label={category}>
                   {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
@@ -1687,13 +1140,13 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
           </div>
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">Delivery Type</label>
-            <select value={deliveryType} onChange={e => setDeliveryType(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={deliveryType} onChange={e => setDeliveryType(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[#888888] text-[10px] uppercase tracking-[0.1em]">City</label>
-            <select value={city} onChange={e => setCity(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+            <select value={city} onChange={e => setCity(e.target.value)} className="w-full mt-1 px-3 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
               {UK_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -1708,12 +1161,12 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
         {result && (
           <div className="mt-4">
             {loadingNewLeads ? (
-              <div className="bg-white border border-[#EAE6E0] rounded-xl px-4 py-3">
+              <div className="bg-white border border-[#CCCCCC] rounded-xl px-4 py-3">
                 <p className="text-[#888888] text-sm font-medium mb-3">Adding {result.count} leads to pipeline…</p>
                 <SkeletonLeadCards count={result.count} />
               </div>
             ) : (
-              <div className="bg-white border border-[#EAE6E0] rounded-xl px-4 py-3">
+              <div className="bg-white border border-[#CCCCCC] rounded-xl px-4 py-3">
                 <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} new leads added</p>
                 {result.added.length > 0 && (
                   <ul className="mt-2 space-y-1">
@@ -1732,7 +1185,7 @@ function DiscoverPanel({ onRefresh, setLeads, industry: defaultIndustry, city: d
       {/* CSV Import Section */}
       <CSVImportPanel onRefresh={onRefresh} setLeads={setLeads} />
 
-      <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-5">
+      <div className="bg-white border border-[#CCCCCC] rounded-2xl p-5">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">Review monitoring</p>
         <p className="text-[#0D0D0D] text-sm font-medium mb-1">Pain point detection is automatic.</p>
         <p className="text-[#888888] text-sm leading-relaxed">
@@ -1801,7 +1254,7 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
   }
 
   return (
-    <div className="bg-white border border-[#EAE6E0] rounded-2xl p-5">
+    <div className="bg-white border border-[#CCCCCC] rounded-2xl p-5">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">Or upload CSV</p>
       <input
         ref={fileInputRef}
@@ -1813,14 +1266,14 @@ function CSVImportPanel({ onRefresh, setLeads }: { onRefresh: () => void; setLea
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={importing}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#EAE6E0] rounded-xl text-[#0D0D0D] font-semibold text-sm transition-all duration-150 hover:border-[#0D0D0D] hover:bg-[#F5F5F5] active:bg-[#E8E8E8] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#CCCCCC] rounded-xl text-[#0D0D0D] font-semibold text-sm transition-all duration-150 hover:border-[#0D0D0D] hover:bg-white active:bg-[#E8E8E8] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span>📎</span>
         {importing ? "Processing…" : fileName ? `✓ ${fileName}` : "Upload CSV file"}
       </button>
       <p className="text-[#888888] text-xs mt-3">Required columns: business_name, business_category, city. Optional: email, website, phone, pain_point, review_rating</p>
       {result && (
-        <div className="mt-4 bg-[#F5F5F5] border border-[#EAE6E0] rounded-xl px-4 py-3">
+        <div className="mt-4 bg-white border border-[#CCCCCC] rounded-xl px-4 py-3">
           <p className="text-[#0D0D0D] text-sm font-semibold">{result.count} leads imported</p>
           {result.added.length > 0 && (
             <ul className="mt-2 space-y-1">
@@ -1889,49 +1342,49 @@ function AddLeadPanel({ onRefresh }: { onRefresh: () => void }): React.ReactElem
   }
 
   return (
-    <div className="bg-white border border-[#EAE6E0] rounded-2xl p-5 space-y-3">
+    <div className="bg-white border border-[#CCCCCC] rounded-2xl p-5 space-y-3">
       <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">Add lead manually</p>
-      <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+      <input value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Business name *" className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
 
       <div className="grid grid-cols-2 gap-3">
-        <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {Object.entries(B2B_INDUSTRIES).map(([category, industries]) => (
             <optgroup key={category} label={category}>
               {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
             </optgroup>
           ))}
         </select>
-        <select value={form.deliveryType} onChange={e => setForm(f => ({ ...f, deliveryType: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.deliveryType} onChange={e => setForm(f => ({ ...f, deliveryType: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           {DELIVERY_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
         </select>
-        <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
-        <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Email" className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone" className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
-        <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D]" />
+        <select value={form.deliveryFrequency} onChange={e => setForm(f => ({ ...f, deliveryFrequency: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Delivery Frequency</option>
           {DELIVERY_FREQUENCIES.map(df => <option key={df} value={df}>{df}</option>)}
         </select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.averageDeliveries} onChange={e => setForm(f => ({ ...f, averageDeliveries: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Avg Deliveries/Month</option>
           {AVERAGE_DELIVERIES.map(ad => <option key={ad} value={ad}>{ad}</option>)}
         </select>
-        <select value={form.courierProvider} onChange={e => setForm(f => ({ ...f, courierProvider: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.courierProvider} onChange={e => setForm(f => ({ ...f, courierProvider: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Current Courier</option>
           {COURIER_PROVIDERS.map(cp => <option key={cp} value={cp}>{cp}</option>)}
         </select>
-        <select value={form.deliveryChallenge} onChange={e => setForm(f => ({ ...f, deliveryChallenge: e.target.value }))} className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
+        <select value={form.deliveryChallenge} onChange={e => setForm(f => ({ ...f, deliveryChallenge: e.target.value }))} className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm bg-white focus:outline-none focus:border-[#0D0D0D]">
           <option disabled>Biggest Challenge</option>
           {DELIVERY_CHALLENGES.map(dc => <option key={dc} value={dc}>{dc}</option>)}
         </select>
       </div>
 
-      <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#EAE6E0] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
+      <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Notes or pain point" className="w-full px-4 py-2.5 border border-[#CCCCCC] rounded-xl text-sm focus:outline-none focus:border-[#0D0D0D] resize-none" />
       <button onClick={save} disabled={saving || !form.business_name} className="w-full bg-[#0D0D0D] hover:bg-[#333333] disabled:opacity-40 text-white font-semibold py-2.5 rounded-full text-sm transition-colors">
         {saving ? "Adding…" : "Add to pipeline →"}
       </button>
@@ -1965,11 +1418,11 @@ function StandingOrdersPanel({ orders, onGenerate }: { orders: StandingOrder[]; 
         </button>
       </div>
       {orders.length === 0 ? (
-        <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-8 text-center">
+        <div className="bg-white border border-[#CCCCCC] rounded-2xl p-8 text-center">
           <p className="text-[#888888] text-sm">No standing orders yet. Close a lead to create one.</p>
         </div>
       ) : (
-        <div className="bg-white border border-[#EAE6E0] rounded-2xl overflow-hidden divide-y divide-[#EAE6E0]">
+        <div className="bg-white border border-[#CCCCCC] rounded-2xl overflow-hidden divide-y divide-[#EAE6E0]">
           {orders.map((order) => (
             <div key={order.id} className="flex items-center justify-between px-5 py-4 gap-4">
               <div className="flex-1 min-w-0">
@@ -2031,12 +1484,12 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-3 mb-12">
         {activeTabs.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#666666] hover:text-[#0D0D0D] border border-[#EAE6E0] hover:border-[#0D0D0D]"}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.key ? "bg-[#0D0D0D] text-white" : "text-[#666666] hover:text-[#0D0D0D] border border-[#CCCCCC]"}`}
           >
             {t.label}
           </button>
@@ -2044,9 +1497,9 @@ export default function B2BPipeline({ leads: initialLeads, orders: initialOrders
       </div>
 
       {tab === "pipeline" && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {pipelineLeads.length === 0 ? (
-            <div className="bg-[#F5F5F5] border border-[#EAE6E0] rounded-2xl p-8 text-center">
+            <div className="bg-white border border-[#CCCCCC] rounded-2xl p-8 text-center">
               <p className="text-[#888888] text-sm">No active leads. Use Discover to find your first batch.</p>
             </div>
           ) : (

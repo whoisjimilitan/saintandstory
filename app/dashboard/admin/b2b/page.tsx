@@ -1,11 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import B2BPipeline from "@/components/B2BPipeline";
-import B2BMetricsCards from "@/components/B2BMetricsCards";
-import { DiscoveryConfig } from "@/components/DiscoveryConfig";
 import { type Lead, type StandingOrder } from "@/lib/b2b-types";
 
 const ADMIN_EMAILS = [
@@ -81,62 +78,42 @@ export default async function B2BAdminPage() {
   const { leads, orders, stats } = await getB2BData();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <p className="text-[11px] font-medium text-[#666666] uppercase tracking-[0.15em] mb-2">Admin</p>
-          <h1 className="font-black text-[#1A1A1A] text-4xl tracking-tight">
-            B2B Pipeline
-          </h1>
-        </div>
-        <Link href="/dashboard/admin" className="text-xs font-semibold text-[#1A1A1A] hover:text-[#666666] uppercase tracking-[0.1em] transition-colors border border-[#E8E8E8] px-4 py-2 rounded-lg hover:border-[#999999]">
-          ↻ Admin
-        </Link>
-      </div>
+    <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="mb-12">
+        <h1 className="text-3xl font-bold text-[#0D0D0D] mb-8">B2B Pipeline</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Uncontacted</p>
-          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.new}</p>
+        {/* TODAY SECTION */}
+        <div className="mb-12">
+          <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-wide mb-6">Today</p>
+          <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="p-6 bg-white border border-[#CCCCCC] rounded-lg">
+              <p className="text-xs text-[#666666] uppercase tracking-wide mb-1">Requires Response</p>
+              <p className="text-4xl font-bold text-[#0D0D0D]">{stats.warm}</p>
+            </div>
+            <div className="p-6 bg-white border border-[#CCCCCC] rounded-lg">
+              <p className="text-xs text-[#666666] uppercase tracking-wide mb-1">Uncontacted</p>
+              <p className="text-4xl font-bold text-[#0D0D0D]">{stats.new}</p>
+            </div>
+            <div className="p-6 bg-white border border-[#CCCCCC] rounded-lg">
+              <p className="text-xs text-[#666666] uppercase tracking-wide mb-1">Standing Orders</p>
+              <p className="text-4xl font-bold text-[#0D0D0D]">{orders.length}</p>
+            </div>
+          </div>
         </div>
-        {stats.warm > 0 && (
-          <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-            <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Active Conversations</p>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{stats.warm}</p>
+
+        {/* PIPELINE SECTION */}
+        <div className="mb-12">
+          <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-wide mb-6">Pipeline</p>
+          <B2BPipeline leads={leads} orders={orders} />
+        </div>
+
+        {/* ARCHIVE SECTION */}
+        {stats.closed > 0 && (
+          <div className="mb-12">
+            <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-wide mb-4">Archive</p>
+            <p className="text-xs text-[#666666]">{stats.closed} converted leads</p>
           </div>
         )}
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Converted</p>
-          <p className="text-2xl font-bold text-[#1A1A1A]">{stats.closed}</p>
-        </div>
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4">
-          <p className="text-[11px] text-[#666666] uppercase tracking-[0.1em] mb-1">Journeys</p>
-          <p className="text-2xl font-bold text-[#1A1A1A]">{orders.length}</p>
-        </div>
-      </div>
-
-      <div className="mb-16">
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Acquisition Pipeline</h2>
-          <p className="text-xs text-[#999999] mt-1">Discovery → enrichment → qualification → activation</p>
-        </div>
-        <B2BMetricsCards />
-      </div>
-
-      <div className="mb-16">
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Discovery Management</h2>
-          <p className="text-xs text-[#999999] mt-1">Configure discovery sources and research missions</p>
-        </div>
-        <DiscoveryConfig />
-      </div>
-
-      <div className="mb-16">
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-[0.1em]">Opportunities Pipeline</h2>
-          <p className="text-xs text-[#999999] mt-1">Manage conversations, standing orders, and activations</p>
-        </div>
-        <B2BPipeline leads={leads} orders={orders} />
       </div>
     </div>
   );
