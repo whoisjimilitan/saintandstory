@@ -1,3 +1,5 @@
+"use client";
+
 import { LeadActionCard } from "@/components/leads/LeadActionCard";
 import { ReadyTodayCard } from "@/components/leads/ReadyTodayCard";
 
