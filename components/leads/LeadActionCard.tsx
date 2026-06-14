@@ -48,6 +48,16 @@ const tierBadgeColors = {
   C: "bg-gray-100 text-gray-800",
 };
 
+const statusBadgeColors: Record<string, string> = {
+  new: "bg-gray-100 text-gray-800",
+  ready: "bg-blue-100 text-blue-800",
+  contacted: "bg-green-100 text-green-800",
+  engaged: "bg-purple-100 text-purple-800",
+  qualified: "bg-indigo-100 text-indigo-800",
+  active: "bg-emerald-100 text-emerald-800",
+  archived: "bg-slate-100 text-slate-800",
+};
+
 export function LeadActionCard({
   id,
   businessName,
@@ -79,7 +89,7 @@ export function LeadActionCard({
   const [marking, setMarking] = useState(false);
   const scorePercentage = Math.min(100, Math.max(0, score));
 
-  const handleMarkContacted = async () => {
+  const handleStatusChange = async (newStatus: string) => {
     setMarking(true);
     try {
       const response = await fetch("/api/b2b/update-status", {
@@ -87,7 +97,7 @@ export function LeadActionCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lead_id: id,
-          status: "contacted",
+          status: newStatus,
           operator: "operator", // TODO: Get from auth context
         }),
       });
@@ -97,10 +107,10 @@ export function LeadActionCard({
         onRefresh?.();
       } else {
         const error = await response.json();
-        console.error("Failed to mark contacted:", error);
+        console.error(`Failed to change status to ${newStatus}:`, error);
       }
     } catch (error) {
-      console.error("Error marking contacted:", error);
+      console.error("Error changing status:", error);
     } finally {
       setMarking(false);
     }
@@ -121,7 +131,16 @@ export function LeadActionCard({
               <p className="text-xs text-gray-500 mt-1 capitalize">{category}</p>
             )}
           </div>
-          <div className="flex gap-2 flex-shrink-0">
+          <div className="flex gap-2 flex-shrink-0 flex-wrap justify-end">
+            {leadStatus && (
+              <span
+                className={`px-2 py-1 text-xs font-semibold rounded capitalize ${
+                  statusBadgeColors[leadStatus] || "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {leadStatus}
+              </span>
+            )}
             <span
               className={`px-3 py-1 text-sm font-bold rounded ${tierBadgeColors[tier]}`}
             >
@@ -202,25 +221,30 @@ export function LeadActionCard({
         </div>
       )}
 
-      {/* STATUS + LAST CONTACT */}
-      {(leadStatus || lastContactedAt) && (
-        <div className="pt-3 border-t flex gap-4 text-xs">
-          {leadStatus && (
-            <div>
-              <span className="text-gray-600">Status:</span>{" "}
-              <span className="font-semibold text-gray-900 capitalize">
-                {leadStatus}
-              </span>
-            </div>
-          )}
-          {lastContactedAt && (
-            <div>
+      {/* LAST CONTACT + COOLDOWN INDICATOR */}
+      {lastContactedAt && (
+        <div className="pt-3 border-t">
+          <div className="flex items-center gap-3 text-xs">
+            <div className="flex-1">
               <span className="text-gray-600">Last contacted:</span>{" "}
               <span className="font-semibold text-gray-900">
                 {new Date(lastContactedAt).toLocaleDateString("en-GB")}
               </span>
             </div>
-          )}
+            {(() => {
+              const daysAgo = Math.floor(
+                (Date.now() - new Date(lastContactedAt).getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const cooldownColor =
+                daysAgo < 2 ? "bg-red-100 text-red-800" : daysAgo < 7 ? "bg-amber-100 text-amber-800" : "bg-green-100 text-green-800";
+              return (
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${cooldownColor}`}>
+                  {daysAgo}d ago
+                </span>
+              );
+            })()}
+          </div>
         </div>
       )}
 
@@ -252,24 +276,63 @@ export function LeadActionCard({
         </div>
       )}
 
-      {/* ACTIONS */}
-      <div className="pt-3 border-t flex gap-2">
-        {leadStatus !== "contacted" && (
+      {/* ACTION BUTTONS */}
+      <div className="pt-3 border-t space-y-2">
+        <div className="flex gap-2">
+          {leadStatus === "ready" && (
+            <button
+              onClick={() => handleStatusChange("contacted")}
+              disabled={marking}
+              className="flex-1 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
+            >
+              <CheckCircle2 size={16} />
+              {marking ? "..." : "Mark Contacted"}
+            </button>
+          )}
+          {leadStatus === "contacted" && (
+            <button
+              onClick={() => handleStatusChange("engaged")}
+              disabled={marking}
+              className="flex-1 text-sm px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
+            >
+              {marking ? "..." : "Mark Engaged"}
+            </button>
+          )}
+          {leadStatus === "engaged" && (
+            <button
+              onClick={() => handleStatusChange("qualified")}
+              disabled={marking}
+              className="flex-1 text-sm px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
+            >
+              {marking ? "..." : "Mark Qualified"}
+            </button>
+          )}
+          {leadStatus === "qualified" && (
+            <button
+              onClick={() => handleStatusChange("active")}
+              disabled={marking}
+              className="flex-1 text-sm px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
+            >
+              {marking ? "..." : "Mark Active"}
+            </button>
+          )}
+          {onViewBrief && (
+            <button
+              onClick={onViewBrief}
+              className="flex-1 text-sm px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded transition font-medium"
+            >
+              Brief
+            </button>
+          )}
+        </div>
+
+        {leadStatus && leadStatus !== "archived" && (
           <button
-            onClick={handleMarkContacted}
+            onClick={() => handleStatusChange("archived")}
             disabled={marking}
-            className="flex-1 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition font-medium flex items-center justify-center gap-1 disabled:opacity-50"
+            className="w-full text-xs px-3 py-1 text-gray-600 hover:text-gray-900 border border-gray-300 rounded transition disabled:opacity-50"
           >
-            <CheckCircle2 size={16} />
-            {marking ? "Marking..." : "Mark Contacted"}
-          </button>
-        )}
-        {onViewBrief && (
-          <button
-            onClick={onViewBrief}
-            className="flex-1 text-sm px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded transition font-medium"
-          >
-            View Full Brief
+            {marking ? "..." : "Archive"}
           </button>
         )}
       </div>
