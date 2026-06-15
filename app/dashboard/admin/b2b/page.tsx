@@ -304,131 +304,109 @@ export default async function B2BTodayPage() {
         </div>
       </div>
 
-      {/* MORNING BRIEF — SYSTEM MOVEMENT */}
-      <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded px-6 py-5 mb-12">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-6">
-          System Movement
+      {/* MORNING BRIEF — SYSTEM MOVEMENT (Premium Metrics) */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          System Health
         </p>
 
-        {/* Row 1: Overnight activity & alerts */}
-        <div className="grid grid-cols-2 gap-8 mb-8 pb-8 border-b border-[#E8E8E8]">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
-              What Happened Overnight
-            </p>
-            <div className="space-y-2">
-              <p className="text-sm text-[#0D0D0D]">
-                <span className="font-semibold">{brief.overnight.discovered}</span> discovered
-              </p>
-              <p className="text-sm text-[#0D0D0D]">
-                <span className="font-semibold">{brief.overnight.qualified}</span> qualified
-              </p>
-            </div>
-          </div>
-
-          <div>
-            {brief.queue_state.stuck_over_5_days > 0 ? (
-              <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
-                  ⚠️ Attention Required
-                </p>
-                <p className="text-sm text-[#0D0D0D]">
-                  <span className="font-semibold">{brief.queue_state.stuck_over_5_days}</span> prospect{brief.queue_state.stuck_over_5_days !== 1 ? 's' : ''} stuck 5+ days without response
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
-                  Status
-                </p>
-                <p className="text-sm text-[#0D0D0D]">
-                  ✅ All prospects being worked
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Row 2: Conversion funnel */}
-        <div className="mb-8 pb-8 border-b border-[#E8E8E8]">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-4">
-            Conversion Funnel
-          </p>
-          <div className="grid grid-cols-7 gap-2">
-            <div>
-              <p className="text-[10px] text-[#888888] mb-1">Discovered</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.discovered}</p>
-            </div>
-            <div className="flex items-end justify-center text-[#666666]">→</div>
-            <div>
-              <p className="text-[10px] text-[#888888] mb-1">Qualified</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.qualified}</p>
-            </div>
-            <div className="flex items-end justify-center text-[#666666]">→</div>
-            <div>
-              <p className="text-[10px] text-[#888888] mb-1">Contacted</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.contacted}</p>
-            </div>
-            <div className="flex items-end justify-center text-[#666666]">→</div>
-            <div>
-              <p className="text-[10px] text-[#888888] mb-1">Replied</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.replied}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Today's queue state */}
-        <div className="grid grid-cols-3 gap-6">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+        {/* Metric Cards Grid — Large, Clean, Focused */}
+        <div className="grid grid-cols-3 gap-8">
+          {/* Waiting for Outreach */}
+          <div className="border border-[#E8E8E8] rounded px-6 py-8 bg-white hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-4">
               Waiting for Outreach
             </p>
-            <p className="text-2xl font-black text-[#0D0D0D]">
+            <p className="text-5xl font-black text-[#0D0D0D] leading-none">
               {brief.queue_state.waiting_for_outreach}
             </p>
           </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+
+          {/* Awaiting Response */}
+          <div className="border border-[#E8E8E8] rounded px-6 py-8 bg-white hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-4">
               Awaiting Response
             </p>
-            <p className="text-2xl font-black text-[#0D0D0D]">
+            <p className="text-5xl font-black text-[#0D0D0D] leading-none">
               {brief.queue_state.awaiting_response}
             </p>
           </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+
+          {/* Open Rate */}
+          <div className="border border-[#E8E8E8] rounded px-6 py-8 bg-white hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-4">
               Open Rate
             </p>
-            <p className="text-2xl font-black text-[#0D0D0D]">
+            <p className="text-5xl font-black text-[#0D0D0D] leading-none">
               {brief.system_health.open_rate}%
             </p>
           </div>
         </div>
       </div>
 
+      {/* Conversion Funnel — Visual Clarity */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Conversion Pipeline
+        </p>
+        <div className="border border-[#E8E8E8] rounded px-8 py-10 bg-white">
+          <div className="flex items-end justify-between">
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                Discovered
+              </p>
+              <p className="text-4xl font-black text-[#0D0D0D]">
+                {brief.funnel.discovered}
+              </p>
+            </div>
+            <div className="text-[#D0D0D0] text-2xl mb-4">—</div>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                Qualified
+              </p>
+              <p className="text-4xl font-black text-[#0D0D0D]">
+                {brief.funnel.qualified}
+              </p>
+            </div>
+            <div className="text-[#D0D0D0] text-2xl mb-4">—</div>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                Contacted
+              </p>
+              <p className="text-4xl font-black text-[#0D0D0D]">
+                {brief.funnel.contacted}
+              </p>
+            </div>
+            <div className="text-[#D0D0D0] text-2xl mb-4">—</div>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                Replied
+              </p>
+              <p className="text-4xl font-black text-[#0D0D0D]">
+                {brief.funnel.replied}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Status Alert — Subtle, Focused */}
+      {brief.queue_state.stuck_over_5_days > 0 && (
+        <div className="mb-16 border border-[#E8E8E8] rounded px-6 py-5 bg-[#FAFAFA]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+            Attention
+          </p>
+          <p className="text-sm text-[#0D0D0D]">
+            <span className="font-semibold">{brief.queue_state.stuck_over_5_days}</span> prospect{brief.queue_state.stuck_over_5_days !== 1 ? 's' : ''} awaiting response for 5+ days
+          </p>
+        </div>
+      )}
+
       {/* Page Title */}
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
         Today Queue.
       </h1>
 
-      {/* SECTION 1: TODAY'S FOCUS */}
-      <div className="mb-12">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Today's Focus
-        </p>
-        <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          <span className="font-semibold">{brief.queue_state.waiting_for_outreach}</span> prospects waiting for first outreach.
-        </p>
-        <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          <span className="font-semibold">{brief.queue_state.awaiting_response}</span> prospects awaiting response to initial contact.
-        </p>
-        <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          System health: <span className="font-semibold">{brief.system_health.open_rate}%</span> open rate on contacted prospects.
-        </p>
-        <p className="text-base leading-relaxed text-[#666666]">
-          {brief.queue_state.stuck_over_5_days > 0 ? `⚠️ ${brief.queue_state.stuck_over_5_days} prospect(s) stuck 5+ days without response.` : '✅ All prospects being actively worked.'}
-        </p>
-      </div>
 
       {/* SECTION 2: OPPORTUNITIES REQUIRING ATTENTION */}
       <div className="mb-8">
