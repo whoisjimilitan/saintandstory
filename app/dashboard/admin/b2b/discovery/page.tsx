@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
+import { IntakeChannels } from "@/components/IntakeChannels";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -301,43 +302,8 @@ export default async function DiscoveryPage() {
         </p>
       </div>
 
-      {/* SECTION 1.5: INTAKE CHANNELS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Opportunity Intake Channels
-        </p>
-        <div className="grid grid-cols-2 gap-4">
-          {discovery.intake_sources.map((source, idx) => (
-            <div key={idx} className="bg-white border border-[#E8E8E8] rounded p-4 hover:border-[#D0D0D0] transition-colors">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {source.name}
-                  </p>
-                  <p className="text-[10px] text-[#888888] mt-1">
-                    {source.last_activity}
-                  </p>
-                </div>
-                <span className={`text-[10px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded ${
-                  source.status === 'operational'
-                    ? 'bg-[#E8F5E9] text-[#1B5E20]'
-                    : source.status === 'hidden'
-                    ? 'bg-[#FFF8E5] text-[#CC6600]'
-                    : 'bg-[#FFE5E5] text-[#CC0000]'
-                }`}>
-                  {source.status === 'operational' ? 'Active' : source.status === 'hidden' ? 'Hidden' : 'Missing'}
-                </span>
-              </div>
-              <p className="text-2xl font-black text-[#0D0D0D]">
-                {source.count}
-              </p>
-              <p className="text-[10px] text-[#666666] mt-2">
-                Entries from {source.name.toLowerCase()}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* SECTION 1.5: INTAKE CHANNELS (INTERACTIVE) */}
+      <IntakeChannels sources={discovery.intake_sources} />
 
       {/* SECTION 2: INTAKE FLOW */}
       <div className="mb-16">
