@@ -400,18 +400,51 @@ export default async function B2BTodayPage() {
         </div>
       )}
 
-      {/* Page Title + Subheader */}
-      <div className="mb-12">
-        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
-          Today's Conversations.
+      {/* MORNING BRIEF — EXECUTIVE INTELLIGENCE SURFACE */}
+      <div className="mb-16">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-5xl tracking-tight mb-8">
+          Good Morning.
         </h1>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          Sorted by conversation urgency
-        </p>
+
+        {/* Executive Summary — Chief of Staff Brief */}
+        <div className="bg-white border border-[#E8E8E8] rounded px-8 py-8 mb-12">
+          <div className="space-y-3">
+            <p className="text-base leading-relaxed text-[#0D0D0D]">
+              <span className="font-semibold">{brief.overnight.discovered}</span> new opportunity{brief.overnight.discovered !== 1 ? 's' : ''} found overnight.
+            </p>
+            <p className="text-base leading-relaxed text-[#0D0D0D]">
+              <span className="font-semibold">{brief.queue_state.waiting_for_outreach}</span> conversation{brief.queue_state.waiting_for_outreach !== 1 ? 's' : ''} waiting for your attention.
+            </p>
+            <p className="text-base leading-relaxed text-[#0D0D0D]">
+              <span className="font-semibold">{brief.funnel.opened}</span> prospect{brief.funnel.opened !== 1 ? 's' : ''} engaged but have not replied.
+            </p>
+            {brief.queue_state.stuck_over_5_days > 0 && (
+              <p className="text-base leading-relaxed text-[#CC6600]">
+                <span className="font-semibold">{brief.queue_state.stuck_over_5_days}</span> standing order{brief.queue_state.stuck_over_5_days !== 1 ? 's' : ''} require{brief.queue_state.stuck_over_5_days === 1 ? 's' : ''} action.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Recommended Focus */}
+        <div className="mb-12">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            Your Focus Today
+          </p>
+          <p className="text-lg font-semibold text-[#0D0D0D]">
+            {prospects.length > 0 ? `Start with ${prospects[0].business_name}` : 'Review waiting conversations'}
+          </p>
+        </div>
       </div>
 
-      {/* SECTION 2: PROSPECT QUEUE */}
-      <div className="space-y-4 mb-16">
+      {/* TODAY'S WORK — Execution Section */}
+      <div className="mb-12">
+        <h2 className="font-sans font-black text-[#0D0D0D] text-2xl tracking-tight mb-8">
+          Today's Work.
+        </h2>
+
+        {/* SECTION 2: PROSPECT QUEUE */}
+        <div className="space-y-4 mb-16">
         {prospects.length === 0 ? (
           <p className="text-sm text-[#666666] italic">No leads qualified for outreach yet. Discovery pipeline continues.</p>
         ) : (
@@ -434,18 +467,19 @@ export default async function B2BTodayPage() {
             />
           ))
         )}
-      </div>
+        </div>
 
-      {/* SECTION 3: SYSTEM STATUS */}
-      <div className="pt-12 border-t border-[#E8E8E8]">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          Background Operations
-        </p>
-        <div className="grid grid-cols-2 gap-4 text-[10px] text-[#888888]">
-          <div>Discovery Pipeline: <span className="font-semibold">Active</span></div>
-          <div>Enrichment: <span className="font-semibold">Active</span></div>
-          <div>Ranking Engine: <span className="font-semibold">Active</span></div>
-          <div>Learning System: <span className="font-semibold">Active</span></div>
+        {/* SECTION 3: SYSTEM STATUS */}
+        <div className="pt-12 border-t border-[#E8E8E8]">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            Background Operations
+          </p>
+          <div className="grid grid-cols-2 gap-4 text-[10px] text-[#888888]">
+            <div>Discovery Pipeline: <span className="font-semibold">Active</span></div>
+            <div>Enrichment: <span className="font-semibold">Active</span></div>
+            <div>Ranking Engine: <span className="font-semibold">Active</span></div>
+            <div>Learning System: <span className="font-semibold">Active</span></div>
+          </div>
         </div>
       </div>
     </div>
