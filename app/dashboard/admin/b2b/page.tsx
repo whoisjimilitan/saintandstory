@@ -202,7 +202,7 @@ async function getRealProspects(): Promise<ProspectData[]> {
 
     let leads: any[] = [];
     try {
-      // Simplified query - avoid complex joins that can cause errors
+      // Query sorted by conversation urgency (REPLIED → CLICKED → OPENED → CONTACTED → UNCONTACTED)
       leads = await sql`
         SELECT
           bl.id,
@@ -216,12 +216,10 @@ async function getRealProspects(): Promise<ProspectData[]> {
         FROM b2b_leads bl
         ORDER BY
           CASE
-            WHEN bl.email_sent_at IS NULL THEN 1
-            ELSE 2
-          END,
-          CASE
-            WHEN bl.status IN ('warm', 'engaged') THEN 1
-            ELSE 2
+            WHEN bl.status = 'engaged' THEN 1
+            WHEN bl.status = 'warm' AND bl.email_sent_at IS NOT NULL THEN 2
+            WHEN bl.email_sent_at IS NOT NULL THEN 3
+            ELSE 4
           END,
           bl.engagement_score DESC,
           bl.created_at DESC
@@ -405,10 +403,10 @@ export default async function B2BTodayPage() {
       {/* Page Title + Subheader */}
       <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
-          Today's Prospects.
+          Today's Conversations.
         </h1>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          Ranked by opportunity
+          Sorted by conversation urgency
         </p>
       </div>
 

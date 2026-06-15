@@ -21,9 +21,30 @@ interface ProspectCardProps {
     clicked_count?: number;
     replied?: boolean;
   };
+  email_content?: {
+    subject?: string;
+    body?: string;
+  };
 }
 
 type EmailState = 'idle' | 'loading' | 'success' | 'error';
+
+// Determine conversation state based on engagement
+function getConversationState(engagement?: any): { state: string; label: string; color: string } {
+  if (!engagement?.sent_at) {
+    return { state: 'uncontacted', label: 'UNCONTACTED', color: 'bg-[#F5F5F5] text-[#0D0D0D]' };
+  }
+  if (engagement.replied) {
+    return { state: 'replied', label: 'REPLIED', color: 'bg-[#E8F5E9] text-[#1B5E20]' };
+  }
+  if (engagement.clicked_count && engagement.clicked_count > 0) {
+    return { state: 'clicked', label: 'CLICKED', color: 'bg-[#FFF3E0] text-[#E65100]' };
+  }
+  if (engagement.opened_count && engagement.opened_count > 0) {
+    return { state: 'opened', label: 'OPENED', color: 'bg-[#E3F2FD] text-[#0D47A1]' };
+  }
+  return { state: 'contacted', label: 'CONTACTED', color: 'bg-[#F3E5F5] text-[#4A148C]' };
+}
 
 export default function ProspectCard({
   prospect,
@@ -33,10 +54,12 @@ export default function ProspectCard({
   executiveSummary = "",
   evidence = [],
   engagement,
+  email_content,
 }: ProspectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [emailState, setEmailState] = useState<EmailState>('idle');
   const [emailError, setEmailError] = useState<string>('');
+  const conversationState = getConversationState(engagement);
 
   const sendEmail = async () => {
     if (!prospect.email) {
@@ -91,122 +114,167 @@ export default function ProspectCard({
       className="border border-[#E8E8E8] bg-white cursor-pointer transition-all duration-200 hover:border-[#D0D0D0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      {/* COLLAPSED STATE — Apple + Linear Hybrid */}
+      {/* COLLAPSED STATE — Conversation-First */}
       <div className="px-6 py-5">
-        {/* Header: Company + Category */}
+        {/* SECTION 1: CONVERSATION STATE (PRIMARY) */}
         <div className="mb-4 flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="text-base font-semibold text-[#0D0D0D] mb-1">
-              {prospect.business_name}
-            </h3>
-            {prospect.business_category && (
-              <p className="text-[11px] font-medium text-[#888888] uppercase tracking-[0.05em]">
-                {prospect.business_category}
-              </p>
-            )}
+          <div>
+            <span className={`text-[10px] font-semibold uppercase tracking-[0.05em] px-3 py-1 rounded ${conversationState.color}`}>
+              {conversationState.label}
+            </span>
           </div>
+          {prospect.business_category && (
+            <span className="text-[11px] font-medium text-[#888888] uppercase tracking-[0.05em]">
+              {prospect.business_category}
+            </span>
+          )}
         </div>
 
-        {/* Opportunity */}
-        <p className="text-sm leading-relaxed text-[#0D0D0D] mb-4">
-          {opportunity}
-        </p>
+        {/* Company Name */}
+        <h3 className="text-base font-semibold text-[#0D0D0D] mb-3">
+          {prospect.business_name}
+        </h3>
 
-        {/* Context — Important background */}
-        <p className="text-sm leading-relaxed text-[#666666] mb-4 pb-4 border-b border-[#E8E8E8]">
-          {context}
-        </p>
+        {/* Engagement Summary (if contacted) */}
+        {engagement?.sent_at && (
+          <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
+            <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[#888888] mb-2">
+              Engagement
+            </p>
+            <div className="text-sm text-[#0D0D0D]">
+              {engagement.opened_count ? (
+                <p className="mb-1">
+                  <span className="font-semibold">{engagement.opened_count}</span> open{engagement.opened_count !== 1 ? 's' : ''}
+                </p>
+              ) : null}
+              {engagement.clicked_count ? (
+                <p className="mb-1">
+                  <span className="font-semibold">{engagement.clicked_count}</span> click{engagement.clicked_count !== 1 ? 's' : ''}
+                </p>
+              ) : null}
+              {engagement.replied ? (
+                <p className="mb-1">
+                  <span className="font-semibold">Reply received</span>
+                </p>
+              ) : null}
+            </div>
+          </div>
+        )}
 
         {/* Recommended Action */}
-        <p className="text-sm font-medium text-[#0D0D0D] mb-4">
+        <p className="text-sm font-medium text-[#0D0D0D] mb-3">
           {recommendation}
         </p>
 
         {/* Metadata Footer */}
         <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.05em] text-[#888888]">
-          <span>Reviewed {lastReviewedLabel}</span>
+          <span>
+            {engagement?.sent_at
+              ? `Sent ${new Date(engagement.sent_at).toLocaleDateString()}`
+              : 'Not yet contacted'}
+          </span>
           <span className="text-[9px]">Click to expand</span>
         </div>
       </div>
 
-      {/* EXPANDED STATE — Apple + Linear Hybrid Polish */}
+      {/* EXPANDED STATE — Conversation-Centric */}
       {isExpanded && (
         <div className="border-t border-[#E8E8E8] bg-[#FAFAFA]">
           <div className="px-6 py-6 space-y-6">
-            {/* OUTREACH TIMELINE — CARD WITH POLISH */}
-            <div className="bg-white border border-[#E8E8E8] rounded p-4">
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-4">
-                {engagement?.sent_at ? 'Outreach Timeline' : 'Status'}
-              </h4>
-              {engagement?.sent_at ? (
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center pb-3 border-b border-[#E8E8E8]">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888]">Email Sent</span>
-                    <span className="text-sm font-medium text-[#0D0D0D]">{new Date(engagement.sent_at).toLocaleDateString()}</span>
-                  </div>
-                  {engagement.opened_count !== undefined && (
-                    <div className="flex justify-between items-center pb-3 border-b border-[#E8E8E8]">
-                      <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888]">Opened</span>
-                      <span className="text-sm font-medium text-[#0D0D0D]">{engagement.opened_count} time{engagement.opened_count !== 1 ? 's' : ''}</span>
-                    </div>
-                  )}
-                  {engagement.clicked_count !== undefined && (
-                    <div className="flex justify-between items-center pb-3 border-b border-[#E8E8E8]">
-                      <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888]">Clicked</span>
-                      <span className="text-sm font-medium text-[#0D0D0D]">{engagement.clicked_count} link{engagement.clicked_count !== 1 ? 's' : ''}</span>
-                    </div>
-                  )}
-                  {engagement.replied !== undefined && (
-                    <div className="flex justify-between items-center pb-3 border-b border-[#E8E8E8]">
-                      <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888]">Reply</span>
-                      <span className="text-sm font-medium text-[#0D0D0D]">{engagement.replied ? 'Yes' : 'No'}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888] italic">Current Stage</span>
-                    <span className="text-sm font-medium text-[#0D0D0D]">{context.split('Current stage:')[1]?.split('.')[0]?.trim() || 'Active'}</span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-[#0D0D0D]">
-                  Not yet contacted. Ready for outreach.
-                </p>
-              )}
-            </div>
-
-            {/* Why This Matters — Card */}
+            {/* SECTION 1: CURRENT CONVERSATION STATE */}
             <div className="bg-white border border-[#E8E8E8] rounded p-4">
               <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-3">
-                Why This Matters
+                Conversation State
               </h4>
-              <p className="text-sm leading-relaxed text-[#0D0D0D]">
-                {executiveSummary || 'Commercial timing is optimal. Early engagement significantly improves probability of engagement.'}
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className={`text-sm font-semibold uppercase px-3 py-1 rounded ${conversationState.color}`}>
+                    {conversationState.label}
+                  </span>
+                </div>
+                {engagement?.sent_at && (
+                  <p className="text-[10px] text-[#888888]">
+                    Sent {new Date(engagement.sent_at).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Evidence — Card */}
-            {evidence.length > 0 && (
+            {/* SECTION 2: EMAIL SENT (CENTER OF TRUTH) */}
+            {engagement?.sent_at && (
               <div className="bg-white border border-[#E8E8E8] rounded p-4">
                 <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-3">
-                  Evidence
+                  Email Sent
                 </h4>
-                <ul className="space-y-2">
-                  {evidence.map((item, i) => (
-                    <li key={i} className="text-sm text-[#0D0D0D] flex items-start">
-                      <span className="text-[#888888] mr-2 mt-0.5">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                {email_content?.subject && (
+                  <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
+                    <p className="text-[10px] font-medium text-[#888888] mb-1">Subject</p>
+                    <p className="text-sm text-[#0D0D0D] font-medium">{email_content.subject}</p>
+                  </div>
+                )}
+                {email_content?.body && (
+                  <div>
+                    <p className="text-[10px] font-medium text-[#888888] mb-2">Body</p>
+                    <p className="text-sm text-[#0D0D0D] leading-relaxed whitespace-pre-wrap">{email_content.body}</p>
+                  </div>
+                )}
+                {!email_content && (
+                  <p className="text-sm text-[#666666] italic">Email content not available</p>
+                )}
               </div>
             )}
 
-            {/* Recommended Action — Card */}
+            {/* SECTION 3: ENGAGEMENT METRICS (ENGAGEMENT ONLY) */}
+            {engagement?.sent_at && (
+              <div className="bg-white border border-[#E8E8E8] rounded p-4">
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-3">
+                  Prospect Engagement
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#0D0D0D]">Opens</span>
+                    <span className="text-sm font-semibold text-[#0D0D0D]">{engagement.opened_count || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#0D0D0D]">Clicks</span>
+                    <span className="text-sm font-semibold text-[#0D0D0D]">{engagement.clicked_count || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#0D0D0D]">Reply</span>
+                    <span className="text-sm font-semibold text-[#0D0D0D]">{engagement.replied ? 'Yes' : 'No'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 4: WHY THE SYSTEM SENT THIS */}
             <div className="bg-white border border-[#E8E8E8] rounded p-4">
               <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-3">
-                Recommended Action
+                Why We Targeted This Prospect
               </h4>
               <p className="text-sm leading-relaxed text-[#0D0D0D]">
+                {executiveSummary || opportunity}
+              </p>
+              {evidence.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-[#E8E8E8]">
+                  <p className="text-[10px] font-medium text-[#888888] mb-2">Supporting Signals</p>
+                  <ul className="space-y-1">
+                    {evidence.map((item, i) => (
+                      <li key={i} className="text-sm text-[#0D0D0D]">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 5: RECOMMENDED NEXT ACTION (SINGLE ONLY) */}
+            <div className="bg-white border border-[#E8E8E8] rounded p-4">
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-3">
+                Recommended Next Action
+              </h4>
+              <p className="text-sm font-medium text-[#0D0D0D]">
                 {recommendation}
               </p>
             </div>
