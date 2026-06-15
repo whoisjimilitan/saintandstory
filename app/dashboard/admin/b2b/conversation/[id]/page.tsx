@@ -5,6 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { buildConversationIntelligence } from "@/lib/conversation-intelligence";
 import { ConversationIntelligence } from "@/components/ConversationIntelligence";
 import { OutcomeCaseSection } from "@/components/OutcomeCaseSection";
+import { FrictionValidationSection } from "@/components/FrictionValidationSection";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -69,11 +70,19 @@ export default async function ConversationPage(props: {
       </div>
 
       {/* Outcome Case Analysis */}
-      <div>
+      <div className="mb-12">
         <h2 className="text-sm font-semibold text-[#0D0D0D] mb-6">
           DIAGNOSIS
         </h2>
         <OutcomeCaseSection leadId={params.id} />
+      </div>
+
+      {/* Friction Validation */}
+      <div>
+        <h2 className="text-sm font-semibold text-[#0D0D0D] mb-6">
+          VALIDATION
+        </h2>
+        <FrictionValidationSection leadId={params.id} />
       </div>
     </div>
   );
