@@ -96,9 +96,20 @@ Changes behavior automatically based on learning.
 
 ---
 
-## EVOLUTION PHASES (Prioritized)
+## EIGHT INTELLIGENCE LAYERS (Final Locked Sequence)
 
-### Priority 4: Conversation Intelligence Layer (NEXT)
+### Layer 1: Discovery Intelligence ✅
+### Layer 2: Qualification Intelligence ✅
+### Layer 3: Decision Intelligence ✅
+### Layer 4: Conversation Intelligence ❌ **PRIORITY 1 (NEXT)**
+### Layer 5: Behavior Intelligence ❌ (After Conversation)
+### Layer 6: Memory Intelligence ❌ (After Behavior)
+### Layer 7: Revenue Intelligence ❌ (After Memory stabilizes)
+### Layer 8: Learning Intelligence (Future)
+
+---
+
+## CONVERSATION INTELLIGENCE LAYER (NEXT)
 
 **The Core Question This Answers:**
 "What actually happened after we sent this email?"
@@ -156,96 +167,122 @@ Call today.
 
 ---
 
-### Priority 5: Commercial Intelligence Engine (After Conversation)
+### Layer 5: Behavior Intelligence (After Conversation)
 
 **The Core Question This Answers:**
-"What patterns in behavior create revenue?"
+"Which patterns in conversation behavior create engagement?"
 
-**What Operator Sees in Morning Brief:**
+**NOT about revenue yet. About behavior.**
 
+**Behavior Intelligence answers:**
+- Which messages create opens?
+- Which messages create clicks?
+- Which messages create replies?
+- Which industries engage?
+- Which industries ignore us?
+
+**Why NOT revenue yet:**
+Zero jobs exist to correlate with behavior. Can only learn: "5 clicked, 0 replied. Why?"
+
+**Example Morning Brief (future):**
 ```
-GOOD MORNING
+BEHAVIOR PATTERNS THIS WEEK
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Opens: Care providers 70%, Estate agents 40%
+  → Care provider messaging more compelling
 
-£18,000 POTENTIAL REVENUE IS STALLED
+Clicks: All industries similar (15-20%)
+  → Link placement working consistently
 
-5 warm conversations require follow-up.
+Replies: 0 across industries
+  → System-wide issue. Needs human follow-up.
 
-1 standing order blocked — preventing £3,600.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-WHAT'S WORKING
-
-Care-provider outreach: 2 replies this week.
-
-Pattern: Multiple opens + human touch = replies.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-WHAT'S FAILING
-
-Estate-agent outreach: 40% opens, 0% replies.
-
-Pattern: Sequence A copy not compelling.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-RECOMMENDED TODAY
-
-1. Pause Estate-Agent Sequence A.
-2. Increase Care-Provider discovery allocation.
-3. Call Westpoint Pharmacy (£800 at stake).
-
-Expected impact: +£2,400 revenue this week.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Pattern: High opens but no replies = emotional interest 
+without transformation clarity.
 ```
-
-**Notice What's NOT Here:**
-- No dashboard
-- No charts
-- No metrics
-- No verbose explanation
-
-**Notice What IS Here:**
-- Risk (£18,000 stalled)
-- Leverage (which sequences work/fail)
-- Action (three specific things to do)
-
-**Why:** Founders don't buy dashboards. They buy answers that prevent loss and create revenue.
 
 ---
 
-### Priority 6: Learning Engine (After Commercial Intelligence)
+### Layer 6: Memory Intelligence (After Behavior)
 
-**What:** System learns which behavior patterns produce revenue and recommends behavioral changes.
+**The Core Job:**
+"Remember what worked, what failed, and patterns that matter."
+
+**Bridges between:** Behavior Intelligence → Revenue Intelligence
+
+**Memory Intelligence remembers:**
+- What worked with this prospect/industry
+- What failed with this prospect/industry
+- Prospect preferences (call-first? email-first?)
+- Industry patterns (which sequences get replies?)
+- What NOT to repeat
 
 **Example:**
+
 ```
-SYSTEM LEARNING
+Westpoint Pharmacy
+  History: 3 emails → 0 replies, 1 call → meeting
+  Memory: Call-first prospect. Skip email.
 
-Over 30 days, we've tested 5 outreach sequences.
-
-Care-provider sequence shows 3x better reply rates.
-
-Recommendation: Allocate 60% of new discovery to care providers.
-
-Expected revenue impact: +£1,280/week.
-
-Auto-implementation: Ready to activate.
+Estate agents (industry pattern)
+  Sequence A: 40% open, 0% reply
+  Sequence B: 35% open, 12% reply
+  Memory: Use Sequence B. Sequence A doesn't work.
 ```
 
-**Why:** By this phase, human intelligence guides the system. System amplifies what works.
+**Why essential:**
+- Without memory: Operator repeats failed approaches, asks same prospect twice
+- With memory: System never repeats failure, always applies what worked
 
 ---
 
-### Priority 7: Analytics (Last)
+### Layer 7: Revenue Intelligence (After Memory stabilizes)
 
-**What:** Explain WHY revenue is growing (not just display numbers).
+**The Core Question This Answers:**
+"Which patterns in behavior create revenue?"
 
-**Note:** By this phase, the system is already optimizing toward revenue. Analytics just shows the reasoning behind the growth the operator is already seeing.
+**Only deployed after:**
+- Multiple months of conversation data
+- Memory has captured behavioral patterns
+- Can reliably correlate behavior to revenue
+
+**Example Morning Brief (much later):**
+```
+REVENUE PATTERNS THIS MONTH
+
+Care providers: 15% behavior-to-revenue (opens → jobs)
+Estate agents: 3% behavior-to-revenue
+Pharmacies: 22% behavior-to-revenue (best converter)
+
+Recommendation: Reallocate discovery toward pharmacies
+Expected impact: +£2,400/month
+```
+
+---
+
+### Layer 8: Learning Intelligence (Future)
+
+**System auto-optimization:**
+- Automatically adjusts sequences based on what works
+- Automatically allocates discovery to high-revenue categories
+- Automatically learns optimal follow-up timing
+- Automatically suggests strategies based on memory
+
+---
+
+## THE PRIMARY OBJECT (Locked Definition)
+
+**Not:**
+- The company
+- The lead
+- The opportunity
+
+**Yes:**
+The relationship state between Saint & Story and a prospect.
+
+Everything else is context.
+
+**This one sentence prevents all future drift.**
 
 ---
 
@@ -264,12 +301,12 @@ Auto-implementation: Ready to activate.
 ### Target Language (Business Operating System Thinking)
 - Conversation
 - Commitment
-- Revenue
+- Relationship State
 - Economics
 - Momentum
 - Risk
 
-**Result:** System thinks like a business. Operator makes decisions, not interpretations.
+**Result:** System thinks like a business. Operator manages relationships, not records.
 
 ---
 
@@ -404,18 +441,31 @@ The system is transitioning from:
 
 ---
 
-## CORE PRINCIPLE
+## CORE PRINCIPLES (Locked)
 
-Every screen should increasingly answer one question:
+1. **Primary object is relationship state**
+   - Not company, not lead, not opportunity
+   - Everything else is context
+   - Prevents drift
 
-**"How does this discovered opportunity become revenue, and what do I do about it right now?"**
+2. **Show actual email, not template**
+   - Operator sees exactly what was sent
+   - Basis for all learning
 
-Not:
-- "What happened?" (information only)
-- "What should I do?" (decision only)
+3. **Assessment without interpretation**
+   - Operator shouldn't need to think
+   - System provides interpretation
 
-But:
-- "What's the current state → Why does it matter → What's my one action?" (decision + context + clarity)
+4. **One action, never multiple**
+   - Operator executes or consciously deviates
+   - Eliminates decision paralysis
+
+5. **Memory connects behavior to revenue**
+   - Never repeat what failed
+   - Always apply what worked
+
+**Every screen answers:**
+"What's the current relationship state with this prospect, and what do I do now?"
 
 ---
 
