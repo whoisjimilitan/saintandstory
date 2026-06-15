@@ -3,6 +3,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import { getDeliveryTypeForIndustry } from "@/lib/industry-delivery-mapping";
+import { runFullPipeline } from "@/lib/four-layer-pipeline";
+import type { RawBusinessDiscovery } from "@/lib/four-layer-pipeline";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -99,12 +101,12 @@ export async function POST(request: NextRequest) {
     const added: string[] = [];
     const BASE_URL = "https://saintandstoryltd.co.uk";
     let skippedExisting = 0;
-    let insertAttempts = 0;
-    let insertSuccesses = 0;
-    let insertFailures = 0;
+    let pipelineAttempts = 0;
+    let pipelineSuccesses = 0;
+    let pipelineFailures = 0;
 
     for (const lead of leads) {
-      // Normalize category to niche key (same logic as Google discovery)
+      // Normalize category to niche key
       const niche = lead.business_category.toLowerCase().replace(/\s+/g, "-");
       const deliveryType = getDeliveryTypeForIndustry(lead.business_category) || "General";
 
@@ -113,14 +115,14 @@ export async function POST(request: NextRequest) {
 
       let isDuplicate = false;
       if (lead.email) {
-        const emailExists = await sql`SELECT id FROM b2b_leads WHERE email = ${lead.email} LIMIT 1`;
+        const emailExists = await sql`SELECT id FROM discovered_businesses WHERE business_name = ${lead.business_name} AND address ILIKE ${`%${lead.city}%`} LIMIT 1`;
         isDuplicate = emailExists.length > 0;
       }
 
       if (!isDuplicate) {
         const nameExists = await sql`
-          SELECT id FROM b2b_leads
-          WHERE business_name = ${lead.business_name} AND city = ${lead.city}
+          SELECT id FROM discovered_businesses
+          WHERE business_name = ${lead.business_name} AND address ILIKE ${`%${lead.city}%`}
           LIMIT 1
         `;
         isDuplicate = nameExists.length > 0;
@@ -132,34 +134,47 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      console.log(`[CSV-IMPORT]   → New business, processing`);
+      console.log(`[CSV-IMPORT]   → New business, processing through four-layer pipeline`);
 
       try {
-        insertAttempts++;
-        console.log(`[CSV-IMPORT] INSERT ATTEMPT #${insertAttempts}: ${lead.business_name}`);
+        pipelineAttempts++;
+        console.log(`[CSV-IMPORT] PIPELINE ATTEMPT #${pipelineAttempts}: ${lead.business_name}`);
 
-        const reviewRating = lead.review_rating ? parseInt(lead.review_rating) : null;
+        // Create RawBusinessDiscovery object
+        const business: RawBusinessDiscovery = {
+          placeId: `csv_${lead.business_name.replace(/\s+/g, "_")}_${lead.city.replace(/\s+/g, "_")}`,
+          name: lead.business_name,
+          address: `${lead.city}, UK`,
+          postcode: lead.city,
+          category: lead.business_category,
+          source: "csv",
+          reviews: undefined,
+          website: lead.website,
+          phone: lead.phone,
+          rating: lead.review_rating ? parseFloat(lead.review_rating) : undefined,
+          reviewCount: undefined,
+          rawData: {
+            source: "csv_import",
+            pain_point: lead.pain_point,
+            original_email: lead.email
+          }
+        };
 
-        await sql`
-          INSERT INTO b2b_leads (
-            business_name, business_category, email, phone, city,
-            website, pain_point, review_rating,
-            source, status, niche, delivery_type, landing_page_url, created_at, updated_at
-          ) VALUES (
-            ${lead.business_name}, ${lead.business_category}, ${lead.email || null},
-            ${lead.phone || null}, ${lead.city},
-            ${lead.website || null}, ${lead.pain_point || null}, ${reviewRating},
-            'csv', 'new', ${niche}, ${deliveryType},
-            ${`${BASE_URL}/b2b/${niche}`}, NOW(), NOW()
-          )
-        `;
+        // Run through four-layer pipeline
+        const pipelineResult = await runFullPipeline(sql, business);
 
-        insertSuccesses++;
-        console.log(`[CSV-IMPORT]   ✓ INSERT SUCCESS: ${lead.business_name}`);
-        added.push(lead.business_name);
+        if (pipelineResult.promoted) {
+          pipelineSuccesses++;
+          console.log(`[CSV-IMPORT]   ✓ PIPELINE SUCCESS: ${lead.business_name}`);
+          added.push(lead.business_name);
+        } else {
+          pipelineFailures++;
+          console.log(`[CSV-IMPORT]   ⚠ PIPELINE PARTIAL: ${lead.business_name} (discovered but not all layers)`);
+          added.push(lead.business_name); // Count partial success
+        }
       } catch (error) {
-        insertFailures++;
-        console.error(`[CSV-IMPORT]   ✗ INSERT FAILED: ${lead.business_name}`);
+        pipelineFailures++;
+        console.error(`[CSV-IMPORT]   ✗ PIPELINE FAILED: ${lead.business_name}`);
         console.error(`[CSV-IMPORT]   Error:`, error);
       }
     }
@@ -168,9 +183,9 @@ export async function POST(request: NextRequest) {
     console.log("[CSV-IMPORT] SUMMARY");
     console.log("[CSV-IMPORT]   Total rows parsed:", leads.length);
     console.log("[CSV-IMPORT]   Skipped (already in DB):", skippedExisting);
-    console.log("[CSV-IMPORT]   Insert attempts:", insertAttempts);
-    console.log("[CSV-IMPORT]   Insert successes:", insertSuccesses);
-    console.log("[CSV-IMPORT]   Insert failures:", insertFailures);
+    console.log("[CSV-IMPORT]   Pipeline attempts:", pipelineAttempts);
+    console.log("[CSV-IMPORT]   Pipeline successes:", pipelineSuccesses);
+    console.log("[CSV-IMPORT]   Pipeline failures:", pipelineFailures);
     console.log("[CSV-IMPORT]   Final added count:", added.length);
     console.log("[CSV-IMPORT] ═══════════════════════════════════════");
 

@@ -22,6 +22,14 @@ interface DiscoveryData {
   promotion_rate: number;
   top_categories: Array<{ category: string; count: number; percentage: number }>;
   active_research: string[];
+  intake_sources: Array<{
+    name: string;
+    route: string;
+    status: 'operational' | 'hidden' | 'missing';
+    count: number;
+    last_activity?: string;
+    color: string;
+  }>;
 }
 
 async function getDiscoveryData(): Promise<DiscoveryData> {
@@ -121,6 +129,61 @@ async function getDiscoveryData(): Promise<DiscoveryData> {
       'Logistics companies modernizing'
     ];
 
+    // Get intake source statistics
+    let autonomousCount = 0;
+    let postcodeCount = 0;
+    let csvCount = 0;
+    let manualCount = 0;
+
+    try {
+      const sourceStats = await sql`
+        SELECT source, COUNT(*) as count FROM discovered_businesses GROUP BY source
+      `;
+      for (const row of sourceStats) {
+        if (row.source === 'discovery') autonomousCount = row.count;
+        else if (row.source === 'operator_search') postcodeCount = row.count;
+        else if (row.source === 'csv') csvCount = row.count;
+        else if (row.source === 'manual') manualCount = row.count;
+      }
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch source statistics');
+    }
+
+    const intake_sources = [
+      {
+        name: 'Autonomous Discovery',
+        route: '/api/discovery/run',
+        status: 'operational' as const,
+        count: autonomousCount,
+        last_activity: 'Daily 02:00 UTC',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'Postcode Search',
+        route: '/api/b2b/operator-discovery',
+        status: 'operational' as const,
+        count: postcodeCount,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'CSV Import',
+        route: '/api/b2b/csv-import',
+        status: 'operational' as const,
+        count: csvCount,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'Manual Entry',
+        route: '/api/b2b/manual-entry',
+        status: 'operational' as const,
+        count: manualCount,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      }
+    ];
+
     return {
       discovered_overnight,
       qualified_overnight,
@@ -132,7 +195,8 @@ async function getDiscoveryData(): Promise<DiscoveryData> {
       qualification_rate,
       promotion_rate,
       top_categories,
-      active_research
+      active_research,
+      intake_sources
     };
   } catch (err) {
     console.warn('[Discovery] Critical error:', err instanceof Error ? err.message : String(err));
@@ -152,7 +216,41 @@ function getDefaultDiscovery(): DiscoveryData {
     qualification_rate: 0,
     promotion_rate: 0,
     top_categories: [],
-    active_research: []
+    active_research: [],
+    intake_sources: [
+      {
+        name: 'Autonomous Discovery',
+        route: '/api/discovery/run',
+        status: 'operational',
+        count: 0,
+        last_activity: 'Daily 02:00 UTC',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'Postcode Search',
+        route: '/api/b2b/operator-discovery',
+        status: 'operational',
+        count: 0,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'CSV Import',
+        route: '/api/b2b/csv-import',
+        status: 'operational',
+        count: 0,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      },
+      {
+        name: 'Manual Entry',
+        route: '/api/b2b/manual-entry',
+        status: 'operational',
+        count: 0,
+        last_activity: 'On demand',
+        color: '#0D0D0D'
+      }
+    ]
   };
 }
 
@@ -201,6 +299,44 @@ export default async function DiscoveryPage() {
         <p className="text-sm leading-relaxed text-[#0D0D0D]">
           The system discovered <span className="font-semibold">{discovery.discovered_overnight}</span> new opportunities overnight and qualified <span className="font-semibold">{discovery.qualified_overnight}</span> for evaluation.
         </p>
+      </div>
+
+      {/* SECTION 1.5: INTAKE CHANNELS */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Opportunity Intake Channels
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {discovery.intake_sources.map((source, idx) => (
+            <div key={idx} className="bg-white border border-[#E8E8E8] rounded p-4 hover:border-[#D0D0D0] transition-colors">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {source.name}
+                  </p>
+                  <p className="text-[10px] text-[#888888] mt-1">
+                    {source.last_activity}
+                  </p>
+                </div>
+                <span className={`text-[10px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded ${
+                  source.status === 'operational'
+                    ? 'bg-[#E8F5E9] text-[#1B5E20]'
+                    : source.status === 'hidden'
+                    ? 'bg-[#FFF8E5] text-[#CC6600]'
+                    : 'bg-[#FFE5E5] text-[#CC0000]'
+                }`}>
+                  {source.status === 'operational' ? 'Active' : source.status === 'hidden' ? 'Hidden' : 'Missing'}
+                </span>
+              </div>
+              <p className="text-2xl font-black text-[#0D0D0D]">
+                {source.count}
+              </p>
+              <p className="text-[10px] text-[#666666] mt-2">
+                Entries from {source.name.toLowerCase()}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* SECTION 2: INTAKE FLOW */}
