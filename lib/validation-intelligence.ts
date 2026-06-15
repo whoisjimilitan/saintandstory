@@ -13,7 +13,7 @@
  * Only cases with score ≥ 60 enter Pattern/Commercial/Learning Intelligence.
  */
 
-export type ValidationStatus = 'ignore' | 'emerging' | 'strong' | 'confirmed';
+export type ActionTier = 'ignore' | 'monitor' | 'learn' | 'act';
 
 export interface ValidationIntelligence {
   // Outcome Case reference
@@ -27,11 +27,11 @@ export interface ValidationIntelligence {
   // THE ONLY SCORE
   logistics_fit_score: number; // 0-100
 
-  // Status based on score
-  validation_status: ValidationStatus;
-
-  // Decision gate
-  ready_for_learning: boolean; // logistics_fit_score >= 60
+  // Action tier based on thresholds
+  action_tier: ActionTier;
+  // 0-59: ignore/monitor
+  // 60-74: learn
+  // 75-100: act
 
   // Recommended action (single only)
   recommended_action: string;
@@ -104,13 +104,16 @@ export function calculateLogisticsFitScore(signals: {
 }
 
 /**
- * Determine validation status from score
+ * Determine action tier from score
+ *
+ * 0-59: Ignore or monitor
+ * 60-74: Learn from (eligible for Pattern Intelligence)
+ * 75-100: Act on commercially
  */
-export function getValidationStatus(score: number): ValidationStatus {
-  if (score < 21) return 'ignore';
-  if (score < 61) return 'emerging';
-  if (score < 81) return 'strong';
-  return 'confirmed';
+export function getActionTier(score: number): ActionTier {
+  if (score < 60) return 'ignore';
+  if (score < 75) return 'learn';
+  return 'act';
 }
 
 /**
@@ -154,8 +157,7 @@ export async function generateValidationIntelligence(
       became_customer: false // TODO: query jobs
     });
 
-    const validation_status = getValidationStatus(logistics_fit_score);
-    const ready_for_learning = logistics_fit_score >= 60;
+    const action_tier = getActionTier(logistics_fit_score);
 
     // Recommended action based on score
     const recommended_action = getRecommendedAction(logistics_fit_score);
@@ -168,8 +170,7 @@ export async function generateValidationIntelligence(
       blocked_outcome: blockedOutcome,
       operational_cause: operationalCause,
       logistics_fit_score,
-      validation_status,
-      ready_for_learning,
+      action_tier,
       recommended_action,
       generated_at: new Date().toISOString()
     };
@@ -183,24 +184,11 @@ export async function generateValidationIntelligence(
  * Get recommended action based on Logistics Fit Score
  */
 function getRecommendedAction(score: number): string {
-  if (score < 21) {
-    return 'Ignore. No engagement signal.';
+  if (score < 60) {
+    return 'Monitor. Not yet actionable.';
   }
-  if (score < 41) {
-    return 'Monitor. Weak signal. Ask clarifying questions.';
+  if (score < 75) {
+    return 'Learn from this case. Eligible for pattern analysis.';
   }
-  if (score < 61) {
-    return 'Investigate. May be logistics relevant. Confirm on call.';
-  }
-  if (score < 81) {
-    return 'Engage. Clear logistics relevance. Propose solution.';
-  }
-  return 'Prioritise. Strong opportunity. Fast-track.';
-}
-
-/**
- * Check if ready for learning systems
- */
-export function isReadyForLearning(validation: ValidationIntelligence): boolean {
-  return validation.ready_for_learning;
+  return 'Act commercially. Engage and propose solution.';
 }
