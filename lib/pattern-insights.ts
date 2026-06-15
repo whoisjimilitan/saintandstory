@@ -1,12 +1,9 @@
 /**
  * Pattern Insights
  *
- * Transforms VERIFIED patterns into actionable operator guidance.
+ * Transforms patterns into actionable operator guidance.
  *
- * CRITICAL RULE:
- * Only VERIFIED patterns generate insights.
- * Rejected patterns generate nothing.
- * Unverified patterns generate nothing.
+ * All patterns are from Outcome Cases with Logistics Fit Score >= 60.
  *
  * Insight Structure:
  * - Situation: What's happening
@@ -123,7 +120,8 @@ function buildOperatorGuidance(
 /**
  * Get insights for a specific situation (for Conversation Intelligence)
  *
- * Finds verified patterns that match the outcome case
+ * Finds patterns that match the outcome case.
+ * All patterns are from Outcome Cases with Logistics Fit Score >= 60.
  */
 export async function getInsightsForOutcomeCase(
   sql: any,
@@ -132,18 +130,16 @@ export async function getInsightsForOutcomeCase(
   logisticsFriction?: string
 ): Promise<PatternInsight[]> {
   try {
-    // Find matching VERIFIED patterns
+    // Find matching patterns
     let query = sql`
       SELECT * FROM pattern_records
-      WHERE status = 'verified'
-      AND blocked_outcome = ${blockedOutcome}
+      WHERE blocked_outcome = ${blockedOutcome}
     `;
 
     if (operationalCause) {
       query = sql`
         SELECT * FROM pattern_records
-        WHERE status = 'verified'
-        AND blocked_outcome = ${blockedOutcome}
+        WHERE blocked_outcome = ${blockedOutcome}
         AND operational_cause = ${operationalCause}
       `;
     }
@@ -151,8 +147,7 @@ export async function getInsightsForOutcomeCase(
     if (logisticsFriction) {
       query = sql`
         SELECT * FROM pattern_records
-        WHERE status = 'verified'
-        AND blocked_outcome = ${blockedOutcome}
+        WHERE blocked_outcome = ${blockedOutcome}
         AND logistics_friction = ${logisticsFriction}
       `;
     }
