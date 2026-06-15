@@ -4,6 +4,7 @@ import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
 import { buildConversationIntelligence } from "@/lib/conversation-intelligence";
 import { ConversationIntelligence } from "@/components/ConversationIntelligence";
+import { OutcomeCaseSection } from "@/components/OutcomeCaseSection";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -63,7 +64,17 @@ export default async function ConversationPage(props: {
       </div>
 
       {/* Conversation Intelligence Display */}
-      <ConversationIntelligence conversation={conversation} />
+      <div className="mb-12">
+        <ConversationIntelligence conversation={conversation} />
+      </div>
+
+      {/* Outcome Case Analysis */}
+      <div>
+        <h2 className="text-sm font-semibold text-[#0D0D0D] mb-6">
+          DIAGNOSIS
+        </h2>
+        <OutcomeCaseSection leadId={params.id} />
+      </div>
     </div>
   );
 }
