@@ -402,56 +402,52 @@ export default async function B2BTodayPage() {
         </div>
       )}
 
-      {/* Page Title */}
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
-        Today Queue.
-      </h1>
-
-
-      {/* SECTION 2: OPPORTUNITIES REQUIRING ATTENTION */}
-      <div className="mb-8">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          Opportunities Requiring Attention
+      {/* Page Title + Subheader */}
+      <div className="mb-12">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          Today's Prospects.
+        </h1>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          Ranked by opportunity
         </p>
-
-        {/* SECTION 3: PROSPECT QUEUE */}
-        <div className="space-y-4">
-          {prospects.length === 0 ? (
-            <p className="text-sm text-[#666666] italic">No leads qualified for outreach yet. Discovery pipeline continues.</p>
-          ) : (
-            prospects.map((prospect) => (
-              <ProspectCard
-                key={prospect.id}
-                prospect={{
-                  id: prospect.id,
-                  business_name: prospect.business_name,
-                  business_category: prospect.business_category || undefined,
-                  email: prospect.email,
-                  last_contacted_at: prospect.last_contacted_at,
-                }}
-                opportunity={prospect.opportunity}
-                context={prospect.context}
-                recommendation={prospect.recommendation}
-                executiveSummary={prospect.executiveSummary}
-                evidence={prospect.evidence}
-                engagement={prospect.engagement}
-              />
-            ))
-          )}
-        </div>
       </div>
 
-      {/* SECTION 4: SYSTEM STATUS */}
-      <div className="mt-12 pt-8 border-t border-[#E8E8E8]">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
-          System Status
+      {/* SECTION 2: PROSPECT QUEUE */}
+      <div className="space-y-4 mb-16">
+        {prospects.length === 0 ? (
+          <p className="text-sm text-[#666666] italic">No leads qualified for outreach yet. Discovery pipeline continues.</p>
+        ) : (
+          prospects.map((prospect) => (
+            <ProspectCard
+              key={prospect.id}
+              prospect={{
+                id: prospect.id,
+                business_name: prospect.business_name,
+                business_category: prospect.business_category || undefined,
+                email: prospect.email,
+                last_contacted_at: prospect.last_contacted_at,
+              }}
+              opportunity={prospect.opportunity}
+              context={prospect.context}
+              recommendation={prospect.recommendation}
+              executiveSummary={prospect.executiveSummary}
+              evidence={prospect.evidence}
+              engagement={prospect.engagement}
+            />
+          ))
+        )}
+      </div>
+
+      {/* SECTION 3: SYSTEM STATUS */}
+      <div className="pt-12 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          Background Operations
         </p>
-        <div className="flex gap-4 text-[10px] text-[#888888]">
-          <span>Discovery Active.</span>
-          <span>Enrichment Active.</span>
-          <span>Ranking Active.</span>
-          <span>Learning Active.</span>
-          <span>Research Missions Active.</span>
+        <div className="grid grid-cols-2 gap-4 text-[10px] text-[#888888]">
+          <div>Discovery Pipeline: <span className="font-semibold">Active</span></div>
+          <div>Enrichment: <span className="font-semibold">Active</span></div>
+          <div>Ranking Engine: <span className="font-semibold">Active</span></div>
+          <div>Learning System: <span className="font-semibold">Active</span></div>
         </div>
       </div>
     </div>
