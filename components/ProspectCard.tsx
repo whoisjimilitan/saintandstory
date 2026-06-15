@@ -15,6 +15,12 @@ interface ProspectCardProps {
   recommendation: string;
   executiveSummary?: string;
   evidence?: string[];
+  engagement?: {
+    sent_at?: string;
+    opened_count?: number;
+    clicked_count?: number;
+    replied?: boolean;
+  };
 }
 
 type EmailState = 'idle' | 'loading' | 'success' | 'error';
@@ -26,6 +32,7 @@ export default function ProspectCard({
   recommendation,
   executiveSummary = "",
   evidence = [],
+  engagement,
 }: ProspectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [emailState, setEmailState] = useState<EmailState>('idle');
@@ -117,17 +124,41 @@ export default function ProspectCard({
       {isExpanded && (
         <div className="border-t border-[#E8E8E8] bg-[#FAFAFA]">
           <div className="px-6 py-5 space-y-5">
-            {/* Executive Summary */}
-            {executiveSummary && (
-              <div>
-                <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-2">
-                  Executive Summary
-                </h4>
-                <p className="text-sm leading-relaxed text-[#0D0D0D]">
-                  {executiveSummary}
+            {/* OUTREACH TIMELINE — ALWAYS FIRST */}
+            <div>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
+                {engagement?.sent_at ? 'Outreach Timeline' : 'Status'}
+              </h4>
+              {engagement?.sent_at ? (
+                <div className="space-y-2 text-sm text-[#0D0D0D]">
+                  <p>
+                    <span className="font-semibold">Email sent:</span> {new Date(engagement.sent_at).toLocaleDateString()}
+                  </p>
+                  {engagement.opened_count !== undefined && (
+                    <p>
+                      <span className="font-semibold">Opened:</span> {engagement.opened_count} time{engagement.opened_count !== 1 ? 's' : ''}
+                    </p>
+                  )}
+                  {engagement.clicked_count !== undefined && (
+                    <p>
+                      <span className="font-semibold">Clicked:</span> {engagement.clicked_count} link{engagement.clicked_count !== 1 ? 's' : ''}
+                    </p>
+                  )}
+                  {engagement.replied !== undefined && (
+                    <p>
+                      <span className="font-semibold">Reply:</span> {engagement.replied ? 'Yes ✅' : 'No'}
+                    </p>
+                  )}
+                  <p className="text-[#666666] mt-3">
+                    <span className="font-semibold">Current stage:</span> {context.split('Current stage:')[1]?.split('.')[0]?.trim() || 'Active'}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-[#0D0D0D]">
+                  Not yet contacted. Ready for first outreach.
                 </p>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Why This Matters */}
             <div>
@@ -135,7 +166,7 @@ export default function ProspectCard({
                 Why This Matters
               </h4>
               <p className="text-sm text-[#0D0D0D]">
-                Commercial timing is optimal. Early engagement significantly improves probability of engagement.
+                {executiveSummary || 'Commercial timing is optimal. Early engagement significantly improves probability of engagement.'}
               </p>
             </div>
 

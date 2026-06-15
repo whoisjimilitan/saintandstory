@@ -24,6 +24,12 @@ interface ProspectData {
   recommendation: string;
   executiveSummary: string;
   evidence: string[];
+  engagement?: {
+    sent_at?: string;
+    opened_count?: number;
+    clicked_count?: number;
+    replied?: boolean;
+  };
 }
 
 interface MorningBriefData {
@@ -205,8 +211,13 @@ async function getRealProspects(): Promise<ProspectData[]> {
           bl.email_sent_at,
           bl.engagement_score,
           bl.lead_tier,
-          bl.status
+          bl.status,
+          bo.sent_at,
+          bo.email_type,
+          COUNT(*) FILTER (WHERE bo.replied = true) as replied_count
         FROM b2b_leads bl
+        LEFT JOIN b2b_outreach bo ON bl.id = bo.lead_id
+        GROUP BY bl.id, bl.business_name, bl.business_category, bl.email, bl.email_sent_at, bl.engagement_score, bl.lead_tier, bl.status, bo.sent_at, bo.email_type
         ORDER BY
           CASE
             WHEN bl.email_sent_at IS NULL THEN 1
@@ -246,7 +257,13 @@ async function getRealProspects(): Promise<ProspectData[]> {
           isContacted ? `First contacted: ${new Date(lead.email_sent_at).toLocaleDateString()}` : 'Not yet contacted',
           `Category: ${lead.business_category}`,
           `Engagement: ${lead.engagement_score}/100`
-        ]
+        ],
+        engagement: {
+          sent_at: lead.sent_at || undefined,
+          opened_count: 0,
+          clicked_count: 0,
+          replied: (lead.replied_count || 0) > 0
+        }
       };
     });
   } catch (err) {
@@ -443,6 +460,7 @@ export default async function B2BTodayPage() {
                 recommendation={prospect.recommendation}
                 executiveSummary={prospect.executiveSummary}
                 evidence={prospect.evidence}
+                engagement={prospect.engagement}
               />
             ))
           )}
