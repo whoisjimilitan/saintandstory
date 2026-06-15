@@ -161,24 +161,24 @@ export default async function OrdersPage() {
       {/* Page Header */}
       <div className="mb-16">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
-          Recurring Revenue.
+          Standing Orders.
         </h1>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          What revenue commitments exist in the system?
+          Recurring business we've committed to
         </p>
       </div>
 
       {/* SECTION 1: ORDERS BRIEF */}
       <div className="mb-16 bg-white border border-[#E8E8E8] rounded px-6 py-5">
         <p className="text-sm leading-relaxed text-[#0D0D0D]">
-          The system is managing <span className="font-semibold">{data.total_assets}</span> recurring revenue asset{data.total_assets !== 1 ? 's' : ''}. <span className="font-semibold">{data.healthy_assets}</span> {data.healthy_assets === 1 ? 'is' : 'are'} healthy. <span className="font-semibold">{data.blocked_assets}</span> {data.blocked_assets === 1 ? 'requires' : 'require'} attention.
+          <span className="font-semibold">{data.total_assets}</span> standing order{data.total_assets !== 1 ? 's' : ''}. <span className="font-semibold">{data.healthy_assets}</span> {data.healthy_assets === 1 ? 'is working' : 'are working'}. <span className="font-semibold">{data.blocked_assets}</span> {data.blocked_assets === 1 ? 'is blocked' : 'are blocked'}.
         </p>
       </div>
 
-      {/* SECTION 2: RECURRING REVENUE ASSETS */}
+      {/* SECTION 2: STANDING ORDERS */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Revenue Assets
+          Recurring Business Programs
         </p>
         {data.orders.length > 0 ? (
           <div className="space-y-4">
@@ -204,10 +204,10 @@ export default async function OrdersPage() {
                         }`}
                       >
                         {order.status === 'healthy'
-                          ? 'Healthy'
+                          ? 'Working'
                           : order.status === 'blocked'
                           ? 'Blocked'
-                          : 'Attention Required'}
+                          : 'Needs Attention'}
                       </span>
                     </div>
                   </div>
@@ -217,23 +217,23 @@ export default async function OrdersPage() {
                 <div className="grid grid-cols-3 gap-6 mb-4 pb-4 border-b border-[#E8E8E8]">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      Revenue Potential
+                      Expected Jobs
                     </p>
                     <p className="text-lg font-semibold text-[#0D0D0D]">
-                      {order.revenue_potential} jobs/month
+                      {order.revenue_potential}/month
                     </p>
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      Last Activity
+                      Started
                     </p>
                     <p className="text-base text-[#0D0D0D]">
-                      {order.last_activity || 'Never'}
+                      {order.last_activity || 'Unknown'}
                     </p>
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      Next Action
+                      What to Do
                     </p>
                     <p className="text-base text-[#0D0D0D]">
                       {order.next_action}
@@ -264,36 +264,36 @@ export default async function OrdersPage() {
         )}
       </div>
 
-      {/* SECTION 3: ORDER HEALTH */}
+      {/* SECTION 3: HEALTH STATUS */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Asset Health Summary
+          Status
         </p>
         <div className="grid grid-cols-3 gap-6">
-          {/* Total Assets */}
+          {/* Total */}
           <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
             <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Total Assets
+              Total Programs
             </p>
             <p className="text-5xl font-black text-[#0D0D0D]">
               {data.total_assets}
             </p>
           </div>
 
-          {/* Healthy Assets */}
+          {/* Working */}
           <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
             <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Healthy Assets
+              Working
             </p>
             <p className="text-5xl font-black text-[#0D0D0D]">
               {data.healthy_assets}
             </p>
           </div>
 
-          {/* Blocked Assets */}
+          {/* Blocked */}
           <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
             <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Blocked Assets
+              Blocked
             </p>
             <p className="text-5xl font-black text-[#0D0D0D]">
               {data.blocked_assets}
@@ -302,11 +302,11 @@ export default async function OrdersPage() {
         </div>
       </div>
 
-      {/* SECTION 4: BLOCKERS */}
+      {/* SECTION 4: PROBLEMS */}
       {data.blockers.length > 0 && (
         <div className="mb-16">
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-            Blockers Requiring Attention
+            What's Blocked
           </p>
           <div className="space-y-3">
             {data.blockers.map((blocker, idx) => (
@@ -323,17 +323,17 @@ export default async function OrdersPage() {
         </div>
       )}
 
-      {/* SECTION 5: REVENUE FLOW */}
+      {/* SECTION 5: FLOW */}
       <div className="pt-8 border-t border-[#E8E8E8]">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Asset Pipeline
+          Flow
         </p>
         <div className="bg-white border border-[#E8E8E8] rounded p-8">
           <div className="flex items-center justify-between">
-            {/* Configured */}
+            {/* Set Up */}
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Configured
+                Set Up
               </p>
               <p className="text-5xl font-black text-[#0D0D0D]">
                 {data.total_assets}
@@ -343,10 +343,10 @@ export default async function OrdersPage() {
             {/* Arrow */}
             <div className="text-[#D0D0D0] text-2xl mx-4">→</div>
 
-            {/* Active */}
+            {/* Running */}
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Active
+                Running
               </p>
               <p className="text-5xl font-black text-[#0D0D0D]">
                 {data.healthy_assets}
@@ -356,10 +356,10 @@ export default async function OrdersPage() {
             {/* Arrow */}
             <div className="text-[#D0D0D0] text-2xl mx-4">→</div>
 
-            {/* Producing */}
+            {/* Generating Jobs */}
             <div className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Producing Jobs
+                Generating Jobs
               </p>
               <p className="text-5xl font-black text-[#0D0D0D]">
                 {Math.max(0, data.healthy_assets)}
