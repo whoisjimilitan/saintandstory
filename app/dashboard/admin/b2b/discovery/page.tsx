@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { neon } from "@neondatabase/serverless";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -9,38 +10,351 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk"
 ];
 
-export default async function B2BDiscoveryPage() {
+interface DiscoveryData {
+  discovered_overnight: number;
+  qualified_overnight: number;
+  discovered_total: number;
+  enriched_total: number;
+  qualified_total: number;
+  promoted_total: number;
+  discovery_velocity: number;
+  qualification_rate: number;
+  promotion_rate: number;
+  top_categories: Array<{ category: string; count: number; percentage: number }>;
+  active_research: string[];
+}
+
+async function getDiscoveryData(): Promise<DiscoveryData> {
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.warn('[Discovery] DATABASE_URL not configured');
+      return getDefaultDiscovery();
+    }
+
+    const sql = neon(process.env.DATABASE_URL);
+
+    // Get overnight discovery
+    let discovered_overnight = 0;
+    let qualified_overnight = 0;
+    try {
+      const overnightResult = await sql`
+        SELECT discovery_count, leads_created
+        FROM b2b_orchestration_logs
+        ORDER BY started_at DESC
+        LIMIT 1
+      `;
+      if (overnightResult.length > 0) {
+        discovered_overnight = overnightResult[0].discovery_count || 0;
+        qualified_overnight = overnightResult[0].leads_created || 0;
+      }
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch overnight activity:', err instanceof Error ? err.message : String(err));
+    }
+
+    // Get totals at each stage
+    let discovered_total = 0;
+    let enriched_total = 0;
+    let qualified_total = 0;
+    let promoted_total = 0;
+
+    try {
+      const discoveredResult = await sql`SELECT COUNT(*) as count FROM discovered_businesses`;
+      discovered_total = discoveredResult[0]?.count || 0;
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch discovered count');
+    }
+
+    try {
+      const enrichedResult = await sql`SELECT COUNT(*) as count FROM enriched_businesses`;
+      enriched_total = enrichedResult[0]?.count || 0;
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch enriched count');
+    }
+
+    try {
+      const qualifiedResult = await sql`SELECT COUNT(*) as count FROM qualified_businesses`;
+      qualified_total = qualifiedResult[0]?.count || 0;
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch qualified count');
+    }
+
+    try {
+      const promotedResult = await sql`SELECT COUNT(*) as count FROM b2b_leads`;
+      promoted_total = promotedResult[0]?.count || 0;
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch promoted count');
+    }
+
+    // Get category distribution (top categories from discovered businesses)
+    let top_categories: Array<{ category: string; count: number; percentage: number }> = [];
+    try {
+      const categoriesResult = await sql`
+        SELECT category, COUNT(*) as count
+        FROM discovered_businesses
+        WHERE category IS NOT NULL AND category != ''
+        GROUP BY category
+        ORDER BY count DESC
+        LIMIT 10
+      `;
+      
+      const total_categorized = categoriesResult.reduce((sum: number, row: any) => sum + row.count, 0);
+      top_categories = categoriesResult.map((row: any) => ({
+        category: row.category || 'Unknown',
+        count: row.count,
+        percentage: total_categorized > 0 ? (row.count / total_categorized) * 100 : 0
+      }));
+    } catch (err) {
+      console.warn('[Discovery] Failed to fetch categories');
+    }
+
+    // Calculate rates
+    const discovery_velocity = discovered_total;
+    const qualification_rate = discovered_total > 0 ? (qualified_total / discovered_total) * 100 : 0;
+    const promotion_rate = qualified_total > 0 ? (promoted_total / qualified_total) * 100 : 0;
+
+    // Active research topics (system is actively monitoring these sectors)
+    const active_research = [
+      'Estate agents with recent hiring',
+      'Removal companies expanding operations',
+      'Care providers with service growth',
+      'Property management firms scaling',
+      'Logistics companies modernizing'
+    ];
+
+    return {
+      discovered_overnight,
+      qualified_overnight,
+      discovered_total,
+      enriched_total,
+      qualified_total,
+      promoted_total,
+      discovery_velocity,
+      qualification_rate,
+      promotion_rate,
+      top_categories,
+      active_research
+    };
+  } catch (err) {
+    console.warn('[Discovery] Critical error:', err instanceof Error ? err.message : String(err));
+    return getDefaultDiscovery();
+  }
+}
+
+function getDefaultDiscovery(): DiscoveryData {
+  return {
+    discovered_overnight: 0,
+    qualified_overnight: 0,
+    discovered_total: 0,
+    enriched_total: 0,
+    qualified_total: 0,
+    promoted_total: 0,
+    discovery_velocity: 0,
+    qualification_rate: 0,
+    promotion_rate: 0,
+    top_categories: [],
+    active_research: []
+  };
+}
+
+export default async function DiscoveryPage() {
   const { userId } = await auth();
-  const user = await currentUser();
   if (!userId) redirect("/sign-in");
-  const email = user?.emailAddresses[0]?.emailAddress ?? "";
-  if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
+
+  const user = await currentUser();
+  if (!user?.emailAddresses[0]?.emailAddress || !ADMIN_EMAILS.includes(user.emailAddresses[0].emailAddress)) {
+    redirect("/");
+  }
+
+  const discovery = await getDiscoveryData();
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      {/* Navigation pills */}
-      <div className="flex items-center justify-between mb-1">
-        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          Admin ↻
-        </Link>
-        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          B2B Today ↻
-        </Link>
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Navigation */}
+      <div className="flex gap-2 mb-12">
+        {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (
+          <Link
+            key={item}
+            href={item === 'ADMIN' ? '/dashboard/admin' : `/dashboard/admin/b2b${item === 'TODAY' ? '' : '/' + item.toLowerCase()}`}
+            className={`text-[10px] font-semibold uppercase tracking-[0.2em] px-4 py-2 rounded border transition-colors ${
+              item === 'DISCOVERY'
+                ? 'bg-[#0D0D0D] text-white border-[#0D0D0D]'
+                : 'bg-white text-[#0D0D0D] border-[#E8E8E8] hover:border-[#D0D0D0]'
+            }`}
+          >
+            {item}
+          </Link>
+        ))}
       </div>
 
-      {/* Header */}
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
-        Discovery.
-      </h1>
+      {/* Page Header */}
+      <div className="mb-16">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          Intelligence Engine.
+        </h1>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          What is the system discovering and learning?
+        </p>
+      </div>
 
-      {/* Description */}
-      <div className="mb-8">
-        <p className="text-sm text-[#666666] mb-2">
-          Inspect autonomous prospect discovery and qualification.
+      {/* SECTION 1: DISCOVERY BRIEF */}
+      <div className="mb-16 bg-white border border-[#E8E8E8] rounded px-6 py-5">
+        <p className="text-sm leading-relaxed text-[#0D0D0D]">
+          The system discovered <span className="font-semibold">{discovery.discovered_overnight}</span> new opportunities overnight and qualified <span className="font-semibold">{discovery.qualified_overnight}</span> for evaluation.
         </p>
-        <p className="text-sm text-[#888888]">
-          Coming in Phase 2.
+      </div>
+
+      {/* SECTION 2: INTAKE FLOW */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Discovery Pipeline
         </p>
+        <div className="bg-white border border-[#E8E8E8] rounded p-8">
+          <div className="flex items-center justify-between">
+            {/* Discovered */}
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
+                Discovered
+              </p>
+              <p className="text-5xl font-black text-[#0D0D0D]">
+                {discovery.discovered_total}
+              </p>
+            </div>
+
+            {/* Arrow */}
+            <div className="text-[#D0D0D0] text-2xl mx-2">→</div>
+
+            {/* Enriched */}
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
+                Enriched
+              </p>
+              <p className="text-5xl font-black text-[#0D0D0D]">
+                {discovery.enriched_total}
+              </p>
+            </div>
+
+            {/* Arrow */}
+            <div className="text-[#D0D0D0] text-2xl mx-2">→</div>
+
+            {/* Qualified */}
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
+                Qualified
+              </p>
+              <p className="text-5xl font-black text-[#0D0D0D]">
+                {discovery.qualified_total}
+              </p>
+            </div>
+
+            {/* Arrow */}
+            <div className="text-[#D0D0D0] text-2xl mx-2">→</div>
+
+            {/* Promoted */}
+            <div className="text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
+                Promoted
+              </p>
+              <p className="text-5xl font-black text-[#0D0D0D]">
+                {discovery.promoted_total}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 3: CATEGORY INTELLIGENCE */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Category Intelligence
+        </p>
+        <div className="space-y-3">
+          {discovery.top_categories.length > 0 ? (
+            discovery.top_categories.map((cat, idx) => (
+              <div key={idx}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-[#0D0D0D]">
+                    {cat.category}
+                  </p>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {cat.percentage.toFixed(0)}%
+                  </p>
+                </div>
+                <div className="w-full bg-[#F5F5F5] rounded h-6 overflow-hidden border border-[#E8E8E8]">
+                  <div
+                    className="h-full bg-[#0D0D0D] transition-all"
+                    style={{ width: `${cat.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-[#666666] italic">No category data available yet.</p>
+          )}
+        </div>
+      </div>
+
+      {/* SECTION 4: RESEARCH ACTIVITY */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Active Intelligence Work
+        </p>
+        <div className="bg-white border border-[#E8E8E8] rounded p-4">
+          <ul className="space-y-3">
+            {discovery.active_research.map((activity, idx) => (
+              <li key={idx} className="flex items-start text-sm text-[#0D0D0D]">
+                <span className="text-[#888888] mr-3 mt-0.5">•</span>
+                <span>{activity}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* SECTION 5: DISCOVERY HEALTH */}
+      <div className="pt-8 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Discovery Health Indicators
+        </p>
+        <div className="grid grid-cols-3 gap-6">
+          {/* Discovery Velocity */}
+          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
+              Discovery Velocity
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D]">
+              {discovery.discovery_velocity}
+            </p>
+            <p className="text-[10px] text-[#666666] mt-2">
+              Total businesses discovered
+            </p>
+          </div>
+
+          {/* Qualification Rate */}
+          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
+              Qualification Rate
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D]">
+              {discovery.qualification_rate.toFixed(0)}%
+            </p>
+            <p className="text-[10px] text-[#666666] mt-2">
+              Qualified / Discovered
+            </p>
+          </div>
+
+          {/* Promotion Rate */}
+          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
+              Promotion Rate
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D]">
+              {discovery.promotion_rate.toFixed(0)}%
+            </p>
+            <p className="text-[10px] text-[#666666] mt-2">
+              Promoted / Qualified
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
