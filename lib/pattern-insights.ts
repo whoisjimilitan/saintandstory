@@ -23,16 +23,12 @@ export interface PatternInsight {
 }
 
 /**
- * Generate insight from a verified pattern
+ * Generate insight from a pattern
  *
- * Input: Verified PatternRecord
- * Output: Actionable PatternInsight
+ * All patterns are already from validated Outcome Cases (Score >= 60)
+ * No additional verification needed.
  */
-export function generateInsightFromPattern(pattern: any): PatternInsight | null {
-  // Only generate insights from VERIFIED patterns
-  if (pattern.status !== 'verified') {
-    return null;
-  }
+export function generateInsightFromPattern(pattern: any): PatternInsight {
 
   // Build situation description
   const situation = buildSituation(
@@ -163,10 +159,8 @@ export async function getInsightsForOutcomeCase(
 
     const patterns = (await query) as Array<any>;
 
-    // Convert to insights
-    const insights = patterns
-      .map(p => generateInsightFromPattern(p))
-      .filter(i => i !== null) as PatternInsight[];
+    // Convert to insights (all patterns are from validated outcome cases)
+    const insights = patterns.map(p => generateInsightFromPattern(p));
 
     // Return top 3 by relevance
     return insights.slice(0, 3);
@@ -179,23 +173,20 @@ export async function getInsightsForOutcomeCase(
 /**
  * Get learning insights for Morning Brief
  *
- * Only VERIFIED patterns
+ * Top performing patterns from validated Outcome Cases
  * Maximum 3 items
  */
 export async function getLearningInsightsForBrief(sql: any): Promise<PatternInsight[]> {
   try {
-    // Get top performing VERIFIED patterns
+    // Get top performing patterns (all from Score >= 60 outcome cases)
     const patterns = (await sql`
       SELECT * FROM pattern_records
-      WHERE status = 'verified'
       ORDER BY job_rate DESC, recurring_rate DESC
       LIMIT 3
     `) as Array<any>;
 
     // Convert to insights
-    return patterns
-      .map(p => generateInsightFromPattern(p))
-      .filter(i => i !== null) as PatternInsight[];
+    return patterns.map(p => generateInsightFromPattern(p));
   } catch (error) {
     console.error("[Pattern Insights] Error fetching brief insights:", error);
     return [];
@@ -203,20 +194,20 @@ export async function getLearningInsightsForBrief(sql: any): Promise<PatternInsi
 }
 
 /**
- * Check if outcome case matches any verified pattern
+ * Check if outcome case matches any pattern
+ * All patterns are from validated Outcome Cases (Score >= 60)
  */
-export async function findMatchingVerifiedPattern(
+export async function findMatchingPattern(
   sql: any,
   blockedOutcome: string,
   operationalCause?: string,
   logisticsFriction?: string
 ): Promise<PatternInsight | null> {
   try {
-    // Find EXACT match VERIFIED pattern
+    // Find EXACT match pattern
     const patterns = (await sql`
       SELECT * FROM pattern_records
-      WHERE status = 'verified'
-      AND blocked_outcome = ${blockedOutcome}
+      WHERE blocked_outcome = ${blockedOutcome}
       AND operational_cause = ${operationalCause || ''}
       AND logistics_friction = ${logisticsFriction || ''}
       LIMIT 1

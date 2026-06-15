@@ -2,13 +2,14 @@ import { neon } from "@neondatabase/serverless";
 import {
   getInsightsForOutcomeCase,
   getLearningInsightsForBrief,
-  findMatchingVerifiedPattern
+  findMatchingPattern
 } from "@/lib/pattern-insights";
 
 /**
  * Pattern Insights API
  *
- * Provides actionable guidance from VERIFIED patterns to operator interfaces.
+ * Provides actionable guidance from patterns to operator interfaces.
+ * All patterns are from Outcome Cases with Logistics Fit Score >= 60
  *
  * GET /api/b2b/pattern-insights?source=conversation&leadId=X
  * GET /api/b2b/pattern-insights?source=brief
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
     }
 
     // MORNING BRIEF
-    // Show top learning insights from verified patterns
+    // Show top learning insights from patterns
     if (source === "brief") {
       const insights = await getLearningInsightsForBrief(sql);
 
@@ -98,7 +99,7 @@ export async function GET(request: Request) {
         );
       }
 
-      const insight = await findMatchingVerifiedPattern(
+      const insight = await findMatchingPattern(
         sql,
         blockedOutcome,
         operationalCause,
