@@ -428,7 +428,6 @@ export default async function B2BTodayPage() {
                 last_contacted_at: prospect.last_contacted_at,
               }}
               opportunity={prospect.opportunity}
-              context={prospect.context}
               recommendation={prospect.recommendation}
               executiveSummary={prospect.executiveSummary}
               evidence={prospect.evidence}

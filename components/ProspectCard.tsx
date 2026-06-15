@@ -11,7 +11,6 @@ interface ProspectCardProps {
     last_contacted_at?: string;
   };
   opportunity: string;
-  context: string;
   recommendation: string;
   executiveSummary?: string;
   evidence?: string[];
@@ -28,7 +27,6 @@ type EmailState = 'idle' | 'loading' | 'success' | 'error';
 export default function ProspectCard({
   prospect,
   opportunity,
-  context,
   recommendation,
   executiveSummary = "",
   evidence = [],
@@ -93,37 +91,38 @@ export default function ProspectCard({
     >
       {/* COLLAPSED STATE */}
       <div className="px-6 py-5">
-        {/* 1. Company Name */}
-        <h3 className="text-lg font-semibold text-[#0D0D0D] mb-3">
-          {prospect.business_name}
-        </h3>
+        {/* Company + Category */}
+        <div className="mb-3 flex items-baseline justify-between">
+          <h3 className="text-lg font-semibold text-[#0D0D0D]">
+            {prospect.business_name}
+          </h3>
+          {prospect.business_category && (
+            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888]">
+              {prospect.business_category}
+            </span>
+          )}
+        </div>
 
-        {/* 2. Opportunity */}
-        <p className="text-sm leading-relaxed text-[#0D0D0D] mb-2">
+        {/* Opportunity (Primary) */}
+        <p className="text-sm leading-relaxed text-[#0D0D0D] mb-3">
           {opportunity}
         </p>
 
-        {/* 3. Context */}
-        <p className="text-sm leading-relaxed text-[#666666] mb-3">
-          {context}
-        </p>
-
-        {/* 4. Recommended Action */}
-        <p className="text-sm text-[#0D0D0D] mb-3">
+        {/* Recommended Action */}
+        <p className="text-sm text-[#0D0D0D]">
           {recommendation}
         </p>
 
-        {/* 5. Metadata */}
-        <div className="flex gap-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888]">
-          <span>Last reviewed {lastReviewedLabel}.</span>
-          {prospect.business_category && <span>{prospect.business_category}.</span>}
-        </div>
+        {/* Metadata */}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mt-3">
+          Reviewed {lastReviewedLabel}
+        </p>
       </div>
 
       {/* EXPANDED STATE */}
       {isExpanded && (
         <div className="border-t border-[#E8E8E8] bg-[#FAFAFA]">
-          <div className="px-6 py-5 space-y-5">
+          <div className="px-6 py-6 space-y-6">
             {/* OUTREACH TIMELINE — ALWAYS FIRST */}
             <div>
               <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
@@ -146,16 +145,13 @@ export default function ProspectCard({
                   )}
                   {engagement.replied !== undefined && (
                     <p>
-                      <span className="font-semibold">Reply:</span> {engagement.replied ? 'Yes ✅' : 'No'}
+                      <span className="font-semibold">Reply:</span> {engagement.replied ? 'Yes' : 'No'}
                     </p>
                   )}
-                  <p className="text-[#666666] mt-3">
-                    <span className="font-semibold">Current stage:</span> {context.split('Current stage:')[1]?.split('.')[0]?.trim() || 'Active'}
-                  </p>
                 </div>
               ) : (
                 <p className="text-sm text-[#0D0D0D]">
-                  Not yet contacted. Ready for first outreach.
+                  Not yet contacted. Ready for outreach.
                 </p>
               )}
             </div>
