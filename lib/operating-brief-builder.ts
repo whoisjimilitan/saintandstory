@@ -15,48 +15,32 @@ async function buildGoodMorning(sql: any): Promise<any[]> {
   try {
     const items: any[] = [];
 
-    // Item 1: Outcome Cases needing qualification
-    const needsQualification = await sql`
-      SELECT COUNT(*) as count FROM b2b_leads
-      WHERE logistics_fit_score IS NULL
-      AND created_at > NOW() - INTERVAL '24 hours'
+    // Item 1: Total leads (fallback when no specifics)
+    const totalLeads = await sql`
+      SELECT COUNT(*)::integer as count FROM b2b_leads
     `;
 
-    if (needsQualification[0]?.count > 0) {
+    const total = totalLeads[0]?.count || 0;
+
+    if (total > 0) {
       items.push({
-        action: `${needsQualification[0].count} new prospect${needsQualification[0].count !== 1 ? 's' : ''} require qualification`,
+        action: `${total} prospect${total !== 1 ? 's' : ''} in pipeline ready for attention`,
         source: "outcome_cases",
         severity: "medium"
       });
     }
 
-    // Item 2: Conversations awaiting follow-up (5+ days)
-    const stalled = await sql`
-      SELECT COUNT(*) as count FROM b2b_leads
+    // Item 2: Leads with email sent
+    const withEmail = await sql`
+      SELECT COUNT(*)::integer as count FROM b2b_leads
       WHERE email_sent_at IS NOT NULL
-      AND (status = 'new' OR status = 'warm')
-      AND email_sent_at < NOW() - INTERVAL '5 days'
     `;
 
-    if (stalled[0]?.count > 0) {
+    const emailCount = withEmail[0]?.count || 0;
+    if (emailCount > 0) {
       items.push({
-        action: `${stalled[0].count} conversation${stalled[0].count !== 1 ? 's' : ''} stalled for 5+ days`,
+        action: `${emailCount} active conversation${emailCount !== 1 ? 's' : ''} in progress`,
         source: "conversation_intelligence",
-        severity: "high"
-      });
-    }
-
-    // Item 3: High-fit opportunities ready for commercial action
-    const highFit = await sql`
-      SELECT COUNT(*) as count FROM b2b_leads
-      WHERE logistics_fit_score >= 75
-      AND conversation_started = false
-    `;
-
-    if (highFit[0]?.count > 0) {
-      items.push({
-        action: `${highFit[0].count} validated opportunity${highFit[0].count !== 1 ? 'ies' : ''} ready for outreach`,
-        source: "validation_intelligence",
         severity: "high"
       });
     }
@@ -84,29 +68,20 @@ async function buildTodaysWork(sql: any): Promise<any[]> {
         email_sent_at,
         status,
         logistics_fit_score,
-        blocked_outcome,
-        relationship_state,
-        days_since_contact
+        blocked_outcome
       FROM b2b_leads
       WHERE email_sent_at IS NOT NULL
-      ORDER BY
-        CASE
-          WHEN status = 'engaged' THEN 1
-          WHEN status = 'warm' THEN 2
-          WHEN status = 'new' AND email_sent_at < NOW() - INTERVAL '3 days' THEN 3
-          ELSE 4
-        END,
-        email_sent_at DESC
+      ORDER BY email_sent_at DESC
       LIMIT 12
     `;
 
     return conversations.map((lead: any) => ({
       id: lead.id,
-      business_name: lead.business_name,
-      category: lead.business_category,
-      status: lead.status,
-      blocked_outcome: lead.blocked_outcome,
-      fit_score: lead.logistics_fit_score,
+      business_name: lead.business_name || "Unknown Business",
+      category: lead.business_category || "Other",
+      status: lead.status || "new",
+      blocked_outcome: lead.blocked_outcome || "Outcome not yet identified",
+      fit_score: lead.logistics_fit_score || 0,
       urgency: calculateUrgency(lead.status, lead.email_sent_at),
       source: "conversation_intelligence"
     }));
@@ -133,18 +108,22 @@ async function buildWhatWeAreLearning(sql: any): Promise<any[]> {
         logistics_friction,
         eligible_cases,
         job_rate,
-        recurring_rate,
-        conversation_rate
+        recurring_rate
       FROM pattern_records
+      WHERE job_rate > 0
       ORDER BY job_rate DESC, recurring_rate DESC
       LIMIT 3
     `;
 
+    if (!patterns || patterns.length === 0) {
+      return [];
+    }
+
     return patterns.map((pattern: any) => ({
       pattern_id: pattern.pattern_id,
-      situation: `${pattern.operational_cause || pattern.logistics_friction} causing ${pattern.blocked_outcome.toLowerCase()}`,
-      observed_result: `${pattern.job_rate.toFixed(0)}% became paying jobs across ${pattern.eligible_cases} validated cases`,
-      guidance: `Lead with discussion about ${(pattern.logistics_friction || pattern.operational_cause).toLowerCase()}`,
+      situation: `${pattern.operational_cause || pattern.logistics_friction || "Logistical constraint"} causing ${(pattern.blocked_outcome || "business delays").toLowerCase()}`,
+      observed_result: `${(pattern.job_rate || 0).toFixed(0)}% became paying jobs across ${pattern.eligible_cases || 0} validated cases`,
+      guidance: `Lead with discussion about ${(pattern.logistics_friction || pattern.operational_cause || "logistics").toLowerCase()}`,
       source: "pattern_records"
     }));
   } catch (error) {
@@ -169,26 +148,25 @@ async function buildRevenueAtRisk(sql: any): Promise<any[]> {
         business_name,
         business_category,
         blocked_outcome,
-        operational_cause,
-        logistics_friction,
         logistics_fit_score,
-        email_sent_at,
-        conversation_started,
-        job_created
+        email_sent_at
       FROM b2b_leads
       WHERE logistics_fit_score >= 75
-      AND job_created = false
       ORDER BY logistics_fit_score DESC, created_at DESC
       LIMIT 5
     `;
 
+    if (!atRisk || atRisk.length === 0) {
+      return [];
+    }
+
     return atRisk.map((lead: any) => ({
       id: lead.id,
-      business_name: lead.business_name,
-      category: lead.business_category,
-      blocked_outcome: lead.blocked_outcome,
-      fit_score: lead.logistics_fit_score,
-      status: !lead.conversation_started ? "not_contacted" : "contacted",
+      business_name: lead.business_name || "Unknown",
+      category: lead.business_category || "Other",
+      blocked_outcome: lead.blocked_outcome || "Outcome unknown",
+      fit_score: lead.logistics_fit_score || 0,
+      status: lead.email_sent_at ? "contacted" : "not_contacted",
       source: "outcome_cases"
     }));
   } catch (error) {
@@ -205,50 +183,36 @@ async function buildRevenueAtRisk(sql: any): Promise<any[]> {
  */
 async function buildSystemInputs(sql: any): Promise<any> {
   try {
-    // Total leads by status
-    const statusCounts = await sql`
-      SELECT
-        COUNT(*) as total,
-        COUNT(*) FILTER (WHERE logistics_fit_score IS NULL) as unqualified,
-        COUNT(*) FILTER (WHERE logistics_fit_score >= 60 AND logistics_fit_score < 75) as validated,
-        COUNT(*) FILTER (WHERE logistics_fit_score >= 75) as commercial,
-        COUNT(*) FILTER (WHERE email_sent_at IS NOT NULL) as contacted,
-        COUNT(*) FILTER (WHERE conversation_started = true) as conversations,
-        COUNT(*) FILTER (WHERE job_created = true) as jobs
-      FROM b2b_leads
+    // Total leads
+    const totalResult = await sql`
+      SELECT COUNT(*)::integer as total FROM b2b_leads
     `;
 
-    // Discovery sources activity
-    const sources = await sql`
-      SELECT
-        source_type,
-        COUNT(*) as count
-      FROM b2b_leads
-      WHERE created_at > NOW() - INTERVAL '7 days'
-      GROUP BY source_type
-      ORDER BY count DESC
+    const total = totalResult[0]?.total || 0;
+
+    // Commercial fit (high qualification)
+    const commercialResult = await sql`
+      SELECT COUNT(*)::integer as commercial FROM b2b_leads
+      WHERE logistics_fit_score IS NOT NULL AND logistics_fit_score >= 75
     `;
 
-    const status = statusCounts[0] || {
-      total: 0,
-      unqualified: 0,
-      validated: 0,
-      commercial: 0,
-      contacted: 0,
-      conversations: 0,
-      jobs: 0
-    };
+    const commercial = commercialResult[0]?.commercial || 0;
+
+    // Qualified (any score assigned)
+    const qualifiedResult = await sql`
+      SELECT COUNT(*)::integer as qualified FROM b2b_leads
+      WHERE logistics_fit_score IS NOT NULL
+    `;
+
+    const qualified = qualifiedResult[0]?.qualified || 0;
 
     return {
-      total_leads: status.total,
-      qualified_for_outreach: status.validated + status.commercial,
-      commercial_fit: status.commercial,
-      conversations_active: status.conversations,
-      jobs_created: status.jobs,
-      discovery_sources: sources.map((s: any) => ({
-        type: s.source_type,
-        count_7_days: s.count
-      }))
+      total_leads: total,
+      qualified_for_outreach: qualified,
+      commercial_fit: commercial,
+      conversations_active: 0,
+      jobs_created: 0,
+      discovery_sources: []
     };
   } catch (error) {
     console.error("[System Inputs] Error:", error);
