@@ -68,184 +68,382 @@ Every screen should increasingly orient around this question, because:
 
 ---
 
+## THE OPERATING LAYER ARCHITECTURE
+
+### Layer 1: Discovery Intelligence ✅
+Finds opportunities in the market.
+**Status:** Working.
+
+### Layer 2: Qualification Intelligence ✅
+Determines if opportunity is worth attention.
+**Status:** Working.
+
+### Layer 3: Decision Intelligence ✅
+Tells operator what to do immediately.
+**Status:** Nearly complete (Pressure Engine).
+
+### Layer 4: Conversation Intelligence ❌ **NEXT PRIORITY**
+Tracks what happened after outreach.
+**Status:** Missing. HIGHEST PRIORITY.
+
+### Layer 5: Commercial Intelligence ❌ **AFTER CONVERSATION**
+Understands what behavior creates revenue.
+**Status:** Missing.
+
+### Layer 6: Learning Intelligence (Future)
+Changes behavior automatically based on learning.
+**Status:** Future.
+
+---
+
 ## EVOLUTION PHASES (Prioritized)
 
-### Phase 1: Conversation State Engine (Next)
+### Priority 4: Conversation Intelligence Layer (NEXT)
 
-**What:** Show actual email sent + engagement + what to do + why it matters
+**The Core Question This Answers:**
+"What actually happened after we sent this email?"
 
-**Example:**
+**What Operator Sees When Clicking Any Conversation:**
+
+#### 1. Conversation State Badge
 ```
-Estate Agent A
-Sequence: Initial outreach
-Sent: 3 days ago
-Opened: 4 times
-Clicked: 1 time
-Replied: No
-
-Pattern: High open rate (40%) but zero replies across estate agents.
-Issue: Copy may not be compelling.
-Action: Follow up with alternative sequence.
+COLD / WARM / HOT / REPLIED / MEETING / WON / LOST
 ```
 
-**Why:** Operators need to SEE the problem, not interpret signals
+#### 2. Message History
+The actual email sent (not a template, not generated — the real thing):
+```
+From: Saint & Story
+To: contact@estateagents.com
+Subject: Estate Agent Market Shifts — What Top Agents Know
+
+Dear [Name],
+
+[Full email body exactly as sent...]
+```
+
+#### 3. Prospect Behavior
+```
+Opened: 4x
+Clicked: 1x
+Replied: 0x
+Last activity: 2 days ago
+```
+
+#### 4. System Assessment
+```
+High interest detected.
+
+Multiple opens indicate reading.
+
+No reply indicates copy not compelling enough.
+
+Likely requires human follow-up.
+```
+
+#### 5. Recommended Action (Single)
+```
+Call today.
+```
+
+**Why This Changes Everything:**
+- Operator no longer interprets signals
+- Operator sees WHAT happened + WHAT it means + WHAT to do
+- System becomes transparent (what was sent vs what happened)
+- Basis for learning which sequences work
+
+**Why:** Operators need to SEE the conversation, not interpret metrics. This is the foundation for all later intelligence.
 
 ---
 
-### Phase 2: Revenue Engine (After Conversation State)
+### Priority 5: Commercial Intelligence Engine (After Conversation)
 
-**What:** Show revenue flow through the system + where it's stuck + financial impact
+**The Core Question This Answers:**
+"What patterns in behavior create revenue?"
 
-**Example:**
-```
-REVENUE STATUS
-
-Opportunities: 99
-At risk of loss: 35 (not contacted in 7+ days)
-  → Revenue at risk: £4,200
-
-Conversations: 35
-Showing interest: 5
-  → Revenue emerging: £1,800
-
-Revenue blocked by: 0 replies from estate agents
-Impact: £12,000 potential (if conversion improved to 20%)
-```
-
-**Why:** Operators need to see money, not metrics
-
----
-
-### Phase 3: Learning Engine (After Revenue)
-
-**What:** Show what's working + why + how to replicate
-
-**Example:**
-```
-WHAT'S WORKING
-
-Care providers: 60% reply rate (3x estate agents)
-Discovery rate: 15/week
-Conversion rate: 20%
-Expected revenue: £3,200/week
-
-Why: Category has natural affinity for transport solutions.
-How to replicate: Increase discovery allocation to care providers by 40%.
-Expected impact: +£1,280/week revenue.
-```
-
-**Why:** Operators need to know what to do more of
-
----
-
-### Phase 4: Analytics (Last)
-
-**What:** Explain why revenue is growing (not just display numbers)
-
-**Note:** By this phase, the system is already optimizing toward revenue. Analytics just shows the WHY behind the growth the operator is already seeing.
-
----
-
-## REVENUE INTELLIGENCE COMPONENTS
-
-The Morning Brief should eventually contain:
-
-### 1. Revenue at Risk
-What money is currently blocked:
-- Stuck conversations (not responded to)
-- Stalled prospects (contact initiated but no progress)
-- Failed sequences (low reply rates on specific categories)
-
-**Example:** "£4,200 potential revenue blocked — estate agent replies at 0%"
-
-### 2. Revenue Emerging
-What conversations are closest to becoming jobs:
-- Replied conversations
-- Engaged prospects
-- Moving through pipeline
-
-**Example:** "5 conversations ready for next step — £2,400 emerging revenue"
-
-### 3. Revenue Recommendations
-What specific action most increases expected revenue:
-- Switch outreach sequences
-- Reallocate discovery
-- Change follow-up timing
-- Expand winning categories
-
-**Example:** "Increase pharmacy discovery by 40% — expect +£1,200/week"
-
----
-
-## THE UNIFIED MORNING BRIEF (Future)
+**What Operator Sees in Morning Brief:**
 
 ```
 GOOD MORNING
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-REVENUE AT RISK
-£4,200 blocked by estate-agent outreach (0% reply rate).
+£18,000 POTENTIAL REVENUE IS STALLED
 
-5 conversations require follow-up to unlock £2,400.
+5 warm conversations require follow-up.
 
 1 standing order blocked — preventing £3,600.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-REVENUE EMERGING
-Care provider conversations: 5 (60% reply rate).
-Expected value: £3,200/week.
+WHAT'S WORKING
+
+Care-provider outreach: 2 replies this week.
+
+Pattern: Multiple opens + human touch = replies.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT'S FAILING
+
+Estate-agent outreach: 40% opens, 0% replies.
+
+Pattern: Sequence A copy not compelling.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 RECOMMENDED TODAY
 
-1. Follow up Westpoint Pharmacy (£800 at stake).
-2. Pause estate-agent sequence A (0% replies, wasting effort).
-3. Increase pharmacy discovery allocation (3x better conversion).
+1. Pause Estate-Agent Sequence A.
+2. Increase Care-Provider discovery allocation.
+3. Call Westpoint Pharmacy (£800 at stake).
 
 Expected impact: +£2,400 revenue this week.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Why this works:** Operator sees money, not metrics. They understand what's at stake and what they can change.
+**Notice What's NOT Here:**
+- No dashboard
+- No charts
+- No metrics
+- No verbose explanation
+
+**Notice What IS Here:**
+- Risk (£18,000 stalled)
+- Leverage (which sequences work/fail)
+- Action (three specific things to do)
+
+**Why:** Founders don't buy dashboards. They buy answers that prevent loss and create revenue.
+
+---
+
+### Priority 6: Learning Engine (After Commercial Intelligence)
+
+**What:** System learns which behavior patterns produce revenue and recommends behavioral changes.
+
+**Example:**
+```
+SYSTEM LEARNING
+
+Over 30 days, we've tested 5 outreach sequences.
+
+Care-provider sequence shows 3x better reply rates.
+
+Recommendation: Allocate 60% of new discovery to care providers.
+
+Expected revenue impact: +£1,280/week.
+
+Auto-implementation: Ready to activate.
+```
+
+**Why:** By this phase, human intelligence guides the system. System amplifies what works.
+
+---
+
+### Priority 7: Analytics (Last)
+
+**What:** Explain WHY revenue is growing (not just display numbers).
+
+**Note:** By this phase, the system is already optimizing toward revenue. Analytics just shows the reasoning behind the growth the operator is already seeing.
+
+---
+
+## THE LANGUAGE SHIFT: FROM LEAD SYSTEM TO OPERATING SYSTEM
+
+### Current Language (Lead System Thinking)
+- Lead
+- Opportunity
+- Prospect
+- Engagement Score
+- Funnel Stage
+- Status
+
+**Result:** System thinks like a database. Operator reads charts, not answers.
+
+### Target Language (Business Operating System Thinking)
+- Conversation
+- Commitment
+- Revenue
+- Economics
+- Momentum
+- Risk
+
+**Result:** System thinks like a business. Operator makes decisions, not interpretations.
+
+---
+
+## EXAMPLE: THE LANGUAGE TRANSFORMATION
+
+### Lead System Version (Current)
+```
+Estate Agent A
+Status: Warm
+Last Activity: Email opened 2 days ago
+Engagement Score: 65/100
+Next Action: Follow-up required
+```
+
+**Operator Question:** "What does this mean? Should I call or email?"
+
+### Operating System Version (Target)
+```
+WARM CONVERSATION
+
+What Happened:
+Sent initial outreach 4 days ago.
+Opened email 3 times.
+Clicked link 1 time.
+Has not replied.
+
+System Assessment:
+High interest (multiple opens).
+Copy not compelling enough (no reply despite click).
+
+Recommended Action:
+Call today.
+```
+
+**Operator Question:** Already answered. They call.
+
+---
+
+## PSYCHOLOGY INTEGRATION
+
+The system should apply sales psychology at every layer:
+
+### What Makes People Buy (Psychology Layer)
+- **Emotion before logic** — Opening line creates feeling, not feature
+- **Transformation not product** — "Help you win more business" not "Lead generation tool"
+- **Pain over desire** — "Stop losing jobs to competitors" not "Find more opportunities"
+- **Specificity = credibility** — "Estate agents with 5+ properties" not "Many estate agents"
+
+### How This Shapes Conversation Intelligence
+When analyzing a conversation:
+```
+Email opened 3x → Emotional connection made
+No reply → Transformation not clear
+Clicked link → Some urgency present
+Last activity 2 days ago → Interest cooling
+
+Assessment: Prospect believes you but doesn't believe you solve THEIR problem yet.
+
+Action: Personalized call (not template email) explaining how others like them won.
+```
+
+### How This Shapes Commercial Intelligence  
+When recommending sequences:
+```
+Care-provider sequence: 60% reply rate
+
+Why: Opens with pain (losing clients to competitors), 
+not feature (new system). Shows specificity (care home 
+reputations), not generic benefits.
+
+Estate-agent sequence: 40% open, 0% reply
+
+Why: Opens with feature (transport discovery), 
+not transformation. Generic copy (every agent gets same message).
+
+Recommendation: Personalize estate-agent sequence to open 
+with pain (lost jobs to competitors), not feature.
+```
+
+---
+
+## INTELLIGENCE VOCABULARY
+
+The system should use language operators understand instantly:
+
+### Risk Language
+- "Stalled" = no action in 7+ days
+- "At risk" = likely to be lost
+- "Cold" = no engagement for 14+ days
+- "Warm" = showed interest, needs push
+- "Hot" = active interest, ready to close
+
+### Leverage Language
+- "Pattern" = behavior that repeats across multiple conversations
+- "Works" = produces replies/commitment
+- "Fails" = produces nothing despite effort
+- "Sequence" = series of touches designed to move conversation
+
+### Economic Language
+- "Revenue potential" = estimated value if this conversation closes
+- "Revenue at risk" = potential lost if conversation goes cold
+- "Commitment" = standing order or job generated
+- "Economics" = which category/sequence/approach makes money
 
 ---
 
 ## WHAT THIS MEANS
 
-The system is no longer:
-- Explaining what happened (information)
-- Telling what to do (decision)
+The system is transitioning from:
 
-The system is:
-- **Showing what money is at stake**
-- **Showing what lever moves it**
-- **Showing how much it changes**
+### Lead System (What Saint & Story Currently Is)
+- Shows: Who we found, who we contacted, who responded
+- Operator asks: "Now what?"
+- Result: Confusion, missing context, manual interpretation
 
-That is the difference between a dashboard and a business operating system.
+### Business Operating System (What Saint & Story Becomes)
+- Shows: What happened, why it matters, what you do now
+- Operator asks: Nothing. Just acts.
+- Result: Clarity, immediate action, revenue growth
+
+---
+
+## THE CONVERSATION → COMMERCIAL SEQUENCE
+
+**Conversation Intelligence** (Priority 4) → Operator can see what happened  
+↓  
+**Commercial Intelligence** (Priority 5) → Operator can see what works  
+↓  
+**Learning Intelligence** (Priority 6) → System can learn what wins  
+↓  
+**Business Operating System** → Revenue scales automatically
 
 ---
 
 ## CORE PRINCIPLE
 
-Every screen should increasingly answer:
-**"Why does revenue equal zero, and what lever would move it?"**
+Every screen should increasingly answer one question:
+
+**"How does this discovered opportunity become revenue, and what do I do about it right now?"**
 
 Not:
-- "What happened?" (past-focused)
-- "What should I do?" (action-focused)
+- "What happened?" (information only)
+- "What should I do?" (decision only)
 
 But:
-- "What money is at stake, and what changes it?" (leverage-focused)
+- "What's the current state → Why does it matter → What's my one action?" (decision + context + clarity)
 
 ---
 
-## NEXT SESSION
+## NEXT DEPLOYED MILESTONE
 
-Start with: **Conversation State Engine** + **Revenue Linkage**
+**Build: Conversation Intelligence Layer**
 
-This unlocks the ability to see not just WHAT to do, but WHY it matters financially.
+When complete, operator clicking any prospect will see:
+1. What was sent (actual email)
+2. What happened (behavior data)
+3. What it means (system assessment)
+4. What to do (single action)
+
+This is the foundation for all future intelligence layers.
+
+Once deployed, Commercial Intelligence becomes buildable (we'll have the data to identify patterns).
+
+---
+
+## THE FUNDAMENTAL SHIFT
+
+Saint & Story is no longer a lead-generation system showing metrics.
+
+Saint & Story is a business operating system showing economics.
+
+The difference is:
+- **Lead system:** "Here's what we found" → Operator guesses
+- **Operating system:** "Here's what happened, why it matters, what you do" → Operator acts
+
+That is what founders pay for.
 
