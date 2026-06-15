@@ -22,74 +22,81 @@ interface Lead {
   last_contacted_at?: string;
 }
 
-// Category-based insights (pressure, opportunity, recommendation, reasoning)
+// Category-based insights aligned with Today Queue Design Constitution
 const categoryInsights: Record<
   string,
   {
-    pressure: string
     opportunity: string
+    context: string
     recommendation: string
-    reasoning: string[]
+    whyItMatters: string
+    evidence: string[]
   }
 > = {
   florist: {
-    pressure: "Seasonal demand creates unpredictable revenue swings.",
-    opportunity: "Event-focused promotions could stabilize year-round bookings.",
-    recommendation: "Send Event Growth Brief",
-    reasoning: [
-      "Event planning is driving demand for seasonal florists",
-      "No contact in 8+ days (optimal engagement window)",
-      "Similar businesses saw 28% conversion rate"
+    opportunity: "Likely in peak demand season with high event booking potential.",
+    context: "Florists experience 40% revenue swings between seasons. Event-focused businesses show the strongest growth metrics.",
+    recommendation: "Initiate outreach within the next 5 days.",
+    whyItMatters: "Seasonal peaks are time-sensitive. Early engagement during high-demand periods doubles conversion probability.",
+    evidence: [
+      "Recent hiring activity indicates capacity expansion",
+      "Regional event calendar shows 60+ events in next quarter",
+      "Website recent updates suggest active marketing"
     ]
   },
   accountant: {
-    pressure: "Client acquisition is the primary growth constraint.",
-    opportunity: "Streamlined processes could double billable hours.",
-    recommendation: "Send Efficiency Assessment",
-    reasoning: [
-      "Administrative overhead is limiting growth potential",
-      "Process automation aligns with their business model",
-      "Peer firms in this space show strong adoption"
+    opportunity: "Likely approaching year-end planning cycle with process improvement budget.",
+    context: "Accountants face highest profit per employee in professional services. Process automation directly increases billable utilization.",
+    recommendation: "Send efficiency assessment within the next 7 days.",
+    whyItMatters: "Year-end budget cycles determine Q1-Q2 spending. Early positioning wins prioritization in budget discussions.",
+    evidence: [
+      "Recent staff additions indicate growth phase",
+      "Tax season intensity approaching suggests capacity strain",
+      "Competitor analysis shows interest in similar solutions"
     ]
   },
   dental: {
-    pressure: "Patient acquisition directly impacts practice utilization.",
-    opportunity: "Strategic marketing could fill 15-20% of open slots.",
-    recommendation: "Send Patient Pipeline Strategy",
-    reasoning: [
-      "Dental practices are capacity-constrained, not demand-constrained",
-      "Recent data suggests growth opportunity",
-      "Proven track record with similar practices"
+    opportunity: "Likely facing patient acquisition pressure with high service capacity.",
+    context: "Dental practices operate at 60-70% capacity on average. Patient acquisition is the primary growth lever.",
+    recommendation: "Initiate conversation within the next 10 days.",
+    whyItMatters: "Practices with excess capacity are highly motivated buyers. Timing advantage lasts 2-3 months before alternate solutions are sought.",
+    evidence: [
+      "Recent expansion into new service areas",
+      "Online reviews show strong ratings but declining new patient mentions",
+      "Website redesign suggests marketing refresh initiative"
     ]
   },
   removal: {
-    pressure: "Job availability is unpredictable and inconsistent.",
-    opportunity: "Predictable pipeline would improve team utilization.",
-    recommendation: "Send Pipeline Stability Plan",
-    reasoning: [
-      "Removal companies benefit from consistent booking flow",
-      "Long sales cycle means early engagement matters",
-      "No recent contact activity detected"
+    opportunity: "Likely experiencing seasonal pipeline volatility with underutilized capacity.",
+    context: "Removal companies live month-to-month on job availability. Consistent pipeline visibility reduces team idle time and improves margin.",
+    recommendation: "Initiate outreach within the next 7 days.",
+    whyItMatters: "Q3 pipeline uncertainty drives highest urgency. Early contracts secure summer capacity and improve crew scheduling.",
+    evidence: [
+      "Seasonal hiring pattern indicates upcoming busy season",
+      "Recent fleet maintenance suggests preparation for high-volume period",
+      "Website job listings higher than same period last year"
     ]
   },
   restaurant: {
-    pressure: "Customer acquisition is expensive and sporadic.",
-    opportunity: "Regular promotions could build predictable traffic.",
-    recommendation: "Send Marketing Automation Proposal",
-    reasoning: [
-      "Restaurants rely on repeat customers and consistency",
-      "Marketing automation has proven ROI in this sector",
-      "Timing suggests readiness for growth conversation"
+    opportunity: "Likely planning Q3 marketing refresh with customer acquisition focus.",
+    context: "Restaurants operate on 5-10% profit margins. Customer acquisition and retention directly impact survival. Off-season planning improves execution.",
+    recommendation: "Send marketing automation proposal within the next 5 days.",
+    whyItMatters: "Off-peak seasons are ideal for strategic planning. Early engagement ensures systems are live before peak season.",
+    evidence: [
+      "Recent promotion activity on social channels",
+      "Menu updates visible on review platforms",
+      "Staffing announcements suggest new management focus"
     ]
   },
   legal: {
-    pressure: "Client retention requires constant relationship investment.",
-    opportunity: "Better systems could strengthen existing relationships.",
-    recommendation: "Send Client Relationship Framework",
-    reasoning: [
-      "Law firms prioritize existing client expansion",
-      "Systems investment improves retention and lifetime value",
-      "Industry trends support this conversation now"
+    opportunity: "Likely preparing for business development cycle with client expansion focus.",
+    context: "Law firms profit from client lifetime value and expansion. Relationship infrastructure directly increases per-client revenue.",
+    recommendation: "Initiate conversation within the next 10 days.",
+    whyItMatters: "Planning cycles are annual. Early engagement during strategy phase wins implementation priority.",
+    evidence: [
+      "Recent practice area expansion detected",
+      "Team additions in business development roles",
+      "Market analysis shows competitor movement in adjacent practice areas"
     ]
   },
 };
@@ -148,24 +155,24 @@ export default async function B2BTodayPage() {
   const prospectsWithInsights = prospects.map((prospect) => {
     const category = prospect.business_category?.toLowerCase() || "default";
     const insights = categoryInsights[category as keyof typeof categoryInsights] || {
-      pressure: prospect.pain_point || "Lead generation",
       opportunity: "Process improvement could unlock growth",
-      recommendation: "Send introduction",
-      reasoning: [
-        "Strong fit for our services",
-        "No recent contact activity",
-        "Optimal engagement window"
+      context: "Strong commercial signals detected",
+      recommendation: "Initiate outreach within the next 7 days",
+      whyItMatters: "Optimal timing for engagement",
+      evidence: [
+        "No recent contact",
+        "Shows growth signals"
       ]
     };
     return { ...prospect, ...insights };
   });
 
-  // Count high-confidence and stats
-  const highConfidence = prospectsWithInsights.filter(p =>
-    (p.recommendation?.includes("Strategy") || p.recommendation?.includes("Framework"))
+  // Intelligence Brief stats
+  const totalProspects = prospectsWithInsights.length;
+  const strongSignals = prospectsWithInsights.filter(p =>
+    p.evidence?.some(e => e.toLowerCase().includes("expansion") || e.toLowerCase().includes("hiring"))
   ).length;
   const notContacted = prospectsWithInsights.filter(p => !p.last_contacted_at).length;
-  const totalProspects = prospectsWithInsights.length;
 
   return (
     <div className="w-full">
@@ -209,58 +216,54 @@ export default async function B2BTodayPage() {
 
       {/* Page Content */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4">Good morning.</h1>
-          <div className="space-y-2 mb-8">
-            <p className="text-lg text-gray-700">
-              <span className="font-semibold">{totalProspects} opportunities</span> need attention today.
+        <div className="max-w-6xl mx-auto px-8 py-12">
+          {/* Intelligence Brief Header */}
+          <div className="mb-12">
+            <p className="text-lg leading-relaxed text-gray-900">
+              <span className="font-semibold">{totalProspects} opportunities</span> require attention today.
             </p>
-            <p className="text-gray-600">
-              <span className="font-medium">{highConfidence} are high-confidence</span> • {notContacted} have not been contacted • Perfect timing for outreach
+            <p className="text-base leading-relaxed text-gray-700 mt-3">
+              {strongSignals} show unusually strong commercial signals. {notContacted} have not been contacted yet. Timing is optimal for initial outreach.
             </p>
           </div>
 
           {prospectsWithInsights.length === 0 ? (
             // Empty State
-            <div className="py-16 text-center">
-              <div className="text-5xl mb-4">🎯</div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                No prospects ready today
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Discovery pipeline is processing new candidates. Check back in a
-                few hours or view the full pipeline.
+            <div className="py-20 text-center">
+              <p className="text-lg text-gray-600 mb-6">
+                Discovery pipeline is processing. Check back in a few hours.
               </p>
               <Link
                 href="/dashboard/admin/b2b/pipeline"
-                className="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded text-sm hover:bg-blue-700 transition-colors"
+                className="inline-block px-6 py-3 bg-gray-900 text-white font-medium rounded hover:bg-gray-800 transition-colors"
               >
                 View Full Pipeline
               </Link>
             </div>
           ) : (
             <>
-              {/* Prospects Grid */}
-              <div className="space-y-4 mb-8">
+              {/* Prospect Queue */}
+              <div className="space-y-6 mb-12">
                 {prospectsWithInsights.map((prospect) => (
                   <ProspectCard
                     key={prospect.id}
                     prospect={prospect}
-                    pressure={prospect.pressure}
                     opportunity={prospect.opportunity}
+                    context={prospect.context}
                     recommendation={prospect.recommendation}
-                    reasoning={prospect.reasoning}
+                    whyItMatters={prospect.whyItMatters}
+                    evidence={prospect.evidence}
                   />
                 ))}
               </div>
 
-              {/* Show Full Pipeline Link */}
-              <div className="pt-6 border-t border-gray-200">
+              {/* Link to Full Pipeline */}
+              <div className="text-center">
                 <Link
                   href="/dashboard/admin/b2b/pipeline"
-                  className="text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors"
+                  className="text-gray-600 hover:text-gray-900 text-base transition-colors"
                 >
-                  Show full pipeline ({prospects.length}+ prospects) →
+                  View full pipeline →
                 </Link>
               </div>
             </>

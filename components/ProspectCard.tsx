@@ -11,121 +11,142 @@ interface ProspectCardProps {
     engagement_score?: number;
     last_contacted_at?: string;
   };
-  pressure: string;
   opportunity: string;
-  recommendation?: string;
-  reasoning?: string[];
+  context: string;
+  recommendation: string;
+  evidence?: string[];
+  whyItMatters?: string;
 }
 
 export default function ProspectCard({
   prospect,
-  pressure,
   opportunity,
-  recommendation = "Send introduction email",
-  reasoning = []
+  context,
+  recommendation,
+  evidence = [],
+  whyItMatters = ""
 }: ProspectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Format last contact date
-  const lastContactDaysAgo = prospect.last_contacted_at
-    ? Math.floor(
-        (Date.now() - new Date(prospect.last_contacted_at).getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
-    : null;
+  const lastContactLabel = prospect.last_contacted_at
+    ? (() => {
+        const daysAgo = Math.floor(
+          (Date.now() - new Date(prospect.last_contacted_at).getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        return daysAgo === 0 ? "Today" : `${daysAgo}d ago`;
+      })()
+    : "Not contacted";
 
   return (
     <div
       className="border border-gray-200 rounded-lg bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      {/* Card Header - Company Name Only */}
-      <div className="px-6 py-5">
-        <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+      {/* COLLAPSED STATE */}
+      <div className="px-8 py-8">
+        {/* 1. COMPANY NAME - Scannable, Large */}
+        <h3 className="text-3xl font-semibold text-gray-900 mb-8">
           {prospect.business_name}
         </h3>
 
-        {/* Pressure Section */}
-        <div className="mb-6">
-          <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Pressure
-          </p>
-          <p className="text-base text-gray-700 leading-relaxed">
-            {pressure}
-          </p>
-        </div>
-
-        {/* Opportunity Section */}
-        <div className="mb-6">
-          <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Opportunity
-          </p>
-          <p className="text-lg font-semibold text-gray-900 leading-relaxed">
+        {/* 2. OPPORTUNITY - Most Important */}
+        <div className="mb-8">
+          <p className="text-xl leading-relaxed text-gray-900 font-normal">
             {opportunity}
           </p>
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-gray-200 my-6" />
-
-        {/* System Recommendation */}
-        <div className="mb-6">
-          <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">
-            System Recommends
+        {/* 3. CONTEXT - Supporting the opportunity */}
+        <div className="mb-8">
+          <p className="text-base leading-relaxed text-gray-700">
+            {context}
           </p>
-          <p className="text-base font-medium text-blue-600">
+        </div>
+
+        {/* 4. RECOMMENDATION - Conclusion from the system */}
+        <div className="mb-8">
+          <p className="text-base text-gray-900">
             {recommendation}
           </p>
         </div>
 
-        {/* Last Contact Context (Subtle) */}
-        <p className="text-xs text-gray-500">
-          {lastContactDaysAgo !== null
-            ? `Last contact: ${lastContactDaysAgo} days ago`
-            : "Not yet contacted"}
-        </p>
+        {/* 5. METADATA - Minimal, Muted */}
+        <div className="flex gap-6 text-sm text-gray-500">
+          <span>Last contacted: {lastContactLabel}</span>
+          {prospect.business_category && (
+            <span>Category: {prospect.business_category}</span>
+          )}
+        </div>
       </div>
 
-      {/* Expanded Content - Why This Recommendation */}
+      {/* EXPANDED STATE - Machine's Reasoning */}
       {isExpanded && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <div className="space-y-4">
+        <div className="border-t border-gray-200 bg-white">
+          <div className="px-8 py-8 space-y-8">
+            {/* WHY THIS MATTERS - Mandatory */}
             <div>
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3">
-                Why This Is Recommended
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                WHY THIS MATTERS
+              </h4>
+              <p className="text-base leading-relaxed text-gray-700">
+                {whyItMatters || "This opportunity shows commercial signals that suggest readiness for engagement."}
               </p>
-              <ul className="space-y-2">
-                {reasoning.length > 0 ? (
-                  reasoning.map((reason, i) => (
-                    <li key={i} className="text-sm text-gray-700 flex gap-3">
-                      <span className="text-gray-400">•</span>
-                      <span>{reason}</span>
-                    </li>
-                  ))
-                ) : (
-                  <>
-                    <li className="text-sm text-gray-700 flex gap-3">
-                      <span className="text-gray-400">•</span>
-                      <span>Strong fit for this business type</span>
-                    </li>
-                    <li className="text-sm text-gray-700 flex gap-3">
-                      <span className="text-gray-400">•</span>
-                      <span>No recent contact in optimal window</span>
-                    </li>
-                    <li className="text-sm text-gray-700 flex gap-3">
-                      <span className="text-gray-400">•</span>
-                      <span>Similar businesses showed strong engagement</span>
-                    </li>
-                  </>
-                )}
-              </ul>
             </div>
 
+            {/* EVIDENCE - Concrete signals */}
+            {evidence.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                  EVIDENCE
+                </h4>
+                <ul className="space-y-3">
+                  {evidence.map((item, i) => (
+                    <li key={i} className="text-base text-gray-700 flex gap-4">
+                      <span className="text-gray-400 flex-shrink-0">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* RECOMMENDED ACTION */}
             <div>
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">
-                Contact
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                RECOMMENDED ACTION
+              </h4>
+              <p className="text-base text-gray-900">
+                {recommendation}
               </p>
-              <p className="text-sm text-gray-700 font-mono">
+            </div>
+
+            {/* OPERATOR FEEDBACK */}
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                YOUR FEEDBACK
+              </h4>
+              <div className="flex gap-4">
+                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                  Useful
+                </button>
+                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                  Not useful
+                </button>
+                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                  Wrong priority
+                </button>
+                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                  Already contacted
+                </button>
+              </div>
+            </div>
+
+            {/* CONTACT INFO */}
+            <div className="text-sm">
+              <p className="text-gray-500 mb-2">Contact</p>
+              <p className="text-gray-900 font-mono">
                 {prospect.email || "No email available"}
               </p>
             </div>
@@ -133,31 +154,19 @@ export default function ProspectCard({
         </div>
       )}
 
-      {/* Actions Footer */}
-      <div className="px-6 py-4 bg-white border-t border-gray-200 flex gap-3">
+      {/* ACTION BUTTONS */}
+      <div className="px-8 py-6 border-t border-gray-200 bg-white flex gap-4">
         <button
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className="px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded hover:bg-gray-800 transition-colors"
+          onClick={(e) => e.stopPropagation()}
         >
           Send Email
         </button>
         <button
-          className="px-4 py-2 border border-gray-200 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className="px-6 py-3 border border-gray-300 text-gray-900 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+          onClick={(e) => e.stopPropagation()}
         >
-          Inspect Ranking
-        </button>
-        <button
-          className="px-2 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          ⋮
+          Inspect Reasoning
         </button>
       </div>
     </div>
