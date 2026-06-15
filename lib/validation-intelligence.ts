@@ -37,13 +37,14 @@
  * ═════════════════
  *
  * Pattern Intelligence does the learning, not this score.
+ *
+ * Validation Intelligence filters reality.
+ * Pattern Intelligence learns from reality.
+ *
  * Pattern Intelligence learns:
  * - Which blocked outcomes create conversations
  * - Which operational causes matter
  * - Which logistics frictions repeat
- *
- * This score is the INPUT to Pattern Intelligence.
- * Not the output.
  *
  * Only cases with score ≥ 60 enter Pattern Intelligence.
  * Only cases with score ≥ 75 enter Commercial Intelligence.
