@@ -202,6 +202,7 @@ async function getRealProspects(): Promise<ProspectData[]> {
 
     let leads: any[] = [];
     try {
+      // Simplified query - avoid complex joins that can cause errors
       leads = await sql`
         SELECT
           bl.id,
@@ -211,13 +212,8 @@ async function getRealProspects(): Promise<ProspectData[]> {
           bl.email_sent_at,
           bl.engagement_score,
           bl.lead_tier,
-          bl.status,
-          bo.sent_at,
-          bo.email_type,
-          COUNT(*) FILTER (WHERE bo.replied = true) as replied_count
+          bl.status
         FROM b2b_leads bl
-        LEFT JOIN b2b_outreach bo ON bl.id = bo.lead_id
-        GROUP BY bl.id, bl.business_name, bl.business_category, bl.email, bl.email_sent_at, bl.engagement_score, bl.lead_tier, bl.status, bo.sent_at, bo.email_type
         ORDER BY
           CASE
             WHEN bl.email_sent_at IS NULL THEN 1
