@@ -88,7 +88,7 @@ export default function ProspectCard({
 
   return (
     <div
-      className="border border-[#E8E8E8] bg-white hover:border-[#D0D0D0] transition-colors cursor-pointer"
+      className="border border-[#E8E8E8] bg-white cursor-pointer transition-all duration-200 hover:border-[#D0D0D0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* COLLAPSED STATE — Apple + Linear Hybrid */}
@@ -163,7 +163,7 @@ export default function ProspectCard({
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888]">Current Stage</span>
+                    <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#888888] italic">Current Stage</span>
                     <span className="text-sm font-medium text-[#0D0D0D]">{context.split('Current stage:')[1]?.split('.')[0]?.trim() || 'Active'}</span>
                   </div>
                 </div>
