@@ -1,99 +1,130 @@
 /**
- * Validation Intelligence V2
+ * Validation Intelligence
  *
- * THE TRUTH LAYER OF THE OPERATING SYSTEM
+ * ONE unified scoring system:
+ * LOGISTICS FIT SCORE (0–100)
  *
- * Separates:
- * - What we think is happening (diagnosis)
- * - What we know is happening (evidence)
+ * Measures: How strongly this case indicates a real, logistics-solvable
+ * blocked outcome that Saint & Story can fix.
  *
- * Every Outcome Case has TWO independent validation dimensions:
+ * All signals feed into ONE score.
+ * No sub-layers. No problem/solution split.
  *
- * 1. PROBLEM VALIDATION
- *    Do they actually have the problem we diagnosed?
- *    Evidence: opened → clicked → confirmed issue → discussed issue
- *
- * 2. SOLUTION VALIDATION
- *    Do they believe Saint & Story can solve it?
- *    Evidence: requested details → asked how → booked call → requested pricing → bought
- *
- * Pattern Intelligence learns ONLY from validated problems.
- * Commercial Intelligence learns ONLY from validated solutions.
- * This prevents learning from false positives AND false trust.
+ * Only cases with score ≥ 60 enter Pattern/Commercial/Learning Intelligence.
  */
 
-export type EvidenceLevel = 'none' | 'weak' | 'medium' | 'strong' | 'definitive';
-export type ValidationStatus = 'hypothesis' | 'emerging_truth' | 'confirmed_reality';
+export type ValidationStatus = 'ignore' | 'emerging' | 'strong' | 'confirmed';
 
-/**
- * Problem Validation Evidence
- * Do they actually have the problem we diagnosed?
- */
-export interface ProblemValidationEvidence {
-  opened: boolean;
-  opened_count: number;
-  clicked: boolean;
-  clicked_count: number;
-  replied: boolean;
-  confirmed_issue_in_reply: boolean;
-  discussed_on_call: boolean;
-  explicitly_described_problem: string | null;
-}
-
-/**
- * Solution Validation Evidence
- * Do they believe we can solve it?
- */
-export interface SolutionValidationEvidence {
-  requested_details: boolean;
-  asked_how_it_works: boolean;
-  booked_call: boolean;
-  requested_pricing: boolean;
-  requested_proposal: boolean;
-  became_customer: boolean;
-  endorsement_comment: string | null;
-}
-
-/**
- * Complete Validation Intelligence for an Outcome Case
- */
 export interface ValidationIntelligence {
   // Outcome Case reference
   lead_id: string;
   business_name: string;
   industry: string;
-  diagnosed_outcome: string;
+  desired_outcome: string;
+  blocked_outcome: string;
+  operational_cause?: string;
 
-  // Diagnosis confidence
-  diagnosis_confidence: number; // 0-100: How confident in our assessment?
+  // THE ONLY SCORE
+  logistics_fit_score: number; // 0-100
 
-  // PROBLEM VALIDATION DIMENSION
-  problem_validation_confidence: number; // 0-100: How much evidence they have the problem?
-  problem_evidence_level: EvidenceLevel;
-  problem_status: ValidationStatus;
-  problem_evidence: ProblemValidationEvidence;
+  // Status based on score
+  validation_status: ValidationStatus;
 
-  // SOLUTION VALIDATION DIMENSION
-  solution_validation_confidence: number; // 0-100: How much evidence they believe we solve it?
-  solution_evidence_level: EvidenceLevel;
-  solution_status: ValidationStatus;
-  solution_evidence: SolutionValidationEvidence;
+  // Decision gate
+  ready_for_learning: boolean; // logistics_fit_score >= 60
 
-  // Overall readiness
-  is_pattern_ready: boolean; // problem_validation >= 60
-  is_commercial_ready: boolean; // problem_validation >= 60 AND solution_validation >= 60
+  // Recommended action (single only)
+  recommended_action: string;
 
   // Metadata
   generated_at: string;
 }
 
 /**
- * Build problem validation evidence
+ * Calculate Logistics Fit Score (0-100)
+ *
+ * Scoring rules:
+ * 0–20   = No meaningful engagement (ignore)
+ * 21–40  = Weak interest (uncertain relevance)
+ * 41–60  = Possible logistics relevance
+ * 61–80  = Strong logistics relevance (engage)
+ * 81–100 = Confirmed logistics opportunity (prioritise)
+ *
+ * All signals combine into one score.
  */
-export async function buildProblemValidationEvidence(
+export function calculateLogisticsFitScore(signals: {
+  opened_count: number;
+  clicked_count: number;
+  replied: boolean;
+  confirmed_issue: boolean;
+  booked_call: boolean;
+  became_customer: boolean;
+}): number {
+  let score = 0;
+
+  // No opens = no signal
+  if (signals.opened_count === 0) {
+    return 0;
+  }
+
+  // Base: They read it
+  score = 20;
+
+  // Clicks: Showed specific interest
+  if (signals.clicked_count > 0) {
+    score = 40;
+  }
+
+  // Multiple clicks: Strong engagement
+  if (signals.clicked_count >= 2) {
+    score = 50;
+  }
+
+  // Reply: Serious engagement
+  if (signals.replied) {
+    score = 65;
+  }
+
+  // Confirmed in reply: They validated the issue
+  if (signals.confirmed_issue) {
+    score = 80;
+  }
+
+  // Call booked: Ready to discuss
+  if (signals.booked_call) {
+    score = Math.max(score, 70);
+  }
+
+  // Became customer: Proved it works
+  if (signals.became_customer) {
+    score = 100;
+  }
+
+  return Math.min(score, 100);
+}
+
+/**
+ * Determine validation status from score
+ */
+export function getValidationStatus(score: number): ValidationStatus {
+  if (score < 21) return 'ignore';
+  if (score < 61) return 'emerging';
+  if (score < 81) return 'strong';
+  return 'confirmed';
+}
+
+/**
+ * Generate Validation Intelligence for an Outcome Case
+ */
+export async function generateValidationIntelligence(
   sql: any,
-  leadId: string
-): Promise<ProblemValidationEvidence | null> {
+  leadId: string,
+  businessName: string,
+  industry: string,
+  desiredOutcome: string,
+  blockedOutcome: string,
+  operationalCause?: string
+): Promise<ValidationIntelligence | null> {
   try {
     // Get lead data
     const leadResult = (await sql`
@@ -101,8 +132,7 @@ export async function buildProblemValidationEvidence(
         id,
         email_opened_count,
         email_clicked_count,
-        replied,
-        replied_at
+        replied
       FROM b2b_leads
       WHERE id = ${leadId}
       LIMIT 1
@@ -113,224 +143,34 @@ export async function buildProblemValidationEvidence(
     }
 
     const lead = leadResult[0];
-    const opened_count = lead.email_opened_count || 0;
-    const clicked_count = lead.email_clicked_count || 0;
 
-    // TODO: In a real system, analyze reply text for:
-    // - confirmed_issue_in_reply
-    // - explicitly_described_problem
-    // For now, return base structure
-    return {
-      opened: opened_count > 0,
-      opened_count,
-      clicked: clicked_count > 0,
-      clicked_count,
+    // Calculate score from available signals
+    const logistics_fit_score = calculateLogisticsFitScore({
+      opened_count: lead.email_opened_count || 0,
+      clicked_count: lead.email_clicked_count || 0,
       replied: lead.replied || false,
-      confirmed_issue_in_reply: false,
-      discussed_on_call: false,
-      explicitly_described_problem: null
-    };
-  } catch (error) {
-    console.error("[Problem Validation Evidence] Error:", error);
-    return null;
-  }
-}
+      confirmed_issue: false, // TODO: NLP on reply text
+      booked_call: false, // TODO: query calendar
+      became_customer: false // TODO: query jobs
+    });
 
-/**
- * Build solution validation evidence
- *
- * This measures: "Do they believe we can solve it?"
- * Not just: "Did they engage?"
- */
-export async function buildSolutionValidationEvidence(
-  sql: any,
-  leadId: string
-): Promise<SolutionValidationEvidence | null> {
-  try {
-    // TODO: Query for solution-related signals:
-    // - requested_details: Clicked "how it works" or "learn more"
-    // - asked_how_it_works: Asked in email/call
-    // - booked_call: Scheduled meeting
-    // - requested_pricing: Asked for pricing
-    // - became_customer: Converted to job/payment
-    //
-    // For now, return base structure
-    return {
-      requested_details: false,
-      asked_how_it_works: false,
-      booked_call: false,
-      requested_pricing: false,
-      requested_proposal: false,
-      became_customer: false,
-      endorsement_comment: null
-    };
-  } catch (error) {
-    console.error("[Solution Validation Evidence] Error:", error);
-    return null;
-  }
-}
+    const validation_status = getValidationStatus(logistics_fit_score);
+    const ready_for_learning = logistics_fit_score >= 60;
 
-/**
- * Calculate Problem Validation Confidence
- *
- * Evidence Hierarchy:
- * None: 0 (no engagement)
- * Weak: 20-40 (opened, clicked)
- * Medium: 50-70 (replied)
- * Strong: 75-90 (confirmed issue)
- * Definitive: 100 (discussed on call)
- */
-export function calculateProblemValidationConfidence(
-  evidence: ProblemValidationEvidence
-): number {
-  let confidence = 0;
-
-  if (!evidence.opened) {
-    return 0; // No engagement = no validation
-  }
-
-  confidence = 20; // They read it
-
-  if (evidence.clicked) {
-    confidence = 40; // They showed interest in the specific problem
-  }
-
-  if (evidence.replied) {
-    confidence = 70; // They engaged seriously
-  }
-
-  if (evidence.confirmed_issue_in_reply) {
-    confidence = 90; // They explicitly confirmed the problem
-  }
-
-  if (evidence.discussed_on_call) {
-    confidence = 100; // They discussed it - we know they have it
-  }
-
-  return Math.min(confidence, 100);
-}
-
-/**
- * Calculate Solution Validation Confidence
- *
- * This is SEPARATE from problem validation.
- * A prospect can understand the problem but not believe we solve it.
- *
- * Evidence Hierarchy:
- * None: 0 (no solution interest)
- * Weak: 20-30 (viewed solution details)
- * Medium: 40-60 (asked questions, booked call)
- * Strong: 70-85 (requested pricing, proposal)
- * Definitive: 100 (became customer)
- */
-export function calculateSolutionValidationConfidence(
-  evidence: SolutionValidationEvidence
-): number {
-  let confidence = 0;
-
-  if (!evidence.requested_details && !evidence.asked_how_it_works && !evidence.booked_call) {
-    return 0; // No solution interest
-  }
-
-  if (evidence.requested_details || evidence.asked_how_it_works) {
-    confidence = 30; // Interested in learning more
-  }
-
-  if (evidence.booked_call) {
-    confidence = 60; // Serious enough to meet
-  }
-
-  if (evidence.requested_pricing || evidence.requested_proposal) {
-    confidence = 85; // Ready to buy
-  }
-
-  if (evidence.became_customer) {
-    confidence = 100; // Bought it - they believe we solve it
-  }
-
-  return Math.min(confidence, 100);
-}
-
-/**
- * Determine evidence level from confidence score
- */
-export function getEvidenceLevel(confidence: number): EvidenceLevel {
-  if (confidence === 0) return 'none';
-  if (confidence < 40) return 'weak';
-  if (confidence < 70) return 'medium';
-  if (confidence < 100) return 'strong';
-  return 'definitive';
-}
-
-/**
- * Determine validation status
- */
-export function getValidationStatus(confidence: number): ValidationStatus {
-  if (confidence < 40) return 'hypothesis';
-  if (confidence < 80) return 'emerging_truth';
-  return 'confirmed_reality';
-}
-
-/**
- * Generate complete Validation Intelligence V2
- *
- * This is the truth layer. Every Outcome Case has:
- * - Diagnosis Confidence (how sure are we in our assessment)
- * - Problem Validation (evidence they have the problem)
- * - Solution Validation (evidence they believe we solve it)
- */
-export async function generateValidationIntelligence(
-  sql: any,
-  leadId: string,
-  businessName: string,
-  industry: string,
-  diagnosedOutcome: string,
-  diagnosisConfidence: number
-): Promise<ValidationIntelligence | null> {
-  try {
-    // Build evidence
-    const problemEvidence = await buildProblemValidationEvidence(sql, leadId);
-    const solutionEvidence = await buildSolutionValidationEvidence(sql, leadId);
-
-    if (!problemEvidence || !solutionEvidence) {
-      return null;
-    }
-
-    // Calculate confidences
-    const problemConfidence = calculateProblemValidationConfidence(problemEvidence);
-    const solutionConfidence = calculateSolutionValidationConfidence(solutionEvidence);
-
-    // Determine levels and statuses
-    const problemLevel = getEvidenceLevel(problemConfidence);
-    const problemStatus = getValidationStatus(problemConfidence);
-    const solutionLevel = getEvidenceLevel(solutionConfidence);
-    const solutionStatus = getValidationStatus(solutionConfidence);
-
-    // Pattern Intelligence can only learn from validated problems
-    const is_pattern_ready = problemConfidence >= 60;
-
-    // Commercial Intelligence can only learn from validated problems AND validated solutions
-    const is_commercial_ready = problemConfidence >= 60 && solutionConfidence >= 60;
+    // Recommended action based on score
+    const recommended_action = getRecommendedAction(logistics_fit_score);
 
     return {
       lead_id: leadId,
       business_name: businessName,
       industry,
-      diagnosed_outcome: diagnosedOutcome,
-      diagnosis_confidence: diagnosisConfidence,
-
-      problem_validation_confidence: problemConfidence,
-      problem_evidence_level: problemLevel,
-      problem_status: problemStatus,
-      problem_evidence: problemEvidence,
-
-      solution_validation_confidence: solutionConfidence,
-      solution_evidence_level: solutionLevel,
-      solution_status: solutionStatus,
-      solution_evidence: solutionEvidence,
-
-      is_pattern_ready,
-      is_commercial_ready,
+      desired_outcome: desiredOutcome,
+      blocked_outcome: blockedOutcome,
+      operational_cause: operationalCause,
+      logistics_fit_score,
+      validation_status,
+      ready_for_learning,
+      recommended_action,
       generated_at: new Date().toISOString()
     };
   } catch (error) {
@@ -340,15 +180,27 @@ export async function generateValidationIntelligence(
 }
 
 /**
- * Helper: Check if this outcome case is ready for Pattern Intelligence
+ * Get recommended action based on Logistics Fit Score
  */
-export function isReadyForPatternLearning(validation: ValidationIntelligence): boolean {
-  return validation.is_pattern_ready;
+function getRecommendedAction(score: number): string {
+  if (score < 21) {
+    return 'Ignore. No engagement signal.';
+  }
+  if (score < 41) {
+    return 'Monitor. Weak signal. Ask clarifying questions.';
+  }
+  if (score < 61) {
+    return 'Investigate. May be logistics relevant. Confirm on call.';
+  }
+  if (score < 81) {
+    return 'Engage. Clear logistics relevance. Propose solution.';
+  }
+  return 'Prioritise. Strong opportunity. Fast-track.';
 }
 
 /**
- * Helper: Check if this outcome case is ready for Commercial Intelligence
+ * Check if ready for learning systems
  */
-export function isReadyForCommercialLearning(validation: ValidationIntelligence): boolean {
-  return validation.is_commercial_ready;
+export function isReadyForLearning(validation: ValidationIntelligence): boolean {
+  return validation.ready_for_learning;
 }

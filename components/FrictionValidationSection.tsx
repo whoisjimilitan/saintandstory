@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ValidationIntelligence } from '@/lib/validation-intelligence';
-import { FrictionValidationPanel } from './FrictionValidationPanel';
+import { ValidationPanel } from './ValidationPanel';
 
 interface Props {
   leadId: string;
@@ -18,7 +18,7 @@ export function FrictionValidationSection({ leadId }: Props) {
       try {
         const response = await fetch(`/api/b2b/friction-validation?leadId=${leadId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch friction validation');
+          throw new Error('Failed to fetch validation intelligence');
         }
         const data = await response.json();
         setValidation(data);
@@ -35,7 +35,7 @@ export function FrictionValidationSection({ leadId }: Props) {
   if (loading) {
     return (
       <div className="bg-white border border-[#E8E8E8] rounded p-8">
-        <p className="text-[#888888]">Validating friction diagnosis...</p>
+        <p className="text-[#888888]">Calculating Logistics Fit Score...</p>
       </div>
     );
   }
@@ -43,10 +43,10 @@ export function FrictionValidationSection({ leadId }: Props) {
   if (error || !validation) {
     return (
       <div className="bg-white border border-[#E8E8E8] rounded p-8">
-        <p className="text-[#CC0000]">{error || 'Could not validate friction'}</p>
+        <p className="text-[#CC0000]">{error || 'Could not calculate validation'}</p>
       </div>
     );
   }
 
-  return <FrictionValidationPanel validation={validation} />;
+  return <ValidationPanel validation={validation} />;
 }

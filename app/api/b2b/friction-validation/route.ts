@@ -27,8 +27,7 @@ export async function GET(request: Request) {
       SELECT
         id,
         business_name,
-        business_category,
-        email_sent_at
+        business_category
       FROM b2b_leads
       WHERE id = ${leadId}
       LIMIT 1
@@ -43,10 +42,10 @@ export async function GET(request: Request) {
 
     const lead = leadResult[0];
 
-    // TODO: Get diagnosed outcome from stored outcome case
-    // For now, use placeholder from outcome case engine
-    const diagnosedOutcome = "Outcome case analysis";
-    const diagnosisConfidence = 74;
+    // TODO: Get from stored outcome case once available
+    const desiredOutcome = "Standard outcome";
+    const blockedOutcome = "Standard blockage";
+    const operationalCause = undefined;
 
     // Generate validation intelligence
     const validation = await generateValidationIntelligence(
@@ -54,8 +53,9 @@ export async function GET(request: Request) {
       lead.id,
       lead.business_name,
       lead.business_category || "removals",
-      diagnosedOutcome,
-      diagnosisConfidence
+      desiredOutcome,
+      blockedOutcome,
+      operationalCause
     );
 
     if (!validation) {
