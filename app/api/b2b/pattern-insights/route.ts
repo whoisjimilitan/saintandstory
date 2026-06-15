@@ -86,7 +86,7 @@ export async function GET(request: Request) {
     }
 
     // OUTCOME CASE
-    // Attach insight when outcome matches a verified pattern
+    // Attach insight when outcome matches a pattern
     if (source === "outcome") {
       const blockedOutcome = searchParams.get("blocked_outcome");
       const operationalCause = searchParams.get("operational_cause") || undefined;
