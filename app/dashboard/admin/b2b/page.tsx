@@ -27,23 +27,28 @@ interface ProspectData {
 }
 
 interface MorningBriefData {
-  lastRun: {
-    timestamp: string;
-    status: 'success' | 'partial_failure' | 'failure' | null;
+  overnight: {
     discovered: number;
-    leads_created: number;
-    failures: string[];
+    qualified: number;
   };
-  standing_orders_issues: {
-    total_active: number;
-    blocked_count: number;
-    blocked_reasons: string[];
+  funnel: {
+    discovered: number;
+    qualified: number;
+    contacted: number;
+    opened: number;
+    clicked: number;
+    replied: number;
+    won: number;
   };
-  today_queue: {
-    tier_a_count: number;
-    tier_b_count: number;
-    tier_c_count: number;
-    total_count: number;
+  queue_state: {
+    waiting_for_outreach: number;
+    awaiting_response: number;
+    stuck_over_5_days: number;
+  };
+  system_health: {
+    open_rate: number;
+    reply_rate: number;
+    conversion_rate: number;
   };
 }
 
@@ -56,94 +61,97 @@ async function getMorningBrief(): Promise<MorningBriefData> {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    // Get last orchestration run
-    let lastRun = null;
+    // Get overnight activity
+    let overnight = { discovered: 0, qualified: 0 };
     try {
       const lastRunResult = await sql`
-        SELECT
-          started_at,
-          status,
-          discovery_count,
-          leads_created,
-          failures
+        SELECT discovery_count, leads_created
         FROM b2b_orchestration_logs
         ORDER BY started_at DESC
         LIMIT 1
       `;
-      lastRun = lastRunResult.length > 0 ? lastRunResult[0] : null;
+      if (lastRunResult.length > 0) {
+        overnight = {
+          discovered: lastRunResult[0].discovery_count || 0,
+          qualified: lastRunResult[0].leads_created || 0
+        };
+      }
     } catch (err) {
-      console.warn('[B2B] Failed to fetch orchestration logs:', err instanceof Error ? err.message : String(err));
+      console.warn('[B2B] Failed to fetch overnight activity:', err instanceof Error ? err.message : String(err));
     }
 
-    // Get standing order issues
-    let soIssues = null;
+    // Get conversion funnel
+    let funnel = {
+      discovered: 0,
+      qualified: 0,
+      contacted: 0,
+      opened: 0,
+      clicked: 0,
+      replied: 0,
+      won: 0
+    };
     try {
-      const soIssuesResult = await sql`
+      const funnelResult = await sql`
         SELECT
-          COUNT(*) as total_active,
-          COUNT(*) FILTER (WHERE pickup_postcode IS NULL OR delivery_postcode IS NULL) as blocked_count
-        FROM b2b_standing_orders
-        WHERE active = true
-      `;
-      soIssues = soIssuesResult[0];
-    } catch (err) {
-      console.warn('[B2B] Failed to fetch standing orders:', err instanceof Error ? err.message : String(err));
-    }
-
-    // Get blocked standing order reasons
-    let blockedReasons: string[] = [];
-    try {
-      const blockedSOResult = await sql`
-        SELECT DISTINCT
-          CASE
-            WHEN pickup_postcode IS NULL THEN 'Missing pickup postcode'
-            WHEN delivery_postcode IS NULL THEN 'Missing delivery postcode'
-            ELSE 'Unknown'
-          END as reason
-        FROM b2b_standing_orders
-        WHERE active = true
-          AND (pickup_postcode IS NULL OR delivery_postcode IS NULL)
-      `;
-      blockedReasons = blockedSOResult.map((r: any) => r.reason);
-    } catch (err) {
-      console.warn('[B2B] Failed to fetch blocked SO reasons:', err instanceof Error ? err.message : String(err));
-    }
-
-    // Get today queue stats
-    let queueStats = null;
-    try {
-      const queueStatsResult = await sql`
-        SELECT
-          COUNT(*) FILTER (WHERE lead_tier = 'A') as tier_a,
-          COUNT(*) FILTER (WHERE lead_tier = 'B') as tier_b,
-          COUNT(*) FILTER (WHERE lead_tier = 'C') as tier_c,
-          COUNT(*) as total
+          COUNT(*) as discovered,
+          COUNT(*) FILTER (WHERE lead_tier IS NOT NULL) as qualified,
+          COUNT(*) FILTER (WHERE email_sent_at IS NOT NULL) as contacted,
+          COUNT(*) FILTER (WHERE status IN ('warm', 'engaged')) as opened,
+          COUNT(*) FILTER (WHERE status = 'engaged') as clicked,
+          COUNT(*) FILTER (WHERE status = 'qualified') as replied,
+          COUNT(*) FILTER (WHERE status = 'won') as won
         FROM b2b_leads
-        WHERE lead_tier IN ('A', 'B', 'C')
       `;
-      queueStats = queueStatsResult[0];
+      if (funnelResult.length > 0) {
+        const row = funnelResult[0] as any;
+        funnel = {
+          discovered: row.discovered || 0,
+          qualified: row.qualified || 0,
+          contacted: row.contacted || 0,
+          opened: row.opened || 0,
+          clicked: row.clicked || 0,
+          replied: row.replied || 0,
+          won: row.won || 0
+        };
+      }
     } catch (err) {
-      console.warn('[B2B] Failed to fetch queue stats:', err instanceof Error ? err.message : String(err));
+      console.warn('[B2B] Failed to fetch conversion funnel:', err instanceof Error ? err.message : String(err));
     }
+
+    // Get queue state
+    let queueState = { waiting_for_outreach: 0, awaiting_response: 0, stuck_over_5_days: 0 };
+    try {
+      const queueResult = await sql`
+        SELECT
+          COUNT(*) FILTER (WHERE email_sent_at IS NULL) as waiting_for_outreach,
+          COUNT(*) FILTER (WHERE email_sent_at IS NOT NULL AND status = 'new') as awaiting_response,
+          COUNT(*) FILTER (WHERE email_sent_at IS NOT NULL AND created_at < NOW() - INTERVAL '5 days' AND status = 'new') as stuck_over_5_days
+        FROM b2b_leads
+      `;
+      if (queueResult.length > 0) {
+        queueState = {
+          waiting_for_outreach: queueResult[0].waiting_for_outreach || 0,
+          awaiting_response: queueResult[0].awaiting_response || 0,
+          stuck_over_5_days: queueResult[0].stuck_over_5_days || 0
+        };
+      }
+    } catch (err) {
+      console.warn('[B2B] Failed to fetch queue state:', err instanceof Error ? err.message : String(err));
+    }
+
+    // Calculate system health
+    const open_rate = funnel.contacted > 0 ? Math.round((funnel.opened / funnel.contacted) * 100) : 0;
+    const reply_rate = funnel.contacted > 0 ? Math.round((funnel.replied / funnel.contacted) * 100) : 0;
+    const conversion_rate = funnel.qualified > 0 ? Math.round((funnel.won / funnel.qualified) * 100) : 0;
 
     return {
-      lastRun: {
-        timestamp: lastRun?.started_at ? new Date(lastRun.started_at).toISOString() : 'Never',
-        status: lastRun?.status || null,
-        discovered: lastRun?.discovery_count || 0,
-        leads_created: lastRun?.leads_created || 0,
-        failures: lastRun?.failures || []
-      },
-      standing_orders_issues: {
-        total_active: soIssues?.total_active || 0,
-        blocked_count: soIssues?.blocked_count || 0,
-        blocked_reasons: blockedReasons
-      },
-      today_queue: {
-        tier_a_count: queueStats?.tier_a || 0,
-        tier_b_count: queueStats?.tier_b || 0,
-        tier_c_count: queueStats?.tier_c || 0,
-        total_count: queueStats?.total || 0
+      overnight,
+      funnel,
+      queue_state: queueState,
+      system_health: {
+        open_rate,
+        reply_rate,
+        conversion_rate
       }
     };
   } catch (err) {
@@ -154,23 +162,25 @@ async function getMorningBrief(): Promise<MorningBriefData> {
 
 function getDefaultBrief(): MorningBriefData {
   return {
-    lastRun: {
-      timestamp: 'Never',
-      status: null,
+    overnight: { discovered: 0, qualified: 0 },
+    funnel: {
       discovered: 0,
-      leads_created: 0,
-      failures: []
+      qualified: 0,
+      contacted: 0,
+      opened: 0,
+      clicked: 0,
+      replied: 0,
+      won: 0
     },
-    standing_orders_issues: {
-      total_active: 0,
-      blocked_count: 0,
-      blocked_reasons: []
+    queue_state: {
+      waiting_for_outreach: 0,
+      awaiting_response: 0,
+      stuck_over_5_days: 0
     },
-    today_queue: {
-      tier_a_count: 0,
-      tier_b_count: 0,
-      tier_c_count: 0,
-      total_count: 0
+    system_health: {
+      open_rate: 0,
+      reply_rate: 0,
+      conversion_rate: 0
     }
   };
 }
@@ -194,14 +204,17 @@ async function getRealProspects(): Promise<ProspectData[]> {
           bl.email,
           bl.email_sent_at,
           bl.engagement_score,
-          bl.lead_tier
+          bl.lead_tier,
+          bl.status
         FROM b2b_leads bl
         ORDER BY
           CASE
-            WHEN bl.lead_tier = 'A' THEN 1
-            WHEN bl.lead_tier = 'B' THEN 2
-            WHEN bl.lead_tier = 'C' THEN 3
-            ELSE 4
+            WHEN bl.email_sent_at IS NULL THEN 1
+            ELSE 2
+          END,
+          CASE
+            WHEN bl.status IN ('warm', 'engaged') THEN 1
+            ELSE 2
           END,
           bl.engagement_score DESC,
           bl.created_at DESC
@@ -212,25 +225,30 @@ async function getRealProspects(): Promise<ProspectData[]> {
       return [];
     }
 
-    return leads.map((lead: any) => ({
-      id: lead.id,
-      business_name: lead.business_name,
-      business_category: lead.business_category,
-      email: lead.email || undefined,
-      last_contacted_at: lead.email_sent_at || undefined,
-      engagement_score: lead.engagement_score || 0,
-      lead_tier: lead.lead_tier,
-      opportunity: `Exploring partnership opportunities with ${lead.business_name}.`,
-      context: `This ${lead.business_category} business has been identified as a qualified opportunity based on commercial signals.`,
-      recommendation: `Contact to discuss how we can support ${lead.business_name}'s growth.`,
-      executiveSummary: `Tier-${lead.lead_tier || 'C'} opportunity with engagement score ${lead.engagement_score}/100.`,
-      evidence: [
-        `Discovered via autonomous discovery pipeline`,
-        `Category: ${lead.business_category}`,
-        `Engagement Score: ${lead.engagement_score}/100`,
-        `Lead Tier: ${lead.lead_tier || 'C'}`
-      ]
-    }));
+    return leads.map((lead: any) => {
+      const isContacted = !!lead.email_sent_at;
+      const state = !isContacted ? 'Waiting for outreach' : lead.status === 'warm' ? 'Awaiting response' : lead.status === 'engaged' ? 'Engaged' : 'New';
+
+      return {
+        id: lead.id,
+        business_name: lead.business_name,
+        business_category: lead.business_category,
+        email: lead.email || undefined,
+        last_contacted_at: lead.email_sent_at || undefined,
+        engagement_score: lead.engagement_score || 0,
+        lead_tier: lead.lead_tier,
+        opportunity: `${state} — ${lead.business_name}`,
+        context: `Current stage: ${state}. This prospect is ${!isContacted ? 'ready for initial outreach' : 'awaiting our response'}.`,
+        recommendation: !isContacted ? `Send first outreach email` : `Follow up with sequence`,
+        executiveSummary: `State: ${state} | Score: ${lead.engagement_score}/100 | Category: ${lead.business_category}`,
+        evidence: [
+          `Status: ${state}`,
+          isContacted ? `First contacted: ${new Date(lead.email_sent_at).toLocaleDateString()}` : 'Not yet contacted',
+          `Category: ${lead.business_category}`,
+          `Engagement: ${lead.engagement_score}/100`
+        ]
+      };
+    });
   } catch (err) {
     console.error('[B2B] Fatal error in getRealProspects:', err instanceof Error ? err.message : String(err));
     return [];
@@ -246,16 +264,6 @@ export default async function B2BTodayPage() {
 
   const brief = await getMorningBrief();
   const prospects = await getRealProspects();
-
-  const formatTime = (iso: string) => {
-    if (iso === 'Never') return 'Never';
-    const date = new Date(iso);
-    const today = new Date();
-    const isToday = date.toDateString() === today.toDateString();
-    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-    const day = isToday ? 'Today' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${day} at ${time}`;
-  };
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -283,103 +291,104 @@ export default async function B2BTodayPage() {
         </div>
       </div>
 
-      {/* MORNING BRIEF — PHASE 0: VISIBILITY */}
+      {/* MORNING BRIEF — SYSTEM MOVEMENT */}
       <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded px-6 py-5 mb-12">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          Morning Brief
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-6">
+          System Movement
         </p>
 
-        {/* Row 1: Last orchestration */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
+        {/* Row 1: Overnight activity & alerts */}
+        <div className="grid grid-cols-2 gap-8 mb-8 pb-8 border-b border-[#E8E8E8]">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              Last Run
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+              What Happened Overnight
             </p>
-            <p className="text-sm text-[#0D0D0D]">
-              {formatTime(brief.lastRun.timestamp)}
-            </p>
-            <p className={`text-[10px] font-semibold uppercase tracking-[0.1em] mt-2 ${
-              brief.lastRun.status === 'success' ? 'text-[#0D0D0D]' : 'text-[#666666]'
-            }`}>
-              {brief.lastRun.status === 'success' ? '✅ Success' : brief.lastRun.status === 'partial_failure' ? '⚠️ Partial Failure' : brief.lastRun.status === 'failure' ? '❌ Failed' : '—'}
-            </p>
-          </div>
-
-          {/* Row 1: Discovery stats */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              Overnight Activity
-            </p>
-            <p className="text-sm text-[#0D0D0D]">
-              <span className="font-semibold">{brief.lastRun.discovered}</span> discovered, <span className="font-semibold">{brief.lastRun.leads_created}</span> qualified
-            </p>
-          </div>
-        </div>
-
-        {/* Row 2: Today's queue */}
-        <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-[#E8E8E8]">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              Tier A
-            </p>
-            <p className="text-lg font-black text-[#0D0D0D]">
-              {brief.today_queue.tier_a_count}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              Tier B
-            </p>
-            <p className="text-lg font-black text-[#0D0D0D]">
-              {brief.today_queue.tier_b_count}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              Tier C
-            </p>
-            <p className="text-lg font-black text-[#0D0D0D]">
-              {brief.today_queue.tier_c_count}
-            </p>
-          </div>
-        </div>
-
-        {/* Row 3: System status & blockers */}
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-              System Status
-            </p>
-            <p className="text-sm text-[#0D0D0D]">
-              ✅ Discovery Active
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-[#0D0D0D]">
+                <span className="font-semibold">{brief.overnight.discovered}</span> discovered
+              </p>
+              <p className="text-sm text-[#0D0D0D]">
+                <span className="font-semibold">{brief.overnight.qualified}</span> qualified
+              </p>
+            </div>
           </div>
 
           <div>
-            {brief.standing_orders_issues.blocked_count > 0 ? (
+            {brief.queue_state.stuck_over_5_days > 0 ? (
               <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-                  ⚠️ Issues
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                  ⚠️ Attention Required
                 </p>
                 <p className="text-sm text-[#0D0D0D]">
-                  {brief.standing_orders_issues.blocked_count} standing order{brief.standing_orders_issues.blocked_count !== 1 ? 's' : ''} blocked
+                  <span className="font-semibold">{brief.queue_state.stuck_over_5_days}</span> prospect{brief.queue_state.stuck_over_5_days !== 1 ? 's' : ''} stuck 5+ days without response
                 </p>
-                <ul className="text-[10px] text-[#666666] mt-2 space-y-1">
-                  {brief.standing_orders_issues.blocked_reasons.slice(0, 2).map((reason, i) => (
-                    <li key={i}>• {reason}</li>
-                  ))}
-                </ul>
               </>
             ) : (
               <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
-                  Standing Orders
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-3">
+                  Status
                 </p>
                 <p className="text-sm text-[#0D0D0D]">
-                  {brief.standing_orders_issues.total_active} active, no issues
+                  ✅ All prospects being worked
                 </p>
               </>
             )}
+          </div>
+        </div>
+
+        {/* Row 2: Conversion funnel */}
+        <div className="mb-8 pb-8 border-b border-[#E8E8E8]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-4">
+            Conversion Funnel
+          </p>
+          <div className="grid grid-cols-7 gap-2">
+            <div>
+              <p className="text-[10px] text-[#888888] mb-1">Discovered</p>
+              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.discovered}</p>
+            </div>
+            <div className="flex items-end justify-center text-[#666666]">→</div>
+            <div>
+              <p className="text-[10px] text-[#888888] mb-1">Qualified</p>
+              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.qualified}</p>
+            </div>
+            <div className="flex items-end justify-center text-[#666666]">→</div>
+            <div>
+              <p className="text-[10px] text-[#888888] mb-1">Contacted</p>
+              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.contacted}</p>
+            </div>
+            <div className="flex items-end justify-center text-[#666666]">→</div>
+            <div>
+              <p className="text-[10px] text-[#888888] mb-1">Replied</p>
+              <p className="text-lg font-black text-[#0D0D0D]">{brief.funnel.replied}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Today's queue state */}
+        <div className="grid grid-cols-3 gap-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+              Waiting for Outreach
+            </p>
+            <p className="text-2xl font-black text-[#0D0D0D]">
+              {brief.queue_state.waiting_for_outreach}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+              Awaiting Response
+            </p>
+            <p className="text-2xl font-black text-[#0D0D0D]">
+              {brief.queue_state.awaiting_response}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">
+              Open Rate
+            </p>
+            <p className="text-2xl font-black text-[#0D0D0D]">
+              {brief.system_health.open_rate}%
+            </p>
           </div>
         </div>
       </div>
@@ -389,22 +398,22 @@ export default async function B2BTodayPage() {
         Today Queue.
       </h1>
 
-      {/* SECTION 1: INTELLIGENCE BRIEF */}
+      {/* SECTION 1: TODAY'S FOCUS */}
       <div className="mb-12">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-          Intelligence Brief
+          Today's Focus
         </p>
         <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          <span className="font-semibold">{Math.min(prospects.length, 12)} opportunities</span> ranked and ready for outreach.
+          <span className="font-semibold">{brief.queue_state.waiting_for_outreach}</span> prospects waiting for first outreach.
         </p>
         <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          <span className="font-semibold">{prospects.filter(p => p.lead_tier === 'A').length} Tier-A</span>, <span className="font-semibold">{prospects.filter(p => p.lead_tier === 'B').length} Tier-B</span> in today's queue.
+          <span className="font-semibold">{brief.queue_state.awaiting_response}</span> prospects awaiting response to initial contact.
         </p>
         <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
-          Engagement scores range <span className="font-semibold">{Math.min(...prospects.map(p => p.engagement_score))}</span>–<span className="font-semibold">{Math.max(...prospects.map(p => p.engagement_score))}</span>.
+          System health: <span className="font-semibold">{brief.system_health.open_rate}%</span> open rate on contacted prospects.
         </p>
         <p className="text-base leading-relaxed text-[#666666]">
-          All leads discovered and qualified autonomously. No outreach sent yet.
+          {brief.queue_state.stuck_over_5_days > 0 ? `⚠️ ${brief.queue_state.stuck_over_5_days} prospect(s) stuck 5+ days without response.` : '✅ All prospects being actively worked.'}
         </p>
       </div>
 
