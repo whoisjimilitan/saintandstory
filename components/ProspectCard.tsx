@@ -17,6 +17,8 @@ interface ProspectCardProps {
   evidence?: string[];
 }
 
+type EmailState = 'idle' | 'loading' | 'success' | 'error';
+
 export default function ProspectCard({
   prospect,
   opportunity,
@@ -26,6 +28,43 @@ export default function ProspectCard({
   evidence = [],
 }: ProspectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [emailState, setEmailState] = useState<EmailState>('idle');
+  const [emailError, setEmailError] = useState<string>('');
+
+  const sendEmail = async () => {
+    if (!prospect.email) {
+      setEmailError('No email address available');
+      setEmailState('error');
+      return;
+    }
+
+    setEmailState('loading');
+    setEmailError('');
+
+    try {
+      const response = await fetch('/api/b2b/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: prospect.id,
+          subject: `Opportunity: ${prospect.business_name}`,
+          body: `${opportunity}\n\n${recommendation}`,
+          operator: 'operator@system'
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send email');
+      }
+
+      setEmailState('success');
+      setTimeout(() => setEmailState('idle'), 3000);
+    } catch (err) {
+      setEmailError(err instanceof Error ? err.message : 'Unknown error');
+      setEmailState('error');
+    }
+  };
 
   const lastReviewedLabel = prospect.last_contacted_at
     ? (() => {
@@ -126,10 +165,37 @@ export default function ProspectCard({
               </p>
             </div>
 
+            {/* Send Email Action */}
+            {prospect.email && (
+              <div>
+                <button
+                  onClick={sendEmail}
+                  disabled={emailState === 'loading'}
+                  className={`w-full px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] rounded transition-colors ${
+                    emailState === 'success'
+                      ? 'bg-[#0D0D0D] text-white'
+                      : emailState === 'error'
+                      ? 'bg-[#0D0D0D] text-white opacity-75'
+                      : 'bg-[#0D0D0D] text-white hover:bg-[#333333]'
+                  } ${emailState === 'loading' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {emailState === 'loading' && 'Sending...'}
+                  {emailState === 'success' && '✅ Email Sent'}
+                  {emailState === 'error' && 'Error — Try Again'}
+                  {emailState === 'idle' && 'Send Email'}
+                </button>
+                {emailError && (
+                  <p className="text-[10px] text-[#666666] mt-2">
+                    {emailError}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Operator Feedback */}
             <div>
               <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-2">
-                Operator Feedback
+                Outcome Feedback
               </h4>
               <div className="flex gap-3 flex-wrap">
                 <button className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] hover:text-[#666666] transition-colors">
