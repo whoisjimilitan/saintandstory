@@ -406,35 +406,46 @@ export default async function B2BTodayPage() {
           Good Morning.
         </h1>
 
-        {/* Executive Summary — Chief of Staff Brief */}
+        {/* PRESSURE ENGINE — Forces Immediate Action */}
         <div className="bg-white border border-[#E8E8E8] rounded px-8 py-8 mb-12">
-          <div className="space-y-3">
-            <p className="text-base leading-relaxed text-[#0D0D0D]">
-              <span className="font-semibold">{brief.overnight.discovered}</span> new opportunity{brief.overnight.discovered !== 1 ? 's' : ''} found overnight.
-            </p>
-            <p className="text-base leading-relaxed text-[#0D0D0D]">
-              <span className="font-semibold">{brief.queue_state.waiting_for_outreach}</span> conversation{brief.queue_state.waiting_for_outreach !== 1 ? 's' : ''} waiting for your attention.
-            </p>
-            <p className="text-base leading-relaxed text-[#0D0D0D]">
-              <span className="font-semibold">{brief.funnel.opened}</span> prospect{brief.funnel.opened !== 1 ? 's' : ''} engaged but have not replied.
-            </p>
+          <div className="space-y-4">
+            {brief.overnight.discovered > 0 && (
+              <p className="text-base leading-relaxed text-[#0D0D0D]">
+                <span className="font-semibold text-[#0D0D0D]">{brief.overnight.discovered} high-intent opportunity{brief.overnight.discovered !== 1 ? 'ies' : ''} require outreach today.</span>
+              </p>
+            )}
+
+            {brief.queue_state.waiting_for_outreach > 0 && (
+              <p className="text-base leading-relaxed text-[#0D0D0D]">
+                <span className="font-semibold text-[#0D0D0D]">{brief.queue_state.waiting_for_outreach} conversation{brief.queue_state.waiting_for_outreach !== 1 ? 's' : ''} at risk of going cold</span> — follow-up needed.
+              </p>
+            )}
+
             {brief.queue_state.stuck_over_5_days > 0 && (
               <p className="text-base leading-relaxed text-[#CC6600]">
-                <span className="font-semibold">{brief.queue_state.stuck_over_5_days}</span> standing order{brief.queue_state.stuck_over_5_days !== 1 ? 's' : ''} require{brief.queue_state.stuck_over_5_days === 1 ? 's' : ''} action.
+                <span className="font-semibold text-[#CC6600]">{brief.queue_state.stuck_over_5_days} revenue stream blocked</span> — preventing job creation.
+              </p>
+            )}
+
+            {brief.funnel.replied === 0 && brief.queue_state.waiting_for_outreach > 0 && (
+              <p className="text-base leading-relaxed text-[#0D0D0D]">
+                <span className="font-semibold text-[#0D0D0D]">Zero replies detected</span> — outreach copy requires review.
               </p>
             )}
           </div>
         </div>
 
-        {/* Recommended Focus */}
-        <div className="mb-12">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            Your Focus Today
-          </p>
-          <p className="text-lg font-semibold text-[#0D0D0D]">
-            {prospects.length > 0 ? `Start with ${prospects[0].business_name}` : 'Review waiting conversations'}
-          </p>
-        </div>
+        {/* PRIORITY ACTION — Single Focus Point */}
+        {prospects.length > 0 && (
+          <div className="mb-12 bg-[#0D0D0D] text-white rounded px-8 py-6">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] mb-2 opacity-75">
+              Priority Action
+            </p>
+            <p className="text-lg font-semibold">
+              {prospects[0].business_name} — follow up today.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* TODAY'S WORK — Execution Section */}
