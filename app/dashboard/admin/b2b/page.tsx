@@ -1,9 +1,9 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import ProspectCard from "@/components/ProspectCard";
-import Link from "next/link";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -22,109 +22,102 @@ interface Lead {
   last_contacted_at?: string;
 }
 
-// Category-based insights aligned with Today Queue Design Constitution
 const categoryInsights: Record<
   string,
   {
     opportunity: string
     context: string
     recommendation: string
-    whyItMatters: string
+    executiveSummary: string
     evidence: string[]
   }
 > = {
   florist: {
-    opportunity: "Likely in peak demand season with high event booking potential.",
-    context: "Florists experience 40% revenue swings between seasons. Event-focused businesses show the strongest growth metrics.",
-    recommendation: "Initiate outreach within the next 5 days.",
-    whyItMatters: "Seasonal peaks are time-sensitive. Early engagement during high-demand periods doubles conversion probability.",
+    opportunity: "Expanding service capacity with high event booking pressure.",
+    context: "Florists experience peak demand seasons. Vendors supporting expansion during high-demand windows capture long-term contracts.",
+    recommendation: "Contact before procurement cycle begins.",
+    executiveSummary: "Commercial signals suggest expansion into new service categories. Timing is optimal for vendor evaluation.",
     evidence: [
-      "Recent hiring activity indicates capacity expansion",
-      "Regional event calendar shows 60+ events in next quarter",
-      "Website recent updates suggest active marketing"
+      "Recent hiring activity",
+      "Event calendar shows peak season approaching",
+      "Website updates indicate active marketing"
     ]
   },
   accountant: {
-    opportunity: "Likely approaching year-end planning cycle with process improvement budget.",
-    context: "Accountants face highest profit per employee in professional services. Process automation directly increases billable utilization.",
-    recommendation: "Send efficiency assessment within the next 7 days.",
-    whyItMatters: "Year-end budget cycles determine Q1-Q2 spending. Early positioning wins prioritization in budget discussions.",
+    opportunity: "Planning year-end process improvements with budget allocation.",
+    context: "Year-end planning cycles determine Q1-Q2 vendor priorities. Early engagement wins budget prioritization.",
+    recommendation: "Send assessment proposal within 7 days.",
+    executiveSummary: "Planning phase signals readiness for efficiency tools. Budget cycles are underway.",
     evidence: [
-      "Recent staff additions indicate growth phase",
-      "Tax season intensity approaching suggests capacity strain",
-      "Competitor analysis shows interest in similar solutions"
+      "Staff additions indicate growth",
+      "Tax season timing suggests capacity strain",
+      "Competitor movement shows active market evaluation"
     ]
   },
   dental: {
-    opportunity: "Likely facing patient acquisition pressure with high service capacity.",
-    context: "Dental practices operate at 60-70% capacity on average. Patient acquisition is the primary growth lever.",
-    recommendation: "Initiate conversation within the next 10 days.",
-    whyItMatters: "Practices with excess capacity are highly motivated buyers. Timing advantage lasts 2-3 months before alternate solutions are sought.",
+    opportunity: "Managing high service capacity with patient acquisition focus.",
+    context: "Dental practices at capacity are highly motivated buyers. Excess capacity improves deal probability.",
+    recommendation: "Initiate conversation within 10 days.",
+    executiveSummary: "Capacity signals suggest vendor evaluation window. Practice is positioned to invest.",
     evidence: [
-      "Recent expansion into new service areas",
-      "Online reviews show strong ratings but declining new patient mentions",
-      "Website redesign suggests marketing refresh initiative"
+      "Service expansion recent",
+      "Reviews strong but new patient acquisition declining",
+      "Marketing refresh suggests new strategy"
     ]
   },
   removal: {
-    opportunity: "Likely experiencing seasonal pipeline volatility with underutilized capacity.",
-    context: "Removal companies live month-to-month on job availability. Consistent pipeline visibility reduces team idle time and improves margin.",
-    recommendation: "Initiate outreach within the next 7 days.",
-    whyItMatters: "Q3 pipeline uncertainty drives highest urgency. Early contracts secure summer capacity and improve crew scheduling.",
+    opportunity: "Managing seasonal capacity volatility with pipeline planning.",
+    context: "Seasonal companies benefit most from pipeline visibility. Early contracts secure capacity.",
+    recommendation: "Contact within 7 days.",
+    executiveSummary: "Seasonal signals indicate planning phase. Timing advantage is time-limited.",
     evidence: [
-      "Seasonal hiring pattern indicates upcoming busy season",
-      "Recent fleet maintenance suggests preparation for high-volume period",
-      "Website job listings higher than same period last year"
+      "Seasonal hiring pattern underway",
+      "Fleet maintenance suggests preparation",
+      "Job listings higher than historical baseline"
     ]
   },
   restaurant: {
-    opportunity: "Likely planning Q3 marketing refresh with customer acquisition focus.",
-    context: "Restaurants operate on 5-10% profit margins. Customer acquisition and retention directly impact survival. Off-season planning improves execution.",
-    recommendation: "Send marketing automation proposal within the next 5 days.",
-    whyItMatters: "Off-peak seasons are ideal for strategic planning. Early engagement ensures systems are live before peak season.",
+    opportunity: "Planning Q3 customer acquisition strategy.",
+    context: "Off-peak planning improves execution. Early engagement ensures systems are live before peak.",
+    recommendation: "Contact within 5 days.",
+    executiveSummary: "Strategic planning phase detected. Optimal timing for implementation discussion.",
     evidence: [
-      "Recent promotion activity on social channels",
-      "Menu updates visible on review platforms",
-      "Staffing announcements suggest new management focus"
+      "Promotion activity on social channels",
+      "Menu updates suggest strategy refresh",
+      "Management changes indicate new focus"
     ]
   },
   legal: {
-    opportunity: "Likely preparing for business development cycle with client expansion focus.",
-    context: "Law firms profit from client lifetime value and expansion. Relationship infrastructure directly increases per-client revenue.",
-    recommendation: "Initiate conversation within the next 10 days.",
-    whyItMatters: "Planning cycles are annual. Early engagement during strategy phase wins implementation priority.",
+    opportunity: "Preparing business development cycle with expansion focus.",
+    context: "Planning cycles are annual. Early engagement wins implementation priority.",
+    recommendation: "Contact within 10 days.",
+    executiveSummary: "Strategic planning phase detected. Early positioning improves prioritization.",
     evidence: [
-      "Recent practice area expansion detected",
-      "Team additions in business development roles",
-      "Market analysis shows competitor movement in adjacent practice areas"
+      "Practice area expansion underway",
+      "BD team additions recent",
+      "Market movement suggests evaluation phase"
     ]
   },
 };
 
 async function getTodayQueue(): Promise<Lead[]> {
-  if (!process.env.DATABASE_URL) {
-    console.log("[TODAY] No DATABASE_URL");
-    return [];
-  }
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     await ensureB2BSchema();
-  } catch (schemaError) {
-    console.error("[TODAY] Schema initialization failed:", schemaError);
+  } catch {
     return [];
   }
 
   const sql = neon(process.env.DATABASE_URL);
 
   try {
-    // Get prospects ready to contact (Today Queue)
     const leads = (await sql`
       SELECT
         id,
         business_name,
         business_category,
         email,
-        pain_point,
         engagement_score,
         last_contacted_at
       FROM b2b_leads
@@ -134,10 +127,8 @@ async function getTodayQueue(): Promise<Lead[]> {
       LIMIT 12
     `) as Lead[];
 
-    console.log(`[TODAY] Found ${leads.length} prospects ready today`);
     return leads;
-  } catch (error) {
-    console.error("[TODAY] Database error:", error);
+  } catch {
     return [];
   }
 }
@@ -151,86 +142,114 @@ export default async function B2BTodayPage() {
 
   const prospects = await getTodayQueue();
 
-  // Map insights based on category
   const prospectsWithInsights = prospects.map((prospect) => {
     const category = prospect.business_category?.toLowerCase() || "default";
     const insights = categoryInsights[category as keyof typeof categoryInsights] || {
-      opportunity: "Process improvement could unlock growth",
-      context: "Strong commercial signals detected",
-      recommendation: "Initiate outreach within the next 7 days",
-      whyItMatters: "Optimal timing for engagement",
-      evidence: [
-        "No recent contact",
-        "Shows growth signals"
-      ]
+      opportunity: "Commercial signals detected.",
+      context: "Optimal timing for engagement.",
+      recommendation: "Initiate contact within 7 days.",
+      executiveSummary: "Strong commercial positioning.",
+      evidence: []
     };
     return { ...prospect, ...insights };
   });
 
-  // Intelligence Brief stats
-  const totalProspects = prospectsWithInsights.length;
-  const strongSignals = prospectsWithInsights.filter(p =>
-    p.evidence?.some(e => e.toLowerCase().includes("expansion") || e.toLowerCase().includes("hiring"))
+  const strong = prospectsWithInsights.filter(p =>
+    p.evidence?.some(e => e.toLowerCase().includes("expansion") || e.toLowerCase().includes("recent"))
   ).length;
-  const notContacted = prospectsWithInsights.filter(p => !p.last_contacted_at).length;
+  const uncontacted = prospectsWithInsights.filter(p => !p.last_contacted_at).length;
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
-      {/* Navigation pills matching Admin design language */}
+      {/* Navigation */}
       <div className="flex items-center justify-between mb-1">
         <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
           Admin ↻
         </Link>
-        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] border border-[#0D0D0D] px-3 py-1 rounded-full">
-          B2B Today
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] border border-[#0D0D0D] px-3 py-1 rounded-full">
+            Today
+          </Link>
+          <Link href="/dashboard/admin/b2b/pipeline" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+            Pipeline
+          </Link>
+          <Link href="/dashboard/admin/b2b/discovery" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+            Discovery
+          </Link>
+          <Link href="/dashboard/admin/b2b/orders" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+            Orders
+          </Link>
+          <Link href="/dashboard/admin/b2b/analytics" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+            Analytics
+          </Link>
+        </div>
       </div>
 
-      {/* Header matching Admin typography */}
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
-        Intelligence.
+      {/* Page Title */}
+      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
+        Today Queue.
       </h1>
 
-      {/* Intelligence Brief */}
-      <div className="mb-8">
-        <p className="text-sm leading-relaxed text-[#666666]">
-          <span className="font-semibold text-[#0D0D0D]">{totalProspects} {totalProspects === 1 ? "opportunity" : "opportunities"}</span> require attention today.
+      {/* SECTION 1: INTELLIGENCE BRIEF */}
+      <div className="mb-12">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
+          Intelligence Brief
         </p>
-        {totalProspects > 0 && (
-          <p className="text-sm leading-relaxed text-[#666666] mt-2">
-            {strongSignals} {strongSignals === 1 ? "shows" : "show"} unusually strong commercial signals. {notContacted} {notContacted === 1 ? "has" : "have"} not been contacted yet.
-          </p>
+        <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
+          <span className="font-semibold">{prospectsWithInsights.length} {prospectsWithInsights.length === 1 ? "opportunity" : "opportunities"}</span> currently exceed action threshold.
+        </p>
+        {prospectsWithInsights.length > 0 && (
+          <>
+            <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
+              <span className="font-semibold">{strong}</span> {strong === 1 ? "displays" : "display"} unusually strong commercial signals.
+            </p>
+            <p className="text-base leading-relaxed text-[#0D0D0D] mb-2">
+              <span className="font-semibold">{uncontacted}</span> {uncontacted === 1 ? "requires" : "require"} operator review.
+            </p>
+            <p className="text-base leading-relaxed text-[#666666]">
+              Discovery continues autonomously.
+            </p>
+          </>
         )}
       </div>
 
-      {/* Empty State - Intelligence-oriented */}
-      {prospectsWithInsights.length === 0 ? (
-        <div className="py-12">
-          <p className="text-sm text-[#666666] mb-3">
-            No opportunities currently require attention.
-          </p>
-          <p className="text-sm text-[#888888]">
-            Discovery continues autonomously. New opportunities will appear here when commercial signals exceed threshold.
-          </p>
-        </div>
-      ) : (
+      {/* SECTION 2: TODAY'S OPPORTUNITIES */}
+      {prospectsWithInsights.length > 0 && (
         <>
-          {/* Prospect Queue */}
-          <div className="space-y-4 mb-8">
-            {prospectsWithInsights.map((prospect) => (
-              <ProspectCard
-                key={prospect.id}
-                prospect={prospect}
-                opportunity={prospect.opportunity}
-                context={prospect.context}
-                recommendation={prospect.recommendation}
-                whyItMatters={prospect.whyItMatters}
-                evidence={prospect.evidence}
-              />
-            ))}
+          <div className="mb-8">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+              Today's Opportunities
+            </p>
+
+            {/* SECTION 3: QUEUE */}
+            <div className="space-y-4">
+              {prospectsWithInsights.map((prospect) => (
+                <ProspectCard
+                  key={prospect.id}
+                  prospect={prospect}
+                  opportunity={prospect.opportunity}
+                  context={prospect.context}
+                  recommendation={prospect.recommendation}
+                  executiveSummary={prospect.executiveSummary}
+                  evidence={prospect.evidence}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
+
+      {/* SECTION 4: SYSTEM STATUS */}
+      <div className="mt-12 pt-8 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+          System Status
+        </p>
+        <div className="flex gap-4 text-[10px] text-[#888888]">
+          <span>Discovery active.</span>
+          <span>Enrichment active.</span>
+          <span>Learning active.</span>
+        </div>
+      </div>
     </div>
   );
 }
