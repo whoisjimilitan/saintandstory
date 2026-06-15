@@ -1,6 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { neon } from "@neondatabase/serverless";
+import { buildOperatingBrief } from "@/lib/operating-brief-builder";
 import GoodMorningSection from "@/components/GoodMorningSection";
 import TodaysWorkSection from "@/components/TodaysWorkSection";
 import WhatWeAreLearningSection from "@/components/WhatWeAreLearningSection";
@@ -16,21 +18,15 @@ const ADMIN_EMAILS = [
 
 async function getOperatingBrief() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/b2b/operating-brief`, {
-      headers: {
-        "Authorization": `Bearer ${process.env.INTERNAL_API_KEY || "dev-key"}`
-      }
-    });
-
-    if (!response.ok) {
-      console.warn("[B2B Home] Operating Brief API failed:", response.statusText);
+    if (!process.env.DATABASE_URL) {
+      console.warn("[B2B Home] DATABASE_URL not configured");
       return getDefaultBrief();
     }
 
-    return await response.json();
+    const sql = neon(process.env.DATABASE_URL);
+    return await buildOperatingBrief(sql);
   } catch (err) {
-    console.error("[B2B Home] Error fetching Operating Brief:", err);
+    console.error("[B2B Home] Error building Operating Brief:", err);
     return getDefaultBrief();
   }
 }
