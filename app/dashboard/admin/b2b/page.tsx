@@ -26,6 +26,106 @@ interface ProspectData {
   evidence: string[];
 }
 
+interface MorningBriefData {
+  lastRun: {
+    timestamp: string;
+    status: 'success' | 'partial_failure' | 'failure' | null;
+    discovered: number;
+    leads_created: number;
+    failures: string[];
+  };
+  standing_orders_issues: {
+    total_active: number;
+    blocked_count: number;
+    blocked_reasons: string[];
+  };
+  today_queue: {
+    tier_a_count: number;
+    tier_b_count: number;
+    tier_c_count: number;
+    total_count: number;
+  };
+}
+
+async function getMorningBrief(): Promise<MorningBriefData> {
+  const sql = neon(process.env.DATABASE_URL!);
+
+  // Get last orchestration run
+  const lastRunResult = await sql`
+    SELECT
+      started_at,
+      status,
+      discovery_count,
+      leads_created,
+      failures
+    FROM b2b_orchestration_logs
+    ORDER BY started_at DESC
+    LIMIT 1
+  `;
+
+  const lastRun = lastRunResult.length > 0 ? lastRunResult[0] : null;
+
+  // Get standing order issues
+  const soIssuesResult = await sql`
+    SELECT
+      COUNT(*) as total_active,
+      COUNT(*) FILTER (WHERE pickup_postcode IS NULL OR delivery_postcode IS NULL) as blocked_count
+    FROM b2b_standing_orders
+    WHERE active = true
+  `;
+
+  const soIssues = soIssuesResult[0];
+
+  // Get blocked standing order reasons
+  const blockedSOResult = await sql`
+    SELECT DISTINCT
+      CASE
+        WHEN pickup_postcode IS NULL THEN 'Missing pickup postcode'
+        WHEN delivery_postcode IS NULL THEN 'Missing delivery postcode'
+        ELSE 'Unknown'
+      END as reason
+    FROM b2b_standing_orders
+    WHERE active = true
+      AND (pickup_postcode IS NULL OR delivery_postcode IS NULL)
+  `;
+
+  const blockedReasons = blockedSOResult.map((r: any) => r.reason);
+
+  // Get today queue stats
+  const queueStatsResult = await sql`
+    SELECT
+      COUNT(*) FILTER (WHERE lead_tier = 'A') as tier_a,
+      COUNT(*) FILTER (WHERE lead_tier = 'B') as tier_b,
+      COUNT(*) FILTER (WHERE lead_tier = 'C') as tier_c,
+      COUNT(*) as total
+    FROM b2b_leads
+    WHERE lead_tier IN ('A', 'B', 'C')
+  `;
+
+  const queueStats = queueStatsResult[0];
+
+  return {
+    lastRun: {
+      timestamp: lastRun?.started_at ? new Date(lastRun.started_at).toISOString() : 'Never',
+      status: lastRun?.status || null,
+      discovered: lastRun?.discovery_count || 0,
+      leads_created: lastRun?.leads_created || 0,
+      failures: lastRun?.failures || []
+    },
+    standing_orders_issues: {
+      total_active: soIssues?.total_active || 0,
+      blocked_count: soIssues?.blocked_count || 0,
+      blocked_reasons: blockedReasons
+    },
+    today_queue: {
+      tier_a_count: queueStats?.tier_a || 0,
+      tier_b_count: queueStats?.tier_b || 0,
+      tier_c_count: queueStats?.tier_c || 0,
+      total_count: queueStats?.total || 0
+    }
+  };
+}
+
 async function getRealProspects(): Promise<ProspectData[]> {
   const sql = neon(process.env.DATABASE_URL!);
 
@@ -82,7 +182,18 @@ export default async function B2BTodayPage() {
   const email = user?.emailAddresses[0]?.emailAddress ?? "";
   if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
 
+  const brief = await getMorningBrief();
   const prospects = await getRealProspects();
+
+  const formatTime = (iso: string) => {
+    if (iso === 'Never') return 'Never';
+    const date = new Date(iso);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const day = isToday ? 'Today' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${day} at ${time}`;
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -107,6 +218,107 @@ export default async function B2BTodayPage() {
           <Link href="/dashboard/admin/b2b/analytics" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
             Analytics
           </Link>
+        </div>
+      </div>
+
+      {/* MORNING BRIEF — PHASE 0: VISIBILITY */}
+      <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded px-6 py-5 mb-12">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          Morning Brief
+        </p>
+
+        {/* Row 1: Last orchestration */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              Last Run
+            </p>
+            <p className="text-sm text-[#0D0D0D]">
+              {formatTime(brief.lastRun.timestamp)}
+            </p>
+            <p className={`text-[10px] font-semibold uppercase tracking-[0.1em] mt-2 ${
+              brief.lastRun.status === 'success' ? 'text-[#0D0D0D]' : 'text-[#666666]'
+            }`}>
+              {brief.lastRun.status === 'success' ? '✅ Success' : brief.lastRun.status === 'partial_failure' ? '⚠️ Partial Failure' : brief.lastRun.status === 'failure' ? '❌ Failed' : '—'}
+            </p>
+          </div>
+
+          {/* Row 1: Discovery stats */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              Overnight Activity
+            </p>
+            <p className="text-sm text-[#0D0D0D]">
+              <span className="font-semibold">{brief.lastRun.discovered}</span> discovered, <span className="font-semibold">{brief.lastRun.leads_created}</span> qualified
+            </p>
+          </div>
+        </div>
+
+        {/* Row 2: Today's queue */}
+        <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-[#E8E8E8]">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              Tier A
+            </p>
+            <p className="text-lg font-black text-[#0D0D0D]">
+              {brief.today_queue.tier_a_count}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              Tier B
+            </p>
+            <p className="text-lg font-black text-[#0D0D0D]">
+              {brief.today_queue.tier_b_count}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              Tier C
+            </p>
+            <p className="text-lg font-black text-[#0D0D0D]">
+              {brief.today_queue.tier_c_count}
+            </p>
+          </div>
+        </div>
+
+        {/* Row 3: System status & blockers */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+              System Status
+            </p>
+            <p className="text-sm text-[#0D0D0D]">
+              ✅ Discovery Active
+            </p>
+          </div>
+
+          <div>
+            {brief.standing_orders_issues.blocked_count > 0 ? (
+              <>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+                  ⚠️ Issues
+                </p>
+                <p className="text-sm text-[#0D0D0D]">
+                  {brief.standing_orders_issues.blocked_count} standing order{brief.standing_orders_issues.blocked_count !== 1 ? 's' : ''} blocked
+                </p>
+                <ul className="text-[10px] text-[#666666] mt-2 space-y-1">
+                  {brief.standing_orders_issues.blocked_reasons.slice(0, 2).map((reason, i) => (
+                    <li key={i}>• {reason}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-1">
+                  Standing Orders
+                </p>
+                <p className="text-sm text-[#0D0D0D]">
+                  {brief.standing_orders_issues.total_active} active, no issues
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
