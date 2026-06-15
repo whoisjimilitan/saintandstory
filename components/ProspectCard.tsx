@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface ProspectCardProps {
   prospect: {
@@ -278,6 +279,16 @@ export default function ProspectCard({
                 {recommendation}
               </p>
             </div>
+
+            {/* SECTION 5.5: VIEW FULL CONVERSATION INTELLIGENCE */}
+            {engagement?.sent_at && (
+              <Link
+                href={`/dashboard/admin/b2b/conversation/${prospect.id}`}
+                className="w-full px-4 py-3 text-sm font-semibold uppercase tracking-[0.05em] rounded border bg-white text-[#0D0D0D] border-[#E8E8E8] hover:border-[#D0D0D0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all inline-block text-center"
+              >
+                View Full Conversation
+              </Link>
+            )}
 
             {/* Send Email Action — Premium Button */}
             {prospect.email && (
