@@ -4,6 +4,23 @@
  * ONE unified scoring system:
  * LOGISTICS FIT SCORE (0–100)
  *
+ * CRITICAL NON-NEGOTIABLE
+ * ═════════════════════════
+ *
+ * This score is NOT:
+ * ❌ Predictive (does not estimate conversion probability)
+ * ❌ Revenue-focused (does not estimate deal value)
+ * ❌ Engagement-focused (does not measure response likelihood)
+ * ❌ A lead scoring model (not a CRM propensity score)
+ *
+ * This score IS:
+ * ✅ An operator prioritization tool
+ * ✅ A "Can we genuinely help?" score
+ * ✅ A decision filter: "Should we spend time on this?"
+ *
+ * WHAT IT MEASURES
+ * ═════════════════
+ *
  * Primary drivers (outcome-focused):
  * 1. Blocked business outcome plausibility
  * 2. Likelihood logistics contributes to the blockage
@@ -15,6 +32,18 @@
  * CRITICAL: The score is NOT an engagement score.
  * Heavy engagement with a non-logistics-solvable problem = low score.
  * Weak engagement with clear logistics friction = meaningful score.
+ *
+ * WHAT COMES NEXT
+ * ═════════════════
+ *
+ * Pattern Intelligence does the learning, not this score.
+ * Pattern Intelligence learns:
+ * - Which blocked outcomes create conversations
+ * - Which operational causes matter
+ * - Which logistics frictions repeat
+ *
+ * This score is the INPUT to Pattern Intelligence.
+ * Not the output.
  *
  * Only cases with score ≥ 60 enter Pattern Intelligence.
  * Only cases with score ≥ 75 enter Commercial Intelligence.
