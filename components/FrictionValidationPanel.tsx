@@ -1,164 +1,273 @@
 'use client';
 
-import type { FrictionValidation } from "@/lib/friction-intelligence";
+import type { ValidationIntelligence } from "@/lib/validation-intelligence";
 
 interface Props {
-  validation: FrictionValidation;
+  validation: ValidationIntelligence;
 }
 
 export function FrictionValidationPanel({ validation }: Props) {
-  const getValidationColor = (score: number) => {
+  const getConfidenceColor = (score: number) => {
     if (score >= 80) {
-      return { bg: "#E8F5E9", text: "#1B5E20", label: "Validated" };
+      return { bg: "#E8F5E9", text: "#1B5E20", label: "Confirmed" };
     } else if (score >= 60) {
-      return { bg: "#FFF8E5", text: "#CC6600", label: "Likely Real" };
+      return { bg: "#FFF8E5", text: "#CC6600", label: "Emerging" };
     } else if (score >= 40) {
-      return { bg: "#FFE5CC", text: "#CC5500", label: "Uncertain" };
+      return { bg: "#FFE5CC", text: "#CC5500", label: "Weak" };
     } else {
-      return { bg: "#FFE5E5", text: "#CC0000", label: "Unvalidated" };
+      return { bg: "#FFE5E5", text: "#CC0000", label: "None" };
     }
   };
 
-  const sentimentLabels = {
-    confirmed: "They confirmed this is the issue",
-    refined: "They corrected our understanding",
-    rejected: "They said this isn't the issue",
-    unknown: "Validation status unknown"
+  const getStatusBadgeColor = (status: string) => {
+    if (status === 'confirmed_reality') {
+      return { bg: "#E8F5E9", text: "#1B5E20" };
+    } else if (status === 'emerging_truth') {
+      return { bg: "#FFF8E5", text: "#CC6600" };
+    }
+    return { bg: "#FFE5E5", text: "#CC0000" };
   };
 
-  const color = getValidationColor(validation.friction_validation_score);
+  const problemColor = getConfidenceColor(validation.problem_validation_confidence);
+  const solutionColor = getConfidenceColor(validation.solution_validation_confidence);
+  const problemStatusColor = getStatusBadgeColor(validation.problem_status);
+  const solutionStatusColor = getStatusBadgeColor(validation.solution_status);
 
   return (
     <div className="bg-white border border-[#E8E8E8] rounded p-8 space-y-8">
       {/* HEADER */}
       <div>
+        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">
+          VALIDATION INTELLIGENCE
+        </h3>
+        <p className="text-[10px] text-[#888888]">
+          Evidence that confirms (or refutes) our diagnosis
+        </p>
+      </div>
+
+      <div className="border-t border-[#E8E8E8]"></div>
+
+      {/* PROBLEM VALIDATION */}
+      <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-[#0D0D0D]">
-            FRICTION VALIDATION
-          </h3>
+          <h4 className="text-sm font-semibold text-[#0D0D0D]">
+            PROBLEM VALIDATION
+          </h4>
           <span
             className="text-[10px] font-semibold uppercase tracking-[0.05em] px-3 py-1 rounded"
-            style={{ backgroundColor: color.bg, color: color.text }}
+            style={{
+              backgroundColor: problemColor.bg,
+              color: problemColor.text
+            }}
           >
-            {color.label}
+            {problemColor.label}
           </span>
         </div>
-        <p className="text-[10px] text-[#888888]">
-          {validation.friction_validation_score}% confidence this friction is real
+
+        <p className="text-[10px] text-[#888888] mb-4">
+          Do they actually have the problem we diagnosed?
         </p>
+
+        {/* Confidence Score */}
+        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em]">
+              Confidence Score
+            </p>
+            <p className="text-2xl font-black text-[#0D0D0D]">
+              {validation.problem_validation_confidence}%
+            </p>
+          </div>
+          <div className="w-full bg-[#E8E8E8] rounded h-2 overflow-hidden">
+            <div
+              className="h-full bg-[#0D0D0D]"
+              style={{
+                width: `${validation.problem_validation_confidence}%`
+              }}
+            />
+          </div>
+          <p className="text-[10px] text-[#666666] mt-2">
+            Evidence Level: <span className="font-semibold">{validation.problem_evidence_level}</span> •{" "}
+            <span
+              style={{
+                color: problemStatusColor.text,
+                fontWeight: 600
+              }}
+            >
+              {validation.problem_status.replace(/_/g, " ")}
+            </span>
+          </p>
+        </div>
+
+        {/* Evidence breakdown */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Opened email</span>
+            <span className={validation.problem_evidence.opened ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.problem_evidence.opened ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Clicked content ({validation.problem_evidence.clicked_count}x)</span>
+            <span className={validation.problem_evidence.clicked ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.problem_evidence.clicked ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Replied to email</span>
+            <span className={validation.problem_evidence.replied ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.problem_evidence.replied ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Confirmed issue in reply</span>
+            <span className={validation.problem_evidence.confirmed_issue_in_reply ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.problem_evidence.confirmed_issue_in_reply ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Discussed on call</span>
+            <span className={validation.problem_evidence.discussed_on_call ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.problem_evidence.discussed_on_call ? "✓" : "—"}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="border-t border-[#E8E8E8]"></div>
 
-      {/* DIAGNOSED FRICTION */}
+      {/* SOLUTION VALIDATION */}
       <div>
-        <h4 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em] mb-2">
-          Diagnosed Friction
-        </h4>
-        <p className="text-base font-semibold text-[#0D0D0D]">
-          {validation.diagnosed_friction}
-        </p>
-      </div>
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-semibold text-[#0D0D0D]">
+            SOLUTION VALIDATION
+          </h4>
+          <span
+            className="text-[10px] font-semibold uppercase tracking-[0.05em] px-3 py-1 rounded"
+            style={{
+              backgroundColor: solutionColor.bg,
+              color: solutionColor.text
+            }}
+          >
+            {solutionColor.label}
+          </span>
+        </div>
 
-      {/* VALIDATION SCORE EXPLANATION */}
-      <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded p-4">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em] mb-3">
-          What this score means
+        <p className="text-[10px] text-[#888888] mb-4">
+          Do they believe Saint & Story can solve it?
         </p>
-        <div className="space-y-2 text-sm text-[#333333]">
-          {validation.friction_validation_score >= 80 && (
-            <p>✓ This friction is validated. They engaged strongly with this diagnosis.</p>
-          )}
-          {validation.friction_validation_score >= 60 && validation.friction_validation_score < 80 && (
-            <p>◐ This friction is likely real. They showed interest but haven't fully confirmed.</p>
-          )}
-          {validation.friction_validation_score >= 40 && validation.friction_validation_score < 60 && (
-            <p>~ Uncertain if this is the right friction. Some engagement but not conclusive.</p>
-          )}
-          {validation.friction_validation_score < 40 && (
-            <p>✗ This friction diagnosis is probably wrong. Minimal engagement despite outreach.</p>
-          )}
+
+        {/* Confidence Score */}
+        <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em]">
+              Confidence Score
+            </p>
+            <p className="text-2xl font-black text-[#0D0D0D]">
+              {validation.solution_validation_confidence}%
+            </p>
+          </div>
+          <div className="w-full bg-[#E8E8E8] rounded h-2 overflow-hidden">
+            <div
+              className="h-full bg-[#0D0D0D]"
+              style={{
+                width: `${validation.solution_validation_confidence}%`
+              }}
+            />
+          </div>
+          <p className="text-[10px] text-[#666666] mt-2">
+            Evidence Level: <span className="font-semibold">{validation.solution_evidence_level}</span> •{" "}
+            <span
+              style={{
+                color: solutionStatusColor.text,
+                fontWeight: 600
+              }}
+            >
+              {validation.solution_status.replace(/_/g, " ")}
+            </span>
+          </p>
+        </div>
+
+        {/* Evidence breakdown */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Requested details</span>
+            <span className={validation.solution_evidence.requested_details ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.solution_evidence.requested_details ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Asked how it works</span>
+            <span className={validation.solution_evidence.asked_how_it_works ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.solution_evidence.asked_how_it_works ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Booked call</span>
+            <span className={validation.solution_evidence.booked_call ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.solution_evidence.booked_call ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Requested pricing</span>
+            <span className={validation.solution_evidence.requested_pricing ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.solution_evidence.requested_pricing ? "✓" : "—"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between p-2 text-[10px]">
+            <span className="text-[#666666]">Became customer</span>
+            <span className={validation.solution_evidence.became_customer ? "text-[#1B5E20] font-semibold" : "text-[#999999]"}>
+              {validation.solution_evidence.became_customer ? "✓" : "—"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* ENGAGEMENT SIGNALS */}
+      <div className="border-t border-[#E8E8E8]"></div>
+
+      {/* READINESS */}
       <div>
         <h4 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em] mb-4">
-          Engagement Signals
+          Readiness for Learning
         </h4>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded">
-            <span className="text-sm text-[#333333]">Opened email</span>
-            <span className={`text-sm font-semibold ${validation.opened ? "text-[#1B5E20]" : "text-[#CC0000]"}`}>
-              {validation.opened ? "Yes" : "No"}
-            </span>
+        <div className="grid grid-cols-2 gap-4">
+          <div
+            className={`p-4 rounded border ${
+              validation.is_pattern_ready
+                ? "bg-[#E8F5E9] border-[#C8E6C9]"
+                : "bg-[#F5F5F5] border-[#E8E8E8]"
+            }`}
+          >
+            <p className="text-[10px] font-semibold text-[#666666] uppercase mb-2">
+              Pattern Learning
+            </p>
+            <p className={`text-sm font-semibold ${validation.is_pattern_ready ? "text-[#1B5E20]" : "text-[#999999]"}`}>
+              {validation.is_pattern_ready ? "Ready" : "Not Ready"}
+            </p>
+            <p className="text-[10px] text-[#666666] mt-1">
+              Requires problem validation ≥ 60%
+            </p>
           </div>
-          <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded">
-            <span className="text-sm text-[#333333]">Clicked related content</span>
-            <span className={`text-sm font-semibold ${validation.clicked ? "text-[#1B5E20]" : "text-[#CC0000]"}`}>
-              {validation.clicked ? "Yes" : "No"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded">
-            <span className="text-sm text-[#333333]">Replied to email</span>
-            <span className={`text-sm font-semibold ${validation.replied ? "text-[#1B5E20]" : "text-[#888888]"}`}>
-              {validation.replied ? "Yes" : "No"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded">
-            <span className="text-sm text-[#333333]">Scheduled meeting</span>
-            <span className={`text-sm font-semibold ${validation.meeting_scheduled ? "text-[#1B5E20]" : "text-[#888888]"}`}>
-              {validation.meeting_scheduled ? "Yes" : "No"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded">
-            <span className="text-sm text-[#333333]">Became job</span>
-            <span className={`text-sm font-semibold ${validation.became_job ? "text-[#1B5E20]" : "text-[#888888]"}`}>
-              {validation.became_job ? "Yes" : "No"}
-            </span>
+
+          <div
+            className={`p-4 rounded border ${
+              validation.is_commercial_ready
+                ? "bg-[#E8F5E9] border-[#C8E6C9]"
+                : "bg-[#F5F5F5] border-[#E8E8E8]"
+            }`}
+          >
+            <p className="text-[10px] font-semibold text-[#666666] uppercase mb-2">
+              Commercial Learning
+            </p>
+            <p className={`text-sm font-semibold ${validation.is_commercial_ready ? "text-[#1B5E20]" : "text-[#999999]"}`}>
+              {validation.is_commercial_ready ? "Ready" : "Not Ready"}
+            </p>
+            <p className="text-[10px] text-[#666666] mt-1">
+              Requires both validations ≥ 60%
+            </p>
           </div>
         </div>
       </div>
-
-      <div className="border-t border-[#E8E8E8]"></div>
-
-      {/* SENTIMENT */}
-      {validation.friction_sentiment !== 'unknown' && (
-        <div>
-          <h4 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.05em] mb-2">
-            What they said
-          </h4>
-          <p className="text-sm text-[#333333]">
-            {sentimentLabels[validation.friction_sentiment]}
-          </p>
-          {validation.friction_refinement && (
-            <p className="text-sm text-[#0D0D0D] font-semibold mt-2">
-              "{validation.friction_refinement}"
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* RECOMMENDATION */}
-      {validation.is_validated ? (
-        <div className="bg-[#E8F5E9] border border-[#C8E6C9] rounded p-4">
-          <p className="text-[10px] font-semibold text-[#1B5E20] uppercase tracking-[0.05em] mb-2">
-            Next Step
-          </p>
-          <p className="text-sm text-[#1B5E20]">
-            This friction is validated. Proceed with solution discussion.
-          </p>
-        </div>
-      ) : (
-        <div className="bg-[#FFE5E5] border border-[#FFCCCC] rounded p-4">
-          <p className="text-[10px] font-semibold text-[#CC0000] uppercase tracking-[0.05em] mb-2">
-            Caution
-          </p>
-          <p className="text-sm text-[#CC0000]">
-            This friction diagnosis is unvalidated. Ask clarifying questions before proposing solutions.
-          </p>
-        </div>
-      )}
     </div>
   );
 }

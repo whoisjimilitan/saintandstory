@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { FrictionValidation } from '@/lib/friction-intelligence';
+import type { ValidationIntelligence } from '@/lib/validation-intelligence';
 import { FrictionValidationPanel } from './FrictionValidationPanel';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function FrictionValidationSection({ leadId }: Props) {
-  const [validation, setValidation] = useState<FrictionValidation | null>(null);
+  const [validation, setValidation] = useState<ValidationIntelligence | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
