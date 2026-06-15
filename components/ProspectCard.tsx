@@ -207,7 +207,7 @@ export default function ProspectCard({
                   } ${emailState === 'loading' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {emailState === 'loading' && 'Sending...'}
-                  {emailState === 'success' && '✅ Email Sent'}
+                  {emailState === 'success' && 'Email Sent'}
                   {emailState === 'error' && 'Error — Try Again'}
                   {emailState === 'idle' && 'Send Email'}
                 </button>
