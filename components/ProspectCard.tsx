@@ -35,76 +35,70 @@ export default function ProspectCard({
           (Date.now() - new Date(prospect.last_contacted_at).getTime()) /
             (1000 * 60 * 60 * 24)
         );
-        return daysAgo === 0 ? "Today" : `${daysAgo}d ago`;
+        return daysAgo === 0 ? "today" : `${daysAgo}d ago`;
       })()
-    : "Not contacted";
+    : "not contacted";
 
   return (
     <div
-      className="border border-gray-200 rounded-lg bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+      className="border border-[#E8E8E8] bg-white hover:border-[#D0D0D0] hover:bg-[#FAFAFA] transition-all cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {/* COLLAPSED STATE */}
-      <div className="px-8 py-8">
-        {/* 1. COMPANY NAME - Scannable, Large */}
-        <h3 className="text-3xl font-semibold text-gray-900 mb-8">
+      <div className="px-6 py-6">
+        {/* Company Name */}
+        <h3 className="text-lg font-semibold text-[#0D0D0D] mb-4">
           {prospect.business_name}
         </h3>
 
-        {/* 2. OPPORTUNITY - Most Important */}
-        <div className="mb-8">
-          <p className="text-xl leading-relaxed text-gray-900 font-normal">
-            {opportunity}
-          </p>
-        </div>
+        {/* Opportunity - Key insight */}
+        <p className="text-sm leading-relaxed text-[#0D0D0D] mb-3">
+          {opportunity}
+        </p>
 
-        {/* 3. CONTEXT - Supporting the opportunity */}
-        <div className="mb-8">
-          <p className="text-base leading-relaxed text-gray-700">
-            {context}
-          </p>
-        </div>
+        {/* Context */}
+        <p className="text-sm leading-relaxed text-[#666666] mb-4">
+          {context}
+        </p>
 
-        {/* 4. RECOMMENDATION - Conclusion from the system */}
-        <div className="mb-8">
-          <p className="text-base text-gray-900">
-            {recommendation}
-          </p>
-        </div>
+        {/* Recommendation */}
+        <p className="text-sm text-[#0D0D0D] mb-4">
+          {recommendation}
+        </p>
 
-        {/* 5. METADATA - Minimal, Muted */}
-        <div className="flex gap-6 text-sm text-gray-500">
-          <span>Last contacted: {lastContactLabel}</span>
+        {/* Metadata - Minimal */}
+        <div className="flex gap-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888]">
+          <span>{lastContactLabel}</span>
           {prospect.business_category && (
-            <span>Category: {prospect.business_category}</span>
+            <span>{prospect.business_category}</span>
           )}
         </div>
       </div>
 
-      {/* EXPANDED STATE - Machine's Reasoning */}
+      {/* EXPANDED STATE */}
       {isExpanded && (
-        <div className="border-t border-gray-200 bg-white">
-          <div className="px-8 py-8 space-y-8">
-            {/* WHY THIS MATTERS - Mandatory */}
+        <div className="border-t border-[#E8E8E8] bg-[#FAFAFA]">
+          <div className="px-6 py-6 space-y-6">
+            {/* Why This Matters */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">
-                WHY THIS MATTERS
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
+                Why this matters
               </h4>
-              <p className="text-base leading-relaxed text-gray-700">
-                {whyItMatters || "This opportunity shows commercial signals that suggest readiness for engagement."}
+              <p className="text-sm text-[#666666]">
+                {whyItMatters || "Shows commercial signals suggesting readiness for engagement."}
               </p>
             </div>
 
-            {/* EVIDENCE - Concrete signals */}
+            {/* Evidence */}
             {evidence.length > 0 && (
               <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-4">
-                  EVIDENCE
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
+                  Evidence
                 </h4>
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   {evidence.map((item, i) => (
-                    <li key={i} className="text-base text-gray-700 flex gap-4">
-                      <span className="text-gray-400 flex-shrink-0">•</span>
+                    <li key={i} className="text-sm text-[#666666] flex gap-3">
+                      <span className="text-[#D0D0D0] flex-shrink-0">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -112,61 +106,61 @@ export default function ProspectCard({
               </div>
             )}
 
-            {/* RECOMMENDED ACTION */}
+            {/* Recommended action */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">
-                RECOMMENDED ACTION
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
+                Recommended action
               </h4>
-              <p className="text-base text-gray-900">
+              <p className="text-sm text-[#0D0D0D]">
                 {recommendation}
               </p>
             </div>
 
-            {/* OPERATOR FEEDBACK */}
+            {/* Feedback */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">
-                YOUR FEEDBACK
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0D0D0D] mb-3">
+                Your feedback
               </h4>
-              <div className="flex gap-4">
-                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+              <div className="flex gap-4 flex-wrap">
+                <button className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666] hover:text-[#0D0D0D] transition-colors">
                   Useful
                 </button>
-                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                <button className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666] hover:text-[#0D0D0D] transition-colors">
                   Not useful
                 </button>
-                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                <button className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666] hover:text-[#0D0D0D] transition-colors">
                   Wrong priority
                 </button>
-                <button className="text-sm text-gray-600 hover:text-gray-900 underline">
+                <button className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#666666] hover:text-[#0D0D0D] transition-colors">
                   Already contacted
                 </button>
               </div>
             </div>
 
-            {/* CONTACT INFO */}
+            {/* Contact */}
             <div className="text-sm">
-              <p className="text-gray-500 mb-2">Contact</p>
-              <p className="text-gray-900 font-mono">
-                {prospect.email || "No email available"}
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#888888] mb-2">Contact</p>
+              <p className="text-sm text-[#0D0D0D] font-mono">
+                {prospect.email || "—"}
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* ACTION BUTTONS */}
-      <div className="px-8 py-6 border-t border-gray-200 bg-white flex gap-4">
+      {/* Action buttons */}
+      <div className="px-6 py-4 border-t border-[#E8E8E8] bg-white flex gap-2">
         <button
-          className="px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded hover:bg-gray-800 transition-colors"
+          className="px-3 py-1.5 bg-[#0D0D0D] text-white text-[10px] font-semibold uppercase tracking-[0.1em] rounded hover:bg-[#333333] transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
-          Send Email
+          Send email
         </button>
         <button
-          className="px-6 py-3 border border-gray-300 text-gray-900 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+          className="px-3 py-1.5 border border-[#E8E8E8] text-[#0D0D0D] text-[10px] font-semibold uppercase tracking-[0.1em] rounded hover:border-[#D0D0D0] hover:bg-white transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
-          Inspect Reasoning
+          Inspect reasoning
         </button>
       </div>
     </div>

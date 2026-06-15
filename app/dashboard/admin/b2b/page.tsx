@@ -175,101 +175,62 @@ export default async function B2BTodayPage() {
   const notContacted = prospectsWithInsights.filter(p => !p.last_contacted_at).length;
 
   return (
-    <div className="w-full">
-      {/* B2B Navigation Tabs */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex gap-8">
-            <Link
-              href="/dashboard/admin/b2b"
-              className="py-4 px-0 border-b-2 border-blue-600 text-sm font-medium text-blue-600"
-            >
-              Today
-            </Link>
-            <Link
-              href="/dashboard/admin/b2b/pipeline"
-              className="py-4 px-0 border-b-2 border-transparent text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-200"
-            >
-              Pipeline
-            </Link>
-            <Link
-              href="/dashboard/admin/b2b/discovery"
-              className="py-4 px-0 border-b-2 border-transparent text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-200"
-            >
-              Discovery
-            </Link>
-            <Link
-              href="/dashboard/admin/b2b/orders"
-              className="py-4 px-0 border-b-2 border-transparent text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-200"
-            >
-              Standing Orders
-            </Link>
-            <Link
-              href="/dashboard/admin/b2b/analytics"
-              className="py-4 px-0 border-b-2 border-transparent text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-200"
-            >
-              Analytics
-            </Link>
-          </div>
-        </div>
+    <div className="max-w-3xl mx-auto px-6 py-10">
+      {/* Navigation pills matching Admin design language */}
+      <div className="flex items-center justify-between mb-1">
+        <Link href="/dashboard/admin" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          Admin ↻
+        </Link>
+        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] border border-[#0D0D0D] px-3 py-1 rounded-full">
+          B2B Today
+        </Link>
       </div>
 
-      {/* Page Content */}
-      <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          {/* Intelligence Brief Header */}
-          <div className="mb-12">
-            <p className="text-lg leading-relaxed text-gray-900">
-              <span className="font-semibold">{totalProspects} opportunities</span> require attention today.
-            </p>
-            <p className="text-base leading-relaxed text-gray-700 mt-3">
-              {strongSignals} show unusually strong commercial signals. {notContacted} have not been contacted yet. Timing is optimal for initial outreach.
-            </p>
-          </div>
+      {/* Header matching Admin typography */}
+      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
+        Intelligence.
+      </h1>
 
-          {prospectsWithInsights.length === 0 ? (
-            // Empty State
-            <div className="py-20 text-center">
-              <p className="text-lg text-gray-600 mb-6">
-                Discovery pipeline is processing. Check back in a few hours.
-              </p>
-              <Link
-                href="/dashboard/admin/b2b/pipeline"
-                className="inline-block px-6 py-3 bg-gray-900 text-white font-medium rounded hover:bg-gray-800 transition-colors"
-              >
-                View Full Pipeline
-              </Link>
-            </div>
-          ) : (
-            <>
-              {/* Prospect Queue */}
-              <div className="space-y-6 mb-12">
-                {prospectsWithInsights.map((prospect) => (
-                  <ProspectCard
-                    key={prospect.id}
-                    prospect={prospect}
-                    opportunity={prospect.opportunity}
-                    context={prospect.context}
-                    recommendation={prospect.recommendation}
-                    whyItMatters={prospect.whyItMatters}
-                    evidence={prospect.evidence}
-                  />
-                ))}
-              </div>
-
-              {/* Link to Full Pipeline */}
-              <div className="text-center">
-                <Link
-                  href="/dashboard/admin/b2b/pipeline"
-                  className="text-gray-600 hover:text-gray-900 text-base transition-colors"
-                >
-                  View full pipeline →
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
+      {/* Intelligence Brief */}
+      <div className="mb-8">
+        <p className="text-sm leading-relaxed text-[#666666]">
+          <span className="font-semibold text-[#0D0D0D]">{totalProspects} {totalProspects === 1 ? "opportunity" : "opportunities"}</span> require attention today.
+        </p>
+        {totalProspects > 0 && (
+          <p className="text-sm leading-relaxed text-[#666666] mt-2">
+            {strongSignals} {strongSignals === 1 ? "shows" : "show"} unusually strong commercial signals. {notContacted} {notContacted === 1 ? "has" : "have"} not been contacted yet.
+          </p>
+        )}
       </div>
+
+      {/* Empty State - Intelligence-oriented */}
+      {prospectsWithInsights.length === 0 ? (
+        <div className="py-12">
+          <p className="text-sm text-[#666666] mb-3">
+            No opportunities currently require attention.
+          </p>
+          <p className="text-sm text-[#888888]">
+            Discovery continues autonomously. New opportunities will appear here when commercial signals exceed threshold.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Prospect Queue */}
+          <div className="space-y-4 mb-8">
+            {prospectsWithInsights.map((prospect) => (
+              <ProspectCard
+                key={prospect.id}
+                prospect={prospect}
+                opportunity={prospect.opportunity}
+                context={prospect.context}
+                recommendation={prospect.recommendation}
+                whyItMatters={prospect.whyItMatters}
+                evidence={prospect.evidence}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
