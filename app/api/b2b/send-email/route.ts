@@ -111,11 +111,15 @@ export async function POST(request: NextRequest) {
     `;
 
     // Update lead status: READY -> CONTACTED
+    // CRITICAL: Save email subject and body for Conversation Intelligence
     await sql`
       UPDATE b2b_leads
       SET
         lead_status = 'contacted',
         last_contacted_at = NOW(),
+        email_sent_at = NOW(),
+        subject = ${subject},
+        body = ${body},
         updated_at = NOW()
       WHERE id = ${lead_id}
     `;

@@ -29,7 +29,7 @@ export interface ConversationIntelligence {
   last_activity_at: string | null;
 
   // Derived State
-  relationship_state: "cold" | "warm" | "hot" | "replied" | "meeting" | "won" | "lost";
+  relationship_state: "cold" | "warm" | "hot" | "stalled" | "replied" | "meeting" | "won" | "lost";
   days_since_sent: number;
   days_since_last_activity: number;
 
@@ -49,23 +49,29 @@ export function deriveRelationshipState(
   replied: boolean,
   days_since_sent: number,
   days_since_activity: number
-): "cold" | "warm" | "hot" | "replied" | "meeting" | "won" | "lost" {
+): "cold" | "warm" | "hot" | "stalled" | "replied" | "meeting" | "won" | "lost" {
   // If replied, they're engaged
   if (replied) {
     return "replied";
   }
 
-  // If clicked, they're interested
+  // If clicked, they're interested (hot)
   if (clicked_count > 0) {
     return "hot";
   }
 
-  // If opened, they've seen it
+  // If opened but no click/reply and been 7+ days: STALLED
+  // This is the most critical B2B state - where conversations die
+  if (opened_count > 0 && clicked_count === 0 && !replied && days_since_activity > 7) {
+    return "stalled";
+  }
+
+  // If opened (but less than 7 days of inactivity), they've seen it
   if (opened_count > 0) {
     return "warm";
   }
 
-  // If nothing in 14+ days, probably lost interest
+  // If nothing in 14+ days, definitely cold (lost interest)
   if (days_since_activity > 14) {
     return "cold";
   }
@@ -76,34 +82,42 @@ export function deriveRelationshipState(
 
 /**
  * Generate assessment based on behavior
+ * DETERMINISTIC: Rule-based logic, not AI-generated
  */
 export function generateAssessment(
   opened_count: number,
   clicked_count: number,
   replied: boolean,
   days_since_sent: number,
-  days_since_activity: number,
-  business_category?: string
+  days_since_activity: number
 ): string {
+  // REPLIED: Most engaged state
   if (replied) {
-    return "Prospect is actively engaged and responded. Next action: Schedule meeting or send follow-up information.";
+    return "REPLIED: Prospect is actively engaged and responded. Ready for conversation.";
   }
 
-  if (clicked_count > 0) {
-    const interest = opened_count > 2 ? "strong" : "specific";
-    return `${interest.charAt(0).toUpperCase() + interest.slice(1)} interest detected. Clicked link ${clicked_count} time${clicked_count > 1 ? "s" : ""}. No reply yet suggests they're evaluating or need human confirmation.`;
+  // HOT: Clicked link (showed specific interest)
+  if (clicked_count > 0 && !replied) {
+    return `HOT: Clicked link ${clicked_count} time${clicked_count > 1 ? "s" : ""}. Shows specific interest. No reply suggests they're evaluating or need human confirmation.`;
   }
 
-  if (opened_count > 0) {
-    const times = opened_count > 2 ? "multiple times" : "once";
-    return `Prospect opened email ${times} (${opened_count} times). Interest confirmed but not yet committed. May need higher-touch follow-up.`;
+  // STALLED: Opened but inactive 7+ days (most dangerous state)
+  if (opened_count > 0 && clicked_count === 0 && !replied && days_since_activity > 7) {
+    return `STALLED: Opened email ${opened_count} time${opened_count > 1 ? "s" : ""} but inactive for ${days_since_activity} days. Interest is cooling. Action required to revive.`;
   }
 
-  if (days_since_sent > 7) {
-    return `Email sent ${days_since_sent} days ago with no opens. Likely not seen or deprioritized. Consider follow-up or different approach.`;
+  // WARM: Opened but recently (less than 7 days since activity)
+  if (opened_count > 0 && !replied && days_since_activity <= 7) {
+    return `WARM: Opened email ${opened_count} time${opened_count > 1 ? "s" : ""}. Interest confirmed. Still evaluating or processing. Wait or follow up with additional value.`;
   }
 
-  return "Email recently sent. Awaiting prospect response.";
+  // COLD: No opens in 7+ days
+  if (opened_count === 0 && days_since_sent > 7) {
+    return `COLD: Email sent ${days_since_sent} days ago with no opens. Likely not seen or deprioritized. Requires different approach or timing.`;
+  }
+
+  // CONTACTED: Recently sent, awaiting response
+  return `CONTACTED: Email sent ${days_since_sent} day${days_since_sent > 1 ? "s" : ""} ago. Awaiting prospect response.`;
 }
 
 /**
@@ -232,8 +246,7 @@ export async function buildConversationIntelligence(
       clicked_count,
       lead.replied,
       days_since_sent,
-      days_since_activity,
-      lead.business_category
+      days_since_activity
     );
 
     // Generate recommended action

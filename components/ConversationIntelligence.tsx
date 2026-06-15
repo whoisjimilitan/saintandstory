@@ -11,6 +11,7 @@ export function ConversationIntelligence({ conversation }: Props) {
     cold: { bg: "#F5F5F5", text: "#666666", label: "Cold" },
     warm: { bg: "#E8F5E9", text: "#1B5E20", label: "Warm" },
     hot: { bg: "#FFF8E5", text: "#CC6600", label: "Hot" },
+    stalled: { bg: "#FFE5CC", text: "#CC5500", label: "Stalled" },
     replied: { bg: "#E3F2FD", text: "#0D47A1", label: "Replied" },
     meeting: { bg: "#F3E5F5", text: "#6A1B9A", label: "Meeting" },
     won: { bg: "#E8F5E9", text: "#1B5E20", label: "Won" },
