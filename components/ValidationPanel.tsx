@@ -7,18 +7,18 @@ interface Props {
 }
 
 export function ValidationPanel({ validation }: Props) {
-  const getScoreColor = (tier: string) => {
-    if (tier === 'ignore') {
-      return { bg: "#FFE5E5", text: "#CC0000", label: "Ignore/Monitor" };
-    } else if (tier === 'learn') {
-      return { bg: "#FFF8E5", text: "#CC6600", label: "Learn" };
+  const getScoreColor = (level: string) => {
+    if (level === 'low-fit') {
+      return { bg: "#FFE5E5", text: "#CC0000", label: "Low Fit" };
+    } else if (level === 'validated-fit') {
+      return { bg: "#FFF8E5", text: "#CC6600", label: "Validated Fit" };
     }
-    return { bg: "#E8F5E9", text: "#1B5E20", label: "Act" };
+    return { bg: "#E8F5E9", text: "#1B5E20", label: "Commercial Fit" };
   };
 
-  const scoreColor = getScoreColor(validation.action_tier);
-  const isLearnable = validation.action_tier !== 'ignore';
-  const isCommercial = validation.action_tier === 'act';
+  const scoreColor = getScoreColor(validation.fit_level);
+  const isValidated = validation.fit_level !== 'low-fit';
+  const isCommercial = validation.fit_level === 'commercial-fit';
 
   return (
     <div className="bg-white border border-[#E8E8E8] rounded p-8 space-y-8">
@@ -73,19 +73,19 @@ export function ValidationPanel({ validation }: Props) {
 
         {/* Score meaning */}
         <div className="space-y-3">
-          {validation.action_tier === 'ignore' && (
+          {validation.fit_level === 'low-fit' && (
             <p className="text-sm text-[#CC0000]">
-              Not enough signal to act. Monitor for future engagement.
+              Insufficient logistics fit. Monitor for stronger signals.
             </p>
           )}
-          {validation.action_tier === 'learn' && (
+          {validation.fit_level === 'validated-fit' && (
             <p className="text-sm text-[#CC6600]">
-              Eligible for pattern learning. Strong logistics signal.
+              Logistics fit validated. Eligible for pattern learning.
             </p>
           )}
-          {validation.action_tier === 'act' && (
+          {validation.fit_level === 'commercial-fit' && (
             <p className="text-sm text-[#1B5E20]">
-              Commercially actionable. Engage and propose solution.
+              Commercial logistics fit. Prioritise engagement.
             </p>
           )}
         </div>
@@ -99,38 +99,38 @@ export function ValidationPanel({ validation }: Props) {
           Next Step
         </p>
         <div className={`p-4 rounded border ${
-          isLearnable
+          isValidated
             ? "bg-[#E8F5E9] border-[#C8E6C9]"
             : "bg-[#FFF8E5] border-[#FFE5CC]"
         }`}>
           <p className={`text-sm font-semibold ${
-            isLearnable ? "text-[#1B5E20]" : "text-[#CC6600]"
+            isValidated ? "text-[#1B5E20]" : "text-[#CC6600]"
           }`}>
             {validation.recommended_action}
           </p>
         </div>
       </div>
 
-      {/* ACTION TIER GATES */}
+      {/* INTELLIGENCE GATES */}
       <div className="space-y-3">
         <div className={`p-3 rounded border text-sm ${
-          validation.action_tier !== 'ignore'
+          validation.fit_level !== 'low-fit'
             ? "bg-[#E8F5E9] border-[#C8E6C9] text-[#1B5E20]"
             : "bg-[#F5F5F5] border-[#E8E8E8] text-[#999999]"
         }`}>
           <p className="font-semibold">Pattern Intelligence (≥60)</p>
           <p className="text-[10px] mt-1">
-            {validation.action_tier !== 'ignore' ? "✓ Eligible" : "— Not yet"}
+            {validation.fit_level !== 'low-fit' ? "✓ Eligible" : "— Insufficient fit"}
           </p>
         </div>
         <div className={`p-3 rounded border text-sm ${
-          validation.action_tier === 'act'
+          validation.fit_level === 'commercial-fit'
             ? "bg-[#E8F5E9] border-[#C8E6C9] text-[#1B5E20]"
             : "bg-[#F5F5F5] border-[#E8E8E8] text-[#999999]"
         }`}>
           <p className="font-semibold">Commercial Intelligence (≥75)</p>
           <p className="text-[10px] mt-1">
-            {validation.action_tier === 'act' ? "✓ Eligible" : "— Not yet"}
+            {validation.fit_level === 'commercial-fit' ? "✓ Eligible" : "— Not yet commercial"}
           </p>
         </div>
       </div>

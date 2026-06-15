@@ -4,16 +4,23 @@
  * ONE unified scoring system:
  * LOGISTICS FIT SCORE (0–100)
  *
- * Measures: How strongly this case indicates a real, logistics-solvable
- * blocked outcome that Saint & Story can fix.
+ * Primary drivers (outcome-focused):
+ * 1. Blocked business outcome plausibility
+ * 2. Likelihood logistics contributes to the blockage
+ * 3. Likelihood Saint & Story can realistically remove the blockage
  *
- * All signals feed into ONE score.
- * No sub-layers. No problem/solution split.
+ * Supporting evidence (engagement signals):
+ * - Opens, clicks, replies, meetings, customer conversion
  *
- * Only cases with score ≥ 60 enter Pattern/Commercial/Learning Intelligence.
+ * CRITICAL: The score is NOT an engagement score.
+ * Heavy engagement with a non-logistics-solvable problem = low score.
+ * Weak engagement with clear logistics friction = meaningful score.
+ *
+ * Only cases with score ≥ 60 enter Pattern Intelligence.
+ * Only cases with score ≥ 75 enter Commercial Intelligence.
  */
 
-export type ActionTier = 'ignore' | 'monitor' | 'learn' | 'act';
+export type FitLevel = 'low-fit' | 'validated-fit' | 'commercial-fit';
 
 export interface ValidationIntelligence {
   // Outcome Case reference
@@ -27,11 +34,11 @@ export interface ValidationIntelligence {
   // THE ONLY SCORE
   logistics_fit_score: number; // 0-100
 
-  // Action tier based on thresholds
-  action_tier: ActionTier;
-  // 0-59: ignore/monitor
-  // 60-74: learn
-  // 75-100: act
+  // Fit level based on thresholds
+  fit_level: FitLevel;
+  // 0-59: low-fit
+  // 60-74: validated-fit
+  // 75-100: commercial-fit
 
   // Recommended action (single only)
   recommended_action: string;
@@ -104,16 +111,16 @@ export function calculateLogisticsFitScore(signals: {
 }
 
 /**
- * Determine action tier from score
+ * Determine fit level from score
  *
- * 0-59: Ignore or monitor
- * 60-74: Learn from (eligible for Pattern Intelligence)
- * 75-100: Act on commercially
+ * 0-59: Low fit
+ * 60-74: Validated fit (eligible for Pattern Intelligence)
+ * 75-100: Commercial fit (eligible for Commercial Intelligence)
  */
-export function getActionTier(score: number): ActionTier {
-  if (score < 60) return 'ignore';
-  if (score < 75) return 'learn';
-  return 'act';
+export function getFitLevel(score: number): FitLevel {
+  if (score < 60) return 'low-fit';
+  if (score < 75) return 'validated-fit';
+  return 'commercial-fit';
 }
 
 /**
@@ -157,7 +164,7 @@ export async function generateValidationIntelligence(
       became_customer: false // TODO: query jobs
     });
 
-    const action_tier = getActionTier(logistics_fit_score);
+    const fit_level = getFitLevel(logistics_fit_score);
 
     // Recommended action based on score
     const recommended_action = getRecommendedAction(logistics_fit_score);
@@ -170,7 +177,7 @@ export async function generateValidationIntelligence(
       blocked_outcome: blockedOutcome,
       operational_cause: operationalCause,
       logistics_fit_score,
-      action_tier,
+      fit_level,
       recommended_action,
       generated_at: new Date().toISOString()
     };
@@ -185,10 +192,10 @@ export async function generateValidationIntelligence(
  */
 function getRecommendedAction(score: number): string {
   if (score < 60) {
-    return 'Monitor. Not yet actionable.';
+    return 'Monitor. Insufficient logistics fit.';
   }
   if (score < 75) {
-    return 'Learn from this case. Eligible for pattern analysis.';
+    return 'Learn. Case has validated logistics fit.';
   }
-  return 'Act commercially. Engage and propose solution.';
+  return 'Prioritise. Case has commercial logistics fit.';
 }
