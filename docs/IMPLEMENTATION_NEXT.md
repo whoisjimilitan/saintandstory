@@ -36,88 +36,66 @@ Westpoint Pharmacy | Warm | Opened 3x | Clicked 1x | Follow up
 
 ---
 
-## IMPLEMENTATION CHECKLIST
+## IMPLEMENTATION PHASES
 
-### PHASE 1: DATA INFRASTRUCTURE (Days 1-2)
+### PHASE A: Conversation Data Visibility
 
-- [ ] **Database schema:** Add fields to `b2b_leads` table
-  ```sql
-  ALTER TABLE b2b_leads ADD COLUMN (
-    email_subject VARCHAR(255),
-    email_body TEXT,
-    recipient_email VARCHAR(255),
-    email_opened_count INT DEFAULT 0,
-    email_clicked_count INT DEFAULT 0,
-    email_replied BOOLEAN DEFAULT false,
-    last_interaction_at TIMESTAMP
-  );
-  ```
+**What:** Operator can see the exact email that was sent.
 
-- [ ] **Email event tracking:** Set up integration to track
-  - Email opens (when prospect opens message)
-  - Email clicks (when prospect clicks link)
-  - Email replies (when prospect replies)
-  - Updates `email_opened_count`, `email_clicked_count`, `email_replied`
-  - Automatically updates `last_interaction_at`
+**Why:** Operator cannot interpret signals without knowing what message created them.
 
-- [ ] **Data backfill:** For existing leads, populate:
-  - `email_subject` (from email logs if available)
-  - `email_body` (from email logs if available)
-  - `recipient_email` (from existing contact data)
-  - Engagement metrics (from any existing tracking)
+**How implemented:**
+- Add fields to `b2b_leads`: email_subject, email_body, recipient_email
+- Set up email tracking: opens, clicks, replies
+- Display actual email body in UI (not template, not description)
 
-### PHASE 2: UI COMPONENT (Days 3-5)
+**Success condition:** Operator opens any prospect and sees the exact email message that was sent.
 
-- [ ] **Create ConversationCard component** (`components/ConversationCard.tsx`)
-  - Display: Company name + status badge
-  - Display: Actual email sent (subject + body)
-  - Display: Prospect behavior (opened count, clicked count, replied, last activity)
-  - Display: System assessment (2-3 sentence psychology-informed interpretation)
-  - Display: Recommended action (ONE action, never multiple)
+---
 
-- [ ] **Assessment logic**
-  - Analyze: open count + click count + recency
-  - Interpret: What emotion/transformation is missing?
-  - Assess: Is prospect cooling? Stuck? Engaged?
-  - Recommend: What next action prevents loss or creates progress?
+### PHASE B: Conversation Understanding
 
-- [ ] **Action recommendation logic**
-  - Based on: engagement level, industry, sequence stage, recency
-  - Output: Single action (call, send X, schedule Y, etc.)
-  - Never: Multiple options for operator to choose from
+**What:** Operator understands what the prospect's behavior means.
 
-### PHASE 3: INTEGRATION (Days 5-7)
+**Why:** Raw signals (opened 3x, clicked 1x) don't tell the story. Assessment does.
 
-- [ ] **Replace in Today Queue**
-  - Replace existing ProspectCard with ConversationCard
-  - Test with production data
-  - Verify: Operator can see conversations, not just leads
+**How implemented:**
+- Build assessment logic that interprets: open count + click count + recency
+- Assessment applies sales psychology: emotion → transformation → pain/specificity
+- Assessment answers: Is this person interested? What's missing? Are they cooling?
 
-- [ ] **Add to other surfaces** (as needed)
-  - Pipeline view (click to see conversation)
-  - Orders view (context when needed)
+**Success condition:** Operator reads assessment and immediately understands prospect state without needing to interpret metrics.
 
-- [ ] **Performance testing**
-  - Email rendering doesn't slow page load
-  - Assessment calculation is fast
-  - Action recommendation is instant
+---
 
-### PHASE 4: VALIDATION & MONITORING (Week 2)
+### PHASE C: Conversation Recommendations
 
-- [ ] **Operator feedback**
-  - Is assessment accurate?
-  - Is recommended action useful?
-  - Are they following the actions?
+**What:** Operator knows exactly what action to take next.
 
-- [ ] **Data quality check**
-  - Email tracking events firing correctly
-  - Behavior counts accurate
-  - Assessment logic working as expected
+**Why:** Without clear next step, operator must decide. With recommendation, operator executes or consciously deviates.
 
-- [ ] **Refinement**
-  - Adjust assessment language if needed
-  - Refine action recommendations based on usage
-  - Improve email rendering if needed
+**How implemented:**
+- Build action recommendation logic
+- Output: Single action (never multiple)
+- Action is: most high-leverage next step
+- Action is: immediately executable
+
+**Success condition:** Operator sees recommended action and either follows it or explicitly chooses a different path (tracking deviation).
+
+---
+
+### PHASE D: Conversation Learning
+
+**What:** System learns which conversation patterns work and remembers for future decisions.
+
+**Why:** Without memory, operator makes same decisions repeatedly. With memory, system improves.
+
+**How implemented:**
+- Build Memory Intelligence layer (see architecture)
+- System remembers: What worked. What failed. Preferences. Patterns.
+- System applies learning to future assessments and recommendations.
+
+**Success condition:** System recommends better actions based on accumulated learning. Operator sees different (better) recommendations for similar conversations over time.
 
 ---
 
@@ -191,23 +169,21 @@ Without Conversation Intelligence, these questions are unanswerable.
 
 ---
 
-## TIMELINE
-
-**Goal:** Complete by end of week (2026-06-21)
-
-- Days 1-2: Data infrastructure
-- Days 3-5: UI component + assessment logic
-- Days 5-7: Integration + testing
-- Week 2: Validation + refinement
-
----
-
 ## KEY PRINCIPLES
 
-1. **Conversation is primary object** — Not company, not opportunity, not lead
-2. **Show actual email** — Operator sees exactly what was sent
-3. **Assessment is psychology-informed** — Reflects sales psychology, not just metrics
+1. **The primary object is the relationship state between Saint & Story and a prospect**
+   - Not the company
+   - Not the lead
+   - Not the opportunity
+   - Everything else is context
+   - This prevents drift
+
+2. **Show actual email** — Operator sees exactly what was sent (not template description)
+
+3. **Assessment is psychology-informed** — Reflects sales psychology principles, not just metrics
+
 4. **Action is singular** — Never multiple options
+
 5. **No new dashboards** — Everything feeds conversation understanding
 
 ---
