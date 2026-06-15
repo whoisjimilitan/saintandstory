@@ -48,131 +48,193 @@ interface MorningBriefData {
 }
 
 async function getMorningBrief(): Promise<MorningBriefData> {
-  const sql = neon(process.env.DATABASE_URL!);
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.warn('[B2B] DATABASE_URL not configured');
+      return getDefaultBrief();
+    }
 
-  // Get last orchestration run
-  const lastRunResult = await sql`
-    SELECT
-      started_at,
-      status,
-      discovery_count,
-      leads_created,
-      failures
-    FROM b2b_orchestration_logs
-    ORDER BY started_at DESC
-    LIMIT 1
-  `;
+    const sql = neon(process.env.DATABASE_URL);
 
-  const lastRun = lastRunResult.length > 0 ? lastRunResult[0] : null;
+    // Get last orchestration run
+    let lastRun = null;
+    try {
+      const lastRunResult = await sql`
+        SELECT
+          started_at,
+          status,
+          discovery_count,
+          leads_created,
+          failures
+        FROM b2b_orchestration_logs
+        ORDER BY started_at DESC
+        LIMIT 1
+      `;
+      lastRun = lastRunResult.length > 0 ? lastRunResult[0] : null;
+    } catch (err) {
+      console.warn('[B2B] Failed to fetch orchestration logs:', err instanceof Error ? err.message : String(err));
+    }
 
-  // Get standing order issues
-  const soIssuesResult = await sql`
-    SELECT
-      COUNT(*) as total_active,
-      COUNT(*) FILTER (WHERE pickup_postcode IS NULL OR delivery_postcode IS NULL) as blocked_count
-    FROM b2b_standing_orders
-    WHERE active = true
-  `;
+    // Get standing order issues
+    let soIssues = null;
+    try {
+      const soIssuesResult = await sql`
+        SELECT
+          COUNT(*) as total_active,
+          COUNT(*) FILTER (WHERE pickup_postcode IS NULL OR delivery_postcode IS NULL) as blocked_count
+        FROM b2b_standing_orders
+        WHERE active = true
+      `;
+      soIssues = soIssuesResult[0];
+    } catch (err) {
+      console.warn('[B2B] Failed to fetch standing orders:', err instanceof Error ? err.message : String(err));
+    }
 
-  const soIssues = soIssuesResult[0];
+    // Get blocked standing order reasons
+    let blockedReasons: string[] = [];
+    try {
+      const blockedSOResult = await sql`
+        SELECT DISTINCT
+          CASE
+            WHEN pickup_postcode IS NULL THEN 'Missing pickup postcode'
+            WHEN delivery_postcode IS NULL THEN 'Missing delivery postcode'
+            ELSE 'Unknown'
+          END as reason
+        FROM b2b_standing_orders
+        WHERE active = true
+          AND (pickup_postcode IS NULL OR delivery_postcode IS NULL)
+      `;
+      blockedReasons = blockedSOResult.map((r: any) => r.reason);
+    } catch (err) {
+      console.warn('[B2B] Failed to fetch blocked SO reasons:', err instanceof Error ? err.message : String(err));
+    }
 
-  // Get blocked standing order reasons
-  const blockedSOResult = await sql`
-    SELECT DISTINCT
-      CASE
-        WHEN pickup_postcode IS NULL THEN 'Missing pickup postcode'
-        WHEN delivery_postcode IS NULL THEN 'Missing delivery postcode'
-        ELSE 'Unknown'
-      END as reason
-    FROM b2b_standing_orders
-    WHERE active = true
-      AND (pickup_postcode IS NULL OR delivery_postcode IS NULL)
-  `;
+    // Get today queue stats
+    let queueStats = null;
+    try {
+      const queueStatsResult = await sql`
+        SELECT
+          COUNT(*) FILTER (WHERE lead_tier = 'A') as tier_a,
+          COUNT(*) FILTER (WHERE lead_tier = 'B') as tier_b,
+          COUNT(*) FILTER (WHERE lead_tier = 'C') as tier_c,
+          COUNT(*) as total
+        FROM b2b_leads
+        WHERE lead_tier IN ('A', 'B', 'C')
+      `;
+      queueStats = queueStatsResult[0];
+    } catch (err) {
+      console.warn('[B2B] Failed to fetch queue stats:', err instanceof Error ? err.message : String(err));
+    }
 
-  const blockedReasons = blockedSOResult.map((r: any) => r.reason);
+    return {
+      lastRun: {
+        timestamp: lastRun?.started_at ? new Date(lastRun.started_at).toISOString() : 'Never',
+        status: lastRun?.status || null,
+        discovered: lastRun?.discovery_count || 0,
+        leads_created: lastRun?.leads_created || 0,
+        failures: lastRun?.failures || []
+      },
+      standing_orders_issues: {
+        total_active: soIssues?.total_active || 0,
+        blocked_count: soIssues?.blocked_count || 0,
+        blocked_reasons: blockedReasons
+      },
+      today_queue: {
+        tier_a_count: queueStats?.tier_a || 0,
+        tier_b_count: queueStats?.tier_b || 0,
+        tier_c_count: queueStats?.tier_c || 0,
+        total_count: queueStats?.total || 0
+      }
+    };
+  } catch (err) {
+    console.error('[B2B] Fatal error in getMorningBrief:', err instanceof Error ? err.message : String(err));
+    return getDefaultBrief();
+  }
+}
 
-  // Get today queue stats
-  const queueStatsResult = await sql`
-    SELECT
-      COUNT(*) FILTER (WHERE lead_tier = 'A') as tier_a,
-      COUNT(*) FILTER (WHERE lead_tier = 'B') as tier_b,
-      COUNT(*) FILTER (WHERE lead_tier = 'C') as tier_c,
-      COUNT(*) as total
-    FROM b2b_leads
-    WHERE lead_tier IN ('A', 'B', 'C')
-  `;
-
-  const queueStats = queueStatsResult[0];
-
+function getDefaultBrief(): MorningBriefData {
   return {
     lastRun: {
-      timestamp: lastRun?.started_at ? new Date(lastRun.started_at).toISOString() : 'Never',
-      status: lastRun?.status || null,
-      discovered: lastRun?.discovery_count || 0,
-      leads_created: lastRun?.leads_created || 0,
-      failures: lastRun?.failures || []
+      timestamp: 'Never',
+      status: null,
+      discovered: 0,
+      leads_created: 0,
+      failures: []
     },
     standing_orders_issues: {
-      total_active: soIssues?.total_active || 0,
-      blocked_count: soIssues?.blocked_count || 0,
-      blocked_reasons: blockedReasons
+      total_active: 0,
+      blocked_count: 0,
+      blocked_reasons: []
     },
     today_queue: {
-      tier_a_count: queueStats?.tier_a || 0,
-      tier_b_count: queueStats?.tier_b || 0,
-      tier_c_count: queueStats?.tier_c || 0,
-      total_count: queueStats?.total || 0
+      tier_a_count: 0,
+      tier_b_count: 0,
+      tier_c_count: 0,
+      total_count: 0
     }
   };
 }
 
 async function getRealProspects(): Promise<ProspectData[]> {
-  const sql = neon(process.env.DATABASE_URL!);
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.warn('[B2B] DATABASE_URL not configured for getRealProspects');
+      return [];
+    }
 
-  const leads = await sql`
-    SELECT
-      bl.id,
-      bl.business_name,
-      bl.business_category,
-      bl.email,
-      bl.email_sent_at,
-      bl.engagement_score,
-      bl.lead_tier,
-      eb.opportunity,
-      eb.ai_observations
-    FROM b2b_leads bl
-    LEFT JOIN enriched_businesses eb ON bl.id::text = eb.discovered_business_id::text
-    ORDER BY
-      CASE
-        WHEN bl.lead_tier = 'A' THEN 1
-        WHEN bl.lead_tier = 'B' THEN 2
-        WHEN bl.lead_tier = 'C' THEN 3
-        ELSE 4
-      END,
-      bl.engagement_score DESC,
-      bl.created_at DESC
-    LIMIT 12
-  `;
+    const sql = neon(process.env.DATABASE_URL);
 
-  return leads.map((lead: any) => ({
-    id: lead.id,
-    business_name: lead.business_name,
-    business_category: lead.business_category,
-    email: lead.email || undefined,
-    last_contacted_at: lead.email_sent_at || undefined,
-    engagement_score: lead.engagement_score || 0,
-    lead_tier: lead.lead_tier,
-    opportunity: lead.opportunity || `Exploring partnership opportunities with ${lead.business_name}.`,
-    context: lead.ai_observations || `This ${lead.business_category} business has been identified as a qualified opportunity based on commercial signals.`,
-    recommendation: `Contact to discuss how we can support ${lead.business_name}'s growth.`,
-    executiveSummary: `Tier-${lead.lead_tier || 'C'} opportunity with engagement score ${lead.engagement_score}/100.`,
-    evidence: [
-      `Discovered via autonomous discovery pipeline`,
-      `Category: ${lead.business_category}`,
-      `Engagement Score: ${lead.engagement_score}/100`,
-      `Lead Tier: ${lead.lead_tier || 'C'}`
-    ]
-  }));
+    let leads: any[] = [];
+    try {
+      leads = await sql`
+        SELECT
+          bl.id,
+          bl.business_name,
+          bl.business_category,
+          bl.email,
+          bl.email_sent_at,
+          bl.engagement_score,
+          bl.lead_tier
+        FROM b2b_leads bl
+        ORDER BY
+          CASE
+            WHEN bl.lead_tier = 'A' THEN 1
+            WHEN bl.lead_tier = 'B' THEN 2
+            WHEN bl.lead_tier = 'C' THEN 3
+            ELSE 4
+          END,
+          bl.engagement_score DESC,
+          bl.created_at DESC
+        LIMIT 12
+      `;
+    } catch (queryErr) {
+      console.warn('[B2B] Failed to fetch leads:', queryErr instanceof Error ? queryErr.message : String(queryErr));
+      return [];
+    }
+
+    return leads.map((lead: any) => ({
+      id: lead.id,
+      business_name: lead.business_name,
+      business_category: lead.business_category,
+      email: lead.email || undefined,
+      last_contacted_at: lead.email_sent_at || undefined,
+      engagement_score: lead.engagement_score || 0,
+      lead_tier: lead.lead_tier,
+      opportunity: `Exploring partnership opportunities with ${lead.business_name}.`,
+      context: `This ${lead.business_category} business has been identified as a qualified opportunity based on commercial signals.`,
+      recommendation: `Contact to discuss how we can support ${lead.business_name}'s growth.`,
+      executiveSummary: `Tier-${lead.lead_tier || 'C'} opportunity with engagement score ${lead.engagement_score}/100.`,
+      evidence: [
+        `Discovered via autonomous discovery pipeline`,
+        `Category: ${lead.business_category}`,
+        `Engagement Score: ${lead.engagement_score}/100`,
+        `Lead Tier: ${lead.lead_tier || 'C'}`
+      ]
+    }));
+  } catch (err) {
+    console.error('[B2B] Fatal error in getRealProspects:', err instanceof Error ? err.message : String(err));
+    return [];
+  }
 }
 
 export default async function B2BTodayPage() {
