@@ -32,10 +32,14 @@ export async function POST(req: NextRequest) {
     const sql = neon(process.env.DATABASE_URL!);
 
     try {
+      const startedAt = new Date(result.timestamp);
+      const completedAt = new Date();
+      const durationMs = completedAt.getTime() - startedAt.getTime();
+
       await sql`
-        CREATE TABLE IF NOT EXISTS b2b_orchestration_logs (
+        CREATE TABLE IF NOT EXISTS b2b_orchestration_runs (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          run_id TEXT NOT NULL,
+          run_id TEXT NOT NULL UNIQUE,
           started_at TIMESTAMPTZ NOT NULL,
           completed_at TIMESTAMPTZ NOT NULL,
           discovery_count INTEGER,
@@ -47,21 +51,22 @@ export async function POST(req: NextRequest) {
           jobs_created INTEGER,
           failures TEXT[],
           status TEXT NOT NULL,
+          duration_ms INTEGER,
           execution_details JSONB,
           created_at TIMESTAMPTZ DEFAULT NOW()
         )
       `;
 
       await sql`
-        INSERT INTO b2b_orchestration_logs (
+        INSERT INTO b2b_orchestration_runs (
           run_id, started_at, completed_at, status, execution_details,
           discovery_count, businesses_found, leads_created,
           drivers_matched, emails_sent, standing_orders_processed,
-          jobs_created, failures
+          jobs_created, failures, duration_ms
         ) VALUES (
           ${result.executionId},
-          ${new Date(result.timestamp).toISOString()},
-          ${new Date().toISOString()},
+          ${startedAt.toISOString()},
+          ${completedAt.toISOString()},
           ${result.success ? "success" : "partial_failure"},
           ${JSON.stringify(result)},
           ${result.stages.discovery.count},
@@ -75,7 +80,8 @@ export async function POST(req: NextRequest) {
             ...result.stages.discovery.errors,
             ...result.stages.driverMatching.failed,
             ...result.stages.standingOrders.failed,
-          ]}
+          ]},
+          ${durationMs}
         )
       `;
     } catch (logError) {

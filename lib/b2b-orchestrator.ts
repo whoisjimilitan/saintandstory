@@ -181,7 +181,7 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
     }
 
     const drivers = (await sql`
-      SELECT id, name, email, postcode, latitude, longitude, radius_miles
+      SELECT id, full_name as name, email, postcode, latitude, longitude, radius_miles
       FROM drivers
       WHERE b2b_opt_in = true
     `) as Driver[];
