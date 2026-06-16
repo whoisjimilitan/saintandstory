@@ -7,10 +7,12 @@
  * Fully idempotent: designed to be safely run multiple times.
  */
 
-import { runDiscoveryPipeline } from "./discovery/pipeline";
+import { runFullPipeline } from "./four-layer-pipeline";
+import { GooglePlacesSource } from "./discovery/google-places-source";
 import { neon } from "@neondatabase/serverless";
 import { OrchestrationLogger } from "./orchestration-logger";
 import type { Driver } from "./b2b-types";
+import type { RawBusinessDiscovery } from "./four-layer-pipeline";
 
 // Lazy-load recognition to avoid initialization errors from Resend
 let triggerDriverLeadDiscovery: any;
@@ -106,14 +108,44 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
     for (const { niche, location } of discoveryParams) {
       try {
         console.log(`  → Discovering ${niche} in ${location}`);
-        const discoveryResult = await runDiscoveryPipeline({
-          niche,
-          location,
-        });
 
-        totalDiscovered += discoveryResult.discovered;
-        totalStored += discoveryResult.stored;
-        console.log(`    ✓ Stored ${discoveryResult.stored} new businesses`);
+        // Use Google Places to discover businesses
+        const source = new GooglePlacesSource();
+        const payloads = await source.discover(niche, location);
+        totalDiscovered += payloads.length;
+
+        // Process each business through four-layer pipeline
+        let promotedCount = 0;
+        for (const payload of payloads) {
+          try {
+            // Extract category and rating from Google Places details
+            const details = payload.rawPayload as any;
+            const business: RawBusinessDiscovery = {
+              placeId: payload.sourceEntityId,
+              name: payload.name,
+              address: payload.address || 'address not available',
+              postcode: details?.formatted_address?.split(',').pop()?.trim(),
+              category: details?.types?.[0] || 'business',
+              source: 'discovery',
+              reviews: payload.reviews,
+              website: payload.website,
+              phone: payload.phone,
+              rating: details?.rating,
+              reviewCount: payload.reviews?.length || 0,
+              rawData: payload.rawPayload,
+            };
+
+            const pipelineResult = await runFullPipeline(sql, business);
+            if (pipelineResult.promoted) {
+              promotedCount++;
+              totalStored++;
+            }
+          } catch (businessErr) {
+            console.error(`    ✗ Failed to process ${payload.name}:`, businessErr instanceof Error ? businessErr.message : String(businessErr));
+          }
+        }
+
+        console.log(`    ✓ Discovered ${totalDiscovered} businesses, promoted ${promotedCount} to leads`);
       } catch (err) {
         const errorMsg = `${niche} @ ${location}: ${err instanceof Error ? err.message : String(err)}`;
         errors.push(errorMsg);

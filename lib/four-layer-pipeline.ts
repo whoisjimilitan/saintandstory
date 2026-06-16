@@ -266,7 +266,7 @@ export async function promoteToLead(
         NOW(), 'discovery_promoted', 'new', ${data.category}, ${tier},
         NOW(), NOW()
       )
-      ON CONFLICT (google_place_id) DO NOTHING
+      ON CONFLICT (qualified_business_id) DO NOTHING
       RETURNING id
     `) as Array<{ id: string }>;
 
