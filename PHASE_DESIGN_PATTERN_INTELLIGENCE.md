@@ -145,6 +145,28 @@ ON CONFLICT (pattern_id) DO UPDATE SET
 
 ---
 
+### GENERATOR LOCK (Non-negotiable)
+
+**Pattern Records may ONLY be generated from:**
+
+```sql
+Outcome Cases WHERE logistics_fit_score >= 60
+```
+
+**Enforcement:**
+```typescript
+// Pattern generation MUST have this filter
+WHERE logistics_fit_score >= 60
+
+// Cases below 60 are PERMANENTLY EXCLUDED
+// They never feed Pattern Intelligence
+// This is enforced in code before grouping
+```
+
+**Why:** Cases below 60 are not qualified. They do not become patterns. This creates a hard boundary.
+
+---
+
 ### Query 2: Display Patterns on Dashboard
 
 **When:** Dashboard loads (GET /dashboard/admin/b2b)  
@@ -161,10 +183,14 @@ SELECT
   job_rate,
   recurring_rate
 FROM pattern_records
-WHERE job_rate > 0
-ORDER BY job_rate DESC, recurring_rate DESC
+WHERE eligible_cases >= 5
+ORDER BY last_updated DESC
 LIMIT 3
 ```
+
+**Purpose:** Show recently observed repeating situations (minimum 5 cases to qualify)
+
+**Not ranking:** Sorted by recency, not by job_rate (which would rank/predict)
 
 **Proof required:**
 ```sql
@@ -222,8 +248,8 @@ WHERE blocked_outcome = 'Delayed moves'
 interface PatternInsight {
   pattern_id: string              // "Delayed moves|Lack of key coordination|Key handover delays"
   situation: string               // "Lack of key coordination causing delayed moves"
-  observed_result: string         // "15% became paying jobs across 20 validated cases"
-  operator_guidance: string       // "Lead with discussion about key handover delays"
+  observed_result: string         // "15% became paying jobs across 20 similar situations"
+  sample_size: number             // 20 (how many similar situations)
 }
 ```
 
@@ -232,8 +258,8 @@ interface PatternInsight {
 {
   "pattern_id": "Delayed moves|Lack of key coordination|Key handover delays",
   "situation": "Lack of key coordination causing delayed moves",
-  "observed_result": "15% became paying jobs across 20 validated cases, 8% became recurring work",
-  "operator_guidance": "Lead with discussion about key handover delays. This friction repeatedly converts to paying work."
+  "observed_result": "15% became paying jobs across 20 similar situations, 8% became recurring work",
+  "sample_size": 20
 }
 ```
 
@@ -405,7 +431,7 @@ Dashboard View:
 
 **ALLOWED:**
 - ✅ Observation (e.g., "15% became paying jobs")
-- ✅ Historical rate (e.g., "across 20 validated cases")
+- ✅ Historical rate (e.g., "across 20 similar situations")
 - ✅ Pattern description (e.g., "key handover delays caused moves")
 
 ### Proof of Compliance
@@ -421,7 +447,7 @@ Proof: This is a DESCRIPTION, not prediction
 
 **Insight 2: Observed Result**
 ```
-Output: "15% became paying jobs across 20 validated cases"
+Output: "15% became paying jobs across 20 similar situations"
 Proof: This is HISTORICAL FACT, not prediction
 - 20 cases with this pattern exist (from pattern_records.eligible_cases)
 - 3 became jobs (from pattern_records.job_count)
@@ -474,7 +500,7 @@ Proof: This is DESCRIPTION + OBSERVED PATTERN, not prediction
 - b2b_orchestration_logs (Good Morning) — untouched
 
 ### New Queries (Read-only)
-- `SELECT * FROM pattern_records WHERE job_rate > 0` — Dashboard display
+- `SELECT * FROM pattern_records WHERE eligible_cases >= 5 ORDER BY last_updated DESC LIMIT 3` — Dashboard display (shows recent repeating situations)
 - `SELECT * FROM b2b_leads WHERE pattern matches` — Drilldown
 
 ### No Destructive Queries
@@ -563,22 +589,62 @@ Authorization: Bearer [admin token]
 
 ---
 
+## REMOVABILITY TEST (Mandatory)
+
+**Requirement:** Delete Pattern Intelligence code. Dashboard continues functioning normally.
+
+**Test procedure:**
+
+```
+Step 1: Delete all code
+- Remove components/WhatWeAreLearningSection.tsx
+- Remove app/api/b2b/pattern-cases/route.ts  
+- Remove Pattern Intelligence imports from dashboard
+- Leave pattern_records table untouched (empty)
+
+Step 2: Deploy
+- Dashboard loads without errors
+- All baseline queries work
+- System Health metrics display
+- Today's Work displays
+- Good Morning displays
+- NO operator-facing breakage
+
+Step 3: Verify
+- All metrics match pre-feature state
+- All queries return same data
+- No console errors
+- No missing components
+
+Success: System functions normally without Pattern Intelligence code
+
+Failure: Feature is too coupled. Redesign required.
+```
+
+---
+
 ## SUCCESS CRITERIA
 
 **Design approved when:**
-1. ✅ Data existence verified (pattern_records has records with job_rate > 0)
+1. ✅ Data existence verified (pattern_records has records with eligible_cases >= 5)
 2. ✅ Queries tested (each query returns expected results)
 3. ✅ Non-predictive language verified (all strings pass rule 6)
-4. ✅ Drillability confirmed (3-click maximum to source data)
-5. ✅ Checklist items all passing
-6. ✅ No architectural violations found
+4. ✅ Dashboard shows only: situation, observed_result, sample_size (no operator_guidance)
+5. ✅ Query uses recency, not ranking (ORDER BY last_updated DESC, not job_rate DESC)
+6. ✅ "Validated cases" replaced with "similar situations" throughout
+7. ✅ Generator lock enforced: logistics_fit_score >= 60 only
+8. ✅ Drillability confirmed (2-click maximum to source data)
+9. ✅ Removability test passes (delete code, dashboard still works)
+10. ✅ Checklist items all passing
+11. ✅ No architectural violations found
 
 **Design rejected if:**
 - ❌ pattern_records is empty (no data to display)
 - ❌ Any query violates existing table structure
-- ❌ Any output uses predictive language
+- ❌ Any output uses predictive language or recommendations
 - ❌ Any checklist item fails
 - ❌ Automation is assumed (cron, scheduler, auto-trigger)
+- ❌ Removability test fails (feature too coupled)
 
 ---
 
