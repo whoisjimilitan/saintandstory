@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { enrichLeadWithOutreach } from "@/lib/b2b-enrichment-orchestrator";
 
 export async function POST(request: Request) {
   try {
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
         }
 
         // Create lead
-        await prisma.b2b_leads.create({
+        const lead = await prisma.b2b_leads.create({
           data: {
             business_name: name,
             business_category: category,
@@ -58,6 +59,13 @@ export async function POST(request: Request) {
             source: "import",
           },
         });
+
+        // Trigger enrichment automatically
+        try {
+          await enrichLeadWithOutreach(lead.id);
+        } catch (enrichErr) {
+          console.error(`[IMPORT] Enrichment failed for ${lead.id}:`, enrichErr);
+        }
 
         processed++;
       } catch (err) {

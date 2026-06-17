@@ -11,6 +11,7 @@
  */
 
 import { prisma } from "./prisma";
+import { resend, FROM } from "./resend";
 
 export interface AutonomousSendConfig {
   max_emails_per_day: number;
@@ -161,10 +162,9 @@ async function getQualifiedLeads(
 }
 
 /**
- * Send single email via SendGrid
- * (Placeholder - actual implementation depends on SendGrid setup)
+ * Send single email via Resend
  */
-async function sendEmailViaSendGrid(
+async function sendEmailViaResend(
   outreachId: string,
   toEmail: string,
   subject: string,
@@ -172,17 +172,61 @@ async function sendEmailViaSendGrid(
   trackingToken: string
 ): Promise<boolean> {
   try {
-    // In real implementation, call SendGrid API here
-    // For now, just log and return true
-    console.log(
-      `[AUTONOMOUS_SEND] Would send email to ${toEmail} with token ${trackingToken}`
-    );
+    const yesToken = `yes_${outreachId}`;
+    const noToken = `no_${outreachId}`;
+    const baseUrl = process.env.VERCEL_URL || "http://localhost:3000";
+    const yesUrl = `https://${baseUrl}/api/b2b/respond?token=${yesToken}&response=YES`;
+    const noUrl = `https://${baseUrl}/api/b2b/respond?token=${noToken}&response=NO`;
 
-    // Mark as sent
+    // Build HTML email with YES/NO buttons
+    const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="font-family:-apple-system,system-ui,sans-serif;margin:0;padding:0;background:#f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px;padding:40px;border:1px solid #e0e0e0;">
+        <tr><td style="font-size:16px;line-height:1.6;color:#333;margin-bottom:24px;">
+          ${body}
+        </td></tr>
+        <tr><td align="center" style="padding-top:20px;border-top:1px solid #e0e0e0;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="padding-right:12px;">
+              <a href="${yesUrl}" style="display:inline-block;background:#10b981;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">YES</a>
+            </td>
+            <td>
+              <a href="${noUrl}" style="display:inline-block;background:#ef4444;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">NO</a>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="padding-top:24px;font-size:12px;color:#999;text-align:center;">
+          Saint & Story
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+    // Send via Resend
+    const result = await resend.emails.send({
+      from: FROM || "Saint & Story <hello@saintandstory.com>",
+      to: toEmail,
+      subject,
+      html,
+    });
+
+    if (result.error) {
+      console.error(`[AUTONOMOUS_SEND] Resend error:`, result.error);
+      return false;
+    }
+
+    // Mark as sent with Resend message ID
     await prisma.b2b_outreach.update({
       where: { id: outreachId },
       data: {
         sent_at: new Date(),
+        resend_message_id: result.data?.id,
       },
     });
 
@@ -259,7 +303,7 @@ export async function autonomousSendEmails(
 
         // Send email
         const trackingToken = `token_${outreach.id}`;
-        const success = await sendEmailViaSendGrid(
+        const success = await sendEmailViaResend(
           outreach.id,
           outreach.b2b_leads.email || "",
           outreach.subject || "",
