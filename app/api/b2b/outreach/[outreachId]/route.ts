@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { outreachId: string } }
+  { params }: { params: Promise<{ outreachId: string }> }
 ) {
   try {
+    const { outreachId } = await params;
     const outreach = await prisma.b2b_outreach.findUnique({
-      where: { id: params.outreachId },
+      where: { id: outreachId },
       include: {
         b2b_leads: {
           select: {
