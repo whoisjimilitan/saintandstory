@@ -12,6 +12,8 @@ interface Lead {
   status: string;
   leadState: string;
   createdAt: string;
+  painPoint?: string | null;
+  businessEvidence?: any;
 }
 
 interface B2BLeadsReviewProps {
@@ -95,18 +97,19 @@ export function B2BLeadsReview({ searchTrigger }: B2BLeadsReviewProps) {
           <div className="space-y-4">
             {leads.map((lead) => (
               <div key={lead.id} className="border border-[#E8E8E8] rounded p-4 hover:border-[#D0D0D0] transition-colors">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
                     <p className="font-semibold text-[#0D0D0D]">{lead.businessName}</p>
+                    {lead.painPoint && (
+                      <p className="text-sm text-[#0D0D0D] mt-1">
+                        {lead.painPoint}
+                      </p>
+                    )}
                     <p className="text-[10px] text-[#888888] mt-1">
-                      {lead.businessCategory} • {lead.city}, {lead.postcode}
+                      {lead.city}, {lead.postcode}
                     </p>
                   </div>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded bg-[#F5F5F5] text-[#0D0D0D]">
-                    {lead.status}
-                  </span>
                 </div>
-                <p className="text-[10px] text-[#666666] mb-4">{lead.email}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleSend(lead.id, lead.businessName)}

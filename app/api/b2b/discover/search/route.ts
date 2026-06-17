@@ -49,6 +49,8 @@ export async function GET(request: Request) {
         status: true,
         leadState: true,
         createdAt: true,
+        painPoint: true,
+        businessEvidence: true,
       },
       take: Math.min(limit, 100),
       orderBy: { createdAt: "desc" },
