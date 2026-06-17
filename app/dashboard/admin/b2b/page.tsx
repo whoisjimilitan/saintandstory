@@ -22,13 +22,13 @@ export default async function B2BPage() {
     <div className="p-8 max-w-7xl mx-auto">
       {/* Navigation */}
       <div className="flex gap-2 mb-12">
-        {['ADMIN', 'DISCOVERY', 'PIPELINE', 'ORDERS', 'ANALYTICS'].map((item) => (
+        {['ADMIN', 'TODAY', 'DISCOVERY', 'PIPELINE', 'ORDERS', 'ANALYTICS'].map((item) => (
           <Link
             key={item}
-            href={item === 'ADMIN' ? '/dashboard/admin' : `/dashboard/admin/b2b/${item.toLowerCase()}`}
+            href={item === 'ADMIN' ? '/dashboard/admin' : `/dashboard/admin/b2b${item === 'TODAY' ? '' : '/' + item.toLowerCase()}`}
             className={`text-[10px] font-semibold uppercase tracking-[0.2em] px-4 py-2 rounded border transition-colors ${
-              !['DISCOVERY', 'PIPELINE', 'ORDERS', 'ANALYTICS'].includes(item)
-                ? 'bg-white text-[#0D0D0D] border-[#E8E8E8] hover:border-[#D0D0D0]'
+              item === 'TODAY'
+                ? 'bg-[#0D0D0D] text-white border-[#0D0D0D]'
                 : 'bg-white text-[#0D0D0D] border-[#E8E8E8] hover:border-[#D0D0D0]'
             }`}
           >
