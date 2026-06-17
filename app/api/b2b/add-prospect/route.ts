@@ -41,10 +41,11 @@ export async function POST(request: Request) {
         city: body.city || null,
         postcode: body.postcode || null,
         contact_name: body.contact_name || null,
-        engagement_score: 50, // Default mid-tier
+        engagement_score: 50,
         lead_tier: "B",
         pipeline_stage: "NEW",
         source: "manual",
+        updated_at: new Date(),
       },
     });
 

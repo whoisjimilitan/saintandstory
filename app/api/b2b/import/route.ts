@@ -57,6 +57,7 @@ export async function POST(request: Request) {
             lead_tier: "B",
             pipeline_stage: "NEW",
             source: "import",
+            updated_at: new Date(),
           },
         });
 
