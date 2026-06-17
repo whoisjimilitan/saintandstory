@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
-import { IntakeChannels } from "@/components/IntakeChannels";
+import { B2BDiscoverySection } from "@/components/B2BDiscoverySection";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -303,7 +303,7 @@ export default async function DiscoveryPage() {
       </div>
 
       {/* SECTION 1.5: INTAKE CHANNELS (INTERACTIVE) */}
-      <IntakeChannels sources={discovery.intake_sources} />
+      <B2BDiscoverySection sources={discovery.intake_sources} />
 
       {/* SECTION 2: INTAKE FLOW */}
       <div className="mb-16">
