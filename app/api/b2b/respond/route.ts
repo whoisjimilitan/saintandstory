@@ -21,15 +21,16 @@ export async function GET(request: Request) {
       );
     }
 
-    // Find outreach by token (simplified - in production use encrypted tokens)
-    // For now, extract outreach_id from token
-    const outreachId = token.split("_")[1];
-    if (!outreachId) {
+    // Extract outreach_id from token (format: yes_OUTREACH_ID or no_OUTREACH_ID)
+    const parts = token.split("_");
+    if (parts.length < 2) {
       return NextResponse.json(
-        { error: "Invalid token" },
+        { error: "Invalid token format" },
         { status: 400 }
       );
     }
+
+    const outreachId = parts.slice(1).join("_"); // Handle UUIDs with underscores
 
     // Check if already responded (deduplication)
     const existing = await prisma.b2b_responses.findFirst({

@@ -75,7 +75,6 @@ export default function ProspectBriefPage({
       });
 
       if (res.ok) {
-        // Success - redirect to next action
         window.location.href = "/b2b/dashboard";
       }
     } catch (err) {

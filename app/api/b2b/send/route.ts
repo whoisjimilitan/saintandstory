@@ -7,7 +7,6 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { v4 as uuidv4 } from "uuid";
 
 interface SendRequest {
   lead_id: string;
@@ -17,7 +16,7 @@ interface SendRequest {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.send()) as SendRequest;
+    const body = (await request.json()) as SendRequest;
     const { lead_id, pressure_type, copy_variant } = body;
 
     // Fetch existing outreach record
@@ -50,11 +49,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate unique tracking tokens for YES/NO buttons
-    const yesToken = `yes_${uuidv4()}`;
-    const noToken = `no_${uuidv4()}`;
-
-    // Update outreach with sent timestamp and tokens
+    // Update outreach with sent timestamp
     await prisma.b2b_outreach.update({
       where: { id: outreach.id },
       data: {
@@ -65,20 +60,19 @@ export async function POST(request: Request) {
       },
     });
 
-    // In production, send via SendGrid here
-    // For now, just log and return success
+    // In production, send via SendGrid here with tokens embedded in URLs
+    // Token format: yes_{outreachId}, no_{outreachId}
+    // Callback URLs: /api/b2b/respond?token=yes_{outreachId}&response=YES
     console.log(
-      `[SEND] Email sent to ${outreach.b2b_leads.business_name} (${outreach.b2b_leads.email})`
+      `[SEND] Email queued for ${outreach.b2b_leads.business_name} (${outreach.b2b_leads.email})`
     );
-    console.log(`[SEND] YES token: ${yesToken}`);
-    console.log(`[SEND] NO token: ${noToken}`);
+    console.log(`[SEND] Outreach ID: ${outreach.id}`);
 
     return NextResponse.json({
       success: true,
       outreach_id: outreach.id,
       lead_name: outreach.b2b_leads.business_name,
       email: outreach.b2b_leads.email,
-      tokens: { yes: yesToken, no: noToken },
     });
   } catch (error) {
     console.error("[SEND] Error:", error);
