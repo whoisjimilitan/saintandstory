@@ -95,13 +95,13 @@ export async function enrichLeadWithOutreach(
           console.log(`[ENRICHMENT] Email draft generated for ${leadId}`);
 
           // STEP 4: Save to b2b_outreach with pressure_type
-          if (email.subject && email.body) {
+          if (email.subject && email.email_body) {
             try {
               await prisma.b2b_outreach.create({
                 data: {
                   lead_id: leadId,
                   subject: email.subject,
-                  body: email.body,
+                  body: email.email_body,
                   email_type: "initial",
                   sent_by: "autonomous",
                   pressure_type: pressureType,
