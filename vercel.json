@@ -1,12 +1,16 @@
 {
   "crons": [
     {
-      "path": "/api/daily-word",
+      "path": "/api/discovery/run",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/b2b/autonomous-send",
       "schedule": "0 7 * * *"
     },
     {
-      "path": "/api/discovery/run",
-      "schedule": "0 2 * * *"
+      "path": "/api/daily-word",
+      "schedule": "5 7 * * *"
     }
   ]
 }
