@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { neon } from "@neondatabase/serverless";
 import { B2BDiscoverySection } from "@/components/B2BDiscoverySection";
+import { DiscoveryModes } from "@/components/DiscoveryModes";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -286,31 +287,44 @@ export default async function DiscoveryPage() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-16">
+      <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
-          Intelligence Engine.
+          Operator Discovery.
         </h1>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          What is the system discovering and learning?
+          Four ways to find and qualify business opportunities
         </p>
       </div>
 
-      {/* SECTION 1: DISCOVERY BRIEF */}
-      <div className="mb-16 bg-white border border-[#E8E8E8] rounded px-6 py-5">
-        <p className="text-sm leading-relaxed text-[#0D0D0D]">
-          The system discovered <span className="font-semibold">{discovery.discovered_overnight}</span> new opportunities overnight and qualified <span className="font-semibold">{discovery.qualified_overnight}</span> for evaluation.
-        </p>
-      </div>
-
-      {/* SECTION 1.5: INTAKE CHANNELS (INTERACTIVE) */}
-      <B2BDiscoverySection sources={discovery.intake_sources} />
-
-      {/* SECTION 2: INTAKE FLOW */}
-      <div className="mb-16">
+      {/* PRIMARY MODE: POSTCODE DISCOVERY (FULL WIDTH, DOMINANT) */}
+      <div className="mb-20">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Discovery Pipeline
+          Mode 1: Postcode Discovery (Primary)
         </p>
-        <div className="bg-white border border-[#E8E8E8] rounded p-8">
+        <div className="bg-white border-2 border-[#0D0D0D] rounded p-8 shadow-sm">
+          <B2BDiscoverySection sources={discovery.intake_sources} />
+        </div>
+      </div>
+
+      {/* MODES 2-4: SECONDARY DISCOVERY MODES (3-COLUMN) */}
+      <DiscoveryModes
+        csvCount={discovery.intake_sources.find(s => s.name === 'CSV Import')?.count || 0}
+        manualCount={discovery.intake_sources.find(s => s.name === 'Manual Entry')?.count || 0}
+        autonomousCount={discovery.intake_sources.find(s => s.name === 'Autonomous Discovery')?.count || 0}
+      />
+
+      {/* SYSTEM INSIGHTS LAYER (Bottom) */}
+      <div className="pt-12 border-t border-[#E8E8E8] mt-20">
+        <h2 className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-12">
+          System Intelligence & Insights
+        </h2>
+
+        {/* Pipeline Overview */}
+        <div className="mb-16">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+            Pipeline Status
+          </p>
+          <div className="bg-white border border-[#E8E8E8] rounded p-8">
           <div className="flex items-center justify-between">
             {/* Discovered */}
             <div className="text-center">
@@ -361,10 +375,10 @@ export default async function DiscoveryPage() {
               </p>
             </div>
           </div>
+          </div>
         </div>
-      </div>
 
-      {/* SECTION 3: CATEGORY INTELLIGENCE */}
+        {/* SECTION 3: CATEGORY INTELLIGENCE */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
           Category Intelligence
@@ -412,10 +426,10 @@ export default async function DiscoveryPage() {
         </div>
       </div>
 
-      {/* SECTION 5: DISCOVERY HEALTH */}
-      <div className="pt-8 border-t border-[#E8E8E8]">
+      {/* Health Indicators */}
+      <div>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Discovery Health Indicators
+          Pipeline Health Indicators
         </p>
         <div className="grid grid-cols-3 gap-6">
           {/* Discovery Velocity */}
@@ -455,6 +469,7 @@ export default async function DiscoveryPage() {
             <p className="text-[10px] text-[#666666] mt-2">
               Promoted / Qualified
             </p>
+          </div>
           </div>
         </div>
       </div>
