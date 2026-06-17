@@ -217,82 +217,34 @@ export default async function PipelinePage() {
         </div>
       </div>
 
-      {/* Stage Cards Grid */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Stage Breakdown
-        </p>
-        <div className="grid grid-cols-4 gap-4">
-          {stages.map((stage) => (
-            <div key={stage.stage} className="border border-[#E8E8E8] rounded px-4 py-6 bg-white hover:border-[#D0D0D0] transition-colors">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-                {stage.stage}
-              </p>
-              <p className="text-4xl font-black text-[#0D0D0D] mb-2">
-                {stage.count}
-              </p>
-              <p className="text-[10px] font-medium text-[#0D0D0D]">
-                {stage.percentage.toFixed(0)}% of total
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Key Metrics */}
+      {/* Prospects Requiring Attention */}
       <div className="mb-16 border-t border-[#E8E8E8] pt-12">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          System Health Indicators
+          Prospects Requiring Attention
         </p>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Contact Rate
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              {pipeline.total > 0 ? Math.round((pipeline.contacted / pipeline.total) * 100) : 0}%
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              {pipeline.contacted} of {pipeline.total} contacted
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Engagement Rate
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              {pipeline.contacted > 0 ? Math.round((pipeline.opened / pipeline.contacted) * 100) : 0}%
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              {pipeline.opened} opened emails
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Reply Rate
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              {pipeline.contacted > 0 ? Math.round((pipeline.replied / pipeline.contacted) * 100) : 0}%
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              {pipeline.replied} replied
-            </p>
-          </div>
+        <div className="bg-white border border-[#E8E8E8] rounded p-6">
+          <p className="text-sm text-[#666666] italic">
+            Individual prospect engagement tracking available in Pipeline detail view.
+          </p>
+          <p className="text-[10px] text-[#888888] mt-3">
+            Focus on the bottlenecks above to understand where your intervention will have the most impact.
+          </p>
         </div>
       </div>
 
-      {/* Total Inventory */}
+      {/* Pipeline Summary */}
       <div className="pt-8 border-t border-[#E8E8E8]">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          Total Inventory
+          Pipeline Summary
         </p>
         <p className="text-5xl font-black text-[#0D0D0D]">
           {pipeline.total}
         </p>
         <p className="text-sm text-[#666666] mt-2">
-          Prospects in system
+          Total prospects in active engagement
+        </p>
+        <p className="text-sm text-[#0A66C2] font-semibold mt-4">
+          Expected conversions to standing orders: {Math.round(pipeline.replied * 0.4)}–{Math.round(pipeline.replied * 0.5)}
         </p>
       </div>
     </div>

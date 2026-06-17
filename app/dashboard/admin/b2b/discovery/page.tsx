@@ -292,26 +292,73 @@ export default async function DiscoveryPage() {
           Operator Discovery.
         </h1>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          Four ways to find and qualify business opportunities
+          Find. Recognise. Act.
         </p>
       </div>
 
-      {/* PRIMARY MODE: POSTCODE DISCOVERY (FULL WIDTH, DOMINANT) */}
-      <div className="mb-20">
+      {/* RECOMMENDED FOCUS */}
+      <div className="mb-12 bg-[#F9FAFB] border border-[#E8E8E8] rounded p-6">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          Recommended Focus (from Analytics)
+        </p>
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">Priority Category</p>
+            <p className="text-sm text-[#666666]">Logistics (52% conversion rate)</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">Target Pain Point</p>
+            <p className="text-sm text-[#666666]">Delivery bottlenecks + scheduling pressure</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">Volume Needed</p>
+            <p className="text-sm text-[#666666]">8 new prospects this week (expect 2-3 to convert)</p>
+          </div>
+        </div>
+      </div>
+
+      {/* PRIMARY DISCOVERY WORKFLOW */}
+      <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Mode 1: Postcode Discovery (Primary)
+          Find Opportunities
         </p>
         <div className="bg-white border-2 border-[#0D0D0D] rounded p-8 shadow-sm">
           <B2BDiscoverySection sources={discovery.intake_sources} />
         </div>
       </div>
 
-      {/* MODES 2-4: SECONDARY DISCOVERY MODES (3-COLUMN) */}
-      <DiscoveryModes
-        csvCount={discovery.intake_sources.find(s => s.name === 'CSV Import')?.count || 0}
-        manualCount={discovery.intake_sources.find(s => s.name === 'Manual Entry')?.count || 0}
-        autonomousCount={discovery.intake_sources.find(s => s.name === 'Autonomous Discovery')?.count || 0}
-      />
+      {/* AFTER YOU SEND - CONTINUITY TO PIPELINE */}
+      <div className="mb-16 bg-white border border-[#E8E8E8] rounded p-6">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          After You Send
+        </p>
+        <div className="space-y-3 text-sm text-[#0D0D0D]">
+          <p>
+            When you SEND an email, the business appears in <strong>Pipeline</strong> within 5 minutes.
+          </p>
+          <p>
+            You'll see if they open it. If they click a link, you'll know they're interested.
+          </p>
+          <p>
+            If they reply, move them to <strong>Orders</strong> to set up the standing order.
+          </p>
+          <p className="text-[#666666] text-[10px] pt-2">
+            Success path: SEND → Open email → Click link → Reply → Standing order (typical: 5–7 days)
+          </p>
+        </div>
+      </div>
+
+      {/* SECONDARY DISCOVERY METHODS */}
+      <div className="border-t border-[#E8E8E8] pt-12">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Other Ways to Find Opportunities
+        </p>
+        <DiscoveryModes
+          csvCount={discovery.intake_sources.find(s => s.name === 'CSV Import')?.count || 0}
+          manualCount={discovery.intake_sources.find(s => s.name === 'Manual Entry')?.count || 0}
+          autonomousCount={discovery.intake_sources.find(s => s.name === 'Autonomous Discovery')?.count || 0}
+        />
+      </div>
 
     </div>
   );

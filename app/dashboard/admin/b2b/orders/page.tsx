@@ -175,14 +175,18 @@ export default async function OrdersPage() {
         </p>
       </div>
 
-      {/* SECTION 2: STANDING ORDERS */}
+      {/* SECTION 2: STANDING ORDERS (SORTED BY URGENCY) */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
           Recurring Business Programs
         </p>
         {data.orders.length > 0 ? (
           <div className="space-y-4">
-            {data.orders.map((order) => (
+            {data.orders.sort((a, b) => {
+              const priorityA = a.status === 'blocked' ? 0 : a.status === 'attention_required' ? 1 : 2;
+              const priorityB = b.status === 'blocked' ? 0 : b.status === 'attention_required' ? 1 : 2;
+              return priorityA - priorityB;
+            }).map((order) => (
               <div
                 key={order.id}
                 className="border border-[#E8E8E8] rounded p-6 bg-white hover:border-[#D0D0D0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200"
@@ -264,110 +268,7 @@ export default async function OrdersPage() {
         )}
       </div>
 
-      {/* SECTION 3: HEALTH STATUS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Status
-        </p>
-        <div className="grid grid-cols-3 gap-6">
-          {/* Total */}
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Total Programs
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D]">
-              {data.total_assets}
-            </p>
-          </div>
 
-          {/* Working */}
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Working
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D]">
-              {data.healthy_assets}
-            </p>
-          </div>
-
-          {/* Blocked */}
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8 hover:border-[#D0D0D0] transition-colors">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Blocked
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D]">
-              {data.blocked_assets}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* SECTION 4: PROBLEMS */}
-      {data.blockers.length > 0 && (
-        <div className="mb-16">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-            What's Blocked
-          </p>
-          <div className="space-y-3">
-            {data.blockers.map((blocker, idx) => (
-              <div key={idx} className="bg-[#FFF8E5] border border-[#FFE5C0] rounded p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#CC6600] mb-1">
-                  {blocker.name}
-                </p>
-                <p className="text-sm text-[#CC6600]">
-                  {blocker.issue}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* SECTION 5: FLOW */}
-      <div className="pt-8 border-t border-[#E8E8E8]">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Flow
-        </p>
-        <div className="bg-white border border-[#E8E8E8] rounded p-8">
-          <div className="flex items-center justify-between">
-            {/* Set Up */}
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Set Up
-              </p>
-              <p className="text-5xl font-black text-[#0D0D0D]">
-                {data.total_assets}
-              </p>
-            </div>
-
-            {/* Arrow */}
-            <div className="text-[#D0D0D0] text-2xl mx-4">→</div>
-
-            {/* Running */}
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Running
-              </p>
-              <p className="text-5xl font-black text-[#0D0D0D]">
-                {data.healthy_assets}
-              </p>
-            </div>
-
-            {/* Arrow */}
-            <div className="text-[#D0D0D0] text-2xl mx-4">→</div>
-
-            {/* Generating Jobs */}
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                Generating Jobs
-              </p>
-              <p className="text-5xl font-black text-[#0D0D0D]">
-                {Math.max(0, data.healthy_assets)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
