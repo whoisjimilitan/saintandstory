@@ -2,15 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.GOOGLE_AI_API_KEY ?? "",
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-});
-
 type Params = { params: Promise<{ id: string }> };
+
+function getOpenAI() {
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GOOGLE_AI_API_KEY environment variable is not set");
+  }
+  return new OpenAI({
+    apiKey,
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  });
+}
 
 export async function POST(_req: NextRequest, { params }: Params) {
   const { id } = await params;
+  const openai = getOpenAI();
 
   const product = await prisma.product.findUnique({
     where: { id },

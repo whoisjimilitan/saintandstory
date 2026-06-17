@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key);
+}
 
 export async function POST(req: Request) {
+  const stripe = getStripe();
   const { slug, ref, tripwire } = await req.json();
   if (!slug) return NextResponse.json({ error: "Missing slug" }, { status: 400 });
 

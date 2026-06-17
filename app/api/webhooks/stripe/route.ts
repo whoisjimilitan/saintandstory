@@ -3,9 +3,14 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { resend, FROM, purchaseConfirmEmail, partnerWelcomeEmail } from "@/lib/resend";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pdfseeds.com";
 const COMMISSION = 0.80;
+
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key);
+}
 
 function generateCode(email: string): string {
   const prefix = email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "").slice(0, 5).toLowerCase();
@@ -14,6 +19,7 @@ function generateCode(email: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const stripe = getStripe();
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
