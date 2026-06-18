@@ -35,7 +35,11 @@ export function DashboardView() {
   }, []);
 
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return (
+      <div className="flex-1 px-6 py-10">
+        <p className="text-sm text-[#888888]">Loading...</p>
+      </div>
+    );
   }
 
   const hot = prospects.filter((p) => p.status === "warm");
@@ -43,101 +47,100 @@ export function DashboardView() {
   const cold = prospects.filter((p) => p.status === "new");
 
   const selectProspect = (prospect: Prospect) => {
-    // This will be handled by the layout's context panel
-    // For now, we'll just navigate to show the prospect
     router.push(`/dashboard/admin/b2b?module=dashboard&prospect=${prospect.id}`);
   };
 
   return (
-    <div className="flex-1 p-8 overflow-auto">
-      <div className="max-w-3xl">
-        {/* HOT REPLIES */}
+    <div className="flex-1 px-6 py-10 overflow-auto">
+      <div className="max-w-3xl space-y-16">
+        {/* QUEUE SECTIONS */}
+
         {hot.length > 0 && (
-          <div className="mb-8">
-            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
-              🔥 Hot Replies
-            </p>
-            <div className="space-y-2">
+          <section className="space-y-6">
+            <h2 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] border-l-4 border-[#0A66C2] pl-3">
+              Action Required
+            </h2>
+            <div className="space-y-4">
               {hot.map((prospect) => (
-                <div
+                <button
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
+                  className="w-full text-left px-4 py-4 border-l-2 border-[#0A66C2] hover:border-[#0D0D0D] transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
-                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
-                    </div>
-                    <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
-                      WARM
+                  <div className="flex items-baseline justify-between">
+                    <p className="font-medium text-[#0D0D0D]">
+                      {prospect.businessName}
+                    </p>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
+                      warm
                     </span>
                   </div>
-                </div>
+                  <p className="text-sm text-[#888888] mt-2">{prospect.email}</p>
+                </button>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* WARM LEADS */}
         {warm.length > 0 && (
-          <div className="mb-8">
-            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
+          <section className="space-y-6">
+            <h2 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] border-l-4 border-[#888888] pl-3">
               Engaged
-            </p>
-            <div className="space-y-2">
+            </h2>
+            <div className="space-y-4">
               {warm.map((prospect) => (
-                <div
+                <button
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
+                  className="w-full text-left px-4 py-4 border-l-2 border-[#888888] hover:border-[#0D0D0D] transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
-                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
-                    </div>
-                    <span className="text-xs bg-[#D1D1D1] text-[#0D0D0D] px-2 py-1 rounded">
-                      CONTACTED
+                  <div className="flex items-baseline justify-between">
+                    <p className="font-medium text-[#0D0D0D]">
+                      {prospect.businessName}
+                    </p>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
+                      contacted
                     </span>
                   </div>
-                </div>
+                  <p className="text-sm text-[#888888] mt-2">{prospect.email}</p>
+                </button>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* COLD LEADS */}
         {cold.length > 0 && (
-          <div className="mb-8">
-            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
+          <section className="space-y-6">
+            <h2 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] border-l-4 border-[#E8E8E8] pl-3">
               New
-            </p>
-            <div className="space-y-2">
-              {cold.slice(0, 5).map((prospect) => (
-                <div
+            </h2>
+            <div className="space-y-4">
+              {cold.slice(0, 20).map((prospect) => (
+                <button
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
+                  className="w-full text-left px-4 py-4 border-l-2 border-[#E8E8E8] hover:border-[#0D0D0D] transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
-                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
-                    </div>
-                    <span className="text-xs bg-[#E8E8E8] text-[#888888] px-2 py-1 rounded">
-                      NEW
+                  <div className="flex items-baseline justify-between">
+                    <p className="font-medium text-[#0D0D0D]">
+                      {prospect.businessName}
+                    </p>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
+                      new
                     </span>
                   </div>
-                </div>
+                  <p className="text-sm text-[#888888] mt-2">{prospect.email}</p>
+                </button>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {prospects.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-[#888888]">No prospects yet. Discover businesses to get started.</p>
+          <div className="text-center py-20">
+            <p className="text-sm text-[#888888]">
+              No prospects yet. Discover businesses to get started.
+            </p>
           </div>
         )}
       </div>

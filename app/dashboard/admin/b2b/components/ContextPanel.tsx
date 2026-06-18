@@ -61,14 +61,6 @@ export function ContextPanel({
     }
   };
 
-  if (!prospectData) {
-    return (
-      <div className="w-96 bg-[#F5F5F5] border-l border-[#E8E8E8] flex flex-col items-center justify-center p-6">
-        <p className="text-[#888888] text-sm">Select a prospect to begin</p>
-      </div>
-    );
-  }
-
   const handleSendEmail = async () => {
     if (!emailSubject.trim() || !emailBody.trim()) {
       alert("Please fill in subject and body");
@@ -81,7 +73,7 @@ export function ContextPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          leadId: prospectData.id,
+          leadId: prospectData?.id,
           subject: emailSubject,
           body: emailBody,
           emailType: "manual",
@@ -93,7 +85,8 @@ export function ContextPanel({
         setEmailBody("");
         onRefresh();
       } else {
-        alert("Failed to send email");
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
       }
     } catch (error) {
       console.error("Error sending email:", error);
@@ -110,7 +103,7 @@ export function ContextPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          leadId: prospectData.id,
+          leadId: prospectData?.id,
           responseType,
         }),
       });
@@ -129,87 +122,103 @@ export function ContextPanel({
   };
 
   const hasReplied =
-    prospectData.conversationEvents.some((e) => e.type === "REPLIED_YES") ||
-    prospectData.conversationEvents.some((e) => e.type === "REPLIED_NO");
+    prospectData?.conversationEvents.some((e) => e.type === "REPLIED_YES") ||
+    prospectData?.conversationEvents.some((e) => e.type === "REPLIED_NO");
+
+  if (!prospectData) {
+    return (
+      <div className="w-80 border-l border-[#E8E8E8] bg-white px-6 py-10">
+        <p className="text-sm text-[#888888]">Select a prospect to begin</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-96 bg-[#F5F5F5] border-l border-[#E8E8E8] flex flex-col overflow-hidden">
-      {/* HEADER */}
-      <div className="p-6 border-b border-[#E8E8E8]">
-        <h2 className="text-lg font-semibold text-[#0D0D0D]">
-          {prospectData.businessName}
-        </h2>
-        <p className="text-xs text-[#888888] mt-1">{prospectData.businessCategory}</p>
-        <div className="mt-3 flex items-center gap-2">
-          <span
-            className={`px-2 py-1 rounded-md text-xs font-medium ${
-              prospectData.status === "warm"
-                ? "bg-green-500 text-white"
-                : prospectData.status === "contacted"
-                  ? "bg-[#D1D1D1] text-[#0D0D0D]"
-                  : "bg-[#E8E8E8] text-[#888888]"
-            }`}
-          >
-            {prospectData.status}
-          </span>
-          <span className="text-xs text-[#888888]">{prospectData.email}</span>
-        </div>
-      </div>
-
-      {/* SCROLLABLE CONTENT */}
-      <div className="flex-1 overflow-y-auto px-6 py-4">
-        {/* EMAIL SEND SECTION */}
-        <div className="mb-6">
-          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
-            Send Email
-          </p>
-          <div className="space-y-3">
-            <input
-              type="text"
-              value={emailSubject}
-              onChange={(e) => setEmailSubject(e.target.value)}
-              placeholder="Subject"
-              className="w-full bg-white border border-[#E8E8E8] rounded-lg px-3 py-2 text-sm text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
-              disabled={sendingEmail}
-            />
-            <textarea
-              value={emailBody}
-              onChange={(e) => setEmailBody(e.target.value)}
-              placeholder="Email body"
-              rows={4}
-              className="w-full bg-white border border-[#E8E8E8] rounded-lg px-3 py-2 text-sm text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] resize-none"
-              disabled={sendingEmail}
-            />
-            <button
-              onClick={handleSendEmail}
-              disabled={sendingEmail}
-              className="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50"
-            >
-              {sendingEmail ? "Sending..." : "Send Email"}
-            </button>
+    <div className="w-80 border-l border-[#E8E8E8] bg-white overflow-y-auto">
+      <div className="px-6 py-10 space-y-16">
+        {/* PROSPECT HEADER */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-black text-[#0D0D0D] tracking-tight">
+              {prospectData.businessName}
+            </h2>
+            <p className="text-sm text-[#888888] mt-2">
+              {prospectData.businessCategory}
+            </p>
           </div>
+
+          <div className="flex items-center gap-3 pt-4 border-t border-[#E8E8E8]">
+            <div
+              className={`h-3 w-3 rounded-full ${
+                prospectData.status === "warm"
+                  ? "bg-[#0A66C2]"
+                  : prospectData.status === "contacted"
+                    ? "bg-[#666666]"
+                    : "bg-[#E8E8E8]"
+              }`}
+            />
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
+              {prospectData.status}
+            </span>
+          </div>
+
+          <p className="text-xs text-[#888888]">{prospectData.email}</p>
         </div>
 
-        {/* RESPONSE SECTION */}
-        <div className="mb-6 pb-6 border-b border-[#E8E8E8]">
-          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
+        {/* EMAIL COMPOSER */}
+        <div className="space-y-4">
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
+            Send Email
+          </h3>
+
+          <input
+            type="text"
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+            placeholder="Subject"
+            className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-3 py-2 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
+            disabled={sendingEmail}
+          />
+
+          <textarea
+            value={emailBody}
+            onChange={(e) => setEmailBody(e.target.value)}
+            placeholder="Message"
+            rows={5}
+            className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-3 py-2 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] resize-none"
+            disabled={sendingEmail}
+          />
+
+          <button
+            onClick={handleSendEmail}
+            disabled={sendingEmail}
+            className="w-full text-sm font-medium text-[#0D0D0D] border border-[#0D0D0D] px-3 py-2 hover:bg-[#0D0D0D] hover:text-white transition-colors disabled:opacity-50"
+          >
+            {sendingEmail ? "Sending..." : "Send"}
+          </button>
+        </div>
+
+        {/* RESPONSE ACTIONS */}
+        <div className="space-y-4">
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
             Response
-          </p>
+          </h3>
+
           {hasReplied ? (
-            <p className="text-xs text-[#888888]">Response already recorded</p>
+            <p className="text-sm text-[#888888]">Response recorded</p>
           ) : (
             <div className="flex gap-2">
               <button
                 onClick={() => handleRecordResponse("YES")}
                 disabled={recordingResponse}
-                className="flex-1 bg-green-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50"
+                className="flex-1 text-sm font-medium text-white bg-[#0D0D0D] px-3 py-2 hover:opacity-80 transition-opacity disabled:opacity-50"
               >
                 YES
               </button>
               <button
                 onClick={() => handleRecordResponse("NO")}
                 disabled={recordingResponse}
-                className="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 disabled:opacity-50"
+                className="flex-1 text-sm font-medium text-[#DC2626] border border-[#DC2626] px-3 py-2 hover:bg-[#DC2626] hover:text-white transition-colors disabled:opacity-50"
               >
                 NO
               </button>
@@ -218,47 +227,45 @@ export function ContextPanel({
         </div>
 
         {/* TIMELINE */}
-        <div>
-          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
-            Timeline
-          </p>
-          <div className="space-y-4">
-            {prospectData.conversationEvents.length === 0 ? (
-              <p className="text-xs text-[#888888]">No interactions yet</p>
-            ) : (
-              prospectData.conversationEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="text-xs border-l border-[#E8E8E8] pl-3 py-1"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">
+        <div className="space-y-6">
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
+            Interactions
+          </h3>
+
+          {prospectData.conversationEvents.length === 0 ? (
+            <p className="text-sm text-[#888888]">No interactions yet</p>
+          ) : (
+            <div className="space-y-8">
+              {prospectData.conversationEvents.map((event, idx) => (
+                <div key={event.id} className="space-y-2">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#888888] font-medium">
                       {event.type === "EMAIL_SENT"
-                        ? "📧"
+                        ? "Email"
                         : event.type === "REPLIED_YES"
-                          ? "✅"
-                          : event.type === "REPLIED_NO"
-                            ? "❌"
-                            : "•"}
+                          ? "Reply"
+                          : "No Reply"}
                     </span>
-                    <span className="text-[#888888]">
-                      {event.type === "EMAIL_SENT"
-                        ? "Email sent"
-                        : event.type === "REPLIED_YES"
-                          ? "Replied YES"
-                          : "Replied NO"}
+                    <span className="text-[10px] text-[#888888]">
+                      {new Date(event.createdAt).toLocaleDateString()} at{" "}
+                      {new Date(event.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </div>
-                  <span className="text-[#888888] text-xs">
-                    {new Date(event.createdAt).toLocaleString()}
-                  </span>
+
                   {event.subject && (
-                    <p className="text-[#888888] mt-1">Subject: {event.subject}</p>
+                    <p className="text-sm text-[#0D0D0D]">{event.subject}</p>
+                  )}
+
+                  {idx < prospectData.conversationEvents.length - 1 && (
+                    <div className="mt-4 border-t border-[#E8E8E8]" />
                   )}
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
         <TopBar />
 
         {/* MAIN GRID: WORKSPACE + CONTEXT PANEL */}
-        <div className="flex flex-1 overflow-hidden gap-px bg-[#E8E8E8]">
+        <div className="flex flex-1 overflow-hidden border-t border-[#E8E8E8]">
           {/* WORKSPACE (Main Content) */}
           <main className="flex-1 overflow-auto">
             {children}
