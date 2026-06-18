@@ -56,10 +56,10 @@ export function DashboardView() {
         {/* HEADER */}
         <div>
           <h1 className="text-4xl font-black text-[#0D0D0D] tracking-tight">
-            All Leads Queue
+            Queue
           </h1>
           <p className="text-sm text-[#888888] mt-3">
-            Complete queue of all leads organized by response status. Click a lead to view details or follow up.
+            All leads organized by response status. Click a lead to view details or follow up.
           </p>
         </div>
 

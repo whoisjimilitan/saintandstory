@@ -6,7 +6,7 @@ const modules = [
   { id: "add-lead", label: "Send Email" },
   { id: "import", label: "Import CSV" },
   { id: "responses", label: "Responses" },
-  { id: "dashboard", label: "All Leads Queue" },
+  { id: "dashboard", label: "Queue" },
   { id: "leads", label: "All Leads" },
   { id: "learning", label: "Learning" },
   { id: "settings", label: "Settings" },
