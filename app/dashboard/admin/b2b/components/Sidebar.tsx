@@ -3,15 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 const modules = [
-  { id: "dashboard", label: "Queue" },
-  { id: "add-lead", label: "Add Lead" },
+  { id: "add-lead", label: "Send Email" },
   { id: "import", label: "Import CSV" },
+  { id: "responses", label: "Today's Responses" },
+  { id: "dashboard", label: "All Leads Queue" },
   { id: "leads", label: "All Leads" },
   { id: "learning", label: "Learning" },
   { id: "settings", label: "Settings" },
-  { id: "discover", label: "Discover" },
-  { id: "prospects", label: "Prospects" },
-  { id: "inbox", label: "Inbox" },
 ];
 
 export function Sidebar() {

@@ -41,16 +41,61 @@ export function AddLeadView() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewData, setPreviewData] = useState<{
+    leadId?: string;
+    subject: string;
+    body: string;
+  } | null>(null);
 
-  const handleCreateAndSend = async () => {
+  const handlePreview = async () => {
     if (!businessName.trim() || !email.trim() || !category.trim()) {
       setError("Please fill in all fields");
       return;
     }
 
+    setError("");
+
+    try {
+      // Create lead first
+      const createResponse = await fetch("/api/b2b/add-prospect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessName,
+          email,
+          businessCategory: category,
+          painPoint: pressureType,
+        }),
+      });
+
+      if (!createResponse.ok) {
+        throw new Error("Failed to create lead");
+      }
+
+      const leadData = await createResponse.json();
+      const leadId = leadData.lead.id;
+
+      // Show preview
+      const template = TEMPLATES[pressureType];
+      const emailBody = template.body.replace("[NAME]", businessName);
+
+      setPreviewData({
+        leadId,
+        subject: template.subject,
+        body: emailBody,
+      });
+      setShowPreview(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    }
+  };
+
+  const handleConfirmSend = async () => {
+    if (!previewData?.leadId) return;
+
     setLoading(true);
     setError("");
-    setSuccess(false);
 
     try {
       // Create lead
@@ -73,16 +118,13 @@ export function AddLeadView() {
       const leadId = leadData.lead.id;
 
       // Send email
-      const template = TEMPLATES[pressureType];
-      const emailBody = template.body.replace("[NAME]", businessName);
-
       const sendResponse = await fetch("/api/b2b/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          leadId,
-          subject: template.subject,
-          body: emailBody,
+          leadId: previewData.leadId,
+          subject: previewData.subject,
+          body: previewData.body,
           pressureType,
           emailType: "initial",
         }),
@@ -93,6 +135,8 @@ export function AddLeadView() {
       }
 
       setSuccess(true);
+      setShowPreview(false);
+      setPreviewData(null);
       setBusinessName("");
       setEmail("");
       setCategory("");
@@ -104,6 +148,12 @@ export function AddLeadView() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    setShowPreview(false);
+    setPreviewData(null);
+    setError("");
   };
 
   return (
@@ -204,11 +254,11 @@ export function AddLeadView() {
         {/* ACTION BUTTON */}
         <div>
           <button
-            onClick={handleCreateAndSend}
+            onClick={handlePreview}
             disabled={loading}
             className="text-sm font-medium text-[#0D0D0D] border border-[#0D0D0D] px-4 py-3 hover:bg-[#0D0D0D] hover:text-white transition-colors disabled:opacity-50"
           >
-            {loading ? "Sending..." : "Create Lead & Send Email"}
+            {loading ? "Creating..." : "Preview Email"}
           </button>
         </div>
 
@@ -248,6 +298,85 @@ export function AddLeadView() {
                 <p className="text-sm text-[#0D0D0D]">
                   Email includes unique tracking token. Prospect clicks YES or NO button. Response recorded automatically. Lead status updated to warm (YES) or contacted (NO).
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PREVIEW MODAL */}
+        {showPreview && previewData && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+              <div className="p-8 space-y-8">
+                {/* HEADER */}
+                <div>
+                  <h2 className="text-2xl font-black text-[#0D0D0D] tracking-tight">
+                    Confirm Email Send
+                  </h2>
+                  <p className="text-sm text-[#888888] mt-2">
+                    Review the email before sending to {businessName}
+                  </p>
+                </div>
+
+                {/* EMAIL PREVIEW */}
+                <div className="space-y-6 py-6 border-t border-b border-[#E8E8E8]">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888] mb-2">
+                      Subject
+                    </p>
+                    <p className="text-sm font-medium text-[#0D0D0D]">
+                      {previewData.subject}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888] mb-2">
+                      Body
+                    </p>
+                    <p className="text-sm text-[#0D0D0D] whitespace-pre-wrap">
+                      {previewData.body}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888] mb-2">
+                      Buttons
+                    </p>
+                    <div className="flex gap-2">
+                      <button className="text-sm px-3 py-2 border border-green-600 text-green-600 rounded">
+                        YES
+                      </button>
+                      <button className="text-sm px-3 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded">
+                        NO
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ERROR */}
+                {error && (
+                  <div className="text-sm text-[#DC2626] border-l-2 border-[#DC2626] pl-4 py-2">
+                    {error}
+                  </div>
+                )}
+
+                {/* ACTIONS */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleConfirmSend}
+                    disabled={loading}
+                    className="flex-1 text-sm font-medium text-white bg-[#0D0D0D] px-4 py-3 hover:opacity-80 transition-opacity disabled:opacity-50"
+                  >
+                    {loading ? "Sending..." : "Send Email"}
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    disabled={loading}
+                    className="flex-1 text-sm font-medium text-[#0D0D0D] border border-[#0D0D0D] px-4 py-3 hover:bg-[#F5F5F5] transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>

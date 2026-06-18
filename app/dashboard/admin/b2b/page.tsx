@@ -11,6 +11,7 @@ import { ImportView } from "./views/ImportView";
 import { LeadsView } from "./views/LeadsView";
 import { SettingsView } from "./views/SettingsView";
 import { LearningView } from "./views/LearningView";
+import { ResponsesView } from "./views/ResponsesView";
 
 export default function B2BPage() {
   const searchParams = useSearchParams();
@@ -27,6 +28,8 @@ export default function B2BPage() {
         return <AddLeadView />;
       case "import":
         return <ImportView />;
+      case "responses":
+        return <ResponsesView />;
       case "leads":
         return <LeadsView />;
       case "settings":
