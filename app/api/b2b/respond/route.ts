@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 interface RespondRequest {
   outreachId?: string;
   leadId?: string;
-  responseType: "YES" | "NO";
+  responseType: "YES" | "MAYBE" | "NO";
 }
 
 export async function POST(request: Request) {
@@ -68,17 +68,32 @@ export async function POST(request: Request) {
     });
 
     // Update lead status based on response
+    const statusMap = {
+      YES: { status: "warm", leadState: "engaged" },
+      MAYBE: { status: "warm", leadState: "curious" },
+      NO: { status: "contacted", leadState: "recognized" },
+    };
+
+    const statusUpdate = statusMap[body.responseType];
+
     await prisma.b2bLead.update({
       where: { id: outreach.lead.id },
       data: {
-        status: body.responseType === "YES" ? "warm" : "contacted",
-        leadState: body.responseType === "YES" ? "engaged" : "recognized",
+        status: statusUpdate.status,
+        leadState: statusUpdate.leadState,
         transitionedAt: new Date(),
       },
     });
 
-    // Log conversation event: REPLIED_YES or REPLIED_NO (Layer 4 - Conversation Intelligence)
-    const eventType = body.responseType === "YES" ? "REPLIED_YES" : "REPLIED_NO";
+    // Log conversation event: REPLIED_YES, REPLIED_MAYBE, or REPLIED_NO (Layer 4 - Conversation Intelligence)
+    const eventTypeMap = {
+      YES: "REPLIED_YES",
+      MAYBE: "REPLIED_MAYBE",
+      NO: "REPLIED_NO",
+    };
+
+    const eventType = eventTypeMap[body.responseType];
+
     await prisma.b2bConversationEvent.create({
       data: {
         leadId: outreach.lead.id,
@@ -87,6 +102,7 @@ export async function POST(request: Request) {
         metadata: {
           outreachId: updatedOutreach.id,
           respondedAt: new Date().toISOString(),
+          engagementBoost: body.responseType === "MAYBE" ? 5 : 0,
         },
       },
     });

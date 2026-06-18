@@ -283,7 +283,170 @@ export const INDUSTRY_PRESSURE_LIBRARY: IndustryPressureMapping[] = [
       },
     ],
   },
+  {
+    industry: "Education & Training",
+    industry_id: "education",
+    pressure_types: [
+      {
+        pressure_type: "Scheduling friction",
+        scenarios: [
+          {
+            scenario_id: "education_timetable_conflicts",
+            title: "Timetable Coordination Across Classrooms",
+            description: "Managing instructor availability across multiple classes creates scheduling complexity",
+            observation: "Educational institutions often face moments where instructor availability and classroom demand don't sync, creating last-minute swaps.",
+            validation_question: "Is instructor scheduling a real coordination challenge?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Field Services & HVAC",
+    industry_id: "field_services",
+    pressure_types: [
+      {
+        pressure_type: "Delivery delays",
+        scenarios: [
+          {
+            scenario_id: "field_technician_routing",
+            title: "Technician Routing & Travel Optimization",
+            description: "Technicians travel between job sites with suboptimal routing",
+            observation: "Field service operations often see dead time between jobs where technician travel and scheduling creates efficiency gaps.",
+            validation_question: "Is travel time between jobs a consistent cost you're managing?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Manufacturing & Engineering",
+    industry_id: "manufacturing",
+    pressure_types: [
+      {
+        pressure_type: "Operations chaos",
+        scenarios: [
+          {
+            scenario_id: "manufacturing_supply_chain",
+            title: "Supply Chain Coordination",
+            description: "Parts arrive misaligned with production schedules",
+            observation: "Manufacturing operations often hit bottlenecks where component delivery and production line readiness don't coordinate.",
+            validation_question: "Does supply timing create production interruptions?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Automotive Services & Repair",
+    industry_id: "automotive",
+    pressure_types: [
+      {
+        pressure_type: "Scheduling friction",
+        scenarios: [
+          {
+            scenario_id: "automotive_parts_availability",
+            title: "Parts Availability During Service",
+            description: "Required parts don't arrive in time to complete service appointments",
+            observation: "Auto repair shops regularly face moments where parts orders delay job completion, creating customer wait time.",
+            validation_question: "Is parts availability timing something you manage constantly?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Finance & Accounting",
+    industry_id: "finance",
+    pressure_types: [
+      {
+        pressure_type: "Customer complaints",
+        scenarios: [
+          {
+            scenario_id: "finance_compliance_delays",
+            title: "Compliance & Documentation Delays",
+            description: "Regulatory documentation and client requirements create processing bottlenecks",
+            observation: "Financial services hit moments where compliance checks and documentation requirements create service delays.",
+            validation_question: "Does compliance documentation create bottlenecks in your workflow?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "E-Commerce Fulfillment",
+    industry_id: "ecommerce",
+    pressure_types: [
+      {
+        pressure_type: "Delivery delays",
+        scenarios: [
+          {
+            scenario_id: "ecommerce_order_surge",
+            title: "Order Volume Surge Fulfillment",
+            description: "Peak season order volume exceeds warehouse capacity",
+            observation: "E-commerce operations typically see moments where order volume spikes beyond current warehouse throughput.",
+            validation_question: "Do you struggle with fulfillment speed during peak volume?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Hospitality & Hotels",
+    industry_id: "hospitality",
+    pressure_types: [
+      {
+        pressure_type: "Operations chaos",
+        scenarios: [
+          {
+            scenario_id: "hospitality_housekeeping_timing",
+            title: "Housekeeping Turnover Speed",
+            description: "Room turnover speed doesn't match check-out/check-in timing",
+            observation: "Hotels typically face friction between checkout times and housekeeping availability to prepare next rooms.",
+            validation_question: "Is room turnover timing something that creates operational pressure?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Healthcare & Medical Services",
+    industry_id: "healthcare_services",
+    pressure_types: [
+      {
+        pressure_type: "Scheduling friction",
+        scenarios: [
+          {
+            scenario_id: "healthcare_appointment_no_shows",
+            title: "Appointment No-Shows & Last-Minute Cancellations",
+            description: "No-shows create unused capacity and scheduling gaps",
+            observation: "Healthcare providers regularly face moments where appointments get canceled, creating unused staff and facility capacity.",
+            validation_question: "Is no-show/cancellation friction affecting your schedule?",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    industry: "Courier & Delivery Services",
+    industry_id: "courier",
+    pressure_types: [
+      {
+        pressure_type: "Delivery delays",
+        scenarios: [
+          {
+            scenario_id: "courier_volume_spike",
+            title: "Peak Hour Delivery Volume",
+            description: "Delivery volume during peak times exceeds vehicle/staff capacity",
+            observation: "Courier services see clustering where delivery requests spike beyond available vehicles and drivers.",
+            validation_question: "Do peak periods create fulfillment challenges?",
+          },
+        ],
+      },
+    ],
+  },
 ];
+
 
 /**
  * Get pressure scenarios for a specific industry

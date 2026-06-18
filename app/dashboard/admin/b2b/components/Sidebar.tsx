@@ -3,10 +3,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 const modules = [
-  { id: "add-lead", label: "Send Email" },
-  { id: "import", label: "Import CSV" },
-  { id: "responses", label: "Responses" },
+  { id: "discover", label: "Discover" },
   { id: "dashboard", label: "Queue" },
+  { id: "add-lead", label: "Send Email" },
+  { id: "responses", label: "Responses" },
   { id: "leads", label: "All Leads" },
   { id: "learning", label: "Learning" },
   { id: "settings", label: "Settings" },
