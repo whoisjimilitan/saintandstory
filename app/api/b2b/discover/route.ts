@@ -181,13 +181,17 @@ export async function POST(request: NextRequest) {
 
   console.log("[DISCOVER] ✓ Google Maps API key configured");
 
-  const { niche: rawNiche, city } = await request.json() as { niche: string; city: string };
-  console.log("[DISCOVER] Request payload - raw niche:", rawNiche, "city:", city);
+  const body = await request.json() as { postcode?: string; radius?: number; category?: string };
+  const postcode = body.postcode;
+  const radius = body.radius || 5;
+  const category = body.category || "all";
+  let city = postcode ? postcode.split(" ")[0] : "UK";
+
+  console.log("[DISCOVER] Request payload - postcode:", postcode, "radius:", radius, "category:", category, "city:", city);
 
   // Translate form industry value to NICHE_SEARCH_MAP key
-  // Form sends: "Solicitors", "Estate Agents", etc. (from B2B_INDUSTRIES)
-  // NICHE_SEARCH_MAP expects: "legal", "estate-agents", etc.
-  const lowerNiche = rawNiche.toLowerCase();
+  const rawNiche = category === "all" ? undefined : category;
+  const lowerNiche = (rawNiche || "business").toLowerCase();
   const mappedNiche = FORM_VALUE_TO_NICHE[lowerNiche];
   const niche = mappedNiche || lowerNiche.replace(/\s+/g, "-");
 
@@ -195,7 +199,7 @@ export async function POST(request: NextRequest) {
   console.log("[DISCOVER] Mapped niche:", mappedNiche || "(no direct mapping, using normalized)");
   console.log("[DISCOVER] Final niche key:", niche);
 
-  const queries = NICHE_SEARCH_MAP[niche] ?? [rawNiche];
+  const queries = NICHE_SEARCH_MAP[niche] ?? ["business"];
   console.log("[DISCOVER] Search queries:", queries);
   console.log("[DISCOVER] Query source:", NICHE_SEARCH_MAP[niche] ? "mapped" : "fallback (original value)");
 
@@ -307,8 +311,22 @@ export async function POST(request: NextRequest) {
   console.log("[DISCOVER] ═══════════════════════════════════════");
 
   // PRIORITY 2: Ensure DB transaction is flushed before returning
-  // Gives frontend confidence that data is persisted when it refreshes
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  return NextResponse.json({ added, count: added.length, success: true });
+  // Return in format expected by DiscoverView
+  return NextResponse.json({
+    businesses: added.map(name => ({
+      id: name,
+      name: name,
+      address: "",
+      postcode: postcode || "",
+      phone: undefined,
+      email: undefined,
+      website: undefined,
+      category: category || "all",
+      source: "discovery",
+    })),
+    count: added.length,
+    success: true,
+  });
 }
