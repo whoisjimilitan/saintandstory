@@ -268,7 +268,7 @@ export default async function DiscoveryPage() {
   const discovery = await getDiscoveryData();
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
       <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (

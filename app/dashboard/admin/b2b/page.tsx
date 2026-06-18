@@ -139,7 +139,7 @@ export default async function B2BPage() {
   const briefing = await getBriefingData();
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
       <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'DISCOVERY', 'PIPELINE', 'ORDERS', 'ANALYTICS'].map((item) => (

@@ -147,7 +147,7 @@ export default async function PipelinePage() {
   const maxCount = Math.max(...stages.map(s => s.count), 1);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
       <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (
