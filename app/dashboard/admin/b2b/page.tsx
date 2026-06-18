@@ -109,7 +109,7 @@ async function getBriefingData(): Promise<BriefingData> {
       orders_requiring_intervention,
       new_opportunities,
       system_status,
-      recent_learning: "Logistics category: 52% conversion rate. Focus on BOTTLENECKS."
+      recent_learning: "Logistics category: 52% conversion rate. finding live bottleneck signals."
     };
   } catch (err) {
     console.warn('[B2B] Critical error:', err instanceof Error ? err.message : String(err));
