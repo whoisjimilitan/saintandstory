@@ -268,9 +268,9 @@ export default async function DiscoveryPage() {
   const discovery = await getDiscoveryData();
 
   return (
-    <div className="px-6 py-10 max-w-3xl mx-auto">
+    <div className="px-8 py-12 max-w-7xl mx-auto">
       {/* Navigation */}
-      <div className="flex gap-2 mb-12">
+      <div className="flex gap-2 mb-16">
         {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (
           <Link
             key={item}
@@ -287,79 +287,166 @@ export default async function DiscoveryPage() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-12">
-        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
-          Operator Discovery.
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.3em] mb-4">Discovery</p>
+        <h1 className="font-sans font-black text-[#0D0D0D] text-6xl tracking-tight mb-3">
+          Find Opportunities
         </h1>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-          Find. Recognise. Act.
+        <p className="text-base text-[#666666]">
+          Find. Enrich. Qualify. Convert.
         </p>
       </div>
 
-      {/* RECOMMENDED FOCUS */}
-      <div className="mb-12 bg-[#F9FAFB] border border-[#E8E8E8] rounded p-6">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          Recommended Focus (from Analytics)
+      {/* HERO: POSTCODE SEARCH */}
+      <div className="mb-16 bg-gradient-to-br from-[#F0FFFE] to-[#EBEBF9] p-12 rounded-lg">
+        <p className="text-[10px] font-semibold text-[#06B6D4] uppercase tracking-[0.2em] mb-6">
+          Primary Discovery Method
         </p>
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-semibold text-[#0D0D0D]">Priority Category</p>
-            <p className="text-sm text-[#666666]">Logistics (52% conversion rate)</p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-[#0D0D0D]">Target Pain Point</p>
-            <p className="text-sm text-[#666666]">Delivery bottlenecks + scheduling pressure</p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-[#0D0D0D]">Volume Needed</p>
-            <p className="text-sm text-[#666666]">8 new prospects this week (expect 2-3 to convert)</p>
+        <h2 className="text-3xl font-bold text-[#0D0D0D] mb-8">
+          Search by Postcode
+        </h2>
+        <p className="text-base text-[#666666] mb-8 max-w-2xl">
+          Find businesses in your service areas. Enter postcodes or location names to discover prospects in high-opportunity sectors.
+        </p>
+        <div className="flex gap-4">
+          <button className="bg-[#0D0D0D] text-white px-6 py-3 rounded text-sm font-semibold hover:bg-[#333333] transition-colors">
+            Open Postcode Search
+          </button>
+          <Link href="/api/b2b/operator-discovery" className="text-[#0D0D0D] px-6 py-3 rounded text-sm font-semibold border border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors">
+            View Settings →
+          </Link>
+        </div>
+      </div>
+
+      {/* SECONDARY: UPLOAD & AUTONOMOUS */}
+      <div className="grid grid-cols-2 gap-8 mb-16">
+        {/* Upload */}
+        <div className="bg-[#FFFAF0] p-8 rounded-lg">
+          <p className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-[0.2em] mb-4">
+            Bulk Import
+          </p>
+          <h3 className="text-2xl font-bold text-[#0D0D0D] mb-4">
+            Upload CSV
+          </h3>
+          <p className="text-sm text-[#666666] mb-6">
+            Import prospects from your own data. Upload a CSV file with company details and we'll enrich them automatically.
+          </p>
+          <Link href="/api/b2b/csv-import" className="inline-block bg-[#D97706] text-white px-4 py-2 rounded text-sm font-semibold hover:bg-[#B45309] transition-colors">
+            Upload File →
+          </Link>
+        </div>
+
+        {/* Autonomous */}
+        <div className="bg-[#F0FDF4] p-8 rounded-lg">
+          <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-4">
+            Always Running
+          </p>
+          <h3 className="text-2xl font-bold text-[#0D0D0D] mb-4">
+            Autonomous Discovery
+          </h3>
+          <p className="text-sm text-[#666666] mb-6">
+            Our system runs 24/7 discovery jobs. New prospects identified automatically each night at 02:00 UTC.
+          </p>
+          <div className="inline-flex items-center gap-2 text-sm">
+            <span className="w-2 h-2 bg-[#10B981] rounded-full animate-pulse"></span>
+            <span className="text-[#0D0D0D] font-semibold">System Active</span>
           </div>
         </div>
       </div>
 
-      {/* PRIMARY DISCOVERY WORKFLOW */}
+      {/* TERTIARY: MANUAL ENTRY */}
+      <div className="bg-[#F3F4F6] p-8 rounded-lg mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          Add Individually
+        </p>
+        <h3 className="text-2xl font-bold text-[#0D0D0D] mb-4">
+          Manual Entry
+        </h3>
+        <p className="text-sm text-[#666666] mb-6">
+          Add a single prospect manually. Useful when you have a specific company in mind that needs outreach.
+        </p>
+        <Link href="/api/b2b/manual-entry" className="inline-block text-[#0D0D0D] px-4 py-2 rounded text-sm font-semibold border border-[#D1D5DB] hover:border-[#9CA3AF] transition-colors">
+          Add Prospect →
+        </Link>
+      </div>
+
+      {/* DISCOVERY PIPELINE STATS */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Find Opportunities
+          Discovery Pipeline
         </p>
-        <div className="bg-white border-2 border-[#0D0D0D] rounded p-8 shadow-sm">
-          <B2BDiscoverySection sources={discovery.intake_sources} />
+        <div className="grid grid-cols-4 gap-6">
+          <div className="bg-[#EBEBF9] p-6 rounded">
+            <p className="text-[10px] font-semibold text-[#6366F1] uppercase tracking-[0.2em] mb-3">
+              Discovered
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D] mb-2">
+              {discovery.discovered_total}
+            </p>
+            <p className="text-xs text-[#666666]">
+              businesses identified
+            </p>
+          </div>
+
+          <div className="bg-[#F0FFFE] p-6 rounded">
+            <p className="text-[10px] font-semibold text-[#06B6D4] uppercase tracking-[0.2em] mb-3">
+              Enriched
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D] mb-2">
+              {discovery.enriched_total}
+            </p>
+            <p className="text-xs text-[#666666]">
+              with company data
+            </p>
+          </div>
+
+          <div className="bg-[#FEF3C7] p-6 rounded">
+            <p className="text-[10px] font-semibold text-[#D97706] uppercase tracking-[0.2em] mb-3">
+              Qualified
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D] mb-2">
+              {discovery.qualified_total}
+            </p>
+            <p className="text-xs text-[#666666]">
+              meet criteria
+            </p>
+          </div>
+
+          <div className="bg-[#F0FDF4] p-6 rounded">
+            <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-3">
+              Ready
+            </p>
+            <p className="text-4xl font-black text-[#0D0D0D] mb-2">
+              {discovery.promoted_total}
+            </p>
+            <p className="text-xs text-[#666666]">
+              for outreach
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* AFTER YOU SEND - CONTINUITY TO PIPELINE */}
-      <div className="mb-16 bg-white border border-[#E8E8E8] rounded p-6">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-          After You Send
-        </p>
-        <div className="space-y-3 text-sm text-[#0D0D0D]">
-          <p>
-            When you SEND an email, the business appears in <strong>Pipeline</strong> within 5 minutes.
-          </p>
-          <p>
-            You'll see if they open it. If they click a link, you'll know they're interested.
-          </p>
-          <p>
-            If they reply, move them to <strong>Orders</strong> to set up the standing order.
-          </p>
-          <p className="text-[#666666] text-[10px] pt-2">
-            Success path: SEND → Open email → Click link → Reply → Standing order (typical: 5–7 days)
-          </p>
-        </div>
-      </div>
-
-      {/* SECONDARY DISCOVERY METHODS */}
-      <div className="border-t border-[#E8E8E8] pt-12">
+      {/* TOP CATEGORIES */}
+      <div>
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Other Ways to Find Opportunities
+          Focus Categories
         </p>
-        <DiscoveryModes
-          csvCount={discovery.intake_sources.find(s => s.name === 'CSV Import')?.count || 0}
-          manualCount={discovery.intake_sources.find(s => s.name === 'Manual Entry')?.count || 0}
-          autonomousCount={discovery.intake_sources.find(s => s.name === 'Autonomous Discovery')?.count || 0}
-        />
+        <div className="grid grid-cols-3 gap-6">
+          {discovery.top_categories.slice(0, 3).map((cat, idx) => (
+            <div key={idx} className="bg-white border border-[#E5E7EB] p-6 rounded">
+              <p className="text-lg font-bold text-[#0D0D0D] mb-2">
+                {cat.category}
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3">
+                {cat.count}
+              </p>
+              <p className="text-xs text-[#666666]">
+                {cat.percentage.toFixed(0)}% of qualified
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
-
     </div>
   );
 }
