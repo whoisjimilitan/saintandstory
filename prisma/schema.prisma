@@ -355,6 +355,58 @@ model B2bConversationEvent {
   @@map("b2b_conversation_events")
 }
 
+model B2bBehaviorMetrics {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  variantId         String?   @map("variant_id")
+  campaignId        String?   @map("campaign_id")
+  pressureType      String?   @map("pressure_type")
+
+  sentCount         Int       @default(0) @map("sent_count")
+  openCount         Int       @default(0) @map("open_count")
+  clickCount        Int       @default(0) @map("click_count")
+  replyCount        Int       @default(0) @map("reply_count")
+  replyYesCount     Int       @default(0) @map("reply_yes_count")
+  replyNoCount      Int       @default(0) @map("reply_no_count")
+
+  openRate          Decimal   @default(0) @db.Decimal(5, 2) @map("open_rate")
+  clickRate         Decimal   @default(0) @db.Decimal(5, 2) @map("click_rate")
+  replyRate         Decimal   @default(0) @db.Decimal(5, 2) @map("reply_rate")
+  yesRate           Decimal   @default(0) @db.Decimal(5, 2) @map("yes_rate")
+
+  dateRangeStart    DateTime? @map("date_range_start")
+  dateRangeEnd      DateTime? @map("date_range_end")
+
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@unique([variantId, campaignId, pressureType], map: "uq_b2b_behavior_metrics")
+  @@index([yesRate(sort: Desc)], map: "idx_b2b_behavior_yes_rate")
+  @@index([variantId], map: "idx_b2b_behavior_variant")
+  @@index([campaignId], map: "idx_b2b_behavior_campaign")
+  @@index([pressureType], map: "idx_b2b_behavior_pressure")
+  @@map("b2b_behavior_metrics")
+}
+
+model B2bBehaviorSnapshot {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date              DateTime  @map("date")
+  campaignId        String?   @map("campaign_id")
+
+  topVariantId      String?   @map("top_variant_id")
+  worstVariantId    String?   @map("worst_variant_id")
+  bestPressureType  String?   @map("best_pressure_type")
+
+  totalSent         Int       @default(0) @map("total_sent")
+  totalYes          Int       @default(0) @map("total_yes")
+
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@unique([date, campaignId], map: "uq_b2b_behavior_snapshot")
+  @@index([date(sort: Desc)], map: "idx_b2b_behavior_snapshot_date")
+  @@index([campaignId], map: "idx_b2b_behavior_snapshot_campaign")
+  @@map("b2b_behavior_snapshots")
+}
+
 model Business {
   id               String            @id @default(cuid())
   name             String
