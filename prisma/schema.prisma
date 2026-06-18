@@ -407,6 +407,53 @@ model B2bBehaviorSnapshot {
   @@map("b2b_behavior_snapshots")
 }
 
+model B2bMemoryPattern {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type            String
+  // VARIANT_WINNER | PRESSURE_TYPE_WINNER | SEQUENCE_PATTERN
+
+  key             String
+  // e.g. "variant_v3", "pressure_urgency", "seq_open_click_reply"
+
+  value           Json
+  // stores: variant_id, yes_rate OR type, conversion_rate OR sequence_pattern
+
+  confidenceScore Decimal   @default(0) @db.Decimal(5, 2) @map("confidence_score")
+  evidenceCount   Int       @default(0) @map("evidence_count")
+
+  campaignId      String?   @map("campaign_id")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  memoryLogs      B2bLearningMemoryLog[]
+
+  @@unique([type, key, campaignId], map: "uq_b2b_memory_pattern")
+  @@index([type], map: "idx_b2b_memory_type")
+  @@index([confidenceScore(sort: Desc)], map: "idx_b2b_memory_confidence")
+  @@map("b2b_memory_patterns")
+}
+
+model B2bLearningMemoryLog {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patternId       String    @map("pattern_id") @db.Uuid
+  pattern         B2bMemoryPattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+
+  eventTrigger    String    @map("event_trigger")
+  // DAILY_RECALC | NEW_CAMPAIGN_END | MANUAL_UPDATE
+
+  beforeValue     Json?     @map("before_value")
+  afterValue      Json?     @map("after_value")
+
+  deltaScore      Decimal   @default(0) @db.Decimal(5, 2) @map("delta_score")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([patternId], map: "idx_b2b_memory_log_pattern")
+  @@index([eventTrigger], map: "idx_b2b_memory_log_trigger")
+  @@map("b2b_learning_memory_logs")
+}
+
 model Business {
   id               String            @id @default(cuid())
   name             String
