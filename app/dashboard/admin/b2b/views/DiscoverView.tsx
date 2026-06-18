@@ -142,7 +142,7 @@ export function DiscoverView() {
                 max="25"
                 value={radius}
                 onChange={(e) => setRadius(parseInt(e.target.value))}
-                className="flex-1"
+                className="flex-1 accent-[#888888]"
                 disabled={loading}
               />
               <span className="text-sm font-medium text-[#0D0D0D] w-12 text-right">
@@ -237,26 +237,6 @@ export function DiscoverView() {
           </div>
         )}
 
-        {/* INFO */}
-        <div className="space-y-4 pt-8 border-t border-[#E8E8E8]">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
-            How Discovery Works
-          </h3>
-          <div className="space-y-2 text-xs text-[#666666]">
-            <p>
-              1. Enter a postcode and radius to search for businesses in your target area
-            </p>
-            <p>
-              2. Optionally filter by industry to narrow results
-            </p>
-            <p>
-              3. Review businesses and click "+ Queue" to add them to your prospect pipeline
-            </p>
-            <p>
-              4. Once queued, you can send hypothesis emails and track responses
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

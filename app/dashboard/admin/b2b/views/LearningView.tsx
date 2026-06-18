@@ -144,27 +144,6 @@ export function LearningView() {
           </div>
         )}
 
-        {/* INFO */}
-        <div className="space-y-4 pt-12 border-t border-[#E8E8E8]">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
-            How to Use These Metrics
-          </h3>
-          <div className="space-y-2 text-xs text-[#666666]">
-            <p>
-              <strong>YES Rate:</strong> Percentage of responses that were YES (intent signal).
-            </p>
-            <p>
-              <strong>Sent Count:</strong> Total emails sent for this pressure type or variant.
-            </p>
-            <p>
-              <strong>Use this to:</strong> Decide which pressure types to enable/disable in Settings.
-            </p>
-            <p>
-              <strong>⚠️ Remember:</strong> High YES rate doesn't always mean high-quality intent.
-              Verify with follow-up conversations before optimizing too aggressively.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

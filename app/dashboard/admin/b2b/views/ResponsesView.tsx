@@ -139,23 +139,6 @@ export function ResponsesView() {
           </div>
         )}
 
-        {/* INFO */}
-        <div className="space-y-4 pt-8 border-t border-[#E8E8E8]">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
-            What This Means
-          </h3>
-          <div className="space-y-2 text-xs text-[#666666]">
-            <p>
-              <strong>YES:</strong> Company confirms they experience this
-              operational friction. Hypothesis validated for this pressure
-              type.
-            </p>
-            <p>
-              <strong>NO:</strong> Company indicates this pressure type doesn't
-              apply to them. Hypothesis rejected for this industry/scenario.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
