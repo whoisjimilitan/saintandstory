@@ -53,6 +53,16 @@ export function DashboardView() {
   return (
     <div className="flex-1 px-6 py-10 overflow-auto">
       <div className="max-w-3xl space-y-16">
+        {/* HEADER */}
+        <div>
+          <h1 className="text-4xl font-black text-[#0D0D0D] tracking-tight">
+            All Leads Queue
+          </h1>
+          <p className="text-sm text-[#888888] mt-3">
+            Complete queue of all leads organized by response status. Click a lead to view details or follow up.
+          </p>
+        </div>
+
         {/* QUEUE SECTIONS */}
 
         {hot.length > 0 && (

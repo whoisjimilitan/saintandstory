@@ -23,24 +23,34 @@ export function SettingsView() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [insights, setInsights] = useState<Record<string, any>>({});
 
   useEffect(() => {
-    async function loadSettings() {
+    async function loadSettingsAndInsights() {
       try {
-        const response = await fetch("/api/b2b/settings");
-        if (response.ok) {
-          const data = await response.json();
+        const [settingsRes, insightsRes] = await Promise.all([
+          fetch("/api/b2b/settings"),
+          fetch("/api/b2b/learning"),
+        ]);
+
+        if (settingsRes.ok) {
+          const data = await settingsRes.json();
           setSettings(data.settings || {});
           setGlobalMaxEmails(data.globalMaxEmails || 50);
         }
+
+        if (insightsRes.ok) {
+          const data = await insightsRes.json();
+          setInsights(data.data || {});
+        }
       } catch (error) {
-        console.error("Failed to load settings:", error);
+        console.error("Failed to load data:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    loadSettings();
+    loadSettingsAndInsights();
   }, []);
 
   const handleSaveSettings = async () => {
@@ -93,6 +103,25 @@ export function SettingsView() {
             Control operator behavior: which pressure types to use, sending limits, copy variants
           </p>
         </div>
+
+        {/* LEARNING INSIGHTS (if available) */}
+        {insights.pressureTypes && insights.pressureTypes.length > 0 && (
+          <div className="space-y-4 p-4 bg-[#F5F5F5] border border-[#E8E8E8]">
+            <h2 className="text-sm font-medium text-[#0D0D0D]">
+              Based on Learning Insights
+            </h2>
+            <p className="text-xs text-[#666666]">
+              Top performing pressure types. Consider enabling these:
+            </p>
+            <div className="space-y-2">
+              {insights.pressureTypes.slice(0, 3).map((metric: any) => (
+                <p key={metric.pressure_type} className="text-xs text-[#0D0D0D]">
+                  • <strong>{metric.pressure_type}</strong> ({(metric.yes_rate * 100).toFixed(0)}% response rate)
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* GLOBAL SETTINGS */}
         <div className="space-y-8">
