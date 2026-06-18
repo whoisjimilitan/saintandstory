@@ -990,12 +990,15 @@ model b2b_responses {
   response_type         String
   responded_at          DateTime    @default(now())
   response_time_minutes Int?
+  tracking_token        String      @unique @map("tracking_token")
   created_at            DateTime    @default(now())
   b2b_outreach          B2bOutreach @relation(fields: [outreach_id], references: [id], onDelete: Cascade)
 
   @@index([outreach_id])
   @@index([responded_at(sort: Desc)])
   @@index([response_type])
+  @@index([tracking_token])
+  @@map("b2b_responses")
 }
 
 model discovered_businesses {

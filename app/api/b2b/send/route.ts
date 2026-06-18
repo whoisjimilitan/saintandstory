@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import { randomBytes } from "crypto";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -9,12 +10,22 @@ function getResend() {
 }
 
 const FROM = "Saint & Story <hello@saintandstory.com>";
+const WEBHOOK_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+function generateTrackingToken(): string {
+  return randomBytes(16).toString("hex");
+}
+
+function selectCopyVariant(): "A" | "B" {
+  return Math.random() > 0.5 ? "A" : "B";
+}
 
 interface SendRequest {
   leadId: string;
   subject: string;
   body: string;
   emailType?: string;
+  pressureType?: string;
 }
 
 export async function POST(request: Request) {
@@ -43,12 +54,21 @@ export async function POST(request: Request) {
       );
     }
 
+    const trackingToken = generateTrackingToken();
+    const copyVariant = selectCopyVariant();
+    const pressureType = body.pressureType || "general";
+
+    const yesLink = `${WEBHOOK_URL}/api/b2b/webhook/response?token=${trackingToken}&response=YES`;
+    const noLink = `${WEBHOOK_URL}/api/b2b/webhook/response?token=${trackingToken}&response=NO`;
+
+    const emailHtml = `${body.body}\n\n<hr>\n<p><a href="${yesLink}">YES</a> | <a href="${noLink}">NO</a></p>`;
+
     const resend = getResend();
     const result = await resend.emails.send({
       from: FROM,
       to: lead.email,
       subject: body.subject,
-      html: body.body,
+      html: emailHtml,
     });
 
     if (result.error) {
@@ -67,10 +87,22 @@ export async function POST(request: Request) {
         sentAt: new Date(),
         resendMessageId: result.data?.id,
         emailType: body.emailType || "initial",
+        copy_variant: copyVariant,
+        pressure_type: pressureType,
+        sent_by: "manual",
       },
     });
 
-    // Log conversation event: EMAIL_SENT (Layer 4 - Conversation Intelligence)
+    // Pre-create response record with tracking token for webhook validation
+    await (prisma as any).b2b_responses.create({
+      data: {
+        outreach_id: outreach.id as any,
+        response_type: "PENDING",
+        tracking_token: trackingToken,
+      },
+    });
+
+    // Log conversation event: EMAIL_SENT
     await prisma.b2bConversationEvent.create({
       data: {
         leadId: body.leadId as any,

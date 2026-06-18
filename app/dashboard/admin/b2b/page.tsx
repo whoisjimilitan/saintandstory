@@ -6,6 +6,7 @@ import { DashboardView } from "./views/DashboardView";
 import { DiscoverView } from "./views/DiscoverView";
 import { ProspectsView } from "./views/ProspectsView";
 import { InboxView } from "./views/InboxView";
+import { AddLeadView } from "./views/AddLeadView";
 
 export default function B2BPage() {
   const searchParams = useSearchParams();
@@ -18,6 +19,8 @@ export default function B2BPage() {
 
   const renderModule = () => {
     switch (module) {
+      case "add-lead":
+        return <AddLeadView />;
       case "discover":
         return <DiscoverView />;
       case "prospects":
