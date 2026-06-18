@@ -524,6 +524,74 @@ model B2bCampaignRevenueSummary {
   @@map("b2b_campaign_revenue_summaries")
 }
 
+model B2bSafetyGuardrail {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ruleType        String    @map("rule_type")
+  // REVENUE_DROP_PROTECTION | PATTERN_OVERFITTING_PROTECTION | RANDOM_SPIKE_FILTER | CAMPAIGN_STABILITY_LIMIT
+
+  threshold       Decimal   @db.Decimal(10, 4)
+  action          String
+  // BLOCK_AUTOMATION | REVERT_TO_MEMORY | FALLBACK_VARIANT | REDUCE_CONFIDENCE
+
+  severity        String    @default("MEDIUM")
+  // LOW | MEDIUM | HIGH
+
+  isActive        Boolean   @default(true) @map("is_active")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([ruleType], map: "idx_b2b_guardrail_type")
+  @@index([isActive], map: "idx_b2b_guardrail_active")
+  @@map("b2b_safety_guardrails")
+}
+
+model B2bSystemOverrideLog {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  trigger         String
+  // AUTOPILOT | HUMAN | GUARDRAIL
+
+  previousDecision Json?     @map("previous_decision")
+  newDecision      Json?     @map("new_decision")
+
+  reason          String
+
+  impactScore     Decimal   @default(0) @db.Decimal(5, 2) @map("impact_score")
+
+  metadata        Json?
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([trigger], map: "idx_b2b_override_trigger")
+  @@index([createdAt(sort: Desc)], map: "idx_b2b_override_date")
+  @@index([impactScore(sort: Desc)], map: "idx_b2b_override_impact")
+  @@map("b2b_system_override_logs")
+}
+
+model B2bSystemHealth {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  learningStability     Decimal   @default(0) @db.Decimal(5, 2) @map("learning_stability")
+  revenueVolatility     String    @default("LOW")
+  // LOW | MEDIUM | HIGH
+
+  patternConfidenceDrift Decimal  @default(0) @db.Decimal(5, 2) @map("pattern_confidence_drift")
+  guardrailTriggersSevenDay Int   @default(0) @map("guardrail_triggers_7d")
+
+  systemMode            String    @default("MANUAL")
+  // MANUAL | ASSISTED | AUTOPILOT
+
+  lastAnomalyDetected   DateTime? @map("last_anomaly_detected")
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@index([systemMode], map: "idx_b2b_health_mode")
+  @@index([revenueVolatility], map: "idx_b2b_health_volatility")
+  @@map("b2b_system_health")
+}
+
 model Business {
   id               String            @id @default(cuid())
   name             String
