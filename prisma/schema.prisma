@@ -592,6 +592,56 @@ model B2bSystemHealth {
   @@map("b2b_system_health")
 }
 
+model B2bCausalValidationRecord {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patternId           String    @map("pattern_id") @db.Uuid
+  revenueEventId      String    @map("revenue_event_id") @db.Uuid
+
+  campaignId          String?   @map("campaign_id")
+
+  observedOutcome     Decimal   @db.Decimal(12, 2) @map("observed_outcome")
+  controlEstimate     Decimal   @db.Decimal(12, 2) @map("control_estimate")
+  causalLift          Decimal   @db.Decimal(12, 2) @map("causal_lift")
+
+  confidenceScore     Decimal   @db.Decimal(5, 2) @map("confidence_score")
+
+  method              String    @default("COHORT_NORMALIZATION")
+  // A_B_COMPARISON | COHORT_NORMALIZATION | HOLDOUT_ESTIMATE
+
+  isValidCausal       Boolean   @default(false) @map("is_valid_causal")
+
+  metadata            Json?
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@unique([patternId, revenueEventId], map: "uq_b2b_causal_validation")
+  @@index([patternId], map: "idx_b2b_causal_pattern")
+  @@index([isValidCausal], map: "idx_b2b_causal_valid")
+  @@index([confidenceScore(sort: Desc)], map: "idx_b2b_causal_confidence")
+  @@map("b2b_causal_validation_records")
+}
+
+model B2bAutopilotConstraint {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  systemMode          String    @default("SUGGESTION_ONLY")
+  // OBSERVE_ONLY | SUGGESTION_ONLY | HUMAN_APPROVAL_REQUIRED | LIMITED_AUTOPILOT
+
+  causalValidationRequired Boolean @default(true) @map("causal_validation_required")
+
+  minCausalConfidence Decimal   @default(80) @db.Decimal(5, 2) @map("min_causal_confidence")
+  minSampleSize       Int       @default(100) @map("min_sample_size")
+
+  revenueStabilityRequired Boolean @default(true) @map("revenue_stability_required")
+
+  allowedExecutionActions String[]  @default(["recommendation"]) @map("allowed_execution_actions")
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@map("b2b_autopilot_constraints")
+}
+
 model Business {
   id               String            @id @default(cuid())
   name             String
