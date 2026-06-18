@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 interface RespondRequest {
-  outreachId: string;
+  outreachId?: string;
+  leadId?: string;
   responseType: "YES" | "NO";
 }
 
@@ -10,21 +11,42 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as RespondRequest;
 
-    if (!body.outreachId || !body.responseType) {
+    if (!body.responseType) {
       return NextResponse.json(
-        { error: "Missing required fields: outreachId, responseType" },
+        { error: "Missing required fields: responseType" },
         { status: 400 }
       );
     }
 
-    const outreach = await prisma.b2bOutreach.findUnique({
-      where: { id: body.outreachId as any },
-      include: { lead: true },
-    });
+    if (!body.outreachId && !body.leadId) {
+      return NextResponse.json(
+        { error: "Missing required fields: outreachId or leadId" },
+        { status: 400 }
+      );
+    }
+
+    let outreach;
+
+    if (body.outreachId) {
+      outreach = await prisma.b2bOutreach.findUnique({
+        where: { id: body.outreachId as any },
+        include: { lead: true },
+      });
+    } else if (body.leadId) {
+      // Find the most recent unreplied outreach for this lead
+      outreach = await prisma.b2bOutreach.findFirst({
+        where: {
+          leadId: body.leadId as any,
+          replied: false,
+        },
+        include: { lead: true },
+        orderBy: { sentAt: "desc" },
+      });
+    }
 
     if (!outreach) {
       return NextResponse.json(
-        { error: "Outreach record not found" },
+        { error: "No unreplied outreach found for this lead" },
         { status: 404 }
       );
     }

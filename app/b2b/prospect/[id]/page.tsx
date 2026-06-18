@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { prisma } from "@/lib/prisma";
 
 interface ConversationEvent {
   id: string;
@@ -66,36 +65,118 @@ export default function ProspectPage({ params }: { params: Promise<{ id: string 
   const [prospectState, setProspectState] = useState<string>("NO_RESPONSE");
   const [lastActivity, setLastActivity] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [recordingResponse, setRecordingResponse] = useState(false);
+  const [responseRecorded, setResponseRecorded] = useState(false);
+
+  const refreshProspect = async () => {
+    try {
+      const response = await fetch(`/api/b2b/prospect/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProspect(data);
+
+        // Derive state from events
+        const state = deriveProspectState(data.conversationEvents);
+        setProspectState(state);
+
+        // Get last activity
+        if (data.conversationEvents.length > 0) {
+          const lastEvent = data.conversationEvents[0];
+          setLastActivity(
+            new Date(lastEvent.createdAt).toLocaleDateString()
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch prospect:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchProspect() {
-      try {
-        const response = await fetch(`/api/b2b/prospect/${id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setProspect(data);
+    refreshProspect();
+  }, [id]);
 
-          // Derive state from events
-          const state = deriveProspectState(data.conversationEvents);
-          setProspectState(state);
-
-          // Get last activity
-          if (data.conversationEvents.length > 0) {
-            const lastEvent = data.conversationEvents[0];
-            setLastActivity(
-              new Date(lastEvent.createdAt).toLocaleDateString()
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch prospect:", error);
-      } finally {
-        setLoading(false);
-      }
+  const handleSendEmail = async () => {
+    if (!emailSubject.trim() || !emailBody.trim()) {
+      alert("Please fill in subject and body");
+      return;
     }
 
-    fetchProspect();
-  }, [id]);
+    setSendingEmail(true);
+    try {
+      const response = await fetch("/api/b2b/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId: id,
+          subject: emailSubject,
+          body: emailBody,
+          emailType: "manual",
+        }),
+      });
+
+      if (response.ok) {
+        setEmailSent(true);
+        setEmailSubject("");
+        setEmailBody("");
+        setTimeout(() => setEmailSent(false), 3000);
+        // Refresh prospect data to show new event
+        await refreshProspect();
+      } else {
+        alert("Failed to send email");
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      alert("Error sending email");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const handleRecordResponse = async (responseType: "YES" | "NO") => {
+    // Find the most recent outreach
+    const lastEmailEvent = prospect?.conversationEvents.find(
+      (e) => e.type === "EMAIL_SENT"
+    );
+    if (!lastEmailEvent) {
+      alert("No email found to respond to");
+      return;
+    }
+
+    setRecordingResponse(true);
+    try {
+      // We need the outreachId, but it's in metadata. For now, we'll need to fetch it
+      // Actually, we should store outreachId in the conversation event
+      const response = await fetch("/api/b2b/respond", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId: id,
+          responseType,
+        }),
+      });
+
+      if (response.ok) {
+        setResponseRecorded(true);
+        setTimeout(() => setResponseRecorded(false), 3000);
+        // Refresh prospect data to show new event
+        await refreshProspect();
+      } else {
+        alert("Failed to record response");
+      }
+    } catch (error) {
+      console.error("Error recording response:", error);
+      alert("Error recording response");
+    } finally {
+      setRecordingResponse(false);
+    }
+  };
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (!prospect) return <div className="p-6">Prospect not found</div>;
@@ -207,49 +288,85 @@ export default function ProspectPage({ params }: { params: Promise<{ id: string 
           )}
         </div>
 
-        {/* SYSTEM RECOMMENDATION */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mt-6 border-l-4 border-blue-500">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            System Recommendation
-          </h2>
+        {/* EMAIL ACTION PANEL */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Send Email</h2>
 
-          {prospectState === "NO_RESPONSE" && (
-            <div>
-              <p className="text-gray-700 mb-2">
-                No interaction yet. Consider sending a follow-up email.
-              </p>
+          {emailSent && (
+            <div className="bg-green-50 border border-green-200 p-3 rounded mb-4 text-green-700">
+              ✅ Email sent successfully
             </div>
           )}
 
-          {prospectState === "ENGAGED" && (
+          <div className="space-y-4">
             <div>
-              <p className="text-gray-700 mb-2">
-                ✨ High engagement but no reply yet
-              </p>
-              <p className="text-sm text-gray-600">
-                Prospect has opened and clicked your email multiple times. They
-                may need human follow-up or social proof. Consider calling today
-                to discuss their interest.
-              </p>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subject
+              </label>
+              <input
+                type="text"
+                value={emailSubject}
+                onChange={(e) => setEmailSubject(e.target.value)}
+                placeholder="Email subject"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                disabled={sendingEmail}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Body
+              </label>
+              <textarea
+                value={emailBody}
+                onChange={(e) => setEmailBody(e.target.value)}
+                placeholder="Enter email content here"
+                rows={6}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                disabled={sendingEmail}
+              />
+            </div>
+
+            <button
+              onClick={handleSendEmail}
+              disabled={sendingEmail || !prospect?.email}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400"
+            >
+              {sendingEmail ? "Sending..." : "Send Email"}
+            </button>
+          </div>
+        </div>
+
+        {/* RESPONSE PANEL */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Record Response</h2>
+
+          {responseRecorded && (
+            <div className="bg-green-50 border border-green-200 p-3 rounded mb-4 text-green-700">
+              ✅ Response recorded successfully
             </div>
           )}
 
-          {prospectState === "POSITIVE" && (
-            <div>
-              <p className="text-gray-700 mb-2">✅ Move to qualification</p>
-              <p className="text-sm text-gray-600">
-                Prospect replied YES. Schedule qualification call to understand
-                needs and timeline.
-              </p>
+          {prospectState === "POSITIVE" || prospectState === "NEGATIVE" ? (
+            <div className="text-gray-600">
+              Response already recorded: <span className="font-medium">{prospectState}</span>
             </div>
-          )}
-
-          {prospectState === "NEGATIVE" && (
-            <div>
-              <p className="text-gray-700 mb-2">❌ Suppress future outreach</p>
-              <p className="text-sm text-gray-600">
-                Prospect replied NO. Remove from active campaign.
-              </p>
+          ) : (
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleRecordResponse("YES")}
+                disabled={recordingResponse}
+                className="flex-1 bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400"
+              >
+                {recordingResponse ? "Recording..." : "YES"}
+              </button>
+              <button
+                onClick={() => handleRecordResponse("NO")}
+                disabled={recordingResponse}
+                className="flex-1 bg-red-600 text-white py-2 rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-400"
+              >
+                {recordingResponse ? "Recording..." : "NO"}
+              </button>
             </div>
           )}
         </div>

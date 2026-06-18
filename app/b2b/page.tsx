@@ -79,6 +79,12 @@ export default function B2BDashboard() {
               </p>
             </div>
             <div className="flex gap-4">
+              <Link
+                href="/b2b/discover"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+              >
+                + Discover New
+              </Link>
               <button
                 onClick={() => setFilter("all")}
                 className={`px-4 py-2 rounded-lg font-medium ${
