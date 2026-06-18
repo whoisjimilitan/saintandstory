@@ -12,24 +12,24 @@ const PRESSURE_TYPES = [
 
 const TEMPLATES: Record<string, { subject: string; body: string }> = {
   "Delivery delays": {
-    subject: "Fix Your Delivery Problem",
-    body: "Hi [NAME],\n\nWe help businesses solve delivery delays. Our clients see 40% faster delivery times.\n\nReady to talk?",
+    subject: "Quick question about scheduling pressure",
+    body: "Hi [NAME],\n\nSome businesses in your space tend to run into timing pressure during certain parts of the day or week, where demand and internal capacity don't line up cleanly.\n\nIt usually shows up as small delays or backlog building up during peak periods.\n\nJust checking if that reflects your situation at all?\n\nYES / NO",
   },
   "Staff turnover": {
-    subject: "Reduce Your Staff Turnover",
-    body: "Hi [NAME],\n\nWe help reduce staff turnover by 60%. Your team deserves better.\n\nLet's discuss?",
+    subject: "Noticed something about staffing in your sector",
+    body: "Hi [NAME],\n\nWe work with a lot of teams in your space, and a pattern keeps coming up: the people who'd be most valuable to keep are often the first ones to leave.\n\nUsually because the work itself is fine, but the operational friction wears them down.\n\nDoes that resonate for you?\n\nYES / NO",
   },
   "Cash flow": {
-    subject: "Improve Your Cash Flow",
-    body: "Hi [NAME],\n\nWe help businesses improve cash flow. Many see results within 30 days.\n\nInterested?",
+    subject: "Question about payment timing",
+    body: "Hi [NAME],\n\nOne thing we see across most service businesses: the gap between when you pay your team and when you get paid by clients creates real friction.\n\nIt's not usually about profitability—it's about the timing squeeze.\n\nIs that something you manage around?\n\nYES / NO",
   },
   "Customer complaints": {
-    subject: "Eliminate Customer Complaints",
-    body: "Hi [NAME],\n\nWe help eliminate customer complaints. Your reputation matters.\n\nWorth a call?",
+    subject: "Question about customer response time",
+    body: "Hi [NAME],\n\nIn your industry, customer issues often come in clusters—busy days, busy seasons. When that happens, response time suffers even though the service itself is fine.\n\nJust wondering if you hit those pockets where you're basically choosing between speed and quality.\n\nDoes that happen?\n\nYES / NO",
   },
   "Operations chaos": {
-    subject: "Simplify Your Operations",
-    body: "Hi [NAME],\n\nWe help simplify operations. Less chaos, more profit.\n\nReady to streamline?",
+    subject: "Question about operational coordination",
+    body: "Hi [NAME],\n\nWhen you have multiple teams or shifts coordinating, there's usually a moment where things go sideways: communication misses, handoffs fail, small things compound.\n\nMost of the time it's not a process problem—it's a coordination problem under pressure.\n\nHave you run into that?\n\nYES / NO",
   },
 };
 
