@@ -54,7 +54,7 @@ export function DashboardView() {
         {/* HOT REPLIES */}
         {hot.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-semibold text-white mb-4 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
               🔥 Hot Replies
             </p>
             <div className="space-y-2">
@@ -62,14 +62,14 @@ export function DashboardView() {
                 <div
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-[#111111] border border-[#1C1C1C] rounded-lg p-4 cursor-pointer hover:border-[#30D158] transition-colors"
+                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-white">{prospect.businessName}</p>
-                      <p className="text-xs text-[#A0A0A0] mt-1">{prospect.email}</p>
+                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
+                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
                     </div>
-                    <span className="text-xs bg-[#30D158] text-black px-2 py-1 rounded">
+                    <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
                       WARM
                     </span>
                   </div>
@@ -82,7 +82,7 @@ export function DashboardView() {
         {/* WARM LEADS */}
         {warm.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-semibold text-white mb-4 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
               Engaged
             </p>
             <div className="space-y-2">
@@ -90,14 +90,14 @@ export function DashboardView() {
                 <div
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-[#111111] border border-[#1C1C1C] rounded-lg p-4 cursor-pointer hover:border-[#A0A0A0] transition-colors"
+                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-white">{prospect.businessName}</p>
-                      <p className="text-xs text-[#A0A0A0] mt-1">{prospect.email}</p>
+                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
+                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
                     </div>
-                    <span className="text-xs bg-[#A0A0A0] text-black px-2 py-1 rounded">
+                    <span className="text-xs bg-[#D1D1D1] text-[#0D0D0D] px-2 py-1 rounded">
                       CONTACTED
                     </span>
                   </div>
@@ -110,7 +110,7 @@ export function DashboardView() {
         {/* COLD LEADS */}
         {cold.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-semibold text-white mb-4 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-[#0D0D0D] mb-4 uppercase tracking-wider">
               New
             </p>
             <div className="space-y-2">
@@ -118,14 +118,14 @@ export function DashboardView() {
                 <div
                   key={prospect.id}
                   onClick={() => selectProspect(prospect)}
-                  className="bg-[#111111] border border-[#1C1C1C] rounded-lg p-4 cursor-pointer hover:border-[#A0A0A0] transition-colors"
+                  className="bg-white border border-[#E8E8E8] rounded-lg p-4 cursor-pointer hover:border-[#0D0D0D] transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-white">{prospect.businessName}</p>
-                      <p className="text-xs text-[#A0A0A0] mt-1">{prospect.email}</p>
+                      <p className="font-medium text-[#0D0D0D]">{prospect.businessName}</p>
+                      <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
                     </div>
-                    <span className="text-xs bg-[#1C1C1C] text-[#A0A0A0] px-2 py-1 rounded">
+                    <span className="text-xs bg-[#E8E8E8] text-[#888888] px-2 py-1 rounded">
                       NEW
                     </span>
                   </div>
@@ -137,7 +137,7 @@ export function DashboardView() {
 
         {prospects.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-[#6B6B6B]">No prospects yet. Discover businesses to get started.</p>
+            <p className="text-[#888888]">No prospects yet. Discover businesses to get started.</p>
           </div>
         )}
       </div>

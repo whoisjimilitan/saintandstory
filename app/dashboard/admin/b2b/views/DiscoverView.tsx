@@ -41,18 +41,18 @@ export function DiscoverView() {
   return (
     <div className="flex-1 p-8 overflow-auto">
       <div className="max-w-xl">
-        <h1 className="text-2xl font-semibold text-white mb-6">Discover Prospects</h1>
+        <h1 className="text-2xl font-semibold text-[#0D0D0D] mb-6">Discover Prospects</h1>
 
-        <div className="bg-[#111111] border border-[#1C1C1C] rounded-lg p-6 mb-6">
+        <div className="bg-white border border-[#E8E8E8] rounded-lg p-6 mb-6">
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-white uppercase tracking-wider mb-2 block">
+              <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wider mb-2 block">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#0A0A0A] border border-[#1C1C1C] rounded-lg px-3 py-2 text-white text-sm"
+                className="w-full bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg px-3 py-2 text-[#0D0D0D] text-sm"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -63,7 +63,7 @@ export function DiscoverView() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-white uppercase tracking-wider mb-2 block">
+              <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wider mb-2 block">
                 City
               </label>
               <input
@@ -71,7 +71,7 @@ export function DiscoverView() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="e.g., London"
-                className="w-full bg-[#0A0A0A] border border-[#1C1C1C] rounded-lg px-3 py-2 text-white text-sm placeholder-[#6B6B6B]"
+                className="w-full bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg px-3 py-2 text-[#0D0D0D] text-sm placeholder-[#888888]"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") handleSearch();
                 }}
@@ -81,7 +81,7 @@ export function DiscoverView() {
             <button
               onClick={handleSearch}
               disabled={searching}
-              className="w-full bg-[#30D158] text-black py-2 rounded-lg text-sm font-semibold hover:bg-[#26BA50] disabled:opacity-50"
+              className="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50"
             >
               {searching ? "Searching..." : "Search"}
             </button>
@@ -91,8 +91,8 @@ export function DiscoverView() {
         {results.length > 0 && (
           <div className="space-y-2">
             {results.map((name, idx) => (
-              <div key={idx} className="bg-[#111111] border border-[#1C1C1C] rounded-lg p-3">
-                <p className="text-sm text-white">✅ {name}</p>
+              <div key={idx} className="bg-white border border-[#E8E8E8] rounded-lg p-3">
+                <p className="text-sm text-[#0D0D0D]">✅ {name}</p>
               </div>
             ))}
           </div>

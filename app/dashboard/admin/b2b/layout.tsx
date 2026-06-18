@@ -32,7 +32,7 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen bg-black text-white">
+    <div className="flex h-screen bg-white text-[#0D0D0D]">
       {/* SIDEBAR */}
       <Sidebar />
 
@@ -41,7 +41,7 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
         <TopBar />
 
         {/* MAIN GRID: WORKSPACE + CONTEXT PANEL */}
-        <div className="flex flex-1 overflow-hidden gap-px bg-[#1C1C1C]">
+        <div className="flex flex-1 overflow-hidden gap-px bg-[#E8E8E8]">
           {/* WORKSPACE (Main Content) */}
           <main className="flex-1 overflow-auto">
             {children}

@@ -52,8 +52,9 @@ export async function POST(request: Request) {
     });
 
     if (result.error) {
+      console.error("[B2B SEND] Resend error:", result.error);
       return NextResponse.json(
-        { error: "Failed to send email via Resend" },
+        { error: `Failed to send email: ${result.error.message || "Unknown error"}` },
         { status: 500 }
       );
     }

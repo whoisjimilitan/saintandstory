@@ -63,8 +63,8 @@ export function ContextPanel({
 
   if (!prospectData) {
     return (
-      <div className="w-96 bg-[#0A0A0A] border-l border-[#1C1C1C] flex flex-col items-center justify-center p-6">
-        <p className="text-[#6B6B6B] text-sm">Select a prospect to begin</p>
+      <div className="w-96 bg-[#F5F5F5] border-l border-[#E8E8E8] flex flex-col items-center justify-center p-6">
+        <p className="text-[#888888] text-sm">Select a prospect to begin</p>
       </div>
     );
   }
@@ -133,26 +133,26 @@ export function ContextPanel({
     prospectData.conversationEvents.some((e) => e.type === "REPLIED_NO");
 
   return (
-    <div className="w-96 bg-[#0A0A0A] border-l border-[#1C1C1C] flex flex-col overflow-hidden">
+    <div className="w-96 bg-[#F5F5F5] border-l border-[#E8E8E8] flex flex-col overflow-hidden">
       {/* HEADER */}
-      <div className="p-6 border-b border-[#1C1C1C]">
-        <h2 className="text-lg font-semibold text-white">
+      <div className="p-6 border-b border-[#E8E8E8]">
+        <h2 className="text-lg font-semibold text-[#0D0D0D]">
           {prospectData.businessName}
         </h2>
-        <p className="text-xs text-[#A0A0A0] mt-1">{prospectData.businessCategory}</p>
+        <p className="text-xs text-[#888888] mt-1">{prospectData.businessCategory}</p>
         <div className="mt-3 flex items-center gap-2">
           <span
             className={`px-2 py-1 rounded-md text-xs font-medium ${
               prospectData.status === "warm"
-                ? "bg-[#30D158] text-black"
+                ? "bg-green-500 text-white"
                 : prospectData.status === "contacted"
-                  ? "bg-[#A0A0A0] text-black"
-                  : "bg-[#1C1C1C] text-[#A0A0A0]"
+                  ? "bg-[#D1D1D1] text-[#0D0D0D]"
+                  : "bg-[#E8E8E8] text-[#888888]"
             }`}
           >
             {prospectData.status}
           </span>
-          <span className="text-xs text-[#6B6B6B]">{prospectData.email}</span>
+          <span className="text-xs text-[#888888]">{prospectData.email}</span>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export function ContextPanel({
       <div className="flex-1 overflow-y-auto px-6 py-4">
         {/* EMAIL SEND SECTION */}
         <div className="mb-6">
-          <p className="text-xs font-semibold text-white mb-3 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
             Send Email
           </p>
           <div className="space-y-3">
@@ -169,7 +169,7 @@ export function ContextPanel({
               value={emailSubject}
               onChange={(e) => setEmailSubject(e.target.value)}
               placeholder="Subject"
-              className="w-full bg-[#111111] border border-[#1C1C1C] rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B6B] focus:outline-none focus:border-[#30D158]"
+              className="w-full bg-white border border-[#E8E8E8] rounded-lg px-3 py-2 text-sm text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
               disabled={sendingEmail}
             />
             <textarea
@@ -177,13 +177,13 @@ export function ContextPanel({
               onChange={(e) => setEmailBody(e.target.value)}
               placeholder="Email body"
               rows={4}
-              className="w-full bg-[#111111] border border-[#1C1C1C] rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B6B] focus:outline-none focus:border-[#30D158] resize-none"
+              className="w-full bg-white border border-[#E8E8E8] rounded-lg px-3 py-2 text-sm text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] resize-none"
               disabled={sendingEmail}
             />
             <button
               onClick={handleSendEmail}
               disabled={sendingEmail}
-              className="w-full bg-[#30D158] text-black py-2 rounded-lg text-sm font-semibold hover:bg-[#26BA50] disabled:opacity-50"
+              className="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50"
             >
               {sendingEmail ? "Sending..." : "Send Email"}
             </button>
@@ -191,25 +191,25 @@ export function ContextPanel({
         </div>
 
         {/* RESPONSE SECTION */}
-        <div className="mb-6 pb-6 border-b border-[#1C1C1C]">
-          <p className="text-xs font-semibold text-white mb-3 uppercase tracking-wider">
+        <div className="mb-6 pb-6 border-b border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
             Response
           </p>
           {hasReplied ? (
-            <p className="text-xs text-[#A0A0A0]">Response already recorded</p>
+            <p className="text-xs text-[#888888]">Response already recorded</p>
           ) : (
             <div className="flex gap-2">
               <button
                 onClick={() => handleRecordResponse("YES")}
                 disabled={recordingResponse}
-                className="flex-1 bg-[#30D158] text-black py-2 rounded-lg text-sm font-semibold hover:bg-[#26BA50] disabled:opacity-50"
+                className="flex-1 bg-green-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50"
               >
                 YES
               </button>
               <button
                 onClick={() => handleRecordResponse("NO")}
                 disabled={recordingResponse}
-                className="flex-1 bg-[#FF453A] text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#E63E33] disabled:opacity-50"
+                className="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-red-600 disabled:opacity-50"
               >
                 NO
               </button>
@@ -219,17 +219,17 @@ export function ContextPanel({
 
         {/* TIMELINE */}
         <div>
-          <p className="text-xs font-semibold text-white mb-3 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-[#0D0D0D] mb-3 uppercase tracking-wider">
             Timeline
           </p>
           <div className="space-y-4">
             {prospectData.conversationEvents.length === 0 ? (
-              <p className="text-xs text-[#6B6B6B]">No interactions yet</p>
+              <p className="text-xs text-[#888888]">No interactions yet</p>
             ) : (
               prospectData.conversationEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="text-xs border-l border-[#1C1C1C] pl-3 py-1"
+                  className="text-xs border-l border-[#E8E8E8] pl-3 py-1"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sm">
@@ -241,7 +241,7 @@ export function ContextPanel({
                             ? "❌"
                             : "•"}
                     </span>
-                    <span className="text-[#A0A0A0]">
+                    <span className="text-[#888888]">
                       {event.type === "EMAIL_SENT"
                         ? "Email sent"
                         : event.type === "REPLIED_YES"
@@ -249,11 +249,11 @@ export function ContextPanel({
                           : "Replied NO"}
                     </span>
                   </div>
-                  <span className="text-[#6B6B6B] text-xs">
+                  <span className="text-[#888888] text-xs">
                     {new Date(event.createdAt).toLocaleString()}
                   </span>
                   {event.subject && (
-                    <p className="text-[#A0A0A0] mt-1">Subject: {event.subject}</p>
+                    <p className="text-[#888888] mt-1">Subject: {event.subject}</p>
                   )}
                 </div>
               ))

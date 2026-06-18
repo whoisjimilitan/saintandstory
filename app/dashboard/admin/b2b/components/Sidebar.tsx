@@ -18,7 +18,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-20 bg-[#0A0A0A] border-r border-[#1C1C1C] flex flex-col items-center py-6 gap-8">
+    <div className="w-20 bg-[#F5F5F5] border-r border-[#E8E8E8] flex flex-col items-center py-6 gap-8">
       {/* LOGO */}
       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-xs font-bold">
         S&S
@@ -30,7 +30,7 @@ export function Sidebar() {
           <button
             key={module.id}
             onClick={() => handleNavigation(module.id)}
-            className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl hover:bg-[#1C1C1C] transition-colors"
+            className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl hover:bg-[#E8E8E8] transition-colors"
             title={module.label}
           >
             {module.icon}
@@ -42,7 +42,7 @@ export function Sidebar() {
       <div className="flex-1" />
 
       {/* SETTINGS */}
-      <button className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl hover:bg-[#1C1C1C] transition-colors">
+      <button className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl hover:bg-[#E8E8E8] transition-colors">
         ⚙️
       </button>
     </div>
