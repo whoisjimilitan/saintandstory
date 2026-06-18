@@ -221,8 +221,16 @@ export async function POST(request: NextRequest) {
   console.log("[DISCOVER] Search queries:", queries);
   console.log("[DISCOVER] Query source:", NICHE_SEARCH_MAP[niche] ? "mapped" : "fallback (original value)");
 
-  await ensureB2BSchema();
-  console.log("[DISCOVER] ✓ B2B schema ensured");
+  try {
+    await ensureB2BSchema();
+    console.log("[DISCOVER] ✓ B2B schema ensured");
+  } catch (err) {
+    console.error("[DISCOVER_SCHEMA_ERROR]", err);
+    return NextResponse.json(
+      { error: "Discovery schema initialization failed" },
+      { status: 500 }
+    );
+  }
 
   const sql = neon(process.env.DATABASE_URL!);
   console.log("[DISCOVER] ✓ Database connection initialized");

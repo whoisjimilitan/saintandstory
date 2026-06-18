@@ -404,16 +404,12 @@ export async function ensureB2BSchema() {
   `;
 
   // PHASE 5: Mission ROI Tracking
-  await sql`
-    ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS (
-      discovered_count INT DEFAULT 0,
-      qualified_count INT DEFAULT 0,
-      leads_created_count INT DEFAULT 0,
-      converted_count INT DEFAULT 0,
-      revenue_generated DECIMAL(10, 2) DEFAULT 0,
-      last_updated TIMESTAMPTZ
-    )
-  `;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS discovered_count INT DEFAULT 0`;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS qualified_count INT DEFAULT 0`;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS leads_created_count INT DEFAULT 0`;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS converted_count INT DEFAULT 0`;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS revenue_generated DECIMAL(10, 2) DEFAULT 0`;
+  await sql`ALTER TABLE b2b_discovery_config ADD COLUMN IF NOT EXISTS last_updated TIMESTAMPTZ`;
 
   // Enable PostGIS for geospatial queries
   await sql`CREATE EXTENSION IF NOT EXISTS postgis`;
