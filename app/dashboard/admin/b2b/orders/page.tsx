@@ -42,7 +42,7 @@ async function getOrdersData(): Promise<OrdersData> {
 
     try {
       const standingOrders = await sql`
-        SELECT 
+        SELECT
           id,
           category_id,
           frequency,
@@ -53,24 +53,21 @@ async function getOrdersData(): Promise<OrdersData> {
         ORDER BY created_at DESC
       `;
 
-      // Map to business-friendly names and statuses
-      orders = standingOrders.map((order: any) => {
-        const categoryNames: { [key: string]: string } = {
-          'estate-agents': 'Estate Agent Expansion Program',
-          'removals': 'Yorkshire Relocation Program',
-          'care': 'Care Provider Network Program',
-          'pharmacies': 'Pharmacy Growth Program',
-          'logistics': 'Logistics Modernization Program'
-        };
+      const categoryNames: { [key: string]: string } = {
+        'estate-agents': 'Estate Agent Expansion Program',
+        'removals': 'Yorkshire Relocation Program',
+        'care': 'Care Provider Network Program',
+        'pharmacies': 'Pharmacy Growth Program',
+        'logistics': 'Logistics Modernization Program'
+      };
 
+      orders = standingOrders.map((order: any) => {
         const name = categoryNames[order.category_id] || `Revenue Program ${order.id.slice(0, 8)}`;
 
-        // Determine status based on missing data signals
         let status: 'healthy' | 'blocked' | 'attention_required' = 'healthy';
         let blocker: string | undefined;
         let next_action = 'Continue monitoring';
 
-        // Check if this order might be blocked (placeholder logic)
         if (order.status === 'blocked' || order.category_id === 'removals') {
           status = 'blocked';
           blocker = 'Missing pickup postcode';
@@ -91,7 +88,7 @@ async function getOrdersData(): Promise<OrdersData> {
           id: order.id,
           name: name,
           status: status,
-          revenue_potential: 8, // Estimated jobs per month
+          revenue_potential: 8,
           last_activity: new Date(order.created_at).toLocaleDateString(),
           next_action: next_action,
           blocker: blocker
@@ -139,6 +136,10 @@ export default async function OrdersPage() {
 
   const data = await getOrdersData();
 
+  const blockedOrders = data.orders.filter(o => o.status === 'blocked');
+  const attentionOrders = data.orders.filter(o => o.status === 'attention_required');
+  const healthyOrders = data.orders.filter(o => o.status === 'healthy');
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       {/* Navigation */}
@@ -169,106 +170,132 @@ export default async function OrdersPage() {
       </div>
 
       {/* SECTION 1: ORDERS BRIEF */}
-      <div className="mb-16 bg-white border border-[#E8E8E8] rounded px-6 py-5">
+      <div className="mb-16">
         <p className="text-sm leading-relaxed text-[#0D0D0D]">
           <span className="font-semibold">{data.total_assets}</span> standing order{data.total_assets !== 1 ? 's' : ''}. <span className="font-semibold">{data.healthy_assets}</span> {data.healthy_assets === 1 ? 'is working' : 'are working'}. <span className="font-semibold">{data.blocked_assets}</span> {data.blocked_assets === 1 ? 'is blocked' : 'are blocked'}.
         </p>
       </div>
 
-      {/* SECTION 2: STANDING ORDERS (SORTED BY URGENCY) */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Recurring Business Programs
-        </p>
-        {data.orders.length > 0 ? (
-          <div className="space-y-4">
-            {data.orders.sort((a, b) => {
-              const priorityA = a.status === 'blocked' ? 0 : a.status === 'attention_required' ? 1 : 2;
-              const priorityB = b.status === 'blocked' ? 0 : b.status === 'attention_required' ? 1 : 2;
-              return priorityA - priorityB;
-            }).map((order) => (
-              <div
-                key={order.id}
-                className="border border-[#E8E8E8] rounded p-6 bg-white hover:border-[#D0D0D0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all duration-200"
-              >
-                {/* Header: Name + Status */}
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
-                      {order.name}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-[10px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded ${
-                          order.status === 'healthy'
-                            ? 'bg-[#F0F0F0] text-[#0D0D0D]'
-                            : order.status === 'blocked'
-                            ? 'bg-[#FFE5E5] text-[#CC0000]'
-                            : 'bg-[#FFF8E5] text-[#CC6600]'
-                        }`}
-                      >
-                        {order.status === 'healthy'
-                          ? 'Working'
-                          : order.status === 'blocked'
-                          ? 'Blocked'
-                          : 'Needs Attention'}
-                      </span>
-                    </div>
-                  </div>
+      {/* SECTION 2: BLOCKED ORDERS */}
+      {blockedOrders.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-[10px] font-semibold text-[#DC2626] uppercase tracking-[0.2em] mb-8">
+            Requires Immediate Attention
+          </h2>
+          <div className="space-y-6">
+            {blockedOrders.map((order) => (
+              <div key={order.id} className="pl-4 border-l-4 border-[#DC2626] bg-[#FFF5F5] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
+                  {order.name}
+                </h3>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
+                  </p>
                 </div>
-
-                {/* Content Grid */}
-                <div className="grid grid-cols-3 gap-6 mb-4 pb-4 border-b border-[#E8E8E8]">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      Expected Jobs
-                    </p>
-                    <p className="text-lg font-semibold text-[#0D0D0D]">
-                      {order.revenue_potential}/month
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      Started
-                    </p>
-                    <p className="text-base text-[#0D0D0D]">
-                      {order.last_activity || 'Unknown'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
-                      What to Do
-                    </p>
-                    <p className="text-base text-[#0D0D0D]">
-                      {order.next_action}
-                    </p>
-                  </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Blocked
+                  </p>
                 </div>
-
-                {/* Blocker Alert (if exists) */}
                 {order.blocker && (
-                  <div className="bg-[#FFF8E5] border border-[#FFE5C0] rounded p-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#CC6600] mb-1">
-                      Requires Attention
+                  <div className="mb-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#DC2626] mb-1">
+                      Issue
                     </p>
-                    <p className="text-sm text-[#CC6600]">
+                    <p className="text-sm text-[#DC2626]">
                       {order.blocker}
                     </p>
                   </div>
                 )}
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-1">
+                  Action
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.next_action}
+                </p>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="bg-white border border-[#E8E8E8] rounded p-6">
-            <p className="text-sm text-[#666666] italic">
-              No recurring revenue assets configured yet.
-            </p>
+        </div>
+      )}
+
+      {/* SECTION 3: AT-RISK ORDERS */}
+      {attentionOrders.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-[0.2em] mb-8">
+            Attention Required
+          </h2>
+          <div className="space-y-6">
+            {attentionOrders.map((order) => (
+              <div key={order.id} className="pl-4 border-l-4 border-[#F59E0B] bg-[#FFFAF0] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
+                  {order.name}
+                </h3>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
+                  </p>
+                </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Needs Attention
+                  </p>
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-1">
+                  Action
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.next_action}
+                </p>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-
+      {/* SECTION 4: HEALTHY ORDERS */}
+      {healthyOrders.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-[10px] font-semibold text-[#0A0A0A] uppercase tracking-[0.2em] mb-8">
+            Performing
+          </h2>
+          <div className="space-y-6">
+            {healthyOrders.map((order) => (
+              <div key={order.id} className="pl-4 border-l-4 border-[#0D0D0D] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
+                  {order.name}
+                </h3>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
+                  </p>
+                </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Working
+                  </p>
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                  Last Activity
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.last_activity}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

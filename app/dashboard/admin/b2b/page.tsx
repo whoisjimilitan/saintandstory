@@ -167,152 +167,66 @@ export default async function B2BPage() {
         </p>
       </div>
 
-      {/* AWAITING ATTENTION SECTIONS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Awaiting Attention
-        </p>
-        <div className="space-y-4">
-          {/* Section 1: Prospects Awaiting Response */}
-          <Link
-            href="/dashboard/admin/b2b/pipeline"
-            className="block border border-[#E8E8E8] rounded p-6 bg-white hover:border-[#D0D0D0] transition-colors"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                  Prospects Awaiting Response
-                </p>
-                <p className="text-4xl font-black text-[#0D0D0D] mb-2">
-                  {briefing.awaiting_response.count}
-                </p>
-                <p className="text-sm text-[#666666]">
-                  opened email but didn't reply
-                </p>
-                <p className="text-[10px] font-semibold text-[#0A66C2] mt-3">
-                  Revenue impact: £{briefing.awaiting_response.revenue_impact.toLocaleString()}/month if converted
-                </p>
-              </div>
-              <div className="text-[#D0D0D0] text-lg">→</div>
-            </div>
-            <p className="text-[10px] text-[#888888] mt-4 border-t border-[#E8E8E8] pt-4">
-              Action: Review Pipeline. Follow up with prospects showing interest.
-            </p>
-          </Link>
-
-          {/* Section 2: Standing Orders Requiring Intervention */}
-          <Link
-            href="/dashboard/admin/b2b/orders"
-            className="block border border-[#E8E8E8] rounded p-6 bg-white hover:border-[#D0D0D0] transition-colors"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                  Standing Orders Requiring Intervention
-                </p>
-                <p className="text-4xl font-black text-[#0D0D0D] mb-2">
-                  {briefing.orders_requiring_intervention.count}
-                </p>
-                <p className="text-sm text-[#666666]">
-                  blocked or at-risk
-                </p>
-                <p className="text-[10px] font-semibold text-[#CC6600] mt-3">
-                  Revenue at risk: £{briefing.orders_requiring_intervention.revenue_at_risk.toLocaleString()}/month
-                </p>
-              </div>
-              <div className="text-[#D0D0D0] text-lg">→</div>
-            </div>
-            <p className="text-[10px] text-[#888888] mt-4 border-t border-[#E8E8E8] pt-4">
-              Action: Go to Orders. Unblock or renegotiate before revenue is lost.
-            </p>
-          </Link>
-
-          {/* Section 3: New Opportunities Ready */}
-          <Link
-            href="/dashboard/admin/b2b/discovery"
-            className="block border border-[#E8E8E8] rounded p-6 bg-white hover:border-[#D0D0D0] transition-colors"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-2">
-                  New Opportunities Ready for Outreach
-                </p>
-                <p className="text-4xl font-black text-[#0D0D0D] mb-2">
-                  {briefing.new_opportunities.count}
-                </p>
-                <p className="text-sm text-[#666666]">
-                  businesses identified and waiting
-                </p>
-                <p className="text-[10px] font-semibold text-[#0A66C2] mt-3">
-                  Expected: 2-3 will convert to standing orders
-                </p>
-              </div>
-              <div className="text-[#D0D0D0] text-lg">→</div>
-            </div>
-            <p className="text-[10px] text-[#888888] mt-4 border-t border-[#E8E8E8] pt-4">
-              Action: Go to Discovery. Initiate outreach to high-priority prospects.
-            </p>
-          </Link>
+      {/* CRITICAL STATE: Blocked Orders (if exists) */}
+      {briefing.orders_requiring_intervention.count > 0 && (
+        <div className="mb-20 pl-4 border-l-4 border-[#DC2626]">
+          <p className="text-8xl font-black text-[#0D0D0D] mb-4">
+            {briefing.orders_requiring_intervention.count}
+          </p>
+          <p className="text-4xl font-bold text-[#DC2626] mb-3">
+            £{briefing.orders_requiring_intervention.revenue_at_risk.toLocaleString()}/month at risk
+          </p>
+          <p className="text-xl text-[#0D0D0D] mb-2">
+            Standing orders blocked or requiring intervention.
+          </p>
+          <p className="text-base text-[#666666]">
+            Action: Go to Orders immediately.
+          </p>
         </div>
+      )}
+
+      {/* PRIMARY METRICS */}
+      <div className="mb-20 space-y-12">
+        {/* Prospects Awaiting Response */}
+        {briefing.awaiting_response.count > 0 && (
+          <Link href="/dashboard/admin/b2b/pipeline" className="block">
+            <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
+              {briefing.awaiting_response.count}
+            </p>
+            <p className="text-lg text-[#0D0D0D]">
+              Prospects opened email but didn't reply. Follow up in Pipeline.
+            </p>
+          </Link>
+        )}
+
+        {/* New Opportunities */}
+        {briefing.new_opportunities.count > 0 && (
+          <Link href="/dashboard/admin/b2b/discovery" className="block">
+            <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
+              {briefing.new_opportunities.count}
+            </p>
+            <p className="text-lg text-[#0D0D0D]">
+              Opportunities ready for outreach in Discovery.
+            </p>
+          </Link>
+        )}
       </div>
 
-      {/* SYSTEM SNAPSHOT */}
-      <div className="mb-16 border-t border-[#E8E8E8] pt-12">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+      {/* SECONDARY: System Status */}
+      <div className="pt-12 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
           System Snapshot
         </p>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Prospects in Pipeline
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              {briefing.system_status.total_prospects}
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              actively engaged
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Standing Orders Active
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              {briefing.system_status.total_orders}
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              generating recurring revenue
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E8E8E8] rounded px-6 py-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-3">
-              Monthly Revenue
-            </p>
-            <p className="text-4xl font-black text-[#0D0D0D]">
-              £{briefing.system_status.total_revenue_monthly.toLocaleString()}
-            </p>
-            <p className="text-[10px] text-[#666666] mt-2">
-              from active orders
-            </p>
-          </div>
-        </div>
+        <p className="text-base text-[#666666]">
+          <span className="font-semibold text-[#0D0D0D]">{briefing.system_status.total_prospects}</span> prospects in pipeline. <span className="font-semibold text-[#0D0D0D]">{briefing.system_status.total_orders}</span> active standing orders. <span className="font-semibold text-[#0D0D0D]">£{briefing.system_status.total_revenue_monthly.toLocaleString()}</span> monthly revenue.
+        </p>
       </div>
 
-      {/* RECENT LEARNING */}
-      <div className="border-t border-[#E8E8E8] pt-12">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Recent Learning (from Analytics)
+      {/* SYSTEM MEMORY: Learning */}
+      <div className="mt-12 pt-12 border-t border-[#E8E8E8]">
+        <p className="text-base text-[#0D0D0D]">
+          {briefing.recent_learning}
         </p>
-        <div className="bg-[#F9FAFB] border border-[#E8E8E8] rounded p-6">
-          <p className="text-sm text-[#0D0D0D] leading-relaxed">
-            {briefing.recent_learning}
-          </p>
-          <p className="text-[10px] text-[#888888] mt-4">
-            Use this insight to guide your Discovery searches and Pipeline prioritization.
-          </p>
-        </div>
       </div>
     </div>
   );

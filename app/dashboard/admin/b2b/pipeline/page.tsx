@@ -37,9 +37,8 @@ async function getPipelineData(): Promise<PipelineData> {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    // Get all prospects and their states
     const leads = await sql`
-      SELECT 
+      SELECT
         id,
         status,
         email_sent_at,
@@ -47,9 +46,8 @@ async function getPipelineData(): Promise<PipelineData> {
       FROM b2b_leads
     `;
 
-    // Get outreach metrics
     const outreach = await sql`
-      SELECT 
+      SELECT
         lead_id,
         MAX(CASE WHEN event_type = 'email_sent' THEN 1 ELSE 0 END) as contacted,
         MAX(CASE WHEN event_type = 'email_opened' THEN 1 ELSE 0 END) as opened,
@@ -83,7 +81,7 @@ async function getPipelineData(): Promise<PipelineData> {
 
     leads.forEach((lead: any) => {
       const outreachData = outreachMap.get(lead.id) || { contacted: 0, opened: 0, clicked: 0, replied: 0 };
-      
+
       if (lead.status === 'won') {
         pipeline.won++;
       } else if (lead.status === 'lost') {
@@ -146,6 +144,8 @@ export default async function PipelinePage() {
     { stage: 'Lost', count: pipeline.lost, percentage: pipeline.total > 0 ? (pipeline.lost / pipeline.total) * 100 : 0 }
   ];
 
+  const maxCount = Math.max(...stages.map(s => s.count), 1);
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       {/* Navigation */}
@@ -191,24 +191,21 @@ export default async function PipelinePage() {
                   </p>
                   <p className="text-sm font-semibold text-[#0D0D0D]">
                     {stage.count}
-                    <span className="text-[#888888] font-normal ml-2">
-                      {stage.percentage.toFixed(0)}%
-                    </span>
                   </p>
                 </div>
-                <div className="w-full bg-[#F5F5F5] rounded h-8 overflow-hidden border border-[#E8E8E8]">
+                <div className="w-full bg-[#F5F5F5] rounded h-8 overflow-hidden">
                   <div
                     className={`h-full transition-all ${
                       isBottleneck
-                        ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500]'
+                        ? 'bg-[#888888]'
                         : 'bg-[#0D0D0D]'
                     }`}
                     style={{ width: `${Math.max(stage.percentage, 2)}%` }}
                   />
                 </div>
                 {isBottleneck && (
-                  <p className="text-[10px] text-[#FF6B6B] font-medium mt-1">
-                    ⚠️ Bottleneck: {Math.round((1 - stage.count / stages[idx - 1].count) * 100)}% drop from {stages[idx - 1].stage}
+                  <p className="text-[10px] text-[#666666] font-medium mt-1">
+                    Bottleneck: {Math.round((1 - stage.count / stages[idx - 1].count) * 100)}% drop from {stages[idx - 1].stage}
                   </p>
                 )}
               </div>
@@ -222,14 +219,9 @@ export default async function PipelinePage() {
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
           Prospects Requiring Attention
         </p>
-        <div className="bg-white border border-[#E8E8E8] rounded p-6">
-          <p className="text-sm text-[#666666] italic">
-            Individual prospect engagement tracking available in Pipeline detail view.
-          </p>
-          <p className="text-[10px] text-[#888888] mt-3">
-            Focus on the bottlenecks above to understand where your intervention will have the most impact.
-          </p>
-        </div>
+        <p className="text-sm text-[#666666] italic">
+          Individual prospect engagement tracking available in Pipeline detail view. Focus on the bottlenecks above to understand where your intervention will have the most impact.
+        </p>
       </div>
 
       {/* Pipeline Summary */}
