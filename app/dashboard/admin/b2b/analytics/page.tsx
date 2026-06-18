@@ -63,7 +63,7 @@ export default async function B2BAnalyticsPage() {
             </div>
             <div>
               <p className="text-sm text-[#666666] mb-2">Conversion to standing order</p>
-              <p className="text-3xl font-black text-[#0D0D0D]>28%</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">28%</p>
             </div>
           </div>
         </div>
