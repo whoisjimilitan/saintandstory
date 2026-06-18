@@ -4,8 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const modules = [
   { id: "discover", label: "Discover" },
+  { id: "import", label: "Import CSV" },
+  { id: "add-lead", label: "Add Lead" },
   { id: "dashboard", label: "Queue" },
-  { id: "add-lead", label: "Send Email" },
   { id: "responses", label: "Responses" },
   { id: "leads", label: "All Leads" },
   { id: "learning", label: "Learning" },
