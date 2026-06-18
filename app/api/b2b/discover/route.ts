@@ -181,11 +181,29 @@ export async function POST(request: NextRequest) {
 
   console.log("[DISCOVER] ✓ Google Maps API key configured");
 
-  const body = await request.json() as { postcode?: string; radius?: number; category?: string };
-  const postcode = body.postcode;
-  const radius = body.radius || 5;
-  const category = body.category || "all";
-  let city = postcode ? postcode.split(" ")[0] : "UK";
+  // INPUT VALIDATION GATE
+  let body: { postcode?: string; radius?: number; category?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  // Validate and normalize inputs
+  const postcode = body.postcode?.trim();
+  const radius = Math.max(1, Math.min(25, body.radius || 5));
+  const category = body.category?.trim() || "all";
+
+  // Extract or default city
+  const city = postcode ? postcode.split(" ")[0].trim() : "UK";
+
+  // Ensure all critical values are safe strings
+  if (!city || typeof city !== "string") {
+    return NextResponse.json({ error: "Invalid city extracted from postcode" }, { status: 400 });
+  }
+  if (!category || typeof category !== "string") {
+    return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+  }
 
   console.log("[DISCOVER] Request payload - postcode:", postcode, "radius:", radius, "category:", category, "city:", city);
 
