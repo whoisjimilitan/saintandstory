@@ -108,20 +108,22 @@ export function AddLeadView() {
 
   return (
     <div className="flex-1 px-6 py-10 overflow-auto">
-      <div className="max-w-2xl space-y-12">
+      <div className="max-w-3xl space-y-16">
+        {/* HEADER */}
         <div>
           <h1 className="text-4xl font-black text-[#0D0D0D] tracking-tight">
             Add Lead
           </h1>
-          <p className="text-sm text-[#888888] mt-2">
-            Create a lead and send first-touch email automatically
+          <p className="text-sm text-[#888888] mt-3">
+            Create a prospect and send first-touch email with tracking
           </p>
         </div>
 
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-8 space-y-6">
+        {/* FORM — LINEAR, NO CARDS */}
+        <div className="space-y-8">
           {/* Business Name */}
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block mb-2">
+          <div className="space-y-3">
+            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
               Business Name
             </label>
             <input
@@ -129,14 +131,14 @@ export function AddLeadView() {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               placeholder="e.g., ABC Logistics"
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] transition-colors"
               disabled={loading}
             />
           </div>
 
           {/* Email */}
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block mb-2">
+          <div className="space-y-3">
+            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
               Email Address
             </label>
             <input
@@ -144,14 +146,14 @@ export function AddLeadView() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="contact@business.com"
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] transition-colors"
               disabled={loading}
             />
           </div>
 
           {/* Category */}
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block mb-2">
+          <div className="space-y-3">
+            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
               Business Category
             </label>
             <input
@@ -159,20 +161,20 @@ export function AddLeadView() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="e.g., Logistics"
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D] transition-colors"
               disabled={loading}
             />
           </div>
 
           {/* Pressure Type */}
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block mb-2">
+          <div className="space-y-3">
+            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
               Pressure Type
             </label>
             <select
               value={pressureType}
               onChange={(e) => setPressureType(e.target.value)}
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D]"
+              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D] transition-colors"
               disabled={loading}
             >
               {PRESSURE_TYPES.map((type) => (
@@ -182,56 +184,70 @@ export function AddLeadView() {
               ))}
             </select>
           </div>
+        </div>
 
-          {/* Error */}
+        {/* STATUS MESSAGES */}
+        <div className="space-y-3">
           {error && (
-            <div className="text-sm text-[#DC2626] border border-[#DC2626] rounded-lg px-4 py-3">
+            <div className="text-sm text-[#DC2626] border-l-2 border-[#DC2626] pl-4 py-2">
               {error}
             </div>
           )}
 
-          {/* Success */}
           {success && (
-            <div className="text-sm text-green-600 border border-green-300 rounded-lg px-4 py-3">
+            <div className="text-sm text-green-600 border-l-2 border-green-600 pl-4 py-2">
               ✓ Lead created and email sent successfully
             </div>
           )}
+        </div>
 
-          {/* Submit Button */}
+        {/* ACTION BUTTON */}
+        <div>
           <button
             onClick={handleCreateAndSend}
             disabled={loading}
-            className="w-full text-sm font-medium text-white bg-[#0D0D0D] px-4 py-3 hover:opacity-80 transition-opacity disabled:opacity-50"
+            className="text-sm font-medium text-[#0D0D0D] border border-[#0D0D0D] px-4 py-3 hover:bg-[#0D0D0D] hover:text-white transition-colors disabled:opacity-50"
           >
             {loading ? "Sending..." : "Create Lead & Send Email"}
           </button>
         </div>
 
-        {/* Email Preview */}
+        {/* EMAIL PREVIEW — EDITORIAL STYLE */}
         {pressureType && (
-          <div className="space-y-4 pt-12 border-t border-[#E8E8E8]">
+          <div className="space-y-6 pt-16 border-t border-[#E8E8E8]">
             <h2 className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D]">
               Email Preview
             </h2>
-            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-6 space-y-4">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888] mb-2">
+
+            <div className="space-y-6">
+              {/* Subject */}
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
                   Subject
                 </p>
                 <p className="text-sm text-[#0D0D0D]">
                   {TEMPLATES[pressureType].subject}
                 </p>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888] mb-2">
+
+              {/* Body */}
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
                   Body
                 </p>
-                <p className="text-sm text-[#0D0D0D] whitespace-pre-wrap">
+                <p className="text-sm text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
                   {TEMPLATES[pressureType].body.replace("[NAME]", businessName || "[Business Name]")}
                 </p>
               </div>
-              <div className="text-sm text-[#888888]">
-                Email will include YES/NO response buttons with unique tracking token
+
+              {/* Response Mechanism */}
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#888888]">
+                  Response Mechanism
+                </p>
+                <p className="text-sm text-[#0D0D0D]">
+                  Email includes unique tracking token. Prospect clicks YES or NO button. Response recorded automatically. Lead status updated to warm (YES) or contacted (NO).
+                </p>
               </div>
             </div>
           </div>
