@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       );
     }
 
-    if (!["YES", "NO"].includes(response)) {
+    if (!["YES", "MAYBE", "NO"].includes(response)) {
       return NextResponse.json(
         { error: "Invalid response type" },
         { status: 400 }

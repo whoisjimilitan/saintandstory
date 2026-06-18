@@ -13,6 +13,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
+      pressureTypes: report.pressure_type_metrics || [],
+      copyVariants: report.copy_variant_metrics || [],
       data: report,
     });
   } catch (error) {
