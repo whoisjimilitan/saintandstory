@@ -190,6 +190,9 @@ export default async function B2BPage() {
         {/* Prospects Awaiting Response */}
         {briefing.awaiting_response.count > 0 && (
           <Link href="/dashboard/admin/b2b/pipeline" className="block">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+              In Pipeline
+            </p>
             <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
               {briefing.awaiting_response.count}
             </p>
@@ -202,6 +205,9 @@ export default async function B2BPage() {
         {/* New Opportunities */}
         {briefing.new_opportunities.count > 0 && (
           <Link href="/dashboard/admin/b2b/discovery" className="block">
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+              Ready for Outreach
+            </p>
             <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
               {briefing.new_opportunities.count}
             </p>
@@ -214,16 +220,42 @@ export default async function B2BPage() {
 
       {/* SECONDARY: System Status */}
       <div className="pt-12 border-t border-[#E8E8E8]">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
           System Snapshot
         </p>
-        <p className="text-base text-[#666666]">
-          <span className="font-semibold text-[#0D0D0D]">{briefing.system_status.total_prospects}</span> prospects in pipeline. <span className="font-semibold text-[#0D0D0D]">{briefing.system_status.total_orders}</span> active standing orders. <span className="font-semibold text-[#0D0D0D]">£{briefing.system_status.total_revenue_monthly.toLocaleString()}</span> monthly revenue.
-        </p>
+        <div className="space-y-6">
+          <div>
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+              Total Pipeline
+            </p>
+            <p className="text-base text-[#0D0D0D]">
+              <span className="font-black text-2xl">{briefing.system_status.total_prospects}</span> prospects in pipeline
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+              Active Standing Orders
+            </p>
+            <p className="text-base text-[#0D0D0D]">
+              <span className="font-black text-2xl">{briefing.system_status.total_orders}</span> active standing orders
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-2">
+              Monthly Revenue
+            </p>
+            <p className="text-base text-[#0D0D0D]">
+              <span className="font-black text-2xl">£{briefing.system_status.total_revenue_monthly.toLocaleString()}</span> monthly revenue
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* SYSTEM MEMORY: Learning */}
       <div className="mt-12 pt-12 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          System Learning
+        </p>
         <p className="text-base text-[#0D0D0D]">
           {briefing.recent_learning}
         </p>
