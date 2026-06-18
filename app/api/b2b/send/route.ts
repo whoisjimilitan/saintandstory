@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import { randomBytes } from "crypto";
+import { checkSendConstraints } from "@/lib/b2b/enforcement-gate";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -54,9 +55,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const trackingToken = generateTrackingToken();
-    const copyVariant = selectCopyVariant();
     const pressureType = body.pressureType || "general";
+    const copyVariant = selectCopyVariant();
+
+    // ENFORCEMENT GATE: Check constraints before execution
+    const enforcement = await checkSendConstraints(pressureType, copyVariant);
+
+    if (!enforcement.allowed) {
+      // Constraints violated - do not send email
+      const statusCode = enforcement.reason === "daily_limit_reached" ? 429 : 403;
+      return NextResponse.json(
+        { error: enforcement.reason, message: "Send constraints not met" },
+        { status: statusCode }
+      );
+    }
+
+    // Gate passed - proceed with Wave 1 execution
+    const trackingToken = generateTrackingToken();
 
     const yesLink = `${WEBHOOK_URL}/api/b2b/webhook/response?token=${trackingToken}&response=YES`;
     const noLink = `${WEBHOOK_URL}/api/b2b/webhook/response?token=${trackingToken}&response=NO`;
