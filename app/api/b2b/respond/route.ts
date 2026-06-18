@@ -55,6 +55,20 @@ export async function POST(request: Request) {
       },
     });
 
+    // Log conversation event: REPLIED_YES or REPLIED_NO (Layer 4 - Conversation Intelligence)
+    const eventType = body.responseType === "YES" ? "REPLIED_YES" : "REPLIED_NO";
+    await prisma.b2bConversationEvent.create({
+      data: {
+        leadId: outreach.lead.id,
+        type: eventType,
+        direction: "INBOUND",
+        metadata: {
+          outreachId: updatedOutreach.id,
+          respondedAt: new Date().toISOString(),
+        },
+      },
+    });
+
     return NextResponse.json({
       success: true,
       outreachId: updatedOutreach.id,

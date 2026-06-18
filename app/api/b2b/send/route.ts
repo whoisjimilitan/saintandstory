@@ -69,6 +69,22 @@ export async function POST(request: Request) {
       },
     });
 
+    // Log conversation event: EMAIL_SENT (Layer 4 - Conversation Intelligence)
+    await prisma.b2bConversationEvent.create({
+      data: {
+        leadId: body.leadId as any,
+        type: "EMAIL_SENT",
+        direction: "OUTBOUND",
+        subject: body.subject,
+        body: body.body,
+        metadata: {
+          outreachId: outreach.id,
+          resendMessageId: result.data?.id,
+          emailType: body.emailType || "initial",
+        },
+      },
+    });
+
     return NextResponse.json({
       success: true,
       outreachId: outreach.id,
