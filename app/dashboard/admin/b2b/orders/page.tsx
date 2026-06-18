@@ -141,9 +141,9 @@ export default async function OrdersPage() {
   const healthyOrders = data.orders.filter(o => o.status === 'healthy');
 
   return (
-    <div className="px-8 py-12 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
-      <div className="flex gap-2 mb-16">
+      <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (
           <Link
             key={item}
@@ -161,144 +161,136 @@ export default async function OrdersPage() {
 
       {/* Page Header */}
       <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.3em] mb-4">Orders</p>
-        <h1 className="font-sans font-black text-[#0D0D0D] text-6xl tracking-tight mb-3">
-          Standing Orders
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          Standing Orders.
         </h1>
-        <p className="text-base text-[#666666]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
           Recurring business we've committed to
         </p>
       </div>
 
-      {/* STATUS CARDS SUMMARY */}
-      <div className="grid grid-cols-3 gap-8 mb-16">
-        <div className="bg-[#F0FDF4] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-4">
-            Performing
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {data.healthy_assets}
-          </p>
-          <p className="text-sm text-[#666666]">
-            {data.healthy_assets === 1 ? 'order' : 'orders'} working well
-          </p>
-        </div>
-
-        <div className="bg-[#FFFAF0] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-[0.2em] mb-4">
-            Needs Attention
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {attentionOrders.length}
-          </p>
-          <p className="text-sm text-[#666666]">
-            awaiting action
-          </p>
-        </div>
-
-        <div className="bg-[#FEE2E2] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#DC2626] uppercase tracking-[0.2em] mb-4">
-            Blocked
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {data.blocked_assets}
-          </p>
-          <p className="text-sm text-[#666666]">
-            require immediate fix
-          </p>
-        </div>
+      {/* SECTION 1: ORDERS BRIEF */}
+      <div className="mb-16">
+        <p className="text-sm leading-relaxed text-[#0D0D0D]">
+          <span className="font-semibold">{data.total_assets}</span> standing order{data.total_assets !== 1 ? 's' : ''}. <span className="font-semibold">{data.healthy_assets}</span> {data.healthy_assets === 1 ? 'is working' : 'are working'}. <span className="font-semibold">{data.blocked_assets}</span> {data.blocked_assets === 1 ? 'is blocked' : 'are blocked'}.
+        </p>
       </div>
 
-      {/* BLOCKED ORDERS */}
+      {/* SECTION 2: BLOCKED ORDERS */}
       {blockedOrders.length > 0 && (
         <div className="mb-16">
-          <p className="text-[10px] font-semibold text-[#DC2626] uppercase tracking-[0.2em] mb-8">
+          <h2 className="text-[10px] font-semibold text-[#DC2626] uppercase tracking-[0.2em] mb-8">
             Requires Immediate Attention
-          </p>
-          <div className="space-y-4">
+          </h2>
+          <div className="space-y-6">
             {blockedOrders.map((order) => (
-              <div key={order.id} className="bg-[#FEE2E2] border-l-4 border-[#DC2626] p-6 rounded-lg">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#0D0D0D] mb-2">
-                      {order.name}
-                    </h3>
-                    <p className="text-3xl font-black text-[#0D0D0D]">
-                      {order.revenue_potential} jobs/month
-                    </p>
-                  </div>
-                  <span className="inline-block bg-[#DC2626] text-white text-[10px] font-semibold uppercase tracking-[0.2em] px-3 py-1 rounded">
-                    Blocked
-                  </span>
-                </div>
-                {order.blocker && (
-                  <p className="text-sm text-[#DC2626] font-semibold mb-3">
-                    Issue: {order.blocker}
-                  </p>
-                )}
-                <p className="text-sm text-[#0D0D0D]">
-                  {order.next_action}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ATTENTION ORDERS */}
-      {attentionOrders.length > 0 && (
-        <div className="mb-16">
-          <p className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-[0.2em] mb-8">
-            Attention Required
-          </p>
-          <div className="space-y-4">
-            {attentionOrders.map((order) => (
-              <div key={order.id} className="bg-[#FFFAF0] border-l-4 border-[#F59E0B] p-6 rounded-lg">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#0D0D0D] mb-2">
-                      {order.name}
-                    </h3>
-                    <p className="text-3xl font-black text-[#0D0D0D]">
-                      {order.revenue_potential} jobs/month
-                    </p>
-                  </div>
-                  <span className="inline-block bg-[#F59E0B] text-white text-[10px] font-semibold uppercase tracking-[0.2em] px-3 py-1 rounded">
-                    Attention
-                  </span>
-                </div>
-                <p className="text-sm text-[#0D0D0D]">
-                  {order.next_action}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* HEALTHY ORDERS */}
-      {healthyOrders.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-8">
-            Performing
-          </p>
-          <div className="grid grid-cols-2 gap-6">
-            {healthyOrders.map((order) => (
-              <div key={order.id} className="bg-[#F0FDF4] border-l-4 border-[#10B981] p-6 rounded-lg">
-                <h3 className="text-lg font-bold text-[#0D0D0D] mb-4">
+              <div key={order.id} className="pl-4 border-l-4 border-[#DC2626] bg-[#FFF5F5] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
                   {order.name}
                 </h3>
-                <p className="text-3xl font-black text-[#0D0D0D] mb-6">
-                  {order.revenue_potential} jobs/month
-                </p>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-[#666666]">
-                    Last activity
-                  </p>
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {order.last_activity}
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
                   </p>
                 </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Blocked
+                  </p>
+                </div>
+                {order.blocker && (
+                  <div className="mb-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#DC2626] mb-1">
+                      Issue
+                    </p>
+                    <p className="text-sm text-[#DC2626]">
+                      {order.blocker}
+                    </p>
+                  </div>
+                )}
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-1">
+                  Action
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.next_action}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 3: AT-RISK ORDERS */}
+      {attentionOrders.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-[10px] font-semibold text-[#F59E0B] uppercase tracking-[0.2em] mb-8">
+            Attention Required
+          </h2>
+          <div className="space-y-6">
+            {attentionOrders.map((order) => (
+              <div key={order.id} className="pl-4 border-l-4 border-[#F59E0B] bg-[#FFFAF0] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
+                  {order.name}
+                </h3>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
+                  </p>
+                </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Needs Attention
+                  </p>
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#0D0D0D] mb-1">
+                  Action
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.next_action}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 4: HEALTHY ORDERS */}
+      {healthyOrders.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-[10px] font-semibold text-[#0A0A0A] uppercase tracking-[0.2em] mb-8">
+            Performing
+          </h2>
+          <div className="space-y-6">
+            {healthyOrders.map((order) => (
+              <div key={order.id} className="pl-4 border-l-4 border-[#0D0D0D] p-6">
+                <h3 className="text-base font-semibold text-[#0D0D0D] mb-2">
+                  {order.name}
+                </h3>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-[#0D0D0D]">
+                    {order.revenue_potential} jobs/month
+                  </p>
+                </div>
+                <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                    Status
+                  </p>
+                  <p className="text-base text-[#0D0D0D]">
+                    Working
+                  </p>
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#888888] mb-1">
+                  Last Activity
+                </p>
+                <p className="text-base text-[#0D0D0D]">
+                  {order.last_activity}
+                </p>
               </div>
             ))}
           </div>

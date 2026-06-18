@@ -17,9 +17,9 @@ export default async function B2BAnalyticsPage() {
   if (!ADMIN_EMAILS.includes(email)) redirect("/dashboard/driver");
 
   return (
-    <div className="px-8 py-12 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
-      <div className="flex gap-2 mb-16">
+      <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'DISCOVERY', 'PIPELINE', 'ORDERS', 'ANALYTICS'].map((item) => (
           <Link
             key={item}
@@ -36,130 +36,78 @@ export default async function B2BAnalyticsPage() {
       </div>
 
       {/* Header */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.3em] mb-4">Analytics</p>
-        <h1 className="font-sans font-black text-[#0D0D0D] text-6xl tracking-tight mb-3">
-          System Performance
+      <div className="mb-12">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          Analytics.
         </h1>
-        <p className="text-base text-[#666666]">
-          Evaluate effectiveness and commercial performance
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          Evaluate system effectiveness and commercial performance
         </p>
       </div>
 
-      {/* SYSTEM HEALTH METRICS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          System Health
-        </p>
-        <div className="grid grid-cols-3 gap-8">
-          <div className="bg-[#F0FDF4] p-8 rounded-lg">
-            <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-4">
-              Operational Efficiency
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-              94%
-            </p>
-            <p className="text-sm text-[#666666]">
-              uptime and reliability
-            </p>
-          </div>
-
-          <div className="bg-[#EBEBF9] p-8 rounded-lg">
-            <p className="text-[10px] font-semibold text-[#6366F1] uppercase tracking-[0.2em] mb-4">
-              Prospect Engagement
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-              42%
-            </p>
-            <p className="text-sm text-[#666666]">
-              email open rate
-            </p>
-          </div>
-
-          <div className="bg-[#FEF3C7] p-8 rounded-lg">
-            <p className="text-[10px] font-semibold text-[#D97706] uppercase tracking-[0.2em] mb-4">
-              Conversion Rate
-            </p>
-            <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-              28%
-            </p>
-            <p className="text-sm text-[#666666]">
-              to standing order
-            </p>
+      {/* Metrics Grid */}
+      <div className="space-y-12">
+        {/* System Health */}
+        <div>
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            System Health
+          </p>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-[#666666] mb-2">Operational efficiency</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">94%</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#666666] mb-2">Prospect engagement</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">42%</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#666666] mb-2">Conversion to standing order</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">28%</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* WEEK-OVER-WEEK TRENDS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Week-over-week Performance
-        </p>
-        <div className="space-y-4">
-          <div className="bg-white border border-[#E5E7EB] p-6 rounded-lg flex items-center justify-between">
+        {/* Performance Trends */}
+        <div className="border-t border-[#E8E8E8] pt-12">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            Week-over-week
+          </p>
+          <div className="space-y-4">
             <div>
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Prospects Created</p>
-              <p className="text-xs text-[#666666]">412 → 486</p>
+              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Prospects created</p>
+              <p className="text-lg text-[#0D0D0D]"><span className="font-bold">+18%</span> <span className="text-[#666666]">(412 → 486)</span></p>
             </div>
-            <p className="text-3xl font-black text-[#10B981]">
-              +18%
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E5E7EB] p-6 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Standing Orders Activated</p>
-              <p className="text-xs text-[#666666]">31 → 33</p>
+              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Standing orders activated</p>
+              <p className="text-lg text-[#0D0D0D]"><span className="font-bold">+6%</span> <span className="text-[#666666]">(31 → 33)</span></p>
             </div>
-            <p className="text-3xl font-black text-[#10B981]">
-              +6%
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E5E7EB] p-6 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Revenue Generated</p>
-              <p className="text-xs text-[#666666]">£8,420 → £9,431</p>
+              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Revenue generated</p>
+              <p className="text-lg text-[#0D0D0D]"><span className="font-bold">+12%</span> <span className="text-[#666666]">(£8,420 → £9,431)</span></p>
             </div>
-            <p className="text-3xl font-black text-[#10B981]">
-              +12%
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* RECOMMENDATIONS */}
-      <div>
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Recommended Focus Areas
-        </p>
-        <div className="space-y-4">
-          <div className="bg-[#FFFAF0] border-l-4 border-[#F59E0B] p-6 rounded-lg">
-            <p className="text-sm font-bold text-[#0D0D0D] mb-2">
-              Improve Email Engagement
-            </p>
-            <p className="text-sm text-[#666666]">
-              Estate Agents category: 31% open rate (target: 40%). A/B test subject lines to improve visibility.
-            </p>
-          </div>
-
-          <div className="bg-[#F0FDF4] border-l-4 border-[#10B981] p-6 rounded-lg">
-            <p className="text-sm font-bold text-[#0D0D0D] mb-2">
-              Expand High-Converting Category
-            </p>
-            <p className="text-sm text-[#666666]">
-              Logistics shows 52% conversion rate. Increase discovery volume in this category to accelerate revenue growth.
-            </p>
-          </div>
-
-          <div className="bg-[#FEE2E2] border-l-4 border-[#DC2626] p-6 rounded-lg">
-            <p className="text-sm font-bold text-[#0D0D0D] mb-2">
-              Unblock Revenue
-            </p>
-            <p className="text-sm text-[#666666]">
-              2 standing orders blocked. Resolving these issues will restore £16/month potential revenue immediately.
-            </p>
-          </div>
+        {/* Recommendations */}
+        <div className="border-t border-[#E8E8E8] pt-12">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+            Focus Areas
+          </p>
+          <ul className="space-y-3 text-sm text-[#0D0D0D]">
+            <li className="flex gap-3">
+              <span className="font-semibold">→</span>
+              <span>Improve email open rate (Estate Agents category: 31%, target: 40%)</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="font-semibold">→</span>
+              <span>Expand Logistics discovery (highest conversion, 52% → standing order)</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="font-semibold">→</span>
+              <span>Unblock 2 standing orders in Orders to restore £16/month potential</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

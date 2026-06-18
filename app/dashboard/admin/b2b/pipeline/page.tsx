@@ -147,9 +147,9 @@ export default async function PipelinePage() {
   const maxCount = Math.max(...stages.map(s => s.count), 1);
 
   return (
-    <div className="px-8 py-12 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-3xl mx-auto">
       {/* Navigation */}
-      <div className="flex gap-2 mb-16">
+      <div className="flex gap-2 mb-12">
         {['ADMIN', 'TODAY', 'PIPELINE', 'DISCOVERY', 'ORDERS', 'ANALYTICS'].map((item) => (
           <Link
             key={item}
@@ -167,127 +167,77 @@ export default async function PipelinePage() {
 
       {/* Page Header */}
       <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.3em] mb-4">Pipeline</p>
-        <h1 className="font-sans font-black text-[#0D0D0D] text-6xl tracking-tight mb-3">
-          Sales Funnel
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          System Pipeline.
         </h1>
-        <p className="text-base text-[#666666]">
-          Where is your inventory and how is it moving?
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          Where is the inventory and how is it moving?
         </p>
       </div>
 
-      {/* CONVERSION FUNNEL STAGES - CARD GRID */}
+      {/* Pipeline Funnel Visualization */}
       <div className="mb-16">
         <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Acquisition Pipeline
+          Conversion Funnel
         </p>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="space-y-3">
           {stages.map((stage, idx) => {
-            const colors = [
-              '#EBEBF9', // New - indigo
-              '#FFFAF0', // Contacted - amber
-              '#F0FFFE', // Opened - cyan
-              '#FEF3C7', // Clicked - yellow
-              '#F0FDF4', // Replied - green
-              '#FCE7F3', // Qualified - pink
-              '#DBEAFE', // Won - blue
-              '#FEE2E2'  // Lost - red
-            ];
-            const textColors = [
-              '#6366F1',
-              '#F59E0B',
-              '#06B6D4',
-              '#D97706',
-              '#10B981',
-              '#EC4899',
-              '#0284C7',
-              '#DC2626'
-            ];
-
+            const isBottleneck = idx > 0 && stage.count < stages[idx - 1].count * 0.5;
             return (
-              <div key={stage.stage} className={`bg-[${colors[idx]}] p-6 rounded-lg`} style={{backgroundColor: colors[idx]}}>
-                <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] mb-4`} style={{color: textColors[idx]}}>
-                  {stage.stage}
-                </p>
-                <p className="text-5xl font-black text-[#0D0D0D] mb-4">
-                  {stage.count}
-                </p>
-                <p className="text-xs text-[#666666]">
-                  {stage.percentage.toFixed(0)}% of total
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* BOTTLENECK ANALYSIS */}
-      <div className="mb-16">
-        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
-          Conversion Rates
-        </p>
-        <div className="space-y-4">
-          {stages.slice(0, -1).map((stage, idx) => {
-            const nextStage = stages[idx + 1];
-            const conversionRate = stage.count > 0 ? (nextStage.count / stage.count) * 100 : 0;
-            const isBottleneck = conversionRate < 50;
-
-            return (
-              <div key={`${stage.stage}-${nextStage.stage}`} className="flex items-center justify-between p-4 bg-white border border-[#E5E7EB] rounded">
-                <div>
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {stage.stage} → {nextStage.stage}
+              <div key={stage.stage}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-[#0D0D0D]">
+                    {stage.stage}
                   </p>
-                  <p className="text-xs text-[#666666]">
-                    {stage.count} to {nextStage.count}
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {stage.count}
                   </p>
                 </div>
-                <p className={`text-2xl font-black ${isBottleneck ? 'text-[#DC2626]' : 'text-[#10B981]'}`}>
-                  {conversionRate.toFixed(0)}%
-                </p>
+                <div className="w-full bg-[#F5F5F5] rounded h-8 overflow-hidden">
+                  <div
+                    className={`h-full transition-all ${
+                      isBottleneck
+                        ? 'bg-[#888888]'
+                        : 'bg-[#0D0D0D]'
+                    }`}
+                    style={{ width: `${Math.max(stage.percentage, 2)}%` }}
+                  />
+                </div>
+                {isBottleneck && (
+                  <p className="text-[10px] text-[#666666] font-medium mt-1">
+                    Bottleneck: {Math.round((1 - stage.count / stages[idx - 1].count) * 100)}% drop from {stages[idx - 1].stage}
+                  </p>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* SUMMARY */}
-      <div className="grid grid-cols-3 gap-8">
-        <div className="bg-[#F3F4F6] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            Total Pipeline
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {pipeline.total}
-          </p>
-          <p className="text-sm text-[#666666]">
-            prospects in active engagement
-          </p>
-        </div>
+      {/* Prospects Requiring Attention */}
+      <div className="mb-16 border-t border-[#E8E8E8] pt-12">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Prospects Requiring Attention
+        </p>
+        <p className="text-sm text-[#666666] italic">
+          Individual prospect engagement tracking available in Pipeline detail view. Focus on the bottlenecks above to understand where your intervention will have the most impact.
+        </p>
+      </div>
 
-        <div className="bg-[#F0FDF4] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#10B981] uppercase tracking-[0.2em] mb-4">
-            Won
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {pipeline.won}
-          </p>
-          <p className="text-sm text-[#666666]">
-            converted to standing orders
-          </p>
-        </div>
-
-        <div className="bg-[#FEE2E2] p-8 rounded-lg">
-          <p className="text-[10px] font-semibold text-[#DC2626] uppercase tracking-[0.2em] mb-4">
-            Lost
-          </p>
-          <p className="text-5xl font-black text-[#0D0D0D] mb-2">
-            {pipeline.lost}
-          </p>
-          <p className="text-sm text-[#666666]">
-            archived or disqualified
-          </p>
-        </div>
+      {/* Pipeline Summary */}
+      <div className="pt-8 border-t border-[#E8E8E8]">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          Pipeline Summary
+        </p>
+        <p className="text-5xl font-black text-[#0D0D0D]">
+          {pipeline.total}
+        </p>
+        <p className="text-sm text-[#666666] mt-2">
+          Total prospects in active engagement
+        </p>
+        <p className="text-sm text-[#0A66C2] font-semibold mt-4">
+          Expected conversions to standing orders: {Math.round(pipeline.replied * 0.4)}–{Math.round(pipeline.replied * 0.5)}
+        </p>
       </div>
     </div>
   );
