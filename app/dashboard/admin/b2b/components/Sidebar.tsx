@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 const modules = [
   { id: "dashboard", label: "Queue" },
   { id: "add-lead", label: "Add Lead" },
+  { id: "import", label: "Import CSV" },
+  { id: "leads", label: "All Leads" },
   { id: "discover", label: "Discover" },
   { id: "prospects", label: "Prospects" },
   { id: "inbox", label: "Inbox" },
