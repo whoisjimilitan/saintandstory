@@ -109,7 +109,7 @@ async function getBriefingData(): Promise<BriefingData> {
       orders_requiring_intervention,
       new_opportunities,
       system_status,
-      recent_learning: "Logistics category: 52% conversion rate. Prioritize 'delivery bottleneck' signal."
+      recent_learning: "Logistics category: 52% conversion rate. Prioritizing bottleneck signals across various businesses."
     };
   } catch (err) {
     console.warn('[B2B] Critical error:', err instanceof Error ? err.message : String(err));
@@ -189,11 +189,11 @@ export default async function B2BPage() {
       <div className="mb-20 space-y-12">
         {/* Prospects Awaiting Response */}
         {briefing.awaiting_response.count > 0 && (
-          <Link href="/dashboard/admin/b2b/pipeline" className="block">
+          <Link href="/dashboard/admin/b2b/pipeline" className="block hover:opacity-70 transition-opacity">
             <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
               {briefing.awaiting_response.count}
             </p>
-            <p className="text-lg text-[#0D0D0D]">
+            <p className="text-lg text-[#0D0D0D] hover:underline">
               Prospects opened email but didn't reply. Follow up in Pipeline.
             </p>
           </Link>
@@ -201,11 +201,11 @@ export default async function B2BPage() {
 
         {/* New Opportunities */}
         {briefing.new_opportunities.count > 0 && (
-          <Link href="/dashboard/admin/b2b/discovery" className="block">
+          <Link href="/dashboard/admin/b2b/discovery" className="block hover:opacity-70 transition-opacity">
             <p className="text-5xl font-bold text-[#0D0D0D] mb-3">
               {briefing.new_opportunities.count}
             </p>
-            <p className="text-lg text-[#0D0D0D]">
+            <p className="text-lg text-[#0D0D0D] hover:underline">
               Opportunities ready for outreach in Discovery.
             </p>
           </Link>
