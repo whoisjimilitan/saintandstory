@@ -1001,6 +1001,20 @@ model b2b_responses {
   @@map("b2b_responses")
 }
 
+model B2bSettings {
+  id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pressure_type         String
+  enabled               Boolean     @default(true)
+  max_emails_per_day    Int         @default(50)
+  allowed_variants      String      @default("BOTH")
+  updated_at            DateTime    @updatedAt @map("updated_at")
+  created_at            DateTime    @default(now()) @map("created_at")
+
+  @@unique([pressure_type])
+  @@index([enabled])
+  @@map("b2b_settings")
+}
+
 model discovered_businesses {
   id                                                                                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   google_place_id                                                                       String?               @unique

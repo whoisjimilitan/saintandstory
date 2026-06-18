@@ -9,6 +9,8 @@ import { InboxView } from "./views/InboxView";
 import { AddLeadView } from "./views/AddLeadView";
 import { ImportView } from "./views/ImportView";
 import { LeadsView } from "./views/LeadsView";
+import { SettingsView } from "./views/SettingsView";
+import { LearningView } from "./views/LearningView";
 
 export default function B2BPage() {
   const searchParams = useSearchParams();
@@ -27,6 +29,10 @@ export default function B2BPage() {
         return <ImportView />;
       case "leads":
         return <LeadsView />;
+      case "settings":
+        return <SettingsView />;
+      case "learning":
+        return <LearningView />;
       case "discover":
         return <DiscoverView />;
       case "prospects":
