@@ -148,7 +148,7 @@ export async function runWave2(
   const wave2b = await executeWave2B(wave2a, observations);
 
   // ======== WAVE 2D GATE 2: VALIDATE WAVE 2B ========
-  const gateB = validator.validateWave2B(wave2b, validObsIds);
+  const gateB = validator.validateWave2B(wave2b as any, validObsIds);
   if (!gateB.valid) {
     console.warn(`[WAVE 2D GATE 2 FAILURE] Wave 2B validation failed: ${gateB.reason}`);
     return createEmptySafeState("Wave 2B failed Gate 2");
@@ -160,7 +160,7 @@ export async function runWave2(
   const wave2c = await executeWave2C(wave2a, observations);
 
   // ======== WAVE 2D GATE 3: VALIDATE WAVE 2C ========
-  const gateC = validator.validateWave2C(wave2c, validObsIds);
+  const gateC = validator.validateWave2C(wave2c as any, validObsIds);
   if (!gateC.valid) {
     console.warn(`[WAVE 2D GATE 3 FAILURE] Wave 2C validation failed: ${gateC.reason}`);
     return createEmptySafeState("Wave 2C failed Gate 3");

@@ -4,7 +4,7 @@
  */
 
 export { Wave2DLock } from "./lock";
-export {
+export type {
   Wave2DResult,
   Wave2AValidationInput,
   Wave2BValidationInput,
