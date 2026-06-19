@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { DashboardView } from "./views/DashboardView";
+import { B2BIntelligenceLabView } from "./views";
 import { DiscoverView } from "./views/DiscoverView";
 import { ProspectsView } from "./views/ProspectsView";
 import { InboxView } from "./views/InboxView";
@@ -44,7 +44,7 @@ export default function B2BPage() {
         return <InboxView />;
       case "dashboard":
       default:
-        return <DashboardView />;
+        return <B2BIntelligenceLabView />;
     }
   };
 
