@@ -1,0 +1,1 @@
+export { useIntelligence } from "./useIntelligence";
