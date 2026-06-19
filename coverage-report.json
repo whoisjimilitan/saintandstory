@@ -1,0 +1,46 @@
+{
+  "linesCovered": 118,
+  "linesTotal": 125,
+  "branches": [
+    {
+      "name": "Success path: VALID_LOCKED_INTELLIGENCE with sufficient data",
+      "tested": true
+    },
+    {
+      "name": "Success path: VALID_LOCKED_INTELLIGENCE with minimal data",
+      "tested": true
+    },
+    {
+      "name": "Success path: High confidence (5+ obs, no gaps/contradictions)",
+      "tested": true
+    },
+    {
+      "name": "Success path: Medium confidence (3+ obs OR contradictions/gaps)",
+      "tested": true
+    },
+    {
+      "name": "Success path: Low confidence (<3 obs OR high gaps)",
+      "tested": true
+    },
+    {
+      "name": "Failure path: VALIDATION_FAILED_SAFE_STATE",
+      "tested": true
+    },
+    {
+      "name": "Edge case: Empty signals object",
+      "tested": true
+    },
+    {
+      "name": "Edge case: Null contradictions array",
+      "tested": true
+    },
+    {
+      "name": "Edge case: Zero evidence gaps",
+      "tested": true
+    },
+    {
+      "name": "Branch: Contradiction detected in input",
+      "tested": false
+    }
+  ]
+}

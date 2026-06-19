@@ -1,0 +1,16 @@
+{
+  "scenarios": [
+    {
+      "scale": 10000,
+      "durationMs": 0.07175,
+      "throughput": 139372.82229965157,
+      "status": "INSIGHTED"
+    },
+    {
+      "scale": 100000,
+      "durationMs": 0.028125,
+      "throughput": 3555555.5555555555,
+      "status": "INSIGHTED"
+    }
+  ]
+}
