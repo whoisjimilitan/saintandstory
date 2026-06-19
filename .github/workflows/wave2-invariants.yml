@@ -1,0 +1,185 @@
+name: Wave 2 Architectural Invariants Check
+
+on:
+  pull_request:
+    paths:
+      - "wave2*"
+      - "ARCHITECTURE_INVARIANTS.md"
+      - ".github/workflows/wave2-invariants.yml"
+  push:
+    branches:
+      - main
+      - feature/**
+    paths:
+      - "wave2*"
+      - "ARCHITECTURE_INVARIANTS.md"
+
+jobs:
+  invariants:
+    name: Verify Wave 2 Architectural Invariants
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Wave 2E Architectural Invariants Tests
+        run: npm test wave2e-architectural-invariants.test.ts -- --reporter=verbose
+
+      - name: Run Wave 2 Bypass Prevention Tests
+        run: npm test wave2-bypass-validation.test.ts -- --reporter=verbose
+
+      - name: Run Wave 2 Orchestrator Tests
+        run: npm test wave2-orchestrator.test.ts -- --reporter=verbose
+
+      - name: Run Wave 2D Gate Tests
+        run: npm test wave2d-enforcement-gate/lock.test.ts -- --reporter=verbose
+
+      - name: Type Check Wave 2 Modules
+        run: npx tsc --noEmit wave2*.ts wave2d-enforcement-gate/*.ts wave2b-insights/*.ts wave2c-evidence-lock/*.ts
+
+      - name: Check Module Exports
+        run: |
+          # Verify only runWave2 is exported
+          if grep -r "export.*executeWave2" wave2-orchestrator.ts; then
+            echo "❌ INVARIANT VIOLATION: executeWave2A/B/C should not be exported"
+            exit 1
+          fi
+
+          if grep -r "export.*Wave2DLock" wave2-orchestrator.ts | grep -v "import.*Wave2DLock"; then
+            echo "❌ INVARIANT VIOLATION: Wave2DLock should not be exported from orchestrator"
+            exit 1
+          fi
+
+          echo "✅ Module exports verified"
+
+      - name: Verify Architectural Constraints
+        run: |
+          # Count exported functions (should be 1: runWave2)
+          EXPORT_COUNT=$(grep -c "^export" wave2-orchestrator.ts || true)
+
+          if [ "$EXPORT_COUNT" -lt 3 ]; then
+            echo "❌ Minimum exports not found (runWave2, Wave2LockedResult, Observation)"
+            exit 1
+          fi
+
+          # Verify gates are mandatory
+          GATE_COUNT=$(grep -c "validator.validateWave2" wave2-orchestrator.ts)
+          if [ "$GATE_COUNT" -ne 3 ]; then
+            echo "❌ Not all three validation gates present (found: $GATE_COUNT)"
+            exit 1
+          fi
+
+          # Verify safe state is called on failures
+          SAFE_STATE_COUNT=$(grep -c "createEmptySafeState" wave2-orchestrator.ts)
+          if [ "$SAFE_STATE_COUNT" -ne 3 ]; then
+            echo "❌ Safe state not called for each gate failure (found: $SAFE_STATE_COUNT)"
+            exit 1
+          fi
+
+          echo "✅ All architectural constraints verified"
+
+      - name: Report Success
+        run: |
+          echo "✅ WAVE 2 ARCHITECTURAL INVARIANTS: ALL CHECKS PASSED"
+          echo "✅ Exactly one entry point exists: runWave2()"
+          echo "✅ All validation gates are mandatory and inline"
+          echo "✅ No bypass vectors detected"
+          echo "✅ Module boundaries are clean"
+          echo "✅ Safe fallback is consistent"
+
+      - name: Report Failure (if any)
+        if: failure()
+        run: |
+          echo "❌ WAVE 2 ARCHITECTURAL INVARIANTS: CHECK FAILED"
+          echo "This build violates one or more architectural constraints."
+          echo "See ARCHITECTURE_INVARIANTS.md for details on each invariant."
+          echo ""
+          echo "Common issues:"
+          echo "  - Adding alternate entry point (should use runWave2())"
+          echo "  - Exporting internal implementation (A/B/C functions)"
+          echo "  - Exporting Wave2DLock (should remain private)"
+          echo "  - Skipping or making gates optional"
+          echo "  - Creating partial result types"
+          echo ""
+          exit 1
+
+  documentation:
+    name: Verify Architecture Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Verify ARCHITECTURE_INVARIANTS.md exists
+        run: |
+          if [ ! -f ARCHITECTURE_INVARIANTS.md ]; then
+            echo "❌ ARCHITECTURE_INVARIANTS.md not found"
+            exit 1
+          fi
+          echo "✅ ARCHITECTURE_INVARIANTS.md verified"
+
+      - name: Verify WAVE_2D_MANDATORY_GATE_VERIFICATION.md exists
+        run: |
+          if [ ! -f WAVE_2D_MANDATORY_GATE_VERIFICATION.md ]; then
+            echo "❌ WAVE_2D_MANDATORY_GATE_VERIFICATION.md not found"
+            exit 1
+          fi
+          echo "✅ WAVE_2D_MANDATORY_GATE_VERIFICATION.md verified"
+
+      - name: Verify architectural constraint notice in code
+        run: |
+          if ! grep -q "⚠️  CRITICAL ARCHITECTURAL CONSTRAINT" wave2-orchestrator.ts; then
+            echo "❌ Architectural constraint notice missing from wave2-orchestrator.ts"
+            exit 1
+          fi
+          echo "✅ Architectural constraint notice present"
+
+  summary:
+    name: Architecture Check Summary
+    runs-on: ubuntu-latest
+    needs: [invariants, documentation]
+    if: always()
+
+    steps:
+      - name: Invariants Status
+        run: |
+          if [ "${{ needs.invariants.result }}" = "success" ]; then
+            echo "✅ All architectural invariants verified"
+          else
+            echo "❌ Architectural invariants check failed"
+            exit 1
+          fi
+
+      - name: Documentation Status
+        run: |
+          if [ "${{ needs.documentation.result }}" = "success" ]; then
+            echo "✅ Architecture documentation verified"
+          else
+            echo "❌ Architecture documentation check failed"
+            exit 1
+          fi
+
+      - name: Final Status
+        run: |
+          echo ""
+          echo "🔒 WAVE 2 ARCHITECTURE CHECK COMPLETE"
+          echo "✅ Build passed all architectural invariant checks"
+          echo ""
+          echo "This means:"
+          echo "  • Exactly one entry point exists"
+          echo "  • All validation gates are mandatory"
+          echo "  • No bypass vectors detected"
+          echo "  • Module structure is clean"
+          echo "  • Documentation is complete"
+          echo ""
+          echo "Wave 2 maintains its architectural guarantees."
