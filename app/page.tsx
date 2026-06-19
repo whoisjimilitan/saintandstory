@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: "UK Removal Company | Fixed Price. Verified Driver. | Saint & Story",
   description:
     "Book a verified removal driver instantly. Man and van, house moves, office removals — fixed price, confirmed on the call. No hidden fees. London, Manchester, Birmingham & 30+ UK cities.",
+  icons: {
+    icon: "/favicon.svg",
+  },
+  manifest: "/manifest.json",
   openGraph: {
     title: "UK Removal Company | Fixed Price. Verified Driver. | Saint & Story",
     description:
