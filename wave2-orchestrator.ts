@@ -25,7 +25,7 @@
  */
 
 import { Wave2DLock } from "./wave2d-enforcement-gate/lock";
-import type { SafeFallback } from "./wave2d-enforcement-gate/schema";
+import type { SafeFallback, Wave2DResult } from "./wave2d-enforcement-gate/schema";
 import { IntelligenceAnalyzer } from "./wave2b-insights/insight-generator";
 import { Wave2CEngine } from "./wave2c-evidence-lock/engine";
 
@@ -165,7 +165,13 @@ export async function runWave2(
   const wave2a = await executeWave2A(observations);
 
   // ======== WAVE 2D GATE 1: VALIDATE WAVE 2A ========
-  const gateA = validator.validateWave2A(wave2a);
+  let gateA: Wave2DResult;
+  try {
+    gateA = validator.validateWave2A(wave2a);
+  } catch (error) {
+    console.error(`[WAVE 2D GATE 1 EXCEPTION] Validator threw exception:`, error);
+    return createEmptySafeState("Wave 2D Gate 1 threw exception");
+  }
   if (!gateA.valid) {
     console.warn(`[WAVE 2D GATE 1 FAILURE] Wave 2A validation failed: ${gateA.reason}`);
     return createEmptySafeState("Wave 2A failed Gate 1");
@@ -177,7 +183,13 @@ export async function runWave2(
   const wave2b = await executeWave2B(wave2a, observations);
 
   // ======== WAVE 2D GATE 2: VALIDATE WAVE 2B ========
-  const gateB = validator.validateWave2B(wave2b, validObsIds);
+  let gateB: Wave2DResult;
+  try {
+    gateB = validator.validateWave2B(wave2b, validObsIds);
+  } catch (error) {
+    console.error(`[WAVE 2D GATE 2 EXCEPTION] Validator threw exception:`, error);
+    return createEmptySafeState("Wave 2D Gate 2 threw exception");
+  }
   if (!gateB.valid) {
     console.warn(`[WAVE 2D GATE 2 FAILURE] Wave 2B validation failed: ${gateB.reason}`);
     return createEmptySafeState("Wave 2B failed Gate 2");
@@ -189,7 +201,13 @@ export async function runWave2(
   const wave2c = await executeWave2C(wave2a, observations);
 
   // ======== WAVE 2D GATE 3: VALIDATE WAVE 2C ========
-  const gateC = validator.validateWave2C(wave2c, validObsIds);
+  let gateC: Wave2DResult;
+  try {
+    gateC = validator.validateWave2C(wave2c, validObsIds);
+  } catch (error) {
+    console.error(`[WAVE 2D GATE 3 EXCEPTION] Validator threw exception:`, error);
+    return createEmptySafeState("Wave 2D Gate 3 threw exception");
+  }
   if (!gateC.valid) {
     console.warn(`[WAVE 2D GATE 3 FAILURE] Wave 2C validation failed: ${gateC.reason}`);
     return createEmptySafeState("Wave 2C failed Gate 3");
