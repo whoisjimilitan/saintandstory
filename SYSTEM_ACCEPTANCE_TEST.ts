@@ -288,33 +288,33 @@ try {
 console.log("\n\nPHASE 4: BOUNDARY VALIDATION");
 console.log("-".repeat(80));
 
-const boundaryChecks = [
+const boundaryChecks: Array<{ name: string; check: () => boolean; details: string }> = [
   {
     name: "Wave 2 → Wave 3 Input",
-    check: () => wave2Result && wave2Result.status && wave3Result,
+    check: (): boolean => !!(wave2Result && wave2Result.status && wave3Result),
     details: `Wave2LockedResult status="${wave2Result.status}" → Wave3Insight accepted`,
   },
   {
     name: "No Schema Mismatch",
-    check: () =>
-      wave3Result.summary &&
+    check: (): boolean =>
+      !!(wave3Result.summary &&
       Array.isArray(wave3Result.implications) &&
-      Array.isArray(wave3Result.recommended_actions),
+      Array.isArray(wave3Result.recommended_actions)),
     details: `All required Wave3Insight fields present`,
   },
   {
     name: "No Runtime Exceptions",
-    check: () => true,
+    check: (): boolean => true,
     details: `Pipeline completed without errors`,
   },
   {
     name: "Insight is Meaningful",
-    check: () => wave3Result.summary.length > 10 && wave3Result.implications.length > 0,
+    check: (): boolean => wave3Result.summary.length > 10 && wave3Result.implications.length > 0,
     details: `Summary: "${wave3Result.summary.substring(0, 50)}..."`,
   },
   {
     name: "Actions are Actionable",
-    check: () =>
+    check: (): boolean =>
       wave3Result.recommended_actions.every((a) => typeof a === "string" && a.length > 5),
     details: `${wave3Result.recommended_actions.length} concrete actions generated`,
   },

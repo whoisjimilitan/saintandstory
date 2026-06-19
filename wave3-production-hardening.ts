@@ -175,7 +175,7 @@ function generatePathologicalInput(): Wave2LockedResult {
         has_contradictions: true,
         evidence_gap_count: Infinity,
       } as any,
-      source_distribution: Math.random() > 0.5 ? {} : null,
+      source_distribution: {},
       contradictions:
         Math.random() > 0.5
           ? [
@@ -187,7 +187,7 @@ function generatePathologicalInput(): Wave2LockedResult {
               },
             ]
           : (null as any),
-      freshness: Math.random() > 0.5 ? {} : undefined,
+      freshness: {},
       evidence_gaps: [],
       intelligence_observations: [],
       evidence_graph: {

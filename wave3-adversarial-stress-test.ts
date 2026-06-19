@@ -286,7 +286,7 @@ const missingGraphInput: Wave2LockedResult = {
   evidence_gaps: [],
   intelligence_observations: [],
   evidence_graph: null as unknown as {
-    observation_links: Array<{ type: string; source_ids: string[]; reason: string }>;
+    observation_links: Array<{ type: "same_entity" | "temporal_order" | "explicit_contradiction"; source_ids: string[]; reason: string }>;
     clusters: Array<{ cluster_id: string; observation_ids: string[]; rule: string }>;
     raw_facts: Array<{ observation_id: string; fact: string }>;
   },
