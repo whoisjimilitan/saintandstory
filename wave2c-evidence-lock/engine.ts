@@ -46,8 +46,16 @@ export class Wave2CEngine {
 
   private generateLinks(
     observations: Observation[]
-  ): Array<Record<string, unknown>> {
-    const links: Array<Record<string, unknown>> = [];
+  ): Array<{
+    type: "same_entity" | "temporal_order" | "explicit_contradiction";
+    source_ids: string[];
+    reason: string;
+  }> {
+    const links: Array<{
+      type: "same_entity" | "temporal_order" | "explicit_contradiction";
+      source_ids: string[];
+      reason: string;
+    }> = [];
     const seen = new Set<string>();
 
     for (let i = 0; i < observations.length; i++) {
@@ -89,8 +97,16 @@ export class Wave2CEngine {
 
   private generateClusters(
     observations: Observation[]
-  ): Array<Record<string, unknown>> {
-    const clusters: Array<Record<string, unknown>> = [];
+  ): Array<{
+    cluster_id: string;
+    observation_ids: string[];
+    rule: string;
+  }> {
+    const clusters: Array<{
+      cluster_id: string;
+      observation_ids: string[];
+      rule: string;
+    }> = [];
     const assigned = new Set<string>();
     let clusterIndex = 0;
 

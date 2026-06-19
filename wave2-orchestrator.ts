@@ -49,17 +49,16 @@ export interface Wave2LockedResult {
   evidence_gaps: string[];
 
   // Wave 2B: Constrained observations (guaranteed by Gate 2)
-  intelligence_observations: Array<Record<string, unknown>>;
+  intelligence_observations: Wave2BObservation[];
 
   // Wave 2C: Evidence graph (guaranteed by Gate 3)
-  evidence_graph: {
-    observation_links: Array<Record<string, unknown>>;
-    clusters: Array<Record<string, unknown>>;
-    raw_facts: Array<Record<string, unknown>>;
-  };
+  evidence_graph: Wave2CResult;
 
   // Wave 2D: Validation status (GATE RESULT)
   status: "VALID_LOCKED_INTELLIGENCE" | "VALIDATION_FAILED_SAFE_STATE";
+
+  // Failure reason (if status is VALIDATION_FAILED_SAFE_STATE)
+  failure_reason?: string;
 }
 
 /**
@@ -88,6 +87,36 @@ interface Wave2AResult {
   contradictions: Array<Record<string, unknown>>;
   freshness: Record<string, unknown>;
   evidence_gaps: string[];
+}
+
+interface Wave2BObservation {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  supporting_observations: string[];
+  confidence: "high" | "medium" | "low";
+  data_quality: "strong" | "moderate" | "weak";
+  evidence_strength: number;
+  generated_at: string;
+  reasoning: string;
+}
+
+interface Wave2CResult {
+  observation_links: Array<{
+    type: "same_entity" | "temporal_order" | "explicit_contradiction";
+    source_ids: string[];
+    reason: string;
+  }>;
+  clusters: Array<{
+    cluster_id: string;
+    observation_ids: string[];
+    rule: string;
+  }>;
+  raw_facts: Array<{
+    observation_id: string;
+    fact: string;
+  }>;
 }
 
 // ============================================================================
@@ -148,7 +177,7 @@ export async function runWave2(
   const wave2b = await executeWave2B(wave2a, observations);
 
   // ======== WAVE 2D GATE 2: VALIDATE WAVE 2B ========
-  const gateB = validator.validateWave2B(wave2b as any, validObsIds);
+  const gateB = validator.validateWave2B(wave2b, validObsIds);
   if (!gateB.valid) {
     console.warn(`[WAVE 2D GATE 2 FAILURE] Wave 2B validation failed: ${gateB.reason}`);
     return createEmptySafeState("Wave 2B failed Gate 2");
@@ -160,7 +189,7 @@ export async function runWave2(
   const wave2c = await executeWave2C(wave2a, observations);
 
   // ======== WAVE 2D GATE 3: VALIDATE WAVE 2C ========
-  const gateC = validator.validateWave2C(wave2c as any, validObsIds);
+  const gateC = validator.validateWave2C(wave2c, validObsIds);
   if (!gateC.valid) {
     console.warn(`[WAVE 2D GATE 3 FAILURE] Wave 2C validation failed: ${gateC.reason}`);
     return createEmptySafeState("Wave 2C failed Gate 3");
@@ -186,11 +215,7 @@ export async function runWave2(
     intelligence_observations: wave2b,
 
     // From Wave 2C (validated by Gate 3)
-    evidence_graph: {
-      observation_links: (wave2c.observation_links as Array<Record<string, unknown>>) || [],
-      clusters: (wave2c.clusters as Array<Record<string, unknown>>) || [],
-      raw_facts: (wave2c.raw_facts as Array<Record<string, unknown>>) || [],
-    },
+    evidence_graph: wave2c,
 
     // Wave 2D result
     status: "VALID_LOCKED_INTELLIGENCE",
@@ -206,19 +231,72 @@ export async function runWave2(
  * PRIVATE: Only callable from runWave2() via executeWave2A()
  */
 async function executeWave2A(observations: Observation[]): Promise<Wave2AResult> {
-  // TODO: Replace with actual Wave 2A implementation
-  // For now, return minimal valid structure
+  const sourceDistribution: Record<string, number> = {};
+  const contradictions: Array<Record<string, unknown>> = [];
+  const evidenceGaps: string[] = [];
+  let mostRecentDate = new Date(0).toISOString();
+
+  // Extract deterministic signals from observations
+  for (const obs of observations) {
+    // Count sources
+    sourceDistribution[obs.source] = (sourceDistribution[obs.source] || 0) + 1;
+
+    // Track most recent date
+    if (obs.extracted_at > mostRecentDate) {
+      mostRecentDate = obs.extracted_at;
+    }
+
+    // Detect contradictions (simple: same observation_type with conflicting evidence)
+    const existingObs = observations.find(
+      (o) =>
+        o.observation_type === obs.observation_type &&
+        o.observation_id !== obs.observation_id &&
+        o.evidence_text.toLowerCase() !== obs.evidence_text.toLowerCase()
+    );
+    if (existingObs) {
+      contradictions.push({
+        type: obs.observation_type,
+        first_observation: obs.observation_id,
+        second_observation: existingObs.observation_id,
+        conflict_reason: "different_evidence_for_same_type",
+      });
+    }
+  }
+
+  // Identify evidence gaps (observation types not covered)
+  const commonTypes = [
+    "BUSINESS_NAME",
+    "ADDRESS",
+    "PHONE",
+    "EMAIL",
+    "WEBSITE",
+    "HOURS",
+  ];
+  const coveredTypes = new Set(observations.map((o) => o.observation_type));
+  for (const type of commonTypes) {
+    if (!coveredTypes.has(type) && observations.length > 0) {
+      evidenceGaps.push(type);
+    }
+  }
+
   return {
     candidate_id: extractCandidateIdInternal(observations),
     operational_signals: {
       total_observations: observations.length,
+      observation_types: Array.from(
+        new Set(observations.map((o) => o.observation_type))
+      ),
+      source_count: Object.keys(sourceDistribution).length,
+      has_contradictions: contradictions.length > 0,
+      evidence_gap_count: evidenceGaps.length,
     },
-    source_distribution: {},
-    contradictions: [],
+    source_distribution: sourceDistribution,
+    contradictions,
     freshness: {
-      most_recent_observation_date: new Date().toISOString(),
+      most_recent_observation_date: mostRecentDate,
+      total_unique_dates: new Set(observations.map((o) => o.extracted_at)).size,
     },
-    evidence_gaps: [],
+    evidence_gaps: evidenceGaps,
   };
 }
 
@@ -229,11 +307,11 @@ async function executeWave2A(observations: Observation[]): Promise<Wave2AResult>
 async function executeWave2B(
   wave2a: Wave2AResult,
   observations: Observation[]
-): Promise<Array<Record<string, unknown>>> {
-  // TODO: Replace with actual Wave 2B implementation
+): Promise<Wave2BObservation[]> {
   const analyzer = new IntelligenceAnalyzer();
   try {
-    return await analyzer.generateIntelligenceObservations(wave2a, observations);
+    const result = await analyzer.generateIntelligenceObservations(wave2a, observations);
+    return result as unknown as Wave2BObservation[];
   } catch (error) {
     console.error("[WAVE 2B ERROR]", error);
     return [];
@@ -247,23 +325,23 @@ async function executeWave2B(
 async function executeWave2C(
   wave2a: Wave2AResult,
   observations: Observation[]
-): Promise<Record<string, unknown>> {
-  // TODO: Replace with actual Wave 2C implementation
+): Promise<Wave2CResult> {
   const engine = new Wave2CEngine();
   try {
-    return await engine.run({
+    const result = await engine.run({
       signals: wave2a.operational_signals,
       observations,
       contradictions: wave2a.contradictions,
       freshness: wave2a.freshness,
     });
+    return result as unknown as Wave2CResult;
   } catch (error) {
     console.error("[WAVE 2C ERROR]", error);
     return {
       observation_links: [],
       clusters: [],
       raw_facts: [],
-    };
+    } as Wave2CResult;
   }
 }
 
@@ -285,8 +363,9 @@ function createEmptySafeState(reason: string): Wave2LockedResult {
       observation_links: [],
       clusters: [],
       raw_facts: [],
-    },
+    } as Wave2CResult,
     status: "VALIDATION_FAILED_SAFE_STATE",
+    failure_reason: reason,
   };
 }
 
