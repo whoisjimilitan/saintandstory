@@ -38,7 +38,7 @@ export async function GET() {
     });
 
     // Get campaign open rate (Phase 3)
-    const campaignStats = await prisma.$queryRaw<Array<{ opens: number; sends: number }>>`
+    const campaignStats = await prisma.$queryRaw<Array<{ opens: bigint; sends: bigint }>>`
       SELECT
         COUNT(DISTINCT CASE WHEN e.event_type = 'open' THEN e.lead_id END) as opens,
         COUNT(DISTINCT c.lead_id) as sends
@@ -47,8 +47,13 @@ export async function GET() {
       WHERE c.status = 'sent'
     `;
 
-    const campaignOpenRate = campaignStats[0]
-      ? Math.round((campaignStats[0].opens / campaignStats[0].sends) * 100)
+    const row = campaignStats[0];
+    const campaignOpenRate = row
+      ? (() => {
+          const opens = Number(row.opens);
+          const sends = Number(row.sends);
+          return sends === 0 ? 0 : Math.round((opens / sends) * 100);
+        })()
       : 0;
 
     // Determine overall system status
