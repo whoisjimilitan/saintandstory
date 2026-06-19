@@ -9,7 +9,7 @@
  * No architectural coupling.
  */
 
-import { Wave2LockedResult } from "./wave2-orchestrator";
+import type { Wave2LockedResult } from "./wave2-orchestrator";
 import { randomUUID } from "crypto";
 
 export interface Wave3Insight {
