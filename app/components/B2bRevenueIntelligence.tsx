@@ -28,7 +28,12 @@ export function B2bRevenueIntelligence() {
         const response = await fetch("/api/b2b/revenue/insights");
         if (response.ok) {
           const data = await response.json();
-          setSummary(data);
+          setSummary({
+            totalRevenue: data.summary?.totalRevenue ?? 0,
+            averageRoi: data.summary?.averageRoi ?? 0,
+            topPatterns: data.topPatterns ?? [],
+            byType: data.byType ?? {},
+          });
         }
       } catch (error) {
         console.error("Failed to fetch revenue insights:", error);
@@ -55,8 +60,10 @@ export function B2bRevenueIntelligence() {
   const { totalRevenue, averageRoi, topPatterns, byType } = summary;
 
   // Format currency
-  const formatCurrency = (value: number) =>
-    `£${Math.round(value).toLocaleString()}`;
+  const formatCurrency = (value: number | undefined) => {
+    if (value === undefined || value === null) return "£0";
+    return `£${Math.round(value).toLocaleString()}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -88,16 +95,16 @@ export function B2bRevenueIntelligence() {
             </p>
           </div>
 
-          {topPatterns.length > 0 && (
+          {topPatterns && topPatterns.length > 0 && (
             <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
               <p className="text-sm text-purple-700 font-medium">
                 Top Revenue Pattern
               </p>
               <p className="text-2xl font-bold text-purple-900 mt-2">
-                {topPatterns[0].patternKey?.split("_")[1] || "Pattern"}
+                {topPatterns[0]?.patternKey?.split("_")[1] || "Pattern"}
               </p>
               <p className="text-sm text-purple-700 mt-1">
-                {formatCurrency(topPatterns[0].totalRevenue)}
+                {formatCurrency(topPatterns[0]?.totalRevenue)}
               </p>
             </div>
           )}
@@ -199,21 +206,21 @@ export function B2bRevenueIntelligence() {
       )}
 
       {/* SECTION 3: Revenue Insight */}
-      {topPatterns.length > 0 && (
+      {topPatterns && topPatterns.length > 0 && topPatterns[0] && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <p className="text-sm font-medium text-green-900 mb-2">
             💰 Revenue Intelligence
           </p>
           <p className="text-sm text-green-800">
-            {topPatterns[0].patternKey} is your top revenue generator with{" "}
+            {topPatterns[0].patternKey || "Top pattern"} is your top revenue generator with{" "}
             <span className="font-semibold">
-              {topPatterns[0].roiScore.toFixed(0)}% ROI
+              {(topPatterns[0].roiScore ?? 0).toFixed(0)}% ROI
             </span>
             . This pattern has generated{" "}
             <span className="font-semibold">
               {formatCurrency(topPatterns[0].totalRevenue)}
             </span>{" "}
-            from {topPatterns[0].conversionCount} conversions.
+            from {topPatterns[0].conversionCount ?? 0} conversions.
           </p>
         </div>
       )}
