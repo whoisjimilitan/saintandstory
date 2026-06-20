@@ -60,11 +60,18 @@ export function IntakeChannels({ sources }: Props) {
 
     setLoading('postcode');
     try {
-      const response = await fetch(`/api/b2b/discover/search?postcode=${encodeURIComponent(postcode.toUpperCase())}`);
+      const response = await fetch('/api/b2b/operator-discovery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postcodes: [postcode.toUpperCase()],
+          businessType: 'removal',
+        })
+      });
       const result = await response.json();
 
       if (response.ok) {
-        setMessage({ type: 'success', text: `Found ${result.count} qualified leads in ${postcode}` });
+        setMessage({ type: 'success', text: `Search started for ${postcode}. Results loading...` });
         setPostcode('');
         setExpandedCard(null);
       } else {
