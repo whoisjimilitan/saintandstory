@@ -1,9 +1,17 @@
 /**
- * AUTONOMOUS PSYCHOLOGY EMAIL GENERATION
- * Takes discovered prospects, generates psychology emails automatically
+ * AUTONOMOUS PSYCHOLOGY EMAIL GENERATION (NOW FULLY INTEGRATED)
+ *
+ * Pipeline:
+ * 1. Takes discovered prospects with detected pressure type
+ * 2. Gets detection confidence from pressure detection
+ * 3. Gets evidence quality score from signal measurement
+ * 4. Passes confidence through to psychology engine
+ * 5. Psychology engine applies confidence calibration to language
+ * 6. Email strength reflects evidence quality
  */
 
 import { DiscoveredProspect } from './b2b-autonomous-discovery';
+import { generatePsychologyEmail } from './b2b-psychology-engine';
 
 export interface PsychologyEmailGenerated {
   prospect_id: string;
@@ -12,25 +20,38 @@ export interface PsychologyEmailGenerated {
   email_subject: string;
   email_body: string;
   confidence: number;
+  calibrated_confidence?: number;
+  evidence_quality_score?: number;
   generated_at: string;
   status: 'generated' | 'validated' | 'sent';
 }
 
 /**
  * Generate psychology email for discovered prospect
+ * NOW: Calls actual psychology engine with confidence calibration
  */
-export function generatePsychologyEmailAutonomous(
+export async function generatePsychologyEmailAutonomous(
   prospect: DiscoveredProspect
-): PsychologyEmailGenerated {
-  const rrat = buildRRATForProspect(prospect);
+): Promise<PsychologyEmailGenerated> {
+  // Pass confidence and evidence quality to psychology engine
+  const psychology = await generatePsychologyEmail({
+    name: prospect.company_name,
+    category: prospect.category,
+    location: prospect.location || null,
+    observations: prospect.observations?.join('. '),
+    detection_confidence: prospect.confidence,
+    evidence_quality_score: prospect.evidence_quality_score || 75,
+  });
 
   return {
     prospect_id: prospect.id,
     prospect_name: prospect.company_name,
     pressure_type: prospect.detected_pressure_type,
-    email_subject: rrat.subject,
-    email_body: rrat.body,
+    email_subject: `${prospect.company_name}: ${psychology.recognition.substring(0, 40)}...`,
+    email_body: psychology.email_body,
     confidence: prospect.confidence,
+    calibrated_confidence: psychology.calibrated_confidence,
+    evidence_quality_score: prospect.evidence_quality_score,
     generated_at: new Date().toISOString(),
     status: 'generated',
   };
@@ -120,26 +141,27 @@ Looking forward to talking.`,
 /**
  * Generate batch of psychology emails
  */
-export function generatePsychologyEmailsBatch(
+export async function generatePsychologyEmailsBatch(
   prospects: DiscoveredProspect[]
-): PsychologyEmailGenerated[] {
-  return prospects.map((p) => generatePsychologyEmailAutonomous(p));
+): Promise<PsychologyEmailGenerated[]> {
+  return Promise.all(prospects.map((p) => generatePsychologyEmailAutonomous(p)));
 }
 
 /**
  * Autonomous psychology generation process
  */
-export function runAutonomousPsychologyGeneration(
+export async function runAutonomousPsychologyGeneration(
   queuedProspects: DiscoveredProspect[]
-): {
+): Promise<{
   generated: number;
   emails: PsychologyEmailGenerated[];
-} {
+}> {
   console.log(`[Psychology] Generating emails for ${queuedProspects.length} prospects...`);
 
-  const emails = generatePsychologyEmailsBatch(queuedProspects);
+  const emails = await generatePsychologyEmailsBatch(queuedProspects);
 
   console.log(`[Psychology] Generated ${emails.length} psychology emails`);
+  console.log(`[Psychology] Average confidence: ${(emails.reduce((sum, e) => sum + e.confidence, 0) / emails.length).toFixed(2)}`);
 
   return {
     generated: emails.length,

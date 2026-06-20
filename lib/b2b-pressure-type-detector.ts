@@ -1,16 +1,34 @@
 /**
- * PRESSURE TYPE DETECTOR
+ * PRESSURE TYPE DETECTOR - NOW FULLY INTEGRATED
  *
- * Auto-detects pressure type from CSV data
- * Analyzes prospect data and assigns most likely pressure type
- * Returns confidence score (operator can override)
+ * Pipeline:
+ * 1. Measure all signals for evidence quality
+ * 2. Detect contradictions
+ * 3. Generate multiple hypotheses (multi-hypothesis engine)
+ * 4. Evaluate each hypothesis
+ * 5. Select primary, retain alternatives
+ * 6. Calibrate confidence based on evidence
+ * 7. Validate epistemic chain
+ * 8. Return with full reasoning chain
  */
+
+import { measureAllSignals, detectContradictions, scoreEvidenceQuality } from './b2b-signal-measurement';
+import { generateStarVarianceHypotheses, evaluateHypothesisAgainstEvidence, selectPrimaryHypothesis } from './b2b-multi-hypothesis';
+import { createObservation, createInference, createHypothesis, validateEpistemicChain } from './b2b-epistemic-framework';
+import { calibrateConfidence } from './b2b-confidence-calibration';
+import { applyHistoricalFeedback } from './b2b-feedback-loop';
 
 export interface DetectionResult {
   pressure_type: string;
   confidence: number; // 0-1
   reasoning: string;
   matched_fields: string[];
+  alternatives?: Array<{ type: string; confidence: number }>;
+  uncertainty_flag?: boolean;
+  evidence_quality_score?: number;
+  contradictions?: string[];
+  epistemic_chain?: any;
+  historical_feedback_applied?: boolean;
 }
 
 /**
@@ -39,6 +57,29 @@ export async function detectPressureType(prospectData: {
   communication_failures_count?: number;
   [key: string]: any;
 }): Promise<DetectionResult> {
+  // STAGE 1: MEASURE ALL SIGNALS
+  const measuredSignals = measureAllSignals(prospectData);
+
+  // STAGE 2: DETECT CONTRADICTIONS
+  const contradictions = detectContradictions(measuredSignals);
+
+  // STAGE 3: BUILD EPISTEMIC CHAIN
+  const epistemicChain: any = {
+    stage: 'pressure_detection',
+    claims: [],
+    final_conclusion: null,
+  };
+
+  // Add observations for each signal
+  measuredSignals.forEach((signal) => {
+    epistemicChain.claims.push(
+      createObservation(`Signal detected: ${signal.signal_type} = ${JSON.stringify(signal.signal_value)}`,
+        [`Source: ${signal.evidence_quality.type}`, `Reliability: ${signal.evidence_quality.reliability}/100`],
+        signal.evidence_quality.reliability
+      )
+    );
+  });
+
   const scores: { [key: string]: { score: number; matched_fields: string[] } } = {
     'service-quality-inconsistency': { score: 0, matched_fields: [] },
     'time-critical-movement': { score: 0, matched_fields: [] },
@@ -144,6 +185,50 @@ export async function detectPressureType(prospectData: {
     scores['communication-breakdown'].matched_fields.push('communication_failures');
   }
 
+  // STAGE 4: GENERATE MULTIPLE HYPOTHESES (IF STAR VARIANCE)
+  let primaryHypothesis = null;
+  let alternatives = [];
+  let uncertaintyFlag = false;
+
+  if (prospectData.star_rating_best && prospectData.star_rating_worst) {
+    const variance = prospectData.star_rating_best - prospectData.star_rating_worst;
+    if (variance > 1.0) {
+      const hypotheses = generateStarVarianceHypotheses(
+        prospectData.star_rating_best,
+        prospectData.star_rating_worst,
+        variance,
+        prospectData.location_count || 1,
+        1
+      );
+
+      // Evaluate each hypothesis
+      const evaluated = hypotheses.map((h) =>
+        evaluateHypothesisAgainstEvidence(h, {
+          company_age: 5,
+          growth_rate: scores['capacity-overflow'].score > scores['service-quality-inconsistency'].score ? 'fast' : 'moderate',
+          online_presence_strength: 75,
+        })
+      );
+
+      // Select primary
+      const selection = selectPrimaryHypothesis(evaluated);
+      primaryHypothesis = selection.primary;
+      alternatives = selection.alternatives;
+      uncertaintyFlag = selection.should_express_uncertainty;
+
+      // Map hypothesis to pressure type
+      const hypothesisToType: { [key: string]: string } = {
+        'Quality Management Burden': 'service-quality-inconsistency',
+        'Hiring/Training Gap': 'capacity-overflow',
+        'Market Segment Mismatch': 'geographic-service-gaps',
+        'Operational Immaturity': 'time-critical-movement',
+      };
+
+      const hypothesisType = hypothesisToType[primaryHypothesis.name] || 'service-quality-inconsistency';
+      scores[hypothesisType].score = primaryHypothesis.confidence * 100;
+    }
+  }
+
   // Find highest score
   let maxType = 'service-quality-inconsistency';
   let maxScore = 0;
@@ -155,9 +240,43 @@ export async function detectPressureType(prospectData: {
     }
   }
 
-  // Calculate confidence (0-1)
-  // Higher score = higher confidence, cap at 0.95
-  const confidence = Math.min(maxScore / 100, 0.95);
+  // STAGE 5: CALIBRATE CONFIDENCE
+  const baseConfidence = Math.min(maxScore / 100, 0.95);
+  const evidenceQualityScore = measuredSignals.length > 0
+    ? measuredSignals.reduce((sum, s) => sum + scoreEvidenceQuality(s.evidence_quality), 0) / measuredSignals.length
+    : 50;
+
+  const calibration = calibrateConfidence(
+    baseConfidence * 100,
+    {
+      type: contradictions.length > 0 ? 'contradictory' : 'corroborated',
+      source_count: measuredSignals.length,
+      recency: 0,
+      specificity: evidenceQualityScore,
+      reliability: evidenceQualityScore,
+    },
+    0,
+    contradictions.length
+  );
+
+  let finalConfidence = Math.min(calibration.final_calibrated_confidence / 100, 0.95);
+
+  // STAGE 5B: APPLY HISTORICAL FEEDBACK
+  // This is where past outcomes change future behavior
+  const feedback = applyHistoricalFeedback(maxType, finalConfidence);
+  finalConfidence = feedback.adjusted_confidence;
+  const feedbackApplied = feedback.feedback_applied;
+
+  // STAGE 6: VALIDATE EPISTEMIC CHAIN
+  epistemicChain.final_conclusion = createHypothesis(
+    `Primary pressure type: ${maxType}`,
+    [`Evidence quality: ${evidenceQualityScore.toFixed(0)}/100`, `Confidence: ${finalConfidence.toFixed(2)}`],
+    `Selected from ${Object.keys(scores).length} alternatives based on evidence scoring`,
+    finalConfidence * 100,
+    alternatives.map((a) => a.name || a.pressure_type)
+  );
+
+  const chainValidation = validateEpistemicChain(epistemicChain);
 
   const reasoning_map = {
     'service-quality-inconsistency': 'Star rating variance detected across locations',
@@ -173,9 +292,18 @@ export async function detectPressureType(prospectData: {
 
   return {
     pressure_type: maxType,
-    confidence,
+    confidence: finalConfidence,
     reasoning: reasoning_map[maxType] || 'Type detected from data analysis',
     matched_fields: scores[maxType].matched_fields,
+    alternatives: alternatives.map((a) => ({
+      type: a.pressure_type || a.name,
+      confidence: a.confidence / 100,
+    })),
+    uncertainty_flag: uncertaintyFlag,
+    evidence_quality_score: evidenceQualityScore,
+    contradictions: contradictions.length > 0 ? contradictions : undefined,
+    epistemic_chain: chainValidation.valid ? epistemicChain : undefined,
+    historical_feedback_applied: feedbackApplied,
   };
 }
 

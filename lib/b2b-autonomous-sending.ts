@@ -1,9 +1,15 @@
 /**
- * AUTONOMOUS SENDING
- * Sends validated emails automatically, records gates
+ * AUTONOMOUS SENDING (NOW FULLY INTEGRATED)
+ *
+ * Pipeline:
+ * 1. Send validated emails
+ * 2. Record gate_1_delivered_at
+ * 3. PERSIST outcome signal for learning
+ * 4. Track delivery status
  */
 
 import { ValidatedEmail } from './b2b-autonomous-validation';
+import { recordOutcomeSignal, initializePersistence } from './b2b-outcome-persistence';
 
 export interface SentEmail {
   prospect_id: string;
@@ -13,10 +19,15 @@ export interface SentEmail {
   gate_1_delivered_at: string;
   status: 'sent' | 'failed';
   confidence: number;
+  pressure_type?: string;
 }
+
+// Initialize on module load
+initializePersistence();
 
 /**
  * Send email autonomously
+ * NOW: Records outcome signal for persistence
  */
 export function sendEmailAutonomous(validated: ValidatedEmail): SentEmail {
   // In production: integrate with Resend or email service
@@ -24,7 +35,7 @@ export function sendEmailAutonomous(validated: ValidatedEmail): SentEmail {
 
   const now = new Date().toISOString();
 
-  return {
+  const sentEmail: SentEmail = {
     prospect_id: validated.prospect_id,
     prospect_name: validated.prospect_name,
     email_subject: validated.email_subject,
@@ -32,7 +43,26 @@ export function sendEmailAutonomous(validated: ValidatedEmail): SentEmail {
     gate_1_delivered_at: now,
     status: 'sent',
     confidence: validated.validation_confidence,
+    pressure_type: validated.pressure_type,
   };
+
+  // RECORD OUTCOME SIGNAL for persistence and learning
+  recordOutcomeSignal({
+    prospect_id: validated.prospect_id,
+    pressure_type_detected: validated.pressure_type || 'unknown',
+    predicted_confidence: validated.validation_confidence,
+    predicted_burden: validated.email_body.substring(0, 100),
+    email_subject: validated.email_subject,
+    email_body: validated.email_body,
+    email_delivered: sentEmail.status === 'sent',
+    email_opened: false, // Will be updated by tracking
+    email_replied: false, // Will be updated by tracking
+    conversion_to_call: false,
+    conversion_to_customer: false,
+    timestamp: now,
+  });
+
+  return sentEmail;
 }
 
 /**

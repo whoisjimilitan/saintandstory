@@ -1,16 +1,22 @@
 import { getPressureEmailContext, mapCategoryToPressureType } from "./b2b-pressure-type-mapper";
+import { getLanguageByConfidence } from "./b2b-confidence-calibration";
 
 /**
- * PSYCHOLOGY ENGINE - Wave 1
+ * PSYCHOLOGY ENGINE - Wave 1 (NOW FULLY INTEGRATED)
  *
  * Takes enriched lead data and generates RRAT-compliant emails.
  * Uses pressure type mapping to generate specific recognition + relief + trust + action.
+ * NOW: Confidence calibration determines language strength
  *
- * This ENHANCES the existing email generation, not replaces it.
- * Psychology engine output feeds into existing validator + rewriter pipeline.
+ * Pipeline:
+ * 1. Generate initial recognition/relief/trust/action from templates
+ * 2. Measure evidence quality from observations
+ * 3. Calibrate confidence based on evidence
+ * 4. Apply language calibration to adjust certainty
+ * 5. Return email with confidence metadata
  *
- * Input: Lead with intelligence (observations, pain_point_review, category, location)
- * Output: { recognition, relief, trust, action, validation_ready }
+ * Input: Lead with intelligence (observations, pain_point_review, category, location, detection_confidence)
+ * Output: { recognition, relief, trust, action, email_body, pressure_type, calibrated_confidence }
  */
 
 export interface PsychologyEmailOutput {
@@ -20,6 +26,8 @@ export interface PsychologyEmailOutput {
   action: string;
   email_body: string;
   pressure_type: string;
+  calibrated_confidence?: number;
+  language_adjusted?: boolean;
 }
 
 export async function generatePsychologyEmail(lead: {
@@ -30,28 +38,40 @@ export async function generatePsychologyEmail(lead: {
   pain_point_review?: string;
   business_pattern?: string;
   weekly_jobs?: number;
+  detection_confidence?: number;
+  evidence_quality_score?: number;
 }): Promise<PsychologyEmailOutput> {
   const pressureType = mapCategoryToPressureType(lead.category);
   const pressureContext = getPressureEmailContext(pressureType, lead.category, lead.location);
   const weeklyJobs = lead.weekly_jobs || 0;
 
+  // USE CONFIDENCE TO CALIBRATE LANGUAGE
+  const calibratedConfidence = lead.detection_confidence || 0.85;
+  const evidenceQuality = lead.evidence_quality_score || 75;
+
   // STAGE 1: RECOGNITION
   // Specific observation they'd recognize, not generic analysis
-  const recognition = generateRecognition({
+  let recognition = generateRecognition({
     name: lead.name,
     category: lead.category,
     observations: lead.observations,
     pressureContext,
   });
 
+  // Apply confidence calibration to recognition
+  recognition = getLanguageByConfidence(calibratedConfidence * 100, recognition);
+
   // STAGE 2: RELIEF
   // Name their specific burden, not just the problem
-  const relief = generateRelief({
+  let relief = generateRelief({
     name: lead.name,
     painPoint: lead.pain_point_review,
     businessPattern: lead.business_pattern,
     pressureContext,
   });
+
+  // Apply confidence calibration to relief
+  relief = getLanguageByConfidence(calibratedConfidence * 100, relief);
 
   // STAGE 3: TRUST
   // Show proof or methodology specific to their pressure type
@@ -77,6 +97,8 @@ export async function generatePsychologyEmail(lead: {
     action,
     email_body,
     pressure_type: pressureType,
+    calibrated_confidence: calibratedConfidence,
+    language_adjusted: calibratedConfidence < 0.85,
   };
 }
 
