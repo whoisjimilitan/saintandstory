@@ -57,8 +57,8 @@ export default function OperatorBriefing() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="mb-16">
-        <div className="inline-flex items-center gap-2 mb-6 bg-[#F8F8F8] px-4 py-2 rounded-full border border-[#EFEFEF]">
-          <p className="text-xs font-medium text-[#0D0D0D] tracking-[0.5px]">
+        <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-4 py-2 rounded-full border border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.2em] uppercase">
             {dateStr}
           </p>
         </div>
@@ -72,54 +72,54 @@ export default function OperatorBriefing() {
 
       {/* Metrics Cards Grid */}
       <div className="grid grid-cols-4 gap-6 mb-20">
-        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
-          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
             New opportunities
           </p>
           <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
             {data.discovered}
           </p>
           <div className="space-y-1">
-            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#666666]">vs yesterday</p>
             <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
           </div>
         </div>
 
-        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
-          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
             High confidence
           </p>
           <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
             {data.qualified}
           </p>
           <div className="space-y-1">
-            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#666666]">vs yesterday</p>
             <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
           </div>
         </div>
 
-        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
-          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
             Finished
           </p>
           <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
             {data.orders}
           </p>
           <div className="space-y-1">
-            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#666666]">vs yesterday</p>
             <p className="text-xs text-[#D0D0D0]">—</p>
           </div>
         </div>
 
-        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
-          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
             Closed today
           </p>
           <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
             0
           </p>
           <div className="space-y-1">
-            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#666666]">vs yesterday</p>
             <p className="text-xs text-[#D0D0D0]">—</p>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function OperatorBriefing() {
           </p>
         </div>
 
-        <div className="border border-[#EFEFEF] rounded-xl p-12 bg-white">
+        <div className="border border-[#E8E8E8] rounded-xl p-12 bg-white">
           <div className="flex justify-between items-end">
             {/* Discover */}
             <div className="text-center flex-1">
@@ -149,7 +149,7 @@ export default function OperatorBriefing() {
               <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
                 {data.discovered}
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">new</p>
+              <p className="text-xs text-[#666666] font-light">new</p>
             </div>
 
             {/* Connecting Line */}
@@ -164,7 +164,7 @@ export default function OperatorBriefing() {
                   y1="2"
                   x2="100"
                   y2="2"
-                  stroke="#EFEFEF"
+                  stroke="#E8E8E8"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
@@ -182,7 +182,7 @@ export default function OperatorBriefing() {
               <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
                 {data.enriched}
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">start</p>
+              <p className="text-xs text-[#666666] font-light">start</p>
             </div>
 
             {/* Connecting Line */}
@@ -197,7 +197,7 @@ export default function OperatorBriefing() {
                   y1="2"
                   x2="100"
                   y2="2"
-                  stroke="#EFEFEF"
+                  stroke="#E8E8E8"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
@@ -215,7 +215,7 @@ export default function OperatorBriefing() {
               <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
                 1
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">qualified</p>
+              <p className="text-xs text-[#666666] font-light">qualified</p>
             </div>
 
             {/* Connecting Line */}
@@ -230,7 +230,7 @@ export default function OperatorBriefing() {
                   y1="2"
                   x2="100"
                   y2="2"
-                  stroke="#EFEFEF"
+                  stroke="#E8E8E8"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
@@ -248,7 +248,7 @@ export default function OperatorBriefing() {
               <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
                 0
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">proposed</p>
+              <p className="text-xs text-[#666666] font-light">proposed</p>
             </div>
 
             {/* Connecting Line */}
@@ -263,7 +263,7 @@ export default function OperatorBriefing() {
                   y1="2"
                   x2="100"
                   y2="2"
-                  stroke="#EFEFEF"
+                  stroke="#E8E8E8"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
@@ -281,7 +281,7 @@ export default function OperatorBriefing() {
               <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
                 {data.orders}
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">finish</p>
+              <p className="text-xs text-[#666666] font-light">finish</p>
             </div>
           </div>
         </div>
@@ -308,12 +308,12 @@ export default function OperatorBriefing() {
         </div>
 
         <div className="space-y-3">
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#0D0D0D] mb-1">
                 Call Joe Green at Westpoint Pharmacy
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">
+              <p className="text-xs text-[#666666] font-light">
                 High confidence • Manchester
               </p>
             </div>
@@ -321,19 +321,19 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#DC2626] mb-2">
                 Due today
               </p>
-              <p className="text-xs text-[#AAAAAA] mb-3 font-light">10:00 AM</p>
+              <p className="text-xs text-[#666666] mb-3 font-light">10:00 AM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Call
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#0D0D0D] mb-1">
                 Send proposal to Range Pharmacy
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">
+              <p className="text-xs text-[#666666] font-light">
                 Proposal draft ready • High confidence
               </p>
             </div>
@@ -341,19 +341,19 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#DC2626] mb-2">
                 Due today
               </p>
-              <p className="text-xs text-[#AAAAAA] mb-3 font-light">11:30 AM</p>
+              <p className="text-xs text-[#666666] mb-3 font-light">11:30 AM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Send
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#0D0D0D] mb-1">
                 Meeting with A & A Pharmacy
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">
+              <p className="text-xs text-[#666666] font-light">
                 Discovery call • Winslow Road
               </p>
             </div>
@@ -361,19 +361,19 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#DC2626] mb-2">
                 Due today
               </p>
-              <p className="text-xs text-[#AAAAAA] mb-3 font-light">2:00 PM</p>
+              <p className="text-xs text-[#666666] mb-3 font-light">2:00 PM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Join
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#0D0D0D] mb-1">
                 Review contract for Rusholme Pharmacy
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">
+              <p className="text-xs text-[#666666] font-light">
                 Approval required
               </p>
             </div>
@@ -381,19 +381,19 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#DC2626] mb-2">
                 Due today
               </p>
-              <p className="text-xs text-[#AAAAAA] mb-3 font-light">4:15 PM</p>
+              <p className="text-xs text-[#666666] mb-3 font-light">4:15 PM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Review
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#0D0D0D] mb-1">
                 Research 2 new opportunities
               </p>
-              <p className="text-xs text-[#AAAAAA] font-light">
+              <p className="text-xs text-[#666666] font-light">
                 AI suggested • High potential
               </p>
             </div>
@@ -401,7 +401,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#DC2626] mb-2">
                 Due today
               </p>
-              <p className="text-xs text-[#AAAAAA] mb-3 font-light">EOD</p>
+              <p className="text-xs text-[#666666] mb-3 font-light">EOD</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Start
               </span>
@@ -431,47 +431,47 @@ export default function OperatorBriefing() {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
             <p className="text-sm font-semibold text-[#0D0D0D] mb-3">
               Discovered
             </p>
             <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
               2
             </p>
-            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+            <p className="text-xs text-[#666666] mb-3 font-light">
               Manchester area
             </p>
             <p className="text-xs text-[#D0D0D0] font-light">1h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
             <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Opened</p>
             <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+            <p className="text-xs text-[#666666] mb-3 font-light">
               Westpoint Pharmacy
             </p>
             <p className="text-xs text-[#D0D0D0] font-light">2h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
             <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Booked</p>
             <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+            <p className="text-xs text-[#666666] mb-3 font-light">
               A & A Pharmacy
             </p>
             <p className="text-xs text-[#D0D0D0] font-light">3h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
             <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Updated</p>
             <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+            <p className="text-xs text-[#666666] mb-3 font-light">
               Range Pharmacy
             </p>
             <p className="text-xs text-[#D0D0D0] font-light">4h ago</p>
