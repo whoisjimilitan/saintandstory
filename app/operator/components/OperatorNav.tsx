@@ -25,15 +25,15 @@ export function OperatorNav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b border-[#E8E8E8] z-50">
-      <div className="max-w-full mx-auto px-8 py-4 flex items-center justify-between">
-        <div className="flex gap-2">
+      <div className="max-w-full mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
+        <div className="flex gap-2 overflow-x-auto flex-nowrap scrollbar-hide">
           {stages.map((stage) => {
             const isActive = stage.name === currentStage;
             return (
               <Link
                 key={stage.name}
                 href={stage.href}
-                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all ${
+                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all flex-shrink-0 ${
                   isActive
                     ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
                     : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
@@ -47,7 +47,7 @@ export function OperatorNav() {
 
         <Link
           href="/dashboard/admin"
-          className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full bg-[#F5F5F5] hover:bg-white hover:border-[#D0D0D0]"
+          className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full bg-[#F5F5F5] hover:bg-white hover:border-[#D0D0D0] flex-shrink-0"
         >
           Admin
         </Link>

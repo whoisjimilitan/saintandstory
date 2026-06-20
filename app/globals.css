@@ -269,3 +269,13 @@ body.b2b-lab {
   background: rgba(147, 112, 219, 0.12);
   color: #9370db;
 }
+
+/* Hide scrollbar while keeping scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
