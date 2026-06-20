@@ -9,17 +9,16 @@ interface NavItem {
   segment?: string;
 }
 
+// Intelligence lifecycle navigation
 const PRIMARY_NAV: NavItem[] = [
-  { name: "Home", href: "/operator", segment: "home" },
-  { name: "Discover", href: "/operator/discover", segment: "discover" },
-  { name: "Enrich", href: "/operator/enrich", segment: "enrich" },
+  { name: "Today", href: "/operator", segment: "today" },
   { name: "Pipeline", href: "/operator/pipeline", segment: "pipeline" },
-  { name: "Outreach", href: "/operator/outreach", segment: "outreach" },
-  { name: "Responses", href: "/operator/responses", segment: "responses" },
+  { name: "Intelligence", href: "/operator/discover", segment: "discover" },
+  { name: "Orders", href: "/operator/orders", segment: "orders" },
+  { name: "Analytics", href: "/operator/analytics", segment: "analytics" },
 ];
 
 const SECONDARY_NAV: NavItem[] = [
-  { name: "Analytics", href: "/operator/analytics", segment: "analytics" },
   { name: "Settings", href: "/operator/settings", segment: "settings" },
 ];
 

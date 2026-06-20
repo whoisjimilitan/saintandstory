@@ -2,16 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  getTodaySummary,
-  getPriorityQueue,
-  getKnowledgeLoop,
-  getRecommendations,
-  TodaySummary,
-  PriorityItem,
-  KnowledgeLoopStage,
-  Recommendation,
-} from "./lib/morning-brief-queries";
-import {
   MetricCard,
   PriorityQueueItem,
   KnowledgeLoopStage as KnowledgeLoopStageComponent,
@@ -22,6 +12,32 @@ import {
   EmptyState,
   ErrorState,
 } from "./components/MorningBriefComponents";
+
+interface TodaySummary {
+  discovered: number;
+  enriched: number;
+  qualified: number;
+  orders: number;
+}
+
+interface PriorityItem {
+  theme: string;
+  description: string;
+  actionText: string;
+  actionHref: string;
+}
+
+interface KnowledgeLoopStage {
+  name: string;
+  count: number;
+}
+
+interface Recommendation {
+  title: string;
+  description: string;
+  actionText?: string;
+  actionHref?: string;
+}
 
 export default function OperatorHome() {
   const [mounted, setMounted] = useState(false);
@@ -53,12 +69,14 @@ export default function OperatorHome() {
     if (!mounted) return;
 
     const loadData = async () => {
+      // Load Today's Summary
       try {
-        // Load Today's Summary
         setSummaryLoading(true);
         setSummaryError(null);
-        const summaryData = await getTodaySummary();
-        setSummary(summaryData);
+        const res = await fetch("/api/operator/morning-brief/summary");
+        if (!res.ok) throw new Error("Failed to fetch summary");
+        const data = await res.json();
+        setSummary(data);
         setSummaryLoading(false);
       } catch (error) {
         setSummaryError("Failed to load summary data");
@@ -66,12 +84,14 @@ export default function OperatorHome() {
         console.error("Summary error:", error);
       }
 
+      // Load Priority Queue
       try {
-        // Load Priority Queue
         setPriorityLoading(true);
         setPriorityError(null);
-        const priorityData = await getPriorityQueue();
-        setPriorityQueue(priorityData);
+        const res = await fetch("/api/operator/morning-brief/priority-queue");
+        if (!res.ok) throw new Error("Failed to fetch priority queue");
+        const data = await res.json();
+        setPriorityQueue(data);
         setPriorityLoading(false);
       } catch (error) {
         setPriorityError("Failed to load priority queue");
@@ -79,12 +99,14 @@ export default function OperatorHome() {
         console.error("Priority queue error:", error);
       }
 
+      // Load Knowledge Loop
       try {
-        // Load Knowledge Loop
         setKnowledgeLoading(true);
         setKnowledgeError(null);
-        const knowledgeData = await getKnowledgeLoop();
-        setKnowledgeLoop(knowledgeData);
+        const res = await fetch("/api/operator/morning-brief/knowledge-loop");
+        if (!res.ok) throw new Error("Failed to fetch knowledge loop");
+        const data = await res.json();
+        setKnowledgeLoop(data);
         setKnowledgeLoading(false);
       } catch (error) {
         setKnowledgeError("Failed to load knowledge loop");
@@ -92,12 +114,14 @@ export default function OperatorHome() {
         console.error("Knowledge loop error:", error);
       }
 
+      // Load Recommendations
       try {
-        // Load Recommendations
         setRecommendationsLoading(true);
         setRecommendationsError(null);
-        const recommendationData = await getRecommendations();
-        setRecommendations(recommendationData);
+        const res = await fetch("/api/operator/morning-brief/recommendations");
+        if (!res.ok) throw new Error("Failed to fetch recommendations");
+        const data = await res.json();
+        setRecommendations(data);
         setRecommendationsLoading(false);
       } catch (error) {
         setRecommendationsError("Failed to load recommendations");
