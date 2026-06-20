@@ -54,298 +54,437 @@ export default function OperatorBriefing() {
   }, []);
 
   return (
-    <div>
-      {/* Main Content */}
-        {/* Header */}
-        <div className="mb-12">
-          <div className="inline-block bg-[#F5F5F5] px-3 py-2 rounded mb-4">
-            <p className="text-xs font-semibold text-[#0D0D0D]">{dateStr}</p>
-          </div>
-          <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">
-            Good morning, James.
-          </h1>
-          <p className="text-sm text-[#888888]">
-            Here's what matters today.
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="mb-16">
+        <div className="inline-flex items-center gap-2 mb-6 bg-[#F8F8F8] px-4 py-2 rounded-full border border-[#EFEFEF]">
+          <p className="text-xs font-medium text-[#0D0D0D] tracking-[0.5px]">
+            {dateStr}
           </p>
         </div>
+        <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-[-0.01em]">
+          Good morning, James.
+        </h1>
+        <p className="text-base text-[#666666] leading-relaxed max-w-xl font-light">
+          Here's what matters today.
+        </p>
+      </div>
 
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-12">
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-            <p className="text-sm text-[#888888] mb-3">New opportunities</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-3">
-              {data.discovered}
-            </p>
-            <p className="text-xs text-[#888888]">vs yesterday</p>
-            <p className="text-xs text-green-600 font-semibold">↑ 100%</p>
-          </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-            <p className="text-sm text-[#888888] mb-3">High confidence</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-3">
-              {data.qualified}
-            </p>
-            <p className="text-xs text-[#888888]">vs yesterday</p>
-            <p className="text-xs text-green-600 font-semibold">↑ 100%</p>
-          </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-            <p className="text-sm text-[#888888] mb-3">Contracts</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-3">
-              {data.orders}
-            </p>
-            <p className="text-xs text-[#888888]">vs yesterday</p>
-            <p className="text-xs text-[#C9C9C9]">—</p>
-          </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-            <p className="text-sm text-[#888888] mb-3">Closed today</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-3">0</p>
-            <p className="text-xs text-[#888888]">vs yesterday</p>
-            <p className="text-xs text-[#C9C9C9]">—</p>
+      {/* Metrics Cards Grid */}
+      <div className="grid grid-cols-4 gap-6 mb-20">
+        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+            New opportunities
+          </p>
+          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+            {data.discovered}
+          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
           </div>
         </div>
 
-        {/* Pipeline at a Glance */}
-        <div className="mb-12">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wide mb-2">
+        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+            High confidence
+          </p>
+          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+            {data.qualified}
+          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
+          </div>
+        </div>
+
+        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+            Finished
+          </p>
+          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+            {data.orders}
+          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#D0D0D0]">—</p>
+          </div>
+        </div>
+
+        <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+          <p className="text-xs font-medium text-[#888888] uppercase tracking-[0.8px] mb-4">
+            Closed today
+          </p>
+          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+            0
+          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-[#AAAAAA]">vs yesterday</p>
+            <p className="text-xs text-[#D0D0D0]">—</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pipeline at a Glance */}
+      <div className="mb-20">
+        <div className="mb-8">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
             Pipeline at a Glance
           </h2>
-          <p className="text-xs text-[#888888] mb-6">
+          <p className="text-sm text-[#888888] leading-relaxed font-light">
             Where opportunities are in your pipeline.
           </p>
+        </div>
 
-          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white mb-4">
-            <div className="flex justify-between items-end mb-8">
-              <div className="text-center flex-1">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mx-auto mb-3"></div>
-                <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                  Discover
-                </p>
-                <p className="text-2xl font-black text-[#0D0D0D]">
-                  {data.discovered}
-                </p>
-                <p className="text-xs text-[#888888]">new</p>
+        <div className="border border-[#EFEFEF] rounded-xl p-12 bg-white">
+          <div className="flex justify-between items-end">
+            {/* Discover */}
+            <div className="text-center flex-1">
+              <div className="flex justify-center mb-6">
+                <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm"></div>
               </div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+                Discover
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+                {data.discovered}
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">new</p>
+            </div>
 
-              <div className="text-center flex-1">
-                <div className="w-3 h-3 rounded-full border-2 border-green-500 mx-auto mb-3"></div>
-                <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                  Enrich
-                </p>
-                <p className="text-2xl font-black text-[#0D0D0D]">
-                  {data.enriched}
-                </p>
-                <p className="text-xs text-[#888888]">Started</p>
-              </div>
+            {/* Connecting Line */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              <svg
+                className="w-full h-1"
+                viewBox="0 0 100 4"
+                preserveAspectRatio="none"
+              >
+                <line
+                  x1="0"
+                  y1="2"
+                  x2="100"
+                  y2="2"
+                  stroke="#EFEFEF"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
 
-              <div className="text-center flex-1">
-                <div className="w-3 h-3 rounded-full border-2 border-orange-500 mx-auto mb-3"></div>
-                <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                  Qualify
-                </p>
-                <p className="text-2xl font-black text-[#0D0D0D]">1</p>
-                <p className="text-xs text-[#888888]">qualified</p>
+            {/* Enrich */}
+            <div className="text-center flex-1">
+              <div className="flex justify-center mb-6">
+                <div className="w-3 h-3 rounded-full border-2 border-green-500"></div>
               </div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+                Enrich
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+                {data.enriched}
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">start</p>
+            </div>
 
-              <div className="text-center flex-1">
-                <div className="w-3 h-3 rounded-full border-2 border-purple-500 mx-auto mb-3"></div>
-                <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                  Propose
-                </p>
-                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-                <p className="text-xs text-[#888888]">proposed</p>
-              </div>
+            {/* Connecting Line */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              <svg
+                className="w-full h-1"
+                viewBox="0 0 100 4"
+                preserveAspectRatio="none"
+              >
+                <line
+                  x1="0"
+                  y1="2"
+                  x2="100"
+                  y2="2"
+                  stroke="#EFEFEF"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
 
-              <div className="text-center flex-1">
-                <div className="w-3 h-3 rounded-full border-2 border-red-500 mx-auto mb-3"></div>
-                <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                  Orders
-                </p>
-                <p className="text-2xl font-black text-[#0D0D0D]">
-                  {data.orders}
-                </p>
-                <p className="text-xs text-[#888888]">Finished</p>
+            {/* Qualify */}
+            <div className="text-center flex-1">
+              <div className="flex justify-center mb-6">
+                <div className="w-3 h-3 rounded-full border-2 border-orange-500"></div>
               </div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+                Qualify
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+                1
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">qualified</p>
+            </div>
+
+            {/* Connecting Line */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              <svg
+                className="w-full h-1"
+                viewBox="0 0 100 4"
+                preserveAspectRatio="none"
+              >
+                <line
+                  x1="0"
+                  y1="2"
+                  x2="100"
+                  y2="2"
+                  stroke="#EFEFEF"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+
+            {/* Propose */}
+            <div className="text-center flex-1">
+              <div className="flex justify-center mb-6">
+                <div className="w-3 h-3 rounded-full border-2 border-purple-500"></div>
+              </div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+                Propose
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+                0
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">proposed</p>
+            </div>
+
+            {/* Connecting Line */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              <svg
+                className="w-full h-1"
+                viewBox="0 0 100 4"
+                preserveAspectRatio="none"
+              >
+                <line
+                  x1="0"
+                  y1="2"
+                  x2="100"
+                  y2="2"
+                  stroke="#EFEFEF"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+
+            {/* Orders */}
+            <div className="text-center flex-1">
+              <div className="flex justify-center mb-6">
+                <div className="w-3 h-3 rounded-full border-2 border-red-500"></div>
+              </div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+                Orders
+              </p>
+              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+                {data.orders}
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">finish</p>
             </div>
           </div>
+        </div>
 
+        <div className="mt-6">
           <Link
             href="/operator/pipeline"
-            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
+            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
           >
             View full pipeline →
           </Link>
         </div>
+      </div>
 
-        {/* Today's Priority Actions */}
-        <div className="mb-12">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wide mb-2">
+      {/* Today's Priority Actions */}
+      <div className="mb-20">
+        <div className="mb-8">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
             Today's Priority Actions
           </h2>
-          <p className="text-xs text-[#888888] mb-6">
+          <p className="text-sm text-[#888888] leading-relaxed font-light">
             Recommended actions based on opportunities and activity.
           </p>
+        </div>
 
-          <div className="space-y-3">
-            <button className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white flex items-center justify-between hover:border-[#0D0D0D] transition-colors cursor-pointer">
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-[#0D0D0D]">
-                  Call Joe Green at Westpoint Pharmacy
-                </p>
-                <p className="text-xs text-[#888888]">
-                  High confidence • Manchester
-                </p>
-              </div>
-              <div className="text-right ml-6">
-                <p className="text-xs font-semibold text-red-600 mb-2">
-                  Due today
-                </p>
-                <p className="text-xs text-[#888888] mb-3">10:00 AM</p>
-                <span className="text-xs font-semibold text-[#0D0D0D]">
-                  Call
-                </span>
-              </div>
-            </button>
+        <div className="space-y-3">
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+                Call Joe Green at Westpoint Pharmacy
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">
+                High confidence • Manchester
+              </p>
+            </div>
+            <div className="text-right ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+                Due today
+              </p>
+              <p className="text-xs text-[#AAAAAA] mb-3 font-light">10:00 AM</p>
+              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                Call
+              </span>
+            </div>
+          </button>
 
-            <button className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white flex items-center justify-between hover:border-[#0D0D0D] transition-colors cursor-pointer">
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-[#0D0D0D]">
-                  Send proposal to Range Pharmacy
-                </p>
-                <p className="text-xs text-[#888888]">
-                  Proposal draft ready • High confidence
-                </p>
-              </div>
-              <div className="text-right ml-6">
-                <p className="text-xs font-semibold text-red-600 mb-2">
-                  Due today
-                </p>
-                <p className="text-xs text-[#888888] mb-3">11:30 AM</p>
-                <span className="text-xs font-semibold text-[#0D0D0D]">
-                  Send
-                </span>
-              </div>
-            </button>
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+                Send proposal to Range Pharmacy
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">
+                Proposal draft ready • High confidence
+              </p>
+            </div>
+            <div className="text-right ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+                Due today
+              </p>
+              <p className="text-xs text-[#AAAAAA] mb-3 font-light">11:30 AM</p>
+              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                Send
+              </span>
+            </div>
+          </button>
 
-            <button className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white flex items-center justify-between hover:border-[#0D0D0D] transition-colors cursor-pointer">
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-[#0D0D0D]">
-                  Meeting with A & A Pharmacy
-                </p>
-                <p className="text-xs text-[#888888]">
-                  Discovery call • Winslow Road
-                </p>
-              </div>
-              <div className="text-right ml-6">
-                <p className="text-xs font-semibold text-red-600 mb-2">
-                  Due today
-                </p>
-                <p className="text-xs text-[#888888] mb-3">2:00 PM</p>
-                <span className="text-xs font-semibold text-[#0D0D0D]">
-                  Join
-                </span>
-              </div>
-            </button>
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+                Meeting with A & A Pharmacy
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">
+                Discovery call • Winslow Road
+              </p>
+            </div>
+            <div className="text-right ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+                Due today
+              </p>
+              <p className="text-xs text-[#AAAAAA] mb-3 font-light">2:00 PM</p>
+              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                Join
+              </span>
+            </div>
+          </button>
 
-            <button className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white flex items-center justify-between hover:border-[#0D0D0D] transition-colors cursor-pointer">
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-[#0D0D0D]">
-                  Review contract for Rusholme Pharmacy
-                </p>
-                <p className="text-xs text-[#888888]">Approval required</p>
-              </div>
-              <div className="text-right ml-6">
-                <p className="text-xs font-semibold text-red-600 mb-2">
-                  Due today
-                </p>
-                <p className="text-xs text-[#888888] mb-3">4:15 PM</p>
-                <span className="text-xs font-semibold text-[#0D0D0D]">
-                  Review
-                </span>
-              </div>
-            </button>
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+                Review contract for Rusholme Pharmacy
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">
+                Approval required
+              </p>
+            </div>
+            <div className="text-right ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+                Due today
+              </p>
+              <p className="text-xs text-[#AAAAAA] mb-3 font-light">4:15 PM</p>
+              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                Review
+              </span>
+            </div>
+          </button>
 
-            <button className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white flex items-center justify-between hover:border-[#0D0D0D] transition-colors cursor-pointer">
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-[#0D0D0D]">
-                  Research 2 new opportunities
-                </p>
-                <p className="text-xs text-[#888888]">
-                  AI suggested • High potential
-                </p>
-              </div>
-              <div className="text-right ml-6">
-                <p className="text-xs font-semibold text-red-600 mb-2">
-                  Due today
-                </p>
-                <p className="text-xs text-[#888888] mb-3">EOD</p>
-                <span className="text-xs font-semibold text-[#0D0D0D]">
-                  Start
-                </span>
-              </div>
-            </button>
-          </div>
+          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#FAFAFA] transition-all duration-150 cursor-pointer group">
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+                Research 2 new opportunities
+              </p>
+              <p className="text-xs text-[#AAAAAA] font-light">
+                AI suggested • High potential
+              </p>
+            </div>
+            <div className="text-right ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+                Due today
+              </p>
+              <p className="text-xs text-[#AAAAAA] mb-3 font-light">EOD</p>
+              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                Start
+              </span>
+            </div>
+          </button>
+        </div>
 
+        <div className="mt-6">
           <Link
             href="/operator/pipeline"
-            className="inline-block text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors mt-6"
+            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
           >
             View all tasks →
           </Link>
         </div>
+      </div>
 
-        {/* Recent Activity */}
-        <div>
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wide mb-6">
+      {/* Recent Activity */}
+      <div>
+        <div className="mb-8">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
             Recent Activity
           </h2>
+          <p className="text-sm text-[#888888] leading-relaxed font-light">
+            What's happened today.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
-                Discovered
-              </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3">2</p>
-              <p className="text-xs text-[#888888]">Manchester area</p>
-              <p className="text-xs text-[#C9C9C9] mt-3">1h ago</p>
-            </div>
-
-            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
-                Opened
-              </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3">1</p>
-              <p className="text-xs text-[#888888]">Westpoint Pharmacy</p>
-              <p className="text-xs text-[#C9C9C9] mt-3">2h ago</p>
-            </div>
-
-            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
-                Booked
-              </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3">1</p>
-              <p className="text-xs text-[#888888]">A & A Pharmacy</p>
-              <p className="text-xs text-[#C9C9C9] mt-3">3h ago</p>
-            </div>
-
-            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
-                Updated
-              </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3">1</p>
-              <p className="text-xs text-[#888888]">Range Pharmacy</p>
-              <p className="text-xs text-[#C9C9C9] mt-3">4h ago</p>
-            </div>
+        <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">
+              Discovered
+            </p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+              2
+            </p>
+            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+              Manchester area
+            </p>
+            <p className="text-xs text-[#D0D0D0] font-light">1h ago</p>
           </div>
 
-          <Link
-            href="/operator/learn"
-            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            View all activity →
-          </Link>
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Opened</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+              1
+            </p>
+            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+              Westpoint Pharmacy
+            </p>
+            <p className="text-xs text-[#D0D0D0] font-light">2h ago</p>
+          </div>
+
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Booked</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+              1
+            </p>
+            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+              A & A Pharmacy
+            </p>
+            <p className="text-xs text-[#D0D0D0] font-light">3h ago</p>
+          </div>
+
+          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D8D8D8] transition-colors duration-200">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Updated</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+              1
+            </p>
+            <p className="text-xs text-[#AAAAAA] mb-3 font-light">
+              Range Pharmacy
+            </p>
+            <p className="text-xs text-[#D0D0D0] font-light">4h ago</p>
+          </div>
         </div>
+
+        <Link
+          href="/operator/learn"
+          className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
+        >
+          View all activity →
+        </Link>
+      </div>
     </div>
   );
 }
