@@ -1,4 +1,4 @@
-import { OperatorSidebar } from "./components/OperatorSidebar";
+import { OperatorJourneyNav } from "./components/OperatorJourneyNav";
 
 export const metadata = {
   title: "Operator — Saint & Story",
@@ -11,13 +11,15 @@ export default function OperatorLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-white">
-      {/* Sidebar */}
-      <OperatorSidebar />
+    <div className="bg-white min-h-screen">
+      {/* Journey Navigation */}
+      <OperatorJourneyNav />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-white">
-        {children}
+      <main className="pt-20 pb-16 bg-white">
+        <div className="mx-auto px-8" style={{ maxWidth: "1200px" }}>
+          {children}
+        </div>
       </main>
     </div>
   );
