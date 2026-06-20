@@ -1,15 +1,21 @@
 /**
- * GET /api/b2b/operator-os/conversations/:prospect_id
+ * GET /api/b2b/operator-os/conversations
  *
- * Returns full interaction timeline for one prospect
+ * Returns full interaction timeline for a prospect
+ * Query param: prospect_id (required)
  * Emails, calls, notes, replies, standing orders, gate progression
  */
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ prospect_id: string }> }
-) {
-  const { prospect_id } = await params;
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const prospect_id = searchParams.get('prospect_id');
+
+  if (!prospect_id) {
+    return Response.json(
+      { error: 'prospect_id query param is required' },
+      { status: 400 }
+    );
+  }
 
   // Mock conversation history
   const conversations: Record<string, any> = {

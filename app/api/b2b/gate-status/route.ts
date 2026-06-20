@@ -1,22 +1,21 @@
 /**
- * GET /api/b2b/gate-status/:prospect_id
+ * GET /api/b2b/gate-status
  *
- * Returns current gate status for a prospect
+ * Returns current gate status for all prospects
+ * Query param: prospect_id (optional)
  * Used by: Closed-loop dashboard, operator workflows
  */
 
 import { getGateStatus } from '@/lib/b2b-gate-status';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ prospect_id: string }> }
-) {
+export async function GET(request: Request) {
   try {
-    const { prospect_id } = await params;
+    const { searchParams } = new URL(request.url);
+    const prospect_id = searchParams.get('prospect_id');
 
     if (!prospect_id) {
       return Response.json(
-        { error: 'prospect_id is required' },
+        { error: 'prospect_id query param is required' },
         { status: 400 }
       );
     }

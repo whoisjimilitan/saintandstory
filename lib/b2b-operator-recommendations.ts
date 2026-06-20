@@ -137,7 +137,9 @@ export function generateOperatorMastery(
       emails_sent: 47,
       conversion_rate: operator_conversion_rate,
       best_angle,
-      angles_tested,
+      angles_tested: Object.fromEntries(
+        Object.entries(tested_angles).map(([angle, tested]) => [angle, tested ? operator_conversion_rate : 0])
+      ),
     },
     {
       pressure_type,

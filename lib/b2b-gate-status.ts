@@ -45,7 +45,7 @@ export async function getGateStatus(prospect_id: string): Promise<GateStatus> {
   // In real implementation, this queries b2b_leads table for gate timestamps
   // For now, returning example structure
 
-  const gates_timestamps = {
+  const gates_timestamps: GateStatus['gates_timestamps'] = {
     gate_1_delivered_at: new Date('2026-06-20T10:00:00'),
     gate_2_opened_at: new Date('2026-06-20T14:30:00'),
     gate_3_visited_at: null,
@@ -96,7 +96,8 @@ export async function getGateStatus(prospect_id: string): Promise<GateStatus> {
 
   // Gate 5: stalled if advancing_at NULL after 48h
   if (!gates_timestamps.gate_5_advancing_at && gates_timestamps.gate_4_replied_at) {
-    const hours_since = (now.getTime() - gates_timestamps.gate_4_replied_at.getTime()) / (1000 * 60 * 60);
+    const replied_at = gates_timestamps.gate_4_replied_at;
+    const hours_since = (now.getTime() - replied_at.getTime()) / (1000 * 60 * 60);
     if (hours_since > 48) {
       stalled = true;
       stalled_at_gate = 5;

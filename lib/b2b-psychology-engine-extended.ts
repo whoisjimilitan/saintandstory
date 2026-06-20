@@ -65,7 +65,7 @@ So here's the question: ${action}
 Let's talk.`;
 
   // EMAIL SUBJECT: Tailored to pressure type
-  const subject_map = {
+  const subject_map: Record<string, string> = {
     'service-quality-inconsistency': `${input.prospect_name}: Consistent quality across all your locations`,
     'time-critical-movement': `${input.prospect_name}: Making your ${input.observations.includes('75') ? '75' : 'deadline'}-day deadline work`,
     'capacity-overflow': `${input.prospect_name}: Serving more clients without hiring more staff`,

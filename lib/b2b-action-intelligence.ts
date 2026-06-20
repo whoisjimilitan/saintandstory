@@ -204,7 +204,7 @@ export function generateActionIntelligenceBatch(
   actions: ActionItem[],
   pressure_type_stats: Record<string, { name: string; avg_conversion: number }>
 ): ActionIntelligence[] {
-  return actions
+  const intelligence = actions
     .map((action) => {
       const impact_score = calculateImpactScore(action, {
         avg_conversion_rate: pressure_type_stats[action.pressure_type]?.avg_conversion || 0.18,
@@ -212,5 +212,5 @@ export function generateActionIntelligenceBatch(
       return generateActionIntelligence(action, impact_score, pressure_type_stats[action.pressure_type] || { name: action.pressure_type, avg_conversion: 0.18 });
     });
 
-  return Promise.all(actions).then((resolved) => sortActionsByImpact(resolved)).catch(() => []);
+  return sortActionsByImpact(intelligence);
 }

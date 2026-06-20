@@ -186,8 +186,8 @@ export async function detectPressureType(prospectData: {
   }
 
   // STAGE 4: GENERATE MULTIPLE HYPOTHESES (IF STAR VARIANCE)
-  let primaryHypothesis = null;
-  let alternatives = [];
+  let primaryHypothesis: any = null;
+  let alternatives: any[] = [];
   let uncertaintyFlag = false;
 
   if (prospectData.star_rating_best && prospectData.star_rating_worst) {
@@ -278,7 +278,7 @@ export async function detectPressureType(prospectData: {
 
   const chainValidation = validateEpistemicChain(epistemicChain);
 
-  const reasoning_map = {
+  const reasoning_map: Record<string, string> = {
     'service-quality-inconsistency': 'Star rating variance detected across locations',
     'time-critical-movement': 'Urgent deadline detected in data',
     'capacity-overflow': 'Demand exceeds current capacity significantly',

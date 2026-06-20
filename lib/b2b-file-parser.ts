@@ -60,6 +60,7 @@ export async function parseCSV(buffer: Buffer): Promise<ParsedProspect[]> {
 
     const prospect: ParsedProspect = {
       prospect_id: `prospect-${Date.now()}-${i}`,
+      prospect_name: '',
     };
 
     headers.forEach((header, index) => {
@@ -164,10 +165,10 @@ export async function parseFile(
  */
 export function normalizeProspects(prospects: ParsedProspect[]): ParsedProspect[] {
   return prospects.map((p) => ({
+    ...p,
     prospect_id: p.prospect_id || `prospect-${Date.now()}-${Math.random()}`,
     prospect_name: p.prospect_name || p.company_name || 'Unknown Prospect',
     company_name: p.company_name || p.prospect_name || 'Unknown Company',
     category: p.category || 'unknown',
-    ...p,
   }));
 }

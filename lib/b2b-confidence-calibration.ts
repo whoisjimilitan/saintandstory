@@ -135,7 +135,7 @@ Specificity: ${evidence_quality.specificity}/100
  * When should system express vs suppress confidence?
  */
 export function getConfidenceThreshold(purpose: string): number {
-  const thresholds = {
+  const thresholds: Record<string, number> = {
     'send_email_direct': 75, // "You are experiencing..." requires 75%+
     'send_email_exploratory': 55, // "You may be experiencing..." requires 55%+
     'recognize_burden': 70, // Must be fairly confident about burden

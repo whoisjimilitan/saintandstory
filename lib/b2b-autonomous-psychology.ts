@@ -37,10 +37,9 @@ export async function generatePsychologyEmailAutonomous(
   const psychology = await generatePsychologyEmail({
     name: prospect.company_name,
     category: prospect.category,
-    location: prospect.location || null,
+    location: prospect.city || null,
     observations: prospect.observations?.join('. '),
     detection_confidence: prospect.confidence,
-    evidence_quality_score: prospect.evidence_quality_score || 75,
   });
 
   return {
@@ -51,7 +50,6 @@ export async function generatePsychologyEmailAutonomous(
     email_body: psychology.email_body,
     confidence: prospect.confidence,
     calibrated_confidence: psychology.calibrated_confidence,
-    evidence_quality_score: prospect.evidence_quality_score,
     generated_at: new Date().toISOString(),
     status: 'generated',
   };
