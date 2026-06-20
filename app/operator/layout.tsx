@@ -1,4 +1,4 @@
-import { OperatorJourneyNav } from "./components/OperatorJourneyNav";
+import { OperatorNav } from "./components/OperatorNav";
 
 export const metadata = {
   title: "Operator — Saint & Story",
@@ -12,12 +12,12 @@ export default function OperatorLayout({
 }) {
   return (
     <div className="bg-white min-h-screen">
-      {/* Journey Navigation */}
-      <OperatorJourneyNav />
+      {/* Navigation */}
+      <OperatorNav />
 
       {/* Main Content */}
       <main className="pt-20 pb-16 bg-white">
-        <div className="mx-auto px-8" style={{ maxWidth: "1200px" }}>
+        <div className="max-w-4xl mx-auto px-8">
           {children}
         </div>
       </main>
