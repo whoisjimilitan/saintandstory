@@ -26,8 +26,8 @@ export function B2BDiscoverySection({ sources }: Props) {
 
   return (
     <>
-      <IntakeChannels sources={sources} />
-      <B2BLeadsReview key={searchTrigger} />
+      <IntakeChannels sources={sources} onSearchComplete={handleSearchComplete} />
+      <B2BLeadsReview searchTrigger={searchTrigger} />
     </>
   );
 }

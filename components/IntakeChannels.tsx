@@ -13,9 +13,10 @@ interface IntakeSource {
 
 interface Props {
   sources: IntakeSource[];
+  onSearchComplete?: () => void;
 }
 
-export function IntakeChannels({ sources }: Props) {
+export function IntakeChannels({ sources, onSearchComplete }: Props) {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [postcode, setPostcode] = useState('');
@@ -75,6 +76,7 @@ export function IntakeChannels({ sources }: Props) {
         setMessage({ type: 'success', text: `Found ${result.count} businesses in ${postcode}. Added to pipeline.` });
         setPostcode('');
         setExpandedCard(null);
+        onSearchComplete?.();
       } else {
         setMessage({ type: 'error', text: result.error || 'Search failed' });
       }
