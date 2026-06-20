@@ -339,9 +339,25 @@ export async function POST(request: NextRequest) {
   // PRIORITY 2: Ensure DB transaction is flushed before returning
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // Return in format expected by DiscoverView
+  // Query for the actual created leads from database
+  let createdLeads: any[] = [];
+  try {
+    createdLeads = await sql`
+      SELECT id, "businessName", "businessCategory", email, city, postcode, status, "leadState", "createdAt", "painPoint", "businessEvidence"
+      FROM b2b_leads
+      WHERE "createdAt" > NOW() - INTERVAL '2 seconds'
+      AND "businessEvidence" IS NOT NULL
+      ORDER BY "createdAt" DESC
+      LIMIT ${added.length}
+    `;
+    console.log("[DISCOVER] Query returned", createdLeads.length, "leads from database");
+  } catch (err) {
+    console.error("[DISCOVER] Error querying created leads:", err);
+  }
+
+  // Return actual lead records
   return NextResponse.json({
-    businesses: added.map(name => ({
+    businesses: createdLeads.length > 0 ? createdLeads : added.map(name => ({
       id: name,
       name: name,
       address: "",
@@ -352,7 +368,7 @@ export async function POST(request: NextRequest) {
       category: category || "all",
       source: "discovery",
     })),
-    count: added.length,
+    count: createdLeads.length > 0 ? createdLeads.length : added.length,
     success: true,
   });
 }
