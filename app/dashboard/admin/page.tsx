@@ -187,15 +187,18 @@ export default async function AdminPage() {
       <AdminAutoRefresh pendingCount={pendingJobs.length} />
       <AdminPushSubscribe />
       <AdminLocationUpdater />
-      <div className="flex items-center justify-between mb-1">
-        <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          Logout
-        </Link>
-        <Link href="/operator" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          Operator 3.0 →
-        </Link>
+      <div className="flex items-start justify-between mb-8">
+        <div></div>
+        <div className="flex flex-col gap-2 items-end">
+          <Link href="/operator" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full bg-[#F5F5F5] hover:bg-white hover:border-[#D0D0D0]">
+            Operator 3.0 →
+          </Link>
+          <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+            Logout
+          </Link>
+        </div>
       </div>
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
+      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
         Dashboard.
       </h1>
       <div className="flex items-center justify-between mb-8">
