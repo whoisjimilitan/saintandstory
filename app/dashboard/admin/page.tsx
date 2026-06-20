@@ -191,8 +191,8 @@ export default async function AdminPage() {
         <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
           Logout
         </Link>
-        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
-          Intelligence 3.0 →
+        <Link href="/operator" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          Operator 3.0 →
         </Link>
       </div>
       <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-2">
