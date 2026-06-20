@@ -210,7 +210,7 @@ export function generateActionIntelligenceBatch(
         avg_conversion_rate: pressure_type_stats[action.pressure_type]?.avg_conversion || 0.18,
       });
       return generateActionIntelligence(action, impact_score, pressure_type_stats[action.pressure_type] || { name: action.pressure_type, avg_conversion: 0.18 });
-    })
-    .then((actions) => sortActionsByImpact(actions))
-    .catch(() => []);
+    });
+
+  return Promise.all(actions).then((resolved) => sortActionsByImpact(resolved)).catch(() => []);
 }

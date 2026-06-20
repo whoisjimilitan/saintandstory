@@ -7,8 +7,10 @@
 
 export async function GET(
   request: Request,
-  { params }: { params: { prospect_id: string } }
+  { params }: { params: Promise<{ prospect_id: string }> }
 ) {
+  const { prospect_id } = await params;
+
   // Mock conversation history
   const conversations: Record<string, any> = {
     'haart-001': {
@@ -76,7 +78,7 @@ export async function GET(
     },
   };
 
-  const conversation = conversations[params.prospect_id];
+  const conversation = conversations[prospect_id];
 
   if (!conversation) {
     return Response.json({ error: 'Prospect not found' }, { status: 404 });

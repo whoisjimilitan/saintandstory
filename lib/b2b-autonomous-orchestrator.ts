@@ -56,7 +56,7 @@ export interface AutonomousPipelineRun {
 /**
  * Run complete autonomous pipeline
  */
-export function runAutonomousPipeline(): AutonomousPipelineRun {
+export async function runAutonomousPipeline(): Promise<AutonomousPipelineRun> {
   const startTime = new Date();
 
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
@@ -69,7 +69,7 @@ export function runAutonomousPipeline(): AutonomousPipelineRun {
 
   // Phase 2: Psychology
   console.log('\n=== PHASE 2: PSYCHOLOGY ===\n');
-  const psychology = runAutonomousPsychologyGeneration(discovery.prospects);
+  const psychology = await runAutonomousPsychologyGeneration(discovery.prospects);
 
   // Phase 3: Validation
   console.log('\n=== PHASE 3: VALIDATION ===\n');

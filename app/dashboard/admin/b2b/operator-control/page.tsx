@@ -267,7 +267,7 @@ function MetricCard({
 }
 
 function FunnelRow({ label, value, color }: { label: string; value: number; color: string }) {
-  const colorMap = {
+  const colorMap: Record<string, string> = {
     gray: 'bg-gray-400',
     green: 'bg-green-600',
   };
@@ -279,7 +279,7 @@ function FunnelRow({ label, value, color }: { label: string; value: number; colo
         <span className="text-sm text-gray-600">{value}/100</span>
       </div>
       <div className="w-full h-2 bg-gray-200 rounded overflow-hidden">
-        <div className={`h-full ${colorMap[color]}`} style={{ width: `${value}%` }} />
+        <div className={`h-full ${colorMap[color] || 'bg-gray-400'}`} style={{ width: `${value}%` }} />
       </div>
     </div>
   );

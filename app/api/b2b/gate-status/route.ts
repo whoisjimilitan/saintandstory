@@ -9,10 +9,10 @@ import { getGateStatus } from '@/lib/b2b-gate-status';
 
 export async function GET(
   request: Request,
-  { params }: { params: { prospect_id: string } }
+  { params }: { params: Promise<{ prospect_id: string }> }
 ) {
   try {
-    const { prospect_id } = params;
+    const { prospect_id } = await params;
 
     if (!prospect_id) {
       return Response.json(

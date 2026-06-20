@@ -67,9 +67,11 @@ export async function GET(request: Request) {
 
     // Sort by urgency and days
     const sorted = action_items.sort((a, b) => {
-      const urgency_order = { high: 0, medium: 1, low: 2 };
-      if (urgency_order[a.urgency] !== urgency_order[b.urgency]) {
-        return urgency_order[a.urgency] - urgency_order[b.urgency];
+      const urgency_order: Record<string, number> = { high: 0, medium: 1, low: 2 };
+      const a_order = urgency_order[a.urgency] ?? 2;
+      const b_order = urgency_order[b.urgency] ?? 2;
+      if (a_order !== b_order) {
+        return a_order - b_order;
       }
       return b.days_in_gate - a.days_in_gate;
     });

@@ -144,7 +144,7 @@ export default async function ClosedLoopDashboard() {
           <h2 className="text-xs uppercase text-gray-500 tracking-wider mb-6">Action Needed Today</h2>
 
           <div className="space-y-4">
-            {actionItems.map((item) => (
+            {actionItems.map((item: any) => (
               <ActionItem key={item.prospect_id} item={item} />
             ))}
           </div>
@@ -228,13 +228,13 @@ function GateDetail({ label, count, total }: { label: string; count: number; tot
 }
 
 function ActionItem({ item }: { item: any }) {
-  const urgencyColor = {
+  const urgencyColor: Record<string, string> = {
     high: 'border-red-200 bg-red-50',
     medium: 'border-amber-200 bg-amber-50',
     low: 'border-gray-200 bg-gray-50',
   };
 
-  const actionIcon = {
+  const actionIcon: Record<string, string> = {
     follow_up_1: '📧',
     follow_up_2: '⏰',
     follow_up_3: '📞',
@@ -242,7 +242,7 @@ function ActionItem({ item }: { item: any }) {
   };
 
   return (
-    <div className={`border rounded-lg p-4 ${urgencyColor[item.urgency]}`}>
+    <div className={`border rounded-lg p-4 ${urgencyColor[item.urgency] || 'border-gray-200 bg-gray-50'}`}>
       <div className="flex justify-between items-start">
         <div>
           <div className="flex items-center gap-2">
