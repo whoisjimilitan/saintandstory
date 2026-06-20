@@ -188,10 +188,10 @@ export default async function AdminPage() {
       <AdminPushSubscribe />
       <AdminLocationUpdater />
       <div className="flex items-center justify-between mb-1">
-        <button onClick={() => window.location.href = '/sign-out'} className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+        <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
           Logout
-        </button>
-        <Link href="/dashboard/intelligence" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+        </Link>
+        <Link href="/dashboard/admin/b2b" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
           Intelligence 3.0 →
         </Link>
       </div>
