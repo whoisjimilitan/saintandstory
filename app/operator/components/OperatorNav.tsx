@@ -25,23 +25,32 @@ export function OperatorNav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b border-[#E8E8E8] z-50">
-      <div className="max-w-4xl mx-auto px-8 py-4 flex gap-3">
-        {stages.map((stage) => {
-          const isActive = stage.name === currentStage;
-          return (
-            <Link
-              key={stage.name}
-              href={stage.href}
-              className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all ${
-                isActive
-                  ? "bg-[#0D0D0D] text-white"
-                  : "text-[#0D0D0D] hover:text-[#666666]"
-              }`}
-            >
-              {stage.name}
-            </Link>
-          );
-        })}
+      <div className="max-w-full mx-auto px-8 py-4 flex items-center justify-between">
+        <div className="flex gap-3">
+          {stages.map((stage) => {
+            const isActive = stage.name === currentStage;
+            return (
+              <Link
+                key={stage.name}
+                href={stage.href}
+                className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all ${
+                  isActive
+                    ? "bg-[#0D0D0D] text-white"
+                    : "text-[#0D0D0D] hover:text-[#666666]"
+                }`}
+              >
+                {stage.name}
+              </Link>
+            );
+          })}
+        </div>
+
+        <Link
+          href="/dashboard/admin"
+          className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.15em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full"
+        >
+          Admin
+        </Link>
       </div>
     </nav>
   );
