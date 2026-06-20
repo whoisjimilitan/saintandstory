@@ -32,7 +32,7 @@ export default function IndexNowButton() {
       className="text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors disabled:opacity-40"
       style={{ color: state === "done" ? "#16a34a" : state === "error" ? "#dc2626" : "#888888" }}
     >
-      {state === "idle" && "Sync Bing →"}
+      {state === "idle" && "Bing →"}
       {state === "loading" && "Indexing…"}
       {state === "done" && `✓ ${count} URLs submitted`}
       {state === "error" && "Failed — retry"}
