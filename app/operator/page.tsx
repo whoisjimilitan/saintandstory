@@ -56,106 +56,106 @@ export default function OperatorBriefing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="mb-16">
-        <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-4 py-2 rounded-full border border-[#E8E8E8]">
-          <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.2em] uppercase">
+      <div className="mb-12 md:mb-16 px-4 md:px-0">
+        <div className="inline-flex items-center gap-2 mb-4 md:mb-6 bg-[#F5F5F5] px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-[#E8E8E8]">
+          <p className="text-[10px] md:text-xs font-semibold text-[#0D0D0D] tracking-[0.2em] uppercase">
             {dateStr}
           </p>
         </div>
-        <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-[-0.01em]">
+        <h1 className="text-3xl md:text-5xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.01em] leading-tight">
           Good morning, James.
         </h1>
-        <p className="text-base text-[#666666] leading-relaxed max-w-xl font-light">
+        <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-xl font-light">
           Here's what matters today.
         </p>
       </div>
 
       {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-4 gap-6 mb-20">
-        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            New opportunities
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-12 md:mb-20 px-4 md:px-0">
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
+            New
           </p>
-          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
             {data.discovered}
           </p>
-          <div className="space-y-1">
-            <p className="text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
+            <p className="text-[9px] md:text-xs font-semibold text-[#22C55E]">↑ 100%</p>
           </div>
         </div>
 
-        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
             High confidence
           </p>
-          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
             {data.qualified}
           </p>
-          <div className="space-y-1">
-            <p className="text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-xs font-semibold text-[#22C55E]">↑ 100%</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
+            <p className="text-[9px] md:text-xs font-semibold text-[#22C55E]">↑ 100%</p>
           </div>
         </div>
 
-        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
             Finished
           </p>
-          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
             {data.orders}
           </p>
-          <div className="space-y-1">
-            <p className="text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-xs text-[#D0D0D0]">—</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0]">—</p>
           </div>
         </div>
 
-        <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
-            Closed today
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
+            Closed
           </p>
-          <p className="text-4xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
             0
           </p>
-          <div className="space-y-1">
-            <p className="text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-xs text-[#D0D0D0]">—</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0]">—</p>
           </div>
         </div>
       </div>
 
       {/* Pipeline at a Glance */}
-      <div className="mb-20">
-        <div className="mb-8">
+      <div className="mb-12 md:mb-20 px-4 md:px-0">
+        <div className="mb-6 md:mb-8">
           <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Pipeline at a Glance
+            Pipeline
           </h2>
-          <p className="text-sm text-[#888888] leading-relaxed font-light">
+          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
             Where opportunities are in your pipeline.
           </p>
         </div>
 
-        <div className="border border-[#E8E8E8] rounded-xl p-12 bg-white">
-          <div className="flex justify-between items-end">
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-12 bg-white overflow-x-auto">
+          <div className="flex justify-between items-end gap-2 md:gap-4 min-w-min md:min-w-0">
             {/* Discover */}
-            <div className="text-center flex-1">
-              <div className="flex justify-center mb-6">
-                <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm"></div>
+            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+              <div className="flex justify-center mb-3 md:mb-6">
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-blue-500 shadow-sm"></div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Discover
               </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
                 {data.discovered}
               </p>
-              <p className="text-xs text-[#666666] font-light">new</p>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">new</p>
             </div>
 
             {/* Connecting Line */}
-            <div className="flex-1 flex items-center justify-center px-4">
+            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
               <svg
-                className="w-full h-1"
+                className="w-6 md:w-full h-0.5 md:h-1"
                 viewBox="0 0 100 4"
                 preserveAspectRatio="none"
               >
@@ -172,23 +172,23 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Enrich */}
-            <div className="text-center flex-1">
-              <div className="flex justify-center mb-6">
-                <div className="w-3 h-3 rounded-full border-2 border-green-500"></div>
+            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+              <div className="flex justify-center mb-3 md:mb-6">
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-green-500"></div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Enrich
               </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
                 {data.enriched}
               </p>
-              <p className="text-xs text-[#666666] font-light">start</p>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">start</p>
             </div>
 
             {/* Connecting Line */}
-            <div className="flex-1 flex items-center justify-center px-4">
+            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
               <svg
-                className="w-full h-1"
+                className="w-6 md:w-full h-0.5 md:h-1"
                 viewBox="0 0 100 4"
                 preserveAspectRatio="none"
               >
@@ -205,23 +205,23 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Qualify */}
-            <div className="text-center flex-1">
-              <div className="flex justify-center mb-6">
-                <div className="w-3 h-3 rounded-full border-2 border-orange-500"></div>
+            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+              <div className="flex justify-center mb-3 md:mb-6">
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-orange-500"></div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Qualify
               </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
                 1
               </p>
-              <p className="text-xs text-[#666666] font-light">qualified</p>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">qualified</p>
             </div>
 
             {/* Connecting Line */}
-            <div className="flex-1 flex items-center justify-center px-4">
+            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
               <svg
-                className="w-full h-1"
+                className="w-6 md:w-full h-0.5 md:h-1"
                 viewBox="0 0 100 4"
                 preserveAspectRatio="none"
               >
@@ -238,23 +238,23 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Propose */}
-            <div className="text-center flex-1">
-              <div className="flex justify-center mb-6">
-                <div className="w-3 h-3 rounded-full border-2 border-purple-500"></div>
+            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+              <div className="flex justify-center mb-3 md:mb-6">
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-purple-500"></div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Propose
               </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
                 0
               </p>
-              <p className="text-xs text-[#666666] font-light">proposed</p>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">proposed</p>
             </div>
 
             {/* Connecting Line */}
-            <div className="flex-1 flex items-center justify-center px-4">
+            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
               <svg
-                className="w-full h-1"
+                className="w-6 md:w-full h-0.5 md:h-1"
                 viewBox="0 0 100 4"
                 preserveAspectRatio="none"
               >
@@ -271,22 +271,22 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Orders */}
-            <div className="text-center flex-1">
-              <div className="flex justify-center mb-6">
-                <div className="w-3 h-3 rounded-full border-2 border-red-500"></div>
+            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+              <div className="flex justify-center mb-3 md:mb-6">
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-red-500"></div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-2">
+              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Orders
               </p>
-              <p className="text-3xl font-black text-[#0D0D0D] mb-3 tracking-[-0.02em]">
+              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
                 {data.orders}
               </p>
-              <p className="text-xs text-[#666666] font-light">finish</p>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">finish</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-4 md:mt-6">
           <Link
             href="/operator/pipeline"
             className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
@@ -297,111 +297,111 @@ export default function OperatorBriefing() {
       </div>
 
       {/* Today's Priority Actions */}
-      <div className="mb-20">
-        <div className="mb-8">
+      <div className="mb-12 md:mb-20 px-4 md:px-0">
+        <div className="mb-4 md:mb-8">
           <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Today's Priority Actions
+            Today's Actions
           </h2>
-          <p className="text-sm text-[#888888] leading-relaxed font-light">
+          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
             Recommended actions based on opportunities and activity.
           </p>
         </div>
 
-        <div className="space-y-3">
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+        <div className="space-y-2 md:space-y-3">
+          <button className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
+            <div className="flex-1 mb-2 md:mb-0">
+              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
                 Call Joe Green at Westpoint Pharmacy
               </p>
               <p className="text-xs text-[#666666] font-light">
                 High confidence • Manchester
               </p>
             </div>
-            <div className="text-right ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+            <div className="text-right md:ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-1">
                 Due today
               </p>
-              <p className="text-xs text-[#666666] mb-3 font-light">10:00 AM</p>
+              <p className="text-xs text-[#666666] mb-2 font-light">10:00 AM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Call
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+          <button className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
+            <div className="flex-1 mb-2 md:mb-0">
+              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
                 Send proposal to Range Pharmacy
               </p>
               <p className="text-xs text-[#666666] font-light">
                 Proposal draft ready • High confidence
               </p>
             </div>
-            <div className="text-right ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+            <div className="text-right md:ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-1">
                 Due today
               </p>
-              <p className="text-xs text-[#666666] mb-3 font-light">11:30 AM</p>
+              <p className="text-xs text-[#666666] mb-2 font-light">11:30 AM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Send
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+          <button className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
+            <div className="flex-1 mb-2 md:mb-0">
+              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
                 Meeting with A & A Pharmacy
               </p>
               <p className="text-xs text-[#666666] font-light">
                 Discovery call • Winslow Road
               </p>
             </div>
-            <div className="text-right ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+            <div className="text-right md:ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-1">
                 Due today
               </p>
-              <p className="text-xs text-[#666666] mb-3 font-light">2:00 PM</p>
+              <p className="text-xs text-[#666666] mb-2 font-light">2:00 PM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Join
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+          <button className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
+            <div className="flex-1 mb-2 md:mb-0">
+              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
                 Review contract for Rusholme Pharmacy
               </p>
               <p className="text-xs text-[#666666] font-light">
                 Approval required
               </p>
             </div>
-            <div className="text-right ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+            <div className="text-right md:ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-1">
                 Due today
               </p>
-              <p className="text-xs text-[#666666] mb-3 font-light">4:15 PM</p>
+              <p className="text-xs text-[#666666] mb-2 font-light">4:15 PM</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Review
               </span>
             </div>
           </button>
 
-          <button className="w-full border border-[#EFEFEF] rounded-xl p-6 bg-white flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group">
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#0D0D0D] mb-1">
+          <button className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
+            <div className="flex-1 mb-2 md:mb-0">
+              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
                 Research 2 new opportunities
               </p>
               <p className="text-xs text-[#666666] font-light">
                 AI suggested • High potential
               </p>
             </div>
-            <div className="text-right ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-2">
+            <div className="text-right md:ml-8">
+              <p className="text-xs font-semibold text-[#DC2626] mb-1">
                 Due today
               </p>
-              <p className="text-xs text-[#666666] mb-3 font-light">EOD</p>
+              <p className="text-xs text-[#666666] mb-2 font-light">EOD</p>
               <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
                 Start
               </span>
@@ -409,7 +409,7 @@ export default function OperatorBriefing() {
           </button>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-4 md:mt-6">
           <Link
             href="/operator/pipeline"
             className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
@@ -420,70 +420,78 @@ export default function OperatorBriefing() {
       </div>
 
       {/* Recent Activity */}
-      <div>
-        <div className="mb-8">
+      <div className="px-4 md:px-0">
+        <div className="mb-4 md:mb-8">
           <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Recent Activity
+            Activity
           </h2>
-          <p className="text-sm text-[#888888] leading-relaxed font-light">
+          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
             What's happened today.
           </p>
         </div>
 
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
               Discovered
             </p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
               2
             </p>
-            <p className="text-xs text-[#666666] mb-3 font-light">
+            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
               Manchester area
             </p>
-            <p className="text-xs text-[#D0D0D0] font-light">1h ago</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">1h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Opened</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
+              Opened
+            </p>
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#666666] mb-3 font-light">
+            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
               Westpoint Pharmacy
             </p>
-            <p className="text-xs text-[#D0D0D0] font-light">2h ago</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">2h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Booked</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
+              Booked
+            </p>
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#666666] mb-3 font-light">
+            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
               A & A Pharmacy
             </p>
-            <p className="text-xs text-[#D0D0D0] font-light">3h ago</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">3h ago</p>
           </div>
 
-          <div className="border border-[#EFEFEF] rounded-xl p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Updated</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-4 tracking-[-0.02em]">
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
+              Updated
+            </p>
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
               1
             </p>
-            <p className="text-xs text-[#666666] mb-3 font-light">
+            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
               Range Pharmacy
             </p>
-            <p className="text-xs text-[#D0D0D0] font-light">4h ago</p>
+            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">4h ago</p>
           </div>
         </div>
 
-        <Link
-          href="/operator/learn"
-          className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
-        >
-          View all activity →
-        </Link>
+        <div className="mt-4 md:mt-6">
+          <Link
+            href="/operator/learn"
+            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
+          >
+            View all activity →
+          </Link>
+        </div>
       </div>
     </div>
   );
