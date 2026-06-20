@@ -1,10 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { OperatorNav } from "./components/OperatorNav";
 
-const ALLOWED_USERS = [
-  "user_3EVExeiSBmgdhAWGzMEb8GMVc62",
-  // Add more operator user IDs as needed
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
 ];
 
 export const metadata = {
@@ -18,12 +20,14 @@ export default async function OperatorLayout({
   children: React.ReactNode;
 }) {
   const { userId } = await auth();
+  const user = await currentUser();
 
   if (!userId) {
     redirect("/sign-in");
   }
 
-  if (!ALLOWED_USERS.includes(userId)) {
+  const userEmail = user?.emailAddresses[0]?.emailAddress;
+  if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
     redirect("/sign-in");
   }
 
