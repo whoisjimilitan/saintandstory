@@ -1,242 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { B2BDiscoverySection } from "@/components/B2BDiscoverySection";
 
-interface DiscoveredBusiness {
-  id: string;
+interface IntakeSource {
   name: string;
-  address: string;
-  postcode: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  category: string;
-  source: string;
+  route: string;
+  status: 'operational' | 'hidden' | 'missing';
+  count: number;
+  last_activity?: string;
+  color: string;
 }
 
 export function DiscoverView() {
-  const [postcode, setPostcode] = useState("");
-  const [radius, setRadius] = useState(5);
-  const [category, setCategory] = useState("all");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<DiscoveredBusiness[]>([]);
-  const [error, setError] = useState("");
+  // Phase 1 Migration: Module version with feature parity to /dashboard/admin/b2b/discovery
+  // Uses same B2BDiscoverySection component with enrichment workflow
+  // APIs: /api/b2b/discover (postcode search)
+  //       /api/b2b/intelligence/prospect-brief (enrichment)
+  //       /api/b2b/add-prospect (save to pipeline)
+  //       /api/b2b/send (email generation)
+  // Status: Module version (new) - legacy route /dashboard/admin/b2b/discovery kept intact for testing
 
-  const CATEGORIES = [
-    "all",
-    "logistics",
-    "restaurants",
-    "pharmacies",
-    "retail",
-    "estate_agents",
-    "professional_services",
-    "construction",
-    "hospitality",
-    "education",
-    "healthcare",
-    "finance",
+  const sources: IntakeSource[] = [
+    {
+      name: 'Postcode Search',
+      route: '/api/b2b/discover',
+      status: 'operational',
+      count: 0,
+      last_activity: 'On demand',
+      color: '#0D0D0D'
+    },
+    {
+      name: 'CSV Import',
+      route: '/api/b2b/csv-import',
+      status: 'operational',
+      count: 0,
+      last_activity: 'On demand',
+      color: '#0D0D0D'
+    },
+    {
+      name: 'Manual Entry',
+      route: '/api/b2b/manual-entry',
+      status: 'operational',
+      count: 0,
+      last_activity: 'On demand',
+      color: '#0D0D0D'
+    }
   ];
 
-  const handleDiscover = async () => {
-    if (!postcode.trim()) {
-      setError("Please enter a postcode");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setResults([]);
-
-    try {
-      const response = await fetch("/api/b2b/discover", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postcode,
-          radius,
-          category: category === "all" ? undefined : category,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Discovery failed");
-      }
-
-      const data = await response.json();
-      setResults(data.businesses || []);
-
-      if (data.businesses.length === 0) {
-        setError("No businesses found in this area");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Discovery error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddToQueue = async (business: DiscoveredBusiness) => {
-    try {
-      // Create lead from discovered business
-      const response = await fetch("/api/b2b/add-prospect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessName: business.name,
-          email: business.email || "",
-          businessCategory: business.category,
-          painPoint: "discovery",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add to queue");
-      }
-
-      // Show confirmation
-      alert(`${business.name} added to queue`);
-    } catch (err) {
-      alert("Failed to add to queue");
-    }
-  };
-
   return (
-    <div className="flex-1 px-6 py-10 overflow-auto">
-      <div className="max-w-4xl space-y-16">
-        {/* HEADER */}
-        <div>
-          <h1 className="text-4xl font-black text-[#0D0D0D] tracking-tight">
-            Discover
-          </h1>
-          <p className="text-sm text-[#888888] mt-3">
-            Find businesses in your target area. Search by postcode and radius to discover new prospects.
+    <div className="px-6 py-10 max-w-3xl mx-auto">
+      {/* Page Header */}
+      <div className="mb-12">
+        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl tracking-tight mb-1">
+          Operator Discovery.
+        </h1>
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
+          Find. Recognise. Act.
+        </p>
+      </div>
+
+      {/* PRIMARY DISCOVERY WORKFLOW */}
+      <div className="mb-16">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-8">
+          Find Opportunities
+        </p>
+        <div className="bg-white border-2 border-[#0D0D0D] rounded p-8 shadow-sm">
+          <B2BDiscoverySection sources={sources} />
+        </div>
+      </div>
+
+      {/* AFTER YOU SEND - CONTINUITY TO PIPELINE */}
+      <div className="mb-16 bg-white border border-[#E8E8E8] rounded p-6">
+        <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-4">
+          After You Send
+        </p>
+        <div className="space-y-3 text-sm text-[#0D0D0D]">
+          <p>
+            When you SEND an email, the business appears in <strong>Pipeline</strong> within 5 minutes.
+          </p>
+          <p>
+            You'll see if they open it. If they click a link, you'll know they're interested.
+          </p>
+          <p>
+            If they reply, move them to <strong>Orders</strong> to set up the standing order.
+          </p>
+          <p className="text-[#666666] text-[10px] pt-2">
+            Success path: SEND → Open email → Click link → Reply → Standing order (typical: 5–7 days)
           </p>
         </div>
-
-        {/* SEARCH FORM */}
-        <div className="space-y-8 pb-8 border-b border-[#E8E8E8]">
-          {/* Postcode */}
-          <div className="space-y-3">
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
-              Postcode
-            </label>
-            <input
-              type="text"
-              value={postcode}
-              onChange={(e) => setPostcode(e.target.value.toUpperCase())}
-              placeholder="e.g., SW1A 1AA"
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] placeholder-[#888888] focus:outline-none focus:border-[#0D0D0D]"
-              disabled={loading}
-            />
-          </div>
-
-          {/* Radius */}
-          <div className="space-y-3">
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
-              Radius (miles)
-            </label>
-            <div className="flex gap-4 items-center">
-              <input
-                type="range"
-                min="1"
-                max="25"
-                value={radius}
-                onChange={(e) => setRadius(parseInt(e.target.value))}
-                className="flex-1 accent-[#888888]"
-                disabled={loading}
-              />
-              <span className="text-sm font-medium text-[#0D0D0D] w-12 text-right">
-                {radius}
-              </span>
-            </div>
-          </div>
-
-          {/* Category */}
-          <div className="space-y-3">
-            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#0D0D0D] block">
-              Industry (Optional)
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full text-sm bg-[#F5F5F5] border border-[#E8E8E8] px-4 py-3 text-[#0D0D0D] focus:outline-none focus:border-[#0D0D0D]"
-              disabled={loading}
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat === "all" ? "All Industries" : cat.replace(/_/g, " ")}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="text-sm text-[#DC2626] border-l-2 border-[#DC2626] pl-4 py-2">
-              {error}
-            </div>
-          )}
-
-          {/* Search Button */}
-          <button
-            onClick={handleDiscover}
-            disabled={loading}
-            className="text-sm font-medium text-white bg-[#0D0D0D] px-4 py-3 hover:opacity-80 transition-opacity disabled:opacity-50"
-          >
-            {loading ? "Searching..." : "Discover Businesses"}
-          </button>
-        </div>
-
-        {/* RESULTS */}
-        {results.length > 0 && (
-          <div className="space-y-8">
-            <div>
-              <p className="text-sm text-[#888888] mb-4">
-                Found {results.length} businesses
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {results.map((business) => (
-                <div
-                  key={business.id}
-                  className="px-4 py-4 border-l-2 border-[#0A66C2] space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-[#0D0D0D]">
-                        {business.name}
-                      </p>
-                      <p className="text-xs text-[#888888] mt-1">
-                        {business.address}, {business.postcode}
-                      </p>
-                      {business.phone && (
-                        <p className="text-xs text-[#666666] mt-1">
-                          {business.phone}
-                        </p>
-                      )}
-                      {business.email && (
-                        <p className="text-xs text-[#666666]">
-                          {business.email}
-                        </p>
-                      )}
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-[#0A66C2] mt-2">
-                        {business.category}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleAddToQueue(business)}
-                      className="text-sm font-medium text-[#0D0D0D] border border-[#0D0D0D] px-3 py-2 hover:bg-[#0D0D0D] hover:text-white transition-colors"
-                    >
-                      + Queue
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );
