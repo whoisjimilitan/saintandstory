@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // If found, return the existing UUID
-    if (findResult.data) {
+    if (findResult.data?.id) {
       return NextResponse.json({
         id: findResult.data.id,
         imported: false,
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       "ImportProspect: createNew"
     );
 
-    if (!createResult.success) {
+    if (!createResult.success || !createResult.data) {
       return databaseError("prisma");
     }
 
