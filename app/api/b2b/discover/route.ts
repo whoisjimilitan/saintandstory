@@ -228,6 +228,20 @@ export async function GET(request: Request) {
     );
     console.log("[DISCOVER] Provider breakdown:", result.sources);
 
+    // Log ID format of returned businesses
+    if (result.businesses.length > 0) {
+      console.log("[DISCOVER] ========== RETURNED BUSINESS IDs ==========");
+      result.businesses.slice(0, 5).forEach((biz, idx) => {
+        console.log(`[DISCOVER] Business ${idx + 1}:`);
+        console.log(`[DISCOVER]   ID: "${biz.id}"`);
+        console.log(`[DISCOVER]   Type: ${typeof biz.id}`);
+        console.log(`[DISCOVER]   Length: ${biz.id.length}`);
+        console.log(`[DISCOVER]   Format: ${biz.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? 'UUID' : 'NOT UUID'}`);
+        console.log(`[DISCOVER]   Business: "${biz.businessName}"`);
+      });
+      console.log("[DISCOVER] ==========================================");
+    }
+
     if (result.errors.length > 0) {
       console.log("[DISCOVER] Errors encountered:", result.errors);
     }

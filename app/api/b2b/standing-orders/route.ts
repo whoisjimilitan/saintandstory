@@ -29,10 +29,34 @@ function nextOccurrence(dayOfWeek: number): Date {
 
 export async function GET() {
   try {
-    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    console.log("[ORDERS] ========== REQUEST START ==========");
 
+    console.log("[ORDERS] Checking auth status...");
+    const { userId } = await auth();
+    console.log(`[ORDERS] userId: ${userId ? 'present' : 'NOT present'}`);
+
+    if (!userId) {
+      console.log("[ORDERS] ❌ AUTH FAILURE: No userId");
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses[0]?.emailAddress ?? "unknown";
+    console.log(`[ORDERS] User email: ${userEmail}`);
+    console.log(`[ORDERS] Is admin email? ${ADMIN_EMAILS.includes(userEmail)}`);
+
+    if (!(await isAdmin())) {
+      console.log("[ORDERS] ❌ AUTH FAILURE: Email not in admin list");
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    console.log("[ORDERS] ✅ AUTH PASSED");
+
+    console.log("[ORDERS] Calling ensureB2BSchema()...");
     await ensureB2BSchema();
+    console.log("[ORDERS] ✅ Schema check passed");
 
+    console.log("[ORDERS] Executing SQL query...");
     const sql = neon(process.env.DATABASE_URL!);
     const rows = await sql`
       SELECT *
@@ -41,9 +65,14 @@ export async function GET() {
       ORDER BY created_at DESC
     `;
 
+    console.log(`[ORDERS] ✅ Query successful - found ${rows.length} active orders`);
+    console.log("[ORDERS] ========== RETURNING SUCCESS ==========");
     return NextResponse.json({ orders: rows });
   } catch (error) {
-    console.error("[STANDING_ORDERS] Error fetching orders:", error);
+    console.error("[ORDERS] ========== ERROR ==========");
+    console.error("[ORDERS] Error type:", error instanceof Error ? error.constructor.name : typeof error);
+    console.error("[ORDERS] Error message:", error instanceof Error ? error.message : String(error));
+    console.error("[ORDERS] Full error:", error);
     return NextResponse.json(
       { error: "Failed to fetch standing orders", orders: [] },
       { status: 500 }
