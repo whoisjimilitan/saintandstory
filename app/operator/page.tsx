@@ -182,7 +182,7 @@ export default function OperatorBriefing() {
           </p>
         </div>
         <h1 className="text-3xl md:text-5xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.01em] leading-tight">
-          Good morning{firstName && `, ${firstName}`}.
+          {firstName || "Welcome"}.
         </h1>
         <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-2xl font-light">
           Here's what needs your attention today.
