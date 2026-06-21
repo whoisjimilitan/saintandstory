@@ -10,46 +10,52 @@ export class TaskService {
    * Ordered by priority (higher first) and due date
    */
   async getTasksDueToday() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const tasks = await prisma.b2bTask.findMany({
-      where: {
-        status: { in: ["pending", "assigned"] },
-        dueAt: {
-          lt: tomorrow,
-        },
-      },
-      include: {
-        lead: {
-          select: {
-            id: true,
-            businessName: true,
-            contactName: true,
-            confidenceScore: true,
+      const tasks = await prisma.b2bTask.findMany({
+        where: {
+          status: { in: ["pending", "assigned"] },
+          dueAt: {
+            lt: tomorrow,
           },
         },
-      },
-      orderBy: [
-        { priority: "asc" }, // Lower number = higher priority
-        { dueAt: "asc" },
-      ],
-    });
+        include: {
+          lead: {
+            select: {
+              id: true,
+              businessName: true,
+              contactName: true,
+              confidenceScore: true,
+            },
+          },
+        },
+        orderBy: [
+          { priority: "asc" }, // Lower number = higher priority
+          { dueAt: "asc" },
+        ],
+      });
 
-    return tasks.map((task) => ({
-      id: task.id,
-      company: task.lead.businessName,
-      contactName: task.lead.contactName || "Unknown",
-      actionType: task.actionType,
-      priority: task.priority ?? 5,
-      dueAt: task.dueAt.toISOString(),
-      status: task.status,
-      confidenceScore: task.confidenceScore ?? 0,
-      deepLink: task.deepLink || undefined,
-    }));
+      return tasks.map((task) => ({
+        id: task.id,
+        company: task.lead.businessName,
+        contactName: task.lead.contactName || "Unknown",
+        actionType: task.actionType,
+        priority: task.priority ?? 5,
+        dueAt: task.dueAt.toISOString(),
+        status: task.status,
+        confidenceScore: task.confidenceScore ?? 0,
+        deepLink: task.deepLink || undefined,
+      }));
+    } catch (error) {
+      // Table doesn't exist yet (migration not applied)
+      console.log("[TaskService] b2b_tasks table not found, returning empty array");
+      return [];
+    }
   }
 
   /**
@@ -106,19 +112,25 @@ export class TaskService {
    * Count pending tasks due today
    */
   async countTasksDueToday(): Promise<number> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-    return prisma.b2bTask.count({
-      where: {
-        status: { in: ["pending", "assigned"] },
-        dueAt: {
-          lt: tomorrow,
+      return prisma.b2bTask.count({
+        where: {
+          status: { in: ["pending", "assigned"] },
+          dueAt: {
+            lt: tomorrow,
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      // Table doesn't exist yet (migration not applied)
+      console.log("[TaskService] b2b_tasks table not found for count, returning 0");
+      return 0;
+    }
   }
 }

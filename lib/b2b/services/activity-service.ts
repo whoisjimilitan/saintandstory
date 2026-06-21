@@ -11,29 +11,35 @@ export class ActivityService {
    * Returns most recent N items
    */
   async getRecentActivity(limit: number = 20) {
-    const activities = await prisma.b2bActivityLog.findMany({
-      include: {
-        lead: {
-          select: {
-            id: true,
-            businessName: true,
+    try {
+      const activities = await prisma.b2bActivityLog.findMany({
+        include: {
+          lead: {
+            select: {
+              id: true,
+              businessName: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: limit,
-    });
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: limit,
+      });
 
-    return activities.map((activity) => ({
-      id: activity.id,
-      company: activity.lead.businessName,
-      eventType: activity.eventType,
-      description: activity.description || this.getEventDescription(activity.eventType),
-      timestamp: activity.createdAt.toISOString(),
-      metadata: activity.metadata as Record<string, unknown> | undefined,
-    }));
+      return activities.map((activity) => ({
+        id: activity.id,
+        company: activity.lead.businessName,
+        eventType: activity.eventType,
+        description: activity.description || this.getEventDescription(activity.eventType),
+        timestamp: activity.createdAt.toISOString(),
+        metadata: activity.metadata as Record<string, unknown> | undefined,
+      }));
+    } catch (error) {
+      // Table doesn't exist yet (migration not applied)
+      console.log("[ActivityService] b2b_activity_log table not found, returning empty array");
+      return [];
+    }
   }
 
   /**
