@@ -253,7 +253,8 @@ model B2bLead {
   lead_tier                   String?
   engaged_today               Boolean?                     @default(false)
   last_engagement_type        String?
-  pipeline_stage              String?                      @default("NEW")
+  pipeline_stage              String?                      @default("NEW") @map("pipeline_stage")
+  confidenceScore             Int?                         @default(0) @map("confidence_score")
   b2b_email_events            b2b_email_events[]
   b2b_email_link_clicks       b2b_email_link_clicks[]
   b2b_heat_score_history      b2b_heat_score_history[]
@@ -269,6 +270,8 @@ model B2bLead {
   lead_state_transitions      lead_state_transitions[]
   conversationEvents          B2bConversationEvent[]
   revenueEvents               B2bRevenueEvent[]
+  tasks                       B2bTask[]
+  activityLogs                B2bActivityLog[]
 
   @@index([status])
   @@index([createdAt])
@@ -281,6 +284,7 @@ model B2bLead {
   @@index([qualified_business_id], map: "idx_b2b_leads_qualified_business")
   @@index([status], map: "idx_b2b_leads_status")
   @@index([lead_tier], map: "idx_b2b_leads_tier")
+  @@index([confidenceScore(sort: Desc)], map: "idx_b2b_leads_confidence")
   @@map("b2b_leads")
 }
 
@@ -357,28 +361,28 @@ model B2bConversationEvent {
 }
 
 model B2bBehaviorMetrics {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  variantId         String?   @map("variant_id")
-  campaignId        String?   @map("campaign_id")
-  pressureType      String?   @map("pressure_type")
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  variantId    String? @map("variant_id")
+  campaignId   String? @map("campaign_id")
+  pressureType String? @map("pressure_type")
 
-  sentCount         Int       @default(0) @map("sent_count")
-  openCount         Int       @default(0) @map("open_count")
-  clickCount        Int       @default(0) @map("click_count")
-  replyCount        Int       @default(0) @map("reply_count")
-  replyYesCount     Int       @default(0) @map("reply_yes_count")
-  replyNoCount      Int       @default(0) @map("reply_no_count")
+  sentCount     Int @default(0) @map("sent_count")
+  openCount     Int @default(0) @map("open_count")
+  clickCount    Int @default(0) @map("click_count")
+  replyCount    Int @default(0) @map("reply_count")
+  replyYesCount Int @default(0) @map("reply_yes_count")
+  replyNoCount  Int @default(0) @map("reply_no_count")
 
-  openRate          Decimal   @default(0) @db.Decimal(5, 2) @map("open_rate")
-  clickRate         Decimal   @default(0) @db.Decimal(5, 2) @map("click_rate")
-  replyRate         Decimal   @default(0) @db.Decimal(5, 2) @map("reply_rate")
-  yesRate           Decimal   @default(0) @db.Decimal(5, 2) @map("yes_rate")
+  openRate  Decimal @default(0) @map("open_rate") @db.Decimal(5, 2)
+  clickRate Decimal @default(0) @map("click_rate") @db.Decimal(5, 2)
+  replyRate Decimal @default(0) @map("reply_rate") @db.Decimal(5, 2)
+  yesRate   Decimal @default(0) @map("yes_rate") @db.Decimal(5, 2)
 
-  dateRangeStart    DateTime? @map("date_range_start")
-  dateRangeEnd      DateTime? @map("date_range_end")
+  dateRangeStart DateTime? @map("date_range_start")
+  dateRangeEnd   DateTime? @map("date_range_end")
 
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([variantId, campaignId, pressureType], map: "uq_b2b_behavior_metrics")
   @@index([yesRate(sort: Desc)], map: "idx_b2b_behavior_yes_rate")
@@ -389,18 +393,18 @@ model B2bBehaviorMetrics {
 }
 
 model B2bBehaviorSnapshot {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  date              DateTime  @map("date")
-  campaignId        String?   @map("campaign_id")
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date       DateTime @map("date")
+  campaignId String?  @map("campaign_id")
 
-  topVariantId      String?   @map("top_variant_id")
-  worstVariantId    String?   @map("worst_variant_id")
-  bestPressureType  String?   @map("best_pressure_type")
+  topVariantId     String? @map("top_variant_id")
+  worstVariantId   String? @map("worst_variant_id")
+  bestPressureType String? @map("best_pressure_type")
 
-  totalSent         Int       @default(0) @map("total_sent")
-  totalYes          Int       @default(0) @map("total_yes")
+  totalSent Int @default(0) @map("total_sent")
+  totalYes  Int @default(0) @map("total_yes")
 
-  createdAt         DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([date, campaignId], map: "uq_b2b_behavior_snapshot")
   @@index([date(sort: Desc)], map: "idx_b2b_behavior_snapshot_date")
@@ -409,25 +413,25 @@ model B2bBehaviorSnapshot {
 }
 
 model B2bMemoryPattern {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  type            String
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type String
   // VARIANT_WINNER | PRESSURE_TYPE_WINNER | SEQUENCE_PATTERN
 
-  key             String
+  key String
   // e.g. "variant_v3", "pressure_urgency", "seq_open_click_reply"
 
-  value           Json
+  value Json
   // stores: variant_id, yes_rate OR type, conversion_rate OR sequence_pattern
 
-  confidenceScore Decimal   @default(0) @db.Decimal(5, 2) @map("confidence_score")
-  evidenceCount   Int       @default(0) @map("evidence_count")
+  confidenceScore Decimal @default(0) @map("confidence_score") @db.Decimal(5, 2)
+  evidenceCount   Int     @default(0) @map("evidence_count")
 
-  campaignId      String?   @map("campaign_id")
+  campaignId String? @map("campaign_id")
 
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  memoryLogs      B2bLearningMemoryLog[]
+  memoryLogs B2bLearningMemoryLog[]
 
   @@unique([type, key, campaignId], map: "uq_b2b_memory_pattern")
   @@index([type], map: "idx_b2b_memory_type")
@@ -436,19 +440,19 @@ model B2bMemoryPattern {
 }
 
 model B2bLearningMemoryLog {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patternId       String    @map("pattern_id") @db.Uuid
-  pattern         B2bMemoryPattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patternId String           @map("pattern_id") @db.Uuid
+  pattern   B2bMemoryPattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
 
-  eventTrigger    String    @map("event_trigger")
+  eventTrigger String @map("event_trigger")
   // DAILY_RECALC | NEW_CAMPAIGN_END | MANUAL_UPDATE
 
-  beforeValue     Json?     @map("before_value")
-  afterValue      Json?     @map("after_value")
+  beforeValue Json? @map("before_value")
+  afterValue  Json? @map("after_value")
 
-  deltaScore      Decimal   @default(0) @db.Decimal(5, 2) @map("delta_score")
+  deltaScore Decimal @default(0) @map("delta_score") @db.Decimal(5, 2)
 
-  createdAt       DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([patternId], map: "idx_b2b_memory_log_pattern")
   @@index([eventTrigger], map: "idx_b2b_memory_log_trigger")
@@ -456,23 +460,23 @@ model B2bLearningMemoryLog {
 }
 
 model B2bRevenueEvent {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  leadId                String    @map("lead_id") @db.Uuid
-  lead                  B2bLead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  leadId String  @map("lead_id") @db.Uuid
+  lead   B2bLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
-  type                  String
+  type String
   // CONVERSION | PAYMENT | DEAL_WON | DEAL_LOST
 
-  value                 Decimal   @default(0) @db.Decimal(10, 2)
-  currency              String    @default("GBP")
+  value    Decimal @default(0) @db.Decimal(10, 2)
+  currency String  @default("GBP")
 
-  campaignId            String?   @map("campaign_id")
-  linkedBehaviorId      String?   @map("linked_behavior_id") @db.Uuid
-  linkedMemoryPatternId String?   @map("linked_memory_pattern_id") @db.Uuid
+  campaignId            String? @map("campaign_id")
+  linkedBehaviorId      String? @map("linked_behavior_id") @db.Uuid
+  linkedMemoryPatternId String? @map("linked_memory_pattern_id") @db.Uuid
 
-  metadata              Json?
+  metadata Json?
 
-  createdAt             DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([leadId], map: "idx_b2b_revenue_lead")
   @@index([type], map: "idx_b2b_revenue_type")
@@ -482,21 +486,21 @@ model B2bRevenueEvent {
 }
 
 model B2bRevenueAttribution {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patternId             String    @map("pattern_id") @db.Uuid
-  behaviorMetricId      String?   @map("behavior_metric_id") @db.Uuid
+  id               String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patternId        String  @map("pattern_id") @db.Uuid
+  behaviorMetricId String? @map("behavior_metric_id") @db.Uuid
 
-  totalRevenue          Decimal   @default(0) @db.Decimal(12, 2) @map("total_revenue")
-  conversionCount       Int       @default(0) @map("conversion_count")
+  totalRevenue    Decimal @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  conversionCount Int     @default(0) @map("conversion_count")
 
-  revenuePerVariant     Decimal   @default(0) @db.Decimal(10, 2) @map("revenue_per_variant")
-  revenuePerPressure    Decimal   @default(0) @db.Decimal(10, 2) @map("revenue_per_pressure")
+  revenuePerVariant  Decimal @default(0) @map("revenue_per_variant") @db.Decimal(10, 2)
+  revenuePerPressure Decimal @default(0) @map("revenue_per_pressure") @db.Decimal(10, 2)
 
-  roiScore              Decimal   @default(0) @db.Decimal(5, 2) @map("roi_score")
-  confidenceScore       Decimal   @default(0) @db.Decimal(5, 2) @map("confidence_score")
+  roiScore        Decimal @default(0) @map("roi_score") @db.Decimal(5, 2)
+  confidenceScore Decimal @default(0) @map("confidence_score") @db.Decimal(5, 2)
 
-  updatedAt             DateTime  @updatedAt @map("updated_at")
-  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([patternId, behaviorMetricId], map: "uq_b2b_revenue_attribution")
   @@index([patternId], map: "idx_b2b_revenue_pattern")
@@ -506,40 +510,40 @@ model B2bRevenueAttribution {
 }
 
 model B2bCampaignRevenueSummary {
-  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  campaignId                String    @unique @map("campaign_id")
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campaignId String @unique @map("campaign_id")
 
-  totalRevenue              Decimal   @default(0) @db.Decimal(12, 2) @map("total_revenue")
-  totalProspects            Int       @default(0) @map("total_prospects")
+  totalRevenue   Decimal @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  totalProspects Int     @default(0) @map("total_prospects")
 
-  bestRevenueVariant        String?   @map("best_revenue_variant")
-  bestRevenuePresureType    String?   @map("best_revenue_pressure_type")
+  bestRevenueVariant     String? @map("best_revenue_variant")
+  bestRevenuePresureType String? @map("best_revenue_pressure_type")
 
-  revenueConversionRate     Decimal   @default(0) @db.Decimal(5, 2) @map("revenue_conversion_rate")
+  revenueConversionRate Decimal @default(0) @map("revenue_conversion_rate") @db.Decimal(5, 2)
 
-  updatedAt                 DateTime  @updatedAt @map("updated_at")
-  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([totalRevenue(sort: Desc)], map: "idx_b2b_campaign_revenue")
   @@map("b2b_campaign_revenue_summaries")
 }
 
 model B2bSafetyGuardrail {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  ruleType        String    @map("rule_type")
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ruleType String @map("rule_type")
   // REVENUE_DROP_PROTECTION | PATTERN_OVERFITTING_PROTECTION | RANDOM_SPIKE_FILTER | CAMPAIGN_STABILITY_LIMIT
 
-  threshold       Decimal   @db.Decimal(10, 4)
-  action          String
+  threshold Decimal @db.Decimal(10, 4)
+  action    String
   // BLOCK_AUTOMATION | REVERT_TO_MEMORY | FALLBACK_VARIANT | REDUCE_CONFIDENCE
 
-  severity        String    @default("MEDIUM")
+  severity String @default("MEDIUM")
   // LOW | MEDIUM | HIGH
 
-  isActive        Boolean   @default(true) @map("is_active")
+  isActive Boolean @default(true) @map("is_active")
 
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([ruleType], map: "idx_b2b_guardrail_type")
   @@index([isActive], map: "idx_b2b_guardrail_active")
@@ -547,21 +551,21 @@ model B2bSafetyGuardrail {
 }
 
 model B2bSystemOverrideLog {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  trigger         String
+  trigger String
   // AUTOPILOT | HUMAN | GUARDRAIL
 
-  previousDecision Json?     @map("previous_decision")
-  newDecision      Json?     @map("new_decision")
+  previousDecision Json? @map("previous_decision")
+  newDecision      Json? @map("new_decision")
 
-  reason          String
+  reason String
 
-  impactScore     Decimal   @default(0) @db.Decimal(5, 2) @map("impact_score")
+  impactScore Decimal @default(0) @map("impact_score") @db.Decimal(5, 2)
 
-  metadata        Json?
+  metadata Json?
 
-  createdAt       DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([trigger], map: "idx_b2b_override_trigger")
   @@index([createdAt(sort: Desc)], map: "idx_b2b_override_date")
@@ -570,22 +574,22 @@ model B2bSystemOverrideLog {
 }
 
 model B2bSystemHealth {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  learningStability     Decimal   @default(0) @db.Decimal(5, 2) @map("learning_stability")
-  revenueVolatility     String    @default("LOW")
+  learningStability Decimal @default(0) @map("learning_stability") @db.Decimal(5, 2)
+  revenueVolatility String  @default("LOW")
   // LOW | MEDIUM | HIGH
 
-  patternConfidenceDrift Decimal  @default(0) @db.Decimal(5, 2) @map("pattern_confidence_drift")
-  guardrailTriggersSevenDay Int   @default(0) @map("guardrail_triggers_7d")
+  patternConfidenceDrift    Decimal @default(0) @map("pattern_confidence_drift") @db.Decimal(5, 2)
+  guardrailTriggersSevenDay Int     @default(0) @map("guardrail_triggers_7d")
 
-  systemMode            String    @default("MANUAL")
+  systemMode String @default("MANUAL")
   // MANUAL | ASSISTED | AUTOPILOT
 
-  lastAnomalyDetected   DateTime? @map("last_anomaly_detected")
+  lastAnomalyDetected DateTime? @map("last_anomaly_detected")
 
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([systemMode], map: "idx_b2b_health_mode")
   @@index([revenueVolatility], map: "idx_b2b_health_volatility")
@@ -593,26 +597,26 @@ model B2bSystemHealth {
 }
 
 model B2bCausalValidationRecord {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patternId           String    @map("pattern_id") @db.Uuid
-  revenueEventId      String    @map("revenue_event_id") @db.Uuid
+  id             String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  patternId      String @map("pattern_id") @db.Uuid
+  revenueEventId String @map("revenue_event_id") @db.Uuid
 
-  campaignId          String?   @map("campaign_id")
+  campaignId String? @map("campaign_id")
 
-  observedOutcome     Decimal   @db.Decimal(12, 2) @map("observed_outcome")
-  controlEstimate     Decimal   @db.Decimal(12, 2) @map("control_estimate")
-  causalLift          Decimal   @db.Decimal(12, 2) @map("causal_lift")
+  observedOutcome Decimal @map("observed_outcome") @db.Decimal(12, 2)
+  controlEstimate Decimal @map("control_estimate") @db.Decimal(12, 2)
+  causalLift      Decimal @map("causal_lift") @db.Decimal(12, 2)
 
-  confidenceScore     Decimal   @db.Decimal(5, 2) @map("confidence_score")
+  confidenceScore Decimal @map("confidence_score") @db.Decimal(5, 2)
 
-  method              String    @default("COHORT_NORMALIZATION")
+  method String @default("COHORT_NORMALIZATION")
   // A_B_COMPARISON | COHORT_NORMALIZATION | HOLDOUT_ESTIMATE
 
-  isValidCausal       Boolean   @default(false) @map("is_valid_causal")
+  isValidCausal Boolean @default(false) @map("is_valid_causal")
 
-  metadata            Json?
+  metadata Json?
 
-  createdAt           DateTime  @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([patternId, revenueEventId], map: "uq_b2b_causal_validation")
   @@index([patternId], map: "idx_b2b_causal_pattern")
@@ -622,22 +626,22 @@ model B2bCausalValidationRecord {
 }
 
 model B2bAutopilotConstraint {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  systemMode          String    @default("SUGGESTION_ONLY")
+  systemMode String @default("SUGGESTION_ONLY")
   // OBSERVE_ONLY | SUGGESTION_ONLY | HUMAN_APPROVAL_REQUIRED | LIMITED_AUTOPILOT
 
   causalValidationRequired Boolean @default(true) @map("causal_validation_required")
 
-  minCausalConfidence Decimal   @default(80) @db.Decimal(5, 2) @map("min_causal_confidence")
-  minSampleSize       Int       @default(100) @map("min_sample_size")
+  minCausalConfidence Decimal @default(80) @map("min_causal_confidence") @db.Decimal(5, 2)
+  minSampleSize       Int     @default(100) @map("min_sample_size")
 
   revenueStabilityRequired Boolean @default(true) @map("revenue_stability_required")
 
-  allowedExecutionActions String[]  @default(["recommendation"]) @map("allowed_execution_actions")
+  allowedExecutionActions String[] @default(["recommendation"]) @map("allowed_execution_actions")
 
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("b2b_autopilot_constraints")
 }
@@ -1002,13 +1006,13 @@ model b2b_responses {
 }
 
 model B2bSettings {
-  id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  pressure_type         String
-  enabled               Boolean     @default(true)
-  max_emails_per_day    Int         @default(50)
-  allowed_variants      String      @default("BOTH")
-  updated_at            DateTime    @updatedAt @map("updated_at")
-  created_at            DateTime    @default(now()) @map("created_at")
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pressure_type      String
+  enabled            Boolean  @default(true)
+  max_emails_per_day Int      @default(50)
+  allowed_variants   String   @default("BOTH")
+  updated_at         DateTime @updatedAt @map("updated_at")
+  created_at         DateTime @default(now()) @map("created_at")
 
   @@unique([pressure_type])
   @@index([enabled])
@@ -1281,6 +1285,44 @@ enum OutcomeSignal {
   real_conversation
   not_interested
   wrong_fit
+}
+
+model B2bTask {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  leadId          String    @map("lead_id") @db.Uuid
+  actionType      String    @map("action_type")
+  priority        Int?      @default(5)
+  dueAt           DateTime  @map("due_at") @db.Timestamptz(6)
+  status          String    @default("pending")
+  assignedTo      String?   @map("assigned_to")
+  confidenceScore Int?      @default(0) @map("confidence_score")
+  deepLink        String?   @map("deep_link")
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  completedAt     DateTime? @map("completed_at") @db.Timestamptz(6)
+  lead            B2bLead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId], map: "idx_b2b_tasks_lead")
+  @@index([dueAt], map: "idx_b2b_tasks_due")
+  @@index([status], map: "idx_b2b_tasks_status")
+  @@index([dueAt, status], map: "idx_b2b_tasks_due_status")
+  @@map("b2b_tasks")
+}
+
+model B2bActivityLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  leadId      String   @map("lead_id") @db.Uuid
+  eventType   String   @map("event_type")
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lead        B2bLead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId], map: "idx_b2b_activity_lead")
+  @@index([createdAt(sort: Desc)], map: "idx_b2b_activity_created")
+  @@index([eventType], map: "idx_b2b_activity_type")
+  @@map("b2b_activity_log")
 }
 
 enum SignalClassification {
