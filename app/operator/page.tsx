@@ -298,7 +298,7 @@ export default function OperatorBriefing() {
                 {state.data.pipeline.discover}
               </p>
               <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                new prospects
+                prospects
               </p>
             </button>
 
