@@ -30,13 +30,6 @@ interface UnderstandState {
   qualifyError: string | null;
 }
 
-interface DiscoveryResult {
-  id: string;
-  businessName: string;
-  city?: string;
-  confidenceScore?: number;
-}
-
 export default function UnderstandPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,27 +43,10 @@ export default function UnderstandPage() {
     qualifyError: null,
   });
 
-  const [discoveryResults, setDiscoveryResults] = useState<DiscoveryResult[]>([]);
-
   const [form, setForm] = useState({
     confidenceScore: 50,
     notes: "",
   });
-
-  // Load discovery results from sessionStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("discover_results");
-      if (stored) {
-        try {
-          const results = JSON.parse(stored);
-          setDiscoveryResults(results);
-        } catch (e) {
-          console.error("Failed to parse discovery results");
-        }
-      }
-    }
-  }, []);
 
   // Fetch prospect detail
   useEffect(() => {
@@ -193,7 +169,7 @@ export default function UnderstandPage() {
   }
 
   return (
-    <div className="px-4 md:px-12 py-10">
+    <div className="px-4 md:px-12 py-10 max-w-4xl">
       {/* Header */}
       <div className="mb-12">
         <Link
@@ -208,92 +184,12 @@ export default function UnderstandPage() {
         <p className="text-sm md:text-base text-[#888888] font-normal">
           Enrich and qualify this prospect before outreach.
         </p>
-
-        {/* Navigation Counter */}
-        {discoveryResults.length > 0 && (
-          <div className="flex items-center gap-4 mt-6">
-            <button
-              onClick={async () => {
-                const currentIndex = discoveryResults.findIndex(
-                  (r) => r.id === prospectId
-                );
-                if (currentIndex > 0) {
-                  const prevResult = discoveryResults[currentIndex - 1];
-                  try {
-                    const importRes = await fetch("/api/b2b/prospect/import", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        googlePlaceId: prevResult.id,
-                        businessName: prevResult.businessName,
-                        city: prevResult.city,
-                      }),
-                    });
-
-                    if (importRes.ok) {
-                      const { id } = await importRes.json();
-                      router.push(`/operator/understand?prospectId=${id}`);
-                    }
-                  } catch (error) {
-                    console.error("Error navigating:", error);
-                  }
-                }
-              }}
-              disabled={discoveryResults.findIndex((r) => r.id === prospectId) === 0}
-              className="px-3 py-2 text-sm font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              ← Prev
-            </button>
-            <span className="text-sm font-semibold text-[#0D0D0D]">
-              {discoveryResults.findIndex((r) => r.id === prospectId) + 1} of{" "}
-              {discoveryResults.length}
-            </span>
-            <button
-              onClick={async () => {
-                const currentIndex = discoveryResults.findIndex(
-                  (r) => r.id === prospectId
-                );
-                if (currentIndex < discoveryResults.length - 1) {
-                  const nextResult = discoveryResults[currentIndex + 1];
-                  try {
-                    const importRes = await fetch("/api/b2b/prospect/import", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        googlePlaceId: nextResult.id,
-                        businessName: nextResult.businessName,
-                        city: nextResult.city,
-                      }),
-                    });
-
-                    if (importRes.ok) {
-                      const { id } = await importRes.json();
-                      router.push(`/operator/understand?prospectId=${id}`);
-                    }
-                  } catch (error) {
-                    console.error("Error navigating:", error);
-                  }
-                }
-              }}
-              disabled={
-                discoveryResults.findIndex((r) => r.id === prospectId) ===
-                discoveryResults.length - 1
-              }
-              className="px-3 py-2 text-sm font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              Next →
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12 mt-12"></div>
+      <div className="h-px bg-[#E8E8E8] mb-12"></div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Main Content: 2 columns on desktop */}
-        <div className="lg:col-span-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Column: Prospect Info */}
         <div>
           {/* Business Info */}
@@ -474,9 +370,6 @@ export default function UnderstandPage() {
                       }))
                     }
                     className="flex-1"
-                    style={{
-                      accentColor: '#333333',
-                    }}
                   />
                   <span className="text-2xl font-black text-[#0D0D0D] min-w-[50px] text-right">
                     {form.confidenceScore}%
@@ -531,63 +424,6 @@ export default function UnderstandPage() {
             </form>
           </div>
         </div>
-          </div>
-        </div>
-
-        {/* Sidebar: Discovery Results */}
-        {discoveryResults.length > 0 && (
-          <div className="lg:col-span-1">
-            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white sticky top-24 max-h-[600px] overflow-y-auto">
-              <h3 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
-                Discovery Results
-              </h3>
-              <div className="space-y-3">
-                {discoveryResults.map((result) => (
-                  <button
-                    key={result.id}
-                    onClick={async () => {
-                      try {
-                        const importRes = await fetch("/api/b2b/prospect/import", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            googlePlaceId: result.id,
-                            businessName: result.businessName,
-                            city: result.city,
-                          }),
-                        });
-
-                        if (importRes.ok) {
-                          const { id } = await importRes.json();
-                          router.push(`/operator/understand?prospectId=${id}`);
-                        }
-                      } catch (error) {
-                        console.error("Error navigating to prospect:", error);
-                      }
-                    }}
-                    className={`w-full text-left p-4 rounded border transition-colors ${
-                      prospectId === result.id
-                        ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                        : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold text-[#0D0D0D] line-clamp-2">
-                      {result.businessName}
-                    </p>
-                    {result.city && (
-                      <p className="text-xs text-[#888888] mt-1">{result.city}</p>
-                    )}
-                    {result.confidenceScore && (
-                      <p className="text-xs text-[#0D0D0D] mt-2 font-semibold">
-                        Score: {result.confidenceScore}%
-                      </p>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
