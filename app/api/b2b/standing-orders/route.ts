@@ -28,17 +28,25 @@ function nextOccurrence(dayOfWeek: number): Date {
 }
 
 export async function GET() {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  await ensureB2BSchema();
-  const sql = neon(process.env.DATABASE_URL!);
-  const rows = await sql`
-    SELECT so.*, bl.business_name as lead_business_name
-    FROM b2b_standing_orders so
-    LEFT JOIN b2b_leads bl ON bl.id = so.lead_id
-    WHERE so.active = true
-    ORDER BY so.created_at DESC
-  `;
-  return NextResponse.json({ orders: rows });
+  try {
+    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    await ensureB2BSchema();
+    const sql = neon(process.env.DATABASE_URL!);
+    const rows = await sql`
+      SELECT so.*, bl.business_name as lead_business_name
+      FROM b2b_standing_orders so
+      LEFT JOIN b2b_leads bl ON bl.id = so.lead_id
+      WHERE so.active = true
+      ORDER BY so.created_at DESC
+    `;
+    return NextResponse.json({ orders: rows });
+  } catch (error) {
+    console.error("[STANDING_ORDERS] Error fetching orders:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch standing orders", orders: [] },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -138,6 +146,44 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ order: rows[0] });
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const body = await request.json() as { orderId: string; status: string };
+    const { orderId, status } = body;
+
+    if (!orderId || !status) {
+      return NextResponse.json(
+        { error: "orderId and status required" },
+        { status: 400 }
+      );
+    }
+
+    await ensureB2BSchema();
+    const sql = neon(process.env.DATABASE_URL!);
+
+    const rows = await sql`
+      UPDATE b2b_standing_orders
+      SET status = ${status}, updated_at = NOW()
+      WHERE id = ${orderId}
+      RETURNING *
+    `;
+
+    if (!rows.length) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ order: rows[0] });
+  } catch (error) {
+    console.error("[STANDING_ORDERS] Error updating order:", error);
+    return NextResponse.json(
+      { error: "Failed to update order status" },
+      { status: 500 }
+    );
+  }
 }
 
 // Generate this week's jobs from standing orders

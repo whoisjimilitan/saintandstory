@@ -97,10 +97,10 @@ export default function DiscoverPage() {
     try {
       setState((s) => ({ ...s, loading: true, error: null }));
 
-      const res = await fetch("/api/b2b/discover/search", {
-        method: "POST",
+      const url = `/api/b2b/discover/search?query=${encodeURIComponent(searchTerm)}`;
+      const res = await fetch(url, {
+        method: "GET",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchTerm }),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}: Search failed`);
