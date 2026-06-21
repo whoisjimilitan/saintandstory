@@ -7,15 +7,16 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    console.log("[UNDERSTAND-TRACE] Request input:", { id, type: typeof id, length: (id as string)?.length });
-    // ID contract: raw database UUID, no prefix stripping needed
     const leadId = id;
 
-    console.log("[UNDERSTAND] ========== REQUEST START ==========");
-    console.log(`[UNDERSTAND] Incoming prospectId: "${leadId}"`);
-    console.log(`[UNDERSTAND] ID type: ${typeof leadId}`);
-    console.log(`[UNDERSTAND] ID length: ${leadId.length}`);
-    console.log(`[UNDERSTAND] ID format check: ${leadId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? 'valid UUID' : 'NOT valid UUID'}`);
+    // Validate UUID format before querying Prisma
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!leadId.match(uuidRegex)) {
+      return NextResponse.json(
+        { error: "Invalid prospect ID format" },
+        { status: 400 }
+      );
+    }
 
     console.log("[UNDERSTAND] Running Prisma query: findUnique on b2bLead");
     const lead = await prisma.b2bLead.findUnique({
