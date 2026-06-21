@@ -1,96 +1,287 @@
 "use client";
 
-export default function IntelligencePage() {
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+
+interface Prospect {
+  id: string;
+  businessName: string;
+  contactName?: string;
+  city?: string;
+  confidenceScore?: number;
+  industry?: string;
+  status?: string;
+}
+
+interface DiscoverState {
+  loading: boolean;
+  error: string | null;
+  results: Prospect[];
+  totalCount: number;
+  currentFilter: string;
+}
+
+export default function DiscoverPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [state, setState] = useState<DiscoverState>({
+    loading: true,
+    error: null,
+    results: [],
+    totalCount: 0,
+    currentFilter: "all",
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Parse filter from URL
+  const status = searchParams.get("status");
+  const score = searchParams.get("score");
+  const stage = searchParams.get("stage");
+
+  // Determine which filter is active
+  useEffect(() => {
+    if (status) setState((s) => ({ ...s, currentFilter: `status=${status}` }));
+    else if (score) setState((s) => ({ ...s, currentFilter: `score=${score}` }));
+    else if (stage) setState((s) => ({ ...s, currentFilter: `stage=${stage}` }));
+    else setState((s) => ({ ...s, currentFilter: "all" }));
+  }, [status, score, stage]);
+
+  // Fetch data based on filter
+  useEffect(() => {
+    const fetchDiscoverData = async () => {
+      try {
+        setState((s) => ({ ...s, loading: true, error: null }));
+
+        let url = "/api/b2b/discover";
+        const params = new URLSearchParams();
+
+        if (status) params.append("status", status);
+        if (score) params.append("score", score);
+        if (stage) params.append("stage", stage);
+
+        if (params.toString()) {
+          url += "?" + params.toString();
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch`);
+
+        const data = await res.json();
+        setState((s) => ({
+          ...s,
+          loading: false,
+          results: Array.isArray(data) ? data : data.results || [],
+          totalCount: data.totalCount || (Array.isArray(data) ? data.length : 0),
+        }));
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown error occurred";
+        setState((s) => ({
+          ...s,
+          loading: false,
+          error: message,
+          results: [],
+        }));
+      }
+    };
+
+    fetchDiscoverData();
+  }, [status, score, stage]);
+
+  // Handle search
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+
+    try {
+      setState((s) => ({ ...s, loading: true, error: null }));
+
+      const res = await fetch("/api/b2b/discover/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: searchTerm }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Search failed`);
+
+      const data = await res.json();
+      setState((s) => ({
+        ...s,
+        loading: false,
+        results: data.results || [],
+        totalCount: data.totalCount || 0,
+        currentFilter: `search="${searchTerm}"`,
+      }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Search failed";
+      setState((s) => ({
+        ...s,
+        loading: false,
+        error: message,
+      }));
+    }
+  };
+
+  const getFilterLabel = () => {
+    if (status === "new") return "New Leads";
+    if (score === "80+") return "High Confidence (80+)";
+    if (stage) return `Stage: ${stage.charAt(0).toUpperCase() + stage.slice(1)}`;
+    return "All Prospects";
+  };
+
+  const handleProspectClick = (prospect: Prospect) => {
+    router.push(`/operator/understand?prospectId=${prospect.id}`);
+  };
+
   return (
-    <div className="px-12 py-10 max-w-4xl">
-      {/* Page Header */}
+    <div className="px-4 md:px-12 py-10 max-w-4xl">
+      {/* Header */}
       <div className="mb-12">
-        <h1 className="font-sans font-black text-[#0D0D0D] text-5xl tracking-tight leading-tight mb-3">
-          Intelligence Engine
-        </h1>
-        <p className="text-base text-[#888888] font-normal">
-          What the system has learned from today's signals.
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
+            Discover
+          </h1>
+          <Link
+            href="/operator"
+            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
+          >
+            ← Back to Today
+          </Link>
+        </div>
+        <p className="text-sm md:text-base text-[#888888] font-normal">
+          Find and qualify new prospects for outreach.
         </p>
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12"></div>
-
-      {/* Emerging Themes */}
-      <section className="mb-16">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-8">
-          Emerging Themes
-        </h2>
-        <div className="space-y-6">
-          <div className="pb-6 border-b border-[#E8E8E8]">
-            <p className="text-base font-medium text-[#0D0D0D] mb-2">
-              Commercial Roofing Sector — Demand Acceleration
+      {/* Active Filter Display */}
+      {(status || score || stage) && (
+        <div className="mb-8 p-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-[#0D0D0D]">
+              Filtered: {getFilterLabel()}
             </p>
-            <p className="text-sm text-[#888888]">
-              Identified 12 new commercial roofing companies across Manchester, Leeds, and Birmingham. Typical project value £8–15k. Sales cycle 14–21 days. Observed: 3 are existing customer referrals.
-            </p>
-          </div>
-
-          <div className="pb-6 border-b border-[#E8E8E8]">
-            <p className="text-base font-medium text-[#0D0D0D] mb-2">
-              Hospitality & Leisure — Spring Rebound Pattern
-            </p>
-            <p className="text-sm text-[#888888]">
-              Detected: 23 hospitality businesses increasing facility investment and hiring. Signal strength: 78%. Recommended approach: tier-1 properties in major cities. Conversion probability: high.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-base font-medium text-[#0D0D0D] mb-2">
-              Healthcare Procurement — Cycle Change
-            </p>
-            <p className="text-sm text-[#888888]">
-              Observed: 8 NHS dental facilities entering new procurement phase. 3 are current customers. Recommended: outreach to remaining 5 within 48 hours to prevent competitor capture.
-            </p>
+            <button
+              onClick={() => router.push("/operator/discover")}
+              className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
+            >
+              Clear filter
+            </button>
           </div>
         </div>
-      </section>
-
-      {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12"></div>
-
-      {/* Observed Signals */}
-      <section className="mb-16">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-8">
-          High-Confidence Opportunities
-        </h2>
-        <div className="space-y-3">
-          {[
-            { name: "ABC Roofing Services Ltd", confidence: 92, reason: "Sector match + location + hiring signals" },
-            { name: "Heritage Hospitality Group", confidence: 87, reason: "Expansion phase + recent capex increase" },
-            { name: "Northern Healthcare Solutions", confidence: 84, reason: "NHS procurement phase + budget approval signals" },
-            { name: "Manchester Facilities Management", confidence: 81, reason: "Service scope match + tender activity detected" },
-            { name: "Midlands Construction Partners", confidence: 78, reason: "Commercial roofing speciality + growth signals" },
-          ].map((opp) => (
-            <div key={opp.name} className="pb-3 border-b border-[#E8E8E8] last:border-b-0">
-              <div className="flex items-start justify-between mb-1">
-                <p className="text-sm font-medium text-[#0D0D0D]">{opp.name}</p>
-                <p className="text-sm font-black text-[#0D0D0D]">{opp.confidence}%</p>
-              </div>
-              <p className="text-xs text-[#888888]">{opp.reason}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      )}
 
       {/* Divider */}
       <div className="h-px bg-[#E8E8E8] mb-12"></div>
 
       {/* Search Section */}
-      <section>
+      <section className="mb-12">
         <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
-          Discover More
+          Search Prospects
         </h2>
-        <input
-          type="text"
-          placeholder="Search by postcode, industry, or company name…"
-          className="w-full px-4 py-3 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] placeholder-[#C9C9C9] focus:outline-none focus:border-[#0D0D0D] transition-colors"
-        />
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search by postcode, industry, or company name…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-4 py-3 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] placeholder-[#C9C9C9] focus:outline-none focus:border-[#0D0D0D] transition-colors rounded"
+          />
+          <button
+            type="submit"
+            className="px-6 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
+          >
+            Search
+          </button>
+        </form>
+      </section>
+
+      {/* Results Section */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em]">
+            Results
+          </h2>
+          {state.totalCount > 0 && (
+            <p className="text-xs text-[#888888] mt-2">
+              {state.totalCount} prospect{state.totalCount !== 1 ? "s" : ""} found
+            </p>
+          )}
+        </div>
+
+        {state.loading && (
+          <div className="flex justify-center py-12">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-sm text-[#666666]">Searching prospects...</p>
+            </div>
+          </div>
+        )}
+
+        {state.error && (
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
+            <p className="text-sm text-[#666666] mb-4">{state.error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!state.loading && !state.error && state.results.length === 0 && (
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
+            <p className="text-sm text-[#666666]">No prospects found.</p>
+            {searchTerm && (
+              <p className="text-xs text-[#888888] mt-2">
+                Try a different search term or filter.
+              </p>
+            )}
+          </div>
+        )}
+
+        {!state.loading && !state.error && state.results.length > 0 && (
+          <div className="space-y-3">
+            {state.results.map((prospect) => (
+              <button
+                key={prospect.id}
+                onClick={() => handleProspectClick(prospect)}
+                className="w-full text-left border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all cursor-pointer group"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[#0D0D0D] group-hover:text-[#333333]">
+                      {prospect.businessName}
+                    </p>
+                    {prospect.contactName && (
+                      <p className="text-xs text-[#888888]">
+                        Contact: {prospect.contactName}
+                      </p>
+                    )}
+                  </div>
+                  {prospect.confidenceScore !== undefined && (
+                    <div className="ml-4">
+                      <p className="text-sm font-black text-[#0D0D0D]">
+                        {prospect.confidenceScore}%
+                      </p>
+                      <p className="text-[9px] text-[#888888]">confidence</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-4 text-xs text-[#888888]">
+                  {prospect.city && <span>{prospect.city}</span>}
+                  {prospect.industry && <span>{prospect.industry}</span>}
+                  {prospect.status && <span>{prospect.status}</span>}
+                </div>
+                <p className="text-xs text-[#0D0D0D] font-semibold group-hover:text-[#666666] mt-3 transition-colors">
+                  View & Qualify →
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
