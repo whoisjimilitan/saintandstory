@@ -56,7 +56,11 @@ export async function POST(request: NextRequest) {
     );
 
     if (!result.success) {
-      return databaseError("prisma");
+      const errorMsg = result.error?.message || "Unknown database error";
+      return NextResponse.json(
+        { error: errorMsg },
+        { status: 500 }
+      );
     }
 
     if (!result.data) {

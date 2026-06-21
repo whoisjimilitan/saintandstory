@@ -51,17 +51,25 @@ export async function GET() {
     );
 
     if (!result.success) {
-      return databaseError("prisma");
+      const errorMsg = result.error?.message || "Unknown database error";
+      return NextResponse.json(
+        { error: `Orders fetch failed: ${errorMsg}` },
+        { status: 500 }
+      );
     }
 
     // SUCCESS: Return orders in expected format
     return NextResponse.json({ orders: result.data || [] });
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     console.error("🔥 ORDERS-GET UNCAUGHT ERROR:", {
-      message: error instanceof Error ? error.message : String(error),
+      message: errorMsg,
       name: error instanceof Error ? error.name : "Unknown",
     });
-    return databaseError("prisma");
+    return NextResponse.json(
+      { error: `Orders fetch error: ${errorMsg}` },
+      { status: 500 }
+    );
   }
 }
 
