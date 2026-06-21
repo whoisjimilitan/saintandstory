@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { validateUUID, formatValidationError } from "@/lib/validate-request";
+import { isValidUUID } from "@/lib/validate-request";
 import { safeDbCall } from "@/lib/safe-db-call";
 import { validationError, notFoundError, databaseError } from "@/lib/api-response";
 
@@ -10,33 +10,52 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const leadId = id;
+    const prospectId = id;
 
-    // VALIDATION LAYER: Check UUID format before any database call
-    const validation = validateUUID(leadId, "prospectId");
-    if (!validation.valid) {
-      const message = formatValidationError(validation.errors || []);
-      return validationError(message);
-    }
+    // Try lookup by UUID first, then by Google Places ID
+    let lead = null;
 
-    // DATABASE CALL: Wrapped in safeDbCall to catch Prisma errors
-    const result = await safeDbCall(
-      prisma.b2bLead.findUnique({
-        where: { id: leadId as any },
-        include: {
-          conversationEvents: {
-            orderBy: { createdAt: "desc" },
+    // FIRST ATTEMPT: UUID lookup
+    if (isValidUUID(prospectId)) {
+      const result = await safeDbCall(
+        prisma.b2bLead.findUnique({
+          where: { id: prospectId as any },
+          include: {
+            conversationEvents: {
+              orderBy: { createdAt: "desc" },
+            },
           },
-        },
-      }),
-      "Understand: fetchProspect"
-    );
+        }),
+        "Understand: fetchProspectByUUID"
+      );
 
-    if (!result.success) {
-      return databaseError("prisma");
+      if (!result.success) {
+        return databaseError("prisma");
+      }
+      lead = result.data;
     }
 
-    const lead = result.data;
+    // SECOND ATTEMPT: Google Places ID lookup (if UUID lookup failed or ID wasn't UUID)
+    if (!lead) {
+      const result = await safeDbCall(
+        prisma.b2bLead.findFirst({
+          where: { googlePlaceId: prospectId },
+          include: {
+            conversationEvents: {
+              orderBy: { createdAt: "desc" },
+            },
+          },
+        }),
+        "Understand: fetchProspectByGooglePlaceId"
+      );
+
+      if (!result.success) {
+        return databaseError("prisma");
+      }
+      lead = result.data;
+    }
+
+    // Not found in either lookup
     if (!lead) {
       return notFoundError("Prospect not found");
     }
