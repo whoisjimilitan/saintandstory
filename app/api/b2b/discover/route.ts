@@ -3,6 +3,11 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import { runFullPipeline } from "@/lib/four-layer-pipeline";
+import { DiscoverOrchestrator } from "@/lib/discover/orchestrator";
+import { CRMProvider } from "@/lib/discover/providers/crm";
+import { GooglePlacesProvider } from "@/lib/discover/providers/google-places";
+import { CompaniesHouseProvider } from "@/lib/discover/providers/companies-house";
+import { SearchQuery } from "@/lib/discover/types";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -147,6 +152,99 @@ async function searchPlaces(query: string, city: string, apiKey: string): Promis
   } catch (error) {
     console.error(`[DISCOVER/SEARCH] ✗ Fatal error in searchPlaces:`, error);
     return [];
+  }
+}
+
+/**
+ * GET /api/b2b/discover
+ * Intelligence-driven business discovery
+ * Queries multiple providers: CRM, Google Places, Companies House
+ * Returns deduplicated, ranked results with source attribution
+ */
+export async function GET(request: Request) {
+  try {
+    console.log("[DISCOVER] ═══════════════════════════════════════");
+    console.log("[DISCOVER] Starting intelligence discovery (GET)");
+
+    const { userId } = await auth();
+    const user = await currentUser();
+
+    if (!userId || !ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "")) {
+      console.log("[DISCOVER] ✗ FAILED: Authorization failed");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Parse query parameters
+    const url = new URL(request.url);
+    const query: SearchQuery = {
+      keyword: url.searchParams.get("query") || url.searchParams.get("keyword") || undefined,
+      postcode: url.searchParams.get("postcode") || undefined,
+      city: url.searchParams.get("city") || undefined,
+      radius: url.searchParams.get("radius") ? parseInt(url.searchParams.get("radius")!) : undefined,
+      category: url.searchParams.get("category") || undefined,
+      limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : 100,
+    };
+
+    console.log("[DISCOVER] Query parameters:", query);
+
+    if (!query.keyword && !query.postcode && !query.city) {
+      console.log("[DISCOVER] ✗ FAILED: No search criteria provided");
+      return NextResponse.json(
+        { error: "Provide at least one of: keyword, postcode, or city" },
+        { status: 400 }
+      );
+    }
+
+    // Initialize providers
+    const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const companiesHouseKey = process.env.COMPANIES_HOUSE_API_KEY;
+
+    if (!googleApiKey) {
+      console.log("[DISCOVER] ⚠️ WARNING: GOOGLE_MAPS_API_KEY not configured");
+    }
+
+    if (!companiesHouseKey) {
+      console.log("[DISCOVER] ⚠️ WARNING: COMPANIES_HOUSE_API_KEY not configured");
+    }
+
+    const providers = [
+      new CRMProvider(),
+      ...(googleApiKey ? [new GooglePlacesProvider(googleApiKey)] : []),
+      ...(companiesHouseKey ? [new CompaniesHouseProvider(companiesHouseKey)] : []),
+    ];
+
+    // Execute discovery
+    const orchestrator = new DiscoverOrchestrator(providers);
+    const result = await orchestrator.search(query);
+
+    console.log(
+      `[DISCOVER] ✓ Discovery complete: ${result.businesses.length} businesses in ${result.processingTimeMs}ms`
+    );
+    console.log("[DISCOVER] Provider breakdown:", result.sources);
+
+    if (result.errors.length > 0) {
+      console.log("[DISCOVER] Errors encountered:", result.errors);
+    }
+
+    return NextResponse.json({
+      success: true,
+      results: result.businesses,
+      totalCount: result.totalCount,
+      sources: result.sources,
+      processingTimeMs: result.processingTimeMs,
+      errors: result.errors,
+    });
+  } catch (error) {
+    console.error("[DISCOVER] ✗ Unexpected error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Discovery failed",
+        results: [],
+        totalCount: 0,
+      },
+      { status: 500 }
+    );
   }
 }
 
