@@ -191,7 +191,7 @@ export default async function AdminPage() {
         <div></div>
         <div className="flex flex-col gap-2 items-end">
           <Link href="/operator" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full bg-[#F5F5F5] hover:bg-white hover:border-[#D0D0D0]">
-            Pipeline →
+            Intelligence →
           </Link>
           <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
             Logout
