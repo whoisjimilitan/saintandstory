@@ -370,6 +370,9 @@ export default function UnderstandPage() {
                       }))
                     }
                     className="flex-1"
+                    style={{
+                      accentColor: '#333333',
+                    }}
                   />
                   <span className="text-2xl font-black text-[#0D0D0D] min-w-[50px] text-right">
                     {form.confidenceScore}%
