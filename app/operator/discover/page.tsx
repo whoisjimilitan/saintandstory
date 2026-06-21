@@ -96,6 +96,7 @@ export default function DiscoverPage() {
   }, [status, score, stage]);
 
   // Handle search (keyword or postcode with radius)
+  // Uses new orchestrator endpoint at /api/b2b/discover
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
@@ -103,11 +104,21 @@ export default function DiscoverPage() {
     try {
       setState((s) => ({ ...s, loading: true, error: null }));
 
-      let url = `/api/b2b/discover/search?query=${encodeURIComponent(searchTerm)}`;
+      // Build URL for orchestrator endpoint
+      const params = new URLSearchParams();
 
-      if (isPostcodeSearch && searchRadius) {
-        url += `&radius=${searchRadius}`;
+      if (isPostcodeSearch) {
+        params.append("postcode", searchTerm);
+        if (searchRadius) {
+          params.append("radius", searchRadius.toString());
+        }
+      } else {
+        params.append("keyword", searchTerm);
       }
+
+      params.append("limit", "100");
+
+      const url = `/api/b2b/discover?${params.toString()}`;
 
       const res = await fetch(url, {
         method: "GET",
