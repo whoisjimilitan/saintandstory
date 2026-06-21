@@ -254,7 +254,6 @@ model B2bLead {
   engaged_today               Boolean?                     @default(false)
   last_engagement_type        String?
   pipeline_stage              String?                      @default("NEW") @map("pipeline_stage")
-  confidenceScore             Int?                         @default(0) @map("confidence_score")
   b2b_email_events            b2b_email_events[]
   b2b_email_link_clicks       b2b_email_link_clicks[]
   b2b_heat_score_history      b2b_heat_score_history[]
@@ -284,7 +283,6 @@ model B2bLead {
   @@index([qualified_business_id], map: "idx_b2b_leads_qualified_business")
   @@index([status], map: "idx_b2b_leads_status")
   @@index([lead_tier], map: "idx_b2b_leads_tier")
-  @@index([confidenceScore(sort: Desc)], map: "idx_b2b_leads_confidence")
   @@map("b2b_leads")
 }
 

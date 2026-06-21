@@ -45,11 +45,7 @@ export async function GET() {
   } catch (error) {
     console.error("[STANDING_ORDERS] Error fetching orders:", error);
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : String(error),
-        type: error instanceof Error ? error.name : typeof error,
-        stack: error instanceof Error ? error.stack : undefined,
-      },
+      { error: "Failed to fetch standing orders", orders: [] },
       { status: 500 }
     );
   }
