@@ -198,19 +198,17 @@ export default function OperatorBriefing() {
             <p className="text-sm md:text-base text-[#0D0D0D] leading-relaxed mb-4">
               {state.data.metrics.newOpportunitiesToday > baselineNew ? (
                 <>
-                  <span className="font-semibold">Market activity is elevated.</span> You've discovered{" "}
-                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> today
+                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> discovered today
                   {newTrend > 0 && (
                     <>
                       {" "}
-                      ({Math.round(newTrend)}% above your baseline). This suggests sector demand is increasing.
+                      ({Math.round(newTrend)}% above baseline)
                     </>
                   )}
                 </>
               ) : (
                 <>
-                  <span className="font-semibold">Discovery pace is steady.</span> You've identified{" "}
-                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> today.
+                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> discovered today.
                 </>
               )}
             </p>
@@ -244,7 +242,7 @@ export default function OperatorBriefing() {
               {state.data.metrics.highConfidenceToday}
             </p>
             <p className="text-xs md:text-sm text-[#666666] mb-4">
-              prospects show high-confidence signals (80+% confidence). These are best positioned for qualification.
+              high-confidence prospects ready to qualify.
             </p>
             <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
               Review these first →
@@ -263,7 +261,7 @@ export default function OperatorBriefing() {
               {state.data.metrics.closedToday}
             </p>
             <p className="text-xs md:text-sm text-[#666666] mb-4">
-              deals closed today. Monitor your active accounts for renewals and expansion opportunities.
+              deals closed today.
             </p>
             <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
               View orders →
