@@ -685,14 +685,17 @@ export default function OperatorBriefing() {
 
               {/* Next Step */}
               <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-4 md:p-6">
-                <p className="text-xs text-[#888888] mb-2 font-light uppercase tracking-[0.5px]">
-                  Your Next Step
-                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1.5 bg-[#DC2626] text-white text-xs font-semibold uppercase tracking-[0.5px] px-3 py-1.5 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/80"></span>
+                    Due Today
+                  </span>
+                </div>
                 <p className="text-sm md:text-base font-semibold text-[#0D0D0D] mb-3">
                   {selectedAction.nextStep}
                 </p>
                 <p className="text-xs text-[#666666] font-light">
-                  Due: {selectedAction.dueTime}
+                  Time: {selectedAction.dueTime}
                 </p>
               </div>
 
