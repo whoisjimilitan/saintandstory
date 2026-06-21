@@ -68,8 +68,6 @@ export async function GET(request: Request) {
         createdAt: true,
         painPoint: true,
         businessEvidence: true,
-        confidenceScore: true,
-        contactName: true,
       },
       take: Math.min(limit, 100),
       orderBy: { createdAt: "desc" },
