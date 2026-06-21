@@ -68,6 +68,12 @@ export class GooglePlacesProvider extends BusinessProvider {
         searchQuery = searchQuery ? `${searchQuery} ${query.city}` : query.city;
       }
 
+      // Google Places requires a business type for textSearch
+      // If only location provided (no keyword), add default business type
+      if (!query.keyword && (query.postcode || query.city)) {
+        searchQuery = `business ${searchQuery}`;
+      }
+
       if (!searchQuery.trim()) {
         searchQuery = query.city || "business";
       }
