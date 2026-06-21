@@ -12,8 +12,7 @@
 
 import { IngestionSource } from "../B2B_PIPELINE_CONTRACT";
 
-interface GuardPayload {
-  [key: string]: any;
+interface GuardPayload extends Record<string, unknown> {
   sendEmailOnly?: boolean;
   skipEnrichment?: boolean;
   mergeIngestionAndSend?: boolean;
