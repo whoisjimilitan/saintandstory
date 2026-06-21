@@ -7,13 +7,18 @@ import Link from "next/link";
 interface ProspectDetail {
   id: string;
   businessName: string;
+  businessCategory?: string;
   contactName?: string;
   city?: string;
+  postcode?: string;
   industry?: string;
   website?: string;
   phone?: string;
+  email?: string;
   employees?: number;
   annualRevenue?: string;
+  status?: string;
+  leadState?: string;
   enrichedData?: {
     decisionMakers?: Array<{ name: string; role: string; email?: string }>;
     signals?: string[];
@@ -257,6 +262,65 @@ export default function UnderstandPage() {
                   <p className="text-sm text-[#0D0D0D]">
                     {state.prospect.annualRevenue}
                   </p>
+                </div>
+              )}
+
+              {state.prospect.businessCategory && (
+                <div>
+                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
+                    Category
+                  </p>
+                  <p className="text-sm text-[#0D0D0D]">
+                    {state.prospect.businessCategory}
+                  </p>
+                </div>
+              )}
+
+              {state.prospect.email && (
+                <div>
+                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
+                    Email
+                  </p>
+                  <p className="text-sm text-[#0D0D0D]">
+                    <a href={`mailto:${state.prospect.email}`} className="hover:underline">
+                      {state.prospect.email}
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              {state.prospect.phone && (
+                <div>
+                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
+                    Phone
+                  </p>
+                  <p className="text-sm text-[#0D0D0D]">
+                    <a href={`tel:${state.prospect.phone}`} className="hover:underline">
+                      {state.prospect.phone}
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              {state.prospect.website && (
+                <div>
+                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
+                    Website
+                  </p>
+                  <p className="text-sm text-[#0D0D0D]">
+                    <a href={state.prospect.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      {state.prospect.website}
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              {state.prospect.postcode && (
+                <div>
+                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
+                    Postcode
+                  </p>
+                  <p className="text-sm text-[#0D0D0D]">{state.prospect.postcode}</p>
                 </div>
               )}
             </div>
