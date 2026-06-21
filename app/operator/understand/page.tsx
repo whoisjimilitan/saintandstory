@@ -30,6 +30,13 @@ interface UnderstandState {
   qualifyError: string | null;
 }
 
+interface DiscoveryResult {
+  id: string;
+  businessName: string;
+  city?: string;
+  confidenceScore?: number;
+}
+
 export default function UnderstandPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,10 +50,27 @@ export default function UnderstandPage() {
     qualifyError: null,
   });
 
+  const [discoveryResults, setDiscoveryResults] = useState<DiscoveryResult[]>([]);
+
   const [form, setForm] = useState({
     confidenceScore: 50,
     notes: "",
   });
+
+  // Load discovery results from sessionStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("discover_results");
+      if (stored) {
+        try {
+          const results = JSON.parse(stored);
+          setDiscoveryResults(results);
+        } catch (e) {
+          console.error("Failed to parse discovery results");
+        }
+      }
+    }
+  }, []);
 
   // Fetch prospect detail
   useEffect(() => {

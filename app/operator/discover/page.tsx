@@ -74,10 +74,18 @@ export default function DiscoverPage() {
         if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch`);
 
         const data = await res.json();
+        const resultsData = Array.isArray(data) ? data : data.results || [];
+
+        // Store discovery results in sessionStorage for access in Understand page
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("discover_results", JSON.stringify(resultsData));
+          sessionStorage.setItem("discover_timestamp", new Date().toISOString());
+        }
+
         setState((s) => ({
           ...s,
           loading: false,
-          results: Array.isArray(data) ? data : data.results || [],
+          results: resultsData,
           totalCount: data.totalCount || (Array.isArray(data) ? data.length : 0),
         }));
       } catch (error) {
