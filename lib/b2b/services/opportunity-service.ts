@@ -22,7 +22,7 @@ export class OpportunityService {
   /**
    * Count high-confidence opportunities
    * High confidence = confidence_score >= 80
-   * Falls back to 0 if column doesn't exist yet
+   * Falls back to simple count if column doesn't exist yet
    */
   async countHighConfidenceToday(today: Date): Promise<number> {
     try {
@@ -38,8 +38,22 @@ export class OpportunityService {
       });
     } catch (error) {
       // confidenceScore column doesn't exist yet (migration not applied)
-      console.log("[OpportunityService] confidence_score column not found, returning 0");
-      return 0;
+      // Fall back to simple count without the score filter
+      console.log(
+        "[OpportunityService] confidence_score column not found, falling back to basic count"
+      );
+      try {
+        // Count leads created today without confidence threshold
+        return prisma.b2bLead.count({
+          where: {
+            createdAt: {
+              gte: today,
+            },
+          },
+        });
+      } catch {
+        return 0;
+      }
     }
   }
 
