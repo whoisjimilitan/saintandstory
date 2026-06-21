@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 interface MorningBriefMetrics {
   newOpportunitiesToday: number;
@@ -58,6 +59,7 @@ interface PageState {
 
 export default function OperatorBriefing() {
   const router = useRouter();
+  const { user } = useUser();
   const [state, setState] = useState<PageState>({
     loading: true,
     error: null,
@@ -65,6 +67,7 @@ export default function OperatorBriefing() {
   });
 
   const [dateStr, setDateStr] = useState("");
+  const firstName = user?.firstName || "";
 
   useEffect(() => {
     const today = new Date();
@@ -179,7 +182,7 @@ export default function OperatorBriefing() {
           </p>
         </div>
         <h1 className="text-3xl md:text-5xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.01em] leading-tight">
-          Good morning.
+          Good morning{firstName && `, ${firstName}`}.
         </h1>
         <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-2xl font-light">
           Here's what needs your attention today.
