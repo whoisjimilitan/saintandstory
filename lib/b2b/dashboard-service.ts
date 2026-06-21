@@ -91,12 +91,31 @@ export class DashboardService {
   async getMorningBriefData(): Promise<MorningBriefResponse> {
     const startTime = Date.now();
 
-    const [metrics, pipeline, todaysActions, recentActivity] = await Promise.all([
-      this.getMetricsForToday(),
-      this.getPipelineBreakdown(),
-      this.getTodaysActions(),
-      this.getRecentActivity(),
-    ]);
+    // Fetch data with safe defaults for missing tables/columns
+    const metrics = await this.getMetricsForToday().catch((error) => {
+      console.error("[DashboardService] Error fetching metrics:", error);
+      return {
+        newOpportunitiesToday: 0,
+        highConfidenceToday: 0,
+        finishedToday: 0,
+        closedToday: 0,
+      };
+    });
+
+    const pipeline = await this.getPipelineBreakdown().catch((error) => {
+      console.error("[DashboardService] Error fetching pipeline:", error);
+      return { discover: 0, enrich: 0, qualify: 0, propose: 0, orders: 0 };
+    });
+
+    const todaysActions = await this.getTodaysActions().catch((error) => {
+      console.error("[DashboardService] Error fetching actions:", error);
+      return [];
+    });
+
+    const recentActivity = await this.getRecentActivity().catch((error) => {
+      console.error("[DashboardService] Error fetching activity:", error);
+      return [];
+    });
 
     const duration = Date.now() - startTime;
     console.log(`[DashboardService] Morning Brief aggregated in ${duration}ms`);
