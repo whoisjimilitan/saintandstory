@@ -3,6 +3,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
 import { recordOutcome } from "@/lib/learning-outcomes";
+import { safeSqlCall } from "@/lib/safe-db-call";
+import { validationError, notFoundError, databaseError, authError } from "@/lib/api-response";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -29,55 +31,37 @@ function nextOccurrence(dayOfWeek: number): Date {
 
 export async function GET() {
   try {
-    console.log("[ORDERS-GET-TRACE] Handler invoked");
-
-    console.log("[ORDERS] Checking auth status...");
-    const { userId } = await auth();
-    console.log(`[ORDERS] userId: ${userId ? 'present' : 'NOT present'}`);
-
-    if (!userId) {
-      console.log("[ORDERS] ❌ AUTH FAILURE: No userId");
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const user = await currentUser();
-    const userEmail = user?.emailAddresses[0]?.emailAddress ?? "unknown";
-    console.log(`[ORDERS] User email: ${userEmail}`);
-    console.log(`[ORDERS] Is admin email? ${ADMIN_EMAILS.includes(userEmail)}`);
-
+    // AUTH LAYER: Check authentication
     if (!(await isAdmin())) {
-      console.log("[ORDERS] ❌ AUTH FAILURE: Email not in admin list");
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return authError("Forbidden");
     }
 
-    console.log("[ORDERS] ✅ AUTH PASSED");
-
-    console.log("[ORDERS] Calling ensureB2BSchema()...");
+    // SCHEMA LAYER: Ensure database schema exists
     await ensureB2BSchema();
-    console.log("[ORDERS] ✅ Schema check passed");
 
-    console.log("[ORDERS] Executing SQL query...");
-    const sql = neon(process.env.DATABASE_URL!);
-    const rows = await sql`
-      SELECT *
-      FROM b2b_standing_orders
-      WHERE active = true
-      ORDER BY created_at DESC
-    `;
+    // DATABASE CALL: Wrapped in safeSqlCall to catch SQL errors
+    const result = await safeSqlCall(
+      neon(process.env.DATABASE_URL!)`
+        SELECT *
+        FROM b2b_standing_orders
+        WHERE active = true
+        ORDER BY created_at DESC
+      `,
+      "Orders: fetchStandingOrders"
+    );
 
-    console.log(`[ORDERS] ✅ Query successful - found ${rows.length} active orders`);
-    console.log("[ORDERS-GET-TRACE] Success, returning rows");
-    return NextResponse.json({ orders: rows });
+    if (!result.success) {
+      return databaseError("prisma");
+    }
+
+    // SUCCESS: Return orders in expected format
+    return NextResponse.json({ orders: result.data || [] });
   } catch (error) {
-    console.error("🔥 ORDERS-GET ERROR:", {
+    console.error("🔥 ORDERS-GET UNCAUGHT ERROR:", {
       message: error instanceof Error ? error.message : String(error),
       name: error instanceof Error ? error.name : "Unknown",
-      stack: error instanceof Error ? error.stack : undefined
     });
-    return NextResponse.json(
-      { error: "Failed to fetch standing orders", orders: [] },
-      { status: 500 }
-    );
+    return databaseError("prisma");
   }
 }
 
@@ -199,11 +183,13 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    console.log("[ORDERS-PATCH-TRACE] Handler invoked");
-    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // AUTH LAYER: Check authentication
+    if (!(await isAdmin())) {
+      return authError("Forbidden");
+    }
 
+    // VALIDATION LAYER: Parse and validate request body
     const body = await request.json() as { orderId: string; status?: string; active?: boolean };
-    console.log("[ORDERS-PATCH-TRACE] Request body:", body);
     const { orderId, status, active } = body;
 
     if (!orderId) {
@@ -227,32 +213,36 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // SCHEMA LAYER: Ensure database schema exists
     await ensureB2BSchema();
-    const sql = neon(process.env.DATABASE_URL!);
 
-    console.log("[ORDERS-PATCH] Running query: UPDATE b2b_standing_orders SET active");
-    const rows = await sql`
-      UPDATE b2b_standing_orders
-      SET active = ${activeValue}, updated_at = NOW()
-      WHERE id = ${orderId}
-      RETURNING *
-    `;
+    // DATABASE CALL: Wrapped in safeSqlCall to catch SQL errors
+    const result = await safeSqlCall(
+      neon(process.env.DATABASE_URL!)`
+        UPDATE b2b_standing_orders
+        SET active = ${activeValue}, updated_at = NOW()
+        WHERE id = ${orderId}
+        RETURNING *
+      `,
+      "Orders: updateOrderStatus"
+    );
 
+    if (!result.success) {
+      return databaseError("prisma");
+    }
+
+    const rows = result.data as any[];
     if (!rows.length) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     return NextResponse.json({ order: rows[0] });
   } catch (error) {
-    console.error("🔥 ORDERS-PATCH ERROR:", {
+    console.error("🔥 ORDERS-PATCH UNCAUGHT ERROR:", {
       message: error instanceof Error ? error.message : String(error),
       name: error instanceof Error ? error.name : "Unknown",
-      stack: error instanceof Error ? error.stack : undefined
     });
-    return NextResponse.json(
-      { error: "Failed to update order status" },
-      { status: 500 }
-    );
+    return databaseError("prisma");
   }
 }
 
