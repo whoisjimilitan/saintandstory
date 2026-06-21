@@ -39,7 +39,11 @@ export async function GET(
   } catch (error) {
     console.error("[B2B PROSPECT] Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch prospect" },
+      {
+        error: error instanceof Error ? error.message : String(error),
+        type: error instanceof Error ? error.name : typeof error,
+        stack: error instanceof Error ? error.stack : undefined,
+      },
       { status: 500 }
     );
   }
