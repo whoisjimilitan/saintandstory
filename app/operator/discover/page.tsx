@@ -187,6 +187,21 @@ export default function DiscoverPage() {
     router.push(`/operator/understand?prospectId=${prospect.id}`);
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSearchRadius(10);
+    setIsPostcodeSearch(false);
+    setState({
+      loading: true,
+      error: null,
+      results: [],
+      totalCount: 0,
+      currentFilter: "all",
+      uploadProgress: undefined,
+    });
+    router.push("/operator/discover");
+  };
+
   // Interpret pressure signal from prospect data
   const getPressureSignal = (prospect: Prospect): string => {
     if (prospect.pressureSignal) return prospect.pressureSignal;
@@ -250,7 +265,7 @@ export default function DiscoverPage() {
               Filtered: {state.currentFilter === "all" ? getFilterLabel() : state.currentFilter}
             </p>
             <button
-              onClick={() => router.push("/operator/discover")}
+              onClick={handleClearFilters}
               className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
             >
               Clear filter
@@ -307,7 +322,7 @@ export default function DiscoverPage() {
               max="25"
               value={searchRadius}
               onChange={(e) => setSearchRadius(parseInt(e.target.value))}
-              className="w-full"
+              className="w-full accent-[#333333]"
             />
             <p className="text-xs text-[#888888] mt-2">
               Adjust radius to find prospects near your target location
