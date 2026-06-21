@@ -194,8 +194,32 @@ export default function DiscoverPage() {
     return "All Prospects";
   };
 
-  const handleProspectClick = (prospect: Prospect) => {
-    router.push(`/operator/understand?prospectId=${prospect.id}`);
+  const handleProspectClick = async (prospect: Prospect) => {
+    try {
+      // Import prospect into database (or get existing UUID if already imported)
+      const importRes = await fetch("/api/b2b/prospect/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googlePlaceId: prospect.id,
+          businessName: prospect.businessName,
+          city: prospect.city,
+        }),
+      });
+
+      if (!importRes.ok) {
+        console.error("Failed to import prospect");
+        alert("Could not load prospect. Please try again.");
+        return;
+      }
+
+      const { id } = await importRes.json();
+      // Navigate to Understand with the database UUID
+      router.push(`/operator/understand?prospectId=${id}`);
+    } catch (error) {
+      console.error("Error importing prospect:", error);
+      alert("Could not load prospect. Please try again.");
+    }
   };
 
   const handleClearFilters = () => {
