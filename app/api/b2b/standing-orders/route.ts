@@ -35,11 +35,10 @@ export async function GET() {
 
     const sql = neon(process.env.DATABASE_URL!);
     const rows = await sql`
-      SELECT so.*, bl.business_name as lead_business_name
-      FROM b2b_standing_orders so
-      LEFT JOIN b2b_leads bl ON bl.id = so.lead_id
-      WHERE so.active = true
-      ORDER BY so.created_at DESC
+      SELECT *
+      FROM b2b_standing_orders
+      WHERE active = true
+      ORDER BY created_at DESC
     `;
 
     return NextResponse.json({ orders: rows });

@@ -187,12 +187,18 @@ export async function GET(request: Request) {
 
     console.log("[DISCOVER] Query parameters:", query);
 
+    // Allow empty results for filter-only queries (backward compatibility)
+    // If no search criteria, return empty results rather than error
     if (!query.keyword && !query.postcode && !query.city) {
-      console.log("[DISCOVER] ✗ FAILED: No search criteria provided");
-      return NextResponse.json(
-        { error: "Provide at least one of: keyword, postcode, or city" },
-        { status: 400 }
-      );
+      console.log("[DISCOVER] ℹ️  Filter-only query, returning empty results");
+      return NextResponse.json({
+        success: true,
+        results: [],
+        totalCount: 0,
+        sources: { crm: 0, google_places: 0, companies_house: 0 },
+        errors: [],
+        processingTimeMs: 0,
+      });
     }
 
     // Initialize providers
