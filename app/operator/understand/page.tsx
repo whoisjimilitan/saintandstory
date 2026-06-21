@@ -316,11 +316,11 @@ export default function UnderstandPage() {
               )}
 
               {state.prospect.postcode && (
-                <div>
+                <div className="p-3 border border-[#0D0D0D] rounded" style={{ boxShadow: '0 0 8px rgba(13, 13, 13, 0.15)' }}>
                   <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">
                     Postcode
                   </p>
-                  <p className="text-sm text-[#0D0D0D]">{state.prospect.postcode}</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">{state.prospect.postcode}</p>
                 </div>
               )}
             </div>

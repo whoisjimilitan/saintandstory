@@ -39,6 +39,16 @@ export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
+  const [showManualAddForm, setShowManualAddForm] = useState(false);
+  const [manualAddForm, setManualAddForm] = useState({
+    businessName: "",
+    contactName: "",
+    email: "",
+    phone: "",
+    city: "",
+    postcode: "",
+  });
+  const [manualAddLoading, setManualAddLoading] = useState(false);
 
   // Parse filter from URL
   const status = searchParams.get("status");
@@ -245,6 +255,38 @@ export default function DiscoverPage() {
     router.push("/operator/discover");
   };
 
+  const handleManualAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setManualAddLoading(true);
+
+    try {
+      const res = await fetch("/api/b2b/prospect/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googlePlaceId: `manual-${Date.now()}`,
+          businessName: manualAddForm.businessName,
+          city: manualAddForm.city,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create lead");
+
+      const { id } = await res.json();
+
+      // TODO: Store additional fields (email, phone, contact name, postcode) separately
+      // For now, navigate to Understand to complete the entry
+      setShowManualAddForm(false);
+      setManualAddForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
+      router.push(`/operator/understand?prospectId=${id}`);
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      alert("Could not create lead. Please try again.");
+    } finally {
+      setManualAddLoading(false);
+    }
+  };
+
   // Interpret pressure signal from prospect data
   const getPressureSignal = (prospect: Prospect): string => {
     if (prospect.pressureSignal) return prospect.pressureSignal;
@@ -281,24 +323,25 @@ export default function DiscoverPage() {
           <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
             Discover
           </h1>
-          <Link
-            href="/operator"
-            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
-          >
-            ← Back to Today
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowManualAddForm(true)}
+              className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"
+            >
+              + Manually Add Lead
+            </button>
+            <Link
+              href="/operator"
+              className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
+            >
+              ← Back to Today
+            </Link>
+          </div>
         </div>
         <p className="text-sm md:text-base text-[#888888] font-normal">
           Find new prospects and import lead lists into your pipeline.
         </p>
       </div>
-
-      {/* Discovery Briefing (Pressure Signals) */}
-      <section className="mb-12 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-        <p className="text-sm text-[#0D0D0D]">
-          <span className="font-semibold">Opportunity window is open.</span> Find prospects showing pressure signals (expansion, hiring, capex) when they're ready to buy.
-        </p>
-      </section>
 
       {/* Active Filter Display */}
       {(status || score || stage || state.currentFilter !== "all") && (
@@ -528,6 +571,125 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+
+      {/* Manual Add Lead Modal */}
+      {showManualAddForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full">
+            <h2 className="text-2xl font-black text-[#0D0D0D] mb-6">Add Lead Manually</h2>
+
+            <form onSubmit={handleManualAddSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  Business Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={manualAddForm.businessName}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, businessName: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Company name"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  Contact Name
+                </label>
+                <input
+                  type="text"
+                  value={manualAddForm.contactName}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, contactName: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Contact name"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={manualAddForm.email}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, email: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Email"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={manualAddForm.phone}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, phone: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Phone number"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  City
+                </label>
+                <input
+                  type="text"
+                  value={manualAddForm.city}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, city: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="City"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase block mb-2">
+                  Postcode
+                </label>
+                <input
+                  type="text"
+                  value={manualAddForm.postcode}
+                  onChange={(e) =>
+                    setManualAddForm((f) => ({ ...f, postcode: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Postcode"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-6 border-t border-[#E8E8E8]">
+                <button
+                  type="submit"
+                  disabled={manualAddLoading}
+                  className="flex-1 px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {manualAddLoading ? "Creating..." : "Create Lead"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowManualAddForm(false)}
+                  className="px-4 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:border-[#0D0D0D] transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
