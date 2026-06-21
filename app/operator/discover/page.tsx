@@ -323,20 +323,12 @@ export default function DiscoverPage() {
           <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
             Discover
           </h1>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowManualAddForm(true)}
-              className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"
-            >
-              + Manually Add Lead
-            </button>
-            <Link
-              href="/operator"
-              className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
-            >
-              ← Back to Today
-            </Link>
-          </div>
+          <button
+            onClick={() => setShowManualAddForm(true)}
+            className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"
+          >
+            + Manually Add Lead
+          </button>
         </div>
         <p className="text-sm md:text-base text-[#888888] font-normal">
           Find new prospects and import lead lists into your pipeline.
