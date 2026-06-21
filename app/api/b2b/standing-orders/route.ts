@@ -202,13 +202,27 @@ export async function PATCH(request: NextRequest) {
     console.log("[ORDERS-PATCH-TRACE] Handler invoked");
     if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const body = await request.json() as { orderId: string; active?: boolean };
+    const body = await request.json() as { orderId: string; status?: string; active?: boolean };
     console.log("[ORDERS-PATCH-TRACE] Request body:", body);
-    const { orderId, active } = body;
+    const { orderId, status, active } = body;
 
-    if (!orderId || active === undefined) {
+    if (!orderId) {
       return NextResponse.json(
-        { error: "orderId and active (boolean) required" },
+        { error: "orderId required" },
+        { status: 400 }
+      );
+    }
+
+    // Map status to active Boolean (support both old and new formats)
+    let activeValue: boolean;
+    if (active !== undefined) {
+      activeValue = active;
+    } else if (status !== undefined) {
+      // Map string status to Boolean: "active" or "renewed" → true, others → false
+      activeValue = status === "active" || status === "renewed";
+    } else {
+      return NextResponse.json(
+        { error: "status or active required" },
         { status: 400 }
       );
     }
@@ -219,7 +233,7 @@ export async function PATCH(request: NextRequest) {
     console.log("[ORDERS-PATCH] Running query: UPDATE b2b_standing_orders SET active");
     const rows = await sql`
       UPDATE b2b_standing_orders
-      SET active = ${active}, updated_at = NOW()
+      SET active = ${activeValue}, updated_at = NOW()
       WHERE id = ${orderId}
       RETURNING *
     `;
