@@ -70,10 +70,16 @@ export async function POST(request: NextRequest) {
       status: status || "qualified",
     });
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     console.error("🔥 QUALIFY UNCAUGHT ERROR:", {
-      message: error instanceof Error ? error.message : String(error),
+      message: errorMsg,
       name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined,
     });
-    return databaseError("prisma");
+    // Return actual error to client for debugging
+    return NextResponse.json(
+      { error: `Qualification failed: ${errorMsg}` },
+      { status: 500 }
+    );
   }
 }
