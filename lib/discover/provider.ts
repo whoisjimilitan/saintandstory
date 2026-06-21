@@ -26,10 +26,12 @@ export abstract class BusinessProvider implements IBusinessProvider {
   abstract search(query: SearchQuery): Promise<ProviderResult>;
 
   /**
-   * Generate a unique business ID from provider-specific data
+   * Return raw business ID for database lookups
+   * ID contract: raw UUID only, no provider prefix
+   * Provider attribution tracked in sources array
    */
   protected generateId(providerId: string): string {
-    return `${this.name}_${providerId}`;
+    return providerId;
   }
 
   /**

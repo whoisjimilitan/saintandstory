@@ -7,8 +7,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    // Strip provider prefix (e.g., "crm_" from "crm_uuid") to get actual Prisma ID
-    const leadId = id.includes("_") ? id.split("_").slice(1).join("_") : id;
+    // ID contract: raw database UUID, no prefix stripping needed
+    const leadId = id;
 
     const lead = await prisma.b2bLead.findUnique({
       where: { id: leadId as any },
