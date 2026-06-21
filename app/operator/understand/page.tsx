@@ -193,7 +193,7 @@ export default function UnderstandPage() {
   }
 
   return (
-    <div className="px-4 md:px-12 py-10 max-w-4xl">
+    <div className="px-4 md:px-12 py-10">
       {/* Header */}
       <div className="mb-12">
         <Link
@@ -213,7 +213,10 @@ export default function UnderstandPage() {
       {/* Divider */}
       <div className="h-px bg-[#E8E8E8] mb-12"></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Main Content: 2 columns on desktop */}
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Column: Prospect Info */}
         <div>
           {/* Business Info */}
@@ -451,6 +454,63 @@ export default function UnderstandPage() {
             </form>
           </div>
         </div>
+          </div>
+        </div>
+
+        {/* Sidebar: Discovery Results */}
+        {discoveryResults.length > 0 && (
+          <div className="lg:col-span-1">
+            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white sticky top-24 max-h-[600px] overflow-y-auto">
+              <h3 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
+                Discovery Results
+              </h3>
+              <div className="space-y-3">
+                {discoveryResults.map((result) => (
+                  <button
+                    key={result.id}
+                    onClick={async () => {
+                      try {
+                        const importRes = await fetch("/api/b2b/prospect/import", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            googlePlaceId: result.id,
+                            businessName: result.businessName,
+                            city: result.city,
+                          }),
+                        });
+
+                        if (importRes.ok) {
+                          const { id } = await importRes.json();
+                          router.push(`/operator/understand?prospectId=${id}`);
+                        }
+                      } catch (error) {
+                        console.error("Error navigating to prospect:", error);
+                      }
+                    }}
+                    className={`w-full text-left p-4 rounded border transition-colors ${
+                      prospectId === result.id
+                        ? "border-[#0D0D0D] bg-[#F9F9F9]"
+                        : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-[#0D0D0D] line-clamp-2">
+                      {result.businessName}
+                    </p>
+                    {result.city && (
+                      <p className="text-xs text-[#888888] mt-1">{result.city}</p>
+                    )}
+                    {result.confidenceScore && (
+                      <p className="text-xs text-[#0D0D0D] mt-2 font-semibold">
+                        Score: {result.confidenceScore}%
+                      </p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
