@@ -29,7 +29,7 @@ function nextOccurrence(dayOfWeek: number): Date {
 
 export async function GET() {
   try {
-    console.log("[ORDERS] ========== REQUEST START ==========");
+    console.log("[ORDERS-GET-TRACE] Handler invoked");
 
     console.log("[ORDERS] Checking auth status...");
     const { userId } = await auth();
@@ -66,13 +66,14 @@ export async function GET() {
     `;
 
     console.log(`[ORDERS] ✅ Query successful - found ${rows.length} active orders`);
-    console.log("[ORDERS] ========== RETURNING SUCCESS ==========");
+    console.log("[ORDERS-GET-TRACE] Success, returning rows");
     return NextResponse.json({ orders: rows });
   } catch (error) {
-    console.error("[ORDERS] ========== ERROR ==========");
-    console.error("[ORDERS] Error type:", error instanceof Error ? error.constructor.name : typeof error);
-    console.error("[ORDERS] Error message:", error instanceof Error ? error.message : String(error));
-    console.error("[ORDERS] Full error:", error);
+    console.error("🔥 ORDERS-GET ERROR:", {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
       { error: "Failed to fetch standing orders", orders: [] },
       { status: 500 }
@@ -81,11 +82,13 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  await ensureB2BSchema();
-  const sql = neon(process.env.DATABASE_URL!);
+  try {
+    console.log("[ORDERS-POST-TRACE] Handler invoked");
+    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    await ensureB2BSchema();
+    const sql = neon(process.env.DATABASE_URL!);
 
-  const body = await request.json() as {
+    const body = await request.json() as {
     lead_id?: string;
     business_name: string;
     contact_name?: string;
@@ -176,14 +179,27 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ order: rows[0] });
+    return NextResponse.json({ order: rows[0] });
+  } catch (error) {
+    console.error("🔥 ORDERS-POST ERROR:", {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return NextResponse.json(
+      { error: "Failed to create standing order" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
+    console.log("[ORDERS-PATCH-TRACE] Handler invoked");
     if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await request.json() as { orderId: string; active?: boolean };
+    console.log("[ORDERS-PATCH-TRACE] Request body:", body);
     const { orderId, active } = body;
 
     if (!orderId || active === undefined) {
@@ -209,7 +225,11 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ order: rows[0] });
   } catch (error) {
-    console.error("[STANDING_ORDERS] Error updating order:", error);
+    console.error("🔥 ORDERS-PATCH ERROR:", {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
       { error: "Failed to update order status" },
       { status: 500 }
@@ -219,8 +239,10 @@ export async function PATCH(request: NextRequest) {
 
 // Generate this week's jobs from standing orders
 export async function PUT() {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const sql = neon(process.env.DATABASE_URL!);
+  try {
+    console.log("[ORDERS-PUT-TRACE] Handler invoked");
+    if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const sql = neon(process.env.DATABASE_URL!);
 
   const now = new Date();
   const orders = await sql`
@@ -283,13 +305,24 @@ export async function PUT() {
     created.push(reference);
   }
 
-  return NextResponse.json({
-    created,
-    skipped,
-    count: created.length,
-    skippedCount: skipped.length,
-    message: skipped.length > 0
-      ? `Created ${created.length} jobs, skipped ${skipped.length} standing orders due to missing routing information`
-      : `Created ${created.length} jobs successfully`
-  });
+    return NextResponse.json({
+      created,
+      skipped,
+      count: created.length,
+      skippedCount: skipped.length,
+      message: skipped.length > 0
+        ? `Created ${created.length} jobs, skipped ${skipped.length} standing orders due to missing routing information`
+        : `Created ${created.length} jobs successfully`
+    });
+  } catch (error) {
+    console.error("🔥 ORDERS-PUT ERROR:", {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return NextResponse.json(
+      { error: "Failed to generate jobs" },
+      { status: 500 }
+    );
+  }
 }

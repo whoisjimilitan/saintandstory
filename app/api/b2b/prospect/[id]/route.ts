@@ -7,6 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    console.log("[UNDERSTAND-TRACE] Request input:", { id, type: typeof id, length: (id as string)?.length });
     // ID contract: raw database UUID, no prefix stripping needed
     const leadId = id;
 
@@ -56,10 +57,11 @@ export async function GET(
     console.log(`[UNDERSTAND] Response businessName: "${response.businessName}"`);
     return NextResponse.json(response);
   } catch (error) {
-    console.error("[UNDERSTAND] ========== ERROR ==========");
-    console.error("[UNDERSTAND] Error type:", error instanceof Error ? error.constructor.name : typeof error);
-    console.error("[UNDERSTAND] Error message:", error instanceof Error ? error.message : String(error));
-    console.error("[UNDERSTAND] Error details:", error);
+    console.error("🔥 UNDERSTAND ERROR:", {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : "Unknown",
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
       { error: "Failed to fetch prospect" },
       { status: 500 }
