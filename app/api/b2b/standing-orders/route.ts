@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
     ? nextOccurrence(body.day_of_week).toISOString()
     : null;
 
+  console.log("[ORDERS-POST] Running query: INSERT into b2b_standing_orders");
   const rows = await sql`
     INSERT INTO b2b_standing_orders (
       lead_id, business_name, contact_name, contact_phone, contact_email,
@@ -144,10 +145,12 @@ export async function POST(request: NextRequest) {
 
   // Update lead status to closed
   if (body.lead_id) {
+    console.log("[ORDERS-POST] Running query: UPDATE b2b_leads SET status = 'closed'");
     await sql`UPDATE b2b_leads SET status = 'closed', updated_at = NOW() WHERE id = ${body.lead_id}`;
 
     // Record conversion outcome for learning loop
     try {
+      console.log("[ORDERS-POST] Running query: SELECT from b2b_leads for learning");
       const lead = await sql`
         SELECT qualified_business_id, business_category, created_at
         FROM b2b_leads
@@ -162,6 +165,7 @@ export async function POST(request: NextRequest) {
             )
           : 0;
 
+        console.log("[ORDERS-POST] Calling recordOutcome function");
         await recordOutcome(
           sql,
           leadData.qualified_business_id as string,
@@ -212,6 +216,7 @@ export async function PATCH(request: NextRequest) {
     await ensureB2BSchema();
     const sql = neon(process.env.DATABASE_URL!);
 
+    console.log("[ORDERS-PATCH] Running query: UPDATE b2b_standing_orders SET active");
     const rows = await sql`
       UPDATE b2b_standing_orders
       SET active = ${active}, updated_at = NOW()
@@ -245,6 +250,7 @@ export async function PUT() {
     const sql = neon(process.env.DATABASE_URL!);
 
   const now = new Date();
+  console.log("[ORDERS-PUT] Running query: SELECT active orders due for job generation");
   const orders = await sql`
     SELECT * FROM b2b_standing_orders
     WHERE active = true
@@ -269,6 +275,7 @@ export async function PUT() {
 
     // Create a job in the existing jobs table
     const reference = `B2B-${Date.now().toString(36).toUpperCase()}`;
+    console.log("[ORDERS-PUT] Running query: INSERT INTO jobs");
     await sql`
       INSERT INTO jobs (
         customer_name, customer_email, customer_phone, service_type,
@@ -296,6 +303,7 @@ export async function PUT() {
       nextDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     }
 
+    console.log("[ORDERS-PUT] Running query: UPDATE b2b_standing_orders SET next_scheduled_at");
     await sql`
       UPDATE b2b_standing_orders
       SET last_generated_at = NOW(), next_scheduled_at = ${nextDate.toISOString()}

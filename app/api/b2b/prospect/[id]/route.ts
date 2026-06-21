@@ -17,7 +17,7 @@ export async function GET(
     console.log(`[UNDERSTAND] ID length: ${leadId.length}`);
     console.log(`[UNDERSTAND] ID format check: ${leadId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? 'valid UUID' : 'NOT valid UUID'}`);
 
-    console.log(`[UNDERSTAND] Executing: prisma.b2bLead.findUnique({ where: { id: "${leadId}" } })`);
+    console.log("[UNDERSTAND] Running Prisma query: findUnique on b2bLead");
     const lead = await prisma.b2bLead.findUnique({
       where: { id: leadId as any },
       include: {
