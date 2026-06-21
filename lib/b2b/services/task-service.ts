@@ -30,7 +30,6 @@ export class TaskService {
               id: true,
               businessName: true,
               contactName: true,
-              confidenceScore: true,
             },
           },
         },

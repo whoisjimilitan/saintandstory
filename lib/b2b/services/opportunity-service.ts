@@ -26,64 +26,40 @@ export class OpportunityService {
    */
   async countHighConfidenceToday(today: Date): Promise<number> {
     try {
+      // Count leads created today without confidence threshold
+      // (confidence_score column no longer exists in schema)
       return prisma.b2bLead.count({
         where: {
           createdAt: {
             gte: today,
           },
-          confidenceScore: {
-            gte: CONFIDENCE_THRESHOLD_HIGH,
-          },
         },
       });
-    } catch (error) {
-      // confidenceScore column doesn't exist yet (migration not applied)
-      // Fall back to simple count without the score filter
-      console.log(
-        "[OpportunityService] confidence_score column not found, falling back to basic count"
-      );
-      try {
-        // Count leads created today without confidence threshold
-        return prisma.b2bLead.count({
-          where: {
-            createdAt: {
-              gte: today,
-            },
-          },
-        });
-      } catch {
-        return 0;
-      }
+    } catch {
+      return 0;
     }
   }
 
   /**
    * Get high-confidence opportunities for display
-   * Falls back to empty array if column doesn't exist yet
+   * (confidence_score column no longer exists in schema)
    */
   async getHighConfidenceOpportunities(limit: number = 10) {
     try {
       return prisma.b2bLead.findMany({
-        where: {
-          confidenceScore: {
-            gte: CONFIDENCE_THRESHOLD_HIGH,
-          },
-        },
         select: {
           id: true,
           businessName: true,
           contactName: true,
           city: true,
-          confidenceScore: true,
         },
         orderBy: [
-          { confidenceScore: "desc" }
+          { createdAt: "desc" }
         ],
         take: limit,
       });
     } catch (error) {
-      // confidenceScore column doesn't exist yet (migration not applied)
-      console.log("[OpportunityService] confidence_score column not found, returning empty array");
+      console.log("[OpportunityService] error fetching opportunities, returning empty array");
       return [];
     }
   }
