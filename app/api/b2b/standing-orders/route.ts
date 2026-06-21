@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     // Record conversion outcome for learning loop
     try {
       const lead = await sql`
-        SELECT qualified_business_id, business_category, opportunity_score, created_at
+        SELECT qualified_business_id, business_category, created_at
         FROM b2b_leads
         WHERE id = ${body.lead_id}
       `;
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           body.lead_id,
           "converted",
           leadData.business_category as string,
-          (leadData.opportunity_score as number) || 0,
+          0,
           daysToConversion,
           { standing_order_created: true, price: body.price }
         );
@@ -183,12 +183,12 @@ export async function PATCH(request: NextRequest) {
   try {
     if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const body = await request.json() as { orderId: string; status: string };
-    const { orderId, status } = body;
+    const body = await request.json() as { orderId: string; active?: boolean };
+    const { orderId, active } = body;
 
-    if (!orderId || !status) {
+    if (!orderId || active === undefined) {
       return NextResponse.json(
-        { error: "orderId and status required" },
+        { error: "orderId and active (boolean) required" },
         { status: 400 }
       );
     }
@@ -198,7 +198,7 @@ export async function PATCH(request: NextRequest) {
 
     const rows = await sql`
       UPDATE b2b_standing_orders
-      SET status = ${status}, updated_at = NOW()
+      SET active = ${active}, updated_at = NOW()
       WHERE id = ${orderId}
       RETURNING *
     `;
