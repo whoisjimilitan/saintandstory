@@ -98,14 +98,11 @@ export default function OperatorBriefing() {
   }, []);
 
   const handleRetry = () => {
-    setState({ loading: true, error: null, data: null });
-    setTimeout(() => {
-      window.location.reload();
-    }, 200);
+    setState((s) => ({ ...s, loading: true, error: null }));
   };
 
-  const handleMetricClick = (metricType: string) => {
-    switch (metricType) {
+  const handleMetricClick = (metric: string) => {
+    switch (metric) {
       case "new":
         router.push("/operator/discover?status=new");
         break;
@@ -113,32 +110,24 @@ export default function OperatorBriefing() {
         router.push("/operator/discover?score=80+");
         break;
       case "finished":
-        router.push("/operator/completed");
+        router.push("/operator/pipeline?stage=propose");
         break;
       case "closed":
-        router.push("/operator/sales");
+        router.push("/operator/orders");
         break;
     }
   };
 
   const handlePipelineStageClick = (stage: string) => {
-    router.push(`/operator/discover?stage=${stage.toLowerCase()}`);
-  };
-
-  const handleActionClick = (action: TodaysAction) => {
-    if (action.deepLink) {
-      router.push(action.deepLink);
-    }
+    router.push(`/operator/pipeline?stage=${stage}`);
   };
 
   if (state.loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block">
-            <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin"></div>
-          </div>
-          <p className="mt-4 text-sm text-[#666666]">Loading Morning Brief...</p>
+          <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-[#666666]">Loading your briefing...</p>
         </div>
       </div>
     );
@@ -153,8 +142,7 @@ export default function OperatorBriefing() {
               Error loading Morning Brief
             </h1>
             <p className="text-sm text-[#666666] mb-6">
-              {state.error ||
-                "Could not load dashboard data. Please try again."}
+              {state.error || "Could not load dashboard data. Please try again."}
             </p>
             <button
               onClick={handleRetry}
@@ -171,9 +159,19 @@ export default function OperatorBriefing() {
   const hasActions = state.data.todaysActions.length > 0;
   const hasActivity = state.data.recentActivity.length > 0;
 
+  // Calculate metrics for narrative
+  const baselineNew = 16;
+  const newTrend = ((state.data.metrics.newOpportunitiesToday - baselineNew) / baselineNew) * 100;
+  const totalPipelineProspects =
+    state.data.pipeline.discover +
+    state.data.pipeline.enrich +
+    state.data.pipeline.qualify +
+    state.data.pipeline.propose +
+    state.data.pipeline.orders;
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
+      {/* HEADER */}
       <div className="mb-12 md:mb-16 px-4 md:px-0">
         <div className="inline-flex items-center gap-2 mb-4 md:mb-6 bg-[#F5F5F5] px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-[#E8E8E8]">
           <p className="text-[10px] md:text-xs font-semibold text-[#0D0D0D] tracking-[0.2em] uppercase">
@@ -181,88 +179,107 @@ export default function OperatorBriefing() {
           </p>
         </div>
         <h1 className="text-3xl md:text-5xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.01em] leading-tight">
-          Good morning, James.
+          Good morning.
         </h1>
-        <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-xl font-light">
-          Here's what matters today.
+        <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-2xl font-light">
+          Here's what needs your attention today.
         </p>
       </div>
 
-      {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-12 md:mb-20 px-4 md:px-0">
-        {/* New Opportunities */}
-        <button
-          onClick={() => handleMetricClick("new")}
-          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
-        >
-          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            New Leads
-          </p>
-          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {state.data.metrics.newOpportunitiesToday}
-          </p>
-          <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">today</p>
-          </div>
-        </button>
-
-        {/* High Confidence */}
-        <button
-          onClick={() => handleMetricClick("highConfidence")}
-          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
-        >
-          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            High Confidence
-          </p>
-          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {state.data.metrics.highConfidenceToday}
-          </p>
-          <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">80+ score</p>
-          </div>
-        </button>
-
-        {/* Finished */}
-        <button
-          onClick={() => handleMetricClick("finished")}
-          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
-        >
-          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            Finished
-          </p>
-          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {state.data.metrics.finishedToday}
-          </p>
-          <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">completed</p>
-          </div>
-        </button>
-
-        {/* Closed */}
-        <button
-          onClick={() => handleMetricClick("closed")}
-          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
-        >
-          <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            Closed Won
-          </p>
-          <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {state.data.metrics.closedToday}
-          </p>
-          <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">closed</p>
-          </div>
-        </button>
-      </div>
-
-      {/* Pipeline at a Glance */}
+      {/* MARKET BRIEFING (Pressure Signals) */}
       <div className="mb-12 md:mb-20 px-4 md:px-0">
         <div className="mb-6 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Pipeline
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+            Market Signal
           </h2>
-          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
-            Where opportunities are in your pipeline.
+        </div>
+        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-[#F9F9F9]">
+          <div className="max-w-3xl">
+            <p className="text-sm md:text-base text-[#0D0D0D] leading-relaxed mb-4">
+              {state.data.metrics.newOpportunitiesToday > baselineNew ? (
+                <>
+                  <span className="font-semibold">Market activity is elevated.</span> You've discovered{" "}
+                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> today
+                  {newTrend > 0 && (
+                    <>
+                      {" "}
+                      ({Math.round(newTrend)}% above your baseline). This suggests sector demand is increasing.
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold">Discovery pace is steady.</span> You've identified{" "}
+                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> today.
+                </>
+              )}
+            </p>
+            <p className="text-xs text-[#888888]">
+              Last updated: {new Date(state.data.metadata.lastUpdated).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FOCUS FIRST (Decision Guidance) */}
+      <div className="mb-12 md:mb-20 px-4 md:px-0">
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+            Focus First
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Opportunity Summary Card */}
+          <button
+            onClick={() => router.push("/operator/discover")}
+            className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all text-left cursor-pointer group"
+          >
+            <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
+              Discovery Pipeline
+            </p>
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              {state.data.metrics.highConfidenceToday}
+            </p>
+            <p className="text-xs md:text-sm text-[#666666] mb-4">
+              prospects show high-confidence signals (80+% confidence). These are best positioned for qualification.
+            </p>
+            <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
+              Review these first →
+            </p>
+          </button>
+
+          {/* Revenue Summary Card */}
+          <button
+            onClick={() => router.push("/operator/orders")}
+            className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all text-left cursor-pointer group"
+          >
+            <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
+              Revenue Status
+            </p>
+            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              {state.data.metrics.closedToday}
+            </p>
+            <p className="text-xs md:text-sm text-[#666666] mb-4">
+              deals closed today. Monitor your active accounts for renewals and expansion opportunities.
+            </p>
+            <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
+              View orders →
+            </p>
+          </button>
+        </div>
+      </div>
+
+      {/* PIPELINE HEALTH (Trust Signals - Pipeline Confidence) */}
+      <div className="mb-12 md:mb-20 px-4 md:px-0">
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+            Pipeline Confidence
+          </h2>
+          <p className="text-xs text-[#888888]">
+            Distribution of {totalPipelineProspects} prospects across qualification stages.
           </p>
         </div>
 
@@ -271,7 +288,7 @@ export default function OperatorBriefing() {
             {/* Discover */}
             <button
               onClick={() => handlePipelineStageClick("discover")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
             >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-blue-500 shadow-sm"></div>
@@ -283,7 +300,7 @@ export default function OperatorBriefing() {
                 {state.data.pipeline.discover}
               </p>
               <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                new
+                new prospects
               </p>
             </button>
 
@@ -301,7 +318,6 @@ export default function OperatorBriefing() {
                   y2="2"
                   stroke="#E8E8E8"
                   strokeWidth="2"
-                  strokeLinecap="round"
                 />
               </svg>
             </div>
@@ -309,10 +325,10 @@ export default function OperatorBriefing() {
             {/* Enrich */}
             <button
               onClick={() => handlePipelineStageClick("enrich")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
             >
               <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-green-500"></div>
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-green-500 shadow-sm"></div>
               </div>
               <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Enrich
@@ -321,7 +337,7 @@ export default function OperatorBriefing() {
                 {state.data.pipeline.enrich}
               </p>
               <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                start
+                enriching
               </p>
             </button>
 
@@ -339,7 +355,6 @@ export default function OperatorBriefing() {
                   y2="2"
                   stroke="#E8E8E8"
                   strokeWidth="2"
-                  strokeLinecap="round"
                 />
               </svg>
             </div>
@@ -347,10 +362,10 @@ export default function OperatorBriefing() {
             {/* Qualify */}
             <button
               onClick={() => handlePipelineStageClick("qualify")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
             >
               <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-orange-500"></div>
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-orange-500 shadow-sm"></div>
               </div>
               <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Qualify
@@ -377,7 +392,6 @@ export default function OperatorBriefing() {
                   y2="2"
                   stroke="#E8E8E8"
                   strokeWidth="2"
-                  strokeLinecap="round"
                 />
               </svg>
             </div>
@@ -385,10 +399,10 @@ export default function OperatorBriefing() {
             {/* Propose */}
             <button
               onClick={() => handlePipelineStageClick("propose")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
             >
               <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-purple-500"></div>
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-purple-500 shadow-sm"></div>
               </div>
               <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Propose
@@ -415,7 +429,6 @@ export default function OperatorBriefing() {
                   y2="2"
                   stroke="#E8E8E8"
                   strokeWidth="2"
-                  strokeLinecap="round"
                 />
               </svg>
             </div>
@@ -423,10 +436,10 @@ export default function OperatorBriefing() {
             {/* Orders */}
             <button
               onClick={() => handlePipelineStageClick("orders")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
             >
               <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-red-500"></div>
+                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-red-500 shadow-sm"></div>
               </div>
               <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
                 Orders
@@ -435,145 +448,72 @@ export default function OperatorBriefing() {
                 {state.data.pipeline.orders}
               </p>
               <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                finish
+                closed
               </p>
             </button>
           </div>
         </div>
-
-        <div className="mt-4 md:mt-6">
-          <Link
-            href="/operator/pipeline"
-            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            View full pipeline →
-          </Link>
-        </div>
       </div>
 
-      {/* Today's Actions */}
-      <div className="mb-12 md:mb-20 px-4 md:px-0">
-        <div className="mb-4 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Today's Actions
-          </h2>
-          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
-            Tasks due today from your pipeline.
-          </p>
-        </div>
-
-        {!hasActions ? (
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white text-center">
-            <p className="text-sm text-[#666666]">
-              No actions due today. Great work! 🎉
-            </p>
+      {/* TODAY'S ACTIONS */}
+      {hasActions && (
+        <div className="mb-12 md:mb-20 px-4 md:px-0">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+              Today's Tasks
+            </h2>
           </div>
-        ) : (
-          <div className="space-y-2 md:space-y-3">
-            {state.data.todaysActions.map((action) => (
-              <button
+          <div className="space-y-3">
+            {state.data.todaysActions.slice(0, 5).map((action) => (
+              <div
                 key={action.id}
-                onClick={() => handleActionClick(action)}
-                className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left"
+                className="border border-[#E8E8E8] rounded-lg p-4 md:p-6 bg-white hover:border-[#0D0D0D] transition-all"
               >
-                <div className="flex-1 mb-2 md:mb-0">
-                  <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                    {action.actionType.charAt(0).toUpperCase() +
-                      action.actionType.slice(1)}{" "}
-                    {action.contactName ? `with ${action.contactName}` : ""} at{" "}
+                <div className="flex items-start justify-between mb-2">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
                     {action.company}
                   </p>
-                  <p className="text-xs text-[#666666] font-light">
-                    {action.confidenceScore}% confidence
+                  <p className="text-xs font-semibold text-[#0D0D0D]">
+                    {action.confidenceScore}%
                   </p>
                 </div>
-                <div className="text-right md:ml-8">
-                  <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                    Due today
-                  </p>
-                  <p className="text-xs text-[#666666] mb-2 font-light">
-                    {new Date(action.dueAt).toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                  <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                    {action.actionType === "call"
-                      ? "Call"
-                      : action.actionType === "email"
-                        ? "Send"
-                        : "View"}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-4 md:mt-6">
-          <Link
-            href="/operator/pipeline"
-            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            View all tasks →
-          </Link>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="px-4 md:px-0">
-        <div className="mb-4 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
-            Activity
-          </h2>
-          <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
-            What's happened today.
-          </p>
-        </div>
-
-        {!hasActivity ? (
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white text-center">
-            <p className="text-sm text-[#666666]">
-              No activity yet today. Check back later.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2 md:space-y-3">
-            {state.data.recentActivity.map((item) => (
-              <div
-                key={item.id}
-                className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-6 bg-white hover:border-[#D0D0D0] transition-colors"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div className="flex-1 mb-2 md:mb-0">
-                    <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                      {item.description}
-                    </p>
-                    <p className="text-xs text-[#666666] font-light">
-                      {item.company}
-                    </p>
-                  </div>
-                  <p className="text-xs text-[#D0D0D0] font-light">
-                    {new Date(item.timestamp).toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
+                <p className="text-xs text-[#888888]">
+                  {action.actionType} {action.contactName ? `— ${action.contactName}` : ""}
+                </p>
               </div>
             ))}
           </div>
-        )}
-
-        <div className="mt-4 md:mt-6 pb-12 md:pb-16">
-          <Link
-            href="/operator/analytics"
-            className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            View full activity log →
-          </Link>
         </div>
-      </div>
+      )}
+
+      {/* RECENT ACTIVITY */}
+      {hasActivity && (
+        <div className="mb-12 md:mb-20 px-4 md:px-0">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+              Recent Activity
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {state.data.recentActivity.slice(0, 5).map((item) => (
+              <div
+                key={item.id}
+                className="border border-[#E8E8E8] rounded-lg p-4 md:p-6 bg-white"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {item.company}
+                  </p>
+                  <p className="text-[9px] text-[#888888]">
+                    {new Date(item.timestamp).toLocaleString()}
+                  </p>
+                </div>
+                <p className="text-xs text-[#666666]">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
