@@ -2,132 +2,69 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-interface BriefingData {
-  discovered: number;
-  enriched: number;
-  qualified: number;
+interface MorningBriefMetrics {
+  newOpportunitiesToday: number;
+  highConfidenceToday: number;
+  finishedToday: number;
+  closedToday: number;
+}
+
+interface Pipeline {
+  discover: number;
+  enrich: number;
+  qualify: number;
+  propose: number;
   orders: number;
-  loading: boolean;
 }
 
-interface ActionDetail {
+interface TodaysAction {
   id: string;
-  business: string;
-  location: string;
-  category: string;
-  confidence: string;
-  stage: string;
-  lastContact?: string;
-  reason: string;
-  requiredActions: string[];
-  nextStep: string;
-  dueTime: string;
+  company: string;
+  contactName: string;
+  actionType: string;
+  priority: number;
+  dueAt: string;
+  status: string;
+  confidenceScore: number;
+  deepLink?: string;
 }
 
-const actionDetails: Record<string, ActionDetail> = {
-  "1": {
-    id: "1",
-    business: "Westpoint Pharmacy",
-    location: "Manchester",
-    category: "High confidence",
-    confidence: "95%",
-    stage: "Enrich",
-    lastContact: "2 days ago",
-    reason: "High engagement on initial contact. Decision maker available today.",
-    requiredActions: [
-      "Discuss service scope and pricing",
-      "Confirm transition timeline",
-      "Send formal proposal",
-      "Schedule follow-up meeting"
-    ],
-    nextStep: "Call Joe Green to confirm availability",
-    dueTime: "10:00 AM"
-  },
-  "2": {
-    id: "2",
-    business: "Range Pharmacy",
-    location: "Leeds",
-    category: "Proposal draft ready",
-    confidence: "88%",
-    stage: "Qualify",
-    lastContact: "1 week ago",
-    reason: "Proposal reviewed internally. Ready for formal submission and discussion.",
-    requiredActions: [
-      "Review proposal feedback",
-      "Address any concerns",
-      "Send via formal channel",
-      "Schedule review call"
-    ],
-    nextStep: "Send proposal and request review meeting",
-    dueTime: "11:30 AM"
-  },
-  "3": {
-    id: "3",
-    business: "A & A Pharmacy",
-    location: "Winslow Road",
-    category: "Discovery call",
-    confidence: "72%",
-    stage: "Discover",
-    lastContact: "3 days ago",
-    reason: "Initial discovery call scheduled. Need to understand their current operations.",
-    requiredActions: [
-      "Review their current provider",
-      "Prepare discovery questions",
-      "Identify pain points",
-      "Take detailed notes"
-    ],
-    nextStep: "Join discovery call and take comprehensive notes",
-    dueTime: "2:00 PM"
-  },
-  "4": {
-    id: "4",
-    business: "Rusholme Pharmacy",
-    location: "Manchester",
-    category: "Approval required",
-    confidence: "91%",
-    stage: "Propose",
-    lastContact: "4 days ago",
-    reason: "Contract finalized and ready for internal review and approval.",
-    requiredActions: [
-      "Review contract terms",
-      "Verify all terms aligned",
-      "Check legal compliance",
-      "Prepare for execution"
-    ],
-    nextStep: "Review contract and prepare for signature",
-    dueTime: "4:15 PM"
-  },
-  "5": {
-    id: "5",
-    business: "2 New Opportunities",
-    location: "Multiple",
-    category: "AI suggested",
-    confidence: "65%",
-    stage: "Discover",
-    reason: "AI identified potential matches based on location and service requirements.",
-    requiredActions: [
-      "Research business profiles",
-      "Check market fit",
-      "Identify decision makers",
-      "Prepare outreach strategy"
-    ],
-    nextStep: "Research opportunities and create outreach plan",
-    dueTime: "EOD"
-  }
-};
+interface RecentActivityItem {
+  id: string;
+  company: string;
+  eventType: string;
+  description: string;
+  timestamp: string;
+}
+
+interface MorningBriefResponse {
+  metrics: MorningBriefMetrics;
+  pipeline: Pipeline;
+  todaysActions: TodaysAction[];
+  recentActivity: RecentActivityItem[];
+  metadata: {
+    lastUpdated: string;
+    version: string;
+  };
+}
+
+interface PageState {
+  loading: boolean;
+  error: string | null;
+  data: MorningBriefResponse | null;
+}
 
 export default function OperatorBriefing() {
-  const [data, setData] = useState<BriefingData>({
-    discovered: 0,
-    enriched: 0,
-    qualified: 0,
-    orders: 0,
+  const router = useRouter();
+  const [state, setState] = useState<PageState>({
     loading: true,
+    error: null,
+    data: null,
   });
 
   const [dateStr, setDateStr] = useState("");
-  const [selectedAction, setSelectedAction] = useState<ActionDetail | null>(null);
 
   useEffect(() => {
     const today = new Date();
@@ -142,27 +79,97 @@ export default function OperatorBriefing() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch("/api/operator/morning-brief/summary");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const summary = await res.json();
-        setData({
-          discovered: summary.discovered,
-          enriched: summary.enriched,
-          qualified: summary.qualified,
-          orders: summary.orders,
-          loading: false,
-        });
+        setState({ loading: true, error: null, data: null });
+        const res = await fetch("/api/v1/dashboard/morning-brief");
+        if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch`);
+        const data: MorningBriefResponse = await res.json();
+        setState({ loading: false, error: null, data });
       } catch (error) {
-        console.error("Error:", error);
-        setData((prev) => ({ ...prev, loading: false }));
+        const message =
+          error instanceof Error ? error.message : "Unknown error occurred";
+        setState({
+          loading: false,
+          error: message,
+          data: null,
+        });
       }
     };
     loadData();
   }, []);
 
-  const handleActionClick = (actionId: string) => {
-    setSelectedAction(actionDetails[actionId] || null);
+  const handleRetry = () => {
+    setState({ loading: true, error: null, data: null });
+    setTimeout(() => {
+      window.location.reload();
+    }, 200);
   };
+
+  const handleMetricClick = (metricType: string) => {
+    switch (metricType) {
+      case "new":
+        router.push("/operator/discover?status=new");
+        break;
+      case "highConfidence":
+        router.push("/operator/discover?score=80+");
+        break;
+      case "finished":
+        router.push("/operator/completed");
+        break;
+      case "closed":
+        router.push("/operator/sales");
+        break;
+    }
+  };
+
+  const handlePipelineStageClick = (stage: string) => {
+    router.push(`/operator/discover?stage=${stage.toLowerCase()}`);
+  };
+
+  const handleActionClick = (action: TodaysAction) => {
+    if (action.deepLink) {
+      router.push(action.deepLink);
+    }
+  };
+
+  if (state.loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block">
+            <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin"></div>
+          </div>
+          <p className="mt-4 text-sm text-[#666666]">Loading Morning Brief...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (state.error || !state.data) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-2xl mx-auto px-4 md:px-0 py-12 md:py-16">
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white">
+            <h1 className="text-lg font-semibold text-[#0D0D0D] mb-2">
+              Error loading Morning Brief
+            </h1>
+            <p className="text-sm text-[#666666] mb-6">
+              {state.error ||
+                "Could not load dashboard data. Please try again."}
+            </p>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const hasActions = state.data.todaysActions.length > 0;
+  const hasActivity = state.data.recentActivity.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -183,57 +190,69 @@ export default function OperatorBriefing() {
 
       {/* Metrics Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-12 md:mb-20 px-4 md:px-0">
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+        {/* New Opportunities */}
+        <button
+          onClick={() => handleMetricClick("new")}
+          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+        >
           <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            New
+            New Leads
           </p>
           <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {data.discovered}
+            {state.data.metrics.newOpportunitiesToday}
           </p>
           <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-[9px] md:text-xs font-semibold text-[#22C55E]">↑ 100%</p>
+            <p className="text-[9px] md:text-xs text-[#666666]">today</p>
           </div>
-        </div>
+        </button>
 
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+        {/* High Confidence */}
+        <button
+          onClick={() => handleMetricClick("highConfidence")}
+          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+        >
           <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            High confidence
+            High Confidence
           </p>
           <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {data.qualified}
+            {state.data.metrics.highConfidenceToday}
           </p>
           <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-[9px] md:text-xs font-semibold text-[#22C55E]">↑ 100%</p>
+            <p className="text-[9px] md:text-xs text-[#666666]">80+ score</p>
           </div>
-        </div>
+        </button>
 
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+        {/* Finished */}
+        <button
+          onClick={() => handleMetricClick("finished")}
+          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+        >
           <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
             Finished
           </p>
           <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            {data.orders}
+            {state.data.metrics.finishedToday}
           </p>
           <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0]">—</p>
+            <p className="text-[9px] md:text-xs text-[#666666]">completed</p>
           </div>
-        </div>
+        </button>
 
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
+        {/* Closed */}
+        <button
+          onClick={() => handleMetricClick("closed")}
+          className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+        >
           <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-            Closed
+            Closed Won
           </p>
           <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-            0
+            {state.data.metrics.closedToday}
           </p>
           <div className="space-y-0.5">
-            <p className="text-[9px] md:text-xs text-[#666666]">vs yesterday</p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0]">—</p>
+            <p className="text-[9px] md:text-xs text-[#666666]">closed</p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Pipeline at a Glance */}
@@ -250,7 +269,10 @@ export default function OperatorBriefing() {
         <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-12 bg-white overflow-x-auto">
           <div className="flex justify-between items-end gap-2 md:gap-4 min-w-min md:min-w-0">
             {/* Discover */}
-            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+            <button
+              onClick={() => handlePipelineStageClick("discover")}
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+            >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-blue-500 shadow-sm"></div>
               </div>
@@ -258,10 +280,12 @@ export default function OperatorBriefing() {
                 Discover
               </p>
               <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-                {data.discovered}
+                {state.data.pipeline.discover}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">new</p>
-            </div>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">
+                new
+              </p>
+            </button>
 
             {/* Connecting Line */}
             <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
@@ -283,7 +307,10 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Enrich */}
-            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+            <button
+              onClick={() => handlePipelineStageClick("enrich")}
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+            >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-green-500"></div>
               </div>
@@ -291,10 +318,12 @@ export default function OperatorBriefing() {
                 Enrich
               </p>
               <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-                {data.enriched}
+                {state.data.pipeline.enrich}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">start</p>
-            </div>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">
+                start
+              </p>
+            </button>
 
             {/* Connecting Line */}
             <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
@@ -316,7 +345,10 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Qualify */}
-            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+            <button
+              onClick={() => handlePipelineStageClick("qualify")}
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+            >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-orange-500"></div>
               </div>
@@ -324,10 +356,12 @@ export default function OperatorBriefing() {
                 Qualify
               </p>
               <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-                1
+                {state.data.pipeline.qualify}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">qualified</p>
-            </div>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">
+                qualified
+              </p>
+            </button>
 
             {/* Connecting Line */}
             <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
@@ -349,7 +383,10 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Propose */}
-            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+            <button
+              onClick={() => handlePipelineStageClick("propose")}
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+            >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-purple-500"></div>
               </div>
@@ -357,10 +394,12 @@ export default function OperatorBriefing() {
                 Propose
               </p>
               <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-                0
+                {state.data.pipeline.propose}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">proposed</p>
-            </div>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">
+                proposed
+              </p>
+            </button>
 
             {/* Connecting Line */}
             <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
@@ -382,7 +421,10 @@ export default function OperatorBriefing() {
             </div>
 
             {/* Orders */}
-            <div className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0">
+            <button
+              onClick={() => handlePipelineStageClick("orders")}
+              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer"
+            >
               <div className="flex justify-center mb-3 md:mb-6">
                 <div className="w-2 md:w-3 h-2 md:h-3 rounded-full border-2 border-red-500"></div>
               </div>
@@ -390,10 +432,12 @@ export default function OperatorBriefing() {
                 Orders
               </p>
               <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-                {data.orders}
+                {state.data.pipeline.orders}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">finish</p>
-            </div>
+              <p className="text-[9px] md:text-xs text-[#666666] font-light">
+                finish
+              </p>
+            </button>
           </div>
         </div>
 
@@ -407,118 +451,64 @@ export default function OperatorBriefing() {
         </div>
       </div>
 
-      {/* Today's Priority Actions */}
+      {/* Today's Actions */}
       <div className="mb-12 md:mb-20 px-4 md:px-0">
         <div className="mb-4 md:mb-8">
           <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-2">
             Today's Actions
           </h2>
           <p className="text-xs md:text-sm text-[#888888] leading-relaxed font-light">
-            Recommended actions based on opportunities and activity.
+            Tasks due today from your pipeline.
           </p>
         </div>
 
-        <div className="space-y-2 md:space-y-3">
-          <button onClick={() => handleActionClick("1")} className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
-            <div className="flex-1 mb-2 md:mb-0">
-              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                Call Joe Green at Westpoint Pharmacy
-              </p>
-              <p className="text-xs text-[#666666] font-light">
-                High confidence • Manchester
-              </p>
-            </div>
-            <div className="text-right md:ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                Due today
-              </p>
-              <p className="text-xs text-[#666666] mb-2 font-light">10:00 AM</p>
-              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                Call
-              </span>
-            </div>
-          </button>
-
-          <button onClick={() => handleActionClick("2")} className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
-            <div className="flex-1 mb-2 md:mb-0">
-              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                Send proposal to Range Pharmacy
-              </p>
-              <p className="text-xs text-[#666666] font-light">
-                Proposal draft ready • High confidence
-              </p>
-            </div>
-            <div className="text-right md:ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                Due today
-              </p>
-              <p className="text-xs text-[#666666] mb-2 font-light">11:30 AM</p>
-              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                Send
-              </span>
-            </div>
-          </button>
-
-          <button onClick={() => handleActionClick("3")} className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
-            <div className="flex-1 mb-2 md:mb-0">
-              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                Meeting with A & A Pharmacy
-              </p>
-              <p className="text-xs text-[#666666] font-light">
-                Discovery call • Winslow Road
-              </p>
-            </div>
-            <div className="text-right md:ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                Due today
-              </p>
-              <p className="text-xs text-[#666666] mb-2 font-light">2:00 PM</p>
-              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                Join
-              </span>
-            </div>
-          </button>
-
-          <button onClick={() => handleActionClick("4")} className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
-            <div className="flex-1 mb-2 md:mb-0">
-              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                Review contract for Rusholme Pharmacy
-              </p>
-              <p className="text-xs text-[#666666] font-light">
-                Approval required
-              </p>
-            </div>
-            <div className="text-right md:ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                Due today
-              </p>
-              <p className="text-xs text-[#666666] mb-2 font-light">4:15 PM</p>
-              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                Review
-              </span>
-            </div>
-          </button>
-
-          <button onClick={() => handleActionClick("5")} className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left">
-            <div className="flex-1 mb-2 md:mb-0">
-              <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
-                Research 2 new opportunities
-              </p>
-              <p className="text-xs text-[#666666] font-light">
-                AI suggested • High potential
-              </p>
-            </div>
-            <div className="text-right md:ml-8">
-              <p className="text-xs font-semibold text-[#DC2626] mb-1">
-                Due today
-              </p>
-              <p className="text-xs text-[#666666] mb-2 font-light">EOD</p>
-              <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
-                Start
-              </span>
-            </div>
-          </button>
-        </div>
+        {!hasActions ? (
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white text-center">
+            <p className="text-sm text-[#666666]">
+              No actions due today. Great work! 🎉
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2 md:space-y-3">
+            {state.data.todaysActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={() => handleActionClick(action)}
+                className="w-full border border-[#E8E8E8] rounded-lg md:rounded-xl p-3 md:p-6 bg-white flex flex-col md:flex-row md:items-center md:justify-between hover:border-[#0D0D0D] hover:bg-[#F5F5F5] transition-all duration-150 cursor-pointer group text-left"
+              >
+                <div className="flex-1 mb-2 md:mb-0">
+                  <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
+                    {action.actionType.charAt(0).toUpperCase() +
+                      action.actionType.slice(1)}{" "}
+                    {action.contactName ? `with ${action.contactName}` : ""} at{" "}
+                    {action.company}
+                  </p>
+                  <p className="text-xs text-[#666666] font-light">
+                    {action.confidenceScore}% confidence
+                  </p>
+                </div>
+                <div className="text-right md:ml-8">
+                  <p className="text-xs font-semibold text-[#DC2626] mb-1">
+                    Due today
+                  </p>
+                  <p className="text-xs text-[#666666] mb-2 font-light">
+                    {new Date(action.dueAt).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <span className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#666666] transition-colors">
+                    {action.actionType === "call"
+                      ? "Call"
+                      : action.actionType === "email"
+                        ? "Send"
+                        : "View"}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 md:mt-6">
           <Link
@@ -541,175 +531,49 @@ export default function OperatorBriefing() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
-              Discovered
+        {!hasActivity ? (
+          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white text-center">
+            <p className="text-sm text-[#666666]">
+              No activity yet today. Check back later.
             </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-              2
-            </p>
-            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
-              Manchester area
-            </p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">1h ago</p>
           </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
-              Opened
-            </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-              1
-            </p>
-            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
-              Westpoint Pharmacy
-            </p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">2h ago</p>
+        ) : (
+          <div className="space-y-2 md:space-y-3">
+            {state.data.recentActivity.map((item) => (
+              <div
+                key={item.id}
+                className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-6 bg-white hover:border-[#D0D0D0] transition-colors"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div className="flex-1 mb-2 md:mb-0">
+                    <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-1">
+                      {item.description}
+                    </p>
+                    <p className="text-xs text-[#666666] font-light">
+                      {item.company}
+                    </p>
+                  </div>
+                  <p className="text-xs text-[#D0D0D0] font-light">
+                    {new Date(item.timestamp).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
 
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
-              Booked
-            </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-              1
-            </p>
-            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
-              A & A Pharmacy
-            </p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">3h ago</p>
-          </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-4 md:p-8 bg-white hover:border-[#D0D0D0] transition-colors duration-200">
-            <p className="text-xs md:text-sm font-semibold text-[#0D0D0D] mb-2 md:mb-3">
-              Updated
-            </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-3 md:mb-4 tracking-[-0.02em]">
-              1
-            </p>
-            <p className="text-[9px] md:text-xs text-[#666666] mb-2 md:mb-3 font-light">
-              Range Pharmacy
-            </p>
-            <p className="text-[9px] md:text-xs text-[#D0D0D0] font-light">4h ago</p>
-          </div>
-        </div>
-
-        <div className="mt-4 md:mt-6">
+        <div className="mt-4 md:mt-6 pb-12 md:pb-16">
           <Link
-            href="/operator/learn"
+            href="/operator/analytics"
             className="text-xs font-medium text-[#0D0D0D] hover:text-[#666666] transition-colors"
           >
-            View all activity →
+            View full activity log →
           </Link>
         </div>
       </div>
-
-      {/* Action Detail Modal */}
-      {selectedAction && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 py-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E8E8E8]">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-[#E8E8E8] px-6 md:px-8 py-6 flex items-start justify-between">
-              <div className="flex-1">
-                <h2 className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-2 tracking-[-0.01em]">
-                  {selectedAction.business}
-                </h2>
-                <p className="text-sm text-[#666666] font-light">
-                  {selectedAction.location} • {selectedAction.category}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedAction(null)}
-                className="text-2xl text-[#888888] hover:text-[#0D0D0D] transition-colors ml-4 flex-shrink-0"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="px-6 md:px-8 py-6 space-y-8">
-              {/* Business Overview */}
-              <div>
-                <h3 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-4">
-                  Business Overview
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="border border-[#E8E8E8] rounded-lg p-4">
-                    <p className="text-xs text-[#888888] mb-1 font-light">Stage</p>
-                    <p className="text-sm font-semibold text-[#0D0D0D]">{selectedAction.stage}</p>
-                  </div>
-                  <div className="border border-[#E8E8E8] rounded-lg p-4">
-                    <p className="text-xs text-[#888888] mb-1 font-light">Confidence</p>
-                    <p className="text-sm font-semibold text-[#0D0D0D]">{selectedAction.confidence}</p>
-                  </div>
-                  <div className="border border-[#E8E8E8] rounded-lg p-4">
-                    <p className="text-xs text-[#888888] mb-1 font-light">Location</p>
-                    <p className="text-sm font-semibold text-[#0D0D0D]">{selectedAction.location}</p>
-                  </div>
-                  {selectedAction.lastContact && (
-                    <div className="border border-[#E8E8E8] rounded-lg p-4">
-                      <p className="text-xs text-[#888888] mb-1 font-light">Last Contact</p>
-                      <p className="text-sm font-semibold text-[#0D0D0D]">{selectedAction.lastContact}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Why This Matters */}
-              <div>
-                <h3 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
-                  Why This Matters
-                </h3>
-                <p className="text-sm text-[#666666] leading-relaxed font-light">
-                  {selectedAction.reason}
-                </p>
-              </div>
-
-              {/* Required Actions */}
-              <div>
-                <h3 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-4">
-                  Today's Required Actions
-                </h3>
-                <div className="space-y-2">
-                  {selectedAction.requiredActions.map((action, idx) => (
-                    <div key={idx} className="flex gap-3 text-sm">
-                      <div className="w-5 h-5 rounded-full bg-[#0D0D0D] text-white flex items-center justify-center flex-shrink-0 text-xs font-semibold">
-                        {idx + 1}
-                      </div>
-                      <p className="text-[#666666] pt-0.5 font-light">{action}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Next Step */}
-              <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-4 md:p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1.5 bg-[#DC2626] text-white text-xs font-semibold uppercase tracking-[0.5px] px-3 py-1.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/80"></span>
-                    Due Today
-                  </span>
-                </div>
-                <p className="text-sm md:text-base font-semibold text-[#0D0D0D] mb-3">
-                  {selectedAction.nextStep}
-                </p>
-                <p className="text-xs text-[#666666] font-light">
-                  Time: {selectedAction.dueTime}
-                </p>
-              </div>
-
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedAction(null)}
-                className="w-full border border-[#E8E8E8] rounded-lg p-4 bg-white hover:bg-[#F5F5F5] hover:border-[#D0D0D0] transition-all font-semibold text-[#0D0D0D] text-sm"
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
