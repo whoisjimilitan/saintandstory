@@ -9,9 +9,12 @@ interface Prospect {
   businessName: string;
   contactName?: string;
   city?: string;
+  postcode?: string;
   confidenceScore?: number;
   industry?: string;
   status?: string;
+  pressureSignal?: string;
+  trustSource?: string;
 }
 
 interface DiscoverState {
@@ -20,6 +23,7 @@ interface DiscoverState {
   results: Prospect[];
   totalCount: number;
   currentFilter: string;
+  uploadProgress?: number;
 }
 
 export default function DiscoverPage() {
@@ -33,6 +37,8 @@ export default function DiscoverPage() {
     currentFilter: "all",
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchRadius, setSearchRadius] = useState(10);
+  const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
 
   // Parse filter from URL
   const status = searchParams.get("status");
@@ -89,7 +95,7 @@ export default function DiscoverPage() {
     fetchDiscoverData();
   }, [status, score, stage]);
 
-  // Handle search
+  // Handle search (keyword or postcode with radius)
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
@@ -97,7 +103,12 @@ export default function DiscoverPage() {
     try {
       setState((s) => ({ ...s, loading: true, error: null }));
 
-      const url = `/api/b2b/discover/search?query=${encodeURIComponent(searchTerm)}`;
+      let url = `/api/b2b/discover/search?query=${encodeURIComponent(searchTerm)}`;
+
+      if (isPostcodeSearch && searchRadius) {
+        url += `&radius=${searchRadius}`;
+      }
+
       const res = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +122,7 @@ export default function DiscoverPage() {
         loading: false,
         results: data.results || [],
         totalCount: data.totalCount || 0,
-        currentFilter: `search="${searchTerm}"`,
+        currentFilter: `search="${searchTerm}"${isPostcodeSearch ? ` within ${searchRadius}km` : ""}`,
       }));
     } catch (error) {
       const message =
@@ -119,6 +130,47 @@ export default function DiscoverPage() {
       setState((s) => ({
         ...s,
         loading: false,
+        error: message,
+      }));
+    }
+  };
+
+  // Handle file upload for bulk import
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setState((s) => ({ ...s, uploadProgress: 0 }));
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/b2b/discover/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Upload failed`);
+
+      const data = await res.json();
+
+      setState((s) => ({
+        ...s,
+        uploadProgress: undefined,
+        results: data.results || [],
+        totalCount: data.totalCount || 0,
+        currentFilter: `imported from file (${data.importedCount || 0} leads)`,
+      }));
+
+      // Reset file input
+      e.target.value = "";
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Upload failed";
+      setState((s) => ({
+        ...s,
+        uploadProgress: undefined,
         error: message,
       }));
     }
@@ -135,8 +187,36 @@ export default function DiscoverPage() {
     router.push(`/operator/understand?prospectId=${prospect.id}`);
   };
 
+  // Interpret pressure signal from prospect data
+  const getPressureSignal = (prospect: Prospect): string => {
+    if (prospect.pressureSignal) return prospect.pressureSignal;
+
+    // Fallback interpretation
+    if (prospect.confidenceScore && prospect.confidenceScore >= 80) {
+      return "Strong market signals detected";
+    }
+    if (prospect.status === "expansion") {
+      return "Company expanding (growth signal)";
+    }
+    return "Potential opportunity";
+  };
+
+  // Interpret trust source from prospect data
+  const getTrustSource = (prospect: Prospect): string => {
+    if (prospect.trustSource) return prospect.trustSource;
+
+    // Fallback interpretation
+    if (prospect.confidenceScore && prospect.confidenceScore >= 85) {
+      return "Multiple signals aligned (Google, hiring, capex)";
+    }
+    if (prospect.confidenceScore && prospect.confidenceScore >= 70) {
+      return "Primary signals confirmed";
+    }
+    return "Basic business data verified";
+  };
+
   return (
-    <div className="px-4 md:px-12 py-10 max-w-4xl">
+    <div className="px-4 md:px-12 py-10 max-w-6xl">
       {/* Header */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-4">
@@ -151,16 +231,29 @@ export default function DiscoverPage() {
           </Link>
         </div>
         <p className="text-sm md:text-base text-[#888888] font-normal">
-          Find and qualify new prospects for outreach.
+          Find new prospects and import lead lists into your pipeline.
         </p>
       </div>
 
+      {/* Discovery Briefing (Pressure Signals) */}
+      <section className="mb-12 p-6 md:p-8 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+        <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-3">
+          Why Discovery Matters Now
+        </h2>
+        <p className="text-sm text-[#0D0D0D] leading-relaxed mb-2">
+          <span className="font-semibold">Opportunity window is open.</span> Companies in growth phases make purchase decisions faster. By finding prospects showing pressure signals (expansion, hiring, capex) you can reach them at the exact moment they're ready to buy.
+        </p>
+        <p className="text-xs text-[#888888]">
+          Use keyword search for industry discovery. Use postcode + radius to find local opportunities. Upload CSV files to bulk-import leads.
+        </p>
+      </section>
+
       {/* Active Filter Display */}
-      {(status || score || stage) && (
+      {(status || score || stage || state.currentFilter !== "all") && (
         <div className="mb-8 p-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-[#0D0D0D]">
-              Filtered: {getFilterLabel()}
+              Filtered: {state.currentFilter === "all" ? getFilterLabel() : state.currentFilter}
             </p>
             <button
               onClick={() => router.push("/operator/discover")}
@@ -180,13 +273,66 @@ export default function DiscoverPage() {
         <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
           Search Prospects
         </h2>
-        <form onSubmit={handleSearch} className="flex gap-2">
+
+        {/* Search Type Toggle */}
+        <div className="flex gap-4 mb-6">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="searchType"
+              checked={!isPostcodeSearch}
+              onChange={() => setIsPostcodeSearch(false)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm text-[#0D0D0D]">Keyword Search</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="searchType"
+              checked={isPostcodeSearch}
+              onChange={() => setIsPostcodeSearch(true)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm text-[#0D0D0D]">Postcode Search</span>
+          </label>
+        </div>
+
+        {/* Postcode Search with Radius Slider */}
+        {isPostcodeSearch && (
+          <div className="mb-6 p-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg">
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-sm font-semibold text-[#0D0D0D]">
+                Search Radius: {searchRadius} km
+              </label>
+              <span className="text-xs text-[#888888]">1-25 km</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="25"
+              value={searchRadius}
+              onChange={(e) => setSearchRadius(parseInt(e.target.value))}
+              className="w-full"
+            />
+            <p className="text-xs text-[#888888] mt-2">
+              Adjust radius to find prospects near your target location
+            </p>
+          </div>
+        )}
+
+        {/* Search Input */}
+        <form onSubmit={handleSearch} className="flex gap-2 mb-6">
           <input
             type="text"
-            placeholder="Search by postcode, industry, or company name…"
+            placeholder={
+              isPostcodeSearch
+                ? "Enter postcode (e.g., SW1A 1AA)"
+                : "Search by company name, industry, or location…"
+            }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-3 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] placeholder-[#C9C9C9] focus:outline-none focus:border-[#0D0D0D] transition-colors rounded"
+            className="flex-1 px-4 py-3 bg-white border border-[#E8E8E8] text-sm text-[#0D0D0D] placeholder-[#C9C9C9] focus:outline-none focus:border-[#0D0D0D] transition-colors rounded"
           />
           <button
             type="submit"
@@ -195,6 +341,28 @@ export default function DiscoverPage() {
             Search
           </button>
         </form>
+
+        {/* File Upload Section */}
+        <div className="p-4 bg-[#F9F9F9] border-2 border-dashed border-[#E8E8E8] rounded-lg text-center">
+          <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
+            Or import leads from CSV file
+          </p>
+          <p className="text-xs text-[#888888] mb-4">
+            Upload a CSV with columns: businessName, city, industry, contactName
+          </p>
+          <label className="inline-flex px-4 py-2 bg-white border border-[#E8E8E8] rounded text-xs font-semibold text-[#0D0D0D] hover:border-[#0D0D0D] cursor-pointer transition-colors">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
+              disabled={state.uploadProgress !== undefined}
+            />
+            {state.uploadProgress !== undefined
+              ? `Uploading... ${state.uploadProgress}%`
+              : "Choose CSV File"}
+          </label>
+        </div>
       </section>
 
       {/* Results Section */}
@@ -236,33 +404,34 @@ export default function DiscoverPage() {
             <p className="text-sm text-[#666666]">No prospects found.</p>
             {searchTerm && (
               <p className="text-xs text-[#888888] mt-2">
-                Try a different search term or filter.
+                Try a different search term or expand your radius.
               </p>
             )}
           </div>
         )}
 
         {!state.loading && !state.error && state.results.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {state.results.map((prospect) => (
               <button
                 key={prospect.id}
                 onClick={() => handleProspectClick(prospect)}
                 className="w-full text-left border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all cursor-pointer group"
               >
-                <div className="flex items-start justify-between mb-2">
+                {/* Header: Company + Confidence */}
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-[#0D0D0D] group-hover:text-[#333333]">
                       {prospect.businessName}
                     </p>
                     {prospect.contactName && (
                       <p className="text-xs text-[#888888]">
-                        Contact: {prospect.contactName}
+                        {prospect.contactName}
                       </p>
                     )}
                   </div>
                   {prospect.confidenceScore !== undefined && (
-                    <div className="ml-4">
+                    <div className="ml-4 text-right">
                       <p className="text-sm font-black text-[#0D0D0D]">
                         {prospect.confidenceScore}%
                       </p>
@@ -270,13 +439,37 @@ export default function DiscoverPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex gap-4 text-xs text-[#888888]">
+
+                {/* Pressure Signal (Why This Matters Now) */}
+                <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
+                    PRESSURE SIGNAL
+                  </p>
+                  <p className="text-xs text-[#666666]">
+                    {getPressureSignal(prospect)}
+                  </p>
+                </div>
+
+                {/* Trust Signal (Why Confident) */}
+                <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
+                    TRUST BASIS
+                  </p>
+                  <p className="text-xs text-[#666666]">
+                    {getTrustSource(prospect)}
+                  </p>
+                </div>
+
+                {/* Location + Industry */}
+                <div className="flex gap-3 text-xs text-[#888888] mb-3">
+                  {prospect.postcode && <span>{prospect.postcode}</span>}
                   {prospect.city && <span>{prospect.city}</span>}
                   {prospect.industry && <span>{prospect.industry}</span>}
-                  {prospect.status && <span>{prospect.status}</span>}
                 </div>
-                <p className="text-xs text-[#0D0D0D] font-semibold group-hover:text-[#666666] mt-3 transition-colors">
-                  View & Qualify →
+
+                {/* Decision Guidance + CTA */}
+                <p className="text-xs text-[#0D0D0D] font-semibold group-hover:text-[#666666] transition-colors">
+                  Qualify This Prospect →
                 </p>
               </button>
             ))}
