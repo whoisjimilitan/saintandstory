@@ -236,15 +236,9 @@ export default function DiscoverPage() {
       </div>
 
       {/* Discovery Briefing (Pressure Signals) */}
-      <section className="mb-12 p-6 md:p-8 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-        <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-3">
-          Why Discovery Matters Now
-        </h2>
-        <p className="text-sm text-[#0D0D0D] leading-relaxed mb-2">
-          <span className="font-semibold">Opportunity window is open.</span> Companies in growth phases make purchase decisions faster. By finding prospects showing pressure signals (expansion, hiring, capex) you can reach them at the exact moment they're ready to buy.
-        </p>
-        <p className="text-xs text-[#888888]">
-          Use keyword search for industry discovery. Use postcode + radius to find local opportunities. Upload CSV files to bulk-import leads.
+      <section className="mb-12 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+        <p className="text-sm text-[#0D0D0D]">
+          <span className="font-semibold">Opportunity window is open.</span> Find prospects showing pressure signals (expansion, hiring, capex) when they're ready to buy.
         </p>
       </section>
 
@@ -282,7 +276,7 @@ export default function DiscoverPage() {
               name="searchType"
               checked={!isPostcodeSearch}
               onChange={() => setIsPostcodeSearch(false)}
-              className="w-4 h-4"
+              className="w-4 h-4 accent-[#0D0D0D]"
             />
             <span className="text-sm text-[#0D0D0D]">Keyword Search</span>
           </label>
@@ -292,7 +286,7 @@ export default function DiscoverPage() {
               name="searchType"
               checked={isPostcodeSearch}
               onChange={() => setIsPostcodeSearch(true)}
-              className="w-4 h-4"
+              className="w-4 h-4 accent-[#0D0D0D]"
             />
             <span className="text-sm text-[#0D0D0D]">Postcode Search</span>
           </label>

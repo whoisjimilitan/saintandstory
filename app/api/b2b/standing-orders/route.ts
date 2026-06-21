@@ -30,22 +30,32 @@ function nextOccurrence(dayOfWeek: number): Date {
 export async function GET() {
   try {
     if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    await ensureB2BSchema();
-    const sql = neon(process.env.DATABASE_URL!);
-    const rows = await sql`
-      SELECT so.*, bl.business_name as lead_business_name
-      FROM b2b_standing_orders so
-      LEFT JOIN b2b_leads bl ON bl.id = so.lead_id
-      WHERE so.active = true
-      ORDER BY so.created_at DESC
-    `;
-    return NextResponse.json({ orders: rows });
+
+    try {
+      await ensureB2BSchema();
+    } catch (schemaError) {
+      console.error("[STANDING_ORDERS] Schema error:", schemaError);
+      return NextResponse.json({ orders: [] });
+    }
+
+    try {
+      const sql = neon(process.env.DATABASE_URL!);
+      const rows = await sql`
+        SELECT so.*, bl.business_name as lead_business_name
+        FROM b2b_standing_orders so
+        LEFT JOIN b2b_leads bl ON bl.id = so.lead_id
+        WHERE so.active = true
+        ORDER BY so.created_at DESC
+      `;
+      return NextResponse.json({ orders: rows });
+    } catch (queryError) {
+      console.error("[STANDING_ORDERS] Query error:", queryError);
+      // Return empty array rather than error if table doesn't exist
+      return NextResponse.json({ orders: [] });
+    }
   } catch (error) {
-    console.error("[STANDING_ORDERS] Error fetching orders:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch standing orders", orders: [] },
-      { status: 500 }
-    );
+    console.error("[STANDING_ORDERS] Unexpected error:", error);
+    return NextResponse.json({ orders: [] });
   }
 }
 
