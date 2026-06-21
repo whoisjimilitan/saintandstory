@@ -208,10 +208,87 @@ export default function UnderstandPage() {
         <p className="text-sm md:text-base text-[#888888] font-normal">
           Enrich and qualify this prospect before outreach.
         </p>
+
+        {/* Navigation Counter */}
+        {discoveryResults.length > 0 && (
+          <div className="flex items-center gap-4 mt-6">
+            <button
+              onClick={async () => {
+                const currentIndex = discoveryResults.findIndex(
+                  (r) => r.id === prospectId
+                );
+                if (currentIndex > 0) {
+                  const prevResult = discoveryResults[currentIndex - 1];
+                  try {
+                    const importRes = await fetch("/api/b2b/prospect/import", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        googlePlaceId: prevResult.id,
+                        businessName: prevResult.businessName,
+                        city: prevResult.city,
+                      }),
+                    });
+
+                    if (importRes.ok) {
+                      const { id } = await importRes.json();
+                      router.push(`/operator/understand?prospectId=${id}`);
+                    }
+                  } catch (error) {
+                    console.error("Error navigating:", error);
+                  }
+                }
+              }}
+              disabled={discoveryResults.findIndex((r) => r.id === prospectId) === 0}
+              className="px-3 py-2 text-sm font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Prev
+            </button>
+            <span className="text-sm font-semibold text-[#0D0D0D]">
+              {discoveryResults.findIndex((r) => r.id === prospectId) + 1} of{" "}
+              {discoveryResults.length}
+            </span>
+            <button
+              onClick={async () => {
+                const currentIndex = discoveryResults.findIndex(
+                  (r) => r.id === prospectId
+                );
+                if (currentIndex < discoveryResults.length - 1) {
+                  const nextResult = discoveryResults[currentIndex + 1];
+                  try {
+                    const importRes = await fetch("/api/b2b/prospect/import", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        googlePlaceId: nextResult.id,
+                        businessName: nextResult.businessName,
+                        city: nextResult.city,
+                      }),
+                    });
+
+                    if (importRes.ok) {
+                      const { id } = await importRes.json();
+                      router.push(`/operator/understand?prospectId=${id}`);
+                    }
+                  } catch (error) {
+                    console.error("Error navigating:", error);
+                  }
+                }
+              }}
+              disabled={
+                discoveryResults.findIndex((r) => r.id === prospectId) ===
+                discoveryResults.length - 1
+              }
+              className="px-3 py-2 text-sm font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12"></div>
+      <div className="h-px bg-[#E8E8E8] mb-12 mt-12"></div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Main Content: 2 columns on desktop */}
