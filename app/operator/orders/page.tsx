@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { JourneyProgress } from "../components/journey-progress";
 
 interface Order {
   id: string;
@@ -27,10 +28,10 @@ interface OrdersState {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  active: "bg-green-100 text-green-800",
-  completed: "bg-blue-100 text-blue-800",
-  renewed: "bg-purple-100 text-purple-800",
+  pending: "bg-[#F5F5F5] text-[#888888]",
+  active: "bg-[#E8E8E8] text-[#0D0D0D]",
+  completed: "bg-[#0D0D0D] text-white",
+  renewed: "bg-[#DEDEDE] text-[#0D0D0D]",
 };
 
 export default function OrdersPage() {
@@ -191,14 +192,11 @@ export default function OrdersPage() {
 
   return (
     <div className="px-4 md:px-12 py-10 max-w-6xl">
+      {/* Journey Progress */}
+      <JourneyProgress currentStage="orders" prospectCount={{ orders: state.orders.length }} />
+
       {/* Header */}
       <div className="mb-12">
-        <Link
-          href="/operator"
-          className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-        >
-          ← Back to Today
-        </Link>
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
           Orders
         </h1>

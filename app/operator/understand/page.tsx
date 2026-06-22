@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { JourneyProgress } from "../components/journey-progress";
 
 interface ProspectDetail {
   id: string;
@@ -175,19 +176,16 @@ export default function UnderstandPage() {
 
   return (
     <div className="px-4 md:px-12 py-10 max-w-4xl">
+      {/* Journey Progress */}
+      <JourneyProgress currentStage="understand" prospectId={state.prospect?.id} />
+
       {/* Header */}
       <div className="mb-12">
-        <Link
-          href="/operator/discover"
-          className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-        >
-          ← Back to Discover
-        </Link>
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
-          Understand
+          {state.prospect?.businessName}
         </h1>
         <p className="text-sm md:text-base text-[#888888] font-normal">
-          Enrich and qualify this prospect before outreach.
+          Enrich and qualify before outreach.
         </p>
       </div>
 

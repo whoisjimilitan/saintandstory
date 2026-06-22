@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { JourneyProgress } from "../components/journey-progress";
 
 interface ProspectInPipeline {
   id: string;
@@ -22,11 +23,11 @@ interface PipelineState {
 }
 
 const STAGES = [
-  { name: "discover", label: "Discover", color: "bg-blue-500" },
-  { name: "enrich", label: "Enrich", color: "bg-green-500" },
-  { name: "qualify", label: "Qualify", color: "bg-orange-500" },
-  { name: "propose", label: "Propose", color: "bg-purple-500" },
-  { name: "orders", label: "Orders", color: "bg-red-500" },
+  { name: "discover", label: "Discover" },
+  { name: "enrich", label: "Enrich" },
+  { name: "qualify", label: "Qualify" },
+  { name: "propose", label: "Propose" },
+  { name: "orders", label: "Orders" },
 ];
 
 export default function PipelinePage() {
@@ -144,16 +145,21 @@ export default function PipelinePage() {
 
   const totalProspects = state.prospects.length;
 
+  const prospectCounts = {
+    discover: stageFilters.discover?.length || 0,
+    enrich: stageFilters.enrich?.length || 0,
+    qualify: stageFilters.qualify?.length || 0,
+    propose: stageFilters.propose?.length || 0,
+    orders: stageFilters.orders?.length || 0,
+  };
+
   return (
     <div className="px-4 md:px-12 py-10 max-w-6xl">
+      {/* Journey Progress */}
+      <JourneyProgress currentStage="pipeline" prospectCount={prospectCounts} />
+
       {/* Header */}
       <div className="mb-12">
-        <Link
-          href="/operator"
-          className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-        >
-          ← Back to Today
-        </Link>
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
           Pipeline
         </h1>
@@ -172,7 +178,7 @@ export default function PipelinePage() {
             {/* Stage Header */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-3 h-3 rounded-full ${stageConfig.color}`}></div>
+                <div className="w-3 h-3 rounded-full bg-[#0D0D0D]"></div>
                 <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.1em]">
                   {stageConfig.label}
                 </h2>

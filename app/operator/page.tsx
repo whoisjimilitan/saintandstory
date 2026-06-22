@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { JourneyProgress } from "./components/journey-progress";
 
 // Premium single-color icons
 const Icons = {
@@ -243,10 +244,19 @@ export default function OperatorBriefing() {
     state.data.pipeline.propose +
     state.data.pipeline.orders;
 
+  const prospectCounts = {
+    today: state.data?.metrics.newOpportunitiesToday || 0,
+    discover: state.data?.pipeline.discover || 0,
+    understand: state.data?.pipeline.enrich || 0,
+    outreach: state.data?.pipeline.qualify || 0,
+    pipeline: state.data?.pipeline.propose || 0,
+    orders: state.data?.pipeline.orders || 0,
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* HEADER */}
-      <div className="mb-16 px-4 md:px-0">
+      <div className="mb-8 px-4 md:px-0">
         <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
           <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase">
             {dateStr}
@@ -259,6 +269,9 @@ export default function OperatorBriefing() {
           Here's what needs your attention today.
         </p>
       </div>
+
+      {/* JOURNEY PROGRESS */}
+      <JourneyProgress currentStage="today" prospectCount={prospectCounts} />
 
       {/* NARRATIVE BRIEFING - Idea #4 */}
       <div className="mb-16 px-4 md:px-0">
