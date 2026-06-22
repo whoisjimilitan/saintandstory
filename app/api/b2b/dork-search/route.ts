@@ -19,6 +19,10 @@ async function isAdmin() {
 
 // Parse conversational dork input into structured parameters
 function parseConversationalQuery(input: string) {
+  console.log("🔍 parseConversationalQuery input:", input);
+  if (!input || typeof input !== "string") {
+    throw new Error(`Invalid input to parseConversationalQuery: ${typeof input}`);
+  }
   const lower = input.toLowerCase();
 
   // Extract source (instagram, linkedin, facebook, twitter, google, etc.)
@@ -84,6 +88,10 @@ function parseConversationalQuery(input: string) {
 
 // Build dork query from parameters
 function buildDorkQuery(params: any): string {
+  console.log("🔍 buildDorkQuery params:", params);
+  if (!params || !params.keyword || !params.source) {
+    throw new Error(`Invalid params in buildDorkQuery: keyword=${params?.keyword}, source=${params?.source}`);
+  }
   const siteClause = `site:${params.source}.com`;
   const keywordClause = `"${params.keyword}"`;
   const contactClause =
@@ -184,23 +192,32 @@ async function identifyPressureGroup(
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🔍 [DORK-SEARCH] POST handler called");
+
     // AUTH
     if (!(await isAdmin())) {
+      console.log("🔍 [DORK-SEARCH] Auth failed");
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    console.log("🔍 [DORK-SEARCH] Auth passed, parsing body");
     const body = await request.json() as any;
+    console.log("🔍 [DORK-SEARCH] Body received:", body);
     const query = body?.query;
+    console.log("🔍 [DORK-SEARCH] Query extracted:", query, "Type:", typeof query);
 
     if (!query || typeof query !== "string" || query.trim().length === 0) {
+      console.log("🔍 [DORK-SEARCH] Query validation failed");
       return NextResponse.json(
         { error: "Query is required and must be a string" },
         { status: 400 }
       );
     }
 
+    console.log("🔍 [DORK-SEARCH] Query valid, parsing conversational input");
     // PARSE conversational input
     const params = parseConversationalQuery(query);
+    console.log("🔍 [DORK-SEARCH] Params parsed:", params);
 
     // BUILD dork query (for logging/display)
     const dorkQuery = buildDorkQuery(params);
