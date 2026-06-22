@@ -147,13 +147,21 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     setBatchSuccess(null);
 
     try {
+      console.log("Batch qualifying:", selectedArray);
+
       const res = await fetch("/api/b2b/batch-qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prospectIds: selectedArray }),
       });
 
-      if (!res.ok) throw new Error("Failed to qualify prospects");
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMsg = errorData.error || `HTTP ${res.status}`;
+        throw new Error(errorMsg);
+      }
+
+      console.log("Qualified successfully");
 
       setBatchSuccess(`✓ Qualified ${selectedArray.length} prospect${selectedArray.length !== 1 ? "s" : ""}`);
 
