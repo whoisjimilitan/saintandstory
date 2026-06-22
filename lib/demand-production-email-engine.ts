@@ -268,8 +268,8 @@ export function generateDemandProductionEmail(
       return generateGenericDemandEmail(ctx);
     }
 
-    const templateFn = categoryTemplates[signal as keyof typeof categoryTemplates];
-    if (!templateFn) {
+    const templateFn = categoryTemplates[signal as keyof typeof categoryTemplates] as ((ctx: EmailContext) => DemandProductionEmail) | undefined;
+    if (!templateFn || typeof templateFn !== 'function') {
       return generateGenericDemandEmail(ctx);
     }
 
