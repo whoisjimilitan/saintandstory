@@ -37,7 +37,11 @@ function parseConversationalQuery(input: string) {
   const keywordMatch = input.match(
     /(?:find|search|looking for|locate)\s+([a-zA-Z\s]+?)(?:\s+(?:with|on|from|in|via)|$)/i
   );
-  const keyword = keywordMatch ? keywordMatch[1].trim() : input.trim();
+  let keyword = keywordMatch ? keywordMatch[1].trim() : input.trim();
+  // Fallback: if still empty, use first word
+  if (!keyword || keyword.length === 0) {
+    keyword = input.split(/\s+/)[0] || "business";
+  }
 
   // Extract contact type (phone, email, etc.)
   const hasPhone =
@@ -185,11 +189,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { query } = (await request.json()) as { query: string };
+    const body = await request.json() as any;
+    const query = body?.query;
 
-    if (!query || query.trim().length === 0) {
+    if (!query || typeof query !== "string" || query.trim().length === 0) {
       return NextResponse.json(
-        { error: "Query is required" },
+        { error: "Query is required and must be a string" },
         { status: 400 }
       );
     }
@@ -273,10 +278,17 @@ export async function POST(request: NextRequest) {
       readyForPreview: createdLeads.length > 0
     });
   } catch (error) {
-    console.error("🔥 DORK SEARCH ERROR:", error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+    console.error("🔥 DORK SEARCH ERROR:", {
+      message: errorMsg,
+      stack: errorStack,
+      name: error instanceof Error ? error.name : "Unknown"
+    });
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Dork search failed"
+        error: `Dork search error: ${errorMsg}`,
+        details: errorStack
       },
       { status: 500 }
     );
