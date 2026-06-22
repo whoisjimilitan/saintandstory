@@ -206,29 +206,10 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     const selectedArray = Array.from(selectedIds);
     if (selectedArray.length === 0) return;
 
-    setBatchLoading(true);
-    setBatchError(null);
-    setBatchSuccess(null);
-
-    try {
-      const res = await fetch("/api/b2b/batch-emails/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectIds: selectedArray }),
-      });
-
-      if (!res.ok) throw new Error("Failed to generate emails");
-
-      const data = await res.json();
-      setGeneratedEmails(data.emails);
-      setShowCampaignModal(true);
-      setBatchSuccess(`✓ Generated ${data.count} email${data.count !== 1 ? "s" : ""} for review`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Email generation failed";
-      setBatchError(message);
-    } finally {
-      setBatchLoading(false);
-    }
+    // Navigate to ENRICH page with batch of prospectIds
+    // ENRICH page will generate emails for the batch
+    const prospectIdsParam = selectedArray.join(",");
+    router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
   };
 
   const handleCampaignApprove = async (emails: any[]) => {
