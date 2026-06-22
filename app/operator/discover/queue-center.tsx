@@ -19,6 +19,7 @@ interface QueueCenterProps {
   prospects: Prospect[];
   onBack: () => void;
   totalCount: number;
+  onProspectsUpdate?: (updatedProspects: Prospect[]) => void;
 }
 
 // Premium single-color icons
@@ -85,10 +86,13 @@ const sortProspects = (prospects: Prospect[]): Prospect[] => {
   });
 };
 
-export function QueueCenter({ prospects, onBack, totalCount }: QueueCenterProps) {
+export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }: QueueCenterProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sendingBatch, setSendingBatch] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [batchError, setBatchError] = useState<string | null>(null);
+  const [batchSuccess, setBatchSuccess] = useState<string | null>(null);
 
   const sortedProspects = useMemo(() => sortProspects(prospects), [prospects]);
   const currentProspect = sortedProspects[currentIndex];
@@ -121,6 +125,67 @@ export function QueueCenter({ prospects, onBack, totalCount }: QueueCenterProps)
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleBatchQualify = async () => {
+    const selectedArray = Array.from(selectedIds);
+    if (selectedArray.length === 0) return;
+
+    setBatchLoading(true);
+    setBatchError(null);
+    setBatchSuccess(null);
+
+    try {
+      const res = await fetch("/api/b2b/batch-qualify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectIds: selectedArray }),
+      });
+
+      if (!res.ok) throw new Error("Failed to qualify prospects");
+
+      setBatchSuccess(`✓ Qualified ${selectedArray.length} prospect${selectedArray.length !== 1 ? "s" : ""}`);
+      setSelectedIds(new Set());
+
+      // Remove qualified prospects from view
+      const remaining = prospects.filter((p) => !selectedArray.includes(p.id));
+      if (onProspectsUpdate) onProspectsUpdate(remaining);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Batch qualify failed";
+      setBatchError(message);
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  const handleBatchEmail = async () => {
+    const selectedArray = Array.from(selectedIds);
+    if (selectedArray.length === 0) return;
+
+    setBatchLoading(true);
+    setBatchError(null);
+    setBatchSuccess(null);
+
+    try {
+      const res = await fetch("/api/b2b/batch-emails/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectIds: selectedArray }),
+      });
+
+      if (!res.ok) throw new Error("Failed to generate emails");
+
+      const data = await res.json();
+      setBatchSuccess(`✓ Generated ${data.count} email${data.count !== 1 ? "s" : ""} for review`);
+
+      // TODO: Open campaign-style email review modal
+      console.log("Generated emails for batch:", data.emails);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Email generation failed";
+      setBatchError(message);
+    } finally {
+      setBatchLoading(false);
     }
   };
 
@@ -225,12 +290,30 @@ export function QueueCenter({ prospects, onBack, totalCount }: QueueCenterProps)
               <p className="text-xs font-semibold text-[#0D0D0D] mb-3">
                 {selectedCount} selected
               </p>
-              <button className="w-full px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors">
-                Qualify ({selectedCount})
+              <button
+                onClick={handleBatchQualify}
+                disabled={batchLoading}
+                className="w-full px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {batchLoading ? "Processing..." : `Qualify (${selectedCount})`}
               </button>
-              <button className="w-full px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors">
-                Email ({selectedCount})
+              <button
+                onClick={handleBatchEmail}
+                disabled={batchLoading}
+                className="w-full px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {batchLoading ? "Processing..." : `Email (${selectedCount})`}
               </button>
+              {batchSuccess && (
+                <div className="p-2 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[10px] text-[#0D0D0D]">
+                  {batchSuccess}
+                </div>
+              )}
+              {batchError && (
+                <div className="p-2 bg-red-50 border border-red-200 rounded text-[10px] text-red-700">
+                  {batchError}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -305,13 +388,27 @@ export function QueueCenter({ prospects, onBack, totalCount }: QueueCenterProps)
             </button>
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - Single Prospect */}
           <div className="flex gap-2 mt-4">
-            <button className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors flex items-center justify-center gap-1">
+            <button
+              onClick={() => {
+                setSelectedIds(new Set([currentProspect.id]));
+                // Will trigger batch qualify with just this prospect
+              }}
+              disabled={!currentProspect || batchLoading}
+              className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
+            >
               <Icons.CheckCircle />
               Qualify
             </button>
-            <button className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors flex items-center justify-center gap-1">
+            <button
+              onClick={() => {
+                setSelectedIds(new Set([currentProspect.id]));
+                // Will trigger batch email with just this prospect
+              }}
+              disabled={!currentProspect || batchLoading}
+              className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
+            >
               <Icons.Email />
               Email
             </button>
