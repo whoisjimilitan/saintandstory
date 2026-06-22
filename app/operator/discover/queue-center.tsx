@@ -149,10 +149,16 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     try {
       console.log("Batch qualifying:", selectedArray);
 
+      // Get the full prospect data for selected prospects
+      const selectedProspects = prospects.filter((p) => selectedArray.includes(p.id));
+
       const res = await fetch("/api/b2b/batch-qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectIds: selectedArray }),
+        body: JSON.stringify({
+          prospectIds: selectedArray,
+          prospectData: selectedProspects, // Include full prospect data
+        }),
       });
 
       if (!res.ok) {
@@ -216,8 +222,18 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     const selectedArray = Array.from(selectedIds);
     if (selectedArray.length === 0) return;
 
+    // Get the full prospect data for selected prospects
+    const selectedProspects = prospects.filter((p) => selectedArray.includes(p.id));
+
+    // Store prospect data temporarily in sessionStorage for ENRICH to access
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        "batchProspectData",
+        JSON.stringify(selectedProspects)
+      );
+    }
+
     // Navigate to ENRICH page with batch of prospectIds
-    // ENRICH page will generate emails for the batch
     const prospectIdsParam = selectedArray.join(",");
     router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
   };

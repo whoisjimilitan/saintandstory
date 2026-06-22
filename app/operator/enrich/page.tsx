@@ -48,10 +48,23 @@ export default function EnrichPage() {
         // Generate emails for all prospects
         console.log("Generating emails for prospectIds:", prospectIds);
 
+        // Try to get prospect data from sessionStorage (from search results)
+        let prospectDataForApi: any[] | undefined;
+        if (typeof window !== "undefined") {
+          const stored = sessionStorage.getItem("batchProspectData");
+          if (stored) {
+            prospectDataForApi = JSON.parse(stored);
+            console.log("Using prospect data from sessionStorage:", prospectDataForApi?.length);
+          }
+        }
+
         const res = await fetch("/api/b2b/batch-emails/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prospectIds }),
+          body: JSON.stringify({
+            prospectIds,
+            prospectData: prospectDataForApi, // Include full prospect data if available
+          }),
         });
 
         if (!res.ok) {
