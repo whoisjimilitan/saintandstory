@@ -5,11 +5,85 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 
+// Premium single-color icons
+const Icons = {
+  // Temperature/Urgency
+  UltraHot: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M8 2v6M5 8h6M3 10c0 2.21 1.79 4 4 4s4-1.79 4-4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Hot: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M8 3v5M5 8h6M3.5 11c0 1.66 1.34 3 3 3s3-1.34 3-3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Warm: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 5v3" strokeLinecap="round"/>
+    </svg>
+  ),
+
+  // Actions
+  Email: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 4h12v8H2V4z" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M2 4l6 4 6-4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  CheckCircle: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M6 8l1.5 1.5 2.5-2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Clock: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 5v3l2 1" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Eye: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M1 8s2-4 7-4 7 4 7 4-2 4-7 4-7-4-7-4z" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="8" cy="8" r="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  TrendingUp: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 14l3-3 2 2 5-5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M10 6h4v4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  AlertCircle: () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 5v3M8 11h.01" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+};
+
 interface MorningBriefMetrics {
   newOpportunitiesToday: number;
   highConfidenceToday: number;
   finishedToday: number;
   closedToday: number;
+  temperatureBreakdown?: {
+    ultraHot: number;
+    hot: number;
+    warm: number;
+  };
+  industryBreakdown?: Array<{
+    name: string;
+    count: number;
+    percentage: number;
+  }>;
+  pressureBreakdown?: Array<{
+    name: string;
+    count: number;
+    percentage: number;
+  }>;
 }
 
 interface Pipeline {
@@ -100,10 +174,6 @@ export default function OperatorBriefing() {
     loadData();
   }, []);
 
-  const handleRetry = () => {
-    setState((s) => ({ ...s, loading: true, error: null }));
-  };
-
   const handleMetricClick = (metric: string) => {
     switch (metric) {
       case "new":
@@ -148,7 +218,7 @@ export default function OperatorBriefing() {
               {state.error || "Could not load dashboard data. Please try again."}
             </p>
             <button
-              onClick={handleRetry}
+              onClick={() => setState(s => ({ ...s, loading: true }))}
               className="px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-colors"
             >
               Try Again
@@ -159,12 +229,13 @@ export default function OperatorBriefing() {
     );
   }
 
-  const hasActions = state.data.todaysActions.length > 0;
-  const hasActivity = state.data.recentActivity.length > 0;
+  const metrics = state.data.metrics;
+  const tempBreakdown = metrics.temperatureBreakdown || { ultraHot: 0, hot: 0, warm: 0 };
+  const industryData = metrics.industryBreakdown || [];
+  const pressureData = metrics.pressureBreakdown || [];
 
-  // Calculate metrics for narrative
   const baselineNew = 16;
-  const newTrend = ((state.data.metrics.newOpportunitiesToday - baselineNew) / baselineNew) * 100;
+  const newTrend = ((metrics.newOpportunitiesToday - baselineNew) / baselineNew) * 100;
   const totalPipelineProspects =
     state.data.pipeline.discover +
     state.data.pipeline.enrich +
@@ -175,346 +246,346 @@ export default function OperatorBriefing() {
   return (
     <div className="min-h-screen bg-white">
       {/* HEADER */}
-      <div className="mb-12 md:mb-16 px-4 md:px-0">
-        <div className="inline-flex items-center gap-2 mb-4 md:mb-6 bg-[#F5F5F5] px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-[#E8E8E8]">
-          <p className="text-[10px] md:text-xs font-semibold text-[#0D0D0D] tracking-[0.2em] uppercase">
+      <div className="mb-16 px-4 md:px-0">
+        <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase">
             {dateStr}
           </p>
         </div>
-        <h1 className="text-3xl md:text-5xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.01em] leading-tight">
+        <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
           {firstName || "Welcome"}.
         </h1>
-        <p className="text-sm md:text-base text-[#666666] leading-relaxed max-w-2xl font-light">
+        <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
           Here's what needs your attention today.
         </p>
       </div>
 
-      {/* MARKET BRIEFING (Pressure Signals) */}
-      <div className="mb-12 md:mb-20 px-4 md:px-0">
-        <div className="mb-6 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
-            Market Signal
-          </h2>
-        </div>
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-[#F9F9F9]">
-          <div className="max-w-3xl">
-            <p className="text-sm md:text-base text-[#0D0D0D] leading-relaxed mb-4">
-              {state.data.metrics.newOpportunitiesToday > baselineNew ? (
-                <>
-                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> discovered today
-                  {newTrend > 0 && (
-                    <>
-                      {" "}
-                      ({Math.round(newTrend)}% above baseline)
-                    </>
+      {/* NARRATIVE BRIEFING - Idea #4 */}
+      <div className="mb-16 px-4 md:px-0">
+        <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-[#F9F9F9]">
+          <div className="max-w-3xl space-y-4">
+            {/* Status Summary */}
+            <div className="flex items-start gap-3">
+              <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                <Icons.TrendingUp />
+              </div>
+              <div>
+                <p className="text-sm text-[#0D0D0D] font-semibold">
+                  {metrics.newOpportunitiesToday} new prospects discovered today
+                </p>
+                {newTrend > 0 && (
+                  <p className="text-xs text-[#888888] mt-0.5">
+                    {Math.round(newTrend)}% above typical baseline
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Action Items */}
+            <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+              <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                <Icons.AlertCircle />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                  Action Items
+                </p>
+                <ul className="space-y-1.5 text-xs text-[#666666]">
+                  {tempBreakdown.ultraHot > 0 && (
+                    <li>• {tempBreakdown.ultraHot} prospect{tempBreakdown.ultraHot !== 1 ? 's' : ''} awaiting response follow-up</li>
                   )}
-                </>
-              ) : (
-                <>
-                  <span className="font-semibold">{state.data.metrics.newOpportunitiesToday} new prospects</span> discovered today.
-                </>
-              )}
-            </p>
-            <p className="text-xs text-[#888888]">
-              Last updated: {new Date(state.data.metadata.lastUpdated).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+                  {tempBreakdown.hot > 0 && (
+                    <li>• {tempBreakdown.hot} prospect{tempBreakdown.hot !== 1 ? 's' : ''} sent emails, monitor responses</li>
+                  )}
+                  {metrics.highConfidenceToday > 0 && (
+                    <li>• {metrics.highConfidenceToday} high-confidence prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+
+            {/* Market Insight */}
+            {industryData.length > 0 && (
+              <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+                <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                  <Icons.TrendingUp />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                    Market Signal
+                  </p>
+                  <p className="text-xs text-[#666666]">
+                    {industryData[0]?.name} showing strongest opportunity ({industryData[0]?.count} prospects)
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* FOCUS FIRST (Decision Guidance) */}
-      <div className="mb-12 md:mb-20 px-4 md:px-0">
-        <div className="mb-6 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
-            Focus First
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Opportunity Summary Card */}
-          <button
-            onClick={() => router.push("/operator/discover")}
-            className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all text-left cursor-pointer group"
-          >
-            <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
+      {/* HIGH-CONFIDENCE CARD - Ideas #1, #2, #3, #5 */}
+      <div className="mb-16 px-4 md:px-0">
+        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
+          {/* Title and Counts */}
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
               Discovery Pipeline
             </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-              {state.data.metrics.highConfidenceToday}
+            <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-4">
+              {metrics.highConfidenceToday}
             </p>
-            <p className="text-xs md:text-sm text-[#666666] mb-4">
-              high-confidence prospects ready to qualify.
+            <p className="text-sm text-[#666666] mb-6">
+              High-confidence prospects ready to review.
             </p>
-            <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
-              Review these first →
-            </p>
-          </button>
 
-          {/* Revenue Summary Card */}
-          <button
-            onClick={() => router.push("/operator/orders")}
-            className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-8 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all text-left cursor-pointer group"
-          >
-            <p className="text-[9px] md:text-xs font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3 md:mb-4">
-              Revenue Status
-            </p>
-            <p className="text-2xl md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
-              {state.data.metrics.closedToday}
-            </p>
-            <p className="text-xs md:text-sm text-[#666666] mb-4">
-              deals closed today.
-            </p>
-            <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors">
-              View orders →
-            </p>
-          </button>
+            {/* Temperature Breakdown - Idea #1 */}
+            <div className="space-y-2.5 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="text-[#0D0D0D]">
+                    <Icons.UltraHot />
+                  </div>
+                  <span className="text-xs font-semibold text-[#0D0D0D]">Ultra Hot</span>
+                  <span className="text-xs text-[#888888]">— Act now, awaiting response follow-up</span>
+                </div>
+                <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.ultraHot}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="text-[#0D0D0D]">
+                    <Icons.Hot />
+                  </div>
+                  <span className="text-xs font-semibold text-[#0D0D0D]">Hot</span>
+                  <span className="text-xs text-[#888888]">— Today, emails sent, watch for responses</span>
+                </div>
+                <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.hot}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="text-[#0D0D0D]">
+                    <Icons.Warm />
+                  </div>
+                  <span className="text-xs font-semibold text-[#0D0D0D]">Warm</span>
+                  <span className="text-xs text-[#888888]">— This week, awaiting first email</span>
+                </div>
+                <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.warm}</span>
+              </div>
+            </div>
+
+            {/* Industry Breakdown - Idea #2 */}
+            {industryData.length > 0 && (
+              <div className="mb-6 pt-6 border-t border-[#E8E8E8]">
+                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
+                  By Industry
+                </p>
+                <div className="space-y-2">
+                  {industryData.slice(0, 3).map((industry) => (
+                    <div key={industry.name} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-[#0D0D0D] font-medium">{industry.name}</span>
+                          <span className="text-xs text-[#888888]">{industry.count}</span>
+                        </div>
+                        <div className="h-1.5 bg-[#E8E8E8] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#0D0D0D]"
+                            style={{ width: `${industry.percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Pressure Breakdown - Idea #2 */}
+            {pressureData.length > 0 && (
+              <div className="mb-6 pt-6 border-t border-[#E8E8E8]">
+                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
+                  By Pressure Signal
+                </p>
+                <div className="space-y-2">
+                  {pressureData.slice(0, 3).map((pressure) => (
+                    <div key={pressure.name} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-[#0D0D0D] font-medium">{pressure.name}</span>
+                          <span className="text-xs text-[#888888]">{pressure.count}</span>
+                        </div>
+                        <div className="h-1.5 bg-[#E8E8E8] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#0D0D0D]"
+                            style={{ width: `${pressure.percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Micro-Actions - Idea #3 */}
+          <div className="flex flex-wrap gap-3 pt-6 border-t border-[#E8E8E8]">
+            <button
+              onClick={() => router.push("/operator/outreach?action=batch-send")}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+            >
+              <Icons.Email />
+              Send Batch Emails
+            </button>
+
+            <button
+              onClick={() => router.push("/operator/discover?score=80+")}
+              className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
+            >
+              <Icons.Eye />
+              See All
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* PIPELINE HEALTH (Trust Signals - Pipeline Confidence) */}
-      <div className="mb-12 md:mb-20 px-4 md:px-0">
-        <div className="mb-6 md:mb-8">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
+      {/* REVENUE CARD */}
+      <div className="mb-16 px-4 md:px-0">
+        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
+          <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
+            Revenue Status
+          </p>
+          <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-4">
+            {metrics.closedToday}
+          </p>
+          <p className="text-sm text-[#666666] mb-6">
+            Deal{metrics.closedToday !== 1 ? 's' : ''} closed today.
+          </p>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push("/operator/orders")}
+              className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
+            >
+              <Icons.Eye />
+              View Orders
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* PIPELINE CONFIDENCE */}
+      <div className="mb-16 px-4 md:px-0">
+        <div className="mb-6">
+          <h2 className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase mb-3">
             Pipeline Confidence
           </h2>
           <p className="text-xs text-[#888888]">
-            Distribution of {totalPipelineProspects} prospects across qualification stages.
+            {totalPipelineProspects} prospects across qualification stages.
           </p>
         </div>
 
-        <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-6 md:p-12 bg-white overflow-x-auto">
-          <div className="flex justify-between items-end gap-2 md:gap-4 min-w-min md:min-w-0">
+        <div className="border border-[#E8E8E8] rounded-lg p-8 md:p-12 bg-white overflow-x-auto">
+          <div className="flex justify-between items-end gap-4 min-w-min md:min-w-0">
             {/* Discover */}
             <button
               onClick={() => handlePipelineStageClick("discover")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
+              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
             >
-              <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-blue-500 shadow-sm"></div>
+              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full bg-[#0D0D0D]"
+                  style={{ width: `${(state.data.pipeline.discover / totalPipelineProspects) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
                 Discover
               </p>
-              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
                 {state.data.pipeline.discover}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                prospects
-              </p>
             </button>
-
-            {/* Connecting Line */}
-            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
-              <svg
-                className="w-6 md:w-full h-0.5 md:h-1"
-                viewBox="0 0 100 4"
-                preserveAspectRatio="none"
-              >
-                <line
-                  x1="0"
-                  y1="2"
-                  x2="100"
-                  y2="2"
-                  stroke="#E8E8E8"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
 
             {/* Enrich */}
             <button
               onClick={() => handlePipelineStageClick("enrich")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
+              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
             >
-              <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-green-500 shadow-sm"></div>
+              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full bg-[#0D0D0D]"
+                  style={{ width: `${(state.data.pipeline.enrich / totalPipelineProspects) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
                 Enrich
               </p>
-              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
                 {state.data.pipeline.enrich}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                enriching
-              </p>
             </button>
-
-            {/* Connecting Line */}
-            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
-              <svg
-                className="w-6 md:w-full h-0.5 md:h-1"
-                viewBox="0 0 100 4"
-                preserveAspectRatio="none"
-              >
-                <line
-                  x1="0"
-                  y1="2"
-                  x2="100"
-                  y2="2"
-                  stroke="#E8E8E8"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
 
             {/* Qualify */}
             <button
               onClick={() => handlePipelineStageClick("qualify")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
+              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
             >
-              <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-orange-500 shadow-sm"></div>
+              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full bg-[#0D0D0D]"
+                  style={{ width: `${(state.data.pipeline.qualify / totalPipelineProspects) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
                 Qualify
               </p>
-              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
                 {state.data.pipeline.qualify}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                qualified
-              </p>
             </button>
-
-            {/* Connecting Line */}
-            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
-              <svg
-                className="w-6 md:w-full h-0.5 md:h-1"
-                viewBox="0 0 100 4"
-                preserveAspectRatio="none"
-              >
-                <line
-                  x1="0"
-                  y1="2"
-                  x2="100"
-                  y2="2"
-                  stroke="#E8E8E8"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
 
             {/* Propose */}
             <button
               onClick={() => handlePipelineStageClick("propose")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
+              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
             >
-              <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-purple-500 shadow-sm"></div>
+              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full bg-[#0D0D0D]"
+                  style={{ width: `${(state.data.pipeline.propose / totalPipelineProspects) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
                 Propose
               </p>
-              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
                 {state.data.pipeline.propose}
               </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                proposed
-              </p>
             </button>
-
-            {/* Connecting Line */}
-            <div className="flex-shrink-0 md:flex-1 flex items-center justify-center px-1 md:px-4 h-6 md:h-auto">
-              <svg
-                className="w-6 md:w-full h-0.5 md:h-1"
-                viewBox="0 0 100 4"
-                preserveAspectRatio="none"
-              >
-                <line
-                  x1="0"
-                  y1="2"
-                  x2="100"
-                  y2="2"
-                  stroke="#E8E8E8"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
 
             {/* Orders */}
             <button
               onClick={() => handlePipelineStageClick("orders")}
-              className="text-center flex-shrink-0 md:flex-1 min-w-[60px] md:min-w-0 hover:opacity-70 transition-opacity cursor-pointer group"
+              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
             >
-              <div className="flex justify-center mb-3 md:mb-6">
-                <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-red-500 shadow-sm"></div>
+              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full bg-[#0D0D0D]"
+                  style={{ width: `${(state.data.pipeline.orders / totalPipelineProspects) * 100}%` }}
+                ></div>
               </div>
-              <p className="text-[9px] md:text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.5px] mb-1 md:mb-2">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
                 Orders
               </p>
-              <p className="text-lg md:text-3xl font-black text-[#0D0D0D] mb-2 md:mb-3 tracking-[-0.02em]">
+              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
                 {state.data.pipeline.orders}
-              </p>
-              <p className="text-[9px] md:text-xs text-[#666666] font-light">
-                closed
               </p>
             </button>
           </div>
         </div>
       </div>
-
-      {/* TODAY'S ACTIONS */}
-      {hasActions && (
-        <div className="mb-12 md:mb-20 px-4 md:px-0">
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
-              Today's Tasks
-            </h2>
-          </div>
-          <div className="space-y-3">
-            {state.data.todaysActions.slice(0, 5).map((action) => (
-              <div
-                key={action.id}
-                className="border border-[#E8E8E8] rounded-lg p-4 md:p-6 bg-white hover:border-[#0D0D0D] transition-all"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {action.company}
-                  </p>
-                  <p className="text-xs font-semibold text-[#0D0D0D]">
-                    {action.confidenceScore}%
-                  </p>
-                </div>
-                <p className="text-xs text-[#888888]">
-                  {action.actionType} {action.contactName ? `— ${action.contactName}` : ""}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* RECENT ACTIVITY */}
-      {hasActivity && (
-        <div className="mb-12 md:mb-20 px-4 md:px-0">
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[1px] mb-3">
-              Recent Activity
-            </h2>
-          </div>
-          <div className="space-y-3">
-            {state.data.recentActivity.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="border border-[#E8E8E8] rounded-lg p-4 md:p-6 bg-white"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {item.company}
-                  </p>
-                  <p className="text-[9px] text-[#888888]">
-                    {new Date(item.timestamp).toLocaleString()}
-                  </p>
-                </div>
-                <p className="text-xs text-[#666666]">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
