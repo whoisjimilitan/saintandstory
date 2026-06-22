@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { CampaignReviewModal } from "./campaign-review-modal";
 import { SmartSuggestionsModal } from "./smart-suggestions-modal";
 import { findSimilarProspects, formatSimilarityReason } from "./utils/smart-suggestions";
@@ -90,6 +91,7 @@ const sortProspects = (prospects: Prospect[]): Prospect[] => {
 };
 
 export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }: QueueCenterProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sendingBatch, setSendingBatch] = useState(false);
