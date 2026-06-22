@@ -150,15 +150,26 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
       console.log("Batch qualifying:", selectedArray);
 
       // Get the full prospect data for selected prospects
-      const selectedProspects = prospects.filter((p) => selectedArray.includes(p.id));
+      const selectedProspects = prospects.filter((p) =>
+        selectedArray.includes(p.id)
+      );
 
+      // Save prospects to database first
+      const saveRes = await fetch("/api/b2b/batch-save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospects: selectedProspects }),
+      });
+
+      if (!saveRes.ok) throw new Error("Failed to save prospects");
+
+      const { savedIds } = await saveRes.json();
+
+      // Now qualify using database IDs
       const res = await fetch("/api/b2b/batch-qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prospectIds: selectedArray,
-          prospectData: selectedProspects, // Include full prospect data
-        }),
+        body: JSON.stringify({ prospectIds: savedIds }),
       });
 
       if (!res.ok) {
@@ -222,20 +233,36 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     const selectedArray = Array.from(selectedIds);
     if (selectedArray.length === 0) return;
 
-    // Get the full prospect data for selected prospects
-    const selectedProspects = prospects.filter((p) => selectedArray.includes(p.id));
+    setBatchLoading(true);
+    setBatchError(null);
 
-    // Store prospect data temporarily in sessionStorage for ENRICH to access
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(
-        "batchProspectData",
-        JSON.stringify(selectedProspects)
+    try {
+      // Get the full prospect data for selected prospects
+      const selectedProspects = prospects.filter((p) =>
+        selectedArray.includes(p.id)
       );
-    }
 
-    // Navigate to ENRICH page with batch of prospectIds
-    const prospectIdsParam = selectedArray.join(",");
-    router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
+      // Save prospects to database first so we can use database IDs
+      const res = await fetch("/api/b2b/batch-save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospects: selectedProspects }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save prospects");
+
+      const { savedIds } = await res.json();
+
+      // Navigate to ENRICH with database IDs
+      const prospectIdsParam = savedIds.join(",");
+      router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to prepare email";
+      setBatchError(message);
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
   const handleCampaignApprove = async (emails: any[]) => {

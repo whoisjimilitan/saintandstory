@@ -26,7 +26,7 @@ interface EmailPreview {
 
 export async function POST(request: Request) {
   try {
-    const { prospectIds, prospectData } = await request.json();
+    const { prospectIds } = await request.json();
 
     if (!prospectIds || !Array.isArray(prospectIds) || prospectIds.length === 0) {
       return NextResponse.json(
@@ -35,41 +35,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // If prospectData is provided (from search results), use it directly
-    // Otherwise fetch from database
-    let prospects: any[];
+    // Fetch prospects from database
+    const prospects = await prisma.b2bLead.findMany({
+      where: {
+        id: { in: prospectIds },
+      },
+      select: {
+        id: true,
+        businessName: true,
+        city: true,
+        businessCategory: true,
+        email: true,
+      },
+    });
 
-    if (prospectData && Array.isArray(prospectData) && prospectData.length > 0) {
-      // Use provided prospect data (from search results)
-      prospects = prospectData.map((p: any) => ({
-        id: p.id,
-        businessName: p.businessName,
-        city: p.city || "your area",
-        businessCategory: p.businessCategory || "unknown",
-        email: p.email,
-      }));
-    } else {
-      // Fetch from database
-      prospects = await prisma.b2bLead.findMany({
-        where: {
-          id: { in: prospectIds },
-        },
-        select: {
-          id: true,
-          businessName: true,
-          city: true,
-          businessCategory: true,
-          email: true,
-        },
-      });
-
-      // If still no prospects found, return error
-      if (prospects.length === 0) {
-        return NextResponse.json(
-          { error: "No prospects found. Please qualify prospects first or provide prospect data." },
-          { status: 400 }
-        );
-      }
+    if (prospects.length === 0) {
+      return NextResponse.json(
+        { error: "No prospects found in database" },
+        { status: 400 }
+      );
     }
 
     // Extract person name from email if available (fallback to generic)
