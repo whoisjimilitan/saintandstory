@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DorkSearchTab } from "./dork-search-tab";
 import { QueueCenter } from "./queue-center";
-import { JourneyProgress } from "../components/journey-progress";
 
 interface Prospect {
   id: string;
@@ -327,9 +326,6 @@ export default function DiscoverPage() {
 
   return (
     <div className="px-4 md:px-12 py-10 max-w-6xl">
-      {/* Journey Progress */}
-      <JourneyProgress currentStage="discover" prospectCount={{ discover: state.totalCount }} />
-
       {/* Header */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-4">

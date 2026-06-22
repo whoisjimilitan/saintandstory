@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { JourneyProgress } from "./components/journey-progress";
 
 // Premium single-color icons
 const Icons = {
@@ -269,9 +268,6 @@ export default function OperatorBriefing() {
           Here's what needs your attention today.
         </p>
       </div>
-
-      {/* JOURNEY PROGRESS */}
-      <JourneyProgress currentStage="today" prospectCount={prospectCounts} />
 
       {/* NARRATIVE BRIEFING - Idea #4 */}
       <div className="mb-16 px-4 md:px-0">

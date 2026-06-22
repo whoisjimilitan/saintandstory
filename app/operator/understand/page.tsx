@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { JourneyProgress } from "../components/journey-progress";
 
 interface ProspectDetail {
   id: string;
@@ -147,8 +146,6 @@ export default function UnderstandPage() {
   if (state.error || !state.prospect) {
     return (
       <div className="px-4 md:px-12 py-10 max-w-4xl">
-        <JourneyProgress currentStage="understand" />
-
         <div className="mb-12">
           <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
             Understand

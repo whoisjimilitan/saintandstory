@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { JourneyProgress } from "../components/journey-progress";
 
 interface Order {
   id: string;
@@ -165,8 +164,6 @@ export default function OrdersPage() {
   if (state.error) {
     return (
       <div className="px-4 md:px-12 py-10 max-w-6xl">
-        <JourneyProgress currentStage="orders" />
-
         <div className="mb-12">
           <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
             Orders
@@ -188,9 +185,6 @@ export default function OrdersPage() {
 
   return (
     <div className="px-4 md:px-12 py-10 max-w-6xl">
-      {/* Journey Progress */}
-      <JourneyProgress currentStage="orders" prospectCount={{ orders: state.orders.length }} />
-
       {/* Header */}
       <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
