@@ -18,9 +18,8 @@ export async function POST(request: Request) {
         id: { in: prospectIds },
       },
       data: {
-        pipeline_stage: "qualify",
+        status: "qualified",
         leadState: "qualified",
-        last_engagement_at: new Date(),
       },
     });
 

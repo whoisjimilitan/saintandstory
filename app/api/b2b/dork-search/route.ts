@@ -164,9 +164,10 @@ async function identifyPressureGroup(
 
 export async function POST(request: NextRequest) {
   try {
-    const { query } = (await request.json()) as { query: string };
+    const body = (await request.json()) as { query?: string };
+    const query = body?.query;
 
-    if (!query || query.trim().length === 0) {
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
       return NextResponse.json(
         { error: "Query is required" },
         { status: 400 }
