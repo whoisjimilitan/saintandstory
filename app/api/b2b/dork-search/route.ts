@@ -167,7 +167,16 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as { query?: string };
     const query = body?.query;
 
-    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+    // Type safety: Ensure query exists and is a string BEFORE calling .trim()
+    if (!query || typeof query !== 'string') {
+      return NextResponse.json(
+        { error: "Query is required" },
+        { status: 400 }
+      );
+    }
+
+    // Now we can safely call .trim()
+    if (query.trim().length === 0) {
       return NextResponse.json(
         { error: "Query is required" },
         { status: 400 }
