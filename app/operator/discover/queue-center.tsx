@@ -293,8 +293,8 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
         </p>
       </div>
 
-      {/* 3-Column Layout */}
-      <div className="grid grid-cols-3 gap-8">
+      {/* 2-Column Layout */}
+      <div className="grid grid-cols-2 gap-8">
         {/* LEFT: Queue List */}
         <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-6 max-h-[500px] overflow-y-auto">
           <div className="mb-4">
@@ -330,7 +330,7 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
                         e.stopPropagation();
                         toggleSelect(prospect.id);
                       }}
-                      className="mt-1 cursor-pointer"
+                      className="mt-1 cursor-pointer accent-[#0D0D0D]"
                     />
                     <div className="flex-1 min-w-0">
                       <p className={`text-xs font-semibold truncate ${isCurrent ? "text-white" : "text-[#0D0D0D]"}`}>
@@ -481,51 +481,6 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
               Email
             </button>
           </div>
-        </div>
-
-        {/* RIGHT: Email Preview */}
-        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-[#F9F9F9]">
-          <p className="text-xs text-[#888888] uppercase tracking-[0.1em] font-semibold mb-4">
-            Email Preview
-          </p>
-
-          <div className="bg-white border border-[#E8E8E8] rounded p-4 space-y-3 mb-6">
-            <div>
-              <p className="text-[10px] text-[#888888] uppercase font-semibold mb-1">
-                Subject
-              </p>
-              <p className="text-xs text-[#0D0D0D] font-semibold">
-                [Subject line will appear here]
-              </p>
-            </div>
-
-            <div className="border-t border-[#E8E8E8] pt-3">
-              <p className="text-[10px] text-[#888888] uppercase font-semibold mb-2">
-                Preview
-              </p>
-              <p className="text-xs text-[#666666] leading-relaxed">
-                Email content will be generated and displayed here with trust signals, location specificity, and inverse incentive.
-              </p>
-            </div>
-
-            <div className="border-t border-[#E8E8E8] pt-3">
-              <p className="text-[10px] text-[#888888] uppercase font-semibold mb-1">
-                Validation
-              </p>
-              <div className="flex gap-2 text-[10px] text-[#666666]">
-                <span>✓ 60-80 words</span>
-                <span>✓ Trust signals</span>
-                <span>✓ Inverse incentive</span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            disabled={sendingBatch}
-            className="w-full px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 transition-colors"
-          >
-            {sendingBatch ? "Sending..." : "Send Email"}
-          </button>
         </div>
       </div>
 
