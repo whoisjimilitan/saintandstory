@@ -79,23 +79,42 @@ export function DorkSearchTab() {
       {result && result.success && (
         <div className="space-y-4">
           <div className="p-4 bg-green-50 border border-green-200 rounded">
-            <p className="text-sm font-semibold text-green-900">✅ Query Received</p>
-            <p className="text-xs text-green-800 mt-2">
-              Query: <strong>{result.query}</strong>
+            <p className="text-sm font-semibold text-green-900">✅ Query Parsed Successfully</p>
+            <p className="text-xs text-green-800 mt-3">
+              Your Query: <strong>{result.query}</strong>
             </p>
             <p className="text-xs text-green-800">
-              Timestamp: {result.timestamp}
-            </p>
-            <p className="text-xs text-green-800">
-              Status: {result.phase}
+              Phase: {result.phase}
             </p>
           </div>
 
-          <div className="p-4 bg-[#F5F5F5] rounded border border-[#E8E8E8]">
-            <p className="text-xs font-semibold text-[#0D0D0D] mb-2">API Response:</p>
-            <pre className="text-xs overflow-auto bg-white p-2 border border-[#E8E8E8] rounded">
-              {JSON.stringify(result, null, 2)}
-            </pre>
+          {result.parsed && (
+            <div className="p-4 bg-[#F5F5F5] rounded border border-[#E8E8E8]">
+              <p className="text-xs font-semibold text-[#0D0D0D] mb-4">Parsed Search Parameters</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Business Type</p>
+                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.businessType}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Source</p>
+                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.source}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Contact Type</p>
+                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.contactType}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Pressure Group</p>
+                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.pressureGroup}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+            <p className="font-semibold mb-1">Next Phase:</p>
+            <p>Phase 3 will create leads in the database based on these parameters.</p>
           </div>
         </div>
       )}
