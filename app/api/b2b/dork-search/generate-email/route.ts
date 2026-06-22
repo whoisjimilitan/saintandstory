@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { generateTrustSignalEmail, validateTrustSignals } from "@/lib/trust-signal-email-engine";
-import { getIndustryProfile, getBlockerForIndustry } from "@/lib/industry-blocker-mapper";
+import { generateTrustSignalEmailV2, validateEmailV2 } from "@/lib/trust-signal-email-engine-v2";
+import { getIndustryProfile } from "@/lib/industry-blocker-mapper";
 
 /**
  * BATCH 2 REBOOT - Email Generation with Trust Signals
@@ -32,71 +32,53 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get industry profile and blocker
-    const industry = getIndustryProfile(businessCategory);
-    const blocker = getBlockerForIndustry(businessCategory);
+    // Generate V2 email (concise, psychologically dense, intelligent YES/MAYBE/NO)
+    const emailResult = generateTrustSignalEmailV2({
+      businessName,
+      businessCategory,
+      city: "London" // TODO: Extract from lead data when available
+    });
 
-    if (!industry || !blocker) {
+    if (!emailResult) {
       return NextResponse.json(
         {
-          error: "Unable to determine industry or blocker for this business",
+          error: "Unable to determine industry for this business",
           category: businessCategory
         },
         { status: 400 }
       );
     }
 
-    // Generate trust-signal email
-    const emailResult = generateTrustSignalEmail({
-      businessName,
-      businessCategory,
-      industry,
-      blocker
-    });
-
-    if (!emailResult) {
-      return NextResponse.json(
-        { error: "Failed to generate email for this industry" },
-        { status: 500 }
-      );
-    }
-
-    // Validate trust signals
-    const validation = validateTrustSignals(emailResult);
+    // Validate for authenticity (conciseness, density, no salesy language)
+    const validation = validateEmailV2(emailResult);
 
     if (!validation.isValid) {
-      console.warn("[EMAIL-VALIDATION] Trust signal validation failed:", validation.issues);
+      console.warn("[EMAIL-VALIDATION] Email validation issues:", validation.issues);
     }
 
     // Return email with metadata
     return NextResponse.json({
       success: true,
-      phase: "BATCH 2 REBOOT - Trust Signal Email",
+      phase: "BATCH 2 REBOOT V2 - Concise Trust Signal Email",
       email: {
         leadId,
         businessName,
-        industry: industry.industry,
-        blocker: blocker.name,
+        businessCategory,
 
         // Email content
         subject: emailResult.subject,
         body: emailResult.body,
 
         // Metadata
-        framework: emailResult.framework,
-        pattern: emailResult.pattern,
+        wordCount: emailResult.wordCount,
         humanAnchors: emailResult.humanAnchors,
-        blockerReference: emailResult.blockerReference,
-        confidence: emailResult.confidence,
-        blockerUrgency: blocker.urgency,
-        blockerTimeWindow: blocker.timeWindow,
 
         // Validation
-        trustSignalsValid: validation.isValid,
+        authenticityValid: validation.isValid,
         validationIssues: validation.issues,
 
         // Ready?
-        readyForPreview: emailResult.readyForPreview && validation.isValid
+        readyForPreview: validation.isValid
       },
       timestamp: new Date().toISOString()
     });
