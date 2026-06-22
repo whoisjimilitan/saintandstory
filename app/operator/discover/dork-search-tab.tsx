@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { EmailPreviewModal } from "./email-preview-modal";
 
 export function DorkSearchTab() {
   const router = useRouter();
@@ -9,6 +10,8 @@ export function DorkSearchTab() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<any>(null);
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -44,6 +47,17 @@ export function DorkSearchTab() {
 
   const handleViewLead = (leadId: string) => {
     router.push(`/operator/understand?prospectId=${leadId}`);
+  };
+
+  const handleGenerateEmail = (lead: any) => {
+    setSelectedLead(lead);
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailApproved = async (email: any) => {
+    // TODO: BATCH 2 Phase 2 - Save email and send campaign
+    console.log("Email approved:", email);
+    // For now, just close the modal
   };
 
   return (
@@ -147,12 +161,11 @@ export function DorkSearchTab() {
               {/* Leads List */}
               <div className="space-y-3">
                 {result.leads?.map((lead: any, idx: number) => (
-                  <button
+                  <div
                     key={idx}
-                    onClick={() => handleViewLead(lead.id)}
-                    className="w-full p-4 border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all text-left group"
+                    className="p-4 border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[#0D0D0D]">
                           {lead.businessName}
@@ -170,11 +183,22 @@ export function DorkSearchTab() {
                           )}
                         </div>
                       </div>
-                      <p className="text-xs font-semibold text-[#0D0D0D] group-hover:text-[#333333] transition-colors ml-4">
-                        View →
-                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleGenerateEmail(lead)}
+                          className="px-3 py-1 text-xs font-semibold text-white bg-[#0D0D0D] rounded hover:bg-[#333333] transition-colors whitespace-nowrap"
+                        >
+                          Email
+                        </button>
+                        <button
+                          onClick={() => handleViewLead(lead.id)}
+                          className="px-3 py-1 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:bg-[#F9F9F9] transition-colors whitespace-nowrap"
+                        >
+                          View
+                        </button>
+                      </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -189,6 +213,19 @@ export function DorkSearchTab() {
             Enter a search query to discover prospects
           </p>
         </div>
+      )}
+
+      {/* Email Preview Modal */}
+      {selectedLead && (
+        <EmailPreviewModal
+          isOpen={emailModalOpen}
+          lead={selectedLead}
+          onClose={() => {
+            setEmailModalOpen(false);
+            setSelectedLead(null);
+          }}
+          onApprove={handleEmailApproved}
+        />
       )}
     </div>
   );
