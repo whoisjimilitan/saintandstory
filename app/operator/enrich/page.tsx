@@ -46,19 +46,27 @@ export default function EnrichPage() {
     const fetchAndGenerateEmails = async () => {
       try {
         // Generate emails for all prospects
+        console.log("Generating emails for prospectIds:", prospectIds);
+
         const res = await fetch("/api/b2b/batch-emails/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prospectIds }),
         });
 
-        if (!res.ok) throw new Error("Failed to generate emails");
+        if (!res.ok) {
+          const errorData = await res.json();
+          const errorMsg = errorData.error || `HTTP ${res.status}`;
+          throw new Error(errorMsg);
+        }
 
         const data = await res.json();
+        console.log("Generated emails:", data.emails?.length);
         setGeneratedEmails(data.emails);
       } catch (error) {
-        console.error("Error generating emails:", error);
-        alert("Failed to generate emails");
+        const message = error instanceof Error ? error.message : "Failed to generate emails";
+        console.error("Error generating emails:", message);
+        alert(message);
         router.back();
       } finally {
         setLoading(false);
