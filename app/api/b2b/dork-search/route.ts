@@ -1,22 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { enrichLeadWithOutreach } from "@/lib/b2b-enrichment-orchestrator";
-import { mapCategoryToPressureType } from "@/lib/b2b-pressure-type-mapper";
-
-const ADMIN_EMAILS = [
-  "whoisjimi.today@gmail.com",
-  "oyedeleoyepeju2014@gmail.com",
-  "james@saintandstoryltd.co.uk",
-  "oye@saintandstoryltd.co.uk"
-];
-
-async function isAdmin() {
-  const { userId } = await auth();
-  if (!userId) return false;
-  const user = await currentUser();
-  return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
-}
 
 // Parse conversational dork input into structured parameters
 function parseConversationalQuery(input: string) {
@@ -181,11 +164,6 @@ async function identifyPressureGroup(
 
 export async function POST(request: NextRequest) {
   try {
-    // AUTH
-    if (!(await isAdmin())) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
     const { query } = (await request.json()) as { query: string };
 
     if (!query || query.trim().length === 0) {
@@ -245,17 +223,9 @@ export async function POST(request: NextRequest) {
             status: "new",
             leadState: "new",
             businessCategory: params.keyword.split(" ")[0].toLowerCase(),
-            metadata: {
-              dorkBatchId: batchId,
-              dorkQuery,
-              contextSignals: params.contextSignals,
-              pressureGroup
-            }
+            notes: `Dork batch: ${batchId} | Query: ${dorkQuery} | Pressure: ${pressureGroup}`
           }
         });
-
-        // TRIGGER enrichment (REUSE existing)
-        await enrichLeadWithOutreach(lead.id);
 
         createdLeads.push({
           id: lead.id,
