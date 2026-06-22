@@ -3,6 +3,20 @@ import { prisma } from "@/lib/prisma";
 
 // Parse conversational dork input into structured parameters
 function parseConversationalQuery(input: string) {
+  // Type safety first
+  if (!input || typeof input !== 'string') {
+    console.error("[DORK PARSE] Invalid input:", input);
+    return {
+      source: "instagram",
+      location: "UK",
+      keyword: "business",
+      hasPhone: false,
+      hasEmail: false,
+      hasWebsite: false,
+      contextSignals: [],
+    };
+  }
+
   const lower = input.toLowerCase();
 
   // Extract source (instagram, linkedin, facebook, twitter, google, etc.)
@@ -21,7 +35,7 @@ function parseConversationalQuery(input: string) {
   const keywordMatch = input.match(
     /(?:find|search|looking for|locate)\s+([a-zA-Z\s]+?)(?:\s+(?:with|on|from|in|via)|$)/i
   );
-  const keyword = keywordMatch ? keywordMatch[1].trim() : input.trim();
+  const keyword = keywordMatch && keywordMatch[1] ? keywordMatch[1].trim() : (input || "business").trim();
 
   // Extract contact type (phone, email, etc.)
   const hasPhone =
