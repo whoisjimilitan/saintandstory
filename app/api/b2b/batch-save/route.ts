@@ -5,7 +5,10 @@ export async function POST(request: Request) {
   try {
     const { prospects } = await request.json();
 
+    console.log("[BATCH SAVE] Received:", prospects?.length, "prospects");
+
     if (!prospects || !Array.isArray(prospects) || prospects.length === 0) {
+      console.error("[BATCH SAVE] Invalid prospects array");
       return NextResponse.json(
         { error: "Invalid prospects array" },
         { status: 400 }
@@ -14,9 +17,12 @@ export async function POST(request: Request) {
 
     // Save/upsert each prospect to database
     const savedIds: string[] = [];
+    const errors: string[] = [];
 
     for (const prospect of prospects) {
       try {
+        console.log("[BATCH SAVE] Upserting prospect:", prospect.id, prospect.businessName);
+
         const saved = await prisma.b2bLead.upsert({
           where: { id: prospect.id },
           update: {
@@ -38,21 +44,27 @@ export async function POST(request: Request) {
         });
 
         savedIds.push(saved.id);
+        console.log("[BATCH SAVE] Saved:", saved.id);
       } catch (error) {
-        console.error(`Failed to save prospect ${prospect.id}:`, error);
-        // Continue with other prospects even if one fails
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        console.error(`[BATCH SAVE] Failed to save prospect ${prospect.id}:`, msg);
+        errors.push(`${prospect.id}: ${msg}`);
       }
     }
+
+    console.log("[BATCH SAVE] Complete. Saved:", savedIds.length, "Failed:", errors.length);
 
     return NextResponse.json({
       success: true,
       count: savedIds.length,
       savedIds,
+      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error("[BATCH SAVE] Error:", error);
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error("[BATCH SAVE] Error:", msg);
     return NextResponse.json(
-      { error: "Failed to save prospects" },
+      { error: `Failed to save prospects: ${msg}` },
       { status: 500 }
     );
   }

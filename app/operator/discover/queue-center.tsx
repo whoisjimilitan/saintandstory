@@ -147,38 +147,53 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     setBatchSuccess(null);
 
     try {
-      console.log("Batch qualifying:", selectedArray);
+      console.log("✓ Qualify: Selected prospects:", selectedArray.length);
+      console.log("✓ Qualify: Selected IDs:", selectedArray);
 
       // Get the full prospect data for selected prospects
       const selectedProspects = prospects.filter((p) =>
         selectedArray.includes(p.id)
       );
 
+      console.log("✓ Qualify: Prospect data:", selectedProspects.length);
+
       // Save prospects to database first
+      console.log("✓ Qualify: Calling batch-save...");
       const saveRes = await fetch("/api/b2b/batch-save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prospects: selectedProspects }),
       });
 
-      if (!saveRes.ok) throw new Error("Failed to save prospects");
+      console.log("✓ Qualify: batch-save response status:", saveRes.status);
 
-      const { savedIds } = await saveRes.json();
+      if (!saveRes.ok) {
+        const errorData = await saveRes.json();
+        throw new Error(errorData.error || `batch-save failed: ${saveRes.status}`);
+      }
+
+      const saveData = await saveRes.json();
+      const { savedIds } = saveData;
+
+      console.log("✓ Qualify: Saved IDs:", savedIds);
 
       // Now qualify using database IDs
+      console.log("✓ Qualify: Calling batch-qualify...");
       const res = await fetch("/api/b2b/batch-qualify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prospectIds: savedIds }),
       });
 
+      console.log("✓ Qualify: batch-qualify response status:", res.status);
+
       if (!res.ok) {
         const errorData = await res.json();
-        const errorMsg = errorData.error || `HTTP ${res.status}`;
+        const errorMsg = errorData.error || `batch-qualify failed: ${res.status}`;
         throw new Error(errorMsg);
       }
 
-      console.log("Qualified successfully");
+      console.log("✓ Qualify: Qualified successfully");
 
       setBatchSuccess(`✓ Qualified ${selectedArray.length} prospect${selectedArray.length !== 1 ? "s" : ""}`);
 
@@ -242,23 +257,37 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
         selectedArray.includes(p.id)
       );
 
+      console.log("📧 Email: Selected prospects:", selectedProspects.length);
+      console.log("📧 Email: Selected IDs:", selectedArray);
+
       // Save prospects to database first so we can use database IDs
+      console.log("📧 Email: Calling batch-save...");
       const res = await fetch("/api/b2b/batch-save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prospects: selectedProspects }),
       });
 
-      if (!res.ok) throw new Error("Failed to save prospects");
+      console.log("📧 Email: batch-save response status:", res.status);
 
-      const { savedIds } = await res.json();
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `batch-save failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const { savedIds } = data;
+
+      console.log("📧 Email: Saved IDs:", savedIds);
 
       // Navigate to ENRICH with database IDs
       const prospectIdsParam = savedIds.join(",");
+      console.log("📧 Email: Navigating to enrich with:", prospectIdsParam);
       router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to prepare email";
+      console.error("❌ Email error:", message);
       setBatchError(message);
     } finally {
       setBatchLoading(false);
