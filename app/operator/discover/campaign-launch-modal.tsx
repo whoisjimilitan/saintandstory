@@ -137,7 +137,7 @@ export function CampaignLaunchModal({
                 </div>
               </div>
 
-              {/* Pressure Groups */}
+              {/* Pressure Groups with Override */}
               <div className="space-y-4">
                 <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.15em]">
                   Prospects Grouped by Pressure
@@ -146,10 +146,10 @@ export function CampaignLaunchModal({
                   group.count > 0 && (
                     <div
                       key={idx}
-                      className="border border-[#E8E8E8] rounded p-4 space-y-3"
+                      className="border border-[#E8E8E8] rounded p-4 space-y-4"
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
                           <p className="text-sm font-semibold text-[#0D0D0D]">
                             {group.pressure}
                           </p>
@@ -162,19 +162,41 @@ export function CampaignLaunchModal({
                         </p>
                       </div>
 
-                      {/* Leads in Group */}
-                      <div className="pt-3 border-t border-[#E8E8E8] space-y-2">
+                      {/* Leads with Override Options */}
+                      <div className="pt-3 border-t border-[#E8E8E8] space-y-3">
                         {group.leads.slice(0, 3).map((lead: any, lidx: number) => (
-                          <div key={lidx} className="text-xs text-[#666666]">
-                            <p className="font-semibold">{lead.businessName}</p>
-                            {lead.email && <p className="text-[#888888]">{lead.email}</p>}
+                          <div key={lidx} className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <p className="text-xs font-semibold text-[#0D0D0D]">
+                                  {lead.businessName}
+                                </p>
+                                {lead.email && (
+                                  <p className="text-[9px] text-[#888888] mt-0.5">
+                                    {lead.email}
+                                  </p>
+                                )}
+                              </div>
+                              {lead.confidenceScore !== undefined && (
+                                <p className="text-[9px] font-semibold text-[#0D0D0D] whitespace-nowrap">
+                                  {(lead.confidenceScore * 100).toFixed(0)}% confident
+                                </p>
+                              )}
+                            </div>
                           </div>
                         ))}
                         {group.leads.length > 3 && (
-                          <p className="text-xs text-[#888888] italic">
+                          <p className="text-xs text-[#888888] italic pt-2">
                             +{group.leads.length - 3} more
                           </p>
                         )}
+                      </div>
+
+                      {/* Override Note */}
+                      <div className="pt-3 border-t border-[#E8E8E8]">
+                        <p className="text-[9px] text-[#888888]">
+                          💡 Suggested based on business category. Override available before sending if needed.
+                        </p>
                       </div>
                     </div>
                   )
