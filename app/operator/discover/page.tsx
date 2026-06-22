@@ -273,7 +273,11 @@ export default function DiscoverPage() {
         body: JSON.stringify({
           googlePlaceId: `manual-${Date.now()}`,
           businessName: manualAddForm.businessName,
+          contactName: manualAddForm.contactName || undefined,
+          email: manualAddForm.email || undefined,
+          phone: manualAddForm.phone || undefined,
           city: manualAddForm.city,
+          postcode: manualAddForm.postcode || undefined,
         }),
       });
 
@@ -281,8 +285,7 @@ export default function DiscoverPage() {
 
       const { id } = await res.json();
 
-      // TODO: Store additional fields (email, phone, contact name, postcode) separately
-      // For now, navigate to Understand to complete the entry
+      // Reset form and navigate to Understand page
       setShowManualAddForm(false);
       setManualAddForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
       router.push(`/operator/understand?prospectId=${id}`);

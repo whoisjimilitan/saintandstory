@@ -58,9 +58,30 @@ export function DorkSearchTab() {
   };
 
   const handleEmailApproved = async (email: any) => {
-    // TODO: BATCH 2 Phase 2 - Save email and send campaign
-    console.log("Email approved:", email);
-    // For now, just close the modal
+    try {
+      // Save and send email via campaign endpoint
+      const res = await fetch("/api/b2b/dork-search/campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadIds: [email.leadId],
+          campaignName: `Dork Search Campaign - ${new Date().toLocaleDateString()}`
+        }),
+      });
+
+      if (!res.ok) {
+        setError("Failed to send email");
+        return;
+      }
+
+      // Close modal and reset selection
+      setEmailModalOpen(false);
+      setSelectedLead(null);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Email send failed";
+      setError(message);
+    }
   };
 
   const toggleLeadSelection = (leadId: string) => {
