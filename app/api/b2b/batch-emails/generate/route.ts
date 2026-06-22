@@ -10,6 +10,7 @@ interface EmailPreview {
   prospectId: string;
   prospectName: string;
   businessName: string;
+  city: string;
   subject: string;
   body: string;
   wordCount: number;
