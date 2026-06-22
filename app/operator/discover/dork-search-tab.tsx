@@ -17,7 +17,7 @@ export function DorkSearchTab() {
   const [campaignModalOpen, setCampaignModalOpen] = useState(false);
 
   const handleSearch = async () => {
-    if (!query.trim()) {
+    if (!query || !query.trim()) {
       setError("Please enter a search query");
       return;
     }
