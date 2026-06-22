@@ -11,10 +11,25 @@ const ADMIN_EMAILS = [
 ];
 
 async function isAdmin() {
-  const { userId } = await auth();
-  if (!userId) return false;
-  const user = await currentUser();
-  return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("🔍 [DORK-SEARCH] No userId in auth");
+      return false;
+    }
+    const user = await currentUser();
+    if (!user) {
+      console.log("🔍 [DORK-SEARCH] No user from currentUser()");
+      return false;
+    }
+    const email = user?.emailAddresses?.[0]?.emailAddress;
+    const isAdminUser = email && ADMIN_EMAILS.includes(email);
+    console.log("🔍 [DORK-SEARCH] Auth check:", { email, isAdminUser });
+    return isAdminUser ?? false;
+  } catch (error) {
+    console.error("🔍 [DORK-SEARCH] Auth error:", error);
+    return false;
+  }
 }
 
 // Parse conversational dork input into structured parameters
