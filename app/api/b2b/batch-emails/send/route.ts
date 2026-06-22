@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailToSend {
   prospectId: string;
@@ -19,7 +22,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const sent: Array<{ prospectId: string; success: boolean }> = [];
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: "Email service not configured" },
+        { status: 500 }
+      );
+    }
+
+    const sent: Array<{ prospectId: string; success: boolean; messageId?: string; error?: string }> = [];
 
     // Process each email
     for (const email of emails) {
@@ -31,29 +41,42 @@ export async function POST(request: Request) {
         });
 
         if (!prospect?.email) {
-          sent.push({ prospectId: email.prospectId, success: false });
+          sent.push({ prospectId: email.prospectId, success: false, error: "No email address" });
           continue;
         }
 
-        // TODO: Send email via actual email service (Resend, SendGrid, etc.)
-        // For now, we'll just record the intent
-        console.log(`[EMAIL SEND] To: ${prospect.email}, Subject: ${email.subject}`);
+        // Send email via Resend
+        const result = await resend.emails.send({
+          from: "Saint & Story <noreply@saintandstoryltd.co.uk>",
+          to: prospect.email,
+          subject: email.subject,
+          html: email.body,
+          reply_to: "hello@saintandstoryltd.co.uk",
+        });
 
-        // Update prospect record
+        if (result.error) {
+          console.error(`[BATCH EMAIL SEND] Resend error for ${prospect.email}:`, result.error);
+          sent.push({ prospectId: email.prospectId, success: false, error: result.error.message });
+          continue;
+        }
+
+        // Update prospect record on successful send
         await prisma.b2bLead.update({
           where: { id: email.prospectId },
           data: {
             pipeline_stage: "propose",
             leadState: "emailed",
             last_engagement_at: new Date(),
+            email_sent_at: new Date(),
             notes: `Email sent: "${email.subject}"`,
           },
         });
 
-        sent.push({ prospectId: email.prospectId, success: true });
+        sent.push({ prospectId: email.prospectId, success: true, messageId: result.data?.id });
       } catch (error) {
-        console.error(`[EMAIL SEND] Failed for ${email.prospectId}:`, error);
-        sent.push({ prospectId: email.prospectId, success: false });
+        const errorMsg = error instanceof Error ? error.message : "Unknown error";
+        console.error(`[BATCH EMAIL SEND] Failed for ${email.prospectId}:`, errorMsg);
+        sent.push({ prospectId: email.prospectId, success: false, error: errorMsg });
       }
     }
 
