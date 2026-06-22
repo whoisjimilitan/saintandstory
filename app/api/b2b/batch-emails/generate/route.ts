@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateOptimizedEmailV3, validateEmailV3 } from "@/lib/trust-signal-email-engine-v3";
+import {
+  generateReasonedEmailBatch,
+  validateReasoningApplied,
+  type ProspectData
+} from "@/lib/v3-email-reasoning-engine";
 
 interface EmailPreview {
   prospectId: string;
+  prospectName: string;
   businessName: string;
-  city: string;
   subject: string;
   body: string;
   wordCount: number;
-  responseRatePotential: "high" | "medium" | "low";
+  isValid: boolean;
   validationIssues?: string[];
+  reasoning: {
+    moment: string;
+    insight: string;
+    pressurePoint: string;
+    service: string;
+  };
 }
 
 export async function POST(request: Request) {
@@ -24,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch prospects with reasoning data
+    // Fetch prospects with data needed for reasoning
     const prospects = await prisma.b2bLead.findMany({
       where: {
         id: { in: prospectIds },
@@ -34,64 +44,75 @@ export async function POST(request: Request) {
         businessName: true,
         city: true,
         businessCategory: true,
+        country: true,
         email: true,
       },
     });
 
-    // Generate emails using TRUST-SIGNAL-EMAIL-ENGINE-V3 (Universal, Pattern-Based)
+    // Extract person name from email if available (fallback to generic)
+    const prospectDataForReasoning: ProspectData[] = prospects.map((p) => ({
+      name: p.email?.split("@")[0]?.replace(/[._]/g, " ") || "There",
+      businessName: p.businessName,
+      businessCategory: p.businessCategory || "unknown",
+      city: p.city || "your area",
+      country: p.country,
+    }));
+
+    // Generate emails using V3 reasoning engine (NOT templated)
+    const reasonedEmails = generateReasonedEmailBatch(prospectDataForReasoning);
+
+    // Build response previews
     const emails: EmailPreview[] = [];
     const failedProspects: string[] = [];
 
-    for (const prospect of prospects) {
-      try {
-        const result = generateOptimizedEmailV3({
-          businessName: prospect.businessName,
-          businessCategory: prospect.businessCategory || undefined,
-          city: prospect.city || undefined,
-        });
+    for (let i = 0; i < prospects.length; i++) {
+      const prospect = prospects[i];
+      const reasonedEmail = reasonedEmails[i];
 
-        if (!result) {
-          failedProspects.push(prospect.id);
-          continue;
-        }
-
-        const { email, validation } = result;
-
-        emails.push({
-          prospectId: prospect.id,
-          businessName: prospect.businessName,
-          city: prospect.city || "Unknown",
-          subject: email.subject,
-          body: email.body,
-          wordCount: email.wordCount,
-          responseRatePotential: validation.responseRatePotential,
-          validationIssues: validation.issues.length > 0 ? validation.issues : undefined,
-        });
-      } catch (error) {
-        console.error(`[BATCH EMAIL GENERATE] Failed for prospect ${prospect.id}:`, error);
+      if (!reasonedEmail) {
         failedProspects.push(prospect.id);
+        continue;
       }
+
+      // Validate that reasoning was applied (not templating)
+      const validation = validateReasoningApplied(reasonedEmail);
+
+      emails.push({
+        prospectId: prospect.id,
+        prospectName: prospectDataForReasoning[i].name,
+        businessName: prospect.businessName,
+        subject: reasonedEmail.subject,
+        body: reasonedEmail.body,
+        wordCount: reasonedEmail.wordCount,
+        isValid: validation.isValid,
+        validationIssues: validation.issues.length > 0 ? validation.issues : undefined,
+        reasoning: reasonedEmail.reasoning,
+      });
     }
 
-    // Calculate response rate metrics
-    const highPotential = emails.filter((e) => e.responseRatePotential === "high").length;
-    const mediumPotential = emails.filter((e) => e.responseRatePotential === "medium").length;
-    const lowPotential = emails.filter((e) => e.responseRatePotential === "low").length;
+    // Calculate metrics
+    const validEmails = emails.filter((e) => e.isValid).length;
+    const totalGenerated = emails.length;
 
     return NextResponse.json({
       success: true,
       emails,
-      count: emails.length,
+      count: totalGenerated,
+      validCount: validEmails,
       failedCount: failedProspects.length,
       failedProspectIds: failedProspects.length > 0 ? failedProspects : undefined,
       metrics: {
-        highResponsePotential: highPotential,
-        mediumResponsePotential: mediumPotential,
-        lowResponsePotential: lowPotential,
-        estimatedResponseRate: highPotential > 0 ? `${Math.round((highPotential / emails.length) * 100)}%+` : "Optimize before sending",
+        validationRate: `${totalGenerated > 0 ? Math.round((validEmails / totalGenerated) * 100) : 0}%`,
+        averageWordCount:
+          totalGenerated > 0
+            ? Math.round(
+                emails.reduce((sum, e) => sum + e.wordCount, 0) / totalGenerated
+              )
+            : 0,
+        allFollowPattern: validEmails === totalGenerated,
       },
-      engine: "TRUST-SIGNAL-EMAIL-ENGINE-V3 (Universal, Pattern-Based, Reasoning-Driven)",
-      note: "Each email is uniquely generated based on business type reasoning. Not templated. Optimized for trust-signal psychology and 50%+ response rate target.",
+      engine: "V3_EMAIL_REASONING_ENGINE (Personalised, not templated)",
+      note: "Each email is generated through REASONING of their specific moment, insight, and service. Hand-written feeling. Unique per prospect. Never templated.",
     });
   } catch (error) {
     console.error("[BATCH EMAIL GENERATE] Error:", error);
