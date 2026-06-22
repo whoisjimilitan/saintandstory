@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { generateTrustSignalEmailV2, validateEmailV2 } from "@/lib/trust-signal-email-engine-v2";
 
 interface EmailPreview {
   prospectId: string;
@@ -8,63 +9,8 @@ interface EmailPreview {
   subject: string;
   body: string;
   wordCount: number;
+  validationIssues?: string[];
 }
-
-const generateTrustSignalEmail = (prospect: any): { subject: string; body: string } => {
-  const { businessName, city, pressureSignal, industry } = prospect;
-
-  // Generate subject based on pressure signal
-  const subjectLines: Record<string, string> = {
-    "weekend-overflow": `${city}: Weekend peak scheduling?`,
-    "documents-stuck": `${city}: Document handling bottleneck?`,
-    "growth-outpacing": `${city}: Scaling ${industry}?`,
-    "compliance-shift": `${city}: ${industry} compliance update`,
-    "cost-pressure": `${city}: ${industry} margins under pressure?`,
-  };
-
-  const subject = subjectLines[pressureSignal || "growth-outpacing"] || `${city}: Quick question about ${businessName}`;
-
-  // Generate body with trust signals
-  const bodies: Record<string, string> = {
-    "weekend-overflow": `Hi there,
-
-I noticed ${businessName} operates in ${city}. Most ${industry.toLowerCase()}s hit peak demand on weekends – curious if that's creating a bottleneck for you?
-
-If it's not relevant, no worries. If it is, might be worth a 5-min chat.
-
-Best,
-The Team`,
-
-    "documents-stuck": `Hi,
-
-Been following ${industry.toLowerCase()} trends in ${city}. A lot of firms mention document workflows becoming a headache.
-
-Is that on your radar? If so, might be worth exploring.
-
-Best,
-The Team`,
-
-    "growth-outpacing": `Hi,
-
-Spotted ${businessName} expanding in ${city}. When growth accelerates, operational friction usually follows.
-
-Worth a quick conversation?
-
-Best,
-The Team`,
-  };
-
-  const body = bodies[pressureSignal || "growth-outpacing"] || `Hi,
-
-I came across ${businessName} in ${city}. Thought there might be a fit for what we're doing.
-
-Worth a brief conversation?
-
-Best,
-The Team`;
-
-  return { subject, body };
-};
 
 export async function POST(request: Request) {
   try {
@@ -77,7 +23,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch prospects
+    // Fetch prospects with all data needed for email generation
     const prospects = await prisma.b2bLead.findMany({
       where: {
         id: { in: prospectIds },
@@ -91,28 +37,48 @@ export async function POST(request: Request) {
       },
     });
 
-    // Generate emails
-    const emails: EmailPreview[] = prospects.map((prospect) => {
-      const { subject, body } = generateTrustSignalEmail({
-        ...prospect,
-        industry: prospect.businessCategory || "your industry",
-        pressureSignal: "growth-outpacing", // Default - could be extended to use stored pressure signals
-      });
+    // Generate emails using BATCH 2 Trust Signal Email Engine (Commit 3cdb3a5)
+    const emails: EmailPreview[] = [];
+    const failedProspects: string[] = [];
 
-      return {
-        prospectId: prospect.id,
-        businessName: prospect.businessName,
-        city: prospect.city || "Unknown",
-        subject,
-        body,
-        wordCount: body.split(/\s+/).length,
-      };
-    });
+    for (const prospect of prospects) {
+      try {
+        const emailResult = generateTrustSignalEmailV2({
+          businessName: prospect.businessName,
+          businessCategory: prospect.businessCategory || undefined,
+          city: prospect.city || undefined,
+        });
+
+        if (!emailResult) {
+          failedProspects.push(prospect.id);
+          continue;
+        }
+
+        // Validate email against BATCH 2 standards
+        const validation = validateEmailV2(emailResult);
+
+        emails.push({
+          prospectId: prospect.id,
+          businessName: prospect.businessName,
+          city: prospect.city || "Unknown",
+          subject: emailResult.subject,
+          body: emailResult.body,
+          wordCount: emailResult.wordCount,
+          validationIssues: validation.issues.length > 0 ? validation.issues : undefined,
+        });
+      } catch (error) {
+        console.error(`[BATCH EMAIL GENERATE] Failed for prospect ${prospect.id}:`, error);
+        failedProspects.push(prospect.id);
+      }
+    }
 
     return NextResponse.json({
       success: true,
       emails,
       count: emails.length,
+      failedCount: failedProspects.length,
+      failedProspectIds: failedProspects.length > 0 ? failedProspects : undefined,
+      note: "All emails generated using BATCH 2 Trust Signal Email Engine (Commit 3cdb3a5)",
     });
   } catch (error) {
     console.error("[BATCH EMAIL GENERATE] Error:", error);

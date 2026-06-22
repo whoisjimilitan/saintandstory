@@ -31,7 +31,6 @@ export interface EmailContext {
   businessName: string;
   businessCategory?: string;
   city?: string;
-  postcode?: string;
 }
 
 export interface TrustSignalEmailV2 {
@@ -80,42 +79,39 @@ const CONCISE_EMAIL_TEMPLATES: Record<
   (context: EmailContext, industry: IndustryProfile, blocker: Blocker) => TrustSignalEmailV2
 > = {
   "documents-stuck": (context, industry, blocker) => {
-    const city = context.city || "London";
-    const location = context.postcode ? `${context.postcode} (${city})` : city;
     const email = `Hi,
 
-Most law firms in ${location} tell me the same thing: files that need the Old Bailey by 5pm usually arrive next morning. It's happened so often it's almost predictable.
+I noticed you're a law firm in ${context.city || "your area"}. Something I keep hearing from partners: files that need court by end of day usually arrive the next morning instead.
 
-Does this match what you're seeing?
+Does this happen in your firm?
 
-YES - We're dealing with this right now
-MAYBE - Happens occasionally
-NO - Not an issue for us
+YES - We're dealing with this this week
+MAYBE - Happens a few times a year
+NO - Not something we see
 
 If it doesn't apply, ignore this.
 
 Best`;
 
     return {
-      subject: "Files to Old Bailey by 5pm—tonight?",
+      subject: "Court deadline + files on time?",
       body: email,
-      wordCount: context.postcode ? 64 : 63,
+      wordCount: 65,
       humanAnchors: {
-        observation: `Pattern among law firms in ${location}`,
+        observation: `Law firm in ${context.city}`,
         insight: "End of day court deadlines create next-morning delivery gap",
-        question: "Does this match what you're seeing?",
+        question: "Does this happen in your firm?",
         inverseIncentive: "If it doesn't apply, ignore this"
       }
     };
   },
 
   "urgent-prescriptions": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most pharmacies in ${city} tell me: urgent prescription needs come in after 3pm, when regular delivery's already stopped for the day.
+I noticed ${context.businessName} is in ${context.city}. Most pharmacies I speak with see the same pattern: urgent prescription needs come in after 3pm when regular delivery has stopped.
 
-How often is this actually happening?
+How often does this actually happen for you?
 
 YES - Multiple times a week
 MAYBE - Occasional calls
@@ -126,23 +122,22 @@ If it's not an issue, no response needed.
 Best`;
 
     return {
-      subject: "3pm urgent prescription calls?",
+      subject: "Urgent prescription after 3pm?",
       body: email,
-      wordCount: 54,
+      wordCount: 64,
       humanAnchors: {
-        observation: `Pattern among pharmacies in ${city}`,
+        observation: `Pharmacy in ${context.city}`,
         insight: "3pm+ urgent needs create delivery gap with regular suppliers",
-        question: "How often is this actually happening?",
+        question: "How often does this happen?",
         inverseIncentive: "If it's not an issue, no response needed"
       }
     };
   },
 
   "cancellation-gaps": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most practices in ${city} tell me the same thing: 2-4pm cancellations that free up chair time but that's lost revenue, full stop. One said it costs them about £400 per gap.
+I noticed you're a dental practice in ${context.city}. Most practices tell me: cancellations around 2-4pm free up chair time but that revenue gap is real.
 
 Is this something you see regularly?
 
@@ -155,11 +150,11 @@ If this doesn't match your experience, ignore.
 Best`;
 
     return {
-      subject: "Afternoon cancellation revenue gaps?",
+      subject: "Afternoon cancellation gaps?",
       body: email,
       wordCount: 63,
       humanAnchors: {
-        observation: `Pattern among dental practices in ${city}`,
+        observation: `Dental practice in ${context.city}`,
         insight: "2-4pm cancellations create predictable revenue gaps",
         question: "Is this something you see regularly?",
         inverseIncentive: "If this doesn't match your experience, ignore"
@@ -168,10 +163,9 @@ Best`;
   },
 
   "weekend-overflow": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most removers we speak with in ${city} see the same Saturday pattern: 2pm and one job runs late, next client is 45 minutes away, second move starts behind.
+I noticed ${context.businessName} is in ${context.city}. Saturday pattern most removers see: double bookings around 2pm that push the second job 45 minutes behind.
 
 Does this happen on your peak Saturdays?
 
@@ -184,11 +178,11 @@ If you've got this figured out, ignore this.
 Best`;
 
     return {
-      subject: "Saturday 2pm scheduling crunch?",
+      subject: "Saturday double-booking pressure?",
       body: email,
-      wordCount: 59,
+      wordCount: 64,
       humanAnchors: {
-        observation: `Pattern among removers in ${city}`,
+        observation: `Removal company in ${context.city}`,
         insight: "2pm Saturday double-booking creates cascade delay",
         question: "Does this happen on your peak Saturdays?",
         inverseIncentive: "If you've got this figured out, ignore this"
@@ -197,10 +191,9 @@ Best`;
   },
 
   "fulfillment-backlog": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most e-commerce teams in ${city} we work with hit the same wall: around 5-6pm on busy days, 50+ orders in the warehouse and you've promised 24-hour shipping. Overtime or break the promise.
+I noticed you sell online from ${context.city}. Pattern I see often: 50+ orders in the warehouse by 6pm on a busy day, but you promised 24-hour shipping.
 
 How often is this actually a problem?
 
@@ -213,11 +206,11 @@ If this isn't your reality, no need to respond.
 Best`;
 
     return {
-      subject: "5pm order pile-up vs promise?",
+      subject: "Order backlog vs 24h promise?",
       body: email,
-      wordCount: 60,
+      wordCount: 66,
       humanAnchors: {
-        observation: `Pattern among e-commerce teams in ${city}`,
+        observation: `E-commerce business in ${context.city}`,
         insight: "6pm order surge vs 24-hour promise creates pressure",
         question: "How often is this actually a problem?",
         inverseIncentive: "If this isn't your reality, no need to respond"
@@ -226,10 +219,9 @@ Best`;
   },
 
   "after-hours-access": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most emergency plumbers we work with in ${city} get the call around 9pm: kitchen flooded, needs parts delivered tonight to finish the job. That's when parts availability makes or breaks it.
+I noticed you're a plumber in ${context.city}. One thing most emergency plumbers deal with: urgent call at 9pm that needs parts delivered that same night to finish.
 
 How regularly does this come up?
 
@@ -242,11 +234,11 @@ If this doesn't match your business, ignore.
 Best`;
 
     return {
-      subject: "9pm emergency call—parts available?",
+      subject: "Emergency call at 9pm—parts tonight?",
       body: email,
-      wordCount: 61,
+      wordCount: 64,
       humanAnchors: {
-        observation: `Pattern among emergency plumbers in ${city}`,
+        observation: `Plumbing business in ${context.city}`,
         insight: "9pm+ emergencies need immediate parts or job fails",
         question: "How regularly does this come up?",
         inverseIncentive: "If this doesn't match your business, ignore"
@@ -255,10 +247,9 @@ Best`;
   },
 
   "product-stockout": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most salons in ${city} tell me the same thing: Wednesday afternoon, someone wants a specific color, you're out. Client's in the chair. Turn them away or make them wait. Both cost you.
+I noticed ${context.businessName} is in ${context.city}. Most salons tell me: run out of a popular product mid-day during peak, and you have to turn a client away.
 
 Does this actually happen for you?
 
@@ -271,11 +262,11 @@ If this isn't your experience, no response needed.
 Best`;
 
     return {
-      subject: "Out of stock mid-appointment?",
+      subject: "Out of stock during peak hours?",
       body: email,
-      wordCount: 61,
+      wordCount: 63,
       humanAnchors: {
-        observation: `Pattern among salons in ${city}`,
+        observation: `Salon in ${context.city}`,
         insight: "Mid-day stockouts during peak = direct revenue loss",
         question: "Does this actually happen for you?",
         inverseIncentive: "If this isn't your experience, no response needed"
@@ -284,10 +275,9 @@ Best`;
   },
 
   "deadline-documents": (context, industry, blocker) => {
-    const city = context.city || "London";
     const email = `Hi,
 
-Most accounting practices we work with in ${city} hit the same wall: January 28th, documents from 12 different clients scattered across emails, Drives, storage. Deadline is 31st. Happens every year.
+I noticed you're an accountant in ${context.city}. Tax season pattern: documents needed by 31 January but they're scattered across client emails, drives, storage.
 
 Is this a real pain point for you come January?
 
@@ -300,11 +290,11 @@ If you've got a solid system, ignore this.
 Best`;
 
     return {
-      subject: "January document coordination?",
+      subject: "Tax deadline document gathering?",
       body: email,
       wordCount: 64,
       humanAnchors: {
-        observation: `Pattern among accounting practices in ${city}`,
+        observation: `Accountant in ${context.city}`,
         insight: "Tax deadlines create last-minute document coordination pressure",
         question: "Is this a real pain point for you?",
         inverseIncentive: "If you've got a solid system, ignore this"
@@ -323,13 +313,13 @@ function generateGenericEmailV2(
 ): TrustSignalEmailV2 {
   const email = `Hi,
 
-Something I keep hearing about in ${industry.industry.toLowerCase()}: ${blocker.painPoint}.
+I noticed you're in ${industry.industry.toLowerCase()} in ${context.city || "your area"}. Something I keep hearing about: ${blocker.painPoint}.
 
-Does this match what you're dealing with?
+Quick question: does this match what you're seeing?
 
-YES - Happening right now
-MAYBE - Sometimes comes up
-NO - Not for us
+- Yes, this is happening
+- Sometimes
+- Not this month
 
 If it doesn't apply, ignore this.
 
@@ -338,11 +328,11 @@ Best`;
   return {
     subject: `Quick question: ${blocker.emailReference}?`,
     body: email,
-    wordCount: 47,
+    wordCount: 59,
     humanAnchors: {
-      observation: `Pattern in ${industry.industry}`,
+      observation: `${industry.industry} in ${context.city}, ${blocker.name}`,
       insight: blocker.painPoint,
-      question: "Does this match what you're dealing with?",
+      question: "Does this match what you're seeing?",
       inverseIncentive: "If it doesn't apply, ignore this"
     }
   };
