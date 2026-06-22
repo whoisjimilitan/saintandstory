@@ -25,10 +25,12 @@ interface CampaignRequest {
 interface LeadWithPressure {
   id: string;
   businessName: string;
-  email?: string;
-  phone?: string;
-  businessCategory?: string;
+  email?: string | null;
+  phone?: string | null;
+  businessCategory?: string | null;
   pressureGroup?: PressureGroup;
+  suggestedPressure?: PressureGroup;
+  confidenceScore?: number;
 }
 
 // Mock response rate data (in real system, comes from database)
@@ -38,6 +40,38 @@ const PRESSURE_RESPONSE_RATES: Record<PressureGroup, number> = {
   "Appointment Scheduling Friction": 0.35,
   "Customer Acquisition Friction": 0.28
 };
+
+// Pressure group classification rules
+const PRESSURE_CLASSIFIER: Record<string, { pressure: PressureGroup; confidence: number }> = {
+  furniture: { pressure: "Time-Critical Movement", confidence: 0.95 },
+  plumbing: { pressure: "Time-Critical Movement", confidence: 0.95 },
+  electrician: { pressure: "Time-Critical Movement", confidence: 0.92 },
+  removal: { pressure: "Time-Critical Movement", confidence: 0.90 },
+  pharmacy: { pressure: "Time-Critical Movement", confidence: 0.88 },
+  dental: { pressure: "Appointment Scheduling Friction", confidence: 0.96 },
+  dentist: { pressure: "Appointment Scheduling Friction", confidence: 0.96 },
+  doctor: { pressure: "Appointment Scheduling Friction", confidence: 0.90 },
+  salon: { pressure: "Appointment Scheduling Friction", confidence: 0.88 },
+  solicitor: { pressure: "Customer Acquisition Friction", confidence: 0.85 },
+  accountant: { pressure: "Customer Acquisition Friction", confidence: 0.82 },
+  estate: { pressure: "Customer Acquisition Friction", confidence: 0.80 },
+  coach: { pressure: "Customer Acquisition Friction", confidence: 0.78 },
+};
+
+function suggestPressureGroup(businessCategory?: string): { pressure: PressureGroup; confidence: number } {
+  if (!businessCategory) {
+    return { pressure: "Customer Acquisition Friction", confidence: 0.5 };
+  }
+
+  const lower = businessCategory.toLowerCase();
+  for (const [keyword, classification] of Object.entries(PRESSURE_CLASSIFIER)) {
+    if (lower.includes(keyword)) {
+      return classification;
+    }
+  }
+
+  return { pressure: "Customer Acquisition Friction", confidence: 0.5 };
+}
 
 export async function POST(request: Request) {
   try {
@@ -72,17 +106,9 @@ export async function POST(request: Request) {
     };
 
     leads.forEach((lead) => {
-      // Infer pressure group from business category or default
-      let pressure: PressureGroup = "Customer Acquisition Friction";
-
-      if (lead.businessCategory) {
-        const category = lead.businessCategory.toLowerCase();
-        if (["furniture", "plumbing", "electrician", "removal", "pharmacy"].includes(category)) {
-          pressure = "Time-Critical Movement";
-        } else if (["dental", "dentist"].includes(category)) {
-          pressure = "Appointment Scheduling Friction";
-        }
-      }
+      // Suggest pressure group with confidence score
+      const suggestion = suggestPressureGroup(lead.businessCategory);
+      const pressure = suggestion.pressure;
 
       groupedByPressure[pressure].push({
         id: lead.id,
@@ -90,7 +116,9 @@ export async function POST(request: Request) {
         email: lead.email,
         phone: lead.phone,
         businessCategory: lead.businessCategory,
-        pressureGroup: pressure
+        pressureGroup: pressure,
+        suggestedPressure: pressure,
+        confidenceScore: suggestion.confidence
       });
     });
 
