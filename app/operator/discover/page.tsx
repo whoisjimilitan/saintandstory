@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { DorkSearchTab } from "./dork-search-tab";
 
 interface Prospect {
   id: string;
@@ -36,6 +37,7 @@ export default function DiscoverPage() {
     totalCount: 0,
     currentFilter: "all",
   });
+  const [activeTab, setActiveTab] = useState<"google-places" | "dork-search">("google-places");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
@@ -335,6 +337,35 @@ export default function DiscoverPage() {
         </p>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="mb-12 flex gap-0 border-b border-[#E8E8E8]">
+        <button
+          onClick={() => setActiveTab("google-places")}
+          className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+            activeTab === "google-places"
+              ? "text-[#0D0D0D] border-[#0D0D0D]"
+              : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+          }`}
+        >
+          Google Places
+        </button>
+        <button
+          onClick={() => setActiveTab("dork-search")}
+          className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+            activeTab === "dork-search"
+              ? "text-[#0D0D0D] border-[#0D0D0D]"
+              : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+          }`}
+        >
+          Dork Search
+        </button>
+      </div>
+
+      {/* Active Tab Content */}
+      {activeTab === "dork-search" ? (
+        <DorkSearchTab />
+      ) : (
+        <>
       {/* Active Filter Display */}
       {(status || score || stage || state.currentFilter !== "all") && (
         <div className="mb-8 p-4 bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg">
@@ -563,6 +594,8 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+        </>
+      )}
 
       {/* Manual Add Lead Modal */}
       {showManualAddForm && (
