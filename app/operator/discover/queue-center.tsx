@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { CampaignReviewModal } from "./campaign-review-modal";
 
 interface Prospect {
   id: string;
@@ -93,6 +94,8 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchError, setBatchError] = useState<string | null>(null);
   const [batchSuccess, setBatchSuccess] = useState<string | null>(null);
+  const [generatedEmails, setGeneratedEmails] = useState<Array<any> | null>(null);
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
 
   const sortedProspects = useMemo(() => sortProspects(prospects), [prospects]);
   const currentProspect = sortedProspects[currentIndex];
@@ -177,15 +180,40 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
       if (!res.ok) throw new Error("Failed to generate emails");
 
       const data = await res.json();
+      setGeneratedEmails(data.emails);
+      setShowCampaignModal(true);
       setBatchSuccess(`✓ Generated ${data.count} email${data.count !== 1 ? "s" : ""} for review`);
-
-      // TODO: Open campaign-style email review modal
-      console.log("Generated emails for batch:", data.emails);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Email generation failed";
       setBatchError(message);
     } finally {
       setBatchLoading(false);
+    }
+  };
+
+  const handleCampaignApprove = async (emails: any[]) => {
+    try {
+      const res = await fetch("/api/b2b/batch-emails/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emails }),
+      });
+
+      if (!res.ok) throw new Error("Failed to send emails");
+
+      const data = await res.json();
+      setShowCampaignModal(false);
+      setGeneratedEmails(null);
+      setBatchSuccess(`✓ Sent ${data.sent} email${data.sent !== 1 ? "s" : ""}`);
+      setSelectedIds(new Set());
+
+      // Remove emailed prospects from queue
+      const emailedIds = new Set(emails.map((e) => e.prospectId));
+      const remaining = prospects.filter((p) => !emailedIds.has(p.id));
+      if (onProspectsUpdate) onProspectsUpdate(remaining);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send emails";
+      throw error;
     }
   };
 
@@ -460,6 +488,18 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
           </button>
         </div>
       </div>
+
+      {/* Campaign Review Modal */}
+      {showCampaignModal && generatedEmails && (
+        <CampaignReviewModal
+          emails={generatedEmails}
+          onApprove={handleCampaignApprove}
+          onCancel={() => {
+            setShowCampaignModal(false);
+            setGeneratedEmails(null);
+          }}
+        />
+      )}
     </div>
   );
 }
