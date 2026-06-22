@@ -51,7 +51,7 @@ export async function POST(request: Request) {
           to: prospect.email,
           subject: email.subject,
           html: email.body,
-          reply_to: "hello@saintandstoryltd.co.uk",
+          replyTo: "hello@saintandstoryltd.co.uk",
         });
 
         if (result.error) {
