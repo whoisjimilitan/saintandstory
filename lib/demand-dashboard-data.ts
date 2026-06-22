@@ -182,11 +182,16 @@ export function buildOperatorDashboard(
   });
 
   const signalRankings = Object.entries(allSignals)
-    .map(([signal, data]) => ({
-      signal,
-      yesRate: data.total > 0 ? `${Math.round((data.yes / data.total) * 100)}%` : "0%",
-      effectiveness: parseInt(data.yesRate) > 70 ? "HIGH" : parseInt(data.yesRate) > 40 ? "MEDIUM" : "LOW"
-    }))
+    .map(([signal, data]) => {
+      const yesRate = data.total > 0 ? `${Math.round((data.yes / data.total) * 100)}%` : "0%";
+      const yesRateNum = parseInt(yesRate);
+      const effectiveness: "HIGH" | "MEDIUM" | "LOW" = yesRateNum > 70 ? "HIGH" : yesRateNum > 40 ? "MEDIUM" : "LOW";
+      return {
+        signal,
+        yesRate,
+        effectiveness
+      };
+    })
     .sort((a, b) => parseInt(b.yesRate) - parseInt(a.yesRate));
 
   // Operator skill assessment

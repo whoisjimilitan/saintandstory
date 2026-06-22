@@ -219,7 +219,7 @@ export function calculateDemandValue(response: EmailResponse): {
  *
  * Takes a response and returns ALL metrics for operator dashboard
  */
-export function compileResponseMetrics(response: EmailResponse): ResponseMetrics & {
+export function compileResponseMetrics(response: EmailResponse): Omit<ResponseMetrics, 'demandValue'> & {
   demandValue: { demandType: string; demandDescription: string; recurringValue: string };
 } {
   const temperature = mapResponseToTemperature(response.responseType);
@@ -239,7 +239,6 @@ export function compileResponseMetrics(response: EmailResponse): ResponseMetrics
             ? "considering"
             : "not-relevant",
     qualityScore,
-    demandValue: demandValue.demandDescription,
     demandValue: demandValue
   };
 }

@@ -44,7 +44,6 @@ export async function POST(request: Request) {
         businessName: true,
         city: true,
         businessCategory: true,
-        country: true,
         email: true,
       },
     });
@@ -55,7 +54,6 @@ export async function POST(request: Request) {
       businessName: p.businessName,
       businessCategory: p.businessCategory || "unknown",
       city: p.city || "your area",
-      country: p.country,
     }));
 
     // Generate emails using V3 reasoning engine (NOT templated)

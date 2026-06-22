@@ -2,7 +2,7 @@
 interface ProspectForSimilarity {
   id: string;
   businessName: string;
-  city: string;
+  city?: string;
   industry?: string;
   confidenceScore?: number;
   pressureSignal?: string;

@@ -158,6 +158,7 @@ export async function GET() {
           "Each email is unique (not templated)": uniqueBodies.size === totalEmails,
           "All emails have psychological elements": results.every(
             (r) =>
+              r.psychologicalElements &&
               r.psychologicalElements.hasMirror &&
               r.psychologicalElements.hasValueInsight &&
               r.psychologicalElements.hasInverseIncentive &&
