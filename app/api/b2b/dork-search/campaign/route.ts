@@ -133,22 +133,11 @@ export async function POST(request: Request) {
     // Sort by response rate (descending)
     const sortedStats = stats.sort((a, b) => b.responseRate - a.responseRate);
 
-    // Create campaign
-    const campaign = await prisma.b2bCampaign.create({
-      data: {
-        name: campaignName || `Dork Campaign ${new Date().toLocaleDateString()}`,
-        source: "dork_search",
-        status: "draft",
-        totalLeads: leads.length,
-        sentCount: 0,
-        responseCount: 0
-      }
-    });
-
     // Build campaign summary with recommendations
+    const campaignId = `campaign_${Date.now()}`;
     const campaignSummary = {
-      campaignId: campaign.id,
-      campaignName: campaign.name,
+      campaignId,
+      campaignName: campaignName || `Campaign ${new Date().toLocaleDateString()}`,
       totalLeads: leads.length,
       groupedByPressure: sortedStats.map((stat) => ({
         pressure: stat.pressure,
