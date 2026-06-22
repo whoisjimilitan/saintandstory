@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { enrichLeadWithOutreach } from "@/lib/b2b-enrichment-orchestrator";
 import { mapCategoryToPressureType } from "@/lib/b2b-pressure-type-mapper";
 
 const ADMIN_EMAILS = [
@@ -254,9 +253,7 @@ export async function POST(request: NextRequest) {
           }
         });
 
-        // TRIGGER enrichment (REUSE existing)
-        await enrichLeadWithOutreach(lead.id);
-
+        // Lead created - enrichment happens in next batch
         createdLeads.push({
           id: lead.id,
           businessName: lead.businessName,
