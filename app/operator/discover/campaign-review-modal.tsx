@@ -4,11 +4,20 @@ import { useState } from "react";
 
 interface Email {
   prospectId: string;
+  prospectName?: string;
   businessName: string;
-  city: string;
+  city?: string;
   subject: string;
   body: string;
   wordCount: number;
+  isValid?: boolean;
+  validationIssues?: string[];
+  reasoning?: {
+    moment: string;
+    insight: string;
+    pressurePoint: string;
+    service: string;
+  };
 }
 
 interface CampaignReviewModalProps {

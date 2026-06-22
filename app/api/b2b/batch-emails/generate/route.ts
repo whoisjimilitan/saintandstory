@@ -79,6 +79,7 @@ export async function POST(request: Request) {
         prospectId: prospect.id,
         prospectName: prospectDataForReasoning[i].name,
         businessName: prospect.businessName,
+        city: prospect.city || "your area",
         subject: reasonedEmail.subject,
         body: reasonedEmail.body,
         wordCount: reasonedEmail.wordCount,
