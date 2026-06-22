@@ -244,12 +244,7 @@ export async function POST(request: NextRequest) {
             status: "new",
             leadState: "new",
             businessCategory: params.keyword.split(" ")[0].toLowerCase(),
-            metadata: {
-              dorkBatchId: batchId,
-              dorkQuery,
-              contextSignals: params.contextSignals,
-              pressureGroup
-            }
+            notes: `Dork batch: ${batchId} | Pressure: ${pressureGroup}`
           }
         });
 
