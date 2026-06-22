@@ -71,15 +71,6 @@ export function JourneyProgress({ currentStage, prospectCount = {}, prospectId }
         })}
       </div>
 
-      {/* Stage Description */}
-      <div className="mt-3 text-xs text-[#888888]">
-        {currentStage === "today" && "View your daily briefing and pipeline overview"}
-        {currentStage === "discover" && "Search for and discover new prospects"}
-        {currentStage === "understand" && "Deep dive and qualify prospects"}
-        {currentStage === "outreach" && "Send trust-signal emails and track engagement"}
-        {currentStage === "pipeline" && "Monitor progress through all stages"}
-        {currentStage === "orders" && "Track and close revenue-generating deals"}
-      </div>
     </div>
   );
 }
