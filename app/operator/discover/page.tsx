@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DorkSearchTab } from "./dork-search-tab";
+import { QueueCenter } from "./queue-center";
 import { JourneyProgress } from "../components/journey-progress";
 
 interface Prospect {
@@ -52,6 +53,7 @@ export default function DiscoverPage() {
     postcode: "",
   });
   const [manualAddLoading, setManualAddLoading] = useState(false);
+  const [showQueueCenter, setShowQueueCenter] = useState(false);
 
   // Parse filter from URL
   const status = searchParams.get("status");
@@ -156,6 +158,7 @@ export default function DiscoverPage() {
         totalCount: data.totalCount || 0,
         currentFilter: `search="${searchTerm}"${isPostcodeSearch ? ` within ${searchRadius}km` : ""}`,
       }));
+      setShowQueueCenter(true);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Search failed";
@@ -194,6 +197,7 @@ export default function DiscoverPage() {
         totalCount: data.totalCount || 0,
         currentFilter: `imported from file (${data.importedCount || 0} leads)`,
       }));
+      setShowQueueCenter(true);
 
       // Reset file input
       e.target.value = "";
@@ -365,8 +369,16 @@ export default function DiscoverPage() {
         </button>
       </div>
 
-      {/* Active Tab Content */}
-      {activeTab === "dork-search" ? (
+      {/* Queue Center View - Takes Priority */}
+      {showQueueCenter && state.results.length > 0 ? (
+        <div className="mb-12">
+          <QueueCenter
+            prospects={state.results}
+            totalCount={state.totalCount}
+            onBack={() => setShowQueueCenter(false)}
+          />
+        </div>
+      ) : activeTab === "dork-search" ? (
         <DorkSearchTab />
       ) : (
         <>
