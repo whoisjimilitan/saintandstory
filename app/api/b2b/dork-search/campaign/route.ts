@@ -58,7 +58,7 @@ const PRESSURE_CLASSIFIER: Record<string, { pressure: PressureGroup; confidence:
   coach: { pressure: "Customer Acquisition Friction", confidence: 0.78 },
 };
 
-function suggestPressureGroup(businessCategory?: string): { pressure: PressureGroup; confidence: number } {
+function suggestPressureGroup(businessCategory?: string | null): { pressure: PressureGroup; confidence: number } {
   if (!businessCategory) {
     return { pressure: "Customer Acquisition Friction", confidence: 0.5 };
   }
