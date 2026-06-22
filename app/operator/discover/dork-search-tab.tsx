@@ -89,26 +89,47 @@ export function DorkSearchTab() {
           </div>
 
           {result.parsed && (
-            <div className="p-4 bg-[#F5F5F5] rounded border border-[#E8E8E8]">
-              <p className="text-xs font-semibold text-[#0D0D0D] mb-4">Parsed Search Parameters</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Business Type</p>
-                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.businessType}</p>
-                </div>
-                <div>
-                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Source</p>
-                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.source}</p>
-                </div>
-                <div>
-                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Contact Type</p>
-                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.contactType}</p>
-                </div>
-                <div>
-                  <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Pressure Group</p>
-                  <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.pressureGroup}</p>
+            <div className="space-y-4">
+              <div className="p-4 bg-[#F5F5F5] rounded border border-[#E8E8E8]">
+                <p className="text-xs font-semibold text-[#0D0D0D] mb-4">Parsed Search Parameters</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Business Type</p>
+                    <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.businessType}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Source</p>
+                    <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.source}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Contact Type</p>
+                    <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.contactType}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#888888] uppercase font-semibold mb-1">Pressure Group</p>
+                    <p className="text-sm text-[#0D0D0D] font-semibold">{result.parsed.pressureGroup}</p>
+                  </div>
                 </div>
               </div>
+
+              {result.leadsCreated > 0 && (
+                <div className="p-4 bg-[#F5F5F5] rounded border border-[#E8E8E8]">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-4">
+                    Created Leads ({result.leadsCreated})
+                  </p>
+                  <div className="space-y-3">
+                    {result.leads?.map((lead: any, idx: number) => (
+                      <div key={idx} className="p-3 bg-white border border-[#E8E8E8] rounded">
+                        <p className="text-sm font-semibold text-[#0D0D0D]">{lead.businessName}</p>
+                        <div className="text-xs text-[#666666] mt-2 space-y-1">
+                          {lead.email && <p>📧 {lead.email}</p>}
+                          {lead.phone && <p>📞 {lead.phone}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 /**
- * BATCH 1 - PHASE 2: Query Parsing + Pressure Group Identification
- * Goal: Parse natural language query into structured data
+ * BATCH 1 - PHASE 3: Lead Creation
+ * Goal: Parse query, generate mock results, create leads in database
  */
 
-// Pressure group mapping
 const PRESSURE_MAP: Record<string, string> = {
   furniture: "Time-Critical Movement",
   plumbing: "Time-Critical Movement",
@@ -22,7 +22,6 @@ const PRESSURE_MAP: Record<string, string> = {
 function parseQuery(input: string) {
   const lower = input.toLowerCase();
 
-  // Extract business type
   let businessType = "";
   for (const [key, _] of Object.entries(PRESSURE_MAP)) {
     if (lower.includes(key)) {
@@ -34,19 +33,16 @@ function parseQuery(input: string) {
     businessType = input.split(/\s+/)[0] || "business";
   }
 
-  // Extract source (instagram, linkedin, etc)
   let source = "google";
   if (lower.includes("instagram")) source = "instagram";
   else if (lower.includes("linkedin")) source = "linkedin";
   else if (lower.includes("facebook")) source = "facebook";
   else if (lower.includes("twitter")) source = "twitter";
 
-  // Extract contact type
   let contactType = "both";
   if (lower.includes("email")) contactType = "email";
   else if (lower.includes("phone")) contactType = "phone";
 
-  // Get pressure group
   const pressureGroup = PRESSURE_MAP[businessType] || "Customer Acquisition Friction";
 
   return {
@@ -56,6 +52,22 @@ function parseQuery(input: string) {
     pressureGroup,
     rawQuery: input
   };
+}
+
+// Generate mock results based on parsed query
+function generateMockResults(parsed: any, count: number = 3) {
+  const businesses = [];
+  for (let i = 1; i <= count; i++) {
+    businesses.push({
+      businessName: `${parsed.businessType.charAt(0).toUpperCase()}${parsed.businessType.slice(1)} Store ${i}`,
+      email: parsed.contactType !== "phone" ? `contact${i}@store${i}.co.uk` : undefined,
+      phone: parsed.contactType !== "email" ? `+44 20 ${1000 + i} ${2000 + i}` : undefined,
+      website: `https://store${i}.co.uk`,
+      city: "London",
+      source: parsed.source
+    });
+  }
+  return businesses;
 }
 
 export async function POST(request: Request) {
@@ -80,13 +92,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // PHASE 2: Parse query
+    // Phase 2: Parse query
     const parsed = parseQuery(query.trim());
 
-    // Return structured response
+    // Phase 3: Generate mock results
+    const mockResults = generateMockResults(parsed, 3);
+
+    // Phase 3: Create leads in database
+    const createdLeads = [];
+    const batchId = `dork_${Date.now()}`;
+
+    for (const result of mockResults) {
+      try {
+        const lead = await prisma.b2bLead.create({
+          data: {
+            businessName: result.businessName,
+            email: result.email,
+            phone: result.phone,
+            website: result.website,
+            city: result.city,
+            source: "dork_search",
+            status: "new",
+            leadState: "new",
+            businessCategory: parsed.businessType,
+            notes: `Dork batch: ${batchId} | Source: ${parsed.source} | Pressure: ${parsed.pressureGroup}`
+          }
+        });
+
+        createdLeads.push({
+          id: lead.id,
+          businessName: lead.businessName,
+          email: lead.email,
+          phone: lead.phone
+        });
+      } catch (createError) {
+        console.error(`Failed to create lead for ${result.businessName}:`, createError);
+        // Continue with other leads
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      phase: "PHASE 2 - Query Parsing",
+      phase: "PHASE 3 - Lead Creation",
       query: query.trim(),
       parsed: {
         businessType: parsed.businessType,
@@ -94,11 +141,15 @@ export async function POST(request: Request) {
         contactType: parsed.contactType,
         pressureGroup: parsed.pressureGroup
       },
+      batchId,
+      resultsGenerated: mockResults.length,
+      leadsCreated: createdLeads.length,
+      leads: createdLeads,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error("[DORK-SEARCH-PHASE2] Error:", error);
+    console.error("[DORK-SEARCH-PHASE3] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Server error: ${message}` },
