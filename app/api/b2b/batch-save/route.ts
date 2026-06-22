@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -15,44 +16,50 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save/upsert each prospect to database
+    // Save/create each prospect to database
     const savedIds: string[] = [];
     const errors: string[] = [];
 
     for (const prospect of prospects) {
       try {
-        console.log("[BATCH SAVE] Upserting prospect:", prospect.id, prospect.businessName);
+        console.log("[BATCH SAVE] Creating prospect:", prospect.businessName);
 
-        const saved = await prisma.b2bLead.upsert({
-          where: { id: prospect.id },
-          update: {
-            // Update with any new data
-            businessName: prospect.businessName,
-            city: prospect.city,
-            businessCategory: prospect.businessCategory,
-            email: prospect.email,
-          },
-          create: {
-            id: prospect.id,
+        // Generate a new UUID for the database
+        const dbId = randomUUID();
+
+        // Store the original search result ID in googlePlaceId field if it's a Google Places ID
+        const isGooglePlaceId = prospect.id?.startsWith("ChIJ");
+
+        const created = await prisma.b2bLead.create({
+          data: {
+            id: dbId,
             businessName: prospect.businessName || "Unknown Business",
             city: prospect.city || "Unknown City",
             businessCategory: prospect.businessCategory || "unknown",
             email: prospect.email,
+            googlePlaceId: isGooglePlaceId ? prospect.id : undefined,
             status: "discovered",
             leadState: "new",
           },
         });
 
-        savedIds.push(saved.id);
-        console.log("[BATCH SAVE] Saved:", saved.id);
+        savedIds.push(created.id);
+        console.log("[BATCH SAVE] Created with DB ID:", created.id);
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error(`[BATCH SAVE] Failed to save prospect ${prospect.id}:`, msg);
-        errors.push(`${prospect.id}: ${msg}`);
+        console.error(`[BATCH SAVE] Failed to save prospect ${prospect.businessName}:`, msg);
+        errors.push(`${prospect.businessName}: ${msg}`);
       }
     }
 
     console.log("[BATCH SAVE] Complete. Saved:", savedIds.length, "Failed:", errors.length);
+
+    if (savedIds.length === 0) {
+      return NextResponse.json(
+        { error: `Failed to save any prospects. Errors: ${errors.join(", ")}` },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
