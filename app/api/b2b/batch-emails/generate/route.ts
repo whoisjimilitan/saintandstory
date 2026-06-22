@@ -28,12 +28,17 @@ export async function POST(request: Request) {
   try {
     const { prospectIds } = await request.json();
 
+    console.log("[EMAIL GEN] Received prospectIds:", prospectIds);
+
     if (!prospectIds || !Array.isArray(prospectIds) || prospectIds.length === 0) {
+      console.error("[EMAIL GEN] Invalid prospectIds");
       return NextResponse.json(
         { error: "Invalid prospectIds array" },
         { status: 400 }
       );
     }
+
+    console.log("[EMAIL GEN] Finding", prospectIds.length, "prospects in database...");
 
     // Fetch prospects from database
     const prospects = await prisma.b2bLead.findMany({
@@ -49,7 +54,10 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log("[EMAIL GEN] Found", prospects.length, "prospects");
+
     if (prospects.length === 0) {
+      console.error("[EMAIL GEN] No prospects found in database for IDs:", prospectIds);
       return NextResponse.json(
         { error: "No prospects found in database" },
         { status: 400 }
