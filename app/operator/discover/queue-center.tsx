@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { CampaignReviewModal } from "./campaign-review-modal";
+import { SmartSuggestionsModal } from "./smart-suggestions-modal";
+import { findSimilarProspects, formatSimilarityReason } from "./utils/smart-suggestions";
 
 interface Prospect {
   id: string;
@@ -96,6 +98,9 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
   const [batchSuccess, setBatchSuccess] = useState<string | null>(null);
   const [generatedEmails, setGeneratedEmails] = useState<Array<any> | null>(null);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [showSmartSuggestions, setShowSmartSuggestions] = useState(false);
+  const [suggestedProspects, setSuggestedProspects] = useState<Prospect[]>([]);
+  const [suggestReason, setSuggestReason] = useState<string>("");
 
   const sortedProspects = useMemo(() => sortProspects(prospects), [prospects]);
   const currentProspect = sortedProspects[currentIndex];
@@ -149,16 +154,51 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
       if (!res.ok) throw new Error("Failed to qualify prospects");
 
       setBatchSuccess(`✓ Qualified ${selectedArray.length} prospect${selectedArray.length !== 1 ? "s" : ""}`);
-      setSelectedIds(new Set());
 
       // Remove qualified prospects from view
       const remaining = prospects.filter((p) => !selectedArray.includes(p.id));
       if (onProspectsUpdate) onProspectsUpdate(remaining);
+
+      // Show smart suggestions if only 1 was qualified
+      if (selectedArray.length === 1) {
+        const qualifiedProspect = prospects.find((p) => p.id === selectedArray[0]);
+        if (qualifiedProspect) {
+          const similar = findSimilarProspects(qualifiedProspect, remaining, 60);
+          if (similar.length > 0) {
+            setSuggestedProspects(similar);
+            setSuggestReason(formatSimilarityReason(qualifiedProspect, similar));
+            setShowSmartSuggestions(true);
+          }
+        }
+      }
+
+      setSelectedIds(new Set());
     } catch (error) {
       const message = error instanceof Error ? error.message : "Batch qualify failed";
       setBatchError(message);
     } finally {
       setBatchLoading(false);
+    }
+  };
+
+  const handleSmartSuggestApprove = async (prospectIds: string[]) => {
+    try {
+      const res = await fetch("/api/b2b/batch-qualify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectIds }),
+      });
+
+      if (!res.ok) throw new Error("Failed to approve suggested prospects");
+
+      const remaining = prospects.filter((p) => !prospectIds.includes(p.id));
+      if (onProspectsUpdate) onProspectsUpdate(remaining);
+
+      setBatchSuccess(`✓ Batch approved ${prospectIds.length} similar prospect${prospectIds.length !== 1 ? "s" : ""}`);
+      setShowSmartSuggestions(false);
+      setSuggestedProspects([]);
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -497,6 +537,20 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
           onCancel={() => {
             setShowCampaignModal(false);
             setGeneratedEmails(null);
+          }}
+        />
+      )}
+
+      {/* Smart Suggestions Modal */}
+      {showSmartSuggestions && suggestedProspects.length > 0 && (
+        <SmartSuggestionsModal
+          qualified={prospects.find((p) => selectedIds.size === 0) || currentProspect}
+          similar={suggestedProspects}
+          reason={suggestReason}
+          onApprove={handleSmartSuggestApprove}
+          onDismiss={() => {
+            setShowSmartSuggestions(false);
+            setSuggestedProspects([]);
           }}
         />
       )}
