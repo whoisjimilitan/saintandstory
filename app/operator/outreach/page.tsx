@@ -228,9 +228,6 @@ export default function OutreachPage() {
 
   return (
     <div className="px-4 md:px-12 py-10 max-w-4xl">
-      {/* Journey Progress */}
-      <JourneyProgress currentStage="outreach" prospectId={state.prospect?.id} />
-
       {/* Header */}
       <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
