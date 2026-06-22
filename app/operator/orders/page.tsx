@@ -165,14 +165,10 @@ export default function OrdersPage() {
   if (state.error) {
     return (
       <div className="px-4 md:px-12 py-10 max-w-6xl">
+        <JourneyProgress currentStage="orders" />
+
         <div className="mb-12">
-          <Link
-            href="/operator"
-            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-          >
-            ← Back to Today
-          </Link>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
+          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
             Orders
           </h1>
         </div>

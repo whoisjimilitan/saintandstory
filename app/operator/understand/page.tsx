@@ -147,21 +147,17 @@ export default function UnderstandPage() {
   if (state.error || !state.prospect) {
     return (
       <div className="px-4 md:px-12 py-10 max-w-4xl">
+        <JourneyProgress currentStage="understand" />
+
         <div className="mb-12">
-          <Link
-            href="/operator/discover"
-            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-          >
-            ← Back to Discover
-          </Link>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
+          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
             Understand
           </h1>
         </div>
 
         <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
           <p className="text-sm text-[#666666] mb-4">
-            {state.error || "Could not load prospect."}
+            {state.error || "No prospect selected. Please search from Discover."}
           </p>
           <Link
             href="/operator/discover"
