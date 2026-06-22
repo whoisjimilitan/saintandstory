@@ -14,6 +14,8 @@ type Temperature = "ULTRA_HOT" | "HOT" | "WARM" | "COLD";
 
 interface EmailResponse {
   prospectId: string;
+  campaignId?: string; // Link to campaign batch for performance tracking
+  emailSentAt?: Date; // When email was sent (for true velocity calculation)
   responseType: ResponseType;
   responseTimeMs?: number; // How long until they replied
   respondedAt?: Date;
@@ -100,7 +102,7 @@ function calculateDemandValue(
 
 export async function POST(request: Request) {
   try {
-    const { prospectId, responseType, responseTimeMs, respondedAt } =
+    const { prospectId, campaignId, emailSentAt, responseType, responseTimeMs, respondedAt } =
       await request.json();
 
     if (!prospectId || !responseType) {
@@ -133,6 +135,7 @@ export async function POST(request: Request) {
     // Store response in database (mirrored schema - no new fields)
     // Using notes field to store response data as JSON
     const responseData = {
+      campaignId, // LIGHTBULB #2: Campaign linking for batch performance tracking
       type: responseType,
       temperature,
       qualityScore,
@@ -141,6 +144,7 @@ export async function POST(request: Request) {
         hours: velocity.hours,
         urgency: velocity.urgency
       },
+      emailSentAt: emailSentAt?.toISOString(), // LIGHTBULB #1: True velocity calculation
       capturedAt: new Date().toISOString(),
       respondedAt: respondedAt?.toISOString()
     };
@@ -169,6 +173,7 @@ export async function POST(request: Request) {
       success: true,
       response: {
         prospectId,
+        campaignId, // LIGHTBULB #2: Return campaign ID for batch tracking
         responseType,
         temperature,
         velocity: {
@@ -182,9 +187,10 @@ export async function POST(request: Request) {
         "Temperature Assigned": temperature,
         "Quality Score": `${qualityScore}/100`,
         "Response Urgency": velocity.urgency,
-        "Demand Value": demandValue
+        "Demand Value": demandValue,
+        "Campaign Tracked": campaignId ? "YES" : "NO"
       },
-      note: "Response captured and stored. Feeds to dashboard and learning system."
+      note: "Response captured with campaign tracking and velocity calculation. Feeds to dashboard and learning system."
     });
   } catch (error) {
     console.error("[EMAIL RESPONSE CAPTURE] Error:", error);
