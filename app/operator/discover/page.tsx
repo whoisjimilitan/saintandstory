@@ -363,7 +363,11 @@ export default function DiscoverPage() {
 
       {/* Active Tab Content */}
       {activeTab === "dork-search" ? (
-        <DorkSearchTab />
+        <div className="p-8 text-center bg-[#F9F9F9] rounded-lg border border-[#E8E8E8]">
+          <p className="text-sm text-[#888888]">
+            Dork Search is under development. Please use Google Places discovery for now.
+          </p>
+        </div>
       ) : (
         <>
       {/* Active Filter Display */}
