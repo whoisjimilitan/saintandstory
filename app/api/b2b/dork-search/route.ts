@@ -39,9 +39,14 @@ function parseQuery(input: string) {
   else if (lower.includes("facebook")) source = "facebook";
   else if (lower.includes("twitter")) source = "twitter";
 
+  // Check for both email AND phone
+  const hasEmail = lower.includes("email") || lower.includes("@");
+  const hasPhone = lower.includes("phone") || lower.includes("tel") || lower.includes("📞");
+
   let contactType = "both";
-  if (lower.includes("email")) contactType = "email";
-  else if (lower.includes("phone")) contactType = "phone";
+  if (hasEmail && !hasPhone) contactType = "email";
+  else if (hasPhone && !hasEmail) contactType = "phone";
+  else contactType = "both";
 
   const pressureGroup = PRESSURE_MAP[businessType] || "Customer Acquisition Friction";
 
