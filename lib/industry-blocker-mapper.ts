@@ -43,7 +43,7 @@ export const INDUSTRY_BLOCKERS: Record<string, IndustryProfile> = {
   // LEGAL
   lawyers: {
     industry: "Lawyers & Law Firms",
-    keywords: ["lawyer", "solicitor", "legal", "law firm", "attorney"],
+    keywords: ["lawyer", "solicitor", "legal", "law firm", "attorney", "law", "barrister"],
     primaryBlocker: {
       name: "documents-stuck",
       urgency: "immediate",
@@ -70,7 +70,7 @@ export const INDUSTRY_BLOCKERS: Record<string, IndustryProfile> = {
   // PHARMACY
   pharmacy: {
     industry: "Pharmacies & Chemists",
-    keywords: ["pharmacy", "chemist", "pharmacist", "prescription", "drug store"],
+    keywords: ["pharmacy", "chemist", "pharmacist", "prescription", "drug store", "pharma"],
     primaryBlocker: {
       name: "urgent-prescriptions",
       urgency: "immediate",
@@ -97,7 +97,7 @@ export const INDUSTRY_BLOCKERS: Record<string, IndustryProfile> = {
   // DENTISTRY
   dentistry: {
     industry: "Dental Practices",
-    keywords: ["dentist", "dental", "orthodontist", "dental practice", "dental clinic"],
+    keywords: ["dentist", "dental", "orthodontist", "dental practice", "dental clinic", "dentistry"],
     primaryBlocker: {
       name: "cancellation-gaps",
       urgency: "immediate",
@@ -124,7 +124,7 @@ export const INDUSTRY_BLOCKERS: Record<string, IndustryProfile> = {
   // MOVING & REMOVAL
   removals: {
     industry: "Moving & Removal Companies",
-    keywords: ["removal", "removals", "moving", "house move", "van hire", "logistics"],
+    keywords: ["removal", "removals", "moving", "house move", "van hire", "logistics", "mover"],
     primaryBlocker: {
       name: "weekend-overflow",
       urgency: "immediate",
