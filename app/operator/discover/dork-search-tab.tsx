@@ -230,7 +230,7 @@ export function DorkSearchTab() {
                           type="checkbox"
                           checked={selectedLeadIds.has(lead.id)}
                           onChange={() => toggleLeadSelection(lead.id)}
-                          className="mt-0.5 w-4 h-4 rounded border border-[#E8E8E8] cursor-pointer"
+                          className="mt-0.5 w-4 h-4 rounded border border-[#E8E8E8] cursor-pointer accent-[#0D0D0D]"
                         />
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-[#0D0D0D]">

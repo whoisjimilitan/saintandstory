@@ -461,7 +461,7 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
             <button
               onClick={() => {
                 setSelectedIds(new Set([currentProspect.id]));
-                // Will trigger batch qualify with just this prospect
+                setTimeout(() => handleBatchQualify(), 0);
               }}
               disabled={!currentProspect || batchLoading}
               className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
@@ -472,7 +472,7 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
             <button
               onClick={() => {
                 setSelectedIds(new Set([currentProspect.id]));
-                // Will trigger batch email with just this prospect
+                setTimeout(() => handleBatchEmail(), 0);
               }}
               disabled={!currentProspect || batchLoading}
               className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
