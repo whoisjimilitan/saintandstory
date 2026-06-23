@@ -230,8 +230,8 @@ export function generatePhase1Intelligence(
         reason: "Cold prospect, initial contact phase",
       },
       targetStage: {
-        stage: Math.min(6, stage + 1),
-        stageName: stageNames[Math.min(6, stage + 1)],
+        stage: Math.min(6, stage + 1) as RelationshipStage,
+        stageName: stageNames[Math.min(6, stage + 1) as RelationshipStage],
         why: "Natural progression to next relationship phase",
       },
       gap: {
@@ -362,9 +362,9 @@ export function generatePhase1Intelligence(
         whatSuccessLooksLike: "Response email within 7 days",
       },
       nextStage: {
-        stage: Math.min(6, stage + 1),
-        stageName: stageNames[Math.min(6, stage + 1)],
-        objective: stageObjectives[Math.min(6, stage + 1)],
+        stage: Math.min(6, stage + 1) as RelationshipStage,
+        stageName: stageNames[Math.min(6, stage + 1) as RelationshipStage],
+        objective: stageObjectives[Math.min(6, stage + 1) as RelationshipStage],
         estimatedDuration: "14 days",
         triggerForNextStage: "Interest expressed",
         whatSuccessLooksLike: "Meeting scheduled",
