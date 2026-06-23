@@ -31,20 +31,36 @@ export function OperatorNav() {
       <div className="max-w-full mx-auto px-6 py-6">
         {/* Journey Container */}
         <div className="flex items-center justify-between relative">
-          {/* Continuous Journey Line - Background */}
-          <div className="absolute inset-y-0 left-6 right-6 flex items-center pointer-events-none">
-            <div className="w-full h-1 rounded-full overflow-hidden relative">
-              {/* Empty line (future) */}
-              <div className="absolute inset-0 bg-[#E8E8E8]"></div>
-              {/* Filled line (progress) - animates as you move */}
-              <div
-                className="absolute inset-y-0 left-0 bg-[#0D0D0D] rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-          </div>
+          {/* Continuous line - positioned through center of icons (h-12 means 48px, line at 24px = center) */}
+          <svg
+            className="absolute inset-0 w-full pointer-events-none"
+            style={{ height: "48px" }}
+            preserveAspectRatio="none"
+          >
+            {/* Empty/future line */}
+            <line
+              x1="24"
+              y1="24"
+              x2="calc(100% - 24px)"
+              y2="24"
+              stroke="#E8E8E8"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+            {/* Filled/progress line */}
+            <line
+              x1="24"
+              y1="24"
+              x2={`${progressPercentage}%`}
+              y2="24"
+              stroke="#0D0D0D"
+              strokeWidth="4"
+              strokeLinecap="round"
+              style={{ transition: "x2 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}
+            />
+          </svg>
 
-          {/* Stages - sit on top of line */}
+          {/* Stages */}
           <div className="flex items-center justify-between w-full relative z-10">
             {stages.map((stage, index) => {
               const isActive = index === currentStageIndex;
@@ -59,14 +75,14 @@ export function OperatorNav() {
                   } hover:opacity-100 hover:scale-100`}
                   title={stage.name}
                 >
-                  {/* Stage Indicator - sits on journey line */}
+                  {/* Stage Indicator - line passes through center */}
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 border-3 ${
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 border-3 bg-white ${
                       isActive
-                        ? "bg-white border-[#0D0D0D] text-[#0D0D0D] shadow-md"
+                        ? "border-[#0D0D0D] text-[#0D0D0D] shadow-md"
                         : isPast
-                          ? "bg-white border-[#0D0D0D] text-[#0D0D0D]"
-                          : "bg-white border-[#E8E8E8] text-[#999999]"
+                          ? "border-[#0D0D0D] text-[#0D0D0D]"
+                          : "border-[#E8E8E8] text-[#999999]"
                     }`}
                   >
                     <stage.Icon size={20} />
@@ -100,7 +116,6 @@ export function OperatorNav() {
           </div>
         </div>
       </div>
-
     </nav>
   );
 }
