@@ -38,7 +38,11 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[EMAIL GEN] Finding", prospectIds.length, "prospects in database...");
+    console.log("[EMAIL GEN] Looking for", prospectIds.length, "prospects in database...");
+
+    // DEBUG: Check if database is accessible
+    const totalInDB = await prisma.b2bLead.count();
+    console.log("[EMAIL GEN] Total prospects in database:", totalInDB);
 
     // Fetch prospects from database
     const prospects = await prisma.b2bLead.findMany({
@@ -54,7 +58,13 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log("[EMAIL GEN] Found", prospects.length, "prospects");
+    console.log("[EMAIL GEN] ✅ Found", prospects.length, "out of", prospectIds.length, "requested prospects");
+
+    // If none found, log the IDs we were searching for
+    if (prospects.length === 0) {
+      console.error("[EMAIL GEN] ❌ NO MATCHES - Searched for:", prospectIds);
+      console.error("[EMAIL GEN] ❌ Total in DB:", totalInDB);
+    }
 
     if (prospects.length === 0) {
       console.error("[EMAIL GEN] No prospects found in database for IDs:", prospectIds);

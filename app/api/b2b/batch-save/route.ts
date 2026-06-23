@@ -43,8 +43,20 @@ export async function POST(request: Request) {
           },
         });
 
-        savedIds.push(created.id);
         console.log("[BATCH SAVE] Created with DB ID:", created.id);
+
+        // VERIFY it was actually saved by querying it back immediately
+        const verify = await prisma.b2bLead.findUnique({
+          where: { id: created.id },
+        });
+
+        if (verify) {
+          console.log("[BATCH SAVE] ✅ VERIFIED - prospect exists in DB:", verify.id);
+          savedIds.push(created.id);
+        } else {
+          console.error("[BATCH SAVE] ❌ VERIFICATION FAILED - created but NOT in DB:", created.id);
+          errors.push(`${prospect.businessName}: Created but verification failed`);
+        }
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
         console.error(`[BATCH SAVE] Failed to save prospect ${prospect.businessName}:`, msg);
