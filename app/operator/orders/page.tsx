@@ -150,7 +150,7 @@ export default function OrdersPage() {
 
   if (state.loading) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         <div className="flex justify-center py-12">
           <div className="text-center">
@@ -165,7 +165,7 @@ export default function OrdersPage() {
 
   if (state.error) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Orders</h1>
@@ -187,7 +187,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         {/* Sub-Hero */}
         <p className="text-sm text-[#888888] mb-12">Track conversions and manage customer orders</p>

@@ -325,7 +325,7 @@ export default function DiscoverPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         {/* Sub-Hero */}
         <div className="mb-12">

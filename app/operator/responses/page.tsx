@@ -120,7 +120,7 @@ export default function ResponsesPage() {
   const awaitingCount = responses.filter((r) => !r.replied).length;
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="max-w-4xl mx-auto px-4 md:px-0 py-12">
         {/* Sub-Hero */}
         <p className="text-sm text-[#888888] mb-8">Track replies and engage with prospects</p>

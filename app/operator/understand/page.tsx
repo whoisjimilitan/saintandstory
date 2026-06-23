@@ -131,7 +131,7 @@ export default function UnderstandPage() {
   // Loading state
   if (state.loading) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
           <div className="flex justify-center py-12">
             <div className="text-center">
@@ -147,7 +147,7 @@ export default function UnderstandPage() {
   // Error state
   if (state.error || !state.prospect) {
     return (
-      <div className="min-h-screen bg-white pt-32">
+      <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Qualify</h1>
@@ -171,7 +171,7 @@ export default function UnderstandPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
         {/* Sub-Hero */}
         <p className="text-sm text-[#888888] mb-12">Review and qualify opportunities before outreach</p>
