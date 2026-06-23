@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
-  generateReasonedEmailBatch,
-  validateReasoningApplied,
-  type ProspectData
-} from "@/lib/v3-email-reasoning-engine";
+  generateRelationshipCommunication,
+  type BusinessProfile,
+  type RelationshipStage,
+} from "@/lib/business-relationship-engine";
 
 interface EmailPreview {
   prospectId: string;
@@ -14,13 +14,22 @@ interface EmailPreview {
   subject: string;
   body: string;
   wordCount: number;
-  isValid: boolean;
-  validationIssues?: string[];
+
+  // NEW: Relationship reasoning
+  relationshipStage: RelationshipStage;
+  stageObjective: string;
   reasoning: {
-    moment: string;
-    insight: string;
-    pressurePoint: string;
-    service: string;
+    businessAnalysis: {
+      industry: string;
+      location: string;
+    };
+    trustStrategy: string;
+    inverseIncentive: string;
+    mentalSimulation: string;
+    microCommitment: {
+      ask: string;
+      responseOptions: string[];
+    };
   };
 }
 
@@ -28,21 +37,17 @@ export async function POST(request: Request) {
   try {
     const { prospectIds } = await request.json();
 
-    console.log("[EMAIL GEN] Received prospectIds:", prospectIds);
+    console.log("[RELATIONSHIP ENGINE] Received prospectIds:", prospectIds);
 
     if (!prospectIds || !Array.isArray(prospectIds) || prospectIds.length === 0) {
-      console.error("[EMAIL GEN] Invalid prospectIds");
+      console.error("[RELATIONSHIP ENGINE] Invalid prospectIds");
       return NextResponse.json(
         { error: "Invalid prospectIds array" },
         { status: 400 }
       );
     }
 
-    console.log("[EMAIL GEN] Looking for", prospectIds.length, "prospects in database...");
-
-    // DEBUG: Check if database is accessible
-    const totalInDB = await prisma.b2bLead.count();
-    console.log("[EMAIL GEN] Total prospects in database:", totalInDB);
+    console.log("[RELATIONSHIP ENGINE] Looking for", prospectIds.length, "prospects in database...");
 
     // Fetch prospects from database
     const prospects = await prisma.b2bLead.findMany({
@@ -55,104 +60,116 @@ export async function POST(request: Request) {
         city: true,
         businessCategory: true,
         email: true,
+        contactName: true,
       },
     });
 
-    console.log("[EMAIL GEN] ✅ Found", prospects.length, "out of", prospectIds.length, "requested prospects");
-
-    // If none found, log the IDs we were searching for
-    if (prospects.length === 0) {
-      console.error("[EMAIL GEN] ❌ NO MATCHES - Searched for:", prospectIds);
-      console.error("[EMAIL GEN] ❌ Total in DB:", totalInDB);
-    }
+    console.log("[RELATIONSHIP ENGINE] ✅ Found", prospects.length, "out of", prospectIds.length, "requested prospects");
 
     if (prospects.length === 0) {
-      console.error("[EMAIL GEN] No prospects found in database for IDs:", prospectIds);
+      console.error("[RELATIONSHIP ENGINE] No prospects found in database for IDs:", prospectIds);
       return NextResponse.json(
         { error: "No prospects found in database" },
         { status: 400 }
       );
     }
 
-    // Extract person name from email if available (fallback to generic)
-    const prospectDataForReasoning: ProspectData[] = prospects.map((p) => ({
-      name: p.email?.split("@")[0]?.replace(/[._]/g, " ") || "There",
-      businessName: p.businessName,
-      businessCategory: p.businessCategory || "unknown",
-      city: p.city || "your area",
-    }));
-
-    // Generate emails using V3 reasoning engine (NOT templated)
-    console.log("[EMAIL GEN] Calling generateReasonedEmailBatch...");
-    let reasonedEmails;
-    try {
-      reasonedEmails = generateReasonedEmailBatch(prospectDataForReasoning);
-      console.log("[EMAIL GEN] ✅ Generated", reasonedEmails.length, "emails from reasoning engine");
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      console.error("[EMAIL GEN] ❌ Error in reasoning engine:", msg);
-      throw error;
-    }
-
-    // Build response previews
+    // Build business profiles for reasoning engine
     const emails: EmailPreview[] = [];
     const failedProspects: string[] = [];
 
-    for (let i = 0; i < prospects.length; i++) {
-      const prospect = prospects[i];
-      const reasonedEmail = reasonedEmails[i];
+    for (const prospect of prospects) {
+      try {
+        const businessProfile: BusinessProfile = {
+          name: prospect.businessName,
+          industry: prospect.businessCategory || "unknown",
+          location: prospect.city || "UK",
+          size: "small", // Infer from available data
+          contactName: prospect.contactName || undefined,
+          discoveryEvidence: {
+            operationalIndicators: [`Industry: ${prospect.businessCategory}`, `Location: ${prospect.city}`],
+            growthSignals: ["Active prospect"],
+            currentSolutions: [],
+            painPoints: [],
+          },
+        };
 
-      if (!reasonedEmail) {
-        console.error("[EMAIL GEN] ❌ No email generated for prospect", i, prospect.id);
+        // Generate relationship communication (all 8 steps)
+        const communication = generateRelationshipCommunication(businessProfile, undefined);
+
+        emails.push({
+          prospectId: prospect.id,
+          prospectName: prospect.contactName || prospect.businessName,
+          businessName: prospect.businessName,
+          city: prospect.city || "UK",
+          subject: communication.email.subject,
+          body: communication.email.body,
+          wordCount: communication.email.wordCount,
+
+          // NEW: Relationship stage and reasoning
+          relationshipStage: communication.stageProgression.currentStage,
+          stageObjective: communication.reasoning.relationshipStage.stageObjective,
+          reasoning: {
+            businessAnalysis: {
+              industry: communication.reasoning.businessAnalysis.industry,
+              location: communication.reasoning.businessAnalysis.location,
+            },
+            trustStrategy: communication.reasoning.trustStrategy.trustSignal,
+            inverseIncentive: communication.reasoning.inverseIncentive.statement,
+            mentalSimulation: communication.reasoning.mentalSimulation.scenario,
+            microCommitment: {
+              ask: communication.reasoning.microCommitment.ask,
+              responseOptions: communication.reasoning.microCommitment.responseOptions,
+            },
+          },
+        });
+
+        console.log(`[RELATIONSHIP ENGINE] ✅ Generated relationship communication for ${prospect.businessName} (Stage ${communication.stageProgression.currentStage})`);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error("[RELATIONSHIP ENGINE] ❌ Error generating communication:", msg);
         failedProspects.push(prospect.id);
-        continue;
       }
-
-      // Validate that reasoning was applied (not templating)
-      const validation = validateReasoningApplied(reasonedEmail);
-
-      emails.push({
-        prospectId: prospect.id,
-        prospectName: prospectDataForReasoning[i].name,
-        businessName: prospect.businessName,
-        city: prospect.city || "your area",
-        subject: reasonedEmail.subject,
-        body: reasonedEmail.body,
-        wordCount: reasonedEmail.wordCount,
-        isValid: validation.isValid,
-        validationIssues: validation.issues.length > 0 ? validation.issues : undefined,
-        reasoning: reasonedEmail.reasoning,
-      });
     }
 
     // Calculate metrics
-    const validEmails = emails.filter((e) => e.isValid).length;
-    const totalGenerated = emails.length;
+    const stageDistribution = {
+      stage1: emails.filter((e) => e.relationshipStage === 1).length,
+      stage2: emails.filter((e) => e.relationshipStage === 2).length,
+      stage3plus: emails.filter((e) => e.relationshipStage >= 3).length,
+    };
 
     return NextResponse.json({
       success: true,
       emails,
-      count: totalGenerated,
-      validCount: validEmails,
+      count: emails.length,
       failedCount: failedProspects.length,
       failedProspectIds: failedProspects.length > 0 ? failedProspects : undefined,
       metrics: {
-        validationRate: `${totalGenerated > 0 ? Math.round((validEmails / totalGenerated) * 100) : 0}%`,
+        stageDistribution,
         averageWordCount:
-          totalGenerated > 0
-            ? Math.round(
-                emails.reduce((sum, e) => sum + e.wordCount, 0) / totalGenerated
-              )
+          emails.length > 0
+            ? Math.round(emails.reduce((sum, e) => sum + e.wordCount, 0) / emails.length)
             : 0,
-        allFollowPattern: validEmails === totalGenerated,
+        stageBreakdown: `${stageDistribution.stage1} earning reply, ${stageDistribution.stage2} backup positioning, ${stageDistribution.stage3plus} advanced relationships`,
       },
-      engine: "V3_EMAIL_REASONING_ENGINE (Personalised, not templated)",
-      note: "Each email is generated through REASONING of their specific moment, insight, and service. Hand-written feeling. Unique per prospect. Never templated.",
+      engine: "BUSINESS_RELATIONSHIP_ENGINE (8-step reasoning pipeline)",
+      note: "Each communication is generated through strategic relationship reasoning: Who are they? Why would they need us? What stage are they at? What trust strategy works? What inverse incentive? What mental simulation? What micro-commitment? Only THEN is the email generated.",
+      pipeline: [
+        "Step 1: Business Analysis",
+        "Step 2: Delivery Needs Inference",
+        "Step 3: Relationship Stage Assessment",
+        "Step 4: Trust Strategy",
+        "Step 5: Inverse Incentive",
+        "Step 6: Mental Simulation",
+        "Step 7: Micro Commitment",
+        "Step 8: Email Generation",
+      ],
     });
   } catch (error) {
-    console.error("[BATCH EMAIL GENERATE] Error:", error);
+    console.error("[RELATIONSHIP ENGINE] Error:", error);
     return NextResponse.json(
-      { error: "Failed to generate emails" },
+      { error: "Failed to generate relationship communications" },
       { status: 500 }
     );
   }
