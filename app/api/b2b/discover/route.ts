@@ -457,36 +457,44 @@ export async function POST(request: NextRequest) {
   // PRIORITY 2: Ensure DB transaction is flushed before returning
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // Query for the actual created leads from database
+  // Query for the actual created leads from database (use correct snake_case column names)
   let createdLeads: any[] = [];
   try {
     createdLeads = await sql`
-      SELECT id, "businessName", "businessCategory", email, city, postcode, status, "leadState", "createdAt", "painPoint", "businessEvidence"
+      SELECT id, business_name, business_category, email, city, postcode, status, lead_state, created_at, pain_point, business_evidence
       FROM b2b_leads
-      WHERE "createdAt" > NOW() - INTERVAL '2 seconds'
-      AND "businessEvidence" IS NOT NULL
-      ORDER BY "createdAt" DESC
-      LIMIT ${added.length}
+      WHERE created_at > NOW() - INTERVAL '10 seconds'
+      AND (business_evidence IS NOT NULL OR id IS NOT NULL)
+      ORDER BY created_at DESC
+      LIMIT ${Math.max(added.length, 100)}
     `;
     console.log("[DISCOVER] Query returned", createdLeads.length, "leads from database");
+
+    // Transform to match expected format for QueueCenter
+    createdLeads = createdLeads.map((lead: any) => ({
+      id: lead.id,
+      businessName: lead.business_name,
+      businessCategory: lead.business_category,
+      industry: lead.business_category,
+      city: lead.city,
+      postcode: lead.postcode,
+      email: lead.email,
+      contactName: undefined,
+      confidenceScore: 70, // Default confidence
+      status: lead.status,
+    }));
   } catch (err) {
     console.error("[DISCOVER] Error querying created leads:", err);
+    // Don't fail - return empty array and let caller handle it
   }
 
-  // Return actual lead records
+  // Return actual lead records from database (not fallbacks)
   return NextResponse.json({
-    businesses: createdLeads.length > 0 ? createdLeads : added.map(name => ({
-      id: name,
-      name: name,
-      address: "",
-      postcode: postcode || "",
-      phone: undefined,
-      email: undefined,
-      website: undefined,
-      category: category || "all",
-      source: "discovery",
-    })),
-    count: createdLeads.length > 0 ? createdLeads.length : added.length,
+    results: createdLeads,
+    businesses: createdLeads,
+    totalCount: createdLeads.length,
+    count: createdLeads.length,
     success: true,
+    message: createdLeads.length > 0 ? "Leads created and returned" : "No leads were created (pipeline processing)"
   });
 }
