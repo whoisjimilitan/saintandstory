@@ -50,6 +50,14 @@ export default function OrdersPage() {
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
+  // Traceability metadata for revenue memory
+  const [traceability, setTraceability] = useState({
+    discoveredVia: "postcode" as string,
+    psychologyUsed: "loss-aversion" as string,
+    emailVersion: "v5" as string,
+    daysToBooking: 5 as number,
+  });
+
   // Fetch orders
   useEffect(() => {
     const fetchOrders = async () => {
@@ -367,6 +375,77 @@ export default function OrdersPage() {
                       </p>
                     </div>
                   )}
+                </div>
+
+                {/* Revenue Traceability */}
+                <div className="border-t border-[#E8E8E8] pt-6">
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-3">
+                    Revenue Traceability
+                  </p>
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <label className="text-[#888888] block mb-1">Discovery Method</label>
+                      <input
+                        type="text"
+                        value={traceability.discoveredVia}
+                        onChange={(e) => setTraceability(t => ({...t, discoveredVia: e.target.value}))}
+                        placeholder="postcode / keyword / dork"
+                        className="w-full px-2 py-1.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[#0D0D0D] text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[#888888] block mb-1">Psychology Used</label>
+                      <input
+                        type="text"
+                        value={traceability.psychologyUsed}
+                        onChange={(e) => setTraceability(t => ({...t, psychologyUsed: e.target.value}))}
+                        placeholder="loss-aversion, etc"
+                        className="w-full px-2 py-1.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[#0D0D0D] text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[#888888] block mb-1">Email Version</label>
+                      <input
+                        type="text"
+                        value={traceability.emailVersion}
+                        onChange={(e) => setTraceability(t => ({...t, emailVersion: e.target.value}))}
+                        placeholder="v5, etc"
+                        className="w-full px-2 py-1.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[#0D0D0D] text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[#888888] block mb-1">Days to Booking</label>
+                      <input
+                        type="number"
+                        value={traceability.daysToBooking}
+                        onChange={(e) => setTraceability(t => ({...t, daysToBooking: parseInt(e.target.value) || 0}))}
+                        className="w-full px-2 py-1.5 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[#0D0D0D] text-xs"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        // Call revenue memory API
+                        fetch("/api/commercial/revenue-memory", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            leadId: selectedOrder.prospectId,
+                            businessName: selectedOrder.prospectName,
+                            revenue: selectedOrder.value,
+                            discoveredVia: traceability.discoveredVia,
+                            psychologyUsed: traceability.psychologyUsed,
+                            emailVersion: traceability.emailVersion,
+                            daysToBooking: traceability.daysToBooking,
+                          }),
+                        }).then(() => {
+                          alert("Traceability recorded for revenue memory");
+                        });
+                      }}
+                      className="w-full px-2 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors mt-2"
+                    >
+                      Record for Revenue Memory
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
