@@ -178,27 +178,37 @@ async function identifyPressureGroup(
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { query?: string };
+    let body: { query?: string } = {};
+    try {
+      body = (await request.json()) as { query?: string };
+    } catch (parseErr) {
+      return NextResponse.json(
+        { error: "Invalid JSON in request body", success: false },
+        { status: 400 }
+      );
+    }
+
     const query = body?.query;
 
     // Type safety: Ensure query exists and is a string BEFORE calling .trim()
     if (!query || typeof query !== 'string') {
       return NextResponse.json(
-        { error: "Query is required" },
+        { error: "Query parameter is required and must be a string", success: false },
         { status: 400 }
       );
     }
 
-    // Now we can safely call .trim()
-    if (query.trim().length === 0) {
+    // Safely trim and validate
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length === 0) {
       return NextResponse.json(
-        { error: "Query is required" },
+        { error: "Query cannot be empty", success: false },
         { status: 400 }
       );
     }
 
-    // PARSE conversational input
-    const params = parseConversationalQuery(query);
+    // PARSE conversational input (now guaranteed to be non-empty string)
+    const params = parseConversationalQuery(trimmedQuery);
 
     // BUILD dork query (for logging/display)
     const dorkQuery = buildDorkQuery(params);
@@ -264,15 +274,30 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
+      success: true,
       batchId,
       query,
       dorkQuery,
       params,
       pressureGroup,
       resultsCount: cleanedResults.length,
-      createdLeads: createdLeads.length,
-      leads: createdLeads,
-      readyForPreview: createdLeads.length > 0
+      leadsCreated: createdLeads.length,
+      leads: createdLeads.map((lead: any) => ({
+        id: lead.id,
+        businessName: lead.businessName,
+        email: lead.email,
+        phone: lead.phone,
+        city: lead.city,
+        industry: lead.businessCategory || "unknown"
+      })),
+      readyForPreview: createdLeads.length > 0,
+      // Return parsed data in expected format
+      parsed: {
+        businessType: params.keyword || "business",
+        source: params.source || "unknown",
+        contactType: params.contactType || "both",
+        pressureGroup: pressureGroup
+      }
     });
   } catch (error) {
     console.error("🔥 DORK SEARCH ERROR:", error);
