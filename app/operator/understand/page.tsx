@@ -149,7 +149,7 @@ export default function UnderstandPage() {
     return (
       <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
-          <p className="text-lg font-bold text-[#0D0D0D] mb-12 pb-8 border-b border-[#E8E8E8] leading-relaxed">Review and qualify opportunities before outreach</p>
+          <p className="text-lg font-bold text-[#0D0D0D] mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8] leading-relaxed">Review and qualify opportunities before outreach</p>
 
           <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
             <p className="text-sm text-[#666666] mb-4">

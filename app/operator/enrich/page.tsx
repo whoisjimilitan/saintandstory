@@ -166,7 +166,7 @@ export default function EnrichPage() {
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Sub-Hero */}
-        <p className="text-lg font-bold text-[#0D0D0D] mb-12 pb-8 border-b border-[#E8E8E8] leading-relaxed">
+        <p className="text-lg font-bold text-[#0D0D0D] mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8] leading-relaxed">
           Generate personalized emails and send to prospects
         </p>
 
