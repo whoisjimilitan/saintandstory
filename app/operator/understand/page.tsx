@@ -149,9 +149,9 @@ export default function UnderstandPage() {
     return (
       <div className="min-h-screen bg-white pt-32">
         <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Qualify
-            </h1>
+          <div className="mb-8">
+            <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Qualify</h1>
+            <p className="text-sm text-[#888888]">Review and qualify opportunities before outreach</p>
           </div>
 
           <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
@@ -173,18 +173,17 @@ export default function UnderstandPage() {
   return (
     <div className="min-h-screen bg-white pt-32">
       <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
-          {state.prospect?.businessName}
-        </h1>
-        <p className="text-sm md:text-base text-[#888888] font-normal">
-          Enrich and qualify before outreach.
-        </p>
-      </div>
+        {/* Page Hero */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Qualify</h1>
+          <p className="text-sm text-[#888888]">Review and qualify opportunities before outreach</p>
+        </div>
 
-      {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12"></div>
+        {/* Prospect Details Section */}
+        <div className="mb-12">
+          <h2 className="text-lg font-bold text-[#0D0D0D] mb-4">
+            {state.prospect?.businessName}
+          </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Column: Prospect Info */}

@@ -167,8 +167,8 @@ export default function EnrichPage() {
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Email Hub</h1>
-          <p className="text-sm text-[#888888]">Review and send emails</p>
+          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Enrich</h1>
+          <p className="text-sm text-[#888888]">Generate personalized emails and send to prospects</p>
         </div>
 
         {/* Tabs */}
