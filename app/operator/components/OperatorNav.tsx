@@ -38,11 +38,11 @@ export function OperatorNav() {
             style={{ height: "48px" }}
             preserveAspectRatio="none"
           >
-            {/* Progress line only - stops at ORDERS to avoid hamburger menu */}
+            {/* Progress line only - stops at ORDERS, doesn't extend into hamburger */}
             <line
               x1="24"
               y1="24"
-              x2={`${Math.min(progressPercentage, 93)}%`}
+              x2={`${Math.min(progressPercentage, 80)}%`}
               y2="24"
               stroke="#0D0D0D"
               strokeWidth="4"

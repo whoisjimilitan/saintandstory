@@ -328,8 +328,10 @@ export default function DiscoverPage() {
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         {/* Sub-Hero */}
-        <div className="mb-12">
-          <p className="text-sm text-[#888888] mb-8">Search for prospects and build your pipeline</p>
+        <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
+          <p className="text-lg font-bold text-[#0D0D0D] mb-6 leading-relaxed">
+            Search for prospects and build your pipeline
+          </p>
           <button
             onClick={() => setShowManualAddForm(true)}
             className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"
