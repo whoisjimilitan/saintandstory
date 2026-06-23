@@ -187,7 +187,7 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         {/* Sub-Hero */}
-        <p className="text-lg font-bold text-[#0D0D0D] mb-12 pb-12 border-b border-[#E8E8E8] leading-relaxed">
+        <p className="text-lg font-bold text-[#0D0D0D] mb-12 pb-8 border-b border-[#E8E8E8] leading-relaxed">
           Track conversions and manage customer orders
         </p>
 
