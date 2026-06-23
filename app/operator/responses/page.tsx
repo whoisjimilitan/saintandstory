@@ -122,7 +122,7 @@ export default function ResponsesPage() {
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
-      <div className="max-w-4xl mx-auto px-4 md:px-0 py-12">
+      <div className="max-w-6xl mx-auto px-4 md:px-12 py-12">
         {/* Sub-Hero */}
         <p className="text-sm text-[#888888] mb-8">Track replies and engage with prospects</p>
 
@@ -265,9 +265,18 @@ export default function ResponsesPage() {
                               {(response.conversation?.[0]?.body?.length || 0) > 150 ? "..." : ""}
                             </p>
                           </div>
-                          <p className="text-[10px] text-[#888888] flex-shrink-0 whitespace-nowrap">
-                            {expandedEmailId === response.id ? "▼" : "▶"}
-                          </p>
+                          <svg
+                            className="w-4 h-4 text-[#0D0D0D] flex-shrink-0 transition-transform"
+                            style={{
+                              transform: expandedEmailId === response.id ? "rotate(180deg)" : "rotate(0deg)",
+                            }}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            viewBox="0 0 24 24"
+                          >
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
                         </div>
 
                         {/* Full Email - Expanded */}
