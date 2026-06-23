@@ -247,13 +247,13 @@ NEXT ACTIONS
 ────────────
   Immediate (Today): ${
       analyses.filter(
-        (a) => a.forecast.forecasts.find((f) => f.outcome === "reply")?.probability > 60
+        (a) => a.forecast.forecasts.find((f: any) => f.outcome === "reply")?.probability > 60
       ).length
     }
   This Week: ${
       analyses.filter(
         (a) =>
-          a.forecast.forecasts.find((f) => f.outcome === "meeting")?.probability > 50
+          a.forecast.forecasts.find((f: any) => f.outcome === "meeting")?.probability > 50
       ).length
     }
   Long-term Nurture: ${

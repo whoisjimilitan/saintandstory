@@ -43,7 +43,7 @@ export function generatePhase1Intelligence(
       dataQuality: {
         completeness: profile.discoveryEvidence.operationalIndicators.length > 2 ? "high" : "medium",
         verificationLevel: "likely",
-        gaps: ["Decision maker unknown", "Budget not confirmed", "Timeline unclear"],
+        gaps: Array.from(["Decision maker unknown", "Budget not confirmed", "Timeline unclear"]),
       },
     },
 

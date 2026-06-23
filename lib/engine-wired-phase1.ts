@@ -50,9 +50,9 @@ export function generateRelationshipIntelligence(
         ? ("high" as const)
         : ("medium" as const)),
       verificationLevel: ("likely" as const),
-      gaps: ["Decision maker unknown", "Budget not confirmed", "Timeline unclear"],
+      gaps: Array.from(["Decision maker unknown", "Budget not confirmed", "Timeline unclear"]),
     },
-  } as const;
+  };
 
   // LAYER 2.5: EVIDENCE - Gather supporting evidence
   const evidence = {
