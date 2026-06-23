@@ -208,7 +208,7 @@ export default function OperatorBriefing() {
 
   if (state.error || !state.data) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white pt-24">
         <div className="max-w-2xl mx-auto px-4 md:px-0 py-12 md:py-16">
           <div className="border border-[#E8E8E8] rounded-lg md:rounded-xl p-8 bg-white">
             <h1 className="text-lg font-semibold text-[#0D0D0D] mb-2">
@@ -253,7 +253,7 @@ export default function OperatorBriefing() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-24">
       {/* HEADER */}
       <div className="mb-8 px-4 md:px-0">
         <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
