@@ -31,23 +31,13 @@ export function OperatorNav() {
       <div className="max-w-full mx-auto px-6 py-6">
         {/* Journey Container */}
         <div className="flex items-center justify-between relative">
-          {/* Continuous line - positioned through center of icons (h-12 means 48px, line at 24px = center) */}
+          {/* Continuous line - only shows progress (black), no grey strikethrough */}
           <svg
             className="absolute inset-0 w-full pointer-events-none"
             style={{ height: "48px" }}
             preserveAspectRatio="none"
           >
-            {/* Empty/future line */}
-            <line
-              x1="24"
-              y1="24"
-              x2="calc(100% - 24px)"
-              y2="24"
-              stroke="#E8E8E8"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            {/* Filled/progress line */}
+            {/* Progress line only - no grey background line */}
             <line
               x1="24"
               y1="24"
@@ -61,7 +51,7 @@ export function OperatorNav() {
           </svg>
 
           {/* Stages */}
-          <div className="flex items-center justify-between w-full relative z-10">
+          <div className="flex items-center justify-between flex-1 relative z-10">
             {stages.map((stage, index) => {
               const isActive = index === currentStageIndex;
               const isPast = index < currentStageIndex;
@@ -105,16 +95,15 @@ export function OperatorNav() {
             })}
           </div>
 
-          {/* Admin Link */}
-          <div className="absolute -right-6 top-1/2 -translate-y-1/2">
-            <Link
-              href="/dashboard/admin"
-              className="text-[11px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-widest transition-colors duration-200 hover:bg-[#F5F5F5] px-3 py-2 rounded-md"
-            >
-              Admin
-            </Link>
-          </div>
         </div>
+
+        {/* Admin Link - Top Right */}
+        <Link
+          href="/dashboard/admin"
+          className="absolute top-6 right-6 text-[11px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-widest transition-colors duration-200 hover:bg-[#F5F5F5] px-3 py-2 rounded-md"
+        >
+          Admin
+        </Link>
       </div>
     </nav>
   );

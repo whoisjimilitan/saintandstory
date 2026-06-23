@@ -167,10 +167,7 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Orders</h1>
-            <p className="text-sm text-[#888888]">Track conversions and manage customer orders</p>
-          </div>
+          <p className="text-sm text-[#888888] mb-8">Track conversions and manage customer orders</p>
 
         <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
           <p className="text-sm text-[#666666] mb-4">{state.error}</p>
