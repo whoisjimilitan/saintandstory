@@ -26,10 +26,12 @@ export async function POST(request: Request) {
 
         // Generate a new UUID for the database
         const dbId = randomUUID();
+        console.log("[BATCH SAVE] Generated UUID:", dbId);
 
         // Store the original search result ID in googlePlaceId field if it's a Google Places ID
         const isGooglePlaceId = prospect.id?.startsWith("ChIJ");
 
+        console.log("[BATCH SAVE] About to call prisma.b2bLead.create()...");
         const created = await prisma.b2bLead.create({
           data: {
             id: dbId,
@@ -43,23 +45,24 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log("[BATCH SAVE] Created with DB ID:", created.id);
+        console.log("[BATCH SAVE] ✅ Create returned successfully. ID:", created.id);
 
         // VERIFY it was actually saved by querying it back immediately
+        console.log("[BATCH SAVE] Verifying with findUnique...");
         const verify = await prisma.b2bLead.findUnique({
           where: { id: created.id },
         });
 
         if (verify) {
-          console.log("[BATCH SAVE] ✅ VERIFIED - prospect exists in DB:", verify.id);
+          console.log("[BATCH SAVE] ✅✅ VERIFIED - prospect exists in DB:", verify.businessName);
           savedIds.push(created.id);
         } else {
-          console.error("[BATCH SAVE] ❌ VERIFICATION FAILED - created but NOT in DB:", created.id);
-          errors.push(`${prospect.businessName}: Created but verification failed`);
+          console.error("[BATCH SAVE] ❌ VERIFICATION FAILED - Created but NOT found by query:", created.id);
+          errors.push(`${prospect.businessName}: Created but not found in verification query`);
         }
       } catch (error) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error(`[BATCH SAVE] Failed to save prospect ${prospect.businessName}:`, msg);
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error(`[BATCH SAVE] ❌ EXCEPTION thrown for ${prospect.businessName}:`, msg);
         errors.push(`${prospect.businessName}: ${msg}`);
       }
     }
