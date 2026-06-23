@@ -41,16 +41,18 @@ export function generateRelationshipIntelligence(
     contactName: profile.contactName,
     observedIndicators: profile.discoveryEvidence.operationalIndicators.map((indicator) => ({
       indicator,
-      source: "discovery" as const,
+      source: ("discovery" as const),
       dateObserved: new Date().toISOString(),
-      confidence: ("high" as const), // All provided indicators treated as high confidence
+      confidence: ("high" as const),
     })),
     dataQuality: {
-      completeness: profile.discoveryEvidence.operationalIndicators.length > 2 ? "high" : "medium",
-      verificationLevel: "likely" as const,
+      completeness: (profile.discoveryEvidence.operationalIndicators.length > 2
+        ? ("high" as const)
+        : ("medium" as const)),
+      verificationLevel: ("likely" as const),
       gaps: ["Decision maker unknown", "Budget not confirmed", "Timeline unclear"],
     },
-  };
+  } as const;
 
   // LAYER 2.5: EVIDENCE - Gather supporting evidence
   const evidence = {
