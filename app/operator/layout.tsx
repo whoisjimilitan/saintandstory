@@ -38,7 +38,7 @@ export default async function OperatorLayout({
 
       {/* Main Content */}
       <main className="pt-20 pb-16 bg-white">
-        <div className="max-w-4xl mx-auto px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:max-w-4xl lg:mx-auto">
           {children}
         </div>
       </main>
