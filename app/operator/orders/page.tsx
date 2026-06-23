@@ -150,12 +150,14 @@ export default function OrdersPage() {
 
   if (state.loading) {
     return (
-      <div className="px-4 md:px-12 py-10 max-w-6xl">
+      <div className="min-h-screen bg-white pt-32">
+        <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
         <div className="flex justify-center py-12">
           <div className="text-center">
             <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-sm text-[#666666]">Loading orders...</p>
           </div>
+        </div>
         </div>
       </div>
     );
@@ -163,8 +165,9 @@ export default function OrdersPage() {
 
   if (state.error) {
     return (
-      <div className="px-4 md:px-12 py-10 max-w-6xl">
-        <div className="mb-12">
+      <div className="min-h-screen bg-white pt-32">
+        <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
+          <div className="mb-12">
           <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
             Orders
           </h1>
@@ -179,12 +182,14 @@ export default function OrdersPage() {
             Try Again
           </button>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 md:px-12 py-10 max-w-6xl">
+    <div className="min-h-screen bg-white pt-32">
+      <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
@@ -378,6 +383,7 @@ export default function OrdersPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

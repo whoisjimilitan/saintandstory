@@ -143,7 +143,7 @@ export default function EnrichPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
+      <div className="min-h-screen bg-white pt-32 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-sm text-[#666666]">Generating emails...</p>
@@ -154,7 +154,7 @@ export default function EnrichPage() {
 
   if (generatedEmails.length === 0 && activeTab === "draft") {
     return (
-      <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
+      <div className="min-h-screen bg-white pt-32 flex items-center justify-center">
         <p className="text-sm text-[#666666]">No emails generated</p>
       </div>
     );
@@ -163,7 +163,7 @@ export default function EnrichPage() {
   const currentEmail = generatedEmails[currentIndex];
 
   return (
-    <div className="min-h-screen bg-white pt-20">
+    <div className="min-h-screen bg-white pt-32">
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Header */}
         <div className="mb-8">

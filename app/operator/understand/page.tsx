@@ -131,11 +131,13 @@ export default function UnderstandPage() {
   // Loading state
   if (state.loading) {
     return (
-      <div className="px-4 md:px-12 py-10 max-w-4xl">
-        <div className="flex justify-center py-12">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-sm text-[#666666]">Loading prospect details...</p>
+      <div className="min-h-screen bg-white pt-32">
+        <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
+          <div className="flex justify-center py-12">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-sm text-[#666666]">Loading prospect details...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -145,32 +147,35 @@ export default function UnderstandPage() {
   // Error state
   if (state.error || !state.prospect) {
     return (
-      <div className="px-4 md:px-12 py-10 max-w-4xl">
-        <div className="mb-12">
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
-            Understand
-          </h1>
-        </div>
+      <div className="min-h-screen bg-white pt-32">
+        <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
+          <div className="mb-12">
+            <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
+              Understand
+            </h1>
+          </div>
 
-        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
-          <p className="text-sm text-[#666666] mb-4">
-            {state.error || "No prospect selected. Please search from Discover."}
-          </p>
-          <Link
-            href="/operator/discover"
-            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            Go back to Discover
-          </Link>
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
+            <p className="text-sm text-[#666666] mb-4">
+              {state.error || "No prospect selected. Please search from Discover."}
+            </p>
+            <Link
+              href="/operator/discover"
+              className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
+            >
+              Go back to Discover
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 md:px-12 py-10 max-w-4xl">
-      {/* Header */}
-      <div className="mb-12">
+    <div className="min-h-screen bg-white pt-32">
+      <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-12">
         <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
           {state.prospect?.businessName}
         </h1>
@@ -478,6 +483,7 @@ export default function UnderstandPage() {
               </div>
             </form>
           </div>
+        </div>
         </div>
       </div>
     </div>
