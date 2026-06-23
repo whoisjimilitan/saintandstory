@@ -180,12 +180,11 @@ export default function UnderstandPage() {
         </div>
 
         {/* Prospect Details Section */}
-        <div className="mb-12">
-          <h2 className="text-lg font-bold text-[#0D0D0D] mb-4">
-            {state.prospect?.businessName}
-          </h2>
+        <h2 className="text-lg font-bold text-[#0D0D0D] mb-8">
+          {state.prospect?.businessName}
+        </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Column: Prospect Info */}
         <div>
           {/* Business Info */}
