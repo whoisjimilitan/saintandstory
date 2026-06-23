@@ -7,9 +7,9 @@ import { Icons } from "@/lib/icons";
 const stages = [
   { name: "Today", href: "/operator", Icon: Icons.Today },
   { name: "Discover", href: "/operator/discover", Icon: Icons.Discover },
+  { name: "Qualify", href: "/operator/understand", Icon: Icons.Qualify },
   { name: "Enrich", href: "/operator/enrich", Icon: Icons.Enrich },
   { name: "Responses", href: "/operator/responses", Icon: Icons.Responses },
-  { name: "Qualify", href: "/operator/understand", Icon: Icons.Qualify },
   { name: "Orders", href: "/operator/orders", Icon: Icons.Orders },
 ];
 
@@ -19,7 +19,7 @@ export function OperatorNav() {
   const getCurrentStageIndex = () => {
     if (pathname === "/operator" || pathname === "/operator/") return 0;
     const segment = pathname.split("/")[2]?.toLowerCase();
-    if (segment === "understand") return 4;
+    if (segment === "understand") return 2; // Qualify is now at index 2
     return stages.findIndex((s) => s.href === `/operator/${segment}`) || 0;
   };
 

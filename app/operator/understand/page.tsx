@@ -173,11 +173,8 @@ export default function UnderstandPage() {
   return (
     <div className="min-h-screen bg-white pt-32">
       <div className="px-4 md:px-12 py-10 max-w-4xl mx-auto">
-        {/* Page Hero */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Qualify</h1>
-          <p className="text-sm text-[#888888]">Review and qualify opportunities before outreach</p>
-        </div>
+        {/* Sub-Hero */}
+        <p className="text-sm text-[#888888] mb-12">Review and qualify opportunities before outreach</p>
 
         {/* Prospect Details Section */}
         <h2 className="text-lg font-bold text-[#0D0D0D] mb-8">

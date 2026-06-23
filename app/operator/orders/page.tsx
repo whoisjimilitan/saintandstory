@@ -189,11 +189,8 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-white pt-32">
       <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
-        {/* Page Hero */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Orders</h1>
-          <p className="text-sm text-[#888888]">Track conversions and manage customer orders</p>
-        </div>
+        {/* Sub-Hero */}
+        <p className="text-sm text-[#888888] mb-12">Track conversions and manage customer orders</p>
 
         {/* Stats */}
         <div className="mb-12 pb-8 border-b border-[#E8E8E8]">
