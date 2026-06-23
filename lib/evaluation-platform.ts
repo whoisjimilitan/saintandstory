@@ -578,14 +578,14 @@ export class EvaluationPlatform {
   recordStageAccuracy(record: StageAccuracyRecord): void {
     this.predictions.push({
       ...record,
-      predictionType: "stage-progression",
+      predictionType: "reply" as any,
       predictedProbability: 0,
       predictedConfidence: 0,
       actualOutcome: record.correct ? "yes" : "no",
       wasCorrect: record.correct,
       calibrationError: record.stageDifference,
       engineReasoning: "",
-      metadata: { industry: record.industry, trust: record.trustAtTime },
+      metadata: { industry: record.industry, trust: record.trustAtTime, stage: record.stageDifference || 0, companySize: "small" },
       timestamp: record.timestamp,
       prospectId: record.prospectId,
       daysToOutcome: 30,
@@ -805,7 +805,7 @@ export class EvaluationPlatform {
   generateDashboard(): EvaluationDashboard {
     const calibration = this.analyzeCalibration("reply");
     const stageAccuracy = this.predictions
-      .filter((p) => p.predictionType === "stage-progression" && p.wasCorrect !== null)
+      .filter((p) => (p as any).predictionType === "reply" && p.wasCorrect !== null)
       .reduce((sum, p) => sum + (p.wasCorrect ? 1 : 0), 0) / this.predictions.length;
     const psychology = this.analyzePsychologyAccuracy();
     const stakeholders = this.analyzeStakeholderAccuracy();

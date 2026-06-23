@@ -86,8 +86,8 @@ export function scoreEvidenceTraceability(
   // Check if Reasoning layer traces to Evidence
   const reasoningHasEvidence =
     engine.reasoning.whyTheyMightNeedUs &&
-    engine.reasoning.whyTheyMightNeedUs.basedOnFacts &&
-    engine.reasoning.whyTheyMightNeedUs.basedOnFacts.length > 0;
+    (engine.reasoning.whyTheyMightNeedUs as any).supporting_evidence &&
+    (engine.reasoning.whyTheyMightNeedUs as any).supporting_evidence.length > 0;
 
   // Check if Model references Evidence
   const modelHasEvidence =

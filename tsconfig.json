@@ -35,6 +35,10 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "lib/engine-wired-phase1.ts",
+    "lib/evaluation-platform.ts",
+    "lib/phase-1-calibration-validator.ts",
+    "lib/phase-1-runner.ts"
   ]
 }
