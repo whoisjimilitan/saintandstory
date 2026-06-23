@@ -281,6 +281,10 @@ export interface EvidenceLayer {
 // MAIN: RELATIONSHIP INTELLIGENCE OBJECT
 // ============================================================================
 
+// Import the new layers
+import type { RelationshipModel } from "./relationship-model";
+import type { LearningLayer } from "./learning-layer";
+
 export interface RelationshipIntelligenceObject {
   // Identification
   prospectId: string;
@@ -288,32 +292,45 @@ export interface RelationshipIntelligenceObject {
   generatedAt: string;
   generatedBy: "business-relationship-engine";
 
-  // The 7 layers (in reasoning order)
-  facts: FactsLayer;
-  evidence: EvidenceLayer; // NEW: Layer 2.5 - Backing for all inferences
-  reasoning: ReasoningLayer;
-  strategy: StrategyLayer;
-  communications: CommunicationsLayer;
-  timeline: TimelineLayer;
-  operatorGuidance: OperatorGuidanceLayer;
+  // The 8 layers (in order: Reality → Intelligence → Action)
+  //
+  // 1. FACTS (observed, verifiable)
+  // 2.5. EVIDENCE (backing for inferences)
+  // 2. REASONING (inferred from evidence)
+  // 3. RELATIONSHIP MODEL (what is true about the relationship - CORE INTELLIGENCE)
+  // 4. STRATEGY (given model, what should change?)
+  // 5. COMMUNICATIONS (how do we encourage that change?)
+  // 6. TIMELINE (progression expectations)
+  // 7. OPERATOR GUIDANCE (explainability)
+  // 8. LEARNING (outcomes that update the model)
+
+  facts: FactsLayer; // Layer 1
+  evidence: EvidenceLayer; // Layer 2.5
+  reasoning: ReasoningLayer; // Layer 2
+  relationshipModel: RelationshipModel; // Layer 3 - THE CORE
+  strategy: StrategyLayer; // Layer 4 (Relationship Advancement Plan)
+  communications: CommunicationsLayer; // Layer 5
+  timeline: TimelineLayer; // Layer 6
+  operatorGuidance: OperatorGuidanceLayer; // Layer 7
+  learning: LearningLayer; // Layer 8 - FEEDBACK LOOP
 
   // System metadata
   metadata: {
-    version: "1.0";
-    schema: "relationship-intelligence-v1";
-    confidenceScore: number; // 0-100: How confident is this reasoning?
+    version: "2.0";
+    schema: "relationship-intelligence-v2";
+    confidenceScore: number; // 0-100: How confident is this understanding?
     lastUpdated: string;
-    historyCount: number; // How many interactions so far?
+    interactionCount: number; // How many interactions have informed this model?
   };
 
-  // Explainability: Can the operator answer "Why?" without reading the email?
+  // Explainability: Can the operator understand the relationship without reading any communication?
   explainability: {
-    whyThisBusiness: string; // Why are we reaching out?
-    whyThisStage: string; // Why is this the right stage?
-    whyThisStrategy: string; // Why this trust approach?
-    whyThisCommunication: string; // Why this message format?
-    whyNow: string; // Why are we contacting them now?
-    measurableSuccess: string; // How do we know if it worked?
+    currentRelationshipState: string; // What's the status quo?
+    whyThisStage: string; // Why are they at this stage?
+    whyWeBelieveThis: string; // What evidence supports our understanding?
+    whatMustChange: string; // What needs to happen next?
+    whyThatStrategy: string; // Why is that the right next step?
+    howWeWillEncourage: string; // How will communication facilitate that?
   };
 }
 
@@ -327,10 +344,12 @@ export function createRelationshipIntelligenceObject(
   facts: FactsLayer,
   evidence: EvidenceLayer,
   reasoning: ReasoningLayer,
+  relationshipModel: RelationshipModel,
   strategy: StrategyLayer,
   communications: CommunicationsLayer,
   timeline: TimelineLayer,
-  operatorGuidance: OperatorGuidanceLayer
+  operatorGuidance: OperatorGuidanceLayer,
+  learning: LearningLayer
 ): RelationshipIntelligenceObject {
   return {
     prospectId,
@@ -341,26 +360,28 @@ export function createRelationshipIntelligenceObject(
     facts,
     evidence,
     reasoning,
+    relationshipModel,
     strategy,
     communications,
     timeline,
     operatorGuidance,
+    learning,
 
     metadata: {
-      version: "1.0",
-      schema: "relationship-intelligence-v1",
-      confidenceScore: calculateConfidenceScore(facts, reasoning),
+      version: "2.0",
+      schema: "relationship-intelligence-v2",
+      confidenceScore: relationshipModel.modelConfidence,
       lastUpdated: new Date().toISOString(),
-      historyCount: 1,
+      interactionCount: learning.recentOutcomes.length,
     },
 
     explainability: {
-      whyThisBusiness: operatorGuidance.executiveSummary.whoTheyAre,
-      whyThisStage: strategy.targetStage.why,
-      whyThisStrategy: strategy.strategicRationale,
-      whyThisCommunication: strategy.communicationStrategy.whyThisChannel,
-      whyNow: strategy.objectives.primary,
-      measurableSuccess: strategy.successDefinition,
+      currentRelationshipState: `Stage ${relationshipModel.currentStage}: ${relationshipModel.buyingJourneyPhase}`,
+      whyThisStage: relationshipModel.reasonForCurrentStage,
+      whyWeBelieveThis: relationshipModel.trustBasis.join("; ") || "Initial assessment",
+      whatMustChange: strategy.gap.desiredState,
+      whyThatStrategy: strategy.strategicRationale,
+      howWeWillEncourage: strategy.communicationStrategy.whyThisChannel,
     },
   };
 }
@@ -445,12 +466,29 @@ export function validateRelationshipIntelligenceObject(
     }
   }
 
-  // LAYER 4: STRATEGY validation
-  if (!obj.strategy.relationshipStage || !obj.strategy.trustStrategy) {
-    errors.push("STRATEGY: Missing relationship stage or trust strategy");
+  // LAYER 3: RELATIONSHIP MODEL validation (CORE INTELLIGENCE)
+  if (!obj.relationshipModel.primaryContact || !obj.relationshipModel.businessPain) {
+    errors.push("RELATIONSHIP_MODEL: Missing primary contact or business pain");
   }
-  if (!obj.strategy.overallRationale.measurableObjective) {
-    errors.push("STRATEGY: Missing measurable objective");
+  if (obj.relationshipModel.trustScore < 0 || obj.relationshipModel.trustScore > 100) {
+    errors.push("RELATIONSHIP_MODEL: Trust score out of range (0-100)");
+  }
+  if (obj.relationshipModel.modelConfidence < 0 || obj.relationshipModel.modelConfidence > 100) {
+    errors.push("RELATIONSHIP_MODEL: Model confidence out of range (0-100)");
+  }
+  if (!obj.relationshipModel.knownFacts || obj.relationshipModel.knownFacts.length === 0) {
+    warnings.push("RELATIONSHIP_MODEL: No known facts recorded (only assumptions?)");
+  }
+
+  // LAYER 4: STRATEGY validation (Advancement Plan)
+  if (!obj.strategy.currentStage || !obj.strategy.targetStage) {
+    errors.push("STRATEGY: Missing current or target stage");
+  }
+  if (!obj.strategy.gap) {
+    errors.push("STRATEGY: Missing gap analysis");
+  }
+  if (!obj.strategy.successDefinition) {
+    errors.push("STRATEGY: Missing success definition");
   }
 
   // LAYER 5: COMMUNICATIONS validation
@@ -468,8 +506,19 @@ export function validateRelationshipIntelligenceObject(
     errors.push("OPERATOR_GUIDANCE: Missing executive summary");
   }
 
+  // LAYER 8: LEARNING validation (feedback loop)
+  if (!obj.learning || !obj.learning.recentOutcomes) {
+    warnings.push("LEARNING: No outcomes recorded yet (first interaction?)");
+  }
+  if (obj.learning && obj.learning.recentOutcomes.length > 0) {
+    // If we have outcomes, we should have model updates
+    if (obj.learning.modelUpdates.length === 0) {
+      warnings.push("LEARNING: Outcomes recorded but no model updates made");
+    }
+  }
+
   // EXPLAINABILITY validation
-  if (!obj.explainability.whyThisBusiness || !obj.explainability.measurableSuccess) {
+  if (!obj.explainability.currentRelationshipState || !obj.explainability.whatMustChange) {
     errors.push("EXPLAINABILITY: Missing key explainability fields");
   }
 
@@ -482,11 +531,11 @@ export function validateRelationshipIntelligenceObject(
   }
 
   // Strategy should reference reasoning
-  const strategyMentionsReasoning = obj.strategy.overallRationale.whyWeChoseThisStage
+  const strategyMentionsReasoning = obj.strategy.strategicRationale
     .toLowerCase()
     .includes(obj.reasoning.whyTheyMightNeedUs.conclusion.toLowerCase());
   if (!strategyMentionsReasoning) {
-    warnings.push("CONSISTENCY: Strategy doesn't clearly reference reasoning");
+    warnings.push("CONSISTENCY: Strategy doesn't clearly reference relationship model");
   }
 
   return {
