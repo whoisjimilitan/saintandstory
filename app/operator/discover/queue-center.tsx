@@ -226,7 +226,7 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
               type="checkbox"
               checked={selectedIds.has(currentProspect.id)}
               onChange={() => toggleSelect(currentProspect.id)}
-              className="w-4 h-4"
+              className="w-4 h-4 accent-[#0D0D0D] cursor-pointer"
             />
             <span className="text-xs font-semibold text-[#0D0D0D]">Select for email</span>
           </label>
