@@ -6,9 +6,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 interface Prospect {
   id: string;
   businessName: string;
+  city: string;
+  email: string;
+  businessCategory: string;
   contactName?: string;
-  city?: string;
-  email?: string;
 }
 
 interface EnrichedEmail {
@@ -16,114 +17,95 @@ interface EnrichedEmail {
   prospectName: string;
   businessName: string;
   city: string;
+  email: string;
   subject: string;
   body: string;
   wordCount: number;
-  reasoning?: {
-    moment: string;
-    insight: string;
-    pressurePoint: string;
-    service: string;
-  };
 }
 
 interface SentEmail {
   id: string;
-  leadId: string;
   prospectName: string;
   prospectEmail: string;
-  city: string;
   subject: string;
   sentAt: string;
   replied: boolean;
-  repliedAt?: string;
-  engagementScore?: number;
-  status: string;
 }
 
-type TabType = "draft" | "sent" | "standing-orders";
+type TabType = "draft" | "sent";
 
 export default function EnrichPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const prospectId = searchParams.get("prospectId");
-  const prospectIdsParam = searchParams.get("prospectIds");
-  const isBatch = !!prospectIdsParam;
-  const prospectIds = isBatch ? prospectIdsParam?.split(",") || [] : prospectId ? [prospectId] : [];
+  const mode = searchParams.get("mode") || "draft";
+  const count = parseInt(searchParams.get("count") || "0");
 
   const [activeTab, setActiveTab] = useState<TabType>("draft");
+  const [prospects, setProspects] = useState<Prospect[]>([]);
   const [generatedEmails, setGeneratedEmails] = useState<EnrichedEmail[]>([]);
   const [sentEmails, setSentEmails] = useState<SentEmail[]>([]);
   const [loading, setLoading] = useState(true);
-  const [approving, setApproving] = useState(false);
-  const [currentEmailIndex, setCurrentEmailIndex] = useState(0);
+  const [sending, setSending] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
 
-  // Fetch sent emails when component mounts or sent emails tab is opened
   useEffect(() => {
-    if (activeTab === "sent") {
-      fetchSentEmails();
-    }
-  }, [activeTab]);
-
-  const fetchSentEmails = async () => {
-    try {
-      const res = await fetch("/api/b2b/sent-emails?limit=100");
-      if (res.ok) {
-        const data = await res.json();
-        setSentEmails(data.sentEmails);
-      }
-    } catch (error) {
-      console.error("Error fetching sent emails:", error);
-    }
-  };
-
-  // Generate emails on mount if we have prospectIds
-  useEffect(() => {
-    if (prospectIds.length === 0) {
+    const prospectData = sessionStorage.getItem("enrich_prospects");
+    if (!prospectData) {
       router.push("/operator/discover");
       return;
     }
 
-    const fetchAndGenerateEmails = async () => {
-      try {
-        console.log("Generating emails for prospectIds:", prospectIds);
+    try {
+      const data = JSON.parse(prospectData) as Prospect[];
+      setProspects(data);
+      generateEmails(data);
+      sessionStorage.removeItem("enrich_prospects");
+    } catch (error) {
+      console.error("Error parsing prospects:", error);
+      router.push("/operator/discover");
+    }
+  }, [router]);
 
-        const res = await fetch("/api/b2b/batch-emails/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prospectIds }),
-        });
+  const generateEmails = async (prospectList: Prospect[]) => {
+    try {
+      const res = await fetch("/api/b2b/batch-emails/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectIds: prospectList.map(p => p.id) }),
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || `HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
-        console.log("Generated emails:", data.emails?.length);
-        setGeneratedEmails(data.emails);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to generate emails";
-        console.error("Error generating emails:", message);
-        alert(message);
-        router.back();
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        throw new Error("Failed to generate emails");
       }
-    };
 
-    fetchAndGenerateEmails();
-  }, [prospectIds, router]);
+      const data = await res.json();
 
-  const handleApproveAll = async () => {
-    setApproving(true);
+      // Combine prospect data with generated emails
+      const enriched = data.emails.map((email: any) => ({
+        ...email,
+        email: prospectList.find(p => p.id === email.prospectId)?.email || ""
+      }));
+
+      setGeneratedEmails(enriched);
+    } catch (error) {
+      console.error("Error generating emails:", error);
+      alert("Failed to generate emails");
+      router.push("/operator/discover");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendAll = async () => {
+    setSending(true);
     try {
       const res = await fetch("/api/b2b/batch-emails/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          emails: generatedEmails.map((email) => ({
+          emails: generatedEmails.map(email => ({
             prospectId: email.prospectId,
             subject: email.subject,
             body: email.body,
@@ -131,24 +113,35 @@ export default function EnrichPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to send emails");
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to send");
+      }
 
       const data = await res.json();
-      alert(`✓ Sent ${data.sent} emails successfully`);
 
-      // Fetch updated sent emails and switch to sent tab
-      await fetchSentEmails();
+      // Show sent emails
+      const sentList = generatedEmails.map(email => ({
+        id: email.prospectId,
+        prospectName: email.businessName,
+        prospectEmail: email.email,
+        subject: email.subject,
+        sentAt: new Date().toISOString(),
+        replied: false
+      }));
+
+      setSentEmails(sentList);
       setActiveTab("sent");
+      alert(`✓ Sent ${data.sent} emails successfully`);
     } catch (error) {
-      console.error("Error sending emails:", error);
-      alert("Failed to send emails");
+      console.error("Error sending:", error);
+      alert(`Failed to send: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
-      setApproving(false);
+      setSending(false);
     }
   };
 
-  // Loading state
-  if (loading && prospectIds.length > 0) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -159,8 +152,7 @@ export default function EnrichPage() {
     );
   }
 
-  // No data state
-  if (activeTab === "draft" && generatedEmails.length === 0 && !loading) {
+  if (generatedEmails.length === 0 && activeTab === "draft") {
     return (
       <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
         <p className="text-sm text-[#666666]">No emails generated</p>
@@ -168,15 +160,15 @@ export default function EnrichPage() {
     );
   }
 
-  const currentEmail = generatedEmails[currentEmailIndex];
+  const currentEmail = generatedEmails[currentIndex];
 
   return (
     <div className="min-h-screen bg-white pt-20">
-      <div className="max-w-4xl mx-auto px-4 md:px-0 py-12">
+      <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Email Hub</h1>
-          <p className="text-sm text-[#888888]">Draft, send, and track emails</p>
+          <p className="text-sm text-[#888888]">Review and send emails</p>
         </div>
 
         {/* Tabs */}
@@ -189,7 +181,7 @@ export default function EnrichPage() {
                 : "text-[#888888] hover:text-[#0D0D0D]"
             }`}
           >
-            Draft {generatedEmails.length > 0 && `(${generatedEmails.length})`}
+            Draft ({generatedEmails.length})
           </button>
           <button
             onClick={() => setActiveTab("sent")}
@@ -199,109 +191,77 @@ export default function EnrichPage() {
                 : "text-[#888888] hover:text-[#0D0D0D]"
             }`}
           >
-            Sent {sentEmails.length > 0 && `(${sentEmails.length})`}
-          </button>
-          <button
-            onClick={() => setActiveTab("standing-orders")}
-            className={`pb-3 text-sm font-semibold transition-colors ${
-              activeTab === "standing-orders"
-                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
-                : "text-[#888888] hover:text-[#0D0D0D]"
-            }`}
-          >
-            Standing Orders
+            Sent ({sentEmails.length})
           </button>
         </div>
 
         {/* DRAFT TAB */}
-        {activeTab === "draft" && (
+        {activeTab === "draft" && generatedEmails.length > 0 && (
           <>
-            {generatedEmails.length > 0 && (
-              <>
-                {/* Batch Navigation */}
-                {isBatch && generatedEmails.length > 1 && (
-                  <div className="mb-8 flex items-center justify-between p-4 bg-[#F5F5F5] rounded-lg">
-                    <button
-                      onClick={() => setCurrentEmailIndex(Math.max(0, currentEmailIndex - 1))}
-                      disabled={currentEmailIndex === 0}
-                      className="px-4 py-2 text-sm font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-white rounded transition-colors"
-                    >
-                      ← Previous
-                    </button>
-                    <p className="text-sm font-semibold text-[#0D0D0D]">
-                      {currentEmailIndex + 1} / {generatedEmails.length}
-                    </p>
-                    <button
-                      onClick={() => setCurrentEmailIndex(Math.min(generatedEmails.length - 1, currentEmailIndex + 1))}
-                      disabled={currentEmailIndex === generatedEmails.length - 1}
-                      className="px-4 py-2 text-sm font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-white rounded transition-colors"
-                    >
-                      Next →
-                    </button>
-                  </div>
-                )}
+            {/* Navigation */}
+            <div className="mb-6 flex items-center justify-between p-4 bg-[#F5F5F5] rounded-lg">
+              <button
+                onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
+                disabled={currentIndex === 0}
+                className="px-4 py-2 text-sm font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-white rounded transition-colors"
+              >
+                ← Previous
+              </button>
+              <p className="text-sm font-semibold text-[#0D0D0D]">
+                {currentIndex + 1} / {generatedEmails.length}
+              </p>
+              <button
+                onClick={() => setCurrentIndex(Math.min(generatedEmails.length - 1, currentIndex + 1))}
+                disabled={currentIndex === generatedEmails.length - 1}
+                className="px-4 py-2 text-sm font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-white rounded transition-colors"
+              >
+                Next →
+              </button>
+            </div>
 
-                {/* Email Preview */}
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-[#F9F9F9] mb-8">
-                  <div className="bg-white rounded p-6">
-                    <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
-                      <p className="text-xs text-[#888888] uppercase font-semibold mb-1">To</p>
-                      <p className="text-sm font-semibold text-[#0D0D0D]">
-                        {currentEmail.prospectName} ({currentEmail.businessName}) • {currentEmail.city}
-                      </p>
-                    </div>
-
-                    <div className="mb-4 pb-4 border-b border-[#E8E8E8]">
-                      <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Subject</p>
-                      <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.subject}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Body</p>
-                      <div className="bg-white border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
-                        {currentEmail.body}
-                      </div>
-                      <p className="text-xs text-[#888888] mt-2">
-                        {currentEmail.wordCount} words (target: 60-80)
-                      </p>
-                    </div>
-
-                    {currentEmail.reasoning && (
-                      <div className="mt-6 pt-6 border-t border-[#E8E8E8]">
-                        <p className="text-xs text-[#888888] uppercase font-semibold mb-3">Reasoning</p>
-                        <div className="space-y-2 text-xs">
-                          <div>
-                            <p className="font-semibold text-[#0D0D0D]">Moment</p>
-                            <p className="text-[#666666]">{currentEmail.reasoning.moment}</p>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-[#0D0D0D]">Insight</p>
-                            <p className="text-[#666666]">{currentEmail.reasoning.insight}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+            {/* Email Preview */}
+            <div className="border border-[#E8E8E8] rounded-lg p-8 bg-[#F9F9F9] mb-8">
+              <div className="bg-white rounded p-6 space-y-4">
+                {/* TO */}
+                <div className="pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-1">To</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.email}</p>
+                  <p className="text-xs text-[#666666] mt-1">{currentEmail.businessName} • {currentEmail.city}</p>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleApproveAll}
-                    disabled={approving}
-                    className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 transition-colors"
-                  >
-                    {approving ? "Sending..." : `✓ Send All (${generatedEmails.length})`}
-                  </button>
-                  <button
-                    onClick={() => router.back()}
-                    className="flex-1 px-4 py-3 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
-                  >
-                    Cancel
-                  </button>
+                {/* SUBJECT */}
+                <div className="pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Subject</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.subject}</p>
                 </div>
-              </>
-            )}
+
+                {/* BODY */}
+                <div>
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Message</p>
+                  <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
+                    {currentEmail.body}
+                  </div>
+                  <p className="text-xs text-[#888888] mt-2">{currentEmail.wordCount} words</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleSendAll}
+                disabled={sending}
+                className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 transition-colors"
+              >
+                {sending ? "Sending..." : `✓ Send All (${generatedEmails.length})`}
+              </button>
+              <button
+                onClick={() => router.back()}
+                className="flex-1 px-4 py-3 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </>
         )}
 
@@ -315,11 +275,15 @@ export default function EnrichPage() {
             ) : (
               <div className="space-y-3">
                 {sentEmails.map((email) => (
-                  <div key={email.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors">
+                  <div
+                    key={email.id}
+                    onClick={() => setExpandedEmailId(expandedEmailId === email.id ? null : email.id)}
+                    className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white cursor-pointer transition-colors"
+                  >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[#0D0D0D]">{email.prospectName}</p>
-                        <p className="text-xs text-[#888888]">{email.prospectEmail} • {email.city}</p>
+                        <p className="text-xs text-[#888888]">{email.prospectEmail}</p>
                         <p className="text-xs text-[#666666] mt-1">{email.subject}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
@@ -327,25 +291,23 @@ export default function EnrichPage() {
                           {new Date(email.sentAt).toLocaleDateString()}
                         </p>
                         <div className="mt-2 flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${email.replied ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"}`}></div>
-                          <p className="text-xs font-semibold text-[#666666]">
-                            {email.replied ? "Replied" : "Awaiting"}
-                          </p>
+                          <div className="w-2 h-2 rounded-full bg-[#0D0D0D]"></div>
+                          <p className="text-xs font-semibold text-[#666666]">Sent</p>
                         </div>
                       </div>
                     </div>
+
+                    {/* Expanded View */}
+                    {expandedEmailId === email.id && (
+                      <div className="mt-4 pt-4 border-t border-[#E8E8E8] text-xs text-[#666666]">
+                        <p className="font-semibold text-[#0D0D0D] mb-2">Message was sent to: {email.prospectEmail}</p>
+                        <p className="text-[#888888]">Sent on {new Date(email.sentAt).toLocaleString()}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             )}
-          </div>
-        )}
-
-        {/* STANDING ORDERS TAB */}
-        {activeTab === "standing-orders" && (
-          <div className="text-center py-12">
-            <p className="text-sm text-[#666666]">Standing orders coming soon</p>
-            <p className="text-xs text-[#888888] mt-2">Auto-schedule follow-ups for prospects</p>
           </div>
         )}
       </div>

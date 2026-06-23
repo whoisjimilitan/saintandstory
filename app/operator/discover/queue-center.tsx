@@ -2,9 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { CampaignReviewModal } from "./campaign-review-modal";
-import { SmartSuggestionsModal } from "./smart-suggestions-modal";
-import { findSimilarProspects, formatSimilarityReason } from "./utils/smart-suggestions";
 
 interface Prospect {
   id: string;
@@ -17,6 +14,7 @@ interface Prospect {
   status?: string;
   pressureSignal?: string;
   trustSource?: string;
+  email?: string;
 }
 
 interface QueueCenterProps {
@@ -26,7 +24,6 @@ interface QueueCenterProps {
   onProspectsUpdate?: (updatedProspects: Prospect[]) => void;
 }
 
-// Premium single-color icons
 const Icons = {
   CheckCircle: () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -94,15 +91,8 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [sendingBatch, setSendingBatch] = useState(false);
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchError, setBatchError] = useState<string | null>(null);
-  const [batchSuccess, setBatchSuccess] = useState<string | null>(null);
-  const [generatedEmails, setGeneratedEmails] = useState<Array<any> | null>(null);
-  const [showCampaignModal, setShowCampaignModal] = useState(false);
-  const [showSmartSuggestions, setShowSmartSuggestions] = useState(false);
-  const [suggestedProspects, setSuggestedProspects] = useState<Prospect[]>([]);
-  const [suggestReason, setSuggestReason] = useState<string>("");
 
   const sortedProspects = useMemo(() => sortProspects(prospects), [prospects]);
   const currentProspect = sortedProspects[currentIndex];
@@ -138,112 +128,6 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     }
   };
 
-  const handleBatchQualify = async () => {
-    const selectedArray = Array.from(selectedIds);
-    if (selectedArray.length === 0) return;
-
-    setBatchLoading(true);
-    setBatchError(null);
-    setBatchSuccess(null);
-
-    try {
-      console.log("✓ Qualify: Selected prospects:", selectedArray.length);
-      console.log("✓ Qualify: Selected IDs:", selectedArray);
-
-      // Get the full prospect data for selected prospects
-      const selectedProspects = prospects.filter((p) =>
-        selectedArray.includes(p.id)
-      );
-
-      console.log("✓ Qualify: Prospect data:", selectedProspects.length);
-
-      // Save prospects to database first
-      console.log("✓ Qualify: Calling batch-save...");
-      const saveRes = await fetch("/api/b2b/batch-save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospects: selectedProspects }),
-      });
-
-      console.log("✓ Qualify: batch-save response status:", saveRes.status);
-
-      if (!saveRes.ok) {
-        const errorData = await saveRes.json();
-        throw new Error(errorData.error || `batch-save failed: ${saveRes.status}`);
-      }
-
-      const saveData = await saveRes.json();
-      const { savedIds } = saveData;
-
-      console.log("✓ Qualify: Saved IDs:", savedIds);
-
-      // Now qualify using database IDs
-      console.log("✓ Qualify: Calling batch-qualify...");
-      const res = await fetch("/api/b2b/batch-qualify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectIds: savedIds }),
-      });
-
-      console.log("✓ Qualify: batch-qualify response status:", res.status);
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        const errorMsg = errorData.error || `batch-qualify failed: ${res.status}`;
-        throw new Error(errorMsg);
-      }
-
-      console.log("✓ Qualify: Qualified successfully");
-
-      setBatchSuccess(`✓ Qualified ${selectedArray.length} prospect${selectedArray.length !== 1 ? "s" : ""}`);
-
-      // Remove qualified prospects from view
-      const remaining = prospects.filter((p) => !selectedArray.includes(p.id));
-      if (onProspectsUpdate) onProspectsUpdate(remaining);
-
-      // Show smart suggestions if only 1 was qualified
-      if (selectedArray.length === 1) {
-        const qualifiedProspect = prospects.find((p) => p.id === selectedArray[0]);
-        if (qualifiedProspect) {
-          const similar = findSimilarProspects(qualifiedProspect, remaining, 60);
-          if (similar.length > 0) {
-            setSuggestedProspects(similar);
-            setSuggestReason(formatSimilarityReason(qualifiedProspect, similar));
-            setShowSmartSuggestions(true);
-          }
-        }
-      }
-
-      setSelectedIds(new Set());
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Batch qualify failed";
-      setBatchError(message);
-    } finally {
-      setBatchLoading(false);
-    }
-  };
-
-  const handleSmartSuggestApprove = async (prospectIds: string[]) => {
-    try {
-      const res = await fetch("/api/b2b/batch-qualify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectIds }),
-      });
-
-      if (!res.ok) throw new Error("Failed to approve suggested prospects");
-
-      const remaining = prospects.filter((p) => !prospectIds.includes(p.id));
-      if (onProspectsUpdate) onProspectsUpdate(remaining);
-
-      setBatchSuccess(`✓ Batch approved ${prospectIds.length} similar prospect${prospectIds.length !== 1 ? "s" : ""}`);
-      setShowSmartSuggestions(false);
-      setSuggestedProspects([]);
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const handleBatchEmail = async () => {
     const selectedArray = Array.from(selectedIds);
     if (selectedArray.length === 0) return;
@@ -252,325 +136,129 @@ export function QueueCenter({ prospects, onBack, totalCount, onProspectsUpdate }
     setBatchError(null);
 
     try {
-      // Get the full prospect data for selected prospects
-      const selectedProspects = prospects.filter((p) =>
-        selectedArray.includes(p.id)
-      );
+      // Get the selected prospect data
+      const selectedProspects = sortedProspects.filter(p => selectedArray.includes(p.id));
 
-      console.log("📧 Email: Selected prospects:", selectedProspects.length);
-      console.log("📧 Email: Selected IDs:", selectedArray);
+      // Store prospects in sessionStorage for ENRICH to access
+      const prospectData = selectedProspects.map(p => ({
+        id: p.id,
+        businessName: p.businessName,
+        city: p.city || "Unknown City",
+        email: p.email,
+        businessCategory: p.industry || "unknown",
+        contactName: p.contactName,
+      }));
 
-      // Save prospects to database first so we can use database IDs
-      console.log("📧 Email: Calling batch-save...");
-      const res = await fetch("/api/b2b/batch-save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospects: selectedProspects }),
-      });
+      sessionStorage.setItem("enrich_prospects", JSON.stringify(prospectData));
 
-      console.log("📧 Email: batch-save response status:", res.status);
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || `batch-save failed: ${res.status}`);
-      }
-
-      const data = await res.json();
-      const { savedIds } = data;
-
-      console.log("📧 Email: Saved IDs:", savedIds);
-
-      // Navigate to ENRICH with database IDs
-      const prospectIdsParam = savedIds.join(",");
-      console.log("📧 Email: Navigating to enrich with:", prospectIdsParam);
-      router.push(`/operator/enrich?prospectIds=${prospectIdsParam}`);
+      // Navigate to ENRICH
+      router.push(`/operator/enrich?mode=draft&count=${selectedProspects.length}`);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to prepare email";
-      console.error("❌ Email error:", message);
+      const message = error instanceof Error ? error.message : "Failed to prepare emails";
+      console.error("Error:", message);
       setBatchError(message);
     } finally {
       setBatchLoading(false);
     }
   };
 
-  const handleCampaignApprove = async (emails: any[]) => {
-    try {
-      const res = await fetch("/api/b2b/batch-emails/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emails }),
-      });
-
-      if (!res.ok) throw new Error("Failed to send emails");
-
-      const data = await res.json();
-      setShowCampaignModal(false);
-      setGeneratedEmails(null);
-      setBatchSuccess(`✓ Sent ${data.sent} email${data.sent !== 1 ? "s" : ""}`);
-      setSelectedIds(new Set());
-
-      // Remove emailed prospects from queue
-      const emailedIds = new Set(emails.map((e) => e.prospectId));
-      const remaining = prospects.filter((p) => !emailedIds.has(p.id));
-      if (onProspectsUpdate) onProspectsUpdate(remaining);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to send emails";
-      throw error;
-    }
-  };
-
   if (!currentProspect) {
     return (
-      <div className="text-center py-12">
-        <p className="text-sm text-[#666666] mb-4">No prospects to display</p>
-        <button
-          onClick={onBack}
-          className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666]"
-        >
-          ← Back to Search
-        </button>
+      <div className="text-center py-8">
+        <p className="text-sm text-[#888888]">No prospects found</p>
       </div>
     );
   }
 
-  const temp = getTemperature(currentProspect.confidenceScore);
-
   return (
-    <div className="min-h-[600px] bg-white">
-      {/* Header */}
-      <div className="mb-8 pb-6 border-b border-[#E8E8E8]">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em]">
-            Prospect Queue
-          </h2>
-          <button
-            onClick={onBack}
-            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors"
-          >
-            ← Back to Search
-          </button>
-        </div>
-        <p className="text-xs text-[#888888]">
-          {currentIndex + 1} of {totalCount} prospects
-        </p>
-      </div>
-
-      {/* 2-Column Layout */}
-      <div className="grid grid-cols-2 gap-8">
-        {/* LEFT: Queue List */}
-        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-6 max-h-[500px] overflow-y-auto">
-          <div className="mb-4">
-            <button
-              onClick={selectAll}
-              className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
-            >
-              {selectedIds.size === sortedProspects.length ? "Deselect All" : "Select All"}
-            </button>
-          </div>
-
-          <div className="space-y-2">
-            {sortedProspects.map((prospect, idx) => {
-              const isSelected = selectedIds.has(prospect.id);
-              const isCurrent = idx === currentIndex;
-              const tempLevel = getTemperature(prospect.confidenceScore);
-
-              return (
-                <div
-                  key={prospect.id}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`p-3 rounded cursor-pointer transition-all ${
-                    isCurrent
-                      ? "bg-[#0D0D0D] text-white"
-                      : "bg-white border border-[#E8E8E8] hover:border-[#0D0D0D]"
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleSelect(prospect.id);
-                      }}
-                      className="mt-1 cursor-pointer accent-[#0D0D0D]"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-xs font-semibold truncate ${isCurrent ? "text-white" : "text-[#0D0D0D]"}`}>
-                        {prospect.businessName}
-                      </p>
-                      <p className={`text-[10px] truncate ${isCurrent ? "text-gray-300" : "text-[#888888]"}`}>
-                        {prospect.city}
-                      </p>
-                      <div className={`text-[10px] font-bold mt-1 flex items-center gap-1 ${
-                        isCurrent ? "text-white" : getTemperatureColor(tempLevel)
-                      }`}>
-                        <Icons.Flame />
-                        {tempLevel}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Batch Actions */}
-          {selectedCount > 0 && (
-            <div className="mt-6 pt-6 border-t border-[#E8E8E8] space-y-2">
-              <p className="text-xs font-semibold text-[#0D0D0D] mb-3">
-                {selectedCount} selected
-              </p>
+    <div className="space-y-6">
+      {/* Selection Summary */}
+      {selectedCount > 0 && (
+        <div className="border border-[#0D0D0D] rounded-lg p-4 bg-[#0D0D0D] text-white">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">{selectedCount} selected</p>
+            <div className="flex gap-2">
               <button
-                onClick={handleBatchQualify}
-                disabled={batchLoading}
-                className="w-full px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                onClick={selectAll}
+                className="text-xs font-semibold px-3 py-1 border border-white rounded hover:bg-white hover:text-[#0D0D0D] transition-colors"
               >
-                {batchLoading ? "Processing..." : `Qualify (${selectedCount})`}
+                {selectedIds.size === sortedProspects.length ? "Deselect All" : "Select All"}
               </button>
               <button
                 onClick={handleBatchEmail}
                 disabled={batchLoading}
-                className="w-full px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="text-xs font-semibold px-3 py-1 bg-white text-[#0D0D0D] rounded hover:bg-[#F5F5F5] disabled:opacity-50 transition-colors flex items-center gap-1"
               >
-                {batchLoading ? "Processing..." : `Email (${selectedCount})`}
+                <Icons.Email />
+                {batchLoading ? "Preparing..." : "Email"}
               </button>
-              {batchSuccess && (
-                <div className="p-2 bg-[#F5F5F5] border border-[#E8E8E8] rounded text-[10px] text-[#0D0D0D]">
-                  {batchSuccess}
-                </div>
-              )}
-              {batchError && (
-                <div className="p-2 bg-red-50 border border-red-200 rounded text-[10px] text-red-700">
-                  {batchError}
-                </div>
-              )}
             </div>
-          )}
+          </div>
+        </div>
+      )}
+
+      {/* Current Prospect */}
+      <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            <p className="text-lg font-bold text-[#0D0D0D] mb-1">{currentProspect.businessName}</p>
+            <p className="text-sm text-[#888888]">
+              {currentProspect.city} {currentProspect.postcode && `• ${currentProspect.postcode}`}
+            </p>
+            {currentProspect.email && (
+              <p className="text-xs text-[#666666] mt-2">📧 {currentProspect.email}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className={`text-sm font-bold ${getTemperatureColor(getTemperature(currentProspect.confidenceScore))}`}>
+              {getTemperature(currentProspect.confidenceScore)}
+            </div>
+            {currentProspect.confidenceScore && (
+              <p className="text-xs text-[#888888]">Score: {currentProspect.confidenceScore}</p>
+            )}
+          </div>
         </div>
 
-        {/* CENTER: Prospect Detail */}
-        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white">
-          <div className="mb-6">
-            <h3 className="text-lg font-black text-[#0D0D0D] mb-3">
-              {currentProspect.businessName}
-            </h3>
-
-            <div className="space-y-3">
-              {currentProspect.city && (
-                <div>
-                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] font-semibold mb-1">
-                    Location
-                  </p>
-                  <p className="text-sm text-[#0D0D0D]">
-                    {currentProspect.city}{currentProspect.postcode ? ` · ${currentProspect.postcode}` : ""}
-                  </p>
-                </div>
-              )}
-
-              {currentProspect.industry && (
-                <div>
-                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] font-semibold mb-1">
-                    Industry
-                  </p>
-                  <p className="text-sm text-[#0D0D0D]">{currentProspect.industry}</p>
-                </div>
-              )}
-
-              {currentProspect.confidenceScore && (
-                <div>
-                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] font-semibold mb-1">
-                    Confidence
-                  </p>
-                  <p className={`text-sm font-bold ${getTemperatureColor(temp)}`}>
-                    {currentProspect.confidenceScore}% · {temp}
-                  </p>
-                </div>
-              )}
-
-              {currentProspect.pressureSignal && (
-                <div>
-                  <p className="text-xs text-[#888888] uppercase tracking-[0.1em] font-semibold mb-1">
-                    Pressure Signal
-                  </p>
-                  <p className="text-sm text-[#0D0D0D]">{currentProspect.pressureSignal}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex gap-2 pt-6 border-t border-[#E8E8E8]">
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="flex-1 px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-            >
-              <Icons.ChevronLeft />
-              Prev
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === sortedProspects.length - 1}
-              className="flex-1 px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-            >
-              Next
-              <Icons.ChevronRight />
-            </button>
-          </div>
-
-          {/* Quick Actions - Single Prospect */}
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={() => {
-                setSelectedIds(new Set([currentProspect.id]));
-                setTimeout(() => handleBatchQualify(), 0);
-              }}
-              disabled={!currentProspect || batchLoading}
-              className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-            >
-              <Icons.CheckCircle />
-              Qualify
-            </button>
-            <button
-              onClick={() => {
-                setSelectedIds(new Set([currentProspect.id]));
-                setTimeout(() => handleBatchEmail(), 0);
-              }}
-              disabled={!currentProspect || batchLoading}
-              className="flex-1 px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1"
-            >
-              <Icons.Email />
-              Email
-            </button>
-          </div>
+        {/* Selection Checkbox */}
+        <div className="mt-4 pt-4 border-t border-[#E8E8E8]">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedIds.has(currentProspect.id)}
+              onChange={() => toggleSelect(currentProspect.id)}
+              className="w-4 h-4"
+            />
+            <span className="text-xs font-semibold text-[#0D0D0D]">Select for email</span>
+          </label>
         </div>
       </div>
 
-      {/* Campaign Review Modal */}
-      {showCampaignModal && generatedEmails && (
-        <CampaignReviewModal
-          emails={generatedEmails}
-          onApprove={handleCampaignApprove}
-          onCancel={() => {
-            setShowCampaignModal(false);
-            setGeneratedEmails(null);
-          }}
-        />
-      )}
+      {/* Navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={handlePrev}
+          disabled={currentIndex === 0}
+          className="px-3 py-2 text-xs font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-[#F5F5F5] rounded transition-colors"
+        >
+          ← Previous
+        </button>
+        <p className="text-xs text-[#888888]">
+          {currentIndex + 1} / {sortedProspects.length}
+        </p>
+        <button
+          onClick={handleNext}
+          disabled={currentIndex === sortedProspects.length - 1}
+          className="px-3 py-2 text-xs font-semibold text-[#0D0D0D] disabled:text-[#CCCCCC] hover:bg-[#F5F5F5] rounded transition-colors"
+        >
+          Next →
+        </button>
+      </div>
 
-      {/* Smart Suggestions Modal */}
-      {showSmartSuggestions && suggestedProspects.length > 0 && (
-        <SmartSuggestionsModal
-          qualified={prospects.find((p) => selectedIds.size === 0) || currentProspect}
-          similar={suggestedProspects}
-          reason={suggestReason}
-          onApprove={handleSmartSuggestApprove}
-          onDismiss={() => {
-            setShowSmartSuggestions(false);
-            setSuggestedProspects([]);
-          }}
-        />
+      {/* Error */}
+      {batchError && (
+        <div className="p-3 bg-red-100 text-red-700 text-xs rounded">
+          {batchError}
+        </div>
       )}
     </div>
   );
