@@ -60,15 +60,30 @@ export async function POST(request: Request) {
           continue;
         }
 
+        const now = new Date();
+
         // Update prospect record on successful send
         await prisma.b2bLead.update({
           where: { id: email.prospectId },
           data: {
             pipeline_stage: "propose",
             leadState: "emailed",
-            last_engagement_at: new Date(),
-            email_sent_at: new Date(),
+            last_engagement_at: now,
+            email_sent_at: now,
             notes: `Email sent: "${email.subject}"`,
+          },
+        });
+
+        // Track in B2bOutreach for sent history
+        await prisma.b2bOutreach.create({
+          data: {
+            leadId: email.prospectId,
+            subject: email.subject,
+            body: email.body,
+            sentAt: now,
+            resendMessageId: result.data?.id,
+            emailType: "initial",
+            sent_by: "batch_email_enrich",
           },
         });
 

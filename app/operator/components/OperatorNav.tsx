@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 const stages = [
   { name: "TODAY", href: "/operator" },
   { name: "DISCOVER", href: "/operator/discover" },
+  { name: "ENRICH", href: "/operator/enrich" },
+  { name: "RESPONSES", href: "/operator/responses" },
   { name: "UNDERSTAND", href: "/operator/understand" },
   { name: "OUTREACH", href: "/operator/outreach" },
-  { name: "PIPELINE", href: "/operator/pipeline" },
+  { name: "INTELLIGENCE", href: "/operator/intelligence" },
   { name: "ORDERS", href: "/operator/orders" },
 ];
 

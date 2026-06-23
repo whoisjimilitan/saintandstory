@@ -85,7 +85,12 @@ export function generateReasonedEmail(prospect: ProspectData): ReasonedEmail | n
     const service = generateService(categoryKey, prospect.city, prospect.businessName);
     const subject = generateSubject(categoryKey);
 
-    const body = `Hi ${prospect.name},
+    // Use "Hello from Saint & Story" if no personal name, otherwise personalized
+    const greeting = prospect.name && prospect.name.toLowerCase() !== "there"
+      ? `Hi ${prospect.name},`
+      : `Hello from Saint & Story,`;
+
+    const body = `${greeting}
 
 ${moment}
 

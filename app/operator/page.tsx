@@ -442,7 +442,7 @@ export default function OperatorBriefing() {
           {/* Micro-Actions - Idea #3 */}
           <div className="flex flex-wrap gap-3 pt-6 border-t border-[#E8E8E8]">
             <button
-              onClick={() => router.push("/operator/outreach?action=batch-send")}
+              onClick={() => router.push("/operator/discover")}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-colors"
             >
               <Icons.Email />
