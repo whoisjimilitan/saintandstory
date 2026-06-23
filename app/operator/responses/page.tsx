@@ -28,6 +28,7 @@ export default function ResponsesPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "replied" | "awaiting">("awaiting");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -239,35 +240,66 @@ export default function ResponsesPage() {
                 {/* Expanded Conversation View */}
                 {expandedId === response.id && (
                   <div className="border-t border-[#E8E8E8] p-4 bg-[#F9F9F9] space-y-4">
-                    {/* Conversation Thread */}
-                    <div className="space-y-3">
+                    {/* Original Email Context */}
+                    <div className="space-y-2">
                       <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wider">
-                        Conversation
+                        Original Email
                       </p>
 
-                      {response.conversation?.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={`p-3 rounded-lg border ${
-                            msg.type === "sent"
-                              ? "bg-white border-[#0D0D0D] ml-8 text-right"
-                              : "bg-white border-[#E8E8E8] mr-8"
-                          }`}
-                        >
-                          {msg.subject && (
+                      {/* Email Preview */}
+                      <div
+                        onClick={() =>
+                          setExpandedEmailId(
+                            expandedEmailId === response.id ? null : response.id
+                          )
+                        }
+                        className="p-3 bg-white border border-[#0D0D0D] rounded-lg cursor-pointer hover:bg-white transition-colors"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-[#0D0D0D] mb-1">
-                              Subject: {msg.subject}
+                              {response.subject}
                             </p>
-                          )}
-                          <p className="text-xs text-[#0D0D0D] leading-relaxed mb-2">
-                            {msg.body}
-                          </p>
-                          <p className="text-[10px] text-[#888888]">
-                            {new Date(msg.timestamp).toLocaleString()}
+                            <p className="text-xs text-[#666666] leading-relaxed line-clamp-2">
+                              {response.conversation?.[0]?.body?.substring(0, 150)}
+                              {(response.conversation?.[0]?.body?.length || 0) > 150 ? "..." : ""}
+                            </p>
+                          </div>
+                          <p className="text-[10px] text-[#888888] flex-shrink-0 whitespace-nowrap">
+                            {expandedEmailId === response.id ? "▼" : "▶"}
                           </p>
                         </div>
-                      ))}
+
+                        {/* Full Email - Expanded */}
+                        {expandedEmailId === response.id && (
+                          <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
+                            <p className="text-xs text-[#0D0D0D] leading-relaxed whitespace-pre-wrap">
+                              {response.conversation?.[0]?.body}
+                            </p>
+                            <p className="text-[10px] text-[#888888] mt-2">
+                              Sent {new Date(response.conversation?.[0]?.timestamp || "").toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Their Reply (if any) */}
+                    {response.replied && response.conversation?.[1] && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-wider">
+                          Their Response
+                        </p>
+                        <div className="p-3 bg-white border border-[#E8E8E8] rounded-lg mr-8">
+                          <p className="text-xs text-[#0D0D0D] leading-relaxed mb-2">
+                            {response.conversation[1].body}
+                          </p>
+                          <p className="text-[10px] text-[#888888]">
+                            Replied {new Date(response.conversation[1].timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Reply Composition */}
                     {!response.replied && (
