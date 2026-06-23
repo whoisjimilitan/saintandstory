@@ -136,75 +136,23 @@ export interface ReasoningLayer {
 }
 
 // ============================================================================
-// LAYER 3: STRATEGY (CHOSEN APPROACH & RATIONALE)
+// LAYER 3: STRATEGY (RELATIONSHIP ADVANCEMENT PLAN)
 // ============================================================================
 
-export interface TrustStrategyChoice {
-  approach: string;
-  honestStatement: string; // The actual inverse incentive
-  rationale: {
-    whyThisApproach: string;
-    psychologicalBasis: string; // Why it works
-    alternativesConsidered: string[];
-    whyNotThem: string;
-  };
-}
+// Import RelationshipAdvancementPlan from separate file
+// The strategy layer IS the advancement plan
+// This contains NO reference to communication format
+// It contains ONLY relationship dynamics and strategy
+//
+// See relationship-advancement-plan.ts for complete interface
+//
+// Key principle: The engine answers "What must become true in this relationship?"
+// NOT "What email should we send?"
 
-export interface MicroCommitmentChoice {
-  ask: string;
-  responseOptions: string[];
-  cognitiveLoad: "minimal" | "low" | "medium";
-  rationale: {
-    whyThisAsk: string;
-    whyThesOptions: string;
-    psychologicalBasis: string;
-  };
-}
+import type { RelationshipAdvancementPlan } from "./relationship-advancement-plan";
 
-export interface MentalSimulationChoice {
-  scenario: string;
-  trigger: string;
-  believability: ConfidenceLevel;
-  rationale: {
-    whyThisScenario: string;
-    whyBelievable: string;
-    howItRelatesToThem: string;
-  };
-}
-
-export interface StrategyLayer {
-  // What stage are they at?
-  relationshipStage: {
-    current: RelationshipStage;
-    stageName: string;
-    stageObjective: string;
-  };
-
-  // Chosen trust strategy
-  trustStrategy: TrustStrategyChoice;
-
-  // Chosen inverse incentive
-  inverseIncentive: {
-    statement: string;
-    rationale: {
-      whyThis: string;
-      psychologicalEffect: string;
-    };
-  };
-
-  // Chosen mental simulation
-  mentalSimulation: MentalSimulationChoice;
-
-  // Chosen micro commitment
-  microCommitment: MicroCommitmentChoice;
-
-  // Overall strategic rationale
-  overallRationale: {
-    whyWeChoseThisStage: string;
-    whatWeHopeToAchieve: string;
-    measurableObjective: string; // "Advance from Stage X to Stage Y"
-  };
-}
+// Type alias for clarity
+export type StrategyLayer = RelationshipAdvancementPlan;
 
 // ============================================================================
 // LAYER 4: COMMUNICATIONS (RENDERED OUTPUTS)
@@ -377,6 +325,7 @@ export function createRelationshipIntelligenceObject(
   prospectId: string,
   businessName: string,
   facts: FactsLayer,
+  evidence: EvidenceLayer,
   reasoning: ReasoningLayer,
   strategy: StrategyLayer,
   communications: CommunicationsLayer,
@@ -390,6 +339,7 @@ export function createRelationshipIntelligenceObject(
     generatedBy: "business-relationship-engine",
 
     facts,
+    evidence,
     reasoning,
     strategy,
     communications,
@@ -406,11 +356,11 @@ export function createRelationshipIntelligenceObject(
 
     explainability: {
       whyThisBusiness: operatorGuidance.executiveSummary.whoTheyAre,
-      whyThisStage: strategy.relationshipStage.stageObjective,
-      whyThisStrategy: strategy.trustStrategy.rationale.whyThisApproach,
-      whyThisCommunication: communications.channelReasoning.whyEmailFirst,
-      whyNow: strategy.overallRationale.whatWeHopeToAchieve,
-      measurableSuccess: strategy.overallRationale.measurableObjective,
+      whyThisStage: strategy.targetStage.why,
+      whyThisStrategy: strategy.strategicRationale,
+      whyThisCommunication: strategy.communicationStrategy.whyThisChannel,
+      whyNow: strategy.objectives.primary,
+      measurableSuccess: strategy.successDefinition,
     },
   };
 }
