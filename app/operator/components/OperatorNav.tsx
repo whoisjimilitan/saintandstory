@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Icons } from "@/lib/icons";
 
 const stages = [
@@ -15,6 +16,7 @@ const stages = [
 
 export function OperatorNav() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const getCurrentStageIndex = () => {
     if (pathname === "/operator" || pathname === "/operator/") return 0;
@@ -29,7 +31,6 @@ export function OperatorNav() {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-[#E8E8E8] z-50">
       <div className="max-w-full mx-auto px-6 py-6">
-        {/* Journey Container */}
         <div className="flex items-center justify-between relative">
           {/* Continuous line - only shows progress (black), no grey strikethrough */}
           <svg
@@ -95,15 +96,49 @@ export function OperatorNav() {
             })}
           </div>
 
-        </div>
+          {/* Menu Button - Top Right */}
+          <div className="relative ml-4">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 text-[#888888] hover:text-[#0D0D0D] transition-colors"
+              title="Menu"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              >
+                <circle cx="12" cy="5" r="1" />
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="12" cy="19" r="1" />
+              </svg>
+            </button>
 
-        {/* Admin Link - Top Right */}
-        <Link
-          href="/dashboard/admin"
-          className="absolute top-6 right-6 text-[11px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-widest transition-colors duration-200 hover:bg-[#F5F5F5] px-3 py-2 rounded-md"
-        >
-          Admin
-        </Link>
+            {/* Dropdown Menu */}
+            {menuOpen && (
+              <div className="absolute top-full right-0 mt-2 bg-white border border-[#E8E8E8] rounded-lg shadow-md py-2 z-50 min-w-[160px]">
+                <Link
+                  href="/dashboard/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest"
+                >
+                  Admin Dashboard
+                </Link>
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest border-t border-[#E8E8E8]"
+                >
+                  Logout
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </nav>
   );
