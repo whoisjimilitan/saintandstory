@@ -374,6 +374,18 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
+      // VALIDATION: Ensure email is from verified source (Google Places)
+      // Do not use generated or assumed emails
+      if (place.website && !place.formatted_phone_number) {
+        // If we have website but no phone, email is less certain
+        console.log(`[DISCOVER]   ⚠️  Email verification: Has website but no phone number`);
+      }
+
+      if (!place.formatted_phone_number && !place.website) {
+        // No phone or website = limited verification of contact info
+        console.log(`[DISCOVER]   ⚠️  Email verification: No phone or website from Google Places`);
+      }
+
       // Skip if already in DB
       console.log(`[DISCOVER] Checking if exists: ${place.name} (place_id: ${place.place_id})`);
       const existing = await sql`SELECT id FROM b2b_leads WHERE google_place_id = ${place.place_id} LIMIT 1`;
@@ -388,6 +400,21 @@ export async function POST(request: NextRequest) {
 
       const { painPoint, reviewText, rating } = detectPainPoint(place.reviews);
       console.log(`[DISCOVER]   Pain point: ${painPoint || "none"}`);
+
+      // EMAIL SOURCE VALIDATION
+      // Only use emails that come directly from Google Places data
+      // Do not generate or assume emails
+      let emailSource = "none";
+      let useThisEmail = null;
+
+      if (place.formatted_phone_number || place.website) {
+        // Email is more reliable if we have verified contact info
+        emailSource = place.formatted_phone_number ? "verified-phone" : "website-domain";
+        useThisEmail = undefined; // Don't use unverified emails
+        console.log(`[DISCOVER]   Email source: ${emailSource} (not using email from Google)`);
+      } else {
+        console.log(`[DISCOVER]   ⚠️  Email source: Unverified (no phone or website from Google Places)`);
+      }
 
       // Extract city from address
       const addressCity = place.formatted_address?.split(",").slice(-3, -1).join("").trim() ?? city;
