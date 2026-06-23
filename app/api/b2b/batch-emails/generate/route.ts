@@ -83,7 +83,16 @@ export async function POST(request: Request) {
     }));
 
     // Generate emails using V3 reasoning engine (NOT templated)
-    const reasonedEmails = generateReasonedEmailBatch(prospectDataForReasoning);
+    console.log("[EMAIL GEN] Calling generateReasonedEmailBatch...");
+    let reasonedEmails;
+    try {
+      reasonedEmails = generateReasonedEmailBatch(prospectDataForReasoning);
+      console.log("[EMAIL GEN] ✅ Generated", reasonedEmails.length, "emails from reasoning engine");
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error("[EMAIL GEN] ❌ Error in reasoning engine:", msg);
+      throw error;
+    }
 
     // Build response previews
     const emails: EmailPreview[] = [];
@@ -94,6 +103,7 @@ export async function POST(request: Request) {
       const reasonedEmail = reasonedEmails[i];
 
       if (!reasonedEmail) {
+        console.error("[EMAIL GEN] ❌ No email generated for prospect", i, prospect.id);
         failedProspects.push(prospect.id);
         continue;
       }
