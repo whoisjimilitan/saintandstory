@@ -34,6 +34,36 @@ export type DeliveryNeed =
 
 export type ConfidenceLevel = "high" | "medium" | "low";
 
+export type EvidenceSource =
+  | "website"
+  | "google-maps"
+  | "linkedin"
+  | "dot-registration"
+  | "fmcsa-data"
+  | "previous-conversation"
+  | "crm-history"
+  | "industry-data"
+  | "social-media"
+  | "news"
+  | "manual-entry";
+
+export interface EvidencePoint {
+  source: EvidenceSource;
+  observation: string; // The actual observation/signal
+  dateFound: string;
+  confidence: number; // 0-1 scale (0.81 not "high")
+  url?: string; // Link to evidence if available
+  rawData?: string; // The actual text/value from source
+}
+
+export interface InferenceWithEvidence {
+  conclusion: string; // The claim
+  supporting_evidence: EvidencePoint[]; // All evidence backing it
+  confidence_score: number; // Aggregate confidence
+  alternative_explanations?: string[]; // What else could explain this?
+  confidence_reasoning: string; // Why this confidence level?
+}
+
 // ============================================================================
 // LAYER 1: FACTS (OBSERVED, VERIFIABLE)
 // ============================================================================
@@ -84,11 +114,7 @@ export interface ReasoningLayer {
   potentialDeliveryNeeds: InferredDeliveryNeed[];
 
   // Why we think they might need us
-  whyTheyMightNeedUs: {
-    reasoning: string;
-    basedOnFacts: string[];
-    confidenceRating: ConfidenceLevel;
-  };
+  whyTheyMightNeedUs: InferenceWithEvidence;
 
   // What unique value we offer
   ourCompetitivePosition: {
@@ -97,18 +123,15 @@ export interface ReasoningLayer {
     whenItMatters: string;
   };
 
-  // Inferred pain points (NOT invented)
-  inferredPainPoints: {
-    painPoint: string;
-    inferredFrom: string; // Which facts suggest this?
-    likelihood: ConfidenceLevel;
-  }[];
+  // Inferred pain points (NOT invented, with evidence)
+  inferredPainPoints: InferenceWithEvidence[];
 
   // What would make them NOT need us (important for inverse incentive)
   alternativeTheyMayHave: {
     alternative: string;
     howCommon: "typical" | "likely" | "possible";
     ourPosition: string; // How do we position against this?
+    evidence: EvidencePoint[];
   }[];
 }
 
@@ -276,6 +299,37 @@ export interface OperatorGuidanceLayer {
 }
 
 // ============================================================================
+// LAYER 2.5: EVIDENCE (BACKING EVERY INFERENCE)
+// ============================================================================
+
+export interface EvidenceLayer {
+  // Complete audit trail of where conclusions came from
+  allEvidence: EvidencePoint[];
+
+  // Map of inference → evidence
+  inferenceMap: {
+    inference: string; // The claim
+    supportingEvidenceIds: string[]; // References to allEvidence array
+    aggregateConfidence: number;
+  }[];
+
+  // Source quality assessment
+  sourceQuality: {
+    source: EvidenceSource;
+    reliability: ConfidenceLevel;
+    sampleSize: number; // How many pieces of evidence from this source?
+    lastUpdated?: string;
+  }[];
+
+  // Transparency: What we DON'T have evidence for yet
+  evidenceGaps: {
+    topic: string; // What would be good to know?
+    why: string; // Why would this matter?
+    howToObtain?: string; // Where could we get this?
+  }[];
+}
+
+// ============================================================================
 // MAIN: RELATIONSHIP INTELLIGENCE OBJECT
 // ============================================================================
 
@@ -286,8 +340,9 @@ export interface RelationshipIntelligenceObject {
   generatedAt: string;
   generatedBy: "business-relationship-engine";
 
-  // The 6 layers
+  // The 7 layers (in reasoning order)
   facts: FactsLayer;
+  evidence: EvidenceLayer; // NEW: Layer 2.5 - Backing for all inferences
   reasoning: ReasoningLayer;
   strategy: StrategyLayer;
   communications: CommunicationsLayer;
@@ -380,6 +435,116 @@ function calculateConfidenceScore(facts: FactsLayer, reasoning: ReasoningLayer):
 
   // Cap at 100
   return Math.min(score, 100);
+}
+
+// ============================================================================
+// VALIDATION: COMPLETENESS & CONSISTENCY
+// ============================================================================
+
+export interface ValidationResult {
+  isComplete: boolean;
+  isConsistent: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export function validateRelationshipIntelligenceObject(
+  obj: RelationshipIntelligenceObject
+): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // LAYER 1: FACTS validation
+  if (!obj.facts.businessName || !obj.facts.industry || !obj.facts.location) {
+    errors.push("FACTS: Missing required business information");
+  }
+  if (obj.facts.observedIndicators.length === 0) {
+    warnings.push("FACTS: No observed indicators recorded");
+  }
+
+  // LAYER 2.5: EVIDENCE validation
+  if (obj.evidence.allEvidence.length === 0) {
+    errors.push("EVIDENCE: No evidence points recorded for inferences");
+  }
+  if (obj.evidence.inferenceMap.length === 0) {
+    errors.push("EVIDENCE: No inference map (disconnected evidence)");
+  }
+
+  // Check evidence consistency
+  for (const inference of obj.evidence.inferenceMap || []) {
+    if (inference.supportingEvidenceIds.length === 0) {
+      errors.push(`EVIDENCE: Inference "${inference.inference}" has no supporting evidence`);
+    }
+    if (inference.aggregateConfidence < 0 || inference.aggregateConfidence > 1) {
+      errors.push(`EVIDENCE: Confidence score out of range (0-1): ${inference.aggregateConfidence}`);
+    }
+  }
+
+  // LAYER 3: REASONING validation
+  if (!obj.reasoning.whyTheyMightNeedUs || !obj.reasoning.whyTheyMightNeedUs.supporting_evidence) {
+    errors.push("REASONING: Missing 'why they might need us' with evidence");
+  }
+  if (obj.reasoning.potentialDeliveryNeeds.length === 0) {
+    errors.push("REASONING: No potential delivery needs identified");
+  }
+
+  // Check evidence backing for inferences
+  for (const need of obj.reasoning.potentialDeliveryNeeds) {
+    if (need.operationalScenarios.length === 0) {
+      errors.push(`REASONING: Delivery need "${need.deliveryType}" has no scenarios`);
+    }
+  }
+
+  // LAYER 4: STRATEGY validation
+  if (!obj.strategy.relationshipStage || !obj.strategy.trustStrategy) {
+    errors.push("STRATEGY: Missing relationship stage or trust strategy");
+  }
+  if (!obj.strategy.overallRationale.measurableObjective) {
+    errors.push("STRATEGY: Missing measurable objective");
+  }
+
+  // LAYER 5: COMMUNICATIONS validation
+  if (!obj.communications.primary || !obj.communications.primary.content.body) {
+    errors.push("COMMUNICATIONS: No primary communication rendered");
+  }
+
+  // LAYER 6: TIMELINE validation
+  if (!obj.timeline.currentStage || !obj.timeline.nextStage) {
+    errors.push("TIMELINE: Missing current or next stage");
+  }
+
+  // LAYER 7: OPERATOR GUIDANCE validation
+  if (!obj.operatorGuidance.executiveSummary) {
+    errors.push("OPERATOR_GUIDANCE: Missing executive summary");
+  }
+
+  // EXPLAINABILITY validation
+  if (!obj.explainability.whyThisBusiness || !obj.explainability.measurableSuccess) {
+    errors.push("EXPLAINABILITY: Missing key explainability fields");
+  }
+
+  // Cross-layer consistency checks
+  // Evidence should back reasoning
+  if (obj.evidence.allEvidence.length < obj.reasoning.potentialDeliveryNeeds.length) {
+    warnings.push(
+      "CONSISTENCY: Fewer evidence points than inferred needs - may lack backing"
+    );
+  }
+
+  // Strategy should reference reasoning
+  const strategyMentionsReasoning = obj.strategy.overallRationale.whyWeChoseThisStage
+    .toLowerCase()
+    .includes(obj.reasoning.whyTheyMightNeedUs.conclusion.toLowerCase());
+  if (!strategyMentionsReasoning) {
+    warnings.push("CONSISTENCY: Strategy doesn't clearly reference reasoning");
+  }
+
+  return {
+    isComplete: errors.length === 0,
+    isConsistent: errors.length === 0 && warnings.length === 0,
+    errors,
+    warnings,
+  };
 }
 
 export function getExplainabilityScore(obj: RelationshipIntelligenceObject): number {

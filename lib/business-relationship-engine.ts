@@ -600,7 +600,7 @@ export function generateRelationshipCommunication(
   const email = generateCommunicationEmail(reasoning);
 
   // STAGE PROGRESSION LOGIC
-  const nextStage = Math.min(6, (currentStage + 1) as RelationshipStage);
+  const nextStage = Math.min(6, currentStage + 1) as RelationshipStage;
   const triggerForProgression =
     currentStage === 1 ? "Reply received (yes/maybe)" :
     currentStage === 2 ? "Agreed to first delivery" :
