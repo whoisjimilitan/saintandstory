@@ -31,6 +31,8 @@ interface UnderstandState {
   loading: boolean;
   error: string | null;
   prospect: ProspectDetail | null;
+  reasoning: any | null;
+  reasoningLoading: boolean;
   qualifying: boolean;
   qualifyError: string | null;
 }
@@ -44,6 +46,8 @@ export default function UnderstandPage() {
     loading: true,
     error: null,
     prospect: null,
+    reasoning: null,
+    reasoningLoading: false,
     qualifying: false,
     qualifyError: null,
   });
@@ -66,7 +70,7 @@ export default function UnderstandPage() {
       }
 
       try {
-        setState((s) => ({ ...s, loading: true, error: null }));
+        setState((s) => ({ ...s, loading: true, error: null, reasoningLoading: true }));
 
         const res = await fetch(`/api/b2b/prospect/${prospectId}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to load prospect`);
@@ -77,6 +81,22 @@ export default function UnderstandPage() {
           loading: false,
           prospect: data,
         }));
+
+        // Fetch reasoning/intelligence
+        try {
+          const reasoningRes = await fetch(`/api/b2b/intelligence/relationship-analysis?prospect_id=${prospectId}`);
+          if (reasoningRes.ok) {
+            const reasoning = await reasoningRes.json();
+            setState((s) => ({
+              ...s,
+              reasoning,
+              reasoningLoading: false,
+            }));
+          }
+        } catch (err) {
+          console.error("Failed to fetch reasoning:", err);
+          setState((s) => ({ ...s, reasoningLoading: false }));
+        }
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Failed to load prospect";
@@ -84,6 +104,7 @@ export default function UnderstandPage() {
           ...s,
           loading: false,
           error: message,
+          reasoningLoading: false,
         }));
       }
     };
@@ -175,7 +196,88 @@ export default function UnderstandPage() {
           Review and qualify opportunities before outreach
         </p>
 
-        {/* Prospect Details Section */}
+        {/* AI Reasoning Section */}
+        {state.reasoningLoading && (
+          <div className="mb-12 p-8 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin"></div>
+              <p className="text-sm text-[#666666]">Analyzing relationship opportunity...</p>
+            </div>
+          </div>
+        )}
+
+        {state.reasoning && !state.reasoningLoading && (
+          <div className="mb-12 border border-[#0D0D0D] rounded-lg p-8 bg-white">
+            <h3 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
+              AI Reasoning Analysis
+            </h3>
+
+            <div className="space-y-6">
+              {/* Relationship Stage & Trust */}
+              {state.reasoning.intelligence && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">Stage</p>
+                      <p className="text-base font-bold text-[#0D0D0D]">
+                        {state.reasoning.intelligence.relationshipModel?.currentStage || "Unknown"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-1">Trust</p>
+                      <p className="text-base font-bold text-[#0D0D0D]">
+                        {state.reasoning.intelligence.relationshipModel?.trustScore || 0}%
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Key Reasoning */}
+                  {state.reasoning.intelligence.reasoning && (
+                    <div className="p-4 bg-[#F9F9F9] rounded border border-[#E8E8E8]">
+                      <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-2">
+                        Inferred Needs
+                      </p>
+                      <p className="text-sm text-[#0D0D0D] leading-relaxed">
+                        {state.reasoning.intelligence.reasoning.primaryNeedInference}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Psychology Pattern */}
+                  {state.reasoning.psychology?.dominantPattern && (
+                    <div className="p-4 bg-[#FFF5F5] rounded border border-[#FFE0E0]">
+                      <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-2">
+                        Psychology Pattern
+                      </p>
+                      <p className="text-sm font-semibold text-[#0D0D0D] mb-1">
+                        {state.reasoning.psychology.dominantPattern}
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        {state.reasoning.psychology.reframedStrategy}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Confidence */}
+                  <div>
+                    <p className="text-xs text-[#888888] uppercase tracking-[0.1em] mb-2">
+                      System Confidence
+                    </p>
+                    <div className="w-full bg-[#E8E8E8] rounded-full h-2">
+                      <div
+                        className="bg-[#0D0D0D] h-2 rounded-full"
+                        style={{width: `${state.reasoning.metadata?.confidence || 0}%`}}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-[#666666] mt-1">
+                      {state.reasoning.metadata?.confidence || 0}% confident in this analysis
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Prospect Details Section */}
         <h2 className="text-lg font-bold text-[#0D0D0D] mb-8">
