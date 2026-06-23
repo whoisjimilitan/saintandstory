@@ -330,9 +330,7 @@ export default function DiscoverPage() {
         {/* Header */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
-            Discover
-          </h1>
+          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Discover</h1>
           <button
             onClick={() => setShowManualAddForm(true)}
             className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"

@@ -168,9 +168,7 @@ export default function OrdersPage() {
       <div className="min-h-screen bg-white pt-32">
         <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
           <div className="mb-12">
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
-            Orders
-          </h1>
+          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Orders</h1>
         </div>
 
         <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">

@@ -45,7 +45,7 @@ export default function ResponsesPage() {
   const awaitingCount = responses.filter((r) => !r.replied).length;
 
   return (
-    <div className="min-h-screen bg-white pt-20">
+    <div className="min-h-screen bg-white pt-32">
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Header */}
         <div className="mb-8">
