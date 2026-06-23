@@ -101,14 +101,6 @@ export function OperatorNav() {
         </div>
       </div>
 
-      {/* Bottom progress indicator */}
-      <div
-        className="absolute bottom-0 left-0 h-1 bg-[#0D0D0D]"
-        style={{
-          width: `${((currentStageIndex + 1) / stages.length) * 100}%`,
-          transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      />
     </nav>
   );
 }
