@@ -145,12 +145,12 @@ export default function OperatorBriefing() {
 
   useEffect(() => {
     const today = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    };
-    setDateStr(today.toLocaleDateString("en-US", options));
+    const day = String(today.getDate()).padStart(2, "0");
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const year = String(today.getFullYear()).slice(-2);
+    const hours = String(today.getHours()).padStart(2, "0");
+    const minutes = String(today.getMinutes()).padStart(2, "0");
+    setDateStr(`${day}.${month}.${year} at ${hours}:${minutes}`);
   }, []);
 
   useEffect(() => {
@@ -260,7 +260,7 @@ export default function OperatorBriefing() {
       {/* HEADER */}
       <div className="mb-8 px-4 md:px-0">
         <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
-          <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase">
+          <p className="text-xs font-semibold text-[#0D0D0D] font-mono">
             {dateStr}
           </p>
         </div>
