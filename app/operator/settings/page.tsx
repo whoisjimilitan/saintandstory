@@ -68,7 +68,7 @@ export default function SettingsPage() {
         {/* Header - Minimal */}
         <div className="mb-12">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
-            Autonomous Discovery
+            Auto Discovery
           </p>
         </div>
 

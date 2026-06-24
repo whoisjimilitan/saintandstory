@@ -174,12 +174,12 @@ export default async function AdminPage() {
   }).length;
 
   const statLinks = [
-    inProgressJobs.length > 0 && { label: `${inProgressJobs.length} driving`, href: "#section-enroute", bold: true },
-    pendingJobs.length > 0 && { label: `${pendingJobs.length} lead${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
-    offeredJobs.length > 0 && { label: `${offeredJobs.length} searching`, href: "#section-awaiting", bold: false },
-    confirmedJobs.length > 0 && { label: `${confirmedJobs.length} driving`, href: "#section-confirmed", bold: false },
-    { label: `${onlineCount} online`, href: "#section-fleet", bold: false },
-    todayRevenue > 0 && { label: `£${todayRevenue.toFixed(0)} today`, href: "#section-completed", bold: false },
+    inProgressJobs.length > 0 && { label: `${inProgressJobs.length} in transit`, href: "#section-enroute", bold: true },
+    pendingJobs.length > 0 && { label: `${pendingJobs.length} order${pendingJobs.length !== 1 ? "s" : ""}`, href: "#section-orders", bold: false },
+    offeredJobs.length > 0 && { label: `${offeredJobs.length} offered`, href: "#section-awaiting", bold: false },
+    confirmedJobs.length > 0 && { label: `${confirmedJobs.length} assigned`, href: "#section-confirmed", bold: false },
+    { label: `${onlineCount} available`, href: "#section-fleet", bold: false },
+    todayRevenue > 0 && { label: `£${todayRevenue.toFixed(0)} earned`, href: "#section-completed", bold: false },
   ].filter(Boolean) as { label: string; href: string; bold: boolean }[];
 
   return (
@@ -187,31 +187,38 @@ export default async function AdminPage() {
       <AdminAutoRefresh pendingCount={pendingJobs.length} />
       <AdminPushSubscribe />
       <AdminLocationUpdater />
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-12">
         <div></div>
         <div className="flex flex-col gap-2 items-end">
-          <Link href="/operator" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full bg-[#F5F5F5] hover:bg-white hover:border-[#D0D0D0]">
-            Intelligence →
+          <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
+            Ops →
           </Link>
-          <Link href="/sign-in" className="text-[10px] font-semibold text-[#888888] hover:text-[#0D0D0D] uppercase tracking-[0.2em] transition-colors border border-[#E8E8E8] px-3 py-1 rounded-full">
+          <Link href="/sign-in" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D]">
             Logout
           </Link>
         </div>
       </div>
-      <h1 className="font-sans font-black text-[#0D0D0D] text-3xl tracking-tight mb-8">
-        Dashboard.
-      </h1>
+
+      <div className="mb-12">
+        <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+          Fleet Dashboard
+        </p>
+        <p className="text-sm text-[#888888] mt-2">
+          Live job dispatch and driver status
+        </p>
+      </div>
+
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-wrap gap-2">
           {statLinks.map((s) => (
             <a
               key={s.href}
               href={s.href}
-              className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all ${
+              className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold ${
                 s.bold
                   ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
                   : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
-              } text-[10px] font-semibold uppercase tracking-[0.2em]`}
+              }`}
             >
               {s.label}
             </a>
