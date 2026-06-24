@@ -22,11 +22,28 @@ import { OrdersService } from "./services/orders-service";
 
 export const CONFIDENCE_THRESHOLD_HIGH = 80;
 
+export interface TemperatureBreakdown {
+  ultraHot: number;
+  hot: number;
+  warm: number;
+}
+
+export interface ActiveProspect {
+  id: string;
+  businessName: string;
+  location: string;
+  stage: string;
+  stagedAt: string;
+  action: string;
+}
+
 export interface MorningBriefMetrics {
   newOpportunitiesToday: number;
   highConfidenceToday: number;
   finishedToday: number;
   closedToday: number;
+  temperatureBreakdown?: TemperatureBreakdown;
+  activeProspects?: ActiveProspect[];
 }
 
 export interface PipelineBreakdown {
@@ -144,11 +161,15 @@ export class DashboardService {
       highConfidenceToday,
       finishedToday,
       closedToday,
+      temperatureBreakdown,
+      activeProspects,
     ] = await Promise.all([
       this.opportunityService.countDiscoveredToday(today),
       this.opportunityService.countHighConfidenceToday(today),
       this.ordersService.countFinishedToday(today),
       this.ordersService.countClosedToday(today),
+      this.getTemperatureBreakdown(),
+      this.getActiveProspects(),
     ]);
 
     return {
@@ -156,7 +177,123 @@ export class DashboardService {
       highConfidenceToday,
       finishedToday,
       closedToday,
+      temperatureBreakdown,
+      activeProspects,
     };
+  }
+
+  /**
+   * Calculate temperature breakdown based on prospect urgency
+   */
+  private async getTemperatureBreakdown(): Promise<TemperatureBreakdown> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      // Ultra Hot: Replied but not converted (awaiting response follow-up)
+      const ultraHot = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "propose",
+          leadState: "contacted",
+        },
+      });
+
+      // Hot: Emailed in last 24 hours (watch for responses)
+      const hot = await prisma.b2bLead.count({
+        where: {
+          leadState: "emailed",
+          email_sent_at: {
+            gte: yesterday,
+          },
+        },
+      });
+
+      // Warm: Qualified but not yet emailed (awaiting first email)
+      const warm = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "discover",
+          leadState: "understood",
+        },
+      });
+
+      return { ultraHot, hot, warm };
+    } catch (error) {
+      console.error("[DashboardService] Error calculating temperature:", error);
+      return { ultraHot: 0, hot: 0, warm: 0 };
+    }
+  }
+
+  /**
+   * Get active prospects (currently in pipeline, needs action)
+   */
+  private async getActiveProspects(): Promise<ActiveProspect[]> {
+    try {
+      const prospects = await prisma.b2bLead.findMany({
+        where: {
+          pipeline_stage: {
+            in: ["discover", "qualify", "propose"],
+          },
+        },
+        select: {
+          id: true,
+          businessName: true,
+          location: true,
+          pipeline_stage: true,
+          last_engagement_at: true,
+          leadState: true,
+        },
+        orderBy: {
+          last_engagement_at: "desc",
+        },
+        take: 5,
+      });
+
+      return prospects.map((p) => ({
+        id: p.id,
+        businessName: p.businessName || "Unknown",
+        location: p.location || "Unknown",
+        stage: p.pipeline_stage || "discover",
+        stagedAt: p.last_engagement_at
+          ? this.getTimeAgo(p.last_engagement_at)
+          : "Recently",
+        action: this.getActionForStage(p.pipeline_stage || "discover"),
+      }));
+    } catch (error) {
+      console.error("[DashboardService] Error fetching active prospects:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Helper: Convert timestamp to "X hours ago" format
+   */
+  private getTimeAgo(date: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    return "Just now";
+  }
+
+  /**
+   * Helper: Get action text based on prospect stage
+   */
+  private getActionForStage(stage: string): string {
+    switch (stage) {
+      case "discover":
+        return "Ready to qualify";
+      case "qualify":
+        return "Ready to email";
+      case "propose":
+        return "Awaiting reply";
+      default:
+        return "Next action needed";
+    }
   }
 
   /**

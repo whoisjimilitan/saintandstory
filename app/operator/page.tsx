@@ -252,25 +252,8 @@ export default function OperatorBriefing() {
     orders: state.data?.pipeline.orders || 0,
   };
 
-  // Sample active prospects (will be replaced with real data from API)
-  const activeProspects = [
-    {
-      id: "1",
-      name: "Acme Facilities Management",
-      location: "London",
-      stage: "Email Sent",
-      stagedAt: "2 hours ago",
-      action: "Awaiting reply",
-    },
-    {
-      id: "2",
-      name: "Beta Office Services",
-      location: "Manchester",
-      stage: "Qualified",
-      stagedAt: "1 day ago",
-      action: "Ready to email",
-    },
-  ];
+  // Use real active prospects from API
+  const activeProspects = state.data?.metrics.activeProspects || [];
 
   return (
     <div className="min-h-screen bg-white pt-24">
@@ -319,15 +302,36 @@ export default function OperatorBriefing() {
                 <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
                   Action Items
                 </p>
-                <ul className="space-y-1.5 text-xs text-[#666666]">
+                <ul className="space-y-2 text-xs text-[#666666]">
                   {tempBreakdown.ultraHot > 0 && (
-                    <li>• {tempBreakdown.ultraHot} prospect{tempBreakdown.ultraHot !== 1 ? 's' : ''} awaiting response follow-up</li>
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/responses")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • {tempBreakdown.ultraHot} prospect{tempBreakdown.ultraHot !== 1 ? 's' : ''} awaiting response follow-up
+                      </button>
+                    </li>
                   )}
                   {tempBreakdown.hot > 0 && (
-                    <li>• {tempBreakdown.hot} prospect{tempBreakdown.hot !== 1 ? 's' : ''} sent emails, monitor responses</li>
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/responses?filter=awaiting")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • {tempBreakdown.hot} prospect{tempBreakdown.hot !== 1 ? 's' : ''} sent emails, monitor responses
+                      </button>
+                    </li>
                   )}
                   {metrics.highConfidenceToday > 0 && (
-                    <li>• {metrics.highConfidenceToday} high-confidence prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review</li>
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/understand")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • {metrics.highConfidenceToday} high-confidence prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review
+                      </button>
+                    </li>
                   )}
                 </ul>
               </div>
@@ -367,7 +371,7 @@ export default function OperatorBriefing() {
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {prospect.name}
+                    {prospect.businessName || prospect.name}
                   </p>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs text-[#888888]">{prospect.location}</span>
@@ -382,7 +386,7 @@ export default function OperatorBriefing() {
                     {prospect.action}
                   </p>
                   <button
-                    onClick={() => router.push(`/operator/understand`)}
+                    onClick={() => router.push(`/operator/understand?id=${prospect.id}`)}
                     className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-2.5 py-1 rounded hover:bg-[#F5F5F5] transition-colors"
                   >
                     View
