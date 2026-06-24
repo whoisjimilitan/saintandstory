@@ -34,21 +34,28 @@ export async function POST(request: Request) {
     // Process each email
     for (const email of emails) {
       try {
-        // Fetch prospect to get email address
-        const prospect = await prisma.b2bLead.findUnique({
-          where: { id: email.prospectId },
-          select: { id: true, email: true, businessName: true },
-        });
+        // Use email if provided in request, otherwise fetch from database
+        let recipientEmail = email.toEmail;
 
-        if (!prospect?.email) {
-          sent.push({ prospectId: email.prospectId, success: false, error: "No email address" });
-          continue;
+        if (!recipientEmail) {
+          // Fetch prospect to get email address
+          const prospect = await prisma.b2bLead.findUnique({
+            where: { id: email.prospectId },
+            select: { id: true, email: true, businessName: true },
+          });
+
+          if (!prospect?.email) {
+            sent.push({ prospectId: email.prospectId, success: false, error: "No email address" });
+            continue;
+          }
+
+          recipientEmail = prospect.email;
         }
 
         // Send email via Resend
         const result = await resend.emails.send({
           from: "Saint & Story <noreply@saintandstoryltd.co.uk>",
-          to: prospect.email,
+          to: recipientEmail,
           subject: email.subject,
           html: email.body,
           replyTo: "hello@saintandstoryltd.co.uk",

@@ -156,25 +156,31 @@ export default function EnrichPage() {
   const handleSendAll = async () => {
     setSending(true);
     try {
+      console.log("[ENRICH] Sending emails:", generatedEmails.length);
+
+      const emailsToSend = generatedEmails.map(email => ({
+        prospectId: email.prospectId,
+        subject: email.subject,
+        body: email.body,
+        toEmail: email.email,
+      }));
+
+      console.log("[ENRICH] Payload:", emailsToSend);
+
       const res = await fetch("/api/b2b/batch-emails/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          emails: generatedEmails.map(email => ({
-            prospectId: email.prospectId,
-            subject: email.subject,
-            body: email.body,
-            senderName: email.senderName || user?.firstName || "Team Member",
-          })),
-        }),
+        body: JSON.stringify({ emails: emailsToSend }),
       });
 
       if (!res.ok) {
         const error = await res.json();
+        console.error("[ENRICH] API error:", error);
         throw new Error(error.error || "Failed to send");
       }
 
       const data = await res.json();
+      console.log("[ENRICH] API response:", data);
 
       // Show sent emails
       const sentList = generatedEmails.map(email => ({
@@ -188,7 +194,7 @@ export default function EnrichPage() {
 
       setSentEmails(sentList);
       setActiveTab("sent");
-      alert(`✓ Sent ${data.sent} emails successfully`);
+      alert(`✓ Sent ${data.sent || sentList.length} emails successfully`);
     } catch (error) {
       console.error("Error sending:", error);
       alert(`Failed to send: ${error instanceof Error ? error.message : "Unknown error"}`);
@@ -296,11 +302,6 @@ export default function EnrichPage() {
                   <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
                     {currentEmail.body}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
-                    <p className="text-xs text-[#888888]">Signed by:</p>
-                    <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.senderName}</p>
-                  </div>
-                  <p className="text-xs text-[#888888] mt-3">{currentEmail.wordCount} words</p>
                 </div>
               </div>
             </div>
@@ -313,9 +314,12 @@ export default function EnrichPage() {
                   setEditSubject(currentEmail.subject);
                   setEditBody(currentEmail.body);
                 }}
-                className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
+                className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors flex items-center justify-center gap-2"
               >
-                ✏️ Edit & Personalize
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a2.25 2.25 0 112.828 2.828l-1.687 1.687m0 0a2.25 2.25 0 01-3.182 0m0 0l-6.364 6.364m0 0l1.414 1.414m0 0l6.364-6.364" />
+                </svg>
+                Edit & Personalize
               </button>
               <button
                 onClick={handleSendAll}
