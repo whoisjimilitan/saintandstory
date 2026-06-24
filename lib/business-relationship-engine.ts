@@ -21,6 +21,7 @@
  */
 
 import { generatePermissionLine, type IndustryType } from "./behavioral-pattern-map";
+import { predictInternalDialogue, type InternalDialogue } from "./internal-dialogue-predictor";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -112,7 +113,10 @@ export interface RelationshipReasoning {
     basedOnBehavioralPattern: string;
   };
 
-  // Step 8b: Email generation parameters
+  // Step 8b: Internal dialogue prediction (BEFORE email generation)
+  internalDialogue?: InternalDialogue;
+
+  // Step 8c: Email generation parameters
   communicationParams: {
     targetWordCount: number;
     tone: "conversational" | "professional" | "consultative";
@@ -612,6 +616,15 @@ export function generateRelationshipCommunication(
   // STEP 8a: Generate permission line (Stage 1 only)
   const permissionLine = generatePermissionLineForStage(currentStage, profile);
 
+  // STEP 8b: Predict internal dialogue BEFORE email generation
+  // This is the blueprint. Email merely manifests this dialogue.
+  const internalDialogue = predictInternalDialogue(
+    currentStage,
+    profile.industry,
+    profile.location,
+    permissionLine?.text
+  );
+
   // BUILD COMPLETE REASONING
   const reasoning: RelationshipReasoning = {
     businessAnalysis,
@@ -626,6 +639,7 @@ export function generateRelationshipCommunication(
     mentalSimulation,
     microCommitment,
     permissionLine,
+    internalDialogue,
     communicationParams: {
       targetWordCount: currentStage === 1 ? 60 : currentStage === 2 ? 75 : 50,
       tone: (currentStage <= 2 ? "conversational" : "professional") as "conversational" | "professional",
@@ -633,7 +647,7 @@ export function generateRelationshipCommunication(
     },
   };
 
-  // STEP 8: Only AFTER all reasoning, generate email
+  // STEP 8c: Only AFTER all reasoning AND dialogue prediction, generate email
   const email = generateCommunicationEmail(reasoning);
 
   // STAGE PROGRESSION LOGIC
