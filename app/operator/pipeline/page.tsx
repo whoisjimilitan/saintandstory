@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Prospect {
   id: string;
@@ -22,6 +23,7 @@ const stageColors = {
 };
 
 export default function PipelinePage() {
+  const router = useRouter();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -144,6 +146,28 @@ export default function PipelinePage() {
     return prospects.filter((p) => p.stage === stage);
   };
 
+  const handleBatchSend = (stage: string) => {
+    const stageProspects = getProspectsForStage(stage);
+    
+    if (stageProspects.length === 0) {
+      alert("No prospects in this stage to send emails to");
+      return;
+    }
+
+    // Store prospects in sessionStorage for enrich page to use
+    sessionStorage.setItem(
+      "batchProspects",
+      JSON.stringify(stageProspects.map(p => ({
+        id: p.id,
+        businessName: p.businessName,
+        email: `contact@${p.businessName.toLowerCase().replace(/\s+/g, '')}.com`, // Placeholder
+      })))
+    );
+
+    // Navigate to enrich page
+    router.push(`/operator/enrich?source=pipeline&stage=${stage}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center pt-32">
@@ -178,12 +202,23 @@ export default function PipelinePage() {
                   key={stage.key}
                   className={`flex flex-col border-l-4 ${colorClass} bg-white border-r border-b border-t border-[#E8E8E8] rounded-r-lg p-4 hover:shadow-sm transition-shadow`}
                 >
-                  {/* Stage Header */}
+                  {/* Stage Header with Send Button */}
                   <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
-                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
-                      {stage.label}
-                    </p>
-                    <p className="text-xl font-black text-[#0D0D0D] mt-1 leading-none">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+                        {stage.label}
+                      </p>
+                      {stageProspects.length > 0 && (
+                        <button
+                          onClick={() => handleBatchSend(stage.key)}
+                          className="text-[9px] font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-2 py-1 rounded hover:bg-[#F5F5F5] transition-colors whitespace-nowrap"
+                          title={`Send email to all ${stageProspects.length} prospects`}
+                        >
+                          Send
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xl font-black text-[#0D0D0D] leading-none">
                       {stageProspects.length}
                     </p>
                   </div>
