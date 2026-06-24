@@ -1,14 +1,40 @@
 import { NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Map admin emails to display names
+const ADMIN_MAP: Record<string, { name: string; email: string }> = {
+  "whoisjimi.today@gmail.com": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "james@saintandstoryltd.co.uk": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "oye@saintandstoryltd.co.uk": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+  "oyedeleoyepeju2014@gmail.com": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+};
 
 interface EmailToSend {
   prospectId: string;
   subject: string;
   body: string;
   toEmail?: string;
+}
+
+async function getSenderInfo(): Promise<{ name: string; email: string } | null> {
+  try {
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses[0]?.emailAddress ?? "";
+
+    if (userEmail && ADMIN_MAP[userEmail]) {
+      return ADMIN_MAP[userEmail];
+    }
+
+    // Fallback to default if admin not mapped
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+  } catch (error) {
+    console.error("[SENDER_INFO] Error getting current user:", error);
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+  }
 }
 
 export async function POST(request: Request) {
@@ -31,6 +57,15 @@ export async function POST(request: Request) {
 
     const sent: Array<{ prospectId: string; success: boolean; messageId?: string; error?: string }> = [];
 
+    // Get sender info (who's logged in)
+    const sender = await getSenderInfo();
+    if (!sender) {
+      return NextResponse.json(
+        { error: "Could not determine sender" },
+        { status: 401 }
+      );
+    }
+
     // Process each email
     for (const email of emails) {
       try {
@@ -52,12 +87,18 @@ export async function POST(request: Request) {
           recipientEmail = prospect.email;
         }
 
-        // Send email via Resend
+        // Append sender signature to email body if not already present
+        let emailBody = email.body;
+        if (!emailBody.includes(`From: ${sender.name}`) && !emailBody.includes(`- ${sender.name}`)) {
+          emailBody = `${email.body}\n\n---\n${sender.name}\nSaint & Story\n${sender.email}`;
+        }
+
+        // Send email via Resend - personalized by sender
         const result = await resend.emails.send({
-          from: "Saint & Story <noreply@saintandstoryltd.co.uk>",
+          from: `${sender.name} <${sender.email}>`,
           to: recipientEmail,
           subject: email.subject,
-          html: email.body,
+          html: emailBody,
           replyTo: "hello@saintandstoryltd.co.uk",
         });
 
@@ -86,11 +127,11 @@ export async function POST(request: Request) {
           data: {
             leadId: email.prospectId,
             subject: email.subject,
-            body: email.body,
+            body: emailBody,
             sentAt: now,
             resendMessageId: result.data?.id,
             emailType: "initial",
-            sent_by: "batch_email_enrich",
+            sent_by: sender.name.toLowerCase(), // "james" or "oye"
           },
         });
 
