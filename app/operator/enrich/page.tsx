@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 interface Prospect {
   id: string;
@@ -21,6 +22,9 @@ interface EnrichedEmail {
   subject: string;
   body: string;
   wordCount: number;
+  senderName?: string;
+  relationshipStage?: number;
+  reasoning?: any;
 }
 
 interface SentEmail {
@@ -37,6 +41,7 @@ type TabType = "draft" | "sent";
 export default function EnrichPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useUser();
 
   const mode = searchParams.get("mode") || "draft";
   const count = parseInt(searchParams.get("count") || "0");
@@ -91,7 +96,8 @@ export default function EnrichPage() {
       // Combine prospect data with generated emails
       const enriched = data.emails.map((email: any) => ({
         ...email,
-        email: prospectList.find(p => p.id === email.prospectId)?.email || ""
+        email: prospectList.find(p => p.id === email.prospectId)?.email || "",
+        senderName: user?.firstName || "Team Member"
       }));
 
       setGeneratedEmails(enriched);
@@ -115,6 +121,7 @@ export default function EnrichPage() {
             prospectId: email.prospectId,
             subject: email.subject,
             body: email.body,
+            senderName: email.senderName || user?.firstName || "Team Member",
           })),
         }),
       });
@@ -246,7 +253,11 @@ export default function EnrichPage() {
                   <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
                     {currentEmail.body}
                   </div>
-                  <p className="text-xs text-[#888888] mt-2">{currentEmail.wordCount} words</p>
+                  <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
+                    <p className="text-xs text-[#888888]">Signed by:</p>
+                    <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.senderName}</p>
+                  </div>
+                  <p className="text-xs text-[#888888] mt-3">{currentEmail.wordCount} words</p>
                 </div>
               </div>
             </div>
@@ -383,6 +394,7 @@ export default function EnrichPage() {
                           <p className="text-xs text-[#888888]">{prospect.businessName}</p>
                           <p className="text-xs font-semibold text-[#0D0D0D] mt-1">{subj}</p>
                           <p className="text-xs text-[#666666] mt-1 whitespace-pre-wrap">{body.substring(0, 100)}...</p>
+                          <p className="text-xs text-[#888888] mt-2 pt-2 border-t border-[#E8E8E8]">From: {user?.firstName || "Team Member"}</p>
                         </div>
                       );
                     })}
