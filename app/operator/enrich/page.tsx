@@ -73,7 +73,7 @@ export default function EnrichPage() {
       const res = await fetch("/api/b2b/batch-emails/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectIds: prospectList.map(p => p.id) }),
+        body: JSON.stringify({ prospects: prospectList }),
       });
 
       if (!res.ok) {

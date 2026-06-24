@@ -45,67 +45,65 @@ export async function POST(request: Request) {
       );
     }
 
-    const { prospectIds } = body;
+    const { prospects: prospectData, prospectIds } = body;
 
-    console.log("[RELATIONSHIP ENGINE] Received prospectIds:", prospectIds);
-
-    // Validate input
-    if (!prospectIds) {
-      console.error("[RELATIONSHIP ENGINE] prospectIds is missing");
-      return NextResponse.json(
-        { error: "prospectIds parameter is required", success: false, emails: [] },
-        { status: 400 }
-      );
-    }
-
-    if (!Array.isArray(prospectIds)) {
-      console.error("[RELATIONSHIP ENGINE] prospectIds is not an array, got:", typeof prospectIds);
-      return NextResponse.json(
-        { error: "prospectIds must be an array", success: false, emails: [] },
-        { status: 400 }
-      );
-    }
-
-    if (prospectIds.length === 0) {
-      console.error("[RELATIONSHIP ENGINE] prospectIds array is empty");
-      return NextResponse.json(
-        { error: "prospectIds array cannot be empty", success: false, emails: [] },
-        { status: 400 }
-      );
-    }
-
-    console.log("[RELATIONSHIP ENGINE] Looking for", prospectIds.length, "prospects in database...");
-
-    // Fetch prospects from database (with safety checks)
+    // Accept either full prospect data OR just IDs (for backwards compatibility)
     let prospects: any[] = [];
-    try {
-      prospects = await prisma.b2bLead.findMany({
-        where: {
-          id: { in: prospectIds },
-        },
-        select: {
-          id: true,
-          businessName: true,
-          city: true,
-          businessCategory: true,
-          email: true,
-          contactName: true,
-        },
-      });
-    } catch (dbErr) {
-      console.error("[RELATIONSHIP ENGINE] Database error fetching prospects:", dbErr);
+
+    // If prospect data is provided directly, use it
+    if (prospectData && Array.isArray(prospectData)) {
+      console.log("[RELATIONSHIP ENGINE] Received prospect data directly:", prospectData.length, "prospects");
+      prospects = prospectData;
+    }
+    // Otherwise try to fetch by IDs from database (legacy path)
+    else if (prospectIds && Array.isArray(prospectIds)) {
+      console.log("[RELATIONSHIP ENGINE] Received prospectIds, fetching from database:", prospectIds);
+
+      if (prospectIds.length === 0) {
+        console.error("[RELATIONSHIP ENGINE] prospectIds array is empty");
+        return NextResponse.json(
+          { error: "prospectIds array cannot be empty", success: false, emails: [] },
+          { status: 400 }
+        );
+      }
+
+      try {
+        prospects = await prisma.b2bLead.findMany({
+          where: {
+            id: { in: prospectIds },
+          },
+          select: {
+            id: true,
+            businessName: true,
+            city: true,
+            businessCategory: true,
+            email: true,
+            contactName: true,
+          },
+        });
+      } catch (dbErr) {
+        console.error("[RELATIONSHIP ENGINE] Database error fetching prospects:", dbErr);
+        return NextResponse.json(
+          { error: "Database error fetching prospects", success: false, emails: [] },
+          { status: 500 }
+        );
+      }
+
+      console.log("[RELATIONSHIP ENGINE] ✅ Found", prospects.length, "out of", prospectIds.length, "prospects");
+    }
+    // Neither provided
+    else {
+      console.error("[RELATIONSHIP ENGINE] Neither prospects nor prospectIds provided");
       return NextResponse.json(
-        { error: "Database error fetching prospects", success: false, emails: [] },
-        { status: 500 }
+        { error: "Either 'prospects' or 'prospectIds' parameter is required", success: false, emails: [] },
+        { status: 400 }
       );
     }
-
-    console.log("[RELATIONSHIP ENGINE] ✅ Found", prospects.length, "out of", prospectIds.length, "requested prospects");
 
     if (prospects.length === 0) {
-      console.error("[RELATIONSHIP ENGINE] No prospects found in database for IDs:", prospectIds);
+      console.error("[RELATIONSHIP ENGINE] No prospects available");
       return NextResponse.json(
-        { error: "No prospects found in database for the provided IDs", success: false, emails: [], failedIds: prospectIds },
+        { error: "No prospects found", success: false, emails: [], failedIds: prospectIds || [] },
         { status: 400 }
       );
     }
