@@ -97,16 +97,17 @@ function parseSearchResults(results: any[], params: any): Array<{
     const website = result.link || "";
     const snippet = result.snippet || "";
 
-    // Extract contact info from snippet
+    // Extract contact info from snippet (may be empty)
     const email = extractEmailFromText(snippet);
     const phone = extractPhoneFromText(snippet);
 
-    // Only include if we have name and at least one contact method
-    if (businessName && (email || phone)) {
+    // Include ALL results with business name
+    // Email/phone are optional - they may not be in snippet
+    if (businessName && website) {
       cleaned.push({
-        businessName: businessName.replace(" - ", "").substring(0, 100),
-        email,
-        phone,
+        businessName: businessName.replace(" - ", "").substring(0, 150),
+        email: email || undefined,
+        phone: phone || undefined,
         website,
         location: params.location,
         source: params.source,
