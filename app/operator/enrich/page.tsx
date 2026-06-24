@@ -50,6 +50,12 @@ export default function EnrichPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
 
+  // Email editing state
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editSubject, setEditSubject] = useState("");
+  const [editBody, setEditBody] = useState("");
+  const [templateMode, setTemplateMode] = useState<"master" | "batch" | null>(null);
+
   useEffect(() => {
     const prospectData = sessionStorage.getItem("enrich_prospects");
     if (!prospectData) {
@@ -248,6 +254,16 @@ export default function EnrichPage() {
             {/* Action Buttons */}
             <div className="flex gap-3">
               <button
+                onClick={() => {
+                  setEditingIndex(currentIndex);
+                  setEditSubject(currentEmail.subject);
+                  setEditBody(currentEmail.body);
+                }}
+                className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
+              >
+                ✏️ Edit & Personalize
+              </button>
+              <button
                 onClick={handleSendAll}
                 disabled={sending}
                 className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 transition-colors"
@@ -256,7 +272,7 @@ export default function EnrichPage() {
               </button>
               <button
                 onClick={() => router.back()}
-                className="flex-1 px-4 py-3 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
+                className="px-4 py-3 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
               >
                 Cancel
               </button>
@@ -307,6 +323,124 @@ export default function EnrichPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* EDITOR MODAL */}
+        {editingIndex !== null && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white border-b border-[#E8E8E8] p-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold text-[#0D0D0D]">Edit & Personalize Email</h2>
+                  <button
+                    onClick={() => setEditingIndex(null)}
+                    className="text-2xl text-[#888888] hover:text-[#0D0D0D]"
+                  >
+                    ×
+                  </button>
+                </div>
+                <p className="text-xs text-[#666666] mt-2">
+                  Hint: Type {'{{businessName}}'} in subject or message to personalize emails for each prospect
+                </p>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 space-y-6">
+                {/* Subject Editor */}
+                <div>
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase mb-2 block">Subject</label>
+                  <input
+                    type="text"
+                    value={editSubject}
+                    onChange={(e) => setEditSubject(e.target.value)}
+                    className="w-full px-4 py-2 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] rounded focus:outline-none focus:border-[#0D0D0D] transition-colors"
+                  />
+                </div>
+
+                {/* Body Editor */}
+                <div>
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase mb-2 block">Message</label>
+                  <textarea
+                    value={editBody}
+                    onChange={(e) => setEditBody(e.target.value)}
+                    rows={8}
+                    className="w-full px-4 py-3 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] font-mono rounded focus:outline-none focus:border-[#0D0D0D] transition-colors resize-none"
+                  />
+                  <p className="text-xs text-[#888888] mt-2">Use {'{{businessName}}'} to insert prospect business name</p>
+                </div>
+
+                {/* Preview with Substitutions */}
+                <div className="bg-[#F5F5F5] border-2 border-[#E8E8E8] rounded p-4 space-y-3">
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase">Preview (first 3 prospects)</p>
+                  <div className="space-y-2">
+                    {prospects.slice(0, 3).map((prospect, idx) => {
+                      const subj = editSubject.replace(/{{businessName}}/g, prospect.businessName);
+                      const body = editBody.replace(/{{businessName}}/g, prospect.businessName);
+                      return (
+                        <div key={idx} className="bg-white border border-[#E8E8E8] rounded p-3">
+                          <p className="text-xs text-[#888888]">{prospect.businessName}</p>
+                          <p className="text-xs font-semibold text-[#0D0D0D] mt-1">{subj}</p>
+                          <p className="text-xs text-[#666666] mt-1 whitespace-pre-wrap">{body.substring(0, 100)}...</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Variable Guide */}
+                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-3">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-2">Available Variables:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <p className="text-xs text-[#666666]">{'{{businessName}}'} = Business name</p>
+                    <p className="text-xs text-[#666666]">Example: "Hi {'{{businessName}}'}  "</p>
+                  </div>
+                </div>
+
+                {/* Save Options */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      // Save to this email only
+                      const updated = [...generatedEmails];
+                      updated[editingIndex] = {
+                        ...updated[editingIndex],
+                        subject: editSubject,
+                        body: editBody,
+                      };
+                      setGeneratedEmails(updated);
+                      setEditingIndex(null);
+                      alert("✓ Email updated for this batch");
+                    }}
+                    className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
+                  >
+                    ✓ Save for This Batch
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Save as master template
+                      const updated = [...generatedEmails];
+                      updated[editingIndex] = {
+                        ...updated[editingIndex],
+                        subject: editSubject,
+                        body: editBody,
+                      };
+                      setGeneratedEmails(updated);
+                      setEditingIndex(null);
+                      sessionStorage.setItem("masterTemplate", JSON.stringify({
+                        subject: editSubject,
+                        body: editBody
+                      }));
+                      alert("✓ Saved as master template for future use");
+                    }}
+                    className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
+                  >
+                    💾 Save as Master Template
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
