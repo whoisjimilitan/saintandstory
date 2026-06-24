@@ -141,15 +141,32 @@ export default function ResponsesPage() {
             <p className="text-3xl font-black text-[#0D0D0D]">{awaitingCount}</p>
           </div>
           <div className="border border-green-200 rounded-lg p-4 bg-green-50">
-            <p className="text-xs text-green-700 uppercase font-semibold mb-1">Yes ✅</p>
+            <div className="flex items-center gap-2 mb-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-700">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <p className="text-xs text-green-700 uppercase font-semibold">Yes</p>
+            </div>
             <p className="text-3xl font-black text-green-700">{yesCount}</p>
           </div>
           <div className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
-            <p className="text-xs text-yellow-700 uppercase font-semibold mb-1">Maybe ⏳</p>
+            <div className="flex items-center gap-2 mb-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-700">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4M12 8h.01"></path>
+              </svg>
+              <p className="text-xs text-yellow-700 uppercase font-semibold">Maybe</p>
+            </div>
             <p className="text-3xl font-black text-yellow-700">{maybeCount}</p>
           </div>
           <div className="border border-red-200 rounded-lg p-4 bg-red-50">
-            <p className="text-xs text-red-700 uppercase font-semibold mb-1">No ❌</p>
+            <div className="flex items-center gap-2 mb-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-700">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <p className="text-xs text-red-700 uppercase font-semibold">No</p>
+            </div>
             <p className="text-3xl font-black text-red-700">{noCount}</p>
           </div>
         </div>
@@ -168,33 +185,44 @@ export default function ResponsesPage() {
           </button>
           <button
             onClick={() => setFilter("YES")}
-            className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-semibold rounded transition-colors flex items-center gap-2 ${
               filter === "YES"
                 ? "bg-green-600 text-white"
                 : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
             }`}
           >
-            ✅ Yes ({yesCount})
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Yes ({yesCount})
           </button>
           <button
             onClick={() => setFilter("MAYBE")}
-            className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-semibold rounded transition-colors flex items-center gap-2 ${
               filter === "MAYBE"
                 ? "bg-yellow-600 text-white"
                 : "bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200"
             }`}
           >
-            ⏳ Maybe ({maybeCount})
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4M12 8h.01"></path>
+            </svg>
+            Maybe ({maybeCount})
           </button>
           <button
             onClick={() => setFilter("NO")}
-            className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+            className={`px-4 py-2 text-xs font-semibold rounded transition-colors flex items-center gap-2 ${
               filter === "NO"
                 ? "bg-red-600 text-white"
                 : "bg-red-50 text-red-700 hover:bg-red-100 border border-red-200"
             }`}
           >
-            ❌ No ({noCount})
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            No ({noCount})
           </button>
           <button
             onClick={() => setFilter("all")}
@@ -258,16 +286,42 @@ export default function ResponsesPage() {
                       {response.replied ? (
                         <div>
                           <div className="flex gap-2 justify-end items-center mb-1">
-                            <span className="text-xs font-bold text-[#0D0D0D]">✓ Replied</span>
+                            <div className="flex items-center gap-1">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-[#0D0D0D]">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                              <span className="text-xs font-bold text-[#0D0D0D]">Replied</span>
+                            </div>
                             {response.responseType && (
-                              <span className={`px-3 py-1 rounded text-xs font-bold ${
+                              <span className={`px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 ${
                                 response.responseType === "YES" ? "bg-green-600 text-white" :
                                 response.responseType === "MAYBE" ? "bg-yellow-600 text-white" :
                                 "bg-red-600 text-white"
                               }`}>
-                                {response.responseType === "YES" ? "✅ YES" :
-                                 response.responseType === "MAYBE" ? "⏳ MAYBE" :
-                                 "❌ NO"}
+                                {response.responseType === "YES" ? (
+                                  <>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    YES
+                                  </>
+                                ) : response.responseType === "MAYBE" ? (
+                                  <>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <circle cx="12" cy="12" r="10"></circle>
+                                      <path d="M12 16v-4M12 8h.01"></path>
+                                    </svg>
+                                    MAYBE
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    NO
+                                  </>
+                                )}
                               </span>
                             )}
                           </div>
