@@ -26,20 +26,58 @@ export default function PipelinePage() {
         stageUpdatedAt: "2 hours ago",
       },
       {
+        id: "1b",
+        businessName: "Prime Services",
+        location: "Manchester",
+        stage: "discover",
+        stageUpdatedAt: "1 day ago",
+      },
+      {
+        id: "1c",
+        businessName: "Metro FM",
+        location: "Birmingham",
+        stage: "discover",
+        stageUpdatedAt: "3 hours ago",
+      },
+      {
         id: "2",
         businessName: "Beta Services",
         location: "Manchester",
         stage: "qualify",
         stageUpdatedAt: "1 day ago",
-        nextAction: "Review and qualify",
+        nextAction: "Review",
+      },
+      {
+        id: "2b",
+        businessName: "Capital FM",
+        location: "London",
+        stage: "qualify",
+        stageUpdatedAt: "Yesterday",
+        nextAction: "Review",
+      },
+      {
+        id: "2c",
+        businessName: "Nexus Group",
+        location: "Bristol",
+        stage: "qualify",
+        stageUpdatedAt: "2 days ago",
+        nextAction: "Review",
       },
       {
         id: "3",
-        businessName: "Capital FM",
+        businessName: "John's Movers",
         location: "London",
         stage: "enrich",
         stageUpdatedAt: "Yesterday",
-        nextAction: "Draft email",
+        nextAction: "Email",
+      },
+      {
+        id: "3b",
+        businessName: "Sarah M Group",
+        location: "Edinburgh",
+        stage: "enrich",
+        stageUpdatedAt: "6 hours ago",
+        nextAction: "Email",
       },
       {
         id: "4",
@@ -47,7 +85,23 @@ export default function PipelinePage() {
         location: "Birmingham",
         stage: "sent",
         stageUpdatedAt: "6 hours ago",
-        nextAction: "Monitor for replies",
+        nextAction: "Monitor",
+      },
+      {
+        id: "4b",
+        businessName: "New FM",
+        location: "Leeds",
+        stage: "sent",
+        stageUpdatedAt: "2 days ago",
+        nextAction: "Monitor",
+      },
+      {
+        id: "4c",
+        businessName: "Metro Services",
+        location: "Bristol",
+        stage: "sent",
+        stageUpdatedAt: "3 hours ago",
+        nextAction: "Monitor",
       },
       {
         id: "5",
@@ -55,7 +109,22 @@ export default function PipelinePage() {
         location: "Bristol",
         stage: "replied",
         stageUpdatedAt: "2 hours ago",
-        nextAction: "Follow up with proposal",
+        nextAction: "Follow up",
+      },
+      {
+        id: "5b",
+        businessName: "ABC Corp",
+        location: "London",
+        stage: "replied",
+        stageUpdatedAt: "1 day ago",
+        nextAction: "Follow up",
+      },
+      {
+        id: "6",
+        businessName: "XYZ Inc",
+        location: "Manchester",
+        stage: "converted",
+        stageUpdatedAt: "Yesterday",
       },
     ];
 
@@ -69,7 +138,7 @@ export default function PipelinePage() {
     { key: "enrich", label: "Emailed" },
     { key: "sent", label: "Sent" },
     { key: "replied", label: "Replied" },
-    { key: "converted", label: "Converted" },
+    { key: "converted", label: "Won" },
   ];
 
   const getProspectsForStage = (stage: string) => {
@@ -88,9 +157,9 @@ export default function PipelinePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32">
-      <div className="px-4 md:px-12 py-12">
-        {/* Header - Premium styling matching other dashboard pages */}
+    <div className="min-h-screen bg-white pt-32 pb-12">
+      <div className="px-6 md:px-12">
+        {/* Premium Header - Matches Today Page */}
         <div className="mb-16">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
             Pipeline Board
@@ -100,62 +169,85 @@ export default function PipelinePage() {
           </p>
         </div>
 
-        {/* Kanban Board - Vertical Stack (No Horizontal Scroll) */}
-        <div className="space-y-8">
-          {stages.map((stage) => {
-            const stageProspects = getProspectsForStage(stage.key);
-            return (
-              <div key={stage.key} className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-                {/* Stage Header */}
-                <div className="mb-6 pb-4 border-b border-[#E8E8E8]">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-                    {stage.label}
-                  </p>
-                  <p className="text-3xl font-black text-[#0D0D0D] mt-2">
-                    {stageProspects.length}
-                  </p>
-                  <p className="text-xs text-[#888888] mt-1">
-                    {stageProspects.length === 1 ? "prospect" : "prospects"}
-                  </p>
-                </div>
+        {/* Compact One-Screen Board - No Scroll */}
+        <div className="w-full">
+          <div className="grid grid-cols-6 gap-3">
+            {stages.map((stage) => {
+              const stageProspects = getProspectsForStage(stage.key);
+              const topProspects = stageProspects.slice(0, 2);
 
-                {/* Prospects Grid */}
-                {stageProspects.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-xs text-[#AAAAAA]">No prospects at this stage</p>
+              return (
+                <div key={stage.key} className="flex flex-col">
+                  {/* Stage Header - Premium Typography */}
+                  <div className="mb-4 pb-3 border-b-2 border-[#E8E8E8]">
+                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] leading-tight">
+                      {stage.label}
+                    </p>
+                    <p className="text-2xl font-black text-[#0D0D0D] mt-2 leading-none">
+                      {stageProspects.length}
+                    </p>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {stageProspects.map((prospect) => (
-                      <Link
-                        key={prospect.id}
-                        href={`/operator/understand?id=${prospect.id}`}
-                      >
-                        <div className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer">
-                          <p className="text-sm font-semibold text-[#0D0D0D] truncate">
-                            {prospect.businessName}
-                          </p>
-                          <p className="text-xs text-[#888888] mt-1">
-                            {prospect.location}
-                          </p>
-                          <p className="text-[10px] text-[#AAAAAA] mt-2">
-                            {prospect.stageUpdatedAt}
-                          </p>
-                          {prospect.nextAction && (
-                            <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
-                              <p className="text-xs font-semibold text-[#0D0D0D]">
-                                {prospect.nextAction}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </Link>
-                    ))}
+
+                  {/* Prospect Cards - Compact, Premium */}
+                  <div className="space-y-2 flex-1">
+                    {topProspects.length === 0 ? (
+                      <div className="text-center py-4">
+                        <p className="text-[11px] text-[#CCCCCC] font-medium">
+                          —
+                        </p>
+                      </div>
+                    ) : (
+                      topProspects.map((prospect) => (
+                        <Link
+                          key={prospect.id}
+                          href={`/operator/understand?id=${prospect.id}`}
+                        >
+                          <div className="p-2.5 bg-white border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer group">
+                            <p className="text-xs font-semibold text-[#0D0D0D] truncate group-hover:text-[#0D0D0D] line-clamp-1">
+                              {prospect.businessName}
+                            </p>
+                            <p className="text-[10px] text-[#999999] mt-0.5 truncate">
+                              {prospect.location}
+                            </p>
+                            <p className="text-[9px] text-[#CCCCCC] mt-1">
+                              {prospect.stageUpdatedAt}
+                            </p>
+                          </div>
+                        </Link>
+                      ))
+                    )}
+
+                    {/* Show +N if more than 2 */}
+                    {stageProspects.length > 2 && (
+                      <div className="pt-1 mt-1 border-t border-[#E8E8E8]">
+                        <button
+                          onClick={() => {
+                            // Could open modal or navigate with stage filter
+                            window.location.href = `/operator/understand?stage=${stage.key}`;
+                          }}
+                          className="text-[10px] font-semibold text-[#0D0D0D] hover:text-[#0D0D0D] underline"
+                        >
+                          +{stageProspects.length - 2} more
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Legend / Guidance - Premium & Minimal */}
+        <div className="mt-12 pt-8 border-t border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-4">
+            How to use
+          </p>
+          <ul className="space-y-2 text-xs text-[#666666]">
+            <li>• <span className="font-semibold text-[#0D0D0D]">Click any prospect</span> to review or take action</li>
+            <li>• <span className="font-semibold text-[#0D0D0D]">Click +N more</span> to see all prospects in a stage</li>
+            <li>• <span className="font-semibold text-[#0D0D0D]">Watch the flow</span> — prospects move left to right as they progress</li>
+          </ul>
         </div>
       </div>
     </div>
