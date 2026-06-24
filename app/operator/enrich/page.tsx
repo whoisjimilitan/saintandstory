@@ -45,6 +45,7 @@ export default function EnrichPage() {
 
   const mode = searchParams.get("mode") || "draft";
   const count = parseInt(searchParams.get("count") || "0");
+  const batchId = searchParams.get("batch_id");
 
   const [activeTab, setActiveTab] = useState<TabType>("draft");
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -62,6 +63,13 @@ export default function EnrichPage() {
   const [templateMode, setTemplateMode] = useState<"master" | "batch" | null>(null);
 
   useEffect(() => {
+    // Batch mode: load from autonomous queue
+    if (batchId) {
+      loadBatchProspects(batchId);
+      return;
+    }
+
+    // Traditional mode: load from sessionStorage
     const prospectData = sessionStorage.getItem("enrich_prospects");
     if (!prospectData) {
       router.push("/operator/discover");
@@ -77,7 +85,25 @@ export default function EnrichPage() {
       console.error("Error parsing prospects:", error);
       router.push("/operator/discover");
     }
-  }, [router]);
+  }, [router, batchId]);
+
+  const loadBatchProspects = async (batchId: string) => {
+    try {
+      const res = await fetch(`/api/b2b/orchestration/batch?batch_id=${batchId}`);
+      if (!res.ok) throw new Error("Failed to load batch");
+
+      const data = await res.json();
+      const prospects = data.prospects as Prospect[];
+
+      setProspects(prospects);
+      generateEmails(prospects);
+    } catch (error) {
+      console.error("Error loading batch:", error);
+      router.push("/operator/queue");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generateEmails = async (prospectList: Prospect[]) => {
     try {

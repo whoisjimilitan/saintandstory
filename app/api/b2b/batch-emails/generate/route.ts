@@ -45,9 +45,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { prospects: prospectData, prospectIds } = body;
+    const { prospects: prospectData, prospectIds, batchId } = body;
 
-    // Accept either full prospect data OR just IDs (for backwards compatibility)
+    // Accept: full prospect data OR prospectIds (legacy) OR batchId (autonomous queue)
     let prospects: any[] = [];
 
     // If prospect data is provided directly, use it
@@ -55,9 +55,38 @@ export async function POST(request: Request) {
       console.log("[RELATIONSHIP ENGINE] Received prospect data directly:", prospectData.length, "prospects");
       prospects = prospectData;
     }
-    // Otherwise try to fetch by IDs from database (legacy path)
+    // Batch mode: fetch from autonomous batch
+    else if (batchId && typeof batchId === "string") {
+      console.log("[RELATIONSHIP ENGINE] Batch mode: fetching from batch", batchId);
+
+      try {
+        prospects = await prisma.b2bLead.findMany({
+          where: {
+            batch_id: batchId,
+            overnight_discovered: true,
+          },
+          select: {
+            id: true,
+            businessName: true,
+            city: true,
+            businessCategory: true,
+            email: true,
+            contactName: true,
+          },
+        });
+      } catch (dbErr) {
+        console.error("[RELATIONSHIP ENGINE] Database error fetching batch:", dbErr);
+        return NextResponse.json(
+          { error: "Database error fetching batch", success: false, emails: [] },
+          { status: 500 }
+        );
+      }
+
+      console.log("[RELATIONSHIP ENGINE] ✅ Loaded", prospects.length, "prospects from batch", batchId);
+    }
+    // Legacy mode: fetch by prospectIds
     else if (prospectIds && Array.isArray(prospectIds)) {
-      console.log("[RELATIONSHIP ENGINE] Received prospectIds, fetching from database:", prospectIds);
+      console.log("[RELATIONSHIP ENGINE] Legacy mode: fetching by IDs");
 
       if (prospectIds.length === 0) {
         console.error("[RELATIONSHIP ENGINE] prospectIds array is empty");
@@ -91,11 +120,11 @@ export async function POST(request: Request) {
 
       console.log("[RELATIONSHIP ENGINE] ✅ Found", prospects.length, "out of", prospectIds.length, "prospects");
     }
-    // Neither provided
+    // No valid input
     else {
-      console.error("[RELATIONSHIP ENGINE] Neither prospects nor prospectIds provided");
+      console.error("[RELATIONSHIP ENGINE] No valid input: prospects, prospectIds, or batchId required");
       return NextResponse.json(
-        { error: "Either 'prospects' or 'prospectIds' parameter is required", success: false, emails: [] },
+        { error: "Either 'prospects', 'prospectIds', or 'batchId' parameter is required", success: false, emails: [] },
         { status: 400 }
       );
     }

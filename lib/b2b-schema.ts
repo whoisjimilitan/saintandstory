@@ -72,6 +72,32 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS response_type TEXT
   `;
 
+  // Autonomous morning queue columns (additive only)
+  await sql`
+    ALTER TABLE discovery_config ADD COLUMN IF NOT EXISTS auto_approve BOOLEAN DEFAULT false
+  `;
+  await sql`
+    ALTER TABLE discovery_config ADD COLUMN IF NOT EXISTS target_count INTEGER DEFAULT 100
+  `;
+  await sql`
+    ALTER TABLE discovery_config ADD COLUMN IF NOT EXISTS target_stage TEXT DEFAULT 'qualified'
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS batch_id UUID
+  `;
+  await sql`
+    ALTER TABLE b2b_leads ADD COLUMN IF NOT EXISTS overnight_discovered BOOLEAN DEFAULT false
+  `;
+  await sql`
+    ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS batch_id UUID
+  `;
+  await sql`
+    ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS batch_approved_at TIMESTAMPTZ
+  `;
+  await sql`
+    ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS batch_approved_by TEXT
+  `;
+
   await sql`
     CREATE TABLE IF NOT EXISTS b2b_standing_orders (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
