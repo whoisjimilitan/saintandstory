@@ -42,8 +42,14 @@ export async function ensureB2BSchema() {
       replied_at TIMESTAMPTZ,
       email_type TEXT DEFAULT 'initial',
       resend_message_id TEXT,
+      reasoning_metadata JSONB DEFAULT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
+  `;
+
+  // Add reasoning_metadata column if it doesn't exist (for revenue traceability)
+  await sql`
+    ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS reasoning_metadata JSONB DEFAULT NULL
   `;
 
   await sql`
