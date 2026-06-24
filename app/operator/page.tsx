@@ -323,17 +323,17 @@ export default function OperatorBriefing() {
                   {(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/pipeline?stage=discover")}
+                        onClick={() => router.push("/operator/pipeline")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • {state.data?.metrics.actionItemsBreakdown?.readyToQualify} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) !== 1 ? 's' : ''} ready to qualify
+                        • {state.data?.metrics.actionItemsBreakdown?.readyToQualify} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) !== 1 ? 's' : ''} ready to review
                       </button>
                     </li>
                   )}
                   {(state.data?.metrics.actionItemsBreakdown?.readyToEmail ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/pipeline?stage=qualify")}
+                        onClick={() => router.push("/operator/pipeline")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
                         • {state.data?.metrics.actionItemsBreakdown?.readyToEmail} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToEmail ?? 0) !== 1 ? 's' : ''} ready to email
@@ -343,7 +343,7 @@ export default function OperatorBriefing() {
                   {(state.data?.metrics.actionItemsBreakdown?.awaitingReply ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/pipeline?stage=propose")}
+                        onClick={() => router.push("/operator/pipeline")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
                         • {state.data?.metrics.actionItemsBreakdown?.awaitingReply} prospect{(state.data?.metrics.actionItemsBreakdown?.awaitingReply ?? 0) !== 1 ? 's' : ''} awaiting reply
@@ -353,7 +353,7 @@ export default function OperatorBriefing() {
                   {(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/pipeline?stage=propose&action=close")}
+                        onClick={() => router.push("/operator/pipeline")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
                         • {state.data?.metrics.actionItemsBreakdown?.readyToClose} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) !== 1 ? 's' : ''} ready to close
