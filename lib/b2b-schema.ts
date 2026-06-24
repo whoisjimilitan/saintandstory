@@ -52,6 +52,26 @@ export async function ensureB2BSchema() {
     ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS reasoning_metadata JSONB DEFAULT NULL
   `;
 
+  // Response tracking table (stores YES/MAYBE/NO replies)
+  await sql`
+    CREATE TABLE IF NOT EXISTS b2b_responses (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      outreach_id UUID REFERENCES b2b_outreach(id) ON DELETE CASCADE,
+      lead_id UUID REFERENCES b2b_leads(id) ON DELETE CASCADE,
+      response_type TEXT CHECK (response_type IN ('YES', 'MAYBE', 'NO')),
+      response_body TEXT,
+      response_summary TEXT,
+      responded_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Add response_type column to b2b_outreach if missing
+  await sql`
+    ALTER TABLE b2b_outreach ADD COLUMN IF NOT EXISTS response_type TEXT
+  `;
+
   await sql`
     CREATE TABLE IF NOT EXISTS b2b_standing_orders (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
