@@ -203,16 +203,16 @@ export default async function AdminPage() {
         </div>
 
         {/* Date Header - Subtle Context */}
-        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-6">
+        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-8">
           Today, {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
 
         {/* Hero Section - Premium Bold Aesthetic */}
-        <div className="mb-16">
-          <h1 className="text-5xl md:text-6xl font-black text-[#0D0D0D] leading-tight mb-3 tracking-tight">
-            Fleet Dashboard
+        <div className="mb-20">
+          <h1 className="text-6xl md:text-7xl font-black text-[#0D0D0D] leading-none mb-6 tracking-tight">
+            Fleet<br />Dashboard
           </h1>
-          <p className="text-sm text-[#888888]">
+          <p className="text-base text-[#888888] max-w-md">
             Live job dispatch and driver status
           </p>
         </div>
@@ -221,13 +221,13 @@ export default async function AdminPage() {
       {/* Content Section */}
       <div className="px-4 md:px-12 pb-12">
 
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex items-center justify-between mb-8 overflow-x-auto">
+          <div className="flex gap-2 flex-nowrap">
             {statLinks.map((s) => (
               <a
                 key={s.href}
                 href={s.href}
-                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold ${
+                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold flex-shrink-0 ${
                   s.bold
                     ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
                     : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
