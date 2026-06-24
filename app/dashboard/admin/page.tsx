@@ -205,9 +205,6 @@ export default async function AdminPage() {
                 <Link href="/operator" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
                   Ops →
                 </Link>
-                <a href="#section-completed" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
-                  Bing →
-                </a>
                 <Link href="/sign-in" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
                   Logout
                 </Link>
@@ -235,25 +232,42 @@ export default async function AdminPage() {
       {/* Content Section */}
       <div className="px-4 md:px-8 lg:px-12 pb-8 md:pb-10 lg:pb-12">
 
-        <div className="flex items-center justify-between mb-8 md:mb-10 overflow-x-auto">
-          <div className="flex gap-2 flex-nowrap">
-            {statLinks
-              .filter((s) => !s.label.includes("earned")) // Hide revenue pill on all screens (it's in hamburger on mobile, desktop can see it in dropdown)
-              .map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold flex-shrink-0 ${
-                  s.bold
-                    ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
-                    : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
-                }`}
-              >
-                {s.label}
-              </a>
-            ))}
+        <div className="mb-8 md:mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex gap-2 flex-nowrap overflow-x-auto">
+              {statLinks
+                .filter((s) => !s.label.includes("earned"))
+                .map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold flex-shrink-0 ${
+                    s.bold
+                      ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
+                      : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
+                  }`}
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
+            <IndexNowButton />
           </div>
-          <IndexNowButton />
+
+          {/* BING Link - Separate Row */}
+          <div className="flex justify-end">
+            {statLinks
+              .filter((s) => s.label.includes("earned"))
+              .map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  className="text-xs font-semibold text-[#0D0D0D] hover:underline"
+                >
+                  {s.label.replace("£", "").replace(" earned", "")} →
+                </a>
+              ))}
+          </div>
         </div>
 
         <AdminPanel
