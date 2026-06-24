@@ -183,58 +183,67 @@ export default async function AdminPage() {
   ].filter(Boolean) as { label: string; href: string; bold: boolean }[];
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-white">
       <AdminAutoRefresh pendingCount={pendingJobs.length} />
       <AdminPushSubscribe />
       <AdminLocationUpdater />
-      <div className="flex items-start justify-between mb-12">
-        <div></div>
-        <div className="flex flex-col gap-2 items-end">
-          <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
-            Ops →
-          </Link>
-          <Link href="/sign-in" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D]">
-            Logout
-          </Link>
+
+      {/* Premium Header Section */}
+      <div className="px-4 md:px-12 pt-24 pb-12">
+        <div className="flex items-start justify-between mb-12">
+          <div></div>
+          <div className="flex flex-col gap-2 items-end">
+            <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
+              Ops →
+            </Link>
+            <Link href="/sign-in" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D]">
+              Logout
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Section - Premium Styling */}
+        <div className="mb-12">
+          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+            Fleet Dashboard
+          </p>
+          <p className="text-sm text-[#888888] mt-2">
+            Live job dispatch and driver status
+          </p>
         </div>
       </div>
 
-      <div className="mb-12">
-        <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
-          Fleet Dashboard
-        </p>
-        <p className="text-sm text-[#888888] mt-2">
-          Live job dispatch and driver status
-        </p>
-      </div>
+      {/* Content Section */}
+      <div className="px-4 md:px-12 pb-12">
 
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-wrap gap-2">
-          {statLinks.map((s) => (
-            <a
-              key={s.href}
-              href={s.href}
-              className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold ${
-                s.bold
-                  ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
-                  : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
-              }`}
-            >
-              {s.label}
-            </a>
-          ))}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-wrap gap-2">
+            {statLinks.map((s) => (
+              <a
+                key={s.href}
+                href={s.href}
+                className={`inline-flex items-center px-3 py-1.5 rounded-full border transition-all text-xs font-semibold ${
+                  s.bold
+                    ? "bg-[#0D0D0D] text-white border-[#0D0D0D] hover:bg-[#333333] hover:border-[#333333]"
+                    : "bg-[#F5F5F5] text-[#666666] border-[#E8E8E8] hover:bg-white hover:border-[#D0D0D0] hover:text-[#0D0D0D]"
+                }`}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
+          <IndexNowButton />
         </div>
-        <IndexNowButton />
-      </div>
 
-      <AdminPanel
-        pendingJobs={pendingJobs}
-        offeredJobs={offeredJobs}
-        confirmedJobs={confirmedJobs}
-        inProgressJobs={inProgressJobs}
-        drivers={drivers}
-        completedJobs={completedJobs}
-      />
+        <AdminPanel
+          pendingJobs={pendingJobs}
+          offeredJobs={offeredJobs}
+          confirmedJobs={confirmedJobs}
+          inProgressJobs={inProgressJobs}
+          drivers={drivers}
+          completedJobs={completedJobs}
+        />
+      </div>
     </div>
   );
 }
