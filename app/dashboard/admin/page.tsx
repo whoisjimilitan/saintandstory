@@ -190,7 +190,7 @@ export default async function AdminPage() {
 
       {/* Premium Header Section */}
       <div className="px-4 md:px-12 pt-24 pb-12">
-        <div className="flex items-start justify-between mb-12">
+        <div className="flex items-start justify-between mb-16">
           <div></div>
           <div className="flex flex-col gap-2 items-end">
             <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
@@ -202,12 +202,17 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* Hero Section - Premium Styling */}
-        <div className="mb-12">
-          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+        {/* Date Header - Subtle Context */}
+        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-6">
+          Today, {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+
+        {/* Hero Section - Premium Bold Aesthetic */}
+        <div className="mb-16">
+          <h1 className="text-5xl md:text-6xl font-black text-[#0D0D0D] leading-tight mb-3 tracking-tight">
             Fleet Dashboard
-          </p>
-          <p className="text-sm text-[#888888] mt-2">
+          </h1>
+          <p className="text-sm text-[#888888]">
             Live job dispatch and driver status
           </p>
         </div>
