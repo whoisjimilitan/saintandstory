@@ -303,33 +303,43 @@ export default function OperatorBriefing() {
                   Action Items
                 </p>
                 <ul className="space-y-2 text-xs text-[#666666]">
-                  {tempBreakdown.ultraHot > 0 && (
+                  {(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/responses")}
+                        onClick={() => router.push("/operator/discover")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • {tempBreakdown.ultraHot} prospect{tempBreakdown.ultraHot !== 1 ? 's' : ''} awaiting response follow-up
+                        • {state.data?.metrics.actionItemsBreakdown?.readyToQualify} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) !== 1 ? 's' : ''} ready to qualify
                       </button>
                     </li>
                   )}
-                  {tempBreakdown.hot > 0 && (
+                  {(state.data?.metrics.actionItemsBreakdown?.readyToEmail ?? 0) > 0 && (
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/enrich")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • {state.data?.metrics.actionItemsBreakdown?.readyToEmail} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToEmail ?? 0) !== 1 ? 's' : ''} ready to email
+                      </button>
+                    </li>
+                  )}
+                  {(state.data?.metrics.actionItemsBreakdown?.awaitingReply ?? 0) > 0 && (
                     <li>
                       <button
                         onClick={() => router.push("/operator/responses?filter=awaiting")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • {tempBreakdown.hot} prospect{tempBreakdown.hot !== 1 ? 's' : ''} sent emails, monitor responses
+                        • {state.data?.metrics.actionItemsBreakdown?.awaitingReply} prospect{(state.data?.metrics.actionItemsBreakdown?.awaitingReply ?? 0) !== 1 ? 's' : ''} awaiting reply
                       </button>
                     </li>
                   )}
-                  {metrics.highConfidenceToday > 0 && (
+                  {(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/understand")}
+                        onClick={() => router.push("/operator/orders")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • {metrics.highConfidenceToday} high-confidence prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review
+                        • {state.data?.metrics.actionItemsBreakdown?.readyToClose} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) !== 1 ? 's' : ''} ready to close
                       </button>
                     </li>
                   )}
@@ -404,13 +414,13 @@ export default function OperatorBriefing() {
           {/* Title and Counts */}
           <div className="mb-6">
             <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
-              Discovery Pipeline
+              Prospects Needing Attention
             </p>
             <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-2">
-              {metrics.highConfidenceToday}
+              {metrics.prospectNeedingAttention}
             </p>
             <p className="text-sm text-[#666666] mb-4">
-              prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review
+              prospect{metrics.prospectNeedingAttention !== 1 ? 's' : ''} requiring action today
             </p>
 
             {/* Show which prospects these are */}

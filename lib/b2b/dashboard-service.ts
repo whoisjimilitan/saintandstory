@@ -37,13 +37,21 @@ export interface ActiveProspect {
   action: string;
 }
 
+export interface ActionItemsBreakdown {
+  readyToQualify: number;
+  readyToEmail: number;
+  awaitingReply: number;
+  readyToClose: number;
+}
+
 export interface MorningBriefMetrics {
   newOpportunitiesToday: number;
-  highConfidenceToday: number;
+  prospectNeedingAttention: number;
   finishedToday: number;
   closedToday: number;
   temperatureBreakdown?: TemperatureBreakdown;
   activeProspects?: ActiveProspect[];
+  actionItemsBreakdown?: ActionItemsBreakdown;
 }
 
 export interface PipelineBreakdown {
@@ -158,27 +166,35 @@ export class DashboardService {
 
     const [
       newOpportunitiesToday,
-      highConfidenceToday,
       finishedToday,
       closedToday,
       temperatureBreakdown,
       activeProspects,
+      actionItemsBreakdown,
     ] = await Promise.all([
       this.opportunityService.countDiscoveredToday(today),
-      this.opportunityService.countHighConfidenceToday(today),
       this.ordersService.countFinishedToday(today),
       this.ordersService.countClosedToday(today),
       this.getTemperatureBreakdown(),
       this.getActiveProspects(),
+      this.getActionItemsBreakdown(),
     ]);
+
+    // prospectNeedingAttention = sum of all action items
+    const prospectNeedingAttention =
+      (actionItemsBreakdown.readyToQualify || 0) +
+      (actionItemsBreakdown.readyToEmail || 0) +
+      (actionItemsBreakdown.awaitingReply || 0) +
+      (actionItemsBreakdown.readyToClose || 0);
 
     return {
       newOpportunitiesToday,
-      highConfidenceToday,
+      prospectNeedingAttention,
       finishedToday,
       closedToday,
       temperatureBreakdown,
       activeProspects,
+      actionItemsBreakdown,
     };
   }
 
@@ -263,6 +279,60 @@ export class DashboardService {
     } catch (error) {
       console.error("[DashboardService] Error fetching active prospects:", error);
       return [];
+    }
+  }
+
+  /**
+   * Get action items breakdown - what needs doing today
+   */
+  private async getActionItemsBreakdown(): Promise<ActionItemsBreakdown> {
+    try {
+      // Ready to Qualify: discovered, but leadState is not understood yet
+      const readyToQualify = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "discover",
+          leadState: "discovered",
+        },
+      });
+
+      // Ready to Email: qualified and ready to send
+      const readyToEmail = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "qualify",
+          leadState: "understood",
+        },
+      });
+
+      // Awaiting Reply: emailed but no response yet
+      const awaitingReply = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "propose",
+          leadState: "emailed",
+        },
+      });
+
+      // Ready to Close: replied but not yet converted
+      const readyToClose = await prisma.b2bLead.count({
+        where: {
+          pipeline_stage: "propose",
+          leadState: "replied",
+        },
+      });
+
+      return {
+        readyToQualify,
+        readyToEmail,
+        awaitingReply,
+        readyToClose,
+      };
+    } catch (error) {
+      console.error("[DashboardService] Error calculating action items:", error);
+      return {
+        readyToQualify: 0,
+        readyToEmail: 0,
+        awaitingReply: 0,
+        readyToClose: 0,
+      };
     }
   }
 
