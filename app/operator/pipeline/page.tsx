@@ -158,12 +158,9 @@ export default function PipelinePage() {
   return (
     <div className="min-h-screen bg-white pt-24 pb-12">
       <div className="px-4 md:px-8 lg:px-12">
-        {/* Header - Matches Today page style */}
+        {/* Header - Operator's Purpose */}
         <div className="mb-12">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
-            Pipeline Board
-          </p>
-          <p className="text-sm text-[#888888] mt-2">
             Complete prospect journey
           </p>
         </div>
