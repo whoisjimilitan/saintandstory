@@ -16,8 +16,11 @@
  * 5. Inverse incentive (honest qualification)
  * 6. Mental simulation (believable future scenario)
  * 7. Micro commitment (smallest ask possible)
- * 8. Generate communication (ONLY after steps 1-7)
+ * 8a. Permission line (Stage 1 only - based on behavioral patterns)
+ * 8b. Generate communication (ONLY after steps 1-7)
  */
+
+import { generatePermissionLine, type IndustryType } from "./behavioral-pattern-map";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -102,7 +105,14 @@ export interface RelationshipReasoning {
     cognitiveLoad: "minimal" | "low" | "medium";
   };
 
-  // Step 8: Email generation parameters
+  // Step 8a: Permission line (Stage 1 only)
+  permissionLine?: {
+    text: string;
+    appliesAtStage: RelationshipStage;
+    basedOnBehavioralPattern: string;
+  };
+
+  // Step 8b: Email generation parameters
   communicationParams: {
     targetWordCount: number;
     tone: "conversational" | "professional" | "consultative";
@@ -422,7 +432,30 @@ function generateMicroCommitment(stage: RelationshipStage) {
 }
 
 // ============================================================================
-// STEP 8: EMAIL GENERATION
+// STEP 8a: PERMISSION LINE (Stage 1 ONLY)
+// ============================================================================
+
+function generatePermissionLineForStage(
+  stage: RelationshipStage,
+  profile: BusinessProfile
+): RelationshipReasoning["permissionLine"] | undefined {
+  // Permission line ONLY applies to Stage 1 (cold outreach)
+  // Stage 2+ relationships flow naturally without permission
+  if (stage !== 1) {
+    return undefined;
+  }
+
+  const permissionText = generatePermissionLine(profile.industry as IndustryType, profile.location);
+
+  return {
+    text: permissionText,
+    appliesAtStage: 1,
+    basedOnBehavioralPattern: profile.industry,
+  };
+}
+
+// ============================================================================
+// STEP 8b: EMAIL GENERATION
 // ============================================================================
 
 function generateCommunicationEmail(reasoning: RelationshipReasoning): RelationshipCommunication["email"] {
@@ -576,6 +609,9 @@ export function generateRelationshipCommunication(
   // STEP 7: Generate micro commitment
   const microCommitment = generateMicroCommitment(currentStage);
 
+  // STEP 8a: Generate permission line (Stage 1 only)
+  const permissionLine = generatePermissionLineForStage(currentStage, profile);
+
   // BUILD COMPLETE REASONING
   const reasoning: RelationshipReasoning = {
     businessAnalysis,
@@ -589,6 +625,7 @@ export function generateRelationshipCommunication(
     inverseIncentive,
     mentalSimulation,
     microCommitment,
+    permissionLine,
     communicationParams: {
       targetWordCount: currentStage === 1 ? 60 : currentStage === 2 ? 75 : 50,
       tone: (currentStage <= 2 ? "conversational" : "professional") as "conversational" | "professional",
