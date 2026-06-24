@@ -29,13 +29,13 @@ function parseConversationalQuery(input: string) {
   const locationMatch = input.match(
     /(?:in|london|manchester|birmingham|edinburgh|cardiff|bristol|leeds|newcastle|coventry|glasgow|sheffield|nottingham|leicester|dublin|cork|belfast|galway|limerick|waterford|kildare|meath|louth|monaghan|cavan|fermanagh|tyrone|derry|armagh|down|antrim|donegal|leitrim|sligo|roscommon|mayo|galway|clare|limerick|tipperary|waterford|cork|kerry|wexford|wicklow|carlow|kilkenny|laois|offaly|westmeath|longford|east sussex|west sussex|kent|surrey|hampshire|berkshire|oxfordshire|buckinghamshire|essex|suffolk|norfolk|lincolnshire|cambridgeshire|northamptonshire|bedfordshire|hertfordshire|cornwall|devon|dorset|somerset|gloucestershire|worcestershire|herefordshire|warwickshire|staffordshire|shropshire|cheshire|lancashire|greater manchester|merseyside|yorkshire|humber|lincolnshire|derbyshire|nottinghamshire|leicestershire|rutland|northumberland|durham|cleveland|tyne and wear|cumbria|isle of man|jersey|guernsey)\b/i
   );
-  const location = locationMatch ? locationMatch[1] : "";
+  const location = locationMatch && locationMatch[1] ? locationMatch[1].trim() : "";
 
   // Extract business type/keyword (furniture, plumbing, electricians, etc.)
   const keywordMatch = input.match(
     /(?:find|search|looking for|locate)\s+([a-zA-Z\s]+?)(?:\s+(?:with|on|from|in|via)|$)/i
   );
-  const keyword = keywordMatch && keywordMatch[1] ? keywordMatch[1].trim() : (input || "business").trim();
+  const keyword = keywordMatch && keywordMatch[1] && typeof keywordMatch[1] === 'string' ? keywordMatch[1].trim() : (input || "business").trim();
 
   // Extract contact type (phone, email, etc.)
   const hasPhone =
@@ -67,9 +67,9 @@ function parseConversationalQuery(input: string) {
     contextSignals.push("growth constraints");
 
   return {
-    keyword: keyword.trim(),
-    source: source.toLowerCase(),
-    location: location.trim() || "UK",
+    keyword: (keyword && typeof keyword === 'string') ? keyword.trim() : "business",
+    source: (source && typeof source === 'string') ? source.toLowerCase() : "instagram",
+    location: (location && typeof location === 'string') ? location.trim() : "UK",
     contactType,
     contextSignals: contextSignals.length > 0 ? contextSignals : ["general"],
     rawInput: input
