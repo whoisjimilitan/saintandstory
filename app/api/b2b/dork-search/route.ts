@@ -3,122 +3,115 @@ import { prisma } from "@/lib/prisma";
 
 // Parse conversational dork input into structured parameters
 function parseConversationalQuery(input: string) {
-  // Type safety first
-  if (!input || typeof input !== 'string') {
-    console.error("[DORK PARSE] Invalid input:", input);
+  if (!input || typeof input !== "string") {
     return {
+      keyword: "business",
       source: "instagram",
       location: "UK",
-      keyword: "business",
-      hasPhone: false,
-      hasEmail: false,
-      hasWebsite: false,
-      contextSignals: [],
+      contactType: "both",
+      contextSignals: ["general"],
+      rawInput: input,
     };
   }
 
   const lower = input.toLowerCase();
 
-  // Extract source (instagram, linkedin, facebook, twitter, google, etc.)
-  const sourceMatch = input.match(
-    /(?:on|from|via|site:?)\s+(\w+(?:\.\w+)?)/i
-  );
-  const source = sourceMatch ? sourceMatch[1].replace(".com", "") : "instagram";
+  // Extract source (instagram, linkedin, facebook, etc.)
+  const sourceMatch = input.match(/(?:on|from|via|site:?)\s+(\w+(?:\.\w+)?)/i);
+  const source = sourceMatch ? sourceMatch[1].replace(".com", "").toLowerCase() : "instagram";
 
-  // Extract location (London, Manchester, UK, etc.)
+  // Extract location - using capture group properly
   const locationMatch = input.match(
-    /(?:in|london|manchester|birmingham|edinburgh|cardiff|bristol|leeds|newcastle|coventry|glasgow|sheffield|nottingham|leicester|dublin|cork|belfast|galway|limerick|waterford|kildare|meath|louth|monaghan|cavan|fermanagh|tyrone|derry|armagh|down|antrim|donegal|leitrim|sligo|roscommon|mayo|galway|clare|limerick|tipperary|waterford|cork|kerry|wexford|wicklow|carlow|kilkenny|laois|offaly|westmeath|longford|east sussex|west sussex|kent|surrey|hampshire|berkshire|oxfordshire|buckinghamshire|essex|suffolk|norfolk|lincolnshire|cambridgeshire|northamptonshire|bedfordshire|hertfordshire|cornwall|devon|dorset|somerset|gloucestershire|worcestershire|herefordshire|warwickshire|staffordshire|shropshire|cheshire|lancashire|greater manchester|merseyside|yorkshire|humber|lincolnshire|derbyshire|nottinghamshire|leicestershire|rutland|northumberland|durham|cleveland|tyne and wear|cumbria|isle of man|jersey|guernsey)\b/i
+    /(london|manchester|birmingham|edinburgh|cardiff|bristol|leeds|newcastle|coventry|glasgow|sheffield|nottingham|leicester|dublin|cork|belfast|galway|limerick|waterford|kildare|meath|louth|monaghan|cavan|fermanagh|tyrone|derry|armagh|down|antrim|donegal|leitrim|sligo|roscommon|mayo|clare|tipperary|kerry|wexford|wicklow|carlow|kilkenny|laois|offaly|westmeath|longford|east sussex|west sussex|kent|surrey|hampshire|berkshire|oxfordshire|buckinghamshire|essex|suffolk|norfolk|lincolnshire|cambridgeshire|northamptonshire|bedfordshire|hertfordshire|cornwall|devon|dorset|somerset|gloucestershire|worcestershire|herefordshire|warwickshire|staffordshire|shropshire|cheshire|lancashire|greater manchester|merseyside|yorkshire|derbyshire|nottinghamshire|leicestershire|rutland|northumberland|durham|tyne and wear|cumbria|isle of man|jersey|guernsey)\b/i
   );
-  const location = locationMatch && locationMatch[1] ? locationMatch[1].trim() : "";
+  const location = locationMatch ? locationMatch[1] : "UK";
 
-  // Extract business type/keyword (furniture, plumbing, electricians, etc.)
-  const keywordMatch = input.match(
-    /(?:find|search|looking for|locate)\s+([a-zA-Z\s]+?)(?:\s+(?:with|on|from|in|via)|$)/i
-  );
-  const keyword = keywordMatch && keywordMatch[1] && typeof keywordMatch[1] === 'string' ? keywordMatch[1].trim() : (input || "business").trim();
+  // Extract keyword - improved regex
+  const keywordMatch = input.match(/(?:find|search|looking for|locate)\s+([a-zA-Z\s]+?)(?:\s+(?:with|on|from|in|via|site)|$)/i);
+  const keyword = keywordMatch && keywordMatch[1] ? keywordMatch[1].trim() : input.split(/on|from|via/i)[0].trim() || "business";
 
-  // Extract contact type (phone, email, etc.)
-  const hasPhone =
-    input.includes("phone") ||
-    input.includes("tel") ||
-    input.includes("📞") ||
-    input.includes("+44");
-  const hasEmail =
-    input.includes("email") ||
-    input.includes("@") ||
-    input.includes("gmail");
+  // Extract contact type
+  const hasPhone = input.includes("phone") || input.includes("tel") || input.includes("📞") || input.includes("+44");
+  const hasEmail = input.includes("email") || input.includes("@") || input.includes("gmail");
   const contactType = hasPhone ? "phone" : hasEmail ? "email" : "both";
 
-  // Extract pain signals/context
-  const contextSignals: string[] = [];
-  if (lower.includes("custom"))
-    contextSignals.push("custom orders");
-  if (lower.includes("seasonal"))
-    contextSignals.push("seasonal peaks");
-  if (lower.includes("owner"))
-    contextSignals.push("owner-operated");
-  if (lower.includes("manual"))
-    contextSignals.push("manual coordination");
-  if (lower.includes("busy"))
-    contextSignals.push("capacity constraints");
-  if (lower.includes("small"))
-    contextSignals.push("small team");
-  if (lower.includes("growing"))
-    contextSignals.push("growth constraints");
-
   return {
-    keyword: (keyword && typeof keyword === 'string') ? keyword.trim() : "business",
-    source: (source && typeof source === 'string') ? source.toLowerCase() : "instagram",
-    location: (location && typeof location === 'string') ? location.trim() : "UK",
+    keyword: keyword.substring(0, 100),
+    source,
+    location,
     contactType,
-    contextSignals: contextSignals.length > 0 ? contextSignals : ["general"],
-    rawInput: input
+    contextSignals: [],
+    rawInput: input,
   };
 }
 
-// Build dork query from parameters
-function buildDorkQuery(params: any): string {
-  const siteClause = `site:${params.source}.com`;
-  const keywordClause = `"${params.keyword}"`;
-  const contactClause =
-    params.contactType === "phone"
-      ? `("phone:" OR "📞" OR "+44" OR "call:")`
-      : params.contactType === "email"
-        ? `("@gmail.com" OR "@yahoo.com" OR "@outlook.com" OR "@business.com" OR "contact:")`
-        : `("@" OR "phone:" OR "📞")`;
+// Google Custom Search API integration
+async function searchGoogle(params: any): Promise<any[]> {
+  const apiKey = process.env.GOOGLE_CUSTOM_SEARCH_API_KEY;
+  const searchEngineId = process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID;
 
-  return `${siteClause} ${keywordClause} ${contactClause}`;
+  if (!apiKey || !searchEngineId) {
+    console.error("[DORK SEARCH] Missing Google Custom Search credentials");
+    return [];
+  }
+
+  try {
+    // Build search query
+    const query = `${params.keyword} ${params.source} ${params.location}`;
+
+    // Call Google Custom Search API
+    const url = new URL("https://www.googleapis.com/customsearch/v1");
+    url.searchParams.append("q", query);
+    url.searchParams.append("key", apiKey);
+    url.searchParams.append("cx", searchEngineId);
+    url.searchParams.append("num", "10"); // Get 10 results
+
+    const response = await fetch(url.toString());
+
+    if (!response.ok) {
+      console.error("[DORK SEARCH] Google API error:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.items || [];
+  } catch (error) {
+    console.error("[DORK SEARCH] Search error:", error);
+    return [];
+  }
 }
 
-// Extract business information from raw data
-async function parseResults(
-  rawResults: any,
-  params: any
-): Promise<
-  Array<{
-    businessName: string;
-    email?: string;
-    phone?: string;
-    website?: string;
-    location: string;
-    source: string;
-    contextSignals: string[];
-  }>
-> {
+// Extract clean business information from search results
+function parseSearchResults(results: any[], params: any): Array<{
+  businessName: string;
+  email?: string;
+  phone?: string;
+  website: string;
+  location: string;
+  source: string;
+}> {
   const cleaned: any[] = [];
 
-  // Mock implementation - in production, would parse actual SerpAPI results
-  // For now, return structured mock data for testing
-  if (rawResults && rawResults.length > 0) {
-    return rawResults.map((result: any) => ({
-      businessName: result.title || result.name || "Unknown",
-      email: result.email || extractEmailFromText(result.snippet || ""),
-      phone: result.phone || extractPhoneFromText(result.snippet || ""),
-      website: result.link || "",
-      location: params.location,
-      source: params.source,
-      contextSignals: params.contextSignals
-    })).filter((r: any) => r.businessName && (r.email || r.phone));
+  for (const result of results) {
+    const businessName = result.title || "Unknown";
+    const website = result.link || "";
+    const snippet = result.snippet || "";
+
+    // Extract contact info from snippet
+    const email = extractEmailFromText(snippet);
+    const phone = extractPhoneFromText(snippet);
+
+    // Only include if we have name and at least one contact method
+    if (businessName && (email || phone)) {
+      cleaned.push({
+        businessName: businessName.replace(" - ", "").substring(0, 100),
+        email,
+        phone,
+        website,
+        location: params.location,
+        source: params.source,
+      });
+    }
   }
 
   return cleaned;
@@ -130,117 +123,47 @@ function extractEmailFromText(text: string): string | undefined {
 }
 
 function extractPhoneFromText(text: string): string | undefined {
-  const phoneMatch = text.match(/(?:\+44|0)\d{4}\s?\d{6}|\+44\s?\d{3,4}\s?\d{3,4}\s?\d{3,4}/);
+  const phoneMatch = text.match(/(?:\+44|0)\d{3,4}\s?\d{3,4}\s?\d{3,4}|(?:\+44|0)\d{10,11}/);
   return phoneMatch ? phoneMatch[0] : undefined;
-}
-
-// Identify pressure group for this batch
-async function identifyPressureGroup(
-  keyword: string,
-  contextSignals: string[]
-): Promise<string> {
-  // Use existing mapper
-  const pressureMap: Record<string, string> = {
-    furniture: "Time-Critical Movement",
-    plumbing: "Time-Critical Movement",
-    electrician: "Time-Critical Movement",
-    removal: "Time-Critical Movement",
-    pharmacy: "Time-Critical Movement",
-    dental: "Appointment Scheduling Friction",
-    dentist: "Appointment Scheduling Friction",
-    solicitor: "Customer Acquisition Friction",
-    accountant: "Customer Acquisition Friction",
-    estate: "Customer Acquisition Friction",
-    wedding: "Service Quality Inconsistency",
-    event: "Delivery Reliability"
-  };
-
-  const keywordLower = keyword.toLowerCase();
-  for (const [key, pressure] of Object.entries(pressureMap)) {
-    if (keywordLower.includes(key)) {
-      return pressure;
-    }
-  }
-
-  // Default based on context
-  if (
-    contextSignals.includes("seasonal peaks") ||
-    contextSignals.includes("custom orders")
-  ) {
-    return "Time-Critical Movement";
-  }
-  if (contextSignals.includes("capacity constraints")) {
-    return "Capacity Overflow";
-  }
-
-  return "Customer Acquisition Friction";
 }
 
 export async function POST(request: NextRequest) {
   try {
-    let body: { query?: string } = {};
-    try {
-      body = (await request.json()) as { query?: string };
-    } catch (parseErr) {
+    const body = (await request.json()) as { query?: string };
+    const query = body?.query?.trim();
+
+    if (!query) {
       return NextResponse.json(
-        { error: "Invalid JSON in request body", success: false },
+        { error: "Search query required", success: false },
         { status: 400 }
       );
     }
 
-    const query = body?.query;
+    // Parse user input into search parameters
+    const params = parseConversationalQuery(query);
 
-    // Type safety: Ensure query exists and is a string BEFORE calling .trim()
-    if (!query || typeof query !== 'string') {
-      return NextResponse.json(
-        { error: "Query parameter is required and must be a string", success: false },
-        { status: 400 }
-      );
+    // Execute Google Custom Search
+    console.log(`[DORK SEARCH] Searching: "${query}"`);
+    const searchResults = await searchGoogle(params);
+
+    if (searchResults.length === 0) {
+      return NextResponse.json({
+        success: true,
+        leadsCreated: 0,
+        leads: [],
+        parsed: {
+          businessType: params.keyword,
+          source: params.source,
+          contactType: params.contactType,
+        },
+        message: "No results found. Try a different search query.",
+      });
     }
 
-    // Safely trim and validate
-    const trimmedQuery = query.trim();
-    if (trimmedQuery.length === 0) {
-      return NextResponse.json(
-        { error: "Query cannot be empty", success: false },
-        { status: 400 }
-      );
-    }
+    // Clean and structure results
+    const cleanedResults = parseSearchResults(searchResults, params);
 
-    // PARSE conversational input (now guaranteed to be non-empty string)
-    const params = parseConversationalQuery(trimmedQuery);
-
-    // BUILD dork query (for logging/display)
-    const dorkQuery = buildDorkQuery(params);
-
-    // IDENTIFY pressure group
-    const pressureGroup = await identifyPressureGroup(
-      params.keyword,
-      params.contextSignals
-    );
-
-    // PARSE results (mock for now, in real implementation would call SerpAPI)
-    // For testing, we'll create sample results
-    const mockResults = [
-      {
-        title: `${params.keyword.split(" ")[0]} Services - Local`,
-        snippet: "Contact us at: info@example.com or 020 1234 5678",
-        link: `https://example-${params.keyword.replace(" ", "-")}.co.uk`,
-        email: "info@example.com",
-        phone: "+44 20 1234 5678"
-      },
-      {
-        title: `Premium ${params.keyword}`,
-        snippet: "📞 Call us: +44 201 234 567 | hello@service.co.uk",
-        link: `https://premium-${params.keyword.replace(" ", "-")}.co.uk`,
-        email: "hello@service.co.uk",
-        phone: "+44 201 234 567"
-      }
-    ];
-
-    const cleanedResults = await parseResults(mockResults, params);
-
-    // CREATE leads in b2b_leads table (PARALLEL PIPELINE)
+    // Create leads in database
     const createdLeads = [];
     const batchId = `dork_${Date.now()}`;
 
@@ -256,20 +179,19 @@ export async function POST(request: NextRequest) {
             source: "dork_search",
             status: "new",
             leadState: "new",
-            businessCategory: params.keyword.split(" ")[0].toLowerCase(),
-            notes: `Dork batch: ${batchId} | Query: ${dorkQuery} | Pressure: ${pressureGroup}`
-          }
+            businessCategory: params.keyword,
+            notes: `Dork search: "${query}" | Source: ${result.source} | Batch: ${batchId}`,
+          },
         });
 
         createdLeads.push({
           id: lead.id,
           businessName: lead.businessName,
           email: lead.email,
-          phone: lead.phone
+          phone: lead.phone,
         });
       } catch (error) {
-        console.error(`Failed to create lead for ${result.businessName}:`, error);
-        // Continue with other leads, don't fail entire batch
+        console.error(`[DORK SEARCH] Failed to create lead:`, error);
       }
     }
 
@@ -277,33 +199,21 @@ export async function POST(request: NextRequest) {
       success: true,
       batchId,
       query,
-      dorkQuery,
-      params,
-      pressureGroup,
-      resultsCount: cleanedResults.length,
       leadsCreated: createdLeads.length,
-      leads: createdLeads.map((lead: any) => ({
-        id: lead.id,
-        businessName: lead.businessName,
-        email: lead.email,
-        phone: lead.phone,
-        city: lead.city,
-        industry: lead.businessCategory || "unknown"
-      })),
-      readyForPreview: createdLeads.length > 0,
-      // Return parsed data in expected format
+      leads: createdLeads,
       parsed: {
-        businessType: params.keyword || "business",
-        source: params.source || "unknown",
-        contactType: params.contactType || "both",
-        pressureGroup: pressureGroup
-      }
+        businessType: params.keyword,
+        source: params.source,
+        contactType: params.contactType,
+      },
+      message: `Created ${createdLeads.length} leads from search results.`,
     });
   } catch (error) {
-    console.error("🔥 DORK SEARCH ERROR:", error);
+    console.error("[DORK SEARCH] Error:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Dork search failed"
+        error: error instanceof Error ? error.message : "Search failed",
+        success: false,
       },
       { status: 500 }
     );
