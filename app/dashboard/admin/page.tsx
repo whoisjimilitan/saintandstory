@@ -189,8 +189,8 @@ export default async function AdminPage() {
       <AdminLocationUpdater />
 
       {/* Premium Header Section */}
-      <div className="px-4 md:px-12 pt-24 pb-12">
-        <div className="flex items-start justify-between mb-16">
+      <div className="px-4 md:px-8 lg:px-12 pt-16 md:pt-20 lg:pt-24 pb-8 md:pb-10 lg:pb-12">
+        <div className="flex items-start justify-between mb-10 md:mb-12 lg:mb-16">
           <div></div>
 
           {/* Desktop Navigation */}
@@ -215,6 +215,9 @@ export default async function AdminPage() {
                 <Link href="/operator" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
                   Ops →
                 </Link>
+                <a href="#section-completed" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
+                  Revenue
+                </a>
                 <Link href="/sign-in" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
                   Logout
                 </Link>
@@ -224,27 +227,29 @@ export default async function AdminPage() {
         </div>
 
         {/* Date Header - Subtle Context */}
-        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-8">
+        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-6 md:mb-8">
           Today, {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
 
         {/* Hero Section - Premium Bold Aesthetic */}
-        <div className="mb-20">
-          <h1 className="text-6xl md:text-7xl font-black text-[#0D0D0D] leading-none mb-6 tracking-tight">
+        <div className="mb-12 md:mb-16 lg:mb-20">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0D0D0D] leading-none mb-4 md:mb-6 tracking-tight">
             Fleet<br />Dashboard
           </h1>
-          <p className="text-base text-[#888888] max-w-md">
+          <p className="text-sm md:text-base text-[#888888] max-w-md">
             Live job dispatch and driver status
           </p>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="px-4 md:px-12 pb-12">
+      <div className="px-4 md:px-8 lg:px-12 pb-8 md:pb-10 lg:pb-12">
 
-        <div className="flex items-center justify-between mb-8 overflow-x-auto">
+        <div className="flex items-center justify-between mb-8 md:mb-10 overflow-x-auto">
           <div className="flex gap-2 flex-nowrap">
-            {statLinks.map((s) => (
+            {statLinks
+              .filter((s) => !s.label.includes("earned")) // Hide revenue pill on all screens (it's in hamburger on mobile, desktop can see it in dropdown)
+              .map((s) => (
               <a
                 key={s.href}
                 href={s.href}
