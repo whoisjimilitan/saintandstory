@@ -192,13 +192,34 @@ export default async function AdminPage() {
       <div className="px-4 md:px-12 pt-24 pb-12">
         <div className="flex items-start justify-between mb-16">
           <div></div>
-          <div className="flex flex-col gap-2 items-end">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex flex-col gap-2 items-end">
             <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
               Ops →
             </Link>
             <Link href="/sign-in" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D]">
               Logout
             </Link>
+          </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="md:hidden">
+            <details className="group">
+              <summary className="cursor-pointer list-none flex items-center justify-center w-10 h-10 hover:bg-[#F5F5F5] rounded transition-colors">
+                <svg className="w-5 h-5 text-[#0D0D0D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </summary>
+              <div className="absolute right-4 mt-2 bg-white border border-[#E8E8E8] rounded-lg shadow-sm z-10 min-w-[140px]">
+                <Link href="/operator" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
+                  Ops →
+                </Link>
+                <Link href="/sign-in" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
+                  Logout
+                </Link>
+              </div>
+            </details>
           </div>
         </div>
 
