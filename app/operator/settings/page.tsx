@@ -133,14 +133,14 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-32">
-      <div className="max-w-3xl mx-auto px-4 md:px-8 py-12">
-        {/* Header */}
-        <div className="mb-16">
+    <div className="min-h-screen bg-white pt-24 pb-12">
+      <div className="px-4 md:px-12">
+        {/* Header - Consistent with Today page */}
+        <div className="mb-12">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
             Autonomous Discovery
           </p>
-          <p className="text-sm text-[#888888] mt-1">
+          <p className="text-sm text-[#888888] mt-2">
             Configure what prospects we discover and when
           </p>
         </div>

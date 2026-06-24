@@ -127,12 +127,17 @@ export default function ResponsesPage() {
   const noCount = responses.filter((r) => r.responseType === "NO").length;
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] pt-32">
-      <div className="max-w-6xl mx-auto px-4 md:px-12 py-12">
-        {/* Sub-Hero */}
-        <p className="text-lg font-bold text-[#0D0D0D] mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8] leading-relaxed">
-          Track replies and engage with prospects
-        </p>
+    <div className="min-h-screen bg-white pt-24 pb-12">
+      <div className="px-4 md:px-12">
+        {/* Header - Consistent with Today page */}
+        <div className="mb-12">
+          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+            Responses
+          </p>
+          <p className="text-sm text-[#888888] mt-2">
+            Track replies and engage with prospects
+          </p>
+        </div>
 
         {/* Quick Stats - Monochrome */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
