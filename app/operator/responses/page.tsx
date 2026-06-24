@@ -20,13 +20,15 @@ interface Response {
   sentAt: string;
   replied: boolean;
   repliedAt?: string;
+  responseType?: "YES" | "MAYBE" | "NO";
+  responseSummary?: string;
   conversation?: ConversationMessage[];
 }
 
 export default function ResponsesPage() {
   const [responses, setResponses] = useState<Response[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "replied" | "awaiting">("awaiting");
+  const [filter, setFilter] = useState<"all" | "awaiting" | "YES" | "MAYBE" | "NO">("awaiting");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -112,13 +114,17 @@ export default function ResponsesPage() {
   };
 
   const filteredResponses = responses.filter((r) => {
-    if (filter === "replied") return r.replied;
     if (filter === "awaiting") return !r.replied;
+    if (filter === "YES") return r.responseType === "YES";
+    if (filter === "MAYBE") return r.responseType === "MAYBE";
+    if (filter === "NO") return r.responseType === "NO";
     return true;
   });
 
-  const repliedCount = responses.filter((r) => r.replied).length;
   const awaitingCount = responses.filter((r) => !r.replied).length;
+  const yesCount = responses.filter((r) => r.responseType === "YES").length;
+  const maybeCount = responses.filter((r) => r.responseType === "MAYBE").length;
+  const noCount = responses.filter((r) => r.responseType === "NO").length;
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
@@ -129,14 +135,22 @@ export default function ResponsesPage() {
         </p>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9]">
-            <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Replied</p>
-            <p className="text-3xl font-black text-[#0D0D0D]">{repliedCount}</p>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9]">
             <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Awaiting</p>
             <p className="text-3xl font-black text-[#0D0D0D]">{awaitingCount}</p>
+          </div>
+          <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+            <p className="text-xs text-green-700 uppercase font-semibold mb-1">Yes ✅</p>
+            <p className="text-3xl font-black text-green-700">{yesCount}</p>
+          </div>
+          <div className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
+            <p className="text-xs text-yellow-700 uppercase font-semibold mb-1">Maybe ⏳</p>
+            <p className="text-3xl font-black text-yellow-700">{maybeCount}</p>
+          </div>
+          <div className="border border-red-200 rounded-lg p-4 bg-red-50">
+            <p className="text-xs text-red-700 uppercase font-semibold mb-1">No ❌</p>
+            <p className="text-3xl font-black text-red-700">{noCount}</p>
           </div>
         </div>
 
@@ -153,14 +167,34 @@ export default function ResponsesPage() {
             Awaiting ({awaitingCount})
           </button>
           <button
-            onClick={() => setFilter("replied")}
+            onClick={() => setFilter("YES")}
             className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
-              filter === "replied"
-                ? "bg-[#0D0D0D] text-white"
-                : "bg-[#F5F5F5] text-[#0D0D0D] hover:bg-[#E8E8E8]"
+              filter === "YES"
+                ? "bg-green-600 text-white"
+                : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
             }`}
           >
-            Replied ({repliedCount})
+            ✅ Yes ({yesCount})
+          </button>
+          <button
+            onClick={() => setFilter("MAYBE")}
+            className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+              filter === "MAYBE"
+                ? "bg-yellow-600 text-white"
+                : "bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200"
+            }`}
+          >
+            ⏳ Maybe ({maybeCount})
+          </button>
+          <button
+            onClick={() => setFilter("NO")}
+            className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+              filter === "NO"
+                ? "bg-red-600 text-white"
+                : "bg-red-50 text-red-700 hover:bg-red-100 border border-red-200"
+            }`}
+          >
+            ❌ No ({noCount})
           </button>
           <button
             onClick={() => setFilter("all")}
@@ -220,15 +254,33 @@ export default function ResponsesPage() {
                         {response.subject}
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right flex-shrink-0 space-y-2">
                       {response.replied ? (
                         <div>
-                          <p className="text-xs font-bold text-[#0D0D0D]">✓ Replied</p>
-                          <p className="text-xs text-[#888888] mt-1">
+                          <div className="flex gap-2 justify-end items-center mb-1">
+                            <span className="text-xs font-bold text-[#0D0D0D]">✓ Replied</span>
+                            {response.responseType && (
+                              <span className={`px-3 py-1 rounded text-xs font-bold ${
+                                response.responseType === "YES" ? "bg-green-600 text-white" :
+                                response.responseType === "MAYBE" ? "bg-yellow-600 text-white" :
+                                "bg-red-600 text-white"
+                              }`}>
+                                {response.responseType === "YES" ? "✅ YES" :
+                                 response.responseType === "MAYBE" ? "⏳ MAYBE" :
+                                 "❌ NO"}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-[#888888]">
                             {response.repliedAt
                               ? new Date(response.repliedAt).toLocaleDateString()
                               : ""}
                           </p>
+                          {response.responseSummary && (
+                            <p className="text-xs text-[#666666] mt-2 italic max-w-xs text-left">
+                              "{response.responseSummary}"
+                            </p>
+                          )}
                         </div>
                       ) : (
                         <p className="text-xs text-[#888888]">
