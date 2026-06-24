@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
     }
 
     // VALIDATION LAYER: Parse and validate request body
-    const body = await request.json() as { googlePlaceId: string; businessName?: string; city?: string };
-    const { googlePlaceId, businessName, city } = body;
+    const body = await request.json() as { googlePlaceId: string; businessName?: string; email?: string; city?: string };
+    const { googlePlaceId, businessName, email, city } = body;
 
     if (!googlePlaceId) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Try to find existing prospect by Google Places ID
-    const findResult = await safeDbCall(
+    const findByPlaceIdResult = await safeDbCall(
       prisma.b2bLead.findFirst({
         where: { googlePlaceId },
         select: { id: true },
@@ -45,16 +45,46 @@ export async function POST(request: NextRequest) {
       "ImportProspect: findByGooglePlaceId"
     );
 
-    if (!findResult.success) {
+    if (!findByPlaceIdResult.success) {
       return databaseError("prisma");
     }
 
-    // If found, return the existing UUID
-    if (findResult.data?.id) {
+    // If found by Google Place ID, return the existing UUID
+    if (findByPlaceIdResult.data?.id) {
       return NextResponse.json({
-        id: findResult.data.id,
+        id: findByPlaceIdResult.data.id,
         imported: false,
+        reason: "Already in database (Google Place ID match)"
       });
+    }
+
+    // DUPLICATE CHECK: Also check for duplicates by business name + email (for manual entries)
+    if (businessName && email) {
+      const findByNameEmailResult = await safeDbCall(
+        prisma.b2bLead.findFirst({
+          where: {
+            AND: [
+              { businessName: { equals: businessName, mode: "insensitive" } },
+              { email: { equals: email, mode: "insensitive" } }
+            ]
+          },
+          select: { id: true },
+        }),
+        "ImportProspect: findByNameEmail"
+      );
+
+      if (!findByNameEmailResult.success) {
+        return databaseError("prisma");
+      }
+
+      // If found by name + email combination, return the existing UUID
+      if (findByNameEmailResult.data?.id) {
+        return NextResponse.json({
+          id: findByNameEmailResult.data.id,
+          imported: false,
+          reason: "Already in database (Business name + email match)"
+        });
+      }
     }
 
     // If not found, create a new prospect record
