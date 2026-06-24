@@ -413,40 +413,55 @@ export default function OperatorBriefing() {
               High-confidence prospects ready to review.
             </p>
 
-            {/* Temperature Breakdown - Idea #1 */}
+            {/* Temperature Breakdown - Clickable */}
             <div className="space-y-2.5 mb-6">
-              <div className="flex items-center justify-between">
+              <button
+                onClick={() => router.push("/operator/responses?filter=YES")}
+                className="w-full flex items-center justify-between p-3 hover:bg-[#F5F5F5] rounded transition-colors border border-transparent hover:border-[#E8E8E8]"
+              >
                 <div className="flex items-center gap-2">
                   <div className="text-[#0D0D0D]">
                     <Icons.UltraHot />
                   </div>
-                  <span className="text-xs font-semibold text-[#0D0D0D]">Ultra Hot</span>
-                  <span className="text-xs text-[#888888]">— Act now, awaiting response follow-up</span>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold text-[#0D0D0D]">Ultra Hot</span>
+                    <span className="text-xs text-[#888888] ml-2">— Act now, awaiting response follow-up</span>
+                  </div>
                 </div>
                 <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.ultraHot}</span>
-              </div>
+              </button>
 
-              <div className="flex items-center justify-between">
+              <button
+                onClick={() => router.push("/operator/responses?filter=awaiting")}
+                className="w-full flex items-center justify-between p-3 hover:bg-[#F5F5F5] rounded transition-colors border border-transparent hover:border-[#E8E8E8]"
+              >
                 <div className="flex items-center gap-2">
                   <div className="text-[#0D0D0D]">
                     <Icons.Hot />
                   </div>
-                  <span className="text-xs font-semibold text-[#0D0D0D]">Hot</span>
-                  <span className="text-xs text-[#888888]">— Today, emails sent, watch for responses</span>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold text-[#0D0D0D]">Hot</span>
+                    <span className="text-xs text-[#888888] ml-2">— Today, emails sent, watch for responses</span>
+                  </div>
                 </div>
                 <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.hot}</span>
-              </div>
+              </button>
 
-              <div className="flex items-center justify-between">
+              <button
+                onClick={() => router.push("/operator/understand")}
+                className="w-full flex items-center justify-between p-3 hover:bg-[#F5F5F5] rounded transition-colors border border-transparent hover:border-[#E8E8E8]"
+              >
                 <div className="flex items-center gap-2">
                   <div className="text-[#0D0D0D]">
                     <Icons.Warm />
                   </div>
-                  <span className="text-xs font-semibold text-[#0D0D0D]">Warm</span>
-                  <span className="text-xs text-[#888888]">— This week, awaiting first email</span>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold text-[#0D0D0D]">Warm</span>
+                    <span className="text-xs text-[#888888] ml-2">— This week, awaiting first email</span>
+                  </div>
                 </div>
                 <span className="text-sm font-bold text-[#0D0D0D]">{tempBreakdown.warm}</span>
-              </div>
+              </button>
             </div>
 
             {/* Industry Breakdown - Idea #2 */}
@@ -512,14 +527,6 @@ export default function OperatorBriefing() {
             >
               <Icons.Email />
               Send Batch Emails
-            </button>
-
-            <button
-              onClick={() => router.push("/operator/discover?score=80+")}
-              className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
-            >
-              <Icons.Eye />
-              See All
             </button>
           </div>
         </div>

@@ -90,70 +90,72 @@ export default function PipelinePage() {
   return (
     <div className="min-h-screen bg-white pt-32">
       <div className="px-4 md:px-12 py-12">
-        <div className="mb-12">
+        {/* Header - Premium styling matching other dashboard pages */}
+        <div className="mb-16">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
             Pipeline Board
           </p>
-          <p className="text-sm text-[#888888] mt-1">
-            Track all prospects through their journey
+          <p className="text-sm text-[#888888] mt-2">
+            Complete prospect journey across all stages
           </p>
         </div>
 
-        <div className="overflow-x-auto">
-          <div className="flex gap-4 min-w-max pb-8">
-            {stages.map((stage) => {
-              const stageProspects = getProspectsForStage(stage.key);
-              return (
-                <div
-                  key={stage.key}
-                  className="flex flex-col w-72 flex-shrink-0"
-                >
-                  <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
-                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-                      {stage.label}
-                    </p>
-                    <p className="text-2xl font-black text-[#0D0D0D] mt-2">
-                      {stageProspects.length}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 flex-1">
-                    {stageProspects.length === 0 ? (
-                      <div className="text-center py-8">
-                        <p className="text-xs text-[#AAAAAA]">No prospects</p>
-                      </div>
-                    ) : (
-                      stageProspects.map((prospect) => (
-                        <Link
-                          key={prospect.id}
-                          href={`/operator/understand?id=${prospect.id}`}
-                        >
-                          <div className="p-3 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer">
-                            <p className="text-sm font-semibold text-[#0D0D0D] truncate">
-                              {prospect.businessName}
-                            </p>
-                            <p className="text-xs text-[#888888] mt-1">
-                              {prospect.location}
-                            </p>
-                            <p className="text-[10px] text-[#AAAAAA] mt-2">
-                              {prospect.stageUpdatedAt}
-                            </p>
-                            {prospect.nextAction && (
-                              <div className="mt-2 pt-2 border-t border-[#E8E8E8]">
-                                <p className="text-xs font-semibold text-[#0D0D0D]">
-                                  {prospect.nextAction}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </Link>
-                      ))
-                    )}
-                  </div>
+        {/* Kanban Board - Vertical Stack (No Horizontal Scroll) */}
+        <div className="space-y-8">
+          {stages.map((stage) => {
+            const stageProspects = getProspectsForStage(stage.key);
+            return (
+              <div key={stage.key} className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                {/* Stage Header */}
+                <div className="mb-6 pb-4 border-b border-[#E8E8E8]">
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+                    {stage.label}
+                  </p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mt-2">
+                    {stageProspects.length}
+                  </p>
+                  <p className="text-xs text-[#888888] mt-1">
+                    {stageProspects.length === 1 ? "prospect" : "prospects"}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Prospects Grid */}
+                {stageProspects.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-xs text-[#AAAAAA]">No prospects at this stage</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {stageProspects.map((prospect) => (
+                      <Link
+                        key={prospect.id}
+                        href={`/operator/understand?id=${prospect.id}`}
+                      >
+                        <div className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer">
+                          <p className="text-sm font-semibold text-[#0D0D0D] truncate">
+                            {prospect.businessName}
+                          </p>
+                          <p className="text-xs text-[#888888] mt-1">
+                            {prospect.location}
+                          </p>
+                          <p className="text-[10px] text-[#AAAAAA] mt-2">
+                            {prospect.stageUpdatedAt}
+                          </p>
+                          {prospect.nextAction && (
+                            <div className="mt-3 pt-3 border-t border-[#E8E8E8]">
+                              <p className="text-xs font-semibold text-[#0D0D0D]">
+                                {prospect.nextAction}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
