@@ -193,18 +193,8 @@ export default async function AdminPage() {
         <div className="flex items-start justify-between mb-10 md:mb-12 lg:mb-16">
           <div></div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex flex-col gap-2 items-end">
-            <Link href="/operator" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D] hover:bg-[#F5F5F5]">
-              Ops →
-            </Link>
-            <Link href="/sign-in" className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors border border-[#E8E8E8] px-3 py-1.5 rounded hover:border-[#0D0D0D]">
-              Logout
-            </Link>
-          </div>
-
-          {/* Mobile Hamburger Menu */}
-          <div className="md:hidden">
+          {/* Hamburger Menu - All Screens */}
+          <div>
             <details className="group">
               <summary className="cursor-pointer list-none flex items-center justify-center w-10 h-10 hover:bg-[#F5F5F5] rounded transition-colors">
                 <svg className="w-5 h-5 text-[#0D0D0D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +206,7 @@ export default async function AdminPage() {
                   Ops →
                 </Link>
                 <a href="#section-completed" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
-                  Revenue
+                  Bing →
                 </a>
                 <Link href="/sign-in" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
                   Logout
