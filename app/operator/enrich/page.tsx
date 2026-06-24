@@ -93,12 +93,29 @@ export default function EnrichPage() {
 
       const data = await res.json();
 
-      // Combine prospect data with generated emails
-      const enriched = data.emails.map((email: any) => ({
-        ...email,
-        email: prospectList.find(p => p.id === email.prospectId)?.email || "",
-        senderName: user?.firstName || "Team Member"
-      }));
+      // Combine prospect data with generated emails and substitute template variables
+      const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+      const enriched = data.emails.map((email: any) => {
+        const prospect = prospectList.find(p => p.id === email.prospectId);
+
+        // Substitute template variables: {{businessName}}, {{day}}
+        const subject = email.subject
+          .replace(/{{businessName}}/g, prospect?.businessName || "")
+          .replace(/{{day}}/g, dayOfWeek);
+
+        const body = email.body
+          .replace(/{{businessName}}/g, prospect?.businessName || "")
+          .replace(/{{day}}/g, dayOfWeek);
+
+        return {
+          ...email,
+          subject,
+          body,
+          email: prospect?.email || "",
+          senderName: user?.firstName || "Team Member"
+        };
+      });
 
       setGeneratedEmails(enriched);
     } catch (error) {

@@ -345,7 +345,7 @@ function generateMentalSimulation(
   const scenarios: Record<RelationshipStage, { scenario: string; trigger: string }> = {
     0: { scenario: "", trigger: "" },
     1: {
-      scenario: `Imagine a busy Tuesday: ${primaryNeed.realisticScenario}`,
+      scenario: `Last week: ${primaryNeed.realisticScenario}. It'll happen again.`,
       trigger: "Time-sensitive operational need",
     },
     2: {
@@ -436,11 +436,11 @@ function generateCommunicationEmail(reasoning: RelationshipReasoning): Relations
 
   switch (stage) {
     case 1:
-      body = `Hi there,
+      body = `Hi {{businessName}},
+
+It's {{day}}: your business requires ${reasoning.businessAnalysis.likelyDeliveryActivity}.
 
 ${simulation}
-
-${reasoning.businessAnalysis.likelyDeliveryActivity}.
 
 ${trust}
 
