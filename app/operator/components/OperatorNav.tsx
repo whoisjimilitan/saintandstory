@@ -122,9 +122,16 @@ export function OperatorNav() {
             {menuOpen && (
               <div className="absolute top-full right-0 mt-2 bg-white border border-[#E8E8E8] rounded-lg shadow-md py-2 z-50 min-w-[160px]">
                 <Link
-                  href="/dashboard/admin"
+                  href="/operator/settings"
                   onClick={() => setMenuOpen(false)}
                   className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest"
+                >
+                  Settings
+                </Link>
+                <Link
+                  href="/dashboard/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest border-t border-[#E8E8E8]"
                 >
                   Admin Dashboard
                 </Link>
