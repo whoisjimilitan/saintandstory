@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Prospect {
   id: string;
@@ -24,6 +24,8 @@ const stageColors = {
 
 export default function PipelinePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const focusedStage = searchParams.get("stage");
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -187,6 +189,11 @@ export default function PipelinePage() {
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
             Complete prospect journey
           </p>
+          {focusedStage && (
+            <p className="text-sm text-[#888888] mt-2">
+              Focused on: <span className="font-semibold text-[#0D0D0D]">{stages.find(s => s.key === focusedStage)?.label}</span>
+            </p>
+          )}
         </div>
 
         {/* Compact Board - Responsive Grid */}
@@ -200,7 +207,11 @@ export default function PipelinePage() {
               return (
                 <div
                   key={stage.key}
-                  className={`flex flex-col border-l-4 ${colorClass} bg-white border-r border-b border-t border-[#E8E8E8] rounded-r-lg p-4 hover:shadow-sm transition-shadow`}
+                  className={`flex flex-col border-l-4 ${colorClass} bg-white border-r border-b border-t rounded-r-lg p-4 transition-all ${
+                    focusedStage === stage.key
+                      ? "border-[#0D0D0D] shadow-md"
+                      : "border-[#E8E8E8] hover:shadow-sm"
+                  }`}
                 >
                   {/* Stage Header */}
                   <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
