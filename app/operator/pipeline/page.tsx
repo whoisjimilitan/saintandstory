@@ -1,241 +1,161 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
-interface ProspectInPipeline {
+interface Prospect {
   id: string;
   businessName: string;
-  contactName?: string;
-  stage: "discover" | "enrich" | "qualify" | "propose" | "orders";
-  confidenceScore?: number;
-  lastActivity?: string;
-  createdAt?: string;
-  emailSentAt?: string;
+  location: string;
+  stage: "discover" | "qualify" | "enrich" | "sent" | "replied" | "converted";
+  stageUpdatedAt: string;
+  nextAction?: string;
 }
-
-interface PipelineState {
-  loading: boolean;
-  error: string | null;
-  prospects: ProspectInPipeline[];
-  selectedStage: string | null;
-}
-
-const STAGES = [
-  { name: "discover", label: "Discover" },
-  { name: "enrich", label: "Enrich" },
-  { name: "qualify", label: "Qualify" },
-  { name: "propose", label: "Propose" },
-  { name: "orders", label: "Orders" },
-];
 
 export default function PipelinePage() {
-  const [state, setState] = useState<PipelineState>({
-    loading: true,
-    error: null,
-    prospects: [],
-    selectedStage: null,
-  });
+  const [prospects, setProspects] = useState<Prospect[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [stageFilters, setStageFilters] = useState<Record<string, ProspectInPipeline[]>>({
-    discover: [],
-    enrich: [],
-    qualify: [],
-    propose: [],
-    orders: [],
-  });
-
-  // Fetch pipeline data
   useEffect(() => {
-    const fetchPipeline = async () => {
-      try {
-        setState((s) => ({ ...s, loading: true, error: null }));
+    const sampleProspects: Prospect[] = [
+      {
+        id: "1",
+        businessName: "Acme Facilities",
+        location: "London",
+        stage: "discover",
+        stageUpdatedAt: "2 hours ago",
+      },
+      {
+        id: "2",
+        businessName: "Beta Services",
+        location: "Manchester",
+        stage: "qualify",
+        stageUpdatedAt: "1 day ago",
+        nextAction: "Review and qualify",
+      },
+      {
+        id: "3",
+        businessName: "Capital FM",
+        location: "London",
+        stage: "enrich",
+        stageUpdatedAt: "Yesterday",
+        nextAction: "Draft email",
+      },
+      {
+        id: "4",
+        businessName: "Tower Management",
+        location: "Birmingham",
+        stage: "sent",
+        stageUpdatedAt: "6 hours ago",
+        nextAction: "Monitor for replies",
+      },
+      {
+        id: "5",
+        businessName: "Smith & Co",
+        location: "Bristol",
+        stage: "replied",
+        stageUpdatedAt: "2 hours ago",
+        nextAction: "Follow up with proposal",
+      },
+    ];
 
-        const res = await fetch("/api/b2b/prospects");
-        if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch pipeline`);
-
-        const data = await res.json();
-        const prospects = Array.isArray(data) ? data : data.prospects || [];
-
-        // Group by stage
-        const grouped: Record<string, ProspectInPipeline[]> = {
-          discover: [],
-          enrich: [],
-          qualify: [],
-          propose: [],
-          orders: [],
-        };
-
-        prospects.forEach((prospect: ProspectInPipeline) => {
-          if (grouped[prospect.stage]) {
-            grouped[prospect.stage].push(prospect);
-          }
-        });
-
-        // Sort each stage by most recent activity
-        Object.keys(grouped).forEach((stage) => {
-          grouped[stage].sort((a, b) => {
-            const aDate = new Date(a.lastActivity || a.createdAt || 0).getTime();
-            const bDate = new Date(b.lastActivity || b.createdAt || 0).getTime();
-            return bDate - aDate;
-          });
-        });
-
-        setState((s) => ({
-          ...s,
-          loading: false,
-          prospects,
-        }));
-        setStageFilters(grouped);
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Failed to load pipeline";
-        setState((s) => ({
-          ...s,
-          loading: false,
-          error: message,
-        }));
-      }
-    };
-
-    fetchPipeline();
+    setProspects(sampleProspects);
+    setLoading(false);
   }, []);
 
-  if (state.loading) {
-    return (
-      <div className="px-4 md:px-12 py-10 max-w-6xl">
-        <div className="flex justify-center py-12">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-sm text-[#666666]">Loading pipeline...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const stages = [
+    { key: "discover", label: "Discovered" },
+    { key: "qualify", label: "Qualified" },
+    { key: "enrich", label: "Emailed" },
+    { key: "sent", label: "Sent" },
+    { key: "replied", label: "Replied" },
+    { key: "converted", label: "Converted" },
+  ];
 
-  if (state.error) {
-    return (
-      <div className="px-4 md:px-12 py-10 max-w-6xl">
-        <div className="mb-12">
-          <Link
-            href="/operator"
-            className="text-xs font-semibold text-[#888888] hover:text-[#0D0D0D] transition-colors mb-6 inline-block"
-          >
-            ← Back to Today
-          </Link>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight">
-            Pipeline
-          </h1>
-        </div>
-
-        <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white text-center">
-          <p className="text-sm text-[#666666] mb-4">{state.error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const totalProspects = state.prospects.length;
-
-  const prospectCounts = {
-    discover: stageFilters.discover?.length || 0,
-    enrich: stageFilters.enrich?.length || 0,
-    qualify: stageFilters.qualify?.length || 0,
-    propose: stageFilters.propose?.length || 0,
-    orders: stageFilters.orders?.length || 0,
+  const getProspectsForStage = (stage: string) => {
+    return prospects.filter((p) => p.stage === stage);
   };
 
-  return (
-    <div className="px-4 md:px-12 py-10 max-w-6xl">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl tracking-tight leading-tight mb-3">
-          Pipeline
-        </h1>
-        <p className="text-sm md:text-base text-[#888888] font-normal">
-          {totalProspects} prospect{totalProspects !== 1 ? "s" : ""} in pipeline
-        </p>
-      </div>
-
-      {/* Divider */}
-      <div className="h-px bg-[#E8E8E8] mb-12"></div>
-
-      {/* Pipeline Stages */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        {STAGES.map((stageConfig) => (
-          <div key={stageConfig.name}>
-            {/* Stage Header */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-[#0D0D0D]"></div>
-                <h2 className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.1em]">
-                  {stageConfig.label}
-                </h2>
-              </div>
-              <p className="text-xs text-[#888888]">
-                {stageFilters[stageConfig.name as keyof typeof stageFilters]?.length || 0} prospects
-              </p>
-            </div>
-
-            {/* Stage Prospects */}
-            <div className="space-y-3">
-              {stageFilters[stageConfig.name as keyof typeof stageFilters]?.length === 0 ? (
-                <div className="p-3 bg-[#F5F5F5] rounded border border-[#E8E8E8] text-center">
-                  <p className="text-xs text-[#888888]">Empty</p>
-                </div>
-              ) : (
-                stageFilters[stageConfig.name as keyof typeof stageFilters]?.map((prospect) => (
-                  <Link
-                    key={prospect.id}
-                    href={
-                      stageConfig.name === "orders"
-                        ? `/operator/orders?orderId=${prospect.id}`
-                        : `/operator/understand?prospectId=${prospect.id}`
-                    }
-                    className="block p-3 border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer"
-                  >
-                    <p className="text-xs font-semibold text-[#0D0D0D] mb-1 line-clamp-2">
-                      {prospect.businessName}
-                    </p>
-                    {prospect.confidenceScore !== undefined && (
-                      <p className="text-[9px] text-[#888888]">
-                        {prospect.confidenceScore}% confidence
-                      </p>
-                    )}
-                    {prospect.lastActivity && (
-                      <p className="text-[9px] text-[#C9C9C9] mt-1">
-                        {new Date(prospect.lastActivity).toLocaleDateString()}
-                      </p>
-                    )}
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {totalProspects === 0 && (
-        <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center mt-12">
-          <p className="text-sm text-[#888888] mb-4">
-            No prospects in pipeline yet.
-          </p>
-          <Link
-            href="/operator/discover"
-            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            Start discovering →
-          </Link>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center pt-32">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-[#666666]">Loading pipeline...</p>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white pt-32">
+      <div className="px-4 md:px-12 py-12">
+        <div className="mb-12">
+          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+            Pipeline Board
+          </p>
+          <p className="text-sm text-[#888888] mt-1">
+            Track all prospects through their journey
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 min-w-max pb-8">
+            {stages.map((stage) => {
+              const stageProspects = getProspectsForStage(stage.key);
+              return (
+                <div
+                  key={stage.key}
+                  className="flex flex-col w-72 flex-shrink-0"
+                >
+                  <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
+                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+                      {stage.label}
+                    </p>
+                    <p className="text-2xl font-black text-[#0D0D0D] mt-2">
+                      {stageProspects.length}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 flex-1">
+                    {stageProspects.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-xs text-[#AAAAAA]">No prospects</p>
+                      </div>
+                    ) : (
+                      stageProspects.map((prospect) => (
+                        <Link
+                          key={prospect.id}
+                          href={`/operator/understand?id=${prospect.id}`}
+                        >
+                          <div className="p-3 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:shadow-sm transition-all cursor-pointer">
+                            <p className="text-sm font-semibold text-[#0D0D0D] truncate">
+                              {prospect.businessName}
+                            </p>
+                            <p className="text-xs text-[#888888] mt-1">
+                              {prospect.location}
+                            </p>
+                            <p className="text-[10px] text-[#AAAAAA] mt-2">
+                              {prospect.stageUpdatedAt}
+                            </p>
+                            {prospect.nextAction && (
+                              <div className="mt-2 pt-2 border-t border-[#E8E8E8]">
+                                <p className="text-xs font-semibold text-[#0D0D0D]">
+                                  {prospect.nextAction}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

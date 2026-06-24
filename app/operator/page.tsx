@@ -252,6 +252,26 @@ export default function OperatorBriefing() {
     orders: state.data?.pipeline.orders || 0,
   };
 
+  // Sample active prospects (will be replaced with real data from API)
+  const activeProspects = [
+    {
+      id: "1",
+      name: "Acme Facilities Management",
+      location: "London",
+      stage: "Email Sent",
+      stagedAt: "2 hours ago",
+      action: "Awaiting reply",
+    },
+    {
+      id: "2",
+      name: "Beta Office Services",
+      location: "Manchester",
+      stage: "Qualified",
+      stagedAt: "1 day ago",
+      action: "Ready to email",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white pt-24">
       {/* HEADER */}
@@ -332,6 +352,47 @@ export default function OperatorBriefing() {
           </div>
         </div>
       </div>
+
+      {/* ACTIVE PROSPECTS SPOTLIGHT */}
+      {activeProspects.length > 0 && (
+        <div className="mb-16 px-4 md:px-0">
+          <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+            Active Prospects ({activeProspects.length})
+          </p>
+          <div className="grid gap-3">
+            {activeProspects.map((prospect) => (
+              <div
+                key={prospect.id}
+                className="border border-[#E8E8E8] rounded-lg p-4 flex items-center justify-between hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all cursor-pointer"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {prospect.name}
+                  </p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-[#888888]">{prospect.location}</span>
+                    <span className="text-xs text-[#CCCCCC]">•</span>
+                    <span className="text-xs text-[#888888]">{prospect.stage}</span>
+                    <span className="text-xs text-[#CCCCCC]">•</span>
+                    <span className="text-xs text-[#999999]">{prospect.stagedAt}</span>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-2">
+                    {prospect.action}
+                  </p>
+                  <button
+                    onClick={() => router.push(`/operator/understand`)}
+                    className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-2.5 py-1 rounded hover:bg-[#F5F5F5] transition-colors"
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* HIGH-CONFIDENCE CARD - Ideas #1, #2, #3, #5 */}
       <div className="mb-16 px-4 md:px-0">
