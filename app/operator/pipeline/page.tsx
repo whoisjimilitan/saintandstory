@@ -2,172 +2,116 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface Prospect {
   id: string;
   businessName: string;
-  location: string;
-  stage: "discover" | "qualify" | "enrich" | "sent" | "replied" | "converted";
-  stageUpdatedAt: string;
-  nextAction?: string;
+  city: string;
+  email: string;
+  confidenceScore?: number;
+  createdAt?: string;
+  email_sent_at?: string;
+  last_engagement_at?: string;
 }
 
-const stageColors = {
-  discover: "border-l-[#999999]",
-  qualify: "border-l-[#6B9FD1]",
-  enrich: "border-l-[#9B7BAC]",
-  sent: "border-l-[#D4A574]",
-  replied: "border-l-[#E89B5D]",
-  converted: "border-l-[#6DB575]",
-};
+interface Queue {
+  count: number;
+  prospects: Prospect[];
+  action: string;
+}
+
+interface PipelineQueues {
+  readyToQualify: Queue;
+  readyToEmail: Queue;
+  awaitingReply: Queue;
+  readyToClose: Queue;
+}
+
+const queueConfig = [
+  {
+    key: "readyToQualify",
+    label: "Ready to Review",
+    color: "border-l-[#999999]",
+    description: "Discovered, need qualification",
+    action: "Review & Qualify",
+  },
+  {
+    key: "readyToEmail",
+    label: "Ready to Email",
+    color: "border-l-[#6B9FD1]",
+    description: "Qualified, ready for first outreach",
+    action: "Send Emails",
+  },
+  {
+    key: "awaitingReply",
+    label: "Awaiting Reply",
+    color: "border-l-[#D4A574]",
+    description: "Emailed, waiting for response",
+    action: "Follow Up",
+  },
+  {
+    key: "readyToClose",
+    label: "Ready to Close",
+    color: "border-l-[#6DB575]",
+    description: "Replied, ready for offer",
+    action: "Make Offer",
+  },
+];
 
 export default function PipelinePage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const focusedStage = searchParams.get("stage");
-  const [prospects, setProspects] = useState<Prospect[]>([]);
+  const [queues, setQueues] = useState<PipelineQueues | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const sampleProspects: Prospect[] = [
-      {
-        id: "1",
-        businessName: "Acme Facilities",
-        location: "London",
-        stage: "discover",
-        stageUpdatedAt: "2h ago",
-      },
-      {
-        id: "1b",
-        businessName: "Prime Services",
-        location: "Manchester",
-        stage: "discover",
-        stageUpdatedAt: "1d ago",
-      },
-      {
-        id: "1c",
-        businessName: "Metro FM",
-        location: "Birmingham",
-        stage: "discover",
-        stageUpdatedAt: "3h ago",
-      },
-      {
-        id: "2",
-        businessName: "Beta Services",
-        location: "Manchester",
-        stage: "qualify",
-        stageUpdatedAt: "1d ago",
-      },
-      {
-        id: "2b",
-        businessName: "Capital FM",
-        location: "London",
-        stage: "qualify",
-        stageUpdatedAt: "Yesterday",
-      },
-      {
-        id: "2c",
-        businessName: "Nexus Group",
-        location: "Bristol",
-        stage: "qualify",
-        stageUpdatedAt: "2d ago",
-      },
-      {
-        id: "3",
-        businessName: "John's Movers",
-        location: "London",
-        stage: "enrich",
-        stageUpdatedAt: "Yesterday",
-      },
-      {
-        id: "3b",
-        businessName: "Sarah M Group",
-        location: "Edinburgh",
-        stage: "enrich",
-        stageUpdatedAt: "6h ago",
-      },
-      {
-        id: "4",
-        businessName: "Tower Management",
-        location: "Birmingham",
-        stage: "sent",
-        stageUpdatedAt: "6h ago",
-      },
-      {
-        id: "4b",
-        businessName: "New FM",
-        location: "Leeds",
-        stage: "sent",
-        stageUpdatedAt: "2d ago",
-      },
-      {
-        id: "4c",
-        businessName: "Metro Services",
-        location: "Bristol",
-        stage: "sent",
-        stageUpdatedAt: "3h ago",
-      },
-      {
-        id: "5",
-        businessName: "Smith & Co",
-        location: "Bristol",
-        stage: "replied",
-        stageUpdatedAt: "2h ago",
-      },
-      {
-        id: "5b",
-        businessName: "ABC Corp",
-        location: "London",
-        stage: "replied",
-        stageUpdatedAt: "1d ago",
-      },
-      {
-        id: "6",
-        businessName: "XYZ Inc",
-        location: "Manchester",
-        stage: "converted",
-        stageUpdatedAt: "Yesterday",
-      },
-    ];
-
-    setProspects(sampleProspects);
-    setLoading(false);
+    fetchPipelineQueues();
   }, []);
 
-  const stages = [
-    { key: "discover", label: "Discovered" },
-    { key: "qualify", label: "Qualified" },
-    { key: "enrich", label: "Emailed" },
-    { key: "sent", label: "Sent" },
-    { key: "replied", label: "Replied" },
-    { key: "converted", label: "Won" },
-  ];
+  const fetchPipelineQueues = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/operator/pipeline-queues");
 
-  const getProspectsForStage = (stage: string) => {
-    return prospects.filter((p) => p.stage === stage);
+      if (!res.ok) throw new Error("Failed to fetch pipeline queues");
+
+      const data = await res.json();
+      setQueues(data.queues);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[Pipeline] Error:", message);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleBatchSend = (stage: string) => {
-    const stageProspects = getProspectsForStage(stage);
-    
-    if (stageProspects.length === 0) {
-      alert("No prospects in this stage to send emails to");
+  const handleBatchAction = (queueKey: string, prospects: Prospect[]) => {
+    if (prospects.length === 0) {
+      alert("No prospects in this queue");
       return;
     }
 
-    // Store prospects in sessionStorage for enrich page to use
+    const action = queueConfig.find(q => q.key === queueKey)?.action;
+
+    // Store prospects in sessionStorage for action page
     sessionStorage.setItem(
-      "batchProspects",
-      JSON.stringify(stageProspects.map(p => ({
-        id: p.id,
-        businessName: p.businessName,
-        email: `contact@${p.businessName.toLowerCase().replace(/\s+/g, '')}.com`, // Placeholder
-      })))
+      "enrich_prospects",
+      JSON.stringify(
+        prospects.map((p) => ({
+          id: p.id,
+          businessName: p.businessName,
+          email: p.email,
+          city: p.city,
+          businessCategory: "unknown",
+        }))
+      )
     );
 
-    // Navigate to enrich page
-    router.push(`/operator/enrich?source=pipeline&stage=${stage}`);
+    // Navigate to enrich/email page
+    router.push(`/operator/enrich?mode=draft&count=${prospects.length}`);
   };
 
   if (loading) {
@@ -175,103 +119,125 @@ export default function PipelinePage() {
       <div className="min-h-screen bg-white flex items-center justify-center pt-32">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-sm text-[#666666]">Loading...</p>
+          <p className="text-sm text-[#666666]">Loading pipeline...</p>
         </div>
       </div>
     );
   }
 
+  if (error || !queues) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center pt-32">
+        <div className="text-center">
+          <p className="text-sm text-[#E63946] mb-4">Failed to load pipeline</p>
+          <button
+            onClick={fetchPipelineQueues}
+            className="px-4 py-2 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalProspects = Object.values(queues).reduce((sum, q) => sum + q.count, 0);
+
   return (
     <div className="min-h-screen bg-white pt-24 pb-12">
       <div className="px-4 md:px-8 lg:px-12">
-        {/* Header - Operator's Purpose */}
+        {/* Header */}
         <div className="mb-12">
           <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
             Complete prospect journey
           </p>
-          {focusedStage && (
-            <p className="text-sm text-[#888888] mt-2">
-              Focused on: <span className="font-semibold text-[#0D0D0D]">{stages.find(s => s.key === focusedStage)?.label}</span>
-            </p>
-          )}
+          <p className="text-xs text-[#888888] mt-2">
+            {totalProspects} prospect{totalProspects !== 1 ? 's' : ''} across all queues
+          </p>
         </div>
 
-        {/* Compact Board - Responsive Grid */}
-        <div className="w-full">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {stages.map((stage) => {
-              const stageProspects = getProspectsForStage(stage.key);
-              const topProspects = stageProspects.slice(0, 2);
-              const colorClass = stageColors[stage.key as keyof typeof stageColors];
+        {/* Action Queues - Responsive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {queueConfig.map((config) => {
+            const queue = queues[config.key as keyof PipelineQueues];
+            const topProspects = queue.prospects.slice(0, 3);
+            const hasMore = queue.prospects.length > 3;
 
-              return (
-                <div
-                  key={stage.key}
-                  className={`flex flex-col border-l-4 ${colorClass} bg-white border-r border-b border-t rounded-r-lg p-4 transition-all ${
-                    focusedStage === stage.key
-                      ? "border-[#0D0D0D] shadow-md"
-                      : "border-[#E8E8E8] hover:shadow-sm"
-                  }`}
-                >
-                  {/* Stage Header */}
-                  <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
-                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
-                      {stage.label}
-                    </p>
-                    <p className="text-xl font-black text-[#0D0D0D] leading-none mt-1">
-                      {stageProspects.length}
-                    </p>
-                  </div>
+            return (
+              <div
+                key={config.key}
+                className={`flex flex-col border-l-4 ${config.color} bg-white border-r border-b border-t rounded-r-lg p-4 transition-all hover:shadow-sm`}
+              >
+                {/* Queue Header */}
+                <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+                    {config.label}
+                  </p>
+                  <p className="text-2xl font-black text-[#0D0D0D] leading-none mt-1">
+                    {queue.count}
+                  </p>
+                  <p className="text-[10px] text-[#888888] mt-1">
+                    {config.description}
+                  </p>
+                </div>
 
-                  {/* Prospects - Compact */}
-                  <div className="space-y-2 flex-1 mb-4">
-                    {topProspects.length === 0 ? (
-                      <p className="text-xs text-[#CCCCCC]">—</p>
-                    ) : (
-                      topProspects.map((prospect) => (
+                {/* Prospects List */}
+                <div className="space-y-2 flex-1 mb-4">
+                  {queue.prospects.length === 0 ? (
+                    <p className="text-xs text-[#CCCCCC] py-4">—</p>
+                  ) : (
+                    <>
+                      {topProspects.map((prospect) => (
                         <Link
                           key={prospect.id}
-                          href={`/operator/understand?id=${prospect.id}`}
+                          href={`/operator/understand?prospectId=${prospect.id}`}
                         >
-                          <div className="p-2 bg-[#F9F9F9] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-white transition-all cursor-pointer group">
+                          <div className="p-2 bg-[#F9F9F9] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-white transition-all cursor-pointer">
                             <p className="text-xs font-semibold text-[#0D0D0D] truncate">
                               {prospect.businessName}
                             </p>
                             <p className="text-[10px] text-[#999999] truncate mt-0.5">
-                              {prospect.location}
+                              {prospect.city}
                             </p>
+                            {prospect.confidenceScore && (
+                              <p className="text-[10px] text-[#666666] mt-1">
+                                Score: {prospect.confidenceScore}%
+                              </p>
+                            )}
                           </div>
                         </Link>
-                      ))
-                    )}
+                      ))}
 
-                    {/* More indicator */}
-                    {stageProspects.length > 2 && (
-                      <button
-                        onClick={() => {
-                          window.location.href = `/operator/understand?stage=${stage.key}`;
-                        }}
-                        className="text-[10px] font-semibold text-[#0D0D0D] hover:underline mt-1"
-                      >
-                        +{stageProspects.length - 2}
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Send Button - Bottom of Card */}
-                  {stageProspects.length > 0 && (
-                    <button
-                      onClick={() => handleBatchSend(stage.key)}
-                      className="w-full px-3 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
-                      title={`Send email to all ${stageProspects.length} prospect${stageProspects.length !== 1 ? 's' : ''}`}
-                    >
-                      Send to All
-                    </button>
+                      {/* View All Link */}
+                      {hasMore && (
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/operator/understand?queue=${config.key}`
+                            )
+                          }
+                          className="text-[10px] font-semibold text-[#0D0D0D] hover:underline mt-2 w-full text-left"
+                        >
+                          +{queue.prospects.length - 3} more
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Action Button */}
+                {queue.prospects.length > 0 && (
+                  <button
+                    onClick={() => handleBatchAction(config.key, queue.prospects)}
+                    className="w-full px-3 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
+                    title={`${config.action} for all ${queue.count} prospect${queue.count !== 1 ? 's' : ''}`}
+                  >
+                    {config.action} ({queue.count})
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
