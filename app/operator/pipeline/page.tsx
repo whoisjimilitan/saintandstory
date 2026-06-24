@@ -202,29 +202,18 @@ export default function PipelinePage() {
                   key={stage.key}
                   className={`flex flex-col border-l-4 ${colorClass} bg-white border-r border-b border-t border-[#E8E8E8] rounded-r-lg p-4 hover:shadow-sm transition-shadow`}
                 >
-                  {/* Stage Header with Send Button */}
-                  <div className="mb-3 pb-3 border-b border-[#E8E8E8]">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
-                        {stage.label}
-                      </p>
-                      {stageProspects.length > 0 && (
-                        <button
-                          onClick={() => handleBatchSend(stage.key)}
-                          className="text-[9px] font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-2 py-1 rounded hover:bg-[#F5F5F5] transition-colors whitespace-nowrap"
-                          title={`Send email to all ${stageProspects.length} prospects`}
-                        >
-                          Send
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-xl font-black text-[#0D0D0D] leading-none">
+                  {/* Stage Header */}
+                  <div className="mb-4 pb-3 border-b border-[#E8E8E8]">
+                    <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+                      {stage.label}
+                    </p>
+                    <p className="text-xl font-black text-[#0D0D0D] leading-none mt-1">
                       {stageProspects.length}
                     </p>
                   </div>
 
                   {/* Prospects - Compact */}
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-2 flex-1 mb-4">
                     {topProspects.length === 0 ? (
                       <p className="text-xs text-[#CCCCCC]">—</p>
                     ) : (
@@ -257,6 +246,17 @@ export default function PipelinePage() {
                       </button>
                     )}
                   </div>
+
+                  {/* Send Button - Bottom of Card */}
+                  {stageProspects.length > 0 && (
+                    <button
+                      onClick={() => handleBatchSend(stage.key)}
+                      className="w-full px-3 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
+                      title={`Send email to all ${stageProspects.length} prospect${stageProspects.length !== 1 ? 's' : ''}`}
+                    >
+                      Send to All
+                    </button>
+                  )}
                 </div>
               );
             })}

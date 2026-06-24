@@ -124,21 +124,21 @@ export function OperatorNav() {
                 <Link
                   href="/operator/settings"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest"
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors"
                 >
                   Settings
                 </Link>
                 <Link
                   href="/dashboard/admin"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest border-t border-[#E8E8E8]"
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors border-t border-[#E8E8E8]"
                 >
-                  Admin Dashboard
+                  Admin
                 </Link>
                 <Link
                   href="/sign-in"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors uppercase tracking-widest border-t border-[#E8E8E8]"
+                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors border-t border-[#E8E8E8]"
                 >
                   Logout
                 </Link>
