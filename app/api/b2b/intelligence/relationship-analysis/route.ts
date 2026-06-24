@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         website,
         niche,
         notes
-      FROM leads
+      FROM b2b_leads
       WHERE id = ${prospectId}
       LIMIT 1
     `;
