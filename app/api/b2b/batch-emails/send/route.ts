@@ -81,7 +81,7 @@ export async function POST(request: Request) {
           },
         });
 
-        // Track in B2bOutreach for sent history (with optional batch metadata)
+        // Track in B2bOutreach for sent history
         await prisma.b2bOutreach.create({
           data: {
             leadId: email.prospectId,
@@ -91,12 +91,6 @@ export async function POST(request: Request) {
             resendMessageId: result.data?.id,
             emailType: "initial",
             sent_by: "batch_email_enrich",
-            // Autonomous batch metadata (optional)
-            ...(batchId && {
-              batch_id: batchId,
-              batch_approved_at: now,
-              batch_approved_by: approvedBy || "system",
-            }),
           },
         });
 
