@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const postcode = searchParams.get("postcode");
     const city = searchParams.get("city");
     const status = searchParams.get("status");
-    const limit = parseInt(searchParams.get("limit") || "50", 10);
+    const limit = parseInt(searchParams.get("limit") || "500", 10);
 
     if (!query && !postcode && !city) {
       return NextResponse.json(
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
         painPoint: true,
         businessEvidence: true,
       },
-      take: Math.min(limit, 100),
+      take: Math.min(limit, 500),
       orderBy: { createdAt: "desc" },
     });
 

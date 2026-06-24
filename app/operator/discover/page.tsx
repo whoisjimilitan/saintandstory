@@ -138,7 +138,7 @@ export default function DiscoverPage() {
         params.append("keyword", searchTerm);
       }
 
-      params.append("limit", "100");
+      params.append("limit", "500");
 
       const url = `/api/b2b/discover?${params.toString()}`;
 
