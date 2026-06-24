@@ -141,6 +141,8 @@ export default function OperatorBriefing() {
   });
 
   const [dateStr, setDateStr] = useState("");
+  const [sentEmails, setSentEmails] = useState<any[]>([]);
+  const [expandedEmails, setExpandedEmails] = useState<Set<string>>(new Set());
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -172,6 +174,21 @@ export default function OperatorBriefing() {
       }
     };
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const loadSentEmails = async () => {
+      try {
+        const res = await fetch("/api/operator/sent-emails-today");
+        if (res.ok) {
+          const data = await res.json();
+          setSentEmails(data.emails || []);
+        }
+      } catch (error) {
+        console.error("Failed to load sent emails:", error);
+      }
+    };
+    loadSentEmails();
   }, []);
 
   const handleMetricClick = (metric: string) => {
@@ -562,6 +579,128 @@ export default function OperatorBriefing() {
           </div>
         </div>
       </div>
+
+      {/* OUTREACH ACTIVITY CARD - Email Transparency */}
+      {sentEmails.length > 0 && (
+        <div className="mb-16 px-4 md:px-0">
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
+                Outreach Activity
+              </p>
+              <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-2">
+                {sentEmails.length}
+              </p>
+              <p className="text-sm text-[#666666]">
+                email{sentEmails.length !== 1 ? 's' : ''} sent today
+              </p>
+            </div>
+
+            {/* Email List */}
+            <div className="space-y-2">
+              {sentEmails.map((email) => (
+                <div
+                  key={email.id}
+                  className="border border-[#E8E8E8] rounded p-4 hover:bg-[#F5F5F5] transition-colors"
+                >
+                  <button
+                    onClick={() => {
+                      const newSet = new Set(expandedEmails);
+                      if (newSet.has(email.id)) {
+                        newSet.delete(email.id);
+                      } else {
+                        newSet.add(email.id);
+                      }
+                      setExpandedEmails(newSet);
+                    }}
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-[#0D0D0D] truncate">
+                          {email.businessName}
+                        </p>
+                        <p className="text-xs text-[#888888] truncate">
+                          {email.email}
+                        </p>
+                        <p className="text-xs text-[#666666] mt-1 truncate">
+                          {email.subject || "(No subject)"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                        <div className="text-right">
+                          <div className="text-xs font-semibold text-[#0D0D0D]">
+                            {email.status === "sent" ? "✅ Sent" : "⏳ Pending"}
+                          </div>
+                          <div className="text-[10px] text-[#888888] mt-0.5">
+                            {new Date(email.sentAt).toLocaleTimeString("en-GB", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </div>
+                        <div className="text-[#888888]">
+                          {expandedEmails.has(email.id) ? "▼" : "▶"}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Expanded Details */}
+                  {expandedEmails.has(email.id) && (
+                    <div className="mt-4 pt-4 border-t border-[#E8E8E8] space-y-3">
+                      <div>
+                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
+                          Message ID
+                        </p>
+                        <p className="text-xs font-mono text-[#666666]">
+                          {email.resendMessageId || "(Pending Resend ID)"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
+                          Email Body
+                        </p>
+                        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-3 max-h-48 overflow-y-auto">
+                          <p className="text-xs text-[#666666] whitespace-pre-wrap break-words">
+                            {email.body || "(No body content)"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          router.push(`/operator/understand?id=${email.leadId}`)
+                        }
+                        className="text-xs font-semibold text-[#0D0D0D] hover:underline transition-colors"
+                      >
+                        View Prospect Detail →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Summary */}
+            <div className="mt-6 pt-6 border-t border-[#E8E8E8] space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-[#888888]">Sent to Resend</span>
+                <span className="text-sm font-semibold text-[#0D0D0D]">
+                  {sentEmails.filter((e) => e.status === "sent").length}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-[#888888]">Pending</span>
+                <span className="text-sm font-semibold text-[#0D0D0D]">
+                  {sentEmails.filter((e) => e.status === "pending").length}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* REVENUE CARD */}
       <div className="mb-16 px-4 md:px-0">

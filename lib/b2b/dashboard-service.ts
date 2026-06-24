@@ -388,6 +388,65 @@ export class DashboardService {
   }
 
   /**
+   * Get emails sent today - for outreach activity transparency
+   */
+  async getSentEmailsToday(): Promise<Array<{
+    id: string;
+    leadId: string;
+    businessName: string;
+    email: string;
+    subject: string;
+    body: string;
+    sentAt: Date;
+    resendMessageId: string | null;
+    status: "sent" | "pending" | "failed";
+  }>> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Get all outreach records sent today
+      const sentEmails = await prisma.b2bOutreach.findMany({
+        where: {
+          sentAt: {
+            gte: today,
+            lt: tomorrow,
+          },
+        },
+        include: {
+          lead: {
+            select: {
+              id: true,
+              businessName: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          sentAt: "desc",
+        },
+      });
+
+      return sentEmails.map((email) => ({
+        id: email.id,
+        leadId: email.leadId,
+        businessName: email.lead?.businessName || "Unknown",
+        email: email.lead?.email || "unknown@example.com",
+        subject: email.subject || "(No subject)",
+        body: email.body || "",
+        sentAt: email.sentAt || new Date(),
+        resendMessageId: email.resendMessageId,
+        status: email.resendMessageId ? "sent" : "pending",
+      }));
+    } catch (error) {
+      console.error("[DashboardService] Error fetching sent emails today:", error);
+      return [];
+    }
+  }
+
+  /**
    * Health check - verify all data sources are accessible
    */
   async healthCheck(): Promise<{ healthy: boolean; errors: string[] }> {
