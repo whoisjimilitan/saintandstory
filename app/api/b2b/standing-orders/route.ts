@@ -49,12 +49,27 @@ export async function GET() {
     // DATABASE CALL: Try to fetch orders (return empty array if table doesn't exist yet)
     let orders = [];
     try {
-      orders = await sql`
+      const rows = await sql`
         SELECT *
         FROM b2b_standing_orders
         WHERE active = true
         ORDER BY created_at DESC
       ` as any[];
+
+      // Map snake_case database columns to camelCase for frontend
+      orders = rows.map((row: any) => ({
+        id: row.id,
+        prospectId: row.lead_id,
+        prospectName: row.business_name,
+        value: row.price || 0,
+        currency: "GBP",
+        products: row.service_type,
+        status: row.active ? "active" : "pending",
+        createdAt: row.created_at,
+        renewalDate: row.next_scheduled_at,
+        assignedOperator: row.contact_name,
+        notes: row.notes,
+      }));
     } catch (dbError) {
       const msg = dbError instanceof Error ? dbError.message : String(dbError);
       console.error("🔥 ORDERS-GET: Query failed:", msg);
