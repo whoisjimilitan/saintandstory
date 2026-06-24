@@ -388,77 +388,57 @@ export default function EnrichPage() {
         {editingIndex !== null && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              {/* Modal Header */}
-              <div className="sticky top-0 bg-white border-b border-[#E8E8E8] p-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-[#0D0D0D]">Edit & Personalize Email</h2>
-                  <button
-                    onClick={() => setEditingIndex(null)}
-                    className="text-2xl text-[#888888] hover:text-[#0D0D0D]"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-xs text-[#666666] mt-2">
-                  Hint: Type {'{{businessName}}'} in subject or message to personalize emails for each prospect
-                </p>
+              {/* Modal Header - Minimal */}
+              <div className="sticky top-0 bg-white border-b border-[#E8E8E8] p-6 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-[#0D0D0D]">Edit Email</h2>
+                <button
+                  onClick={() => setEditingIndex(null)}
+                  className="text-2xl text-[#888888] hover:text-[#0D0D0D]"
+                >
+                  ×
+                </button>
               </div>
 
-              {/* Modal Content */}
-              <div className="p-6 space-y-6">
+              {/* Modal Content - Pure Minimal */}
+              <div className="p-6 space-y-4">
                 {/* Subject Editor */}
                 <div>
-                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase mb-2 block">Subject</label>
                   <input
                     type="text"
                     value={editSubject}
                     onChange={(e) => setEditSubject(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] rounded focus:outline-none focus:border-[#0D0D0D] transition-colors"
+                    placeholder="Subject"
+                    className="w-full px-3 py-2 bg-[#F9F9F9] border-b border-[#E8E8E8] text-sm text-[#0D0D0D] rounded-none focus:outline-none focus:border-[#0D0D0D] transition-colors"
                   />
                 </div>
 
                 {/* Body Editor */}
                 <div>
-                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase mb-2 block">Message</label>
                   <textarea
                     value={editBody}
                     onChange={(e) => setEditBody(e.target.value)}
-                    rows={8}
-                    className="w-full px-4 py-3 bg-[#F9F9F9] border border-[#E8E8E8] text-sm text-[#0D0D0D] font-mono rounded focus:outline-none focus:border-[#0D0D0D] transition-colors resize-none"
+                    placeholder="Message"
+                    rows={10}
+                    className="w-full px-3 py-2 bg-[#F9F9F9] border-b border-[#E8E8E8] text-sm text-[#0D0D0D] rounded-none focus:outline-none focus:border-[#0D0D0D] transition-colors resize-none"
                   />
-                  <p className="text-xs text-[#888888] mt-2">Use {'{{businessName}}'} to insert prospect business name</p>
                 </div>
 
-                {/* Preview with Substitutions */}
-                <div className="bg-[#F5F5F5] border-2 border-[#E8E8E8] rounded p-4 space-y-3">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase">Preview (first 3 prospects)</p>
-                  <div className="space-y-2">
-                    {prospects.slice(0, 3).map((prospect, idx) => {
-                      const subj = editSubject.replace(/{{businessName}}/g, prospect.businessName);
-                      const body = editBody.replace(/{{businessName}}/g, prospect.businessName);
-                      return (
-                        <div key={idx} className="bg-white border border-[#E8E8E8] rounded p-3">
-                          <p className="text-xs text-[#888888]">{prospect.businessName}</p>
-                          <p className="text-xs font-semibold text-[#0D0D0D] mt-1">{subj}</p>
-                          <p className="text-xs text-[#666666] mt-1 whitespace-pre-wrap">{body.substring(0, 100)}...</p>
-                          <p className="text-xs text-[#888888] mt-2 pt-2 border-t border-[#E8E8E8]">From: {user?.firstName || "Team Member"}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Variable Guide */}
-                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-3">
-                  <p className="text-xs font-semibold text-[#0D0D0D] mb-2">Available Variables:</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <p className="text-xs text-[#666666]">{'{{businessName}}'} = Business name</p>
-                    <p className="text-xs text-[#666666]">Example: "Hi {'{{businessName}}'}  "</p>
-                  </div>
+                {/* Quick Preview - Silent */}
+                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 space-y-2">
+                  {prospects.slice(0, 1).map((prospect, idx) => {
+                    const subj = editSubject.replace(/{{businessName}}/g, prospect.businessName);
+                    const body = editBody.replace(/{{businessName}}/g, prospect.businessName);
+                    return (
+                      <div key={idx}>
+                        <p className="text-xs font-semibold text-[#0D0D0D]">{subj}</p>
+                        <p className="text-xs text-[#666666] mt-1 whitespace-pre-wrap">{body}</p>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Save Options */}
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => {
                       // Save to this email only
