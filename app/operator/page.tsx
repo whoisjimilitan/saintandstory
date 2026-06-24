@@ -406,12 +406,33 @@ export default function OperatorBriefing() {
             <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
               Discovery Pipeline
             </p>
-            <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-4">
+            <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-2">
               {metrics.highConfidenceToday}
             </p>
-            <p className="text-sm text-[#666666] mb-6">
-              High-confidence prospects ready to review.
+            <p className="text-sm text-[#666666] mb-4">
+              prospect{metrics.highConfidenceToday !== 1 ? 's' : ''} ready to review
             </p>
+
+            {/* Show which prospects these are */}
+            {(state.data?.metrics.activeProspects?.length ?? 0) > 0 && (
+              <div className="mb-6 pb-4 border-b border-[#E8E8E8]">
+                <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-2">
+                  In Pipeline Now
+                </p>
+                <ul className="space-y-1">
+                  {state.data?.metrics.activeProspects?.slice(0, 3).map((prospect: any) => (
+                    <li key={prospect.id} className="text-xs text-[#666666]">
+                      • {prospect.businessName} <span className="text-[#999999]">({prospect.location})</span>
+                    </li>
+                  ))}
+                  {(state.data?.metrics.activeProspects?.length ?? 0) > 3 && (
+                    <li className="text-xs font-semibold text-[#0D0D0D] mt-1.5 pt-1.5 border-t border-[#E8E8E8]">
+                      +{(state.data?.metrics.activeProspects?.length ?? 0) - 3} more
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
 
             {/* Temperature Breakdown - Clickable */}
             <div className="space-y-2.5 mb-6">
