@@ -741,9 +741,9 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
 
       {/* En route ─────────────────────────────────────────────────────────── */}
       {inProgressJobs.length > 0 && (
-        <div id="section-enroute">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-3">
-            En route ({inProgressJobs.length})
+        <div id="section-enroute" className="mb-8 pt-8 border-t border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em] mb-4">
+            In Transit ({inProgressJobs.length})
           </p>
           <div className="space-y-2">
             {(inProgressJobs as unknown as Job[]).map((job: Job) => (
@@ -758,15 +758,15 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Leads ──────────────────────────────────────────────────────────────────*/}
+      {/* Orders ──────────────────────────────────────────────────────────────────*/}
       {pending.length > 0 && (
-        <div id="section-orders">
+        <div id="section-orders" className="mb-8 pt-8 border-t border-[#E8E8E8]">
           <button
             onClick={() => setExpandedCustomers(v => !v)}
-            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
+            className="w-full flex items-center justify-between pb-3 mb-4 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-              Lead{pending.length !== 1 ? "s" : ""}
+            <span className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+              Order{pending.length !== 1 ? "s" : ""}
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -789,15 +789,15 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Searching ──────────────────────────────────────────────────────────────*/}
+      {/* Offered ──────────────────────────────────────────────────────────────────*/}
       {offered.length > 0 && (
-        <div id="section-awaiting">
+        <div id="section-awaiting" className="mb-8 pt-8 border-t border-[#E8E8E8]">
           <button
             onClick={() => setExpandedAwaitingDrivers(v => !v)}
-            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
+            className="w-full flex items-center justify-between pb-3 mb-4 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-              Searching
+            <span className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+              Offered
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -820,15 +820,15 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Driving ────────────────────────────────────────────────────────────────*/}
+      {/* Assigned ────────────────────────────────────────────────────────────────*/}
       {confirmedJobs.length > 0 && (
-        <div id="section-confirmed">
+        <div id="section-confirmed" className="mb-8 pt-8 border-t border-[#E8E8E8]">
           <button
             onClick={() => setExpandedConfirmed(v => !v)}
-            className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
+            className="w-full flex items-center justify-between pb-3 mb-4 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
           >
-            <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-              Driving
+            <span className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+              Assigned
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
@@ -856,14 +856,14 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
         </div>
       )}
 
-      {/* Fleet ─────────────────────────────────────────────────────────────── */}
-      <div id="section-fleet">
+      {/* Available ─────────────────────────────────────────────────────────────── */}
+      <div id="section-fleet" className="mb-8 pt-8 border-t border-[#E8E8E8]">
         <button
           onClick={() => setExpandedFleet(v => !v)}
-          className="w-full flex items-center justify-between pb-3 mb-3 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
+          className="w-full flex items-center justify-between pb-3 mb-4 border-b border-[#E8E8E8] hover:border-[#D0D0D0] transition-colors"
         >
-          <span className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em]">
-            Fleet
+          <span className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.08em]">
+            Available
           </span>
           <div className="flex items-center gap-2">
             {onlineCount > 0 && (
