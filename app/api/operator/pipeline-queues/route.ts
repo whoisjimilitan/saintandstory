@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       // Queue 1: Ready to Qualify (discovered, not yet qualified)
       prisma.b2bLead.findMany({
         where: {
-          pipeline_stage: "discover",
+          pipeline_stage: "NEW",
           leadState: "new",
         },
         select: {
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
           city: true,
           email: true,
           createdAt: true,
-          confidenceScore: true,
+          engagement_score: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
       // Queue 2: Ready to Email (qualified, not yet emailed)
       prisma.b2bLead.findMany({
         where: {
-          pipeline_stage: "qualify",
+          pipeline_stage: "QUALIFY",
           leadState: "qualified",
         },
         select: {
@@ -56,10 +56,10 @@ export async function GET(request: Request) {
           city: true,
           email: true,
           createdAt: true,
-          confidenceScore: true,
+          engagement_score: true,
         },
         orderBy: {
-          confidenceScore: "desc",
+          engagement_score: "desc",
         },
         take: 50,
       }),
@@ -67,8 +67,10 @@ export async function GET(request: Request) {
       // Queue 3: Awaiting Reply (emailed, not yet replied)
       prisma.b2bLead.findMany({
         where: {
-          pipeline_stage: "propose",
-          leadState: "emailed",
+          pipeline_stage: "ENGAGE",
+          email_sent_at: {
+            not: null,
+          },
         },
         select: {
           id: true,
@@ -76,7 +78,7 @@ export async function GET(request: Request) {
           city: true,
           email: true,
           email_sent_at: true,
-          confidenceScore: true,
+          engagement_score: true,
         },
         orderBy: {
           email_sent_at: "desc",
@@ -84,11 +86,13 @@ export async function GET(request: Request) {
         take: 50,
       }),
 
-      // Queue 4: Ready to Close (replied, ready for offer)
+      // Queue 4: Ready to Close (engaged, ready for next step)
       prisma.b2bLead.findMany({
         where: {
-          pipeline_stage: "propose",
-          leadState: "replied",
+          pipeline_stage: "ENGAGE",
+          last_engagement_at: {
+            not: null,
+          },
         },
         select: {
           id: true,
@@ -96,7 +100,7 @@ export async function GET(request: Request) {
           city: true,
           email: true,
           last_engagement_at: true,
-          confidenceScore: true,
+          engagement_score: true,
         },
         orderBy: {
           last_engagement_at: "desc",

@@ -1,271 +1,183 @@
+/**
+ * BATCH EMAIL GENERATION ENDPOINT
+ *
+ * Integrates 3-Layer Architecture:
+ * - Layer 1: PD Operating System (immutable philosophy)
+ * - Layer 2: Reasoning Engine (generate 10 formulations, score, rank top 3)
+ * - Layer 3: Trust Validation Engine (QA before output)
+ *
+ * Takes REAL prospects from QUALIFY queue
+ * Returns three ranked recommendations per prospect
+ */
+
 import { NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import {
-  generateRelationshipCommunication,
-  type BusinessProfile,
-  type RelationshipStage,
-} from "@/lib/business-relationship-engine";
+import { generateRelationshipCommunication } from "@/lib/business-relationship-engine";
+import { generateCommunicationRecommendations, formatRecommendationsForOperator } from "@/lib/layer2-reasoning-engine";
 
-interface EmailPreview {
-  prospectId: string;
-  prospectName: string;
-  businessName: string;
-  city: string;
-  subject: string;
-  body: string;
-  wordCount: number;
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk",
+];
 
-  // NEW: Relationship reasoning
-  relationshipStage: RelationshipStage;
-  stageObjective: string;
-  reasoning: {
-    businessAnalysis: {
-      industry: string;
-      location: string;
-    };
-    trustStrategy: string;
-    inverseIncentive: string;
-    mentalSimulation: string;
-    microCommitment: {
-      ask: string;
-      responseOptions: string[];
-    };
-  };
+async function isAdmin() {
+  const { userId } = await auth();
+  if (!userId) return false;
+  const user = await currentUser();
+  return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
 }
 
 export async function POST(request: Request) {
   try {
-    let body: any;
-    try {
-      body = await request.json();
-    } catch (parseErr) {
-      return NextResponse.json(
-        { error: "Invalid JSON payload" },
-        { status: 400 }
-      );
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { prospects: prospectData, prospectIds, batchId } = body;
+    const body = await request.json();
+    const { prospectIds = [] } = body;
 
-    // Accept: full prospect data OR prospectIds (legacy) OR batchId (autonomous queue)
-    let prospects: any[] = [];
-
-    // If prospect data is provided directly, use it
-    if (prospectData && Array.isArray(prospectData)) {
-      console.log("[RELATIONSHIP ENGINE] Received prospect data directly:", prospectData.length, "prospects");
-      prospects = prospectData;
-    }
-    // Batch mode: fetch from autonomous batch
-    else if (batchId && typeof batchId === "string") {
-      console.log("[RELATIONSHIP ENGINE] Batch mode: fetching from batch", batchId);
-
-      try {
-        prospects = await prisma.b2bLead.findMany({
-          where: {
-            batch_id: batchId,
-            overnight_discovered: true,
+    // If no prospects specified, fetch top 5 from QUALIFY queue
+    let prospects;
+    if (prospectIds.length === 0) {
+      prospects = await prisma.b2bLead.findMany({
+        where: {
+          pipeline_stage: "QUALIFY",
+          leadState: "qualified",
+          email: {
+            not: null,
           },
-          select: {
-            id: true,
-            businessName: true,
-            city: true,
-            businessCategory: true,
-            email: true,
-            contactName: true,
+        },
+        select: {
+          id: true,
+          businessName: true,
+          businessCategory: true,
+          city: true,
+          email: true,
+          website: true,
+          painPoint: true,
+          reviewRating: true,
+          engagement_score: true,
+        },
+        orderBy: {
+          engagement_score: "desc",
+        },
+        take: 5,
+      });
+    } else {
+      prospects = await prisma.b2bLead.findMany({
+        where: {
+          id: {
+            in: prospectIds,
           },
-        });
-      } catch (dbErr) {
-        console.error("[RELATIONSHIP ENGINE] Database error fetching batch:", dbErr);
-        return NextResponse.json(
-          { error: "Database error fetching batch", success: false, emails: [] },
-          { status: 500 }
-        );
-      }
-
-      console.log("[RELATIONSHIP ENGINE] ✅ Loaded", prospects.length, "prospects from batch", batchId);
-    }
-    // Legacy mode: fetch by prospectIds
-    else if (prospectIds && Array.isArray(prospectIds)) {
-      console.log("[RELATIONSHIP ENGINE] Legacy mode: fetching by IDs");
-
-      if (prospectIds.length === 0) {
-        console.error("[RELATIONSHIP ENGINE] prospectIds array is empty");
-        return NextResponse.json(
-          { error: "prospectIds array cannot be empty", success: false, emails: [] },
-          { status: 400 }
-        );
-      }
-
-      try {
-        prospects = await prisma.b2bLead.findMany({
-          where: {
-            id: { in: prospectIds },
-          },
-          select: {
-            id: true,
-            businessName: true,
-            city: true,
-            businessCategory: true,
-            email: true,
-            contactName: true,
-          },
-        });
-      } catch (dbErr) {
-        console.error("[RELATIONSHIP ENGINE] Database error fetching prospects:", dbErr);
-        return NextResponse.json(
-          { error: "Database error fetching prospects", success: false, emails: [] },
-          { status: 500 }
-        );
-      }
-
-      console.log("[RELATIONSHIP ENGINE] ✅ Found", prospects.length, "out of", prospectIds.length, "prospects");
-    }
-    // No valid input
-    else {
-      console.error("[RELATIONSHIP ENGINE] No valid input: prospects, prospectIds, or batchId required");
-      return NextResponse.json(
-        { error: "Either 'prospects', 'prospectIds', or 'batchId' parameter is required", success: false, emails: [] },
-        { status: 400 }
-      );
+        },
+        select: {
+          id: true,
+          businessName: true,
+          businessCategory: true,
+          city: true,
+          email: true,
+          website: true,
+          painPoint: true,
+          reviewRating: true,
+          engagement_score: true,
+        },
+      });
     }
 
     if (prospects.length === 0) {
-      console.error("[RELATIONSHIP ENGINE] No prospects available");
       return NextResponse.json(
-        { error: "No prospects found", success: false, emails: [], failedIds: prospectIds || [] },
-        { status: 400 }
+        { error: "No prospects found", success: false },
+        { status: 404 }
       );
     }
 
-    // Build business profiles for reasoning engine
-    const emails: EmailPreview[] = [];
-    const failedProspects: { id: string; reason: string }[] = [];
+    // Generate recommendations for each prospect
+    const results = [];
 
     for (const prospect of prospects) {
       try {
-        // Validate prospect data before processing
-        if (!prospect || !prospect.id) {
-          failedProspects.push({ id: prospect?.id || "unknown", reason: "Invalid prospect object" });
-          continue;
-        }
-
-        if (!prospect.businessName || typeof prospect.businessName !== "string") {
-          failedProspects.push({ id: prospect.id, reason: "Missing or invalid businessName" });
-          continue;
-        }
-
-        const businessProfile: BusinessProfile = {
+        // STEP 1: Generate reasoning context using 8-step engine
+        const reasoning = generateRelationshipCommunication({
           name: prospect.businessName,
-          industry: (prospect.businessCategory && typeof prospect.businessCategory === "string")
-            ? prospect.businessCategory
-            : "unknown",
-          location: (prospect.city && typeof prospect.city === "string")
-            ? prospect.city
-            : "UK",
-          size: "small",
-          contactName: prospect.contactName || undefined,
+          industry: prospect.businessCategory || "logistics",
+          location: prospect.city || "UK",
+          size: "small" as const,
+          contactName: undefined,
           discoveryEvidence: {
-            operationalIndicators: [
-              prospect.businessCategory ? `Industry: ${prospect.businessCategory}` : "Industry: unknown",
-              prospect.city ? `Location: ${prospect.city}` : "Location: UK"
-            ].filter(Boolean),
-            growthSignals: ["Active prospect"],
+            operationalIndicators: [],
+            growthSignals: [],
             currentSolutions: [],
-            painPoints: [],
-          },
-        };
-
-        // Generate relationship communication (all 8 steps)
-        let communication;
-        try {
-          communication = generateRelationshipCommunication(businessProfile, undefined);
-        } catch (commErr) {
-          const msg = commErr instanceof Error ? commErr.message : String(commErr);
-          console.error(`[RELATIONSHIP ENGINE] Communication generation failed for ${prospect.businessName}:`, msg);
-          failedProspects.push({ id: prospect.id, reason: `Communication failed: ${msg.substring(0, 50)}` });
-          continue;
-        }
-
-        // Safely extract communication data
-        if (!communication || !communication.email) {
-          failedProspects.push({ id: prospect.id, reason: "Communication generated but no email output" });
-          continue;
-        }
-
-        emails.push({
-          prospectId: prospect.id,
-          prospectName: prospect.contactName || prospect.businessName,
-          businessName: prospect.businessName,
-          city: prospect.city || "UK",
-          subject: communication.email.subject || "No subject",
-          body: communication.email.body || "No body",
-          wordCount: communication.email.wordCount || 0,
-
-          relationshipStage: communication.stageProgression?.currentStage || 1,
-          stageObjective: communication.reasoning?.relationshipStage?.stageObjective || "Unknown",
-          reasoning: {
-            businessAnalysis: {
-              industry: communication.reasoning?.businessAnalysis?.industry || "unknown",
-              location: communication.reasoning?.businessAnalysis?.location || "unknown",
-            },
-            trustStrategy: communication.reasoning?.trustStrategy?.trustSignal || "Unknown",
-            inverseIncentive: communication.reasoning?.inverseIncentive?.statement || "Unknown",
-            mentalSimulation: communication.reasoning?.mentalSimulation?.scenario || "Unknown",
-            microCommitment: {
-              ask: communication.reasoning?.microCommitment?.ask || "Unknown",
-              responseOptions: communication.reasoning?.microCommitment?.responseOptions || [],
-            },
+            painPoints: prospect.painPoint ? [prospect.painPoint] : [],
           },
         });
 
-        console.log(`[RELATIONSHIP ENGINE] ✅ Generated communication for ${prospect.businessName}`);
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        console.error(`[RELATIONSHIP ENGINE] ❌ Unexpected error for prospect ${prospect?.id}:`, msg);
-        failedProspects.push({ id: prospect?.id || "unknown", reason: msg.substring(0, 50) });
+        // STEP 2: Generate 3 ranked recommendations using Layer 2
+        const recommendations = generateCommunicationRecommendations(reasoning);
+
+        // STEP 3: Format for operator display
+        const formatted = formatRecommendationsForOperator(recommendations);
+
+        results.push({
+          prospectId: prospect.id,
+          businessName: prospect.businessName,
+          email: prospect.email,
+          status: "success",
+          recommendations: recommendations.map((rec) => ({
+            rank: rec.rank,
+            formulation: {
+              name: rec.formulation.name,
+              displayName: rec.formulation.displayName,
+              description: rec.formulation.description,
+              fitScore: rec.formulation.fitScore,
+              qualityPercentile: rec.formulation.qualityPercentile,
+            },
+            ...(rec.rank === 1 && rec.email
+              ? {
+                  email: {
+                    fullBody: rec.email.fullBody,
+                    trustValidation: {
+                      trustScore: rec.email.trustValidation.trustScore,
+                      isValid: rec.email.trustValidation.isValid,
+                      criticalIssues: rec.email.trustValidation.criticalIssues,
+                    },
+                    recommendation: rec.email.recommendation,
+                  },
+                }
+              : { preview: rec.preview }),
+          })),
+          formattedOutput: formatted,
+        });
+      } catch (prospectError) {
+        console.error(
+          `[BATCH-EMAILS] Error processing prospect ${prospect.id}:`,
+          prospectError
+        );
+        results.push({
+          prospectId: prospect.id,
+          businessName: prospect.businessName,
+          email: prospect.email,
+          status: "error",
+          error:
+            prospectError instanceof Error
+              ? prospectError.message
+              : "Unknown error",
+        });
       }
     }
 
-    // Calculate metrics
-    const stageDistribution = {
-      stage1: emails.filter((e) => e.relationshipStage === 1).length,
-      stage2: emails.filter((e) => e.relationshipStage === 2).length,
-      stage3plus: emails.filter((e) => e.relationshipStage >= 3).length,
-    };
-
-    // Return both successful emails and detailed failure info
     return NextResponse.json({
-      success: emails.length > 0,
-      emails,
-      count: emails.length,
-      failedCount: failedProspects.length,
-      failed: failedProspects.length > 0 ? failedProspects : undefined,
-      metrics: {
-        successRate: prospects.length > 0 ? Math.round((emails.length / prospects.length) * 100) : 0,
-        stageDistribution,
-        averageWordCount:
-          emails.length > 0
-            ? Math.round(emails.reduce((sum, e) => sum + e.wordCount, 0) / emails.length)
-            : 0,
-        stageBreakdown: `${stageDistribution.stage1} earning reply, ${stageDistribution.stage2} backup positioning, ${stageDistribution.stage3plus} advanced relationships`,
-      },
-      note: emails.length > 0 ? "Generated successfully" : "No emails generated - see failed array for details",
+      success: true,
+      prospectCount: prospects.length,
+      successCount: results.filter((r) => r.status === "success").length,
+      results,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("[RELATIONSHIP ENGINE] Uncaught error:", {
-      message: msg,
-      name: error instanceof Error ? error.name : "Unknown",
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    console.error("[BATCH-EMAILS-GENERATE] Error:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to generate communications",
-        details: msg,
-        emails: [],
-        count: 0
-      },
+      { error: "Failed to generate batch emails", success: false },
       { status: 500 }
     );
   }
