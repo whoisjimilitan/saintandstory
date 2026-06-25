@@ -62,6 +62,19 @@ export default function EnrichPage() {
   const [editBody, setEditBody] = useState("");
   const [templateMode, setTemplateMode] = useState<"master" | "batch" | null>(null);
 
+  // FIXED: Warn before navigating with unsent emails
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (generatedEmails.length > 0 && activeTab === "draft") {
+        e.preventDefault();
+        e.returnValue = `You have ${generatedEmails.length} unsent emails. Are you sure you want to leave?`;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [generatedEmails.length, activeTab]);
+
   useEffect(() => {
     // Batch mode: load from autonomous queue
     if (batchId) {
