@@ -52,7 +52,7 @@ const UNIVERSAL_PAIN_POINTS = {
   },
   reliability_concerns: {
     pain: "Delivery failures damage reputation",
-    picture: "One failed delivery. One unhappy customer. Reputation damaged.",
+    picture: "A failed delivery. One unhappy customer. Reviews damaged.",
     keywords: ["service", "delivery", "supply", "vendor", "contractor"],
   },
   coordination_chaos: {
