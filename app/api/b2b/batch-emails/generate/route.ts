@@ -1,20 +1,20 @@
 /**
- * BATCH EMAIL GENERATION ENDPOINT
+ * BATCH EMAIL GENERATION ENDPOINT - FIXED
  *
  * Integrates 3-Layer Architecture:
- * - Layer 1: PD Operating System (immutable philosophy)
- * - Layer 2: Reasoning Engine (generate 10 formulations, score, rank top 3)
- * - Layer 3: Trust Validation Engine (QA before output)
+ * - Layer 1: PD Operating System (philosophy guard rails)
+ * - Layer 2: 8-Step Reasoning Engine (generates context)
+ * - Layer 3: Reasoning Engine (generates 10 formulations → ranks top 3)
+ * - Layer 4: Trust Validation Engine (QA gate)
  *
- * Takes REAL prospects from QUALIFY queue
- * Returns three ranked recommendations per prospect
+ * Returns: 3 ranked email recommendations per prospect for operator choice
  */
 
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateRelationshipCommunication } from "@/lib/business-relationship-engine";
-import { generateCommunicationRecommendations, formatRecommendationsForOperator } from "@/lib/layer2-reasoning-engine";
+import { generateCommunicationRecommendations } from "@/lib/layer2-reasoning-engine";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -36,25 +36,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await currentUser();
+    const senderName = user?.firstName || user?.fullName || "Team Member";
+
     const body = await request.json();
     const { prospectIds = [], prospects: incomingProspects = [] } = body;
 
-    // Handle two formats:
-    // 1. New format: { prospectIds: ["id1", "id2"] }
-    // 2. Old format from ENRICH: { prospects: [{id, businessName, email, ...}] }
-
-    let prospects;
+    let prospects: any[] = [];
     if (incomingProspects.length > 0) {
-      // Use prospects directly from ENRICH page
       prospects = incomingProspects;
     } else if (prospectIds.length > 0) {
-      // Fetch prospects by ID
       prospects = await prisma.b2bLead.findMany({
-        where: {
-          id: {
-            in: prospectIds,
-          },
-        },
+        where: { id: { in: prospectIds } },
         select: {
           id: true,
           businessName: true,
@@ -63,18 +56,12 @@ export async function POST(request: Request) {
           email: true,
           website: true,
           painPoint: true,
-          reviewRating: true,
           engagement_score: true,
         },
       });
     } else {
-      // Fallback: fetch top 5 from database
       prospects = await prisma.b2bLead.findMany({
-        where: {
-          email: {
-            not: null,
-          },
-        },
+        where: { email: { not: null } },
         select: {
           id: true,
           businessName: true,
@@ -83,12 +70,9 @@ export async function POST(request: Request) {
           email: true,
           website: true,
           painPoint: true,
-          reviewRating: true,
           engagement_score: true,
         },
-        orderBy: {
-          engagement_score: "desc",
-        },
+        orderBy: { engagement_score: "desc" },
         take: 5,
       });
     }
@@ -100,12 +84,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate recommendations for each prospect
     const results = [];
 
     for (const prospect of prospects) {
       try {
-        // STEP 1: Generate reasoning context using 8-step engine
+        // STEP 1: Generate reasoning context
         const reasoning = generateRelationshipCommunication({
           name: prospect.businessName,
           industry: prospect.businessCategory || "logistics",
@@ -120,41 +103,49 @@ export async function POST(request: Request) {
           },
         });
 
-        // STEP 2: Generate 3 ranked recommendations using Layer 2
+        // STEP 2: Generate 3 ranked recommendations
         const recommendations = generateCommunicationRecommendations(reasoning);
 
-        // STEP 3: Format for operator display
-        const formatted = formatRecommendationsForOperator(recommendations);
+        // STEP 3: Format for ENRICH page with all 3 variations
+        const recommendations_data = recommendations.map((rec) => {
+          let emailBody = "";
+          if (rec.rank === 1 && rec.email) {
+            emailBody = rec.email.fullBody;
+          } else if (rec.preview) {
+            emailBody = rec.preview;
+          }
+
+          return {
+            rank: rec.rank,
+            formulation: rec.formulation.displayName,
+            description: rec.formulation.description,
+            fitScore: rec.formulation.fitScore,
+            qualityScore: rec.formulation.qualityPercentile,
+            trustScore: rec.email?.trustValidation?.trustScore || 0,
+            isValid: rec.email?.trustValidation?.isValid || false,
+            emailBody: emailBody,
+            recommendation: rec.email?.recommendation || "review",
+          };
+        });
+
+        // STEP 4: Format for ENRICH - use #1 as default, but include all 3
+        const topRecommendation = recommendations_data[0];
+        const emailBodyForEnrich = topRecommendation.emailBody
+          .replace(/{{senderName}}/g, senderName)
+          .replace(/{{businessName}}/g, prospect.businessName || "");
 
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
+          subject: `${prospect.businessName} needs us when Thursday hits`,
+          body: `Hi {{businessName}},\n\n${emailBodyForEnrich}`,
+          wordCount: emailBodyForEnrich.split(/\s+/).length,
+          senderName: senderName,
+          relationshipStage: 1,
           status: "success",
-          recommendations: recommendations.map((rec) => ({
-            rank: rec.rank,
-            formulation: {
-              name: rec.formulation.name,
-              displayName: rec.formulation.displayName,
-              description: rec.formulation.description,
-              fitScore: rec.formulation.fitScore,
-              qualityPercentile: rec.formulation.qualityPercentile,
-            },
-            ...(rec.rank === 1 && rec.email
-              ? {
-                  email: {
-                    fullBody: rec.email.fullBody,
-                    trustValidation: {
-                      trustScore: rec.email.trustValidation.trustScore,
-                      isValid: rec.email.trustValidation.isValid,
-                      criticalIssues: rec.email.trustValidation.criticalIssues,
-                    },
-                    recommendation: rec.email.recommendation,
-                  },
-                }
-              : { preview: rec.preview }),
-          })),
-          formattedOutput: formatted,
+          variations: recommendations_data, // ALL 3 variations
+          topRecommendation: topRecommendation,
         });
       } catch (prospectError) {
         console.error(
@@ -174,35 +165,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // Format response for backward compatibility with ENRICH page
     const successfulResults = results.filter((r) => r.status === "success");
-    const emailsForEnrich = successfulResults.map((result) => ({
-      prospectId: result.prospectId,
-      subject: "Your {{businessName}} needs us when {{day}} hits", // Default subject
-      body: result.recommendations?.[0]?.email?.fullBody || "Email body", // #1 recommendation body
-      wordCount: result.recommendations?.[0]?.email?.fullBody?.split(/\s+/).length || 0,
-      relationshipStage: 1,
-      senderName: "Saint & Story",
-      recommendations: result.recommendations,
-    }));
 
     return NextResponse.json({
       success: true,
       prospectCount: prospects.length,
       successCount: successfulResults.length,
-      // Both formats for compatibility
-      emails: emailsForEnrich, // For ENRICH page
-      results, // For new batch system
+      emails: successfulResults, // For ENRICH page
+      results: results, // Full details
     });
   } catch (error) {
     console.error("[BATCH-EMAILS-GENERATE] Error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[BATCH-EMAILS-GENERATE] Full error:", errorMessage);
     return NextResponse.json(
       {
         error: "Failed to generate batch emails",
         details: errorMessage,
-        success: false
+        success: false,
       },
       { status: 500 }
     );
