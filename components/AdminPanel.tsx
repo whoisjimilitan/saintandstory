@@ -704,6 +704,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
   const router = useRouter();
   const [pending, setPending] = useState(pendingJobs as unknown as Job[]);
   const [offered, setOffered] = useState(offeredJobs as unknown as Job[]);
+  const [confirmed, setConfirmed] = useState(confirmedJobs as unknown as Job[]);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedSearch, setCompletedSearch] = useState("");
   const [expandedAwaitingDrivers, setExpandedAwaitingDrivers] = useState(false);
@@ -718,6 +719,11 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
 
   function removeOffered(jobId: string) {
     setOffered(prev => prev.filter(j => j.id !== jobId));
+    router.refresh();
+  }
+
+  function removeConfirmed(jobId: string) {
+    setConfirmed(prev => prev.filter(j => j.id !== jobId));
     router.refresh();
   }
 
@@ -821,7 +827,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
       )}
 
       {/* Assigned ────────────────────────────────────────────────────────────────*/}
-      {confirmedJobs.length > 0 && (
+      {confirmed.length > 0 && (
         <div id="section-confirmed" className="mb-8 pt-8 border-t border-[#E8E8E8]">
           <button
             onClick={() => setExpandedConfirmed(v => !v)}
@@ -832,7 +838,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#888888]">
-                {confirmedJobs.length}
+                {confirmed.length}
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-[#888888] transition-transform ${
@@ -843,12 +849,12 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
           </button>
           {expandedConfirmed && (
             <div className="space-y-2">
-              {(confirmedJobs as unknown as Job[]).map((job: Job) => (
+              {confirmed.map((job: Job) => (
                 <ActiveJobRow
                   key={job.id}
                   job={job}
                   type="confirmed"
-                  onCancelled={() => router.refresh()}
+                  onCancelled={removeConfirmed}
                 />
               ))}
             </div>

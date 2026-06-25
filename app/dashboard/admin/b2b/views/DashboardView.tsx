@@ -51,7 +51,7 @@ export function DashboardView() {
   };
 
   return (
-    <div className="flex-1 px-6 py-10 overflow-auto">
+    <div className="flex-1 px-6 pt-6 pb-10 overflow-auto">
       <div className="max-w-3xl space-y-16">
         {/* HEADER */}
         <div>
