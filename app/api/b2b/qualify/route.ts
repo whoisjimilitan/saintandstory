@@ -20,27 +20,38 @@ async function isAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🔵 QUALIFY: POST request received");
+
     // AUTH LAYER: Check authentication
     if (!(await isAdmin())) {
+      console.log("🔴 QUALIFY: Auth check failed");
       return authError("Forbidden");
     }
 
     // VALIDATION LAYER: Parse and validate request body
-    const body = await request.json() as {
-      prospectId: string;
-      confidenceScore?: number;
-      notes?: string;
-      status?: string;
-    };
+    let body;
+    try {
+      body = await request.json();
+      console.log("🔵 QUALIFY: Request body parsed", { bodyKeys: Object.keys(body) });
+    } catch (parseErr) {
+      console.error("🔴 QUALIFY: JSON parse error", parseErr);
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 }
+      );
+    }
 
     const { prospectId, confidenceScore, notes, status } = body;
 
     if (!prospectId) {
+      console.error("🔴 QUALIFY: Missing prospectId");
       return NextResponse.json(
         { error: "prospectId required" },
         { status: 400 }
       );
     }
+
+    console.log("🔵 QUALIFY: Checking if prospect exists", { prospectId });
 
     // VALIDATION: Check prospect exists before updating
     const prospectExists = await prisma.b2bLead.findUnique({
@@ -49,12 +60,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (!prospectExists) {
+      console.error("🔴 QUALIFY: Prospect not found", { prospectId });
       return notFoundError("Prospect not found");
     }
 
+    console.log("🔵 QUALIFY: Prospect exists, attempting update");
+
     // DATABASE CALL: Update prospect with qualification data
-    let result;
     try {
+      console.log("🔵 QUALIFY: Starting Prisma update");
       const updated = await prisma.b2bLead.update({
         where: { id: prospectId },
         data: {
@@ -63,24 +77,30 @@ export async function POST(request: NextRequest) {
           notes: notes || undefined,
         },
       });
-      result = { success: true, data: updated };
+      console.log("🟢 QUALIFY: Database update succeeded", { updatedId: updated.id });
     } catch (dbError) {
       const errorMsg = dbError instanceof Error ? dbError.message : String(dbError);
+      const errorCode = (dbError as any)?.code;
+      const errorMeta = (dbError as any)?.meta;
+
       console.error("🔥 QUALIFY UPDATE ERROR:", {
         prospectId,
-        error: errorMsg,
-        statusCode: dbError instanceof Error ? (dbError as any).code : undefined,
+        message: errorMsg,
+        code: errorCode,
+        meta: errorMeta,
+        fullError: JSON.stringify(dbError),
       });
-      return NextResponse.json(
-        { error: `Database update failed: ${errorMsg}` },
-        { status: 500 }
-      );
-    }
 
-    if (!result.success) {
-      const errorMsg = result.error?.message || "Unknown database error";
+      // Return detailed error to client for debugging
       return NextResponse.json(
-        { error: errorMsg },
+        {
+          error: `Qualification failed: ${errorMsg}`,
+          details: {
+            code: errorCode,
+            meta: errorMeta,
+            prospectId
+          }
+        },
         { status: 500 }
       );
     }
