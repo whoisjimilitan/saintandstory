@@ -38,17 +38,15 @@ function formatEmailAsLetter(
   businessName: string,
   senderName: string
 ): string {
-  // Convert to peer-to-peer tone: replace "their/they" with "your/you"
-  const peerToPeerBody = recommendationBody
-    .replace(/\btheir\b/gi, "your")
-    .replace(/\bthey\b/gi, "you")
-    .replace(/\bthey're\b/gi, "you're")
-    .replace(/\bthey've\b/gi, "you've");
+  // FIXED: Template already uses correct pronouns
+  // "they" refers to main courier (correct context)
+  // Example: "when they can't" (main courier) ≠ "when you can't" (wrong)
+  // No blanket conversions needed
 
   // Build a proper letter format
   const letterBody = `Hi ${businessName},
 
-${peerToPeerBody.trim()}
+${recommendationBody.trim()}
 
 Best regards,
 ${senderName}

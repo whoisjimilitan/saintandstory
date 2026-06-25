@@ -260,11 +260,8 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
             }
 
             // Format email with greeting and signature (LOCKED TEMPLATE)
-            const emailBody = topRecommendation.email.fullBody
-              .replace(/\btheir\b/gi, "your")
-              .replace(/\bthey\b/gi, "you")
-              .replace(/\bthey're\b/gi, "you're")
-              .replace(/\bthey've\b/gi, "you've");
+            // FIXED: Don't convert "they" - template uses correct pronouns
+            const emailBody = topRecommendation.email.fullBody;
 
             const subject = `We're expanding to ${lead.city || "your area"} - set up your account`;
 
