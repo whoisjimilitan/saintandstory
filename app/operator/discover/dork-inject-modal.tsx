@@ -175,26 +175,26 @@ export function DorkInjectModal({ isOpen, onClose, onSuccess }: DorkInjectModalP
           {/* PREVIEW STAGE */}
           {stage === "preview" && preview && (
             <div className="space-y-6">
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="text-sm font-semibold text-blue-900 mb-3">
+              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+                <div className="text-sm font-semibold text-[#0D0D0D] mb-3">
                   ✓ Search Complete
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <div className="text-[#666666]">Results Found</div>
+                    <div className="text-[#888888]">Results Found</div>
                     <div className="text-lg font-bold text-[#0D0D0D]">
                       {preview.resultsRetrieved}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[#666666]">Businesses Parsed</div>
+                    <div className="text-[#888888]">Businesses Parsed</div>
                     <div className="text-lg font-bold text-[#0D0D0D]">
                       {preview.businessesParsed}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[#666666]">Ready to Inject</div>
-                    <div className="text-lg font-bold text-green-700">
+                    <div className="text-[#888888]">Ready to Inject</div>
+                    <div className="text-lg font-bold text-[#0D0D0D]">
                       {preview.leadsInjected}
                     </div>
                   </div>
@@ -229,7 +229,7 @@ export function DorkInjectModal({ isOpen, onClose, onSuccess }: DorkInjectModalP
                 <button
                   onClick={handleConfirmInject}
                   disabled={loading}
-                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white rounded-lg font-semibold hover:bg-[#333333] disabled:opacity-50 transition-colors"
                 >
                   {loading ? "Injecting..." : `✓ Inject ${preview.leadsInjected} Leads`}
                 </button>
