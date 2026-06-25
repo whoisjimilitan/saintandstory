@@ -21,6 +21,13 @@
 
 import type { RelationshipReasoning } from "./business-relationship-engine";
 import type { InternalDialogue } from "./internal-dialogue-predictor";
+import {
+  generatePermissionSentence,
+  generateRecognitionSentence,
+  generateTrustSignal,
+  generateCTA,
+  calculateSentencePD,
+} from "./sentence-generator";
 
 export interface SentenceWithPD {
   text: string;
@@ -44,104 +51,6 @@ export interface EmailWithPD {
   sentences: SentenceWithPD[];
 }
 
-/**
- * Score a sentence for Psychological Density
- *
- * Emergent reasoning - evaluates context and psychological functions
- */
-function scoreSentencePD(
-  sentence: string,
-  context: {
-    stage: number;
-    industry: string;
-    moment?: string;
-    priorThoughts?: string;
-  }
-): { score: number; functions: string[] } {
-  const functions: string[] = [];
-
-  // Analyze what psychological work this sentence does
-  const lowerSentence = sentence.toLowerCase();
-
-  // Check for various psychological functions
-  if (
-    lowerSentence.includes("if ") ||
-    lowerSentence.includes("but ") ||
-    lowerSentence.includes("though")
-  ) {
-    functions.push("creates-expectation-violation");
-  }
-
-  if (
-    lowerSentence.includes("you") ||
-    lowerSentence.includes("your") ||
-    lowerSentence.includes("happened")
-  ) {
-    functions.push("builds-relevance");
-  }
-
-  if (
-    lowerSentence.includes("actually") ||
-    lowerSentence.includes("really") ||
-    lowerSentence.includes("already")
-  ) {
-    functions.push("signals-honesty");
-  }
-
-  if (
-    lowerSentence.includes("don't") ||
-    lowerSentence.includes("isn't") ||
-    lowerSentence.includes("haven't")
-  ) {
-    functions.push("removes-objection");
-  }
-
-  if (sentence.length < 30 && sentence.includes(".")) {
-    functions.push("creates-emphasis");
-  }
-
-  if (
-    lowerSentence.includes("when ") ||
-    lowerSentence.includes("while ") ||
-    lowerSentence.includes("because")
-  ) {
-    functions.push("builds-scenario");
-  }
-
-  if (
-    lowerSentence.includes("we") ||
-    lowerSentence.includes("similar") ||
-    lowerSentence.includes("like you")
-  ) {
-    functions.push("creates-common-ground");
-  }
-
-  if (
-    lowerSentence.includes("question") ||
-    lowerSentence.includes("?") ||
-    lowerSentence.includes("explore")
-  ) {
-    functions.push("invites-participation");
-  }
-
-  if (
-    lowerSentence.includes("no ") ||
-    lowerSentence.includes("stop") ||
-    lowerSentence.includes("don't read")
-  ) {
-    functions.push("grants-permission");
-  }
-
-  if (sentence.includes("ready") || sentence.includes("next")) {
-    functions.push("signals-readiness");
-  }
-
-  // Calculate PD score based on function count
-  // Higher function count = higher psychological density
-  const score = Math.min(functions.length, 8); // Cap at 8 (maximum realistic PD)
-
-  return { score, functions };
-}
 
 /**
  * Generate email using dialogue blueprint + Permission line
@@ -149,96 +58,77 @@ function scoreSentencePD(
 export function generateEmailWithPD(reasoning: RelationshipReasoning): EmailWithPD {
   const stage = reasoning.relationshipStage.current;
   const industry = reasoning.businessAnalysis.industry;
+  const location = reasoning.businessAnalysis.location;
   const dialogue = reasoning.internalDialogue;
-  const permissionLine = reasoning.permissionLine;
 
   const sentences: SentenceWithPD[] = [];
   let emailBody = "";
 
   // STAGE 1: Start with Permission line
-  if (stage === 1 && permissionLine) {
-    const pdAnalysis = scoreSentencePD(permissionLine.text, {
-      stage,
-      industry,
-      moment: "permission",
-    });
-
-    sentences.push({
-      text: permissionLine.text,
-      pdScore: pdAnalysis.score,
-      psychologicalFunctions: pdAnalysis.functions,
-      shouldInclude: pdAnalysis.score > 0,
-      reasoning: "Permission line - removes resistance before engagement",
-    });
-
-    emailBody += permissionLine.text + "\n\n";
-  }
-
-  // STAGE 1: Recognition moment
   if (stage === 1) {
-    const recognitionSentence = generateRecognitionSentence(industry);
-    const pdAnalysis = scoreSentencePD(recognitionSentence, {
-      stage,
-      industry,
-      moment: "recognition",
-    });
+    const permissionSentence = generatePermissionSentence(industry, location);
+    const pdScore = calculateSentencePD(permissionSentence);
 
     sentences.push({
-      text: recognitionSentence,
-      pdScore: pdAnalysis.score,
-      psychologicalFunctions: pdAnalysis.functions,
-      shouldInclude: pdAnalysis.score > 1,
-      reasoning: "Recognition moment - reader realizes sender understands their situation",
+      text: permissionSentence,
+      pdScore,
+      psychologicalFunctions: ["grants-permission", "removes-resistance", "shows-respect"],
+      shouldInclude: pdScore > 1,
+      reasoning: "Permission line - gives reader permission to ignore if not relevant",
     });
 
-    if (pdAnalysis.score > 1) {
-      emailBody += recognitionSentence + "\n\n";
+    if (pdScore > 1) {
+      emailBody += permissionSentence + "\n\n";
     }
   }
 
-  // STAGE 1: Trust signal
-  if (stage === 1) {
-    const trustSentence = generateTrustSignal(reasoning.trustStrategy.trustSignal);
-    const pdAnalysis = scoreSentencePD(trustSentence, {
-      stage,
-      industry,
-      moment: "trust",
-    });
+  // Recognition moment (all stages)
+  const recognitionSentence = generateRecognitionSentence(industry, location);
+  const recognitionPD = calculateSentencePD(recognitionSentence);
 
-    sentences.push({
-      text: trustSentence,
-      pdScore: pdAnalysis.score,
-      psychologicalFunctions: pdAnalysis.functions,
-      shouldInclude: pdAnalysis.score > 1,
-      reasoning: "Trust signal - demonstrates credibility through observation",
-    });
-
-    if (pdAnalysis.score > 1) {
-      emailBody += trustSentence + "\n\n";
-    }
-  }
-
-  // Micro commitment
-  const ctaSentence = generateCTA(
-    reasoning.microCommitment.ask,
-    reasoning.microCommitment.responseOptions,
-    stage
-  );
-  const pdAnalysis = scoreSentencePD(ctaSentence, {
-    stage,
-    industry,
-    moment: "commitment",
+  sentences.push({
+    text: recognitionSentence,
+    pdScore: recognitionPD,
+    psychologicalFunctions: ["builds-relevance", "shows-observation", "creates-recognition"],
+    shouldInclude: recognitionPD > 1,
+    reasoning: "Recognition - shows what they experience, lets them see themselves",
   });
+
+  if (recognitionPD > 1) {
+    emailBody += recognitionSentence + "\n\n";
+  }
+
+  // Trust signal (all stages)
+  const trustSentence = generateTrustSignal(industry, location);
+  const trustPD = calculateSentencePD(trustSentence);
+
+  sentences.push({
+    text: trustSentence,
+    pdScore: trustPD,
+    psychologicalFunctions: ["shows-behavior", "signals-honesty", "builds-confidence"],
+    shouldInclude: trustPD > 1,
+    reasoning: "Trust signal - shows what we do, not why we're good",
+  });
+
+  if (trustPD > 1) {
+    emailBody += trustSentence + "\n\n";
+  }
+
+  // Micro commitment (CTA)
+  const ctaSentence = generateCTA(stage);
+  const ctaPD = calculateSentencePD(ctaSentence);
 
   sentences.push({
     text: ctaSentence,
-    pdScore: pdAnalysis.score,
-    psychologicalFunctions: pdAnalysis.functions,
-    shouldInclude: pdAnalysis.score > 0,
-    reasoning: "Micro commitment - smallest ask possible, reader feels agency",
+    pdScore: ctaPD,
+    psychologicalFunctions: ["invites-participation", "forces-decision", "removes-friction"],
+    shouldInclude: ctaPD > 0,
+    reasoning: "CTA - binary choice, reader has agency",
   });
 
-  emailBody += ctaSentence + "\n\n";
+  if (ctaPD > 0) {
+    emailBody += ctaSentence + "\n\n";
+  }
 
   // Calculate metadata
   const includedSentences = sentences.filter((s) => s.shouldInclude);
@@ -273,67 +163,30 @@ export function generateEmailWithPD(reasoning: RelationshipReasoning): EmailWith
 }
 
 /**
- * Generate recognition sentence based on industry
- */
-function generateRecognitionSentence(industry: string): string {
-  const recognitionMap: Record<string, string> = {
-    "law-firm": "You're probably handling urgent filings that your primary courier can't accommodate fast enough.",
-    ecommerce: "Peak season probably pushes your main courier past capacity.",
-    healthcare: "Temperature-controlled deliveries likely need backup when volume spikes.",
-    manufacturing: "Your production timeline probably depends on delivery reliability.",
-    logistics: "You're probably turning down work when your routes hit capacity.",
-    retail: "Your stores probably run short on supplies during busy periods.",
-    restaurant: "Your kitchen probably improvises when ingredient deliveries get tight.",
-    "professional-services": "Your clients probably expect delivery reliability you can't always guarantee alone.",
-  };
-
-  return (
-    recognitionMap[industry.toLowerCase()] ||
-    "You probably experience delivery pressure we could relieve."
-  );
-}
-
-/**
- * Generate trust signal
- */
-function generateTrustSignal(signal: string): string {
-  // Use the trust signal from reasoning, make it conversational
-  return `We've worked with businesses like yours. ${signal}`;
-}
-
-/**
- * Generate CTA based on stage and response options
- */
-function generateCTA(ask: string, options: string[], stage: number): string {
-  if (stage === 1) {
-    return `Reply with: ${options.join(", or ")}.`;
-  } else if (stage === 2) {
-    return `${ask}`;
-  } else {
-    return `${ask}`;
-  }
-}
-
-/**
- * Generate subject line
+ * Generate subject line - simple, specific
  */
 function generateSubjectLine(stage: number, industry: string): string {
   const subjects: Record<number, Record<string, string>> = {
     1: {
-      default: "When capacity becomes the constraint",
-      "law-firm": "For urgent filing deadlines",
-      ecommerce: "When peak season hits capacity",
-      logistics: "When routes go over capacity",
+      default: "Your delivery backup.",
+      "law-firm": "For Friday night filings.",
+      ecommerce: "Your October overflow.",
+      logistics: "When your routes are full.",
+      restaurant: "For Friday night supply runs.",
+      retail: "Monday morning stock.",
+      healthcare: "Temperature-controlled backup.",
+      manufacturing: "Parts on time.",
     },
     2: {
-      default: "Next steps for your delivery",
-      "law-firm": "Your backup is ready",
-      ecommerce: "Overflow capacity is live",
+      default: "Next steps.",
+      "law-firm": "You asked about backup.",
+      ecommerce: "Ready when you are.",
+      logistics: "Overflow capacity available.",
     },
     3: {
-      default: "Your first delivery",
-      "law-firm": "Let's prove ourselves",
-      ecommerce: "First order ready",
+      default: "Let's test it.",
+      "law-firm": "First delivery ready.",
+      ecommerce: "First order live.",
     },
   };
 
