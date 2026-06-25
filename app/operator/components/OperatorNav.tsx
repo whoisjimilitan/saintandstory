@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Icons } from "@/lib/icons";
 
 const stages = [
-  { name: "Today", href: "/operator", Icon: Icons.Today },
-  { name: "Discover", href: "/operator/discover", Icon: Icons.Discover },
-  { name: "Qualify", href: "/operator/understand", Icon: Icons.Qualify },
-  { name: "Enrich", href: "/operator/enrich", Icon: Icons.Enrich },
-  { name: "Responses", href: "/operator/responses", Icon: Icons.Responses },
-  { name: "Orders", href: "/operator/orders", Icon: Icons.Orders },
+  { name: "Today", href: "/operator" },
+  { name: "Discover", href: "/operator/discover" },
+  { name: "Qualify", href: "/operator/understand" },
+  { name: "Enrich", href: "/operator/enrich" },
+  { name: "Responses", href: "/operator/responses" },
+  { name: "Orders", href: "/operator/orders" },
 ];
 
 export function OperatorNav() {
@@ -68,16 +67,14 @@ export function OperatorNav() {
                 >
                   {/* Stage Indicator - line passes through center */}
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 border-3 bg-white ${
+                    className={`w-4 h-4 rounded-full transition-all duration-200 ${
                       isActive
-                        ? "border-[#0D0D0D] text-[#0D0D0D] shadow-md"
+                        ? "bg-[#0D0D0D] shadow-md"
                         : isPast
-                          ? "border-[#0D0D0D] text-[#0D0D0D]"
-                          : "border-[#E8E8E8] text-[#999999]"
+                          ? "bg-[#0D0D0D]"
+                          : "bg-[#E8E8E8]"
                     }`}
-                  >
-                    <stage.Icon size={20} />
-                  </div>
+                  />
 
                   {/* Label */}
                   <span
