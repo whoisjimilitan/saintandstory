@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DorkSearchTab } from "./dork-search-tab";
 import { QueueCenter } from "./queue-center";
+import { DorkInjectModal } from "./dork-inject-modal";
 
 interface Prospect {
   id: string;
@@ -43,6 +44,7 @@ export default function DiscoverPage() {
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
   const [showManualAddForm, setShowManualAddForm] = useState(false);
+  const [showDorkInjectModal, setShowDorkInjectModal] = useState(false);
   const [manualAddForm, setManualAddForm] = useState({
     businessName: "",
     contactName: "",
@@ -340,27 +342,38 @@ export default function DiscoverPage() {
           </button>
         </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-12 flex gap-0 border-b border-[#E8E8E8]">
+      {/* Tab Navigation + One-Click Injection */}
+      <div className="mb-12 flex items-center justify-between border-b border-[#E8E8E8] pb-0">
+        <div className="flex gap-0">
+          <button
+            onClick={() => setActiveTab("google-places")}
+            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+              activeTab === "google-places"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Google Places
+          </button>
+          <button
+            onClick={() => setActiveTab("dork-search")}
+            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+              activeTab === "dork-search"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Dork Search
+          </button>
+        </div>
+
+        {/* ONE-CLICK INJECTION BUTTON */}
         <button
-          onClick={() => setActiveTab("google-places")}
-          className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
-            activeTab === "google-places"
-              ? "text-[#0D0D0D] border-[#0D0D0D]"
-              : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-          }`}
+          onClick={() => setShowDorkInjectModal(true)}
+          className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white bg-[#0D0D0D] hover:bg-[#333333] rounded transition-colors"
+          title="Run dork search and inject 50-100 leads directly into pipeline"
         >
-          Google Places
-        </button>
-        <button
-          onClick={() => setActiveTab("dork-search")}
-          className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
-            activeTab === "dork-search"
-              ? "text-[#0D0D0D] border-[#0D0D0D]"
-              : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-          }`}
-        >
-          Dork Search
+          ⚡ Quick Inject
         </button>
       </div>
 
@@ -726,6 +739,18 @@ export default function DiscoverPage() {
           </div>
         </div>
       )}
+
+      {/* DORK SEARCH INJECTION MODAL */}
+      <DorkInjectModal
+        isOpen={showDorkInjectModal}
+        onClose={() => setShowDorkInjectModal(false)}
+        onSuccess={(count) => {
+          // Refresh results after injection
+          setShowDorkInjectModal(false);
+          setState(s => ({ ...s, error: null }));
+          // Could refresh queue or show toast here
+        }}
+      />
       </div>
     </div>
   );
