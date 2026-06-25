@@ -38,6 +38,7 @@ async function getDiscoveryParams(
       SELECT niche, locations, enabled
       FROM discovery_config
       WHERE enabled = true
+        AND (expires_at IS NULL OR expires_at > NOW())
       ORDER BY priority DESC
     `) as Array<{ niche: string; locations: string[]; enabled: boolean }>;
 
