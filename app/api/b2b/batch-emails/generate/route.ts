@@ -37,15 +37,40 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { prospectIds = [] } = body;
+    const { prospectIds = [], prospects: incomingProspects = [] } = body;
 
-    // If no prospects specified, fetch top 5 from QUALIFY queue
+    // Handle two formats:
+    // 1. New format: { prospectIds: ["id1", "id2"] }
+    // 2. Old format from ENRICH: { prospects: [{id, businessName, email, ...}] }
+
     let prospects;
-    if (prospectIds.length === 0) {
+    if (incomingProspects.length > 0) {
+      // Use prospects directly from ENRICH page
+      prospects = incomingProspects;
+    } else if (prospectIds.length > 0) {
+      // Fetch prospects by ID
       prospects = await prisma.b2bLead.findMany({
         where: {
-          pipeline_stage: "QUALIFY",
-          leadState: "qualified",
+          id: {
+            in: prospectIds,
+          },
+        },
+        select: {
+          id: true,
+          businessName: true,
+          businessCategory: true,
+          city: true,
+          email: true,
+          website: true,
+          painPoint: true,
+          reviewRating: true,
+          engagement_score: true,
+        },
+      });
+    } else {
+      // Fallback: fetch top 5 from database
+      prospects = await prisma.b2bLead.findMany({
+        where: {
           email: {
             not: null,
           },
@@ -65,25 +90,6 @@ export async function POST(request: Request) {
           engagement_score: "desc",
         },
         take: 5,
-      });
-    } else {
-      prospects = await prisma.b2bLead.findMany({
-        where: {
-          id: {
-            in: prospectIds,
-          },
-        },
-        select: {
-          id: true,
-          businessName: true,
-          businessCategory: true,
-          city: true,
-          email: true,
-          website: true,
-          painPoint: true,
-          reviewRating: true,
-          engagement_score: true,
-        },
       });
     }
 
@@ -168,16 +174,36 @@ export async function POST(request: Request) {
       }
     }
 
+    // Format response for backward compatibility with ENRICH page
+    const successfulResults = results.filter((r) => r.status === "success");
+    const emailsForEnrich = successfulResults.map((result) => ({
+      prospectId: result.prospectId,
+      subject: "Your {{businessName}} needs us when {{day}} hits", // Default subject
+      body: result.recommendations?.[0]?.email?.fullBody || "Email body", // #1 recommendation body
+      wordCount: result.recommendations?.[0]?.email?.fullBody?.split(/\s+/).length || 0,
+      relationshipStage: 1,
+      senderName: "Saint & Story",
+      recommendations: result.recommendations,
+    }));
+
     return NextResponse.json({
       success: true,
       prospectCount: prospects.length,
-      successCount: results.filter((r) => r.status === "success").length,
-      results,
+      successCount: successfulResults.length,
+      // Both formats for compatibility
+      emails: emailsForEnrich, // For ENRICH page
+      results, // For new batch system
     });
   } catch (error) {
     console.error("[BATCH-EMAILS-GENERATE] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[BATCH-EMAILS-GENERATE] Full error:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to generate batch emails", success: false },
+      {
+        error: "Failed to generate batch emails",
+        details: errorMessage,
+        success: false
+      },
       { status: 500 }
     );
   }
