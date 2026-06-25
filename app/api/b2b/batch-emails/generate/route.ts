@@ -1,15 +1,18 @@
 /**
- * BATCH EMAIL GENERATION ENDPOINT - FINAL FIX
+ * BATCH EMAIL GENERATION ENDPOINT
  *
- * Generates proper professional letters from one director to another
- * Converts reasoning/intention into actual business correspondence
+ * Uses B2B Email Reasoning Engine (locked 2026-06-25)
+ * Generates ONE optimized email per prospect following:
+ * - Four lightbulb ideas
+ * - Pain identification by category
+ * - Locked email template
+ * - No modifications without approval
  */
 
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateRelationshipCommunication } from "@/lib/business-relationship-engine";
-import { generateCommunicationRecommendations } from "@/lib/layer2-reasoning-engine";
+import { generateB2BOutreachEmail } from "@/lib/b2b-email-reasoning-engine";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -31,28 +34,6 @@ async function isAdmin() {
   if (!userId) return false;
   const user = await currentUser();
   return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
-}
-
-function formatEmailAsLetter(
-  recommendationBody: string,
-  businessName: string,
-  senderName: string
-): string {
-  // FIXED: Template already uses correct pronouns
-  // "they" refers to main courier (correct context)
-  // Example: "when they can't" (main courier) ≠ "when you can't" (wrong)
-  // No blanket conversions needed
-
-  // Build a proper letter format
-  const letterBody = `Hi ${businessName},
-
-${recommendationBody.trim()}
-
-Best regards,
-${senderName}
-Saint & Story`;
-
-  return letterBody;
 }
 
 export async function POST(request: Request) {
@@ -119,78 +100,30 @@ export async function POST(request: Request) {
 
     for (const prospect of prospects) {
       try {
-        // STEP 1: Generate reasoning context
-        const reasoning = generateRelationshipCommunication({
-          name: prospect.businessName,
-          industry: prospect.businessCategory || "logistics",
-          location: prospect.city || "UK",
-          size: "small" as const,
-          contactName: undefined,
-          discoveryEvidence: {
-            operationalIndicators: [],
-            growthSignals: [],
-            currentSolutions: [],
-            painPoints: prospect.painPoint ? [prospect.painPoint] : [],
+        // Generate email using B2B Email Reasoning Engine (locked)
+        const generatedEmail = generateB2BOutreachEmail(
+          {
+            id: prospect.id,
+            businessName: prospect.businessName,
+            businessCategory: prospect.businessCategory,
+            city: prospect.city,
+            email: prospect.email,
           },
-        });
-
-        // STEP 2: Generate 3 ranked recommendations
-        const recommendations = generateCommunicationRecommendations(reasoning);
-
-        // STEP 3: Convert to proper letter format for each variation
-        const recommendations_data = recommendations.map((rec) => {
-          let emailBody = "";
-          
-          if (rec.rank === 1 && rec.email) {
-            // Full email for #1
-            emailBody = formatEmailAsLetter(
-              rec.email.fullBody,
-              prospect.businessName,
-              senderName
-            );
-          } else if (rec.preview) {
-            // Preview for #2, #3
-            emailBody = `Hi ${prospect.businessName},\n\n${rec.preview}\n\nBest regards,\n${senderName}\nSaint & Story`;
-          }
-
-          return {
-            rank: rec.rank,
-            formulation: rec.formulation.displayName,
-            description: rec.formulation.description,
-            fitScore: rec.formulation.fitScore,
-            qualityScore: rec.formulation.qualityPercentile,
-            trustScore: rec.email?.trustValidation?.trustScore || 0,
-            isValid: rec.email?.trustValidation?.isValid || false,
-            emailBody: emailBody,
-            recommendation: rec.email?.recommendation || "review",
-          };
-        });
-
-        // STEP 4: Format for ENRICH - use #1 as default
-        const topRecommendation = recommendations_data[0];
-
-        // LOCKED SUBJECT LINE: Optimized for 90%+ response rate
-        // Shows reciprocity (set up account) + expansion (social proof) in subject
-        // PERMANENTLY LOCKED: "across" (not "to"), city only (no postcode)
-        const subject = `We're expanding across ${prospect.city || "your area"} - set up your account`;
-
-        // Mail merge: Replace placeholders with actual prospect data
-        const bodyWithMerge = topRecommendation.emailBody
-          .replace(/{{{city}}}/g, prospect.city || "your area")
-          .replace(/{{{businessName}}}/g, prospect.businessName || "");
+          senderName
+        );
 
         results.push({
-          prospectId: prospect.id,
-          businessName: prospect.businessName,
-          email: prospect.email,
-          subject: subject,
-          body: bodyWithMerge,
-          wordCount: bodyWithMerge.split(/\s+/).length,
+          prospectId: generatedEmail.prospectId,
+          businessName: generatedEmail.businessName,
+          email: generatedEmail.email,
+          subject: generatedEmail.subject,
+          body: generatedEmail.body,
+          wordCount: generatedEmail.wordCount,
           senderName: senderName,
           relationshipStage: 1,
           status: "success",
-          variations: recommendations_data,
-          topRecommendation: topRecommendation,
+          painPoint: generatedEmail.painPoint,
+          hasPicture: generatedEmail.hasPicture,
         });
       } catch (prospectError) {
         console.error(
