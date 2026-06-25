@@ -22,6 +22,7 @@
 
 import { generatePermissionLine, type IndustryType } from "./behavioral-pattern-map";
 import { predictInternalDialogue, type InternalDialogue } from "./internal-dialogue-predictor";
+import { generateEmailWithPD } from "./communication-decision-engine";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -130,6 +131,14 @@ export interface RelationshipCommunication {
     subject: string;
     body: string;
     wordCount: number;
+    pdMetadata?: {
+      averagePD: number;
+      minPD: number;
+      maxPD: number;
+      totalFunctions: number;
+      sentenceCount: number;
+      qualityRating: "high" | "medium" | "low";
+    };
   };
   stageProgression: {
     currentStage: RelationshipStage;
@@ -647,8 +656,16 @@ export function generateRelationshipCommunication(
     },
   };
 
-  // STEP 8c: Only AFTER all reasoning AND dialogue prediction, generate email
-  const email = generateCommunicationEmail(reasoning);
+  // STEP 8c: Only AFTER all reasoning AND dialogue prediction, generate email using Communication Decision Engine
+  const emailWithPD = generateEmailWithPD(reasoning);
+
+  // Convert to standard email format with PD metadata
+  const email = {
+    subject: emailWithPD.subject,
+    body: emailWithPD.body,
+    wordCount: emailWithPD.body.split(/\s+/).length,
+    pdMetadata: emailWithPD.pdMetadata,
+  };
 
   // STAGE PROGRESSION LOGIC
   const nextStage = Math.min(6, currentStage + 1) as RelationshipStage;
