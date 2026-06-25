@@ -1,13 +1,8 @@
 /**
- * BATCH EMAIL GENERATION ENDPOINT - FIXED
+ * BATCH EMAIL GENERATION ENDPOINT - FINAL FIX
  *
- * Integrates 3-Layer Architecture:
- * - Layer 1: PD Operating System (philosophy guard rails)
- * - Layer 2: 8-Step Reasoning Engine (generates context)
- * - Layer 3: Reasoning Engine (generates 10 formulations → ranks top 3)
- * - Layer 4: Trust Validation Engine (QA gate)
- *
- * Returns: 3 ranked email recommendations per prospect for operator choice
+ * Generates proper professional letters from one director to another
+ * Converts reasoning/intention into actual business correspondence
  */
 
 import { NextResponse } from "next/server";
@@ -23,11 +18,39 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk",
 ];
 
+// Admin name mapping
+const ADMIN_NAME_MAP: Record<string, string> = {
+  "jimi": "James",
+  "Jimi": "James",
+  "oyepeju": "Oye",
+  "Oye": "Oye",
+};
+
 async function isAdmin() {
   const { userId } = await auth();
   if (!userId) return false;
   const user = await currentUser();
   return ADMIN_EMAILS.includes(user?.emailAddresses[0]?.emailAddress ?? "");
+}
+
+function formatEmailAsLetter(
+  recommendationBody: string,
+  businessName: string,
+  senderName: string
+): string {
+  // Convert recommendation body into a proper professional letter
+  // The recommendationBody contains the raw output from Layer 3
+  
+  // Build a proper letter format
+  const letterBody = `Hi ${businessName},
+
+${recommendationBody.trim()}
+
+Best regards,
+${senderName}
+Saint & Story`;
+
+  return letterBody;
 }
 
 export async function POST(request: Request) {
@@ -37,7 +60,13 @@ export async function POST(request: Request) {
     }
 
     const user = await currentUser();
-    const senderName = user?.firstName || user?.fullName || "Team Member";
+    let senderName = user?.firstName || user?.fullName || "Team Member";
+    
+    // Map admin names for consistency
+    const firstNameLower = (user?.firstName || "").toLowerCase();
+    if (firstNameLower in ADMIN_NAME_MAP) {
+      senderName = ADMIN_NAME_MAP[firstNameLower];
+    }
 
     const body = await request.json();
     const { prospectIds = [], prospects: incomingProspects = [] } = body;
@@ -106,13 +135,20 @@ export async function POST(request: Request) {
         // STEP 2: Generate 3 ranked recommendations
         const recommendations = generateCommunicationRecommendations(reasoning);
 
-        // STEP 3: Format for ENRICH page with all 3 variations
+        // STEP 3: Convert to proper letter format for each variation
         const recommendations_data = recommendations.map((rec) => {
           let emailBody = "";
+          
           if (rec.rank === 1 && rec.email) {
-            emailBody = rec.email.fullBody;
+            // Full email for #1
+            emailBody = formatEmailAsLetter(
+              rec.email.fullBody,
+              prospect.businessName,
+              senderName
+            );
           } else if (rec.preview) {
-            emailBody = rec.preview;
+            // Preview for #2, #3
+            emailBody = `Hi ${prospect.businessName},\n\n${rec.preview}\n\nBest regards,\n${senderName}\nSaint & Story`;
           }
 
           return {
@@ -128,23 +164,20 @@ export async function POST(request: Request) {
           };
         });
 
-        // STEP 4: Format for ENRICH - use #1 as default, but include all 3
+        // STEP 4: Format for ENRICH - use #1 as default
         const topRecommendation = recommendations_data[0];
-        const emailBodyForEnrich = topRecommendation.emailBody
-          .replace(/{{senderName}}/g, senderName)
-          .replace(/{{businessName}}/g, prospect.businessName || "");
 
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
-          subject: `${prospect.businessName} needs us when Thursday hits`,
-          body: `Hi {{businessName}},\n\n${emailBodyForEnrich}`,
-          wordCount: emailBodyForEnrich.split(/\s+/).length,
+          subject: `Hi ${prospect.businessName}`,
+          body: topRecommendation.emailBody,
+          wordCount: topRecommendation.emailBody.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,
           status: "success",
-          variations: recommendations_data, // ALL 3 variations
+          variations: recommendations_data,
           topRecommendation: topRecommendation,
         });
       } catch (prospectError) {
@@ -171,8 +204,8 @@ export async function POST(request: Request) {
       success: true,
       prospectCount: prospects.length,
       successCount: successfulResults.length,
-      emails: successfulResults, // For ENRICH page
-      results: results, // Full details
+      emails: successfulResults,
+      results: results,
     });
   } catch (error) {
     console.error("[BATCH-EMAILS-GENERATE] Error:", error);

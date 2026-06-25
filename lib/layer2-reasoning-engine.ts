@@ -256,30 +256,24 @@ function generateEmailBody(
   context: RelationshipReasoning,
   stage: RelationshipStage
 ): string {
-  const lines: string[] = [];
+  // Convert reasoning into a proper professional letter
+  // that sounds like one director speaking to another
 
-  // Opening line (from formulation)
-  lines.push(formulation.openingLine);
-  lines.push("");
-
-  // Observation: What they're experiencing
-  lines.push(context.scenarioContext.likelyRealityForThem + ".");
-  lines.push("");
-
-  // Trust signal: What we do (not what we claim)
-  const trustDetail = context.trustContext.genuineStrength;
-  lines.push(trustDetail + ".");
-  lines.push("");
-
-  // Micro commitment: The ask
+  const scenario = context.scenarioContext.likelyRealityForThem;
+  const triggering = context.scenarioContext.triggeringMoment;
+  const strength = context.trustContext.genuineStrength;
   const ask = context.askContext.minimumCommitment;
-  lines.push(ask + "?");
-  lines.push("");
-  lines.push("Best,");
-  lines.push("{{senderName}}");
-  lines.push("Saint & Story");
 
-  return lines.join("\n");
+  // Build a natural, flowing letter (not reasoning dump)
+  const letterBody = `${scenario}
+
+When ${triggering.toLowerCase()}, that's when reliable backup becomes critical. ${strength}
+
+${ask}
+
+If that makes sense, I'd love to explore this together.`;
+
+  return letterBody;
 }
 
 /**
