@@ -256,22 +256,22 @@ function generateEmailBody(
   context: RelationshipReasoning,
   stage: RelationshipStage
 ): string {
-  // Convert reasoning into a proper professional letter
-  // that sounds like one director speaking to another
+  // Convert reasoning into a professional peer-to-peer letter
+  // Position as the solution for specific gaps, not just backup
+  // Use direct, concise language - James talking to another business owner
 
-  const scenario = context.scenarioContext.likelyRealityForThem;
-  const triggering = context.scenarioContext.triggeringMoment;
   const strength = context.trustContext.genuineStrength;
   const ask = context.askContext.minimumCommitment;
 
-  // Build a natural, flowing letter (not reasoning dump)
-  const letterBody = `${scenario}
+  // Peer-to-peer positioning: acknowledge their main solution works,
+  // then name specific scenarios where we're the answer
+  const letterBody = `Your main courier probably handles things well. We're useful for when they can't - capacity, speed, reliability, consistency. One of those usually applies.
 
-When ${triggering.toLowerCase()}, that's when reliable backup becomes critical. ${strength}
+${strength}
 
 ${ask}
 
-If that makes sense, I'd love to explore this together.`;
+If that makes sense, I'd love to explore this with you.`;
 
   return letterBody;
 }

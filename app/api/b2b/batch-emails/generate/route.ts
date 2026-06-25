@@ -38,13 +38,17 @@ function formatEmailAsLetter(
   businessName: string,
   senderName: string
 ): string {
-  // Convert recommendation body into a proper professional letter
-  // The recommendationBody contains the raw output from Layer 3
-  
+  // Convert to peer-to-peer tone: replace "their/they" with "your/you"
+  const peerToPeerBody = recommendationBody
+    .replace(/\btheir\b/gi, "your")
+    .replace(/\bthey\b/gi, "you")
+    .replace(/\bthey're\b/gi, "you're")
+    .replace(/\bthey've\b/gi, "you've");
+
   // Build a proper letter format
   const letterBody = `Hi ${businessName},
 
-${recommendationBody.trim()}
+${peerToPeerBody.trim()}
 
 Best regards,
 ${senderName}
