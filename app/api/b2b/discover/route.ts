@@ -273,21 +273,28 @@ export async function GET(request: Request) {
     console.log("[DISCOVER] Provider breakdown:", result.sources);
 
     // DEDUPLICATE: Filter out leads already in pipeline
-    const sql = neon(process.env.DATABASE_URL!);
-    const existingLeads = await sql`
-      SELECT email FROM b2b_lead
-      WHERE email IS NOT NULL
-    ` as { email: string }[];
+    let newBusinesses = result.businesses;
+    try {
+      const sql = neon(process.env.DATABASE_URL!);
+      const existingLeads = await sql`
+        SELECT email FROM b2b_lead
+        WHERE email IS NOT NULL
+      ` as { email: string }[];
 
-    const existingEmails = new Set(existingLeads.map(l => l.email?.toLowerCase()));
+      const existingEmails = new Set(existingLeads.map(l => l.email?.toLowerCase()));
 
-    const newBusinesses = result.businesses.filter(biz =>
-      !existingEmails.has(((biz as any).email || (biz as any).businessEmail || "").toLowerCase())
-    );
+      newBusinesses = result.businesses.filter(biz =>
+        !existingEmails.has(((biz as any).email || (biz as any).businessEmail || "").toLowerCase())
+      );
 
-    console.log(
-      `[DISCOVER] After duplicate filter: ${newBusinesses.length}/${result.businesses.length} businesses (${result.businesses.length - newBusinesses.length} already in pipeline)`
-    );
+      console.log(
+        `[DISCOVER] After duplicate filter: ${newBusinesses.length}/${result.businesses.length} businesses (${result.businesses.length - newBusinesses.length} already in pipeline)`
+      );
+    } catch (dupError) {
+      console.error("[DISCOVER] Duplicate detection failed, returning all results:", dupError);
+      // If duplicate detection fails, just return all results
+      newBusinesses = result.businesses;
+    }
 
     // Log ID format of returned businesses
     if (result.businesses.length > 0) {
