@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { DorkSearchTab } from "./dork-search-tab";
 import { QueueCenter } from "./queue-center";
 import { DorkInjectModal } from "./dork-inject-modal";
 
@@ -39,7 +38,7 @@ export default function DiscoverPage() {
     totalCount: 0,
     currentFilter: "all",
   });
-  const [activeTab, setActiveTab] = useState<"google-places" | "dork-search">("google-places");
+  const [activeTab, setActiveTab] = useState<"google-places">("google-places");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
@@ -355,16 +354,6 @@ export default function DiscoverPage() {
           >
             Google Places
           </button>
-          <button
-            onClick={() => setActiveTab("dork-search")}
-            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
-              activeTab === "dork-search"
-                ? "text-[#0D0D0D] border-[#0D0D0D]"
-                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-            }`}
-          >
-            Dork Search
-          </button>
         </div>
 
         {/* ONE-CLICK INJECTION BUTTON */}
@@ -386,8 +375,6 @@ export default function DiscoverPage() {
             onBack={() => setShowQueueCenter(false)}
           />
         </div>
-      ) : activeTab === "dork-search" ? (
-        <DorkSearchTab />
       ) : (
         <>
       {/* Active Filter Display */}
