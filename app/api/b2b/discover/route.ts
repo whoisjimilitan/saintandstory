@@ -277,7 +277,7 @@ export async function GET(request: Request) {
     try {
       const sql = neon(process.env.DATABASE_URL!);
       const existingLeads = await sql`
-        SELECT email FROM b2b_lead
+        SELECT email FROM b2b_leads
         WHERE email IS NOT NULL
       ` as { email: string }[];
 
