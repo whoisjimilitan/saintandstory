@@ -40,9 +40,9 @@ export function OperatorNav() {
             {/* Progress line - runs through exact center of dots */}
             <line
               x1="2%"
-              y1="24"
+              y1="18"
               x2={`${Math.min(progressPercentage, 84)}%`}
-              y2="24"
+              y2="18"
               stroke="#0D0D0D"
               strokeWidth="2"
               strokeLinecap="round"
