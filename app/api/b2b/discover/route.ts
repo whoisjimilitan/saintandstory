@@ -78,6 +78,39 @@ interface PlacesResult {
   reviews?: { rating: number; text: string; time: number }[];
 }
 
+function isUKLocation(address: string | undefined): boolean {
+  if (!address) return false;
+  const upperAddress = address.toUpperCase();
+
+  // REJECT: US state abbreviations and ZIP codes
+  const usStates = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+
+  // Check for US state abbreviations (usually after comma: "City, OR 97302")
+  for (const state of usStates) {
+    if (upperAddress.includes(`, ${state}`) || upperAddress.includes(` ${state} `)) {
+      return false;
+    }
+  }
+
+  // Reject ZIP code pattern (5 digits or 5+4)
+  if (/\s\d{5}(-\d{4})?\s*$/.test(address.trim())) {
+    return false;
+  }
+
+  // ACCEPT: Contains UK indicators
+  const ukIndicators = ['UNITED KINGDOM', 'UK', 'ENGLAND', 'SCOTLAND', 'WALES', 'NORTHERN IRELAND', 'LONDON', 'MANCHESTER', 'BIRMINGHAM', 'LEEDS', 'BRISTOL', 'EDINBURGH', 'CARDIFF', 'BELFAST'];
+  if (ukIndicators.some(indicator => upperAddress.includes(indicator))) {
+    return true;
+  }
+
+  // Check for UK postcode format (e.g., SW1A 1AA, E1 6AN)
+  if (/[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}|[A-Z]{1,2}\d[A-Z]\s?\d[A-Z]{2}/i.test(address)) {
+    return true;
+  }
+
+  return false;
+}
+
 function detectPainPoint(reviews: PlacesResult["reviews"]): { painPoint: string | null; reviewText: string | null; rating: number | null } {
   if (!reviews?.length) return { painPoint: null, reviewText: null, rating: null };
 
@@ -148,7 +181,18 @@ async function searchPlaces(query: string, city: string, apiKey: string): Promis
     }
 
     console.log(`[DISCOVER/SEARCH] Total places with details: ${places.length}`);
-    return places;
+
+    // FILTER: Remove US locations (keep UK only)
+    const ukPlaces = places.filter(place => {
+      const isUK = isUKLocation(place.formatted_address);
+      if (!isUK) {
+        console.log(`[DISCOVER/SEARCH] ✗ Rejected non-UK location: ${place.name} (${place.formatted_address})`);
+      }
+      return isUK;
+    });
+
+    console.log(`[DISCOVER/SEARCH] After UK filtering: ${ukPlaces.length}/${places.length} results`);
+    return ukPlaces;
   } catch (error) {
     console.error(`[DISCOVER/SEARCH] ✗ Fatal error in searchPlaces:`, error);
     return [];
