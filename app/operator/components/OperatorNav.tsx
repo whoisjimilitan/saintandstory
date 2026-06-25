@@ -31,20 +31,20 @@ export function OperatorNav() {
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-[#E8E8E8] z-50">
       <div className="max-w-full mx-auto px-6 py-6">
         <div className="flex items-center justify-between relative">
-          {/* Continuous line - only shows progress (black), no grey strikethrough */}
+          {/* FIXED: Line connects through CENTER of dots */}
           <svg
             className="absolute inset-0 w-full pointer-events-none"
-            style={{ height: "48px" }}
+            style={{ height: "48px", top: "-6px" }}
             preserveAspectRatio="none"
           >
-            {/* Progress line only - stops at ORDERS, doesn't extend into hamburger */}
+            {/* Progress line - runs through center of dots at y=30 */}
             <line
-              x1="24"
-              y1="24"
-              x2={`${Math.min(progressPercentage, 80)}%`}
-              y2="24"
+              x1="3%"
+              y1="30"
+              x2={`${Math.min(progressPercentage, 83)}%`}
+              y2="30"
               stroke="#0D0D0D"
-              strokeWidth="4"
+              strokeWidth="2"
               strokeLinecap="round"
               style={{ transition: "x2 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}
             />
