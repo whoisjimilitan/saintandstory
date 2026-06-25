@@ -33,6 +33,22 @@ interface GeneratedEmail {
   hasPicture: boolean;
 }
 
+// Major UK cities where "across" is appropriate
+const MAJOR_CITIES = [
+  "London", "Manchester", "Birmingham", "Leeds", "Glasgow", "Liverpool",
+  "Edinburgh", "Bristol", "Cardiff", "Belfast", "Sheffield", "Nottingham",
+  "Leicester", "Coventry", "Bradford", "Bath", "Oxford", "Cambridge",
+  "Reading", "Norwich", "Peterborough", "Southampton", "Portsmouth",
+  "Newcastle", "Sunderland", "Hull", "Stoke-on-Trent", "Wolverhampton",
+  "Slough", "Crawley", "Colchester", "Derby", "Doncaster", "Exeter",
+  "Plymouth", "Brighton", "Swindon", "Northampton", "Ipswich", "Runcorn"
+];
+
+function isMajorCity(city?: string): boolean {
+  if (!city) return false;
+  return MAJOR_CITIES.some(c => c.toLowerCase() === city.toLowerCase());
+}
+
 /**
  * UNIVERSAL PAIN POINTS
  * Every business that ships faces at least one of these.
@@ -112,8 +128,11 @@ function renderEmail(prospect: ProspectData, senderName: string): { subject: str
   const painPoint = detectPainPoint(prospect.businessName, prospect.businessCategory);
   const city = prospect.city || "your area";
 
+  // Use "across" for major cities, "to" for small towns
+  const preposition = isMajorCity(city) ? "across" : "to";
+
   // SUBJECT LINE (locked template - city only, no postcode)
-  const subject = `We're expanding across ${city} - set up your account`;
+  const subject = `We're expanding ${preposition} ${city} - set up your account`;
 
   // BODY (locked template with picture - always shown for universal pain points)
   let body = `Hi ${prospect.businessName},
@@ -122,7 +141,7 @@ I'm sure your main courier handles things well. We're useful for when they can't
 
 ${painPoint.picture}
 
-Since we're expanding across ${city}, I set up your account for free. No charge. No strings.
+Since we're expanding ${preposition} ${city}, I set up your account for free. No charge. No strings.
 
 Quick question: does this actually apply to you? Yes, Maybe, or No?
 
