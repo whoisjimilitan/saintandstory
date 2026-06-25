@@ -30,23 +30,23 @@ export function OperatorNav() {
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-[#E8E8E8] z-50">
       <div className="max-w-full mx-auto px-6 py-8">
         {/* Underground Journey Map */}
-        <div className="flex items-center justify-between gap-1">
+        <div className="flex items-start justify-between gap-0">
           {stages.map((stage, index) => {
             const isActive = index === currentStageIndex;
             const isPast = index < currentStageIndex;
             const isLast = index === stages.length - 1;
 
             return (
-              <div key={stage.name} className="flex items-center flex-1 min-w-0">
+              <div key={stage.name} className="flex items-center flex-1 min-w-0 pt-1">
                 {/* Station Dot */}
                 <Link
                   href={stage.href}
-                  className="flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-200 hover:scale-110"
+                  className="flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-200 hover:scale-110 relative z-10"
                   title={stage.name}
                 >
                   {/* Circle with indicator */}
                   <div
-                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-200 bg-white ${
                       isActive
                         ? "bg-[#0D0D0D] border-[#0D0D0D] shadow-lg"
                         : isPast
@@ -73,10 +73,10 @@ export function OperatorNav() {
                   </span>
                 </Link>
 
-                {/* Connecting Line (between stations, not after last) */}
+                {/* Connecting Line (between stations, not after last) - Centered with dot */}
                 {!isLast && (
                   <div
-                    className={`flex-1 h-1 transition-all duration-200 ${
+                    className={`flex-1 h-1 transition-all duration-200 -translate-y-3 ${
                       isPast ? "bg-[#0D0D0D]" : "bg-[#E0E0E0]"
                     }`}
                   />
