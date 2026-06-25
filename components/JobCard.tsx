@@ -82,7 +82,7 @@ export default function JobCard({
   const colors = STATUS_COLORS[status] || STATUS_COLORS.offered;
 
   return (
-    <div className={`rounded-2xl p-5 border ${isOffered ? "bg-[#0D0D0D] border-[#0D0D0D]" : "bg-white border-[#E8E8E8]"}`}>
+    <div className={`rounded-2xl p-5 border ${isOffered ? "bg-[#1A1A1A] border-[#1A1A1A]" : "bg-white border-[#E8E8E8]"}`}>
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <p className={`font-sans font-bold text-sm ${isOffered ? "text-white" : "text-[#0D0D0D]"}`}>
