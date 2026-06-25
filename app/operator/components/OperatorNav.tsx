@@ -34,15 +34,15 @@ export function OperatorNav() {
           {/* FIXED: Line connects through CENTER of dots */}
           <svg
             className="absolute inset-0 w-full pointer-events-none"
-            style={{ height: "48px", top: "-6px" }}
+            style={{ height: "100%", top: "0" }}
             preserveAspectRatio="none"
           >
-            {/* Progress line - runs through center of dots at y=30 */}
+            {/* Progress line - runs through exact center of dots */}
             <line
-              x1="3%"
-              y1="30"
-              x2={`${Math.min(progressPercentage, 83)}%`}
-              y2="30"
+              x1="2%"
+              y1="24"
+              x2={`${Math.min(progressPercentage, 84)}%`}
+              y2="24"
               stroke="#0D0D0D"
               strokeWidth="2"
               strokeLinecap="round"
