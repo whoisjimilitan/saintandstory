@@ -126,74 +126,75 @@ export class GooglePlacesProvider extends BusinessProvider {
   ): Promise<GooglePlace[]> {
     const endpoint = "https://maps.googleapis.com/maps/api/place/textsearch/json";
     const allResults: GooglePlace[] = [];
-    let nextPageToken: string | undefined;
     const maxLimit = Math.min(limit || 1000, 1000); // Cap at 1000
 
-    this.log(`Calling API: ${endpoint} (limit: ${maxLimit})`);
+    try {
+      this.log(`Calling API: ${endpoint} (limit: ${maxLimit})`);
 
-    // Pagination loop - Google Places returns 20 results per page
-    let pageCount = 0;
-    while (allResults.length < maxLimit) {
-      pageCount++;
-      this.log(`Fetching page ${pageCount} (have ${allResults.length}/${maxLimit} results)`);
+      // Fetch all pages up to limit
+      let nextPageToken: string | undefined;
+      let pageCount = 0;
 
-      const params = new URLSearchParams({
-        query,
-        key: this.apiKey,
-        language: "en",
-      });
+      while (allResults.length < maxLimit && pageCount < 5) {
+        pageCount++;
+        this.log(`Fetching page ${pageCount} (have ${allResults.length}/${maxLimit} results)`);
 
-      // Add location bias if postcode provided
-      if (postcode && radius) {
-        params.append("region", "gb");
+        const params = new URLSearchParams({
+          query,
+          key: this.apiKey,
+          language: "en",
+        });
+
+        if (postcode && radius) {
+          params.append("region", "gb");
+        }
+
+        // Add next page token if available
+        if (nextPageToken) {
+          params.append("pagetoken", nextPageToken);
+          // Google requires ~2 second delay between pagination requests
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        const url = `${endpoint}?${params.toString()}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          this.log(`API call failed: ${response.status}`);
+          break;
+        }
+
+        const data = (await response.json()) as GooglePlacesResult;
+
+        if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
+          this.log(`API status: ${data.status}`);
+          break;
+        }
+
+        if (!data.results || data.results.length === 0) {
+          this.log(`Page ${pageCount}: no results`);
+          break;
+        }
+
+        allResults.push(...data.results);
+        this.log(`Page ${pageCount}: got ${data.results.length} results (total: ${allResults.length})`);
+
+        // Check for next page
+        if (data.next_page_token) {
+          nextPageToken = data.next_page_token;
+        } else {
+          this.log(`No more pages available`);
+          break;
+        }
       }
 
-      // Add next page token if we have one
-      if (nextPageToken) {
-        params.append("pagetoken", nextPageToken);
-        // Google requires a small delay between pagination requests
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
-
-      const url = `${endpoint}?${params.toString()}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(
-          `Google Places API error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = (await response.json()) as GooglePlacesResult;
-
-      if (data.status && data.status !== "OK" && data.status !== "ZERO_RESULTS") {
-        throw new Error(`Google Places API status: ${data.status}`);
-      }
-
-      if (!data.results || data.results.length === 0) {
-        this.log(`No more results (got ${allResults.length} total)`);
-        break;
-      }
-
-      allResults.push(...data.results);
-      this.log(`Page ${pageCount}: got ${data.results.length} results (total: ${allResults.length})`);
-
-      // Check if there's a next page
-      if (data.next_page_token) {
-        nextPageToken = data.next_page_token;
-      } else {
-        this.log(`No next_page_token, pagination complete`);
-        break;
-      }
-
-      // Stop if we've reached or exceeded the limit
-      if (allResults.length >= maxLimit) {
-        break;
-      }
+      this.log(`Total results from API: ${allResults.length}`);
+      return allResults;
+    } catch (error) {
+      this.log(`Pagination error: ${error instanceof Error ? error.message : String(error)}`);
+      // If pagination fails, return empty array and let caller handle it
+      return [];
     }
-
-    this.log(`API returned total: ${allResults.length} results`);
-    return allResults;
   }
 
   private normalizePlaceResult(place: GooglePlace): Business {
