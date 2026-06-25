@@ -320,15 +320,35 @@ export class GooglePlacesProvider extends BusinessProvider {
   }
 
   private extractCity(address: string): string | undefined {
-    const parts = address.split(",");
-    if (parts.length >= 2) {
-      const cityWithPostcode = parts[parts.length - 2].trim();
-      // Remove UK postcode from city (e.g., "London EC4Y 0HA" → "London")
-      const cityOnly = cityWithPostcode
-        .replace(/\s[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}/i, "")
-        .trim();
-      return cityOnly || undefined;
+    // UK address format: "Street, City Postcode, Country" or "Street, City, Country"
+    const parts = address.split(",").map(p => p.trim());
+
+    if (parts.length < 2) return undefined;
+
+    // Remove UK postcode from city (e.g., "London EC4Y 0HA" → "London")
+    const removePostcode = (text: string) =>
+      text.replace(/\s[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}/i, "").trim();
+
+    // Strategy: look for part that is JUST a city name (not a street address)
+    // Street addresses usually start with a number or contain numbers
+    for (let i = parts.length - 2; i >= 1; i--) {
+      const part = parts[i];
+      const cleanPart = removePostcode(part);
+
+      // Skip if it looks like a street address (contains numbers at start)
+      if (/^\d/.test(cleanPart)) continue;
+
+      // If it's a word (no numbers), it's likely the city
+      if (!/\d/.test(cleanPart) && cleanPart.length > 2) {
+        return cleanPart || undefined;
+      }
+
+      // If it has postcode removed and is reasonable length, use it
+      if (cleanPart.length > 2) {
+        return cleanPart;
+      }
     }
+
     return undefined;
   }
 
