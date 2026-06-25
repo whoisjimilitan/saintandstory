@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import ModalCTA from "@/components/ModalCTA";
 import SiteFooter from "@/components/SiteFooter";
+import ModalProvider from "@/components/ModalProvider";
+import AutoOpenModal from "@/components/AutoOpenModal";
 
 /**
  * SAINT & STORY — CITY PAGE DATA TEMPLATE (CONSTRAINT-LOCKED)
@@ -239,9 +241,12 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
   };
 
   return (
-    <main className="pb-20 md:pb-0">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <Nav />
+    <>
+      <ModalProvider />
+      <AutoOpenModal delayMs={800} />
+      <main className="pb-20 md:pb-0">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+        <Nav />
 
       {/* Hero */}
       <section className="bg-white pt-16 min-h-[80vh] flex items-center border-b border-[#E8E8E8]">
@@ -374,5 +379,6 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
         />
       </div>
     </main>
+    </>
   );
 }
