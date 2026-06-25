@@ -319,31 +319,62 @@ export class GooglePlacesProvider extends BusinessProvider {
     return postcodeMatch ? postcodeMatch[1] : undefined;
   }
 
-  private extractCity(address: string): string | undefined {
-    // UK address format: "Street, City Postcode, Country" or "Street, City, Country"
-    const parts = address.split(",").map(p => p.trim());
+  // UK postcode area to city mapping (outward code → city)
+  private postcodeAreaToCity: Record<string, string> = {
+    // London
+    "E": "London", "EC": "London", "N": "London", "NW": "London",
+    "SE": "London", "SW": "London", "W": "London", "WC": "London",
+    // Major cities
+    "B": "Birmingham", "M": "Manchester", "L": "Liverpool",
+    "LS": "Leeds", "S": "Sheffield", "C": "Cardiff", "EH": "Edinburgh",
+    "G": "Glasgow", "BT": "Belfast", "B": "Bristol", "E": "Nottingham",
+    "NG": "Nottingham", "ST": "Stoke-on-Trent", "CV": "Coventry",
+    "WV": "Wolverhampton", "DY": "Dudley", "B": "Solihull",
+    "PE": "Peterborough", "CB": "Cambridge", "NR": "Norwich",
+    "OX": "Oxford", "RG": "Reading", "SL": "Slough", "UB": "Uxbridge",
+    "TW": "Twickenham", "KT": "Kingston", "SM": "Sutton",
+    "CR": "Croydon", "DA": "Dartford", "BR": "Bromley",
+    "TN": "Tunbridge Wells", "BN": "Brighton", "PO": "Portsmouth",
+    "SO": "Southampton", "SP": "Salisbury", "BA": "Bath",
+    "BS": "Bristol", "GL": "Gloucester", "HR": "Hereford",
+    "LD": "Llandrindod Wells", "SY": "Shrewsbury", "WR": "Worcester",
+    "DT": "Dorchester", "EX": "Exeter", "PL": "Plymouth",
+    "TR": "Truro", "TA": "Taunton", "EX": "Exeter",
+    "BD": "Bradford", "HD": "Huddersfield", "OL": "Oldham",
+    "SK": "Stockport", "CH": "Chester", "WA": "Warrington",
+    "CW": "Crewe", "ST": "Stoke", "DE": "Derby", "NG": "Nottingham",
+    "LE": "Leicester", "LN": "Lincoln", "NN": "Northampton",
+    "MK": "Milton Keynes", "HP": "Hemel Hempstead",
+  };
 
+  private extractCity(address: string): string | undefined {
+    // First, try to extract postcode and use it to determine city
+    const postcodeMatch = address.match(/([A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2})/i);
+    if (postcodeMatch) {
+      const postcode = postcodeMatch[1].toUpperCase();
+      // Extract outward code (first 1-2 characters before numbers)
+      const outwardCode = postcode.split(/\d/)[0];
+
+      if (this.postcodeAreaToCity[outwardCode]) {
+        return this.postcodeAreaToCity[outwardCode];
+      }
+    }
+
+    // Fallback: parse from address if postcode lookup fails
+    const parts = address.split(",").map(p => p.trim());
     if (parts.length < 2) return undefined;
 
-    // Remove UK postcode from city (e.g., "London EC4Y 0HA" → "London")
     const removePostcode = (text: string) =>
       text.replace(/\s[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}/i, "").trim();
 
-    // Strategy: look for part that is JUST a city name (not a street address)
-    // Street addresses usually start with a number or contain numbers
     for (let i = parts.length - 2; i >= 1; i--) {
       const part = parts[i];
       const cleanPart = removePostcode(part);
 
-      // Skip if it looks like a street address (contains numbers at start)
       if (/^\d/.test(cleanPart)) continue;
-
-      // If it's a word (no numbers), it's likely the city
       if (!/\d/.test(cleanPart) && cleanPart.length > 2) {
         return cleanPart || undefined;
       }
-
-      // If it has postcode removed and is reasonable length, use it
       if (cleanPart.length > 2) {
         return cleanPart;
       }
