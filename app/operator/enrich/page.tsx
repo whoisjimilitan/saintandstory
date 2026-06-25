@@ -193,7 +193,10 @@ export default function EnrichPage() {
       }));
 
       setSentEmails(sentList);
+      // FIXED: Clear draft after sending (emails can't be in both draft AND sent)
+      setGeneratedEmails([]);
       setActiveTab("sent");
+      setCurrentIndex(0);
       alert(`✓ Sent ${data.sent || sentList.length} emails successfully`);
     } catch (error) {
       console.error("Error sending:", error);
