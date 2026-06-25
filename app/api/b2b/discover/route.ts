@@ -226,7 +226,7 @@ export async function GET(request: Request) {
       city: url.searchParams.get("city") || undefined,
       radius: url.searchParams.get("radius") ? parseInt(url.searchParams.get("radius")!) : undefined,
       category: url.searchParams.get("category") || undefined,
-      limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : 100,
+      limit: url.searchParams.get("limit") ? parseInt(url.searchParams.get("limit")!) : 1000,
     };
 
     console.log("[DISCOVER] Query parameters:", query);
@@ -272,6 +272,23 @@ export async function GET(request: Request) {
     );
     console.log("[DISCOVER] Provider breakdown:", result.sources);
 
+    // DEDUPLICATE: Filter out leads already in pipeline
+    const sql = neon(process.env.DATABASE_URL!);
+    const existingLeads = await sql`
+      SELECT email FROM b2b_lead
+      WHERE email IS NOT NULL
+    ` as { email: string }[];
+
+    const existingEmails = new Set(existingLeads.map(l => l.email?.toLowerCase()));
+
+    const newBusinesses = result.businesses.filter(biz =>
+      !existingEmails.has(((biz as any).email || (biz as any).businessEmail || "").toLowerCase())
+    );
+
+    console.log(
+      `[DISCOVER] After duplicate filter: ${newBusinesses.length}/${result.businesses.length} businesses (${result.businesses.length - newBusinesses.length} already in pipeline)`
+    );
+
     // Log ID format of returned businesses
     if (result.businesses.length > 0) {
       console.log("[DISCOVER] ========== RETURNED BUSINESS IDs ==========");
@@ -292,8 +309,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      results: result.businesses,
-      totalCount: result.totalCount,
+      results: newBusinesses,
+      totalCount: newBusinesses.length,
       sources: result.sources,
       processingTimeMs: result.processingTimeMs,
       errors: result.errors,

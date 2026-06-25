@@ -284,7 +284,12 @@ export class GooglePlacesProvider extends BusinessProvider {
   private extractCity(address: string): string | undefined {
     const parts = address.split(",");
     if (parts.length >= 2) {
-      return parts[parts.length - 2].trim();
+      const cityWithPostcode = parts[parts.length - 2].trim();
+      // Remove UK postcode from city (e.g., "London EC4Y 0HA" → "London")
+      const cityOnly = cityWithPostcode
+        .replace(/\s[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}/i, "")
+        .trim();
+      return cityOnly || undefined;
     }
     return undefined;
   }
