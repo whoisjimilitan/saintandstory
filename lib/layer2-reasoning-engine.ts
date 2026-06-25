@@ -273,7 +273,7 @@ function generateEmailBody(
 
   const letterBody = `Your main courier probably handles things well. We're useful for when they can't — capacity, speed, reliability, consistency. One of these usually happens or has happened.
 
-Since we're expanding to {{{city}}}, I set up your account. Free. No strings.
+Since we're expanding across {{{city}}}, I set up your account. Free. No strings.
 
 Quick question: does one of these gaps actually apply to you right now, or has it in the past few months? Yes, Maybe, or No?
 

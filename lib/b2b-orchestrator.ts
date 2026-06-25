@@ -261,9 +261,10 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
 
             // Format email with greeting and signature (LOCKED TEMPLATE)
             // FIXED: Don't convert "they" - template uses correct pronouns
+            // PERMANENTLY LOCKED: "across" (not "to"), city only (no postcode)
             const emailBody = topRecommendation.email.fullBody;
 
-            const subject = `We're expanding to ${lead.city || "your area"} - set up your account`;
+            const subject = `We're expanding across ${lead.city || "your area"} - set up your account`;
 
             const fullBody = `Hi ${lead.business_name},
 

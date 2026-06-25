@@ -171,7 +171,8 @@ export async function POST(request: Request) {
 
         // LOCKED SUBJECT LINE: Optimized for 90%+ response rate
         // Shows reciprocity (set up account) + expansion (social proof) in subject
-        const subject = `We're expanding to ${prospect.city || "your area"} - set up your account`;
+        // PERMANENTLY LOCKED: "across" (not "to"), city only (no postcode)
+        const subject = `We're expanding across ${prospect.city || "your area"} - set up your account`;
 
         // Mail merge: Replace placeholders with actual prospect data
         const bodyWithMerge = topRecommendation.emailBody
