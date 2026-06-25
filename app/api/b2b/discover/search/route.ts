@@ -79,22 +79,6 @@ export async function GET(request: Request) {
           },
         }),
         ...(status && { status }),
-        // EXCLUDE: US state abbreviations and ZIP codes from results
-        NOT: {
-          OR: [
-            {
-              city: {
-                in: usStates,
-                mode: "insensitive"
-              }
-            },
-            {
-              postcode: {
-                regex: "^\\d{5}(-\\d{4})?$" // ZIP code pattern
-              }
-            }
-          ]
-        }
       },
       select: {
         id: true,
@@ -114,10 +98,29 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    // Filter out US-based results (Issue 2: No US results)
-    const ukOnlyLeads = leads.filter(lead =>
-      !isUSLocation(lead.city) && !isUSLocation(lead.postcode)
-    );
+    // STRICT: Filter out US-based results at application level (more reliable than DB regex)
+    // Check both city and postcode for US patterns
+    const ukOnlyLeads = leads.filter(lead => {
+      const city = (lead.city || "").toUpperCase().trim();
+      const postcode = (lead.postcode || "").toUpperCase().trim();
+
+      // Reject if city is US state abbreviation
+      if (usStates.includes(city)) return false;
+
+      // Reject if postcode contains US state abbreviation
+      for (const state of usStates) {
+        if (postcode.includes(state)) return false;
+      }
+
+      // Reject if postcode is ZIP code pattern (5 digits or 5+4 digits)
+      if (/^\d{5}(-\d{4})?$/.test(postcode)) return false;
+
+      // Reject if city is a state name (common US state names)
+      const usStateNames = ['california', 'texas', 'florida', 'new york', 'pennsylvania', 'illinois', 'ohio', 'georgia', 'north carolina', 'michigan', 'new jersey', 'virginia', 'washington', 'arizona', 'massachusetts', 'tennessee', 'indiana', 'missouri', 'maryland', 'wisconsin', 'colorado', 'minnesota', 'south carolina', 'alabama', 'louisiana', 'kentucky', 'oregon', 'oklahoma', 'connecticut', 'utah', 'nevada', 'arkansas', 'mississippi', 'kansas', 'iowa', 'nebraska', 'idaho', 'hawaii', 'new hampshire', 'maine', 'montana', 'rhode island', 'delaware', 'south dakota', 'north dakota', 'alaska', 'wyoming', 'vermont'];
+      if (usStateNames.includes(city.toLowerCase())) return false;
+
+      return true;
+    });
 
     return NextResponse.json({
       success: true,
