@@ -17,9 +17,14 @@ export default function QueuePage() {
   const router = useRouter();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [replyCount, setReplyCount] = useState(0);
 
   useEffect(() => {
     fetchBatches();
+    fetchReplyCount();
+    // Poll for new replies every 30 seconds
+    const interval = setInterval(fetchReplyCount, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchBatches = async () => {
@@ -36,16 +41,53 @@ export default function QueuePage() {
     }
   };
 
+  // FIXED: Fetch reply count for smart notification badge
+  const fetchReplyCount = async () => {
+    try {
+      const res = await fetch("/api/operator/reply-count");
+      if (res.ok) {
+        const data = await res.json();
+        setReplyCount(data.replyCount || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching reply count:", error);
+    }
+  };
+
   const handleDraftEmails = (batchId: string) => {
     router.push(`/operator/enrich?batch_id=${batchId}`);
+  };
+
+  // Navigate to RESPONSES page to handle replies
+  const handleViewReplies = () => {
+    router.push("/operator/responses");
   };
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="max-w-6xl mx-auto px-4 md:px-12 py-12">
-        <p className="text-lg font-bold text-[#0D0D0D] mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8] leading-relaxed">
-          Morning Queue: Autonomous discoveries ready for outreach
-        </p>
+        <div className="flex items-center justify-between mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8]">
+          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+            Morning Queue: Autonomous discoveries ready for outreach
+          </p>
+
+          {/* FIXED: Smart notification badge showing new replies */}
+          {replyCount > 0 && (
+            <button
+              onClick={handleViewReplies}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+              title="Click to view new replies"
+            >
+              <span className="flex items-center justify-center w-6 h-6 bg-red-500 text-white rounded-full text-xs font-bold">
+                {replyCount}
+              </span>
+              <span className="text-sm font-medium text-blue-700">
+                New replies
+              </span>
+              <span className="text-xs text-blue-600">→ RESPONSES</span>
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <div className="text-center py-12">
