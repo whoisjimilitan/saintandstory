@@ -1,14 +1,16 @@
 /**
- * B2B EMAIL REASONING ENGINE
+ * B2B EMAIL REASONING ENGINE (UNIVERSAL DELIVERY PAIN POINTS)
  *
  * Locked implementation of the four lightbulb ideas:
  * 1. Inverse Incentive Positioning
  * 2. Self-Discovery Over Telling
  * 3. Pain-to-Picture Painting
- * 4. Pattern-Based Observation
+ * 4. Universal Delivery Challenges (not category guessing)
  *
- * Generates ONE optimized email per prospect following locked template.
- * No modifications without approval.
+ * Strategy: Default to PEAK TIME OVERWHELM (true for every business with shipping needs).
+ * Only vary if we have high confidence from prospect data.
+ *
+ * No modifications without approval. Updated 2026-06-25.
  */
 
 interface ProspectData {
@@ -32,111 +34,70 @@ interface GeneratedEmail {
 }
 
 /**
- * PAIN IDENTIFICATION MAPPING
- * Universal pain points by business category (pattern-based, always true)
+ * UNIVERSAL PAIN POINTS
+ * Every business that ships faces at least one of these.
+ * Keyed by keywords in business name/category to try to match,
+ * but defaults to PEAK TIME OVERWHELM if unsure.
  */
-const PAIN_IDENTIFICATION_MAP: Record<string, { pain: string; picture: string }> = {
-  // Accounting / Tax / Legal
-  "accounting": {
-    pain: "Tax season creates chaos around deadlines",
-    picture: "Tax season hits. A missed pickup becomes a missed deadline becomes an angry client."
+const UNIVERSAL_PAIN_POINTS = {
+  peak_time_overwhelm: {
+    pain: "Peak time creates overwhelm",
+    picture: "Peak season hits. Everything moves at once. One slip costs you.",
+    keywords: ["retail", "restaurant", "hospitality", "e-commerce", "shop", "store"],
   },
-  "tax": {
-    pain: "Tax season creates chaos around deadlines",
-    picture: "Tax season hits. A missed pickup becomes a missed deadline becomes an angry client."
+  timing_pressure: {
+    pain: "Tight deadlines create pressure",
+    picture: "Deadline's tight. Your courier's drowning. Client waiting.",
+    keywords: ["event", "wedding", "urgent", "same-day", "express", "florist"],
   },
-  "legal": {
-    pain: "Deadline pressure creates chaos",
-    picture: "Deadline hits. A missed document becomes a missed filing becomes a compliance issue."
+  reliability_concerns: {
+    pain: "Delivery failures damage reputation",
+    picture: "One failed delivery. One unhappy customer. Reputation damaged.",
+    keywords: ["service", "delivery", "supply", "vendor", "contractor"],
   },
-  "tax services": {
-    pain: "Tax season creates chaos around deadlines",
-    picture: "Tax season hits. A missed pickup becomes a missed deadline becomes an angry client."
+  coordination_chaos: {
+    pain: "Multi-location coordination is hard",
+    picture: "Multiple locations. One courier drops the ball. All your sites feel it.",
+    keywords: ["franchise", "chain", "branch", "office", "site", "location", "multi"],
   },
-
-  // Florist / Event Services
-  "florist": {
-    pain: "Event/same-day deadlines are unforgiving",
-    picture: "Event delivery deadline. Your courier's drowning. Client waiting."
-  },
-  "event services": {
-    pain: "Event/same-day deadlines are unforgiving",
-    picture: "Event delivery deadline. Your courier's drowning. Client waiting."
-  },
-  "events": {
-    pain: "Event/same-day deadlines are unforgiving",
-    picture: "Event delivery deadline. Your courier's drowning. Client waiting."
-  },
-  "flowers": {
-    pain: "Event/same-day deadlines are unforgiving",
-    picture: "Event delivery deadline. Your courier's drowning. Client waiting."
-  },
-
-  // Logistics / Courier / Delivery
-  "logistics": {
-    pain: "Peak hours overwhelm capacity",
-    picture: "Rush hour. Everything needs to move at once. One slip costs you."
-  },
-  "courier": {
-    pain: "Peak hours overwhelm capacity",
-    picture: "Rush hour. Everything needs to move at once. One slip costs you."
-  },
-  "delivery": {
-    pain: "Peak hours overwhelm capacity",
-    picture: "Rush hour. Everything needs to move at once. One slip costs you."
-  },
-
-  // Office Services / Facilities
-  "office services": {
-    pain: "Multiple locations mean coordination nightmares",
-    picture: "Multiple offices. One courier drops the ball. All your sites feel it."
-  },
-  "facilities management": {
-    pain: "Multiple locations mean coordination nightmares",
-    picture: "Multiple offices. One courier drops the ball. All your sites feel it."
-  },
-
-  // Retail / Hospitality / Food
-  "retail": {
-    pain: "Seasonal volume spikes create chaos",
-    picture: "Holiday season. Everything moves at once. One missed delivery tanks reviews."
-  },
-  "hospitality": {
-    pain: "Seasonal volume spikes create chaos",
-    picture: "Holiday season. Everything moves at once. One missed delivery tanks reviews."
-  },
-  "food service": {
-    pain: "Seasonal volume spikes create chaos",
-    picture: "Holiday season. Everything moves at once. One missed delivery tanks reviews."
-  },
-  "restaurant": {
-    pain: "Seasonal volume spikes create chaos",
-    picture: "Holiday season. Everything moves at once. One missed delivery tanks reviews."
+  capacity_gaps: {
+    pain: "Growth creates scaling challenges",
+    picture: "Big order comes in. Your courier can't scale. You miss the revenue.",
+    keywords: ["growth", "scale", "expanding", "startup", "wholesale", "bulk"],
   },
 };
 
 /**
- * Get pain point and picture for prospect category
- * Returns null if category not found (use base email)
+ * Detect which pain point fits best
+ * Returns DEFAULT (peak time overwhelm) if no high-confidence match found
  */
-function getPainPoint(category?: string): { pain: string; picture: string } | null {
-  if (!category) return null;
-
-  const normalized = category.toLowerCase().trim();
-
-  // Try exact match first
-  if (PAIN_IDENTIFICATION_MAP[normalized]) {
-    return PAIN_IDENTIFICATION_MAP[normalized];
+function detectPainPoint(
+  businessName?: string,
+  businessCategory?: string
+): { pain: string; picture: string } {
+  if (!businessName && !businessCategory) {
+    return {
+      pain: UNIVERSAL_PAIN_POINTS.peak_time_overwhelm.pain,
+      picture: UNIVERSAL_PAIN_POINTS.peak_time_overwhelm.picture,
+    };
   }
 
-  // Try partial match (substring)
-  for (const [key, value] of Object.entries(PAIN_IDENTIFICATION_MAP)) {
-    if (normalized.includes(key) || key.includes(normalized)) {
-      return value;
+  const searchText = `${businessName || ""} ${businessCategory || ""}`.toLowerCase();
+
+  // Try to match keywords (only if we find a keyword, we use that pain point)
+  for (const [key, config] of Object.entries(UNIVERSAL_PAIN_POINTS)) {
+    for (const keyword of config.keywords) {
+      if (searchText.includes(keyword)) {
+        return { pain: config.pain, picture: config.picture };
+      }
     }
   }
 
-  return null;
+  // No match found: DEFAULT to peak time overwhelm (safest, most universal)
+  return {
+    pain: UNIVERSAL_PAIN_POINTS.peak_time_overwhelm.pain,
+    picture: UNIVERSAL_PAIN_POINTS.peak_time_overwhelm.picture,
+  };
 }
 
 /**
@@ -144,27 +105,24 @@ function getPainPoint(category?: string): { pain: string; picture: string } | nu
  * Four lightbulb ideas embedded:
  * 1. Inverse incentive positioning (validate their solution first)
  * 2. Self-discovery (ask them to identify)
- * 3. Pain painting (show cascade if applicable)
- * 4. Pattern-based observation (don't guess specifics)
+ * 3. Pain painting (show cascade - always shown now)
+ * 4. Universal delivery challenges (no category guessing)
  */
 function renderEmail(prospect: ProspectData, senderName: string): { subject: string; body: string } {
-  const painPoint = getPainPoint(prospect.businessCategory);
+  const painPoint = detectPainPoint(prospect.businessName, prospect.businessCategory);
   const city = prospect.city || "your area";
 
-  // SUBJECT LINE (locked template)
+  // SUBJECT LINE (locked template - city only, no postcode)
   const subject = `We're expanding across ${city} - set up your account`;
 
-  // BODY (locked template with optional picture)
+  // BODY (locked template with picture - always shown for universal pain points)
   let body = `Hi ${prospect.businessName},
 
-I'm sure your main courier handles things well. We're useful for when they can't or when they don't — poor capacity, speed, reliability, consistency. One of these usually happens or has happened to you in the past.`;
+I'm sure your main courier handles things well. We're useful for when they can't or when they don't — poor capacity, speed, reliability, consistency. One of these usually happens or has happened to you in the past.
 
-  // Add picture if pain point exists
-  if (painPoint) {
-    body += `\n\n${painPoint.picture}`;
-  }
+${painPoint.picture}
 
-  body += `\n\nSince we're expanding across ${city}, I set up your account for free. No charge. No strings.
+Since we're expanding across ${city}, I set up your account for free. No charge. No strings.
 
 Quick question: does this actually apply to you? Yes, Maybe, or No?
 
@@ -185,7 +143,7 @@ export function generateB2BOutreachEmail(
   senderName: string = "James"
 ): GeneratedEmail {
   const { subject, body } = renderEmail(prospect, senderName);
-  const painPoint = getPainPoint(prospect.businessCategory);
+  const painPoint = detectPainPoint(prospect.businessName, prospect.businessCategory);
 
   return {
     prospectId: prospect.id,
@@ -195,7 +153,7 @@ export function generateB2BOutreachEmail(
     subject,
     body,
     wordCount: body.split(/\s+/).length,
-    painPoint: painPoint?.pain,
-    hasPicture: !!painPoint,
+    painPoint: painPoint.pain,
+    hasPicture: true,
   };
 }
