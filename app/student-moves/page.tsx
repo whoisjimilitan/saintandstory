@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
+import ModalProvider from "@/components/ModalProvider";
+import AutoOpenModal from "@/components/AutoOpenModal";
 import ModalCTA from "@/components/ModalCTA";
 import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";

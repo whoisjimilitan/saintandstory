@@ -4,6 +4,7 @@ import AutoOpenModal from "@/components/AutoOpenModal";
 import ModalCTA from "@/components/ModalCTA";
 import LandingHeroSearch from "@/components/LandingHeroSearch";
 import SiteFooter from "@/components/SiteFooter";
+import ModalProvider from "@/components/ModalProvider";
 
 export const metadata: Metadata = {
   title: "London Home Moves | Post Your Job. We Find Your Driver. | Saint & Story",
@@ -76,7 +77,8 @@ export default function LondonHomeMoves() {
   return (
     <main className="pb-20 md:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <AutoOpenModal delayMs={2000} />
+      <ModalProvider />
+      <AutoOpenModal delayMs={800} />
 
       {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">

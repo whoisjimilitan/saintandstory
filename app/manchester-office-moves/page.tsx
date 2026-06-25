@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ModalProvider from "@/components/ModalProvider";
+import AutoOpenModal from "@/components/AutoOpenModal";
 import ModalCTA from "@/components/ModalCTA";
 
 export const metadata: Metadata = {

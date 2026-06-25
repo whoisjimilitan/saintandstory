@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import CityLandingPage, { buildMetadata, type CityPageData } from "@/components/CityLandingPage";
+import ModalProvider from "@/components/ModalProvider";
+import AutoOpenModal from "@/components/AutoOpenModal";
 
 const data: CityPageData = {
   city: "Sheffield",
@@ -50,5 +52,11 @@ sub: "Tell us about your Sheffield removal. Verified driver. price. ",
 export const metadata: Metadata = buildMetadata(data);
 
 export default function SheffieldRemovals() {
-  return <CityLandingPage data={data} />;
+  return (
+    <>
+      <ModalProvider />
+      <AutoOpenModal delayMs={800} />
+      <CityLandingPage data={data} />
+    </>
+  );
 }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import AutoOpenModal from "@/components/AutoOpenModal";
 import DriverModalCTA from "@/components/DriverModalCTA";
 import SiteFooter from "@/components/SiteFooter";
+import ModalProvider from "@/components/ModalProvider";
 
 export const metadata: Metadata = {
   title: "Driver Work in London | Post. Get Booked. Keep It All. | Saint & Story",
@@ -65,7 +66,8 @@ const FAQS = [
 export default function LondonDrivers() {
   return (
     <main className="pb-20 md:pb-0">
-      <AutoOpenModal delayMs={2000} type="driver" />
+      <ModalProvider />
+      <AutoOpenModal delayMs={800} type="driver" />
 
       {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">

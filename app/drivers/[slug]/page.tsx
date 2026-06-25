@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCityConfig, getCitySlugs } from "@/lib/drivers/cities-config";
 import AutoOpenModal from "@/components/AutoOpenModal";
+import ModalProvider from "@/components/ModalProvider";
 import DriverModalCTA from "@/components/DriverModalCTA";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -42,7 +43,8 @@ export default async function DriverPage({
 
   return (
     <main className="pb-20 md:pb-0">
-      <AutoOpenModal delayMs={2000} type="driver" />
+      <ModalProvider />
+      <AutoOpenModal delayMs={800} type="driver" />
 
       {/* Nav */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E8E8E8]">
