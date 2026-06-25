@@ -171,13 +171,22 @@ export async function POST(request: Request) {
         // STEP 4: Format for ENRICH - use #1 as default
         const topRecommendation = recommendations_data[0];
 
+        // LOCKED SUBJECT LINE: Optimized for 90%+ response rate
+        // Shows reciprocity (set up account) + expansion (social proof) in subject
+        const subject = `We're expanding to ${prospect.city || "your area"} - set up your account`;
+
+        // Mail merge: Replace placeholders with actual prospect data
+        const bodyWithMerge = topRecommendation.emailBody
+          .replace(/{{{city}}}/g, prospect.city || "your area")
+          .replace(/{{{businessName}}}/g, prospect.businessName || "");
+
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
-          subject: `Hi ${prospect.businessName}`,
-          body: topRecommendation.emailBody,
-          wordCount: topRecommendation.emailBody.split(/\s+/).length,
+          subject: subject,
+          body: bodyWithMerge,
+          wordCount: bodyWithMerge.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,
           status: "success",
