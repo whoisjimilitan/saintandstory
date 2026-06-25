@@ -20,138 +20,75 @@ export function OperatorNav() {
   const getCurrentStageIndex = () => {
     if (pathname === "/operator" || pathname === "/operator/") return 0;
     const segment = pathname.split("/")[2]?.toLowerCase();
-    if (segment === "understand") return 2; // Qualify is now at index 2
+    if (segment === "understand") return 2;
     return stages.findIndex((s) => s.href === `/operator/${segment}`) || 0;
   };
 
   const currentStageIndex = getCurrentStageIndex();
-  const progressPercentage = (currentStageIndex / (stages.length - 1)) * 100;
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-[#E8E8E8] z-50">
-      <div className="max-w-full mx-auto px-6 py-6">
-        <div className="flex items-center justify-between relative">
-          {/* FIXED: Line connects through CENTER of dots */}
-          <svg
-            className="absolute inset-0 w-full pointer-events-none"
-            style={{ height: "100%", top: "0" }}
-            preserveAspectRatio="none"
-          >
-            {/* Underground map style: Progress line runs through stations */}
-            <line
-              x1="1%"
-              y1="50%"
-              x2={`${Math.min(progressPercentage, 86)}%`}
-              y2="50%"
-              stroke="#0D0D0D"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ transition: "x2 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}
-            />
-          </svg>
+      <div className="max-w-full mx-auto px-6 py-8">
+        {/* Underground Journey Map */}
+        <div className="flex items-center justify-between gap-1">
+          {stages.map((stage, index) => {
+            const isActive = index === currentStageIndex;
+            const isPast = index < currentStageIndex;
+            const isLast = index === stages.length - 1;
 
-          {/* Stages - Underground Map Style */}
-          <div className="flex items-center justify-between flex-1 relative z-10">
-            {stages.map((stage, index) => {
-              const isActive = index === currentStageIndex;
-              const isPast = index < currentStageIndex;
-
-              return (
+            return (
+              <div key={stage.name} className="flex items-center flex-1 min-w-0">
+                {/* Station Dot */}
                 <Link
-                  key={stage.name}
                   href={stage.href}
-                  className={`flex flex-col items-center gap-3 transition-all duration-200 ${
-                    isActive ? "opacity-100" : isPast ? "opacity-75" : "opacity-40"
-                  } hover:opacity-100`}
+                  className="flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-200 hover:scale-110"
                   title={stage.name}
                 >
-                  {/* Station Circle - Underground map aesthetic */}
-                  <div className="relative flex items-center justify-center">
-                    {/* Outer ring for active station */}
+                  {/* Circle with indicator */}
+                  <div
+                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#0D0D0D] border-[#0D0D0D] shadow-lg"
+                        : isPast
+                          ? "bg-[#0D0D0D] border-[#0D0D0D]"
+                          : "bg-white border-[#CCCCCC]"
+                    }`}
+                  >
                     {isActive && (
-                      <div className="absolute w-6 h-6 rounded-full border-2 border-[#0D0D0D] animate-pulse" />
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                     )}
-
-                    {/* Main station dot */}
-                    <div
-                      className={`w-5 h-5 rounded-full transition-all duration-200 border-2 ${
-                        isActive
-                          ? "bg-[#0D0D0D] border-[#0D0D0D] shadow-lg scale-110"
-                          : isPast
-                            ? "bg-[#0D0D0D] border-[#0D0D0D]"
-                            : "bg-white border-[#E8E8E8]"
-                      }`}
-                    />
                   </div>
 
                   {/* Label */}
                   <span
-                    className={`text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition-all duration-200 ${
+                    className={`text-[8px] font-bold uppercase tracking-wide whitespace-nowrap transition-all duration-200 ${
                       isActive
-                        ? "text-[#0D0D0D] font-bold"
+                        ? "text-[#0D0D0D]"
                         : isPast
                           ? "text-[#666666]"
-                          : "text-[#999999]"
+                          : "text-[#AAAAAA]"
                     }`}
                   >
                     {stage.name}
                   </span>
                 </Link>
-              );
-            })}
-          </div>
 
-          {/* Menu Button - Top Right */}
-          <div className="relative ml-4">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 text-[#888888] hover:text-[#0D0D0D] transition-colors"
-              title="Menu"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="5" r="1" />
-                <circle cx="12" cy="12" r="1" />
-                <circle cx="12" cy="19" r="1" />
-              </svg>
-            </button>
-
-            {/* Dropdown Menu */}
-            {menuOpen && (
-              <div className="absolute top-full right-0 mt-2 bg-white border border-[#E8E8E8] rounded-lg shadow-md py-2 z-50 min-w-[160px]">
-                <Link
-                  href="/operator/settings"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors"
-                >
-                  Settings
-                </Link>
-                <Link
-                  href="/dashboard/admin"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors border-t border-[#E8E8E8]"
-                >
-                  Admin
-                </Link>
-                <Link
-                  href="/sign-in"
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-2 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors border-t border-[#E8E8E8]"
-                >
-                  Logout
-                </Link>
+                {/* Connecting Line (between stations, not after last) */}
+                {!isLast && (
+                  <div
+                    className={`flex-1 h-1 transition-all duration-200 ${
+                      isPast ? "bg-[#0D0D0D]" : "bg-[#E0E0E0]"
+                    }`}
+                  />
+                )}
               </div>
-            )}
-          </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Menu Button - Top Right */}
+      <div className="relative ml-4"></div>
     </nav>
   );
 }
