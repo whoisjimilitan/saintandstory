@@ -46,6 +46,9 @@ export async function GET(request: Request) {
       );
     }
 
+    // US states to exclude from results
+    const usStates = ['CA', 'NY', 'TX', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC', 'MI', 'NJ', 'VA', 'WA', 'AZ', 'MA', 'TN', 'IN', 'MO', 'MD', 'WI', 'CO', 'MN', 'SC', 'AL', 'LA', 'KY', 'OR', 'OK', 'CT', 'UT', 'NM', 'NV', 'AR', 'MS', 'KS', 'IA', 'NE', 'ID', 'HI', 'NH', 'ME', 'MT', 'RI', 'DE', 'SD', 'ND', 'AK', 'WY', 'VT'];
+
     const leads = await prisma.b2bLead.findMany({
       where: {
         ...(query && {
@@ -76,6 +79,22 @@ export async function GET(request: Request) {
           },
         }),
         ...(status && { status }),
+        // EXCLUDE: US state abbreviations and ZIP codes from results
+        NOT: {
+          OR: [
+            {
+              city: {
+                in: usStates,
+                mode: "insensitive"
+              }
+            },
+            {
+              postcode: {
+                regex: "^\\d{5}(-\\d{4})?$" // ZIP code pattern
+              }
+            }
+          ]
+        }
       },
       select: {
         id: true,

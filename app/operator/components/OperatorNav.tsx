@@ -107,21 +107,21 @@ export function OperatorNav() {
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
               onClick={() => setMenuOpen(false)}
             >
-              ⚙️ Settings
+              Settings
             </a>
             <a
               href="/operator"
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
               onClick={() => setMenuOpen(false)}
             >
-              📊 Dashboard
+              Dashboard
             </a>
             <a
-              href="/admin"
+              href="/dashboard/admin"
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
               onClick={() => setMenuOpen(false)}
             >
-              🔐 Admin
+              Admin
             </a>
           </div>
         )}
