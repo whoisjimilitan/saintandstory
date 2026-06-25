@@ -53,17 +53,29 @@ export async function POST(request: NextRequest) {
     }
 
     // DATABASE CALL: Update prospect with qualification data
-    const result = await safeDbCall(
-      prisma.b2bLead.update({
+    let result;
+    try {
+      const updated = await prisma.b2bLead.update({
         where: { id: prospectId },
         data: {
           status: status || "qualified",
           leadState: "qualified",
           notes: notes || undefined,
         },
-      }),
-      "Qualify: updateProspect"
-    );
+      });
+      result = { success: true, data: updated };
+    } catch (dbError) {
+      const errorMsg = dbError instanceof Error ? dbError.message : String(dbError);
+      console.error("🔥 QUALIFY UPDATE ERROR:", {
+        prospectId,
+        error: errorMsg,
+        statusCode: dbError instanceof Error ? (dbError as any).code : undefined,
+      });
+      return NextResponse.json(
+        { error: `Database update failed: ${errorMsg}` },
+        { status: 500 }
+      );
+    }
 
     if (!result.success) {
       const errorMsg = result.error?.message || "Unknown database error";
@@ -85,10 +97,12 @@ export async function POST(request: NextRequest) {
       message: errorMsg,
       name: error instanceof Error ? error.name : "Unknown",
       stack: error instanceof Error ? error.stack : undefined,
+      code: (error as any)?.code,
+      meta: (error as any)?.meta,
     });
-    // Return actual error to client for debugging
+    // Return specific error message
     return NextResponse.json(
-      { error: `Qualification failed: ${errorMsg}` },
+      { error: `Qualification error: ${errorMsg}` },
       { status: 500 }
     );
   }
