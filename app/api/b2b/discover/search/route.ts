@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     const postcode = searchParams.get("postcode");
     const city = searchParams.get("city");
     const status = searchParams.get("status");
+    const location = searchParams.get("location") || "United Kingdom"; // DEFAULT: UK
     const limit = parseInt(searchParams.get("limit") || "500", 10);
 
     if (!query && !postcode && !city) {
@@ -23,6 +24,11 @@ export async function GET(request: Request) {
         { status: 400 }
       );
     }
+
+    // UK postcode pattern validation
+    const isUKPostcode = (pc: string) => {
+      return /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(pc);
+    };
 
     const leads = await prisma.b2bLead.findMany({
       where: {
