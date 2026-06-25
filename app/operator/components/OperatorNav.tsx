@@ -37,20 +37,20 @@ export function OperatorNav() {
             style={{ height: "100%", top: "0" }}
             preserveAspectRatio="none"
           >
-            {/* Progress line - runs through exact center of dots */}
+            {/* Underground map style: Progress line runs through stations */}
             <line
-              x1="2%"
-              y1="18"
-              x2={`${Math.min(progressPercentage, 84)}%`}
-              y2="18"
+              x1="1%"
+              y1="50%"
+              x2={`${Math.min(progressPercentage, 86)}%`}
+              y2="50%"
               stroke="#0D0D0D"
-              strokeWidth="2"
+              strokeWidth="3"
               strokeLinecap="round"
               style={{ transition: "x2 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}
             />
           </svg>
 
-          {/* Stages */}
+          {/* Stages - Underground Map Style */}
           <div className="flex items-center justify-between flex-1 relative z-10">
             {stages.map((stage, index) => {
               const isActive = index === currentStageIndex;
@@ -60,21 +60,29 @@ export function OperatorNav() {
                 <Link
                   key={stage.name}
                   href={stage.href}
-                  className={`flex flex-col items-center gap-2 transition-all duration-200 transform ${
-                    isActive ? "opacity-100 scale-100" : isPast ? "opacity-70 scale-95" : "opacity-40 scale-90"
-                  } hover:opacity-100 hover:scale-100`}
+                  className={`flex flex-col items-center gap-3 transition-all duration-200 ${
+                    isActive ? "opacity-100" : isPast ? "opacity-75" : "opacity-40"
+                  } hover:opacity-100`}
                   title={stage.name}
                 >
-                  {/* Stage Indicator - line passes through center */}
-                  <div
-                    className={`w-4 h-4 rounded-full transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#0D0D0D] shadow-md"
-                        : isPast
-                          ? "bg-[#0D0D0D]"
-                          : "bg-[#E8E8E8]"
-                    }`}
-                  />
+                  {/* Station Circle - Underground map aesthetic */}
+                  <div className="relative flex items-center justify-center">
+                    {/* Outer ring for active station */}
+                    {isActive && (
+                      <div className="absolute w-6 h-6 rounded-full border-2 border-[#0D0D0D] animate-pulse" />
+                    )}
+
+                    {/* Main station dot */}
+                    <div
+                      className={`w-5 h-5 rounded-full transition-all duration-200 border-2 ${
+                        isActive
+                          ? "bg-[#0D0D0D] border-[#0D0D0D] shadow-lg scale-110"
+                          : isPast
+                            ? "bg-[#0D0D0D] border-[#0D0D0D]"
+                            : "bg-white border-[#E8E8E8]"
+                      }`}
+                    />
+                  </div>
 
                   {/* Label */}
                   <span
