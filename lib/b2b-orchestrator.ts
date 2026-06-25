@@ -169,16 +169,20 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // STAGE 2: DRIVER MATCHING & RECOGNITION
+  // STAGE 2: DRIVER MATCHING & LOCKED TEMPLATE EMAIL GENERATION
   // ─────────────────────────────────────────────────────────────
-  const stage2Runner = logger.startStage("Driver Matching").start();
+  // NOW USES: Communication engine (unified with ENRICH page)
+  // Uses same 6-layer psychology template for all auto-discovery emails
+  // ─────────────────────────────────────────────────────────────
+  const stage2Runner = logger.startStage("Driver Matching & Email Generation").start();
 
   try {
-    // Lazy-load recognition email module
-    if (!triggerDriverLeadDiscovery) {
-      const module = await import("./recognition-email");
-      triggerDriverLeadDiscovery = module.triggerDriverLeadDiscovery;
-    }
+    // Import communication engine (single source of truth for emails)
+    const { generateRelationshipCommunication } = await import("./business-relationship-engine");
+    const { generateCommunicationRecommendations } = await import("./layer2-reasoning-engine");
+    const { Resend } = await import("resend");
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const drivers = (await sql`
       SELECT id, full_name as name, email, postcode, latitude, longitude, radius_miles
@@ -190,19 +194,128 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
 
     let succeeded = 0;
     const failed: string[] = [];
+    let totalEmailsSent = 0;
 
     for (const driver of drivers) {
       try {
         console.log(`  → Matching for ${driver.name}`);
-        const matchResult = await triggerDriverLeadDiscovery(driver);
 
-        if (matchResult.emailsSent && matchResult.emailsSent > 0) {
+        // Find nearby leads (within driver's radius)
+        const nearbyLeads = (await sql`
+          SELECT id, business_name, city, email, business_category, pain_point
+          FROM b2b_leads
+          WHERE
+            latitude IS NOT NULL
+            AND longitude IS NOT NULL
+            AND email IS NOT NULL
+            AND email_sent_at IS NULL
+            AND (
+              (6371 * acos(cos(radians(${driver.latitude})) * cos(radians(latitude::float)) *
+               cos(radians(longitude::float) - radians(${driver.longitude})) +
+               sin(radians(${driver.latitude})) * sin(radians(latitude::float)))) <= ${driver.radius_miles * 1.609}
+            )
+          ORDER BY engagement_score DESC
+          LIMIT 20
+        `) as Array<{
+          id: string;
+          business_name: string;
+          city: string;
+          email: string;
+          business_category?: string;
+          pain_point?: string;
+        }>;
+
+        if (nearbyLeads.length === 0) {
+          console.log(`    ℹ No nearby leads found`);
+          continue;
+        }
+
+        console.log(`    → Found ${nearbyLeads.length} nearby leads, generating emails...`);
+
+        // Generate emails using LOCKED TEMPLATE for each lead
+        let emailsSentForDriver = 0;
+        for (const lead of nearbyLeads) {
+          try {
+            // Generate reasoning context using 8-step engine
+            const reasoning = generateRelationshipCommunication({
+              name: lead.business_name,
+              industry: lead.business_category || "logistics",
+              location: lead.city || "UK",
+              size: "small" as const,
+              contactName: undefined,
+              discoveryEvidence: {
+                operationalIndicators: [],
+                growthSignals: [],
+                currentSolutions: [],
+                painPoints: lead.pain_point ? [lead.pain_point] : [],
+              },
+            });
+
+            // Generate 3 ranked recommendations using Layer 2
+            const recommendations = generateCommunicationRecommendations(reasoning);
+            const topRecommendation = recommendations[0];
+
+            if (!topRecommendation?.email?.fullBody) {
+              throw new Error("No email body generated");
+            }
+
+            // Format email with greeting and signature (LOCKED TEMPLATE)
+            const emailBody = topRecommendation.email.fullBody
+              .replace(/\btheir\b/gi, "your")
+              .replace(/\bthey\b/gi, "you")
+              .replace(/\bthey're\b/gi, "you're")
+              .replace(/\bthey've\b/gi, "you've");
+
+            const subject = `We're expanding to ${lead.city || "your area"} - set up your account`;
+
+            const fullBody = `Hi ${lead.business_name},
+
+${emailBody.trim()}
+
+Best regards,
+James
+Saint & Story`;
+
+            // Send via Resend (same as manual batch)
+            const response = await resend.emails.send({
+              from: "recognition@saintandstoryltd.co.uk",
+              to: lead.email,
+              subject,
+              text: fullBody,
+              replyTo: "info@saintandstoryltd.co.uk",
+              headers: {
+                "X-Lead-ID": lead.id,
+                "X-Driver-ID": driver.id,
+                "X-Source": "auto-discovery-orchestrator",
+              },
+            });
+
+            if (response.error) {
+              throw new Error(response.error.message);
+            }
+
+            // Mark lead as emailed
+            await sql`
+              UPDATE b2b_leads
+              SET email_sent_at = NOW()
+              WHERE id = ${lead.id}
+            `;
+
+            emailsSentForDriver++;
+            totalEmailsSent++;
+          } catch (leadErr) {
+            console.error(
+              `    ✗ Failed to send email to ${lead.business_name}:`,
+              leadErr instanceof Error ? leadErr.message : String(leadErr)
+            );
+          }
+        }
+
+        if (emailsSentForDriver > 0) {
           succeeded++;
           console.log(
-            `    ✓ Sent ${matchResult.emailsSent} recognition emails`
+            `    ✓ Sent ${emailsSentForDriver} emails to nearby leads`
           );
-        } else {
-          console.log(`    ℹ No nearby leads found`);
         }
       } catch (err) {
         const errorMsg = `Driver ${driver.id}: ${err instanceof Error ? err.message : String(err)}`;
@@ -217,6 +330,8 @@ export async function runDailyB2BOrchestration(): Promise<OrchestrationResult> {
       succeeded,
       failed,
     };
+
+    console.log(`[B2B Orchestrator] Total emails sent: ${totalEmailsSent}`);
   } catch (err) {
     stage2Runner.failure(
       err instanceof Error ? err.message : String(err)
