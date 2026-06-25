@@ -202,10 +202,10 @@ export default async function AdminPage() {
                 </svg>
               </summary>
               <div className="absolute right-4 mt-2 bg-white border border-[#E8E8E8] rounded-lg shadow-sm z-10 min-w-[140px]">
-                <Link href="/operator" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
+                <Link href="/operator" className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F5F5F5] border-b border-[#E8E8E8] transition-colors">
                   Ops →
                 </Link>
-                <Link href="/sign-in" className="block px-4 py-3 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
+                <Link href="/sign-in" className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F5F5F5] transition-colors">
                   Logout
                 </Link>
               </div>
