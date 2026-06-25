@@ -1,23 +1,27 @@
 /**
  * BUSINESS RELATIONSHIP ENGINE (CORE)
  *
- * Replaces V3 Email Reasoning Engine
+ * OBJECTIVE: Provide rich reasoning context for communication
+ * NOT: Prescribe what to say
  *
- * OBJECTIVE: Build genuine business relationships through strategic communication
- * NOT: Sell services in first email
+ * This engine outputs REASONING CONTEXT.
+ * Layer 2 (Reasoning Engine) uses this context to generate communication.
  *
- * Email is ONE OUTPUT of relationship reasoning, not the primary product.
- *
- * PIPELINE:
+ * REASONING PIPELINE (Context Provider):
  * 1. Who is this business? (discovery analysis)
  * 2. Why would they need us? (operational inference)
  * 3. Relationship stage? (0-6 progression)
- * 4. Trust strategy (lower resistance, build credibility)
- * 5. Inverse incentive (honest qualification)
- * 6. Mental simulation (believable future scenario)
- * 7. Micro commitment (smallest ask possible)
- * 8a. Permission line (Stage 1 only - based on behavioral patterns)
- * 8b. Generate communication (ONLY after steps 1-7)
+ * 4. Trust context (what's genuinely true about trust)
+ * 5. Qualification context (what's genuinely true about need)
+ * 6. Scenario context (realistic situation)
+ * 7. Ask context (natural smallest ask)
+ *
+ * Layer 2 then:
+ * - Uses this context to evaluate 10 opening formulations
+ * - Scores each for PD × Trust × Authenticity
+ * - Ranks top 3
+ * - Writes email using best fit
+ * - Passes through Layer 3 (Trust Validation)
  */
 
 import { generatePermissionLine, type IndustryType } from "./behavioral-pattern-map";
@@ -80,48 +84,37 @@ export interface RelationshipReasoning {
     stageObjective: string;
   };
 
-  // Step 4: Trust strategy
-  trustStrategy: {
-    approach: string;
-    trustSignal: string;
-    honestStatement: string;
+  // Step 4: Trust context (what's genuinely true about trust here)
+  // NOT what to say, but what to understand
+  trustContext: {
+    whatEarnsTrust: string; // Observable fact that builds trust
+    whatBreaksTrust: string; // Observable fact that damages trust
+    genuineStrength: string; // Real reason to believe us
   };
 
-  // Step 5: Inverse incentive
-  inverseIncentive: {
-    statement: string;
-    purpose: "reduce-pressure" | "honest-qualification";
+  // Step 5: Qualification context (what's genuinely true about their need)
+  // NOT an "inverse incentive statement", but context about genuine need
+  qualificationContext: {
+    doTheyNeedUs: boolean; // Genuinely true answer
+    reasoning: string; // Why or why not
+    ifYes: string; // What problem they have
+    ifNo: string; // Why they don't need us
   };
 
-  // Step 6: Mental simulation
-  mentalSimulation: {
-    scenario: string;
-    trigger: string;
-    believability: "high" | "medium" | "low";
+  // Step 6: Scenario context (what's the realistic situation)
+  // NOT a prescribed narrative, but the true situation
+  scenarioContext: {
+    likelyRealityForThem: string; // What's probably happening right now
+    triggeringMoment: string; // When this becomes real
+    howTheyFeel: string; // Emotional reality (not manufactured)
   };
 
-  // Step 7: Micro commitment
-  microCommitment: {
-    ask: string;
-    responseOptions: string[];
-    cognitiveLoad: "minimal" | "low" | "medium";
-  };
-
-  // Step 8a: Permission line (Stage 1 only)
-  permissionLine?: {
-    text: string;
-    appliesAtStage: RelationshipStage;
-    basedOnBehavioralPattern: string;
-  };
-
-  // Step 8b: Internal dialogue prediction (BEFORE email generation)
-  internalDialogue?: InternalDialogue;
-
-  // Step 8c: Email generation parameters
-  communicationParams: {
-    targetWordCount: number;
-    tone: "conversational" | "professional" | "consultative";
-    optimizedFor: "reply" | "engagement" | "relationship";
+  // Step 7: Ask context (what's the natural smallest ask)
+  // NOT a micro commitment to force, but the genuine next step
+  askContext: {
+    naturalNextStep: string; // What naturally follows
+    minimumCommitment: string; // Smallest possible request
+    whyThisAsk: string; // Why this is the right ask
   };
 }
 
@@ -286,161 +279,267 @@ function getStageName(stage: RelationshipStage): string {
 }
 
 // ============================================================================
-// STEP 4: TRUST STRATEGY
+// STEP 4: TRUST CONTEXT (What's genuinely true about trust)
 // ============================================================================
 
-function generateTrustStrategy(profile: BusinessProfile, stage: RelationshipStage) {
-  const strategies = {
+function generateTrustContext(
+  profile: BusinessProfile,
+  stage: RelationshipStage
+): typeof RelationshipReasoning.prototype.trustContext {
+  const contexts: Record<RelationshipStage, Record<string, string>> = {
     1: {
-      approach: "Remove commitment barriers",
-      trustSignal: "We've already set up a free account (no obligation, no cost)",
-      honestStatement: "If you already have a courier you trust, keep using them.",
+      whatEarnsTrust:
+        "We exist specifically for overflow. That's all we do. Not trying to replace anyone.",
+      whatBreaksTrust:
+        "Acting like we're their primary solution. Claiming we can do everything.",
+      genuineStrength:
+        "We only succeed if they succeed with us as backup. No hidden agenda.",
     },
     2: {
-      approach: "Position as contingency, not replacement",
-      trustSignal: "We understand most businesses need a backup option",
-      honestStatement: "We'd rather become your backup than replace who already serves you.",
+      whatEarnsTrust:
+        "They've already replied. That's trust. Now we're proving we deliver.",
+      whatBreaksTrust:
+        "Changing our positioning or making new promises beyond backup.",
+      genuineStrength: "We've earned their curiosity. Time to show up reliably.",
     },
     3: {
-      approach: "Prove through delivery",
-      trustSignal: "Let's handle your first job and show you what reliable looks like",
-      honestStatement: "Your current provider might work fine. We're here when they can't.",
+      whatEarnsTrust: "First delivery completed. Trust built through action, not words.",
+      whatBreaksTrust: "Missing deadline or creating friction on first job.",
+      genuineStrength:
+        "Real experience together beats any trust signal we could claim.",
     },
     4: {
-      approach: "Consistency builds trust",
-      trustSignal: "We show up. Every time. Predictable pricing, predictable service.",
-      honestStatement: "Trust is earned through repeated reliable delivery, not promises.",
+      whatEarnsTrust:
+        "Pattern of reliability. We've shown up multiple times. Consistency.",
+      whatBreaksTrust: "Single failure or inconsistency in service.",
+      genuineStrength: "Behavior proves what words never can.",
     },
     5: {
-      approach: "Strategic understanding",
-      trustSignal: "We've learned your business. We know your peak periods and challenges.",
-      honestStatement: "A dedicated driver only makes sense if we've proven ourselves.",
+      whatEarnsTrust:
+        "Deep understanding of their peaks and valleys. We've adapted to them.",
+      whatBreaksTrust: "Treating them like a generic customer.",
+      genuineStrength: "We know their business better than some of their own team.",
     },
     6: {
-      approach: "Long-term partnership mindset",
-      trustSignal: "We're invested in your success, not just this transaction",
-      honestStatement: "True logistics partners align incentives for mutual growth.",
+      whatEarnsTrust: "Aligned incentives. We win when they win.",
+      whatBreaksTrust: "Prioritizing revenue over their success.",
+      genuineStrength:
+        "Long-term partnership is only possible when goals align.",
     },
   };
 
-  const stageStrategy = strategies[stage as keyof typeof strategies] || strategies[1];
+  const stageContext = contexts[stage as keyof typeof contexts] || contexts[1];
 
   return {
-    approach: stageStrategy.approach,
-    trustSignal: stageStrategy.trustSignal,
-    honestStatement: stageStrategy.honestStatement,
+    whatEarnsTrust: stageContext.whatEarnsTrust,
+    whatBreaksTrust: stageContext.whatBreaksTrust,
+    genuineStrength: stageContext.genuineStrength,
   };
 }
 
 // ============================================================================
-// STEP 5: INVERSE INCENTIVE
+// STEP 5: QUALIFICATION CONTEXT (What's genuinely true about their need)
 // ============================================================================
 
-function generateInverseIncentive(profile: BusinessProfile, stage: RelationshipStage) {
-  const inverses: Record<RelationshipStage, string> = {
-    0: "",
-    1: `If your current courier never lets you down, this probably isn't relevant.`,
-    2: `If your current drivers comfortably handle every situation, you can ignore this.`,
-    3: `Only if your current provider occasionally misses deadlines or overcharges.`,
-    4: `Only if you sometimes need a backup when your primary courier is overwhelmed.`,
-    5: `Only if you have regular, predictable delivery needs that justify dedicated service.`,
-    6: `Only if your logistics are becoming complex enough to need strategic partnership.`,
+function generateQualificationContext(
+  profile: BusinessProfile,
+  stage: RelationshipStage
+): typeof RelationshipReasoning.prototype.qualificationContext {
+  // Determine if they genuinely need us
+  const needsUs = stage >= 2; // If they've replied or moved forward, likely they need us
+
+  const contexts: Record<RelationshipStage, { ifYes: string; ifNo: string; reasoning: string }> = {
+    0: {
+      ifYes: "",
+      ifNo: "",
+      reasoning: "Too early to know.",
+    },
+    1: {
+      ifYes: "Their main courier hits capacity or fails them regularly.",
+      ifNo: "Their current courier is genuinely perfect. They've never had overflow issues.",
+      reasoning:
+        "Cold prospect. We know their industry but not their specific situation yet.",
+    },
+    2: {
+      ifYes: "They've replied, which suggests they've experienced delivery problems.",
+      ifNo:
+        "They might be exploring options generally, not because of immediate need.",
+      reasoning: "They engaged, which is a signal they've had friction.",
+    },
+    3: {
+      ifYes: "They're ready to test, which means they've felt the pain.",
+      ifNo: "Unlikely at this stage.",
+      reasoning: "Movement to first delivery is strong signal of genuine need.",
+    },
+    4: {
+      ifYes: "Multiple deliveries prove ongoing need.",
+      ifNo: "Very unlikely.",
+      reasoning: "Repeat usage = real need.",
+    },
+    5: {
+      ifYes: "Scaling conversation means overflow is now a real constraint.",
+      ifNo: "No.",
+      reasoning: "Dedicated driver conversation only makes sense with proven overflow.",
+    },
+    6: {
+      ifYes: "Partnership talk = they've moved past transactional.",
+      ifNo: "No.",
+      reasoning:
+        "Long-term thinking only happens when backup has become essential.",
+    },
   };
 
+  const stageContext = contexts[stage as keyof typeof contexts] || contexts[1];
+
   return {
-    statement: inverses[stage],
-    purpose: "reduce-pressure" as const,
+    doTheyNeedUs: needsUs,
+    reasoning: stageContext.reasoning,
+    ifYes: stageContext.ifYes,
+    ifNo: stageContext.ifNo,
   };
 }
 
 // ============================================================================
-// STEP 6: MENTAL SIMULATION
+// STEP 6: SCENARIO CONTEXT (What's the realistic situation)
 // ============================================================================
 
-function generateMentalSimulation(
+function generateScenarioContext(
   profile: BusinessProfile,
   potentialNeeds: RelationshipReasoning["potentialNeeds"],
   stage: RelationshipStage
-) {
-  // Use most realistic delivery need for this business
+): typeof RelationshipReasoning.prototype.scenarioContext {
   const primaryNeed = potentialNeeds[0];
 
-  const scenarios: Record<RelationshipStage, { scenario: string; trigger: string }> = {
-    0: { scenario: "", trigger: "" },
+  const scenarios: Record<
+    RelationshipStage,
+    {
+      likelyRealityForThem: string;
+      triggeringMoment: string;
+      howTheyFeel: string;
+    }
+  > = {
+    0: {
+      likelyRealityForThem: "",
+      triggeringMoment: "",
+      howTheyFeel: "",
+    },
     1: {
-      scenario: `Last week: ${primaryNeed.realisticScenario}. It'll happen again.`,
-      trigger: "Time-sensitive operational need",
+      likelyRealityForThem: `They experience ${primaryNeed.realisticScenario.toLowerCase()} regularly.`,
+      triggeringMoment: `When their primary courier is fully booked or unavailable.`,
+      howTheyFeel:
+        "Frustrated that they can't fulfill orders or deliver on time because of courier limits.",
     },
     2: {
-      scenario: `Your current courier is fully booked, but you have ${primaryNeed.realisticScenario.toLowerCase()}`,
-      trigger: "Capacity overflow or last-minute need",
+      likelyRealityForThem: `They've had the experience: ${primaryNeed.realisticScenario.toLowerCase()}. It's happened more than once.`,
+      triggeringMoment: `During their busiest periods, when they need backup capacity urgently.`,
+      howTheyFeel:
+        "Concerned that they don't have a reliable contingency when their main courier fails.",
     },
     3: {
-      scenario: `You've already used us once. Now your regular needs are growing, and you need a backup.`,
-      trigger: "Repeated similar situations",
+      likelyRealityForThem: `They used us once and it worked. Now they're seeing a pattern of need.`,
+      triggeringMoment: `When they face the same situation again and realize they need consistent backup.`,
+      howTheyFeel:
+        "More confident because they've seen us deliver. Starting to think about us as a regular option.",
     },
     4: {
-      scenario: `You're handling this delivery pattern regularly, and you want predictable pricing and reliable service.`,
-      trigger: "Operational routine establishment",
+      likelyRealityForThem: `This delivery pattern is now their normal. They're handling it regularly.`,
+      triggeringMoment: `Every week when their volume exceeds their main courier's capacity.`,
+      howTheyFeel:
+        "Relieved that they have a backup they can count on. Thinking about making us more permanent.",
     },
     5: {
-      scenario: `Your delivery volume justifies having a dedicated driver who knows your business.`,
-      trigger: "Predictable recurring need",
+      likelyRealityForThem: `Their volume justifies having dedicated capacity just for them.`,
+      triggeringMoment: `When they realize their growth is consistent enough for a dedicated driver.`,
+      howTheyFeel:
+        "Ready to invest in a more formal arrangement because the ROI is clear.",
     },
     6: {
-      scenario: `Your logistics are complex enough that you need a strategic partner who understands your full supply chain.`,
-      trigger: "Business growth and complexity",
+      likelyRealityForThem: `Their entire supply chain is now a complex puzzle they're solving.`,
+      triggeringMoment: `When they realize one logistics partner could handle their entire operation better.`,
+      howTheyFeel:
+        "Strategic. Thinking long-term about which partners are worth investing in deeply.",
     },
   };
 
-  const simulation = scenarios[stage];
+  const scenario = scenarios[stage];
 
   return {
-    scenario: simulation.scenario,
-    trigger: simulation.trigger,
-    believability: (stage <= 2 ? "high" : stage <= 4 ? "medium" : "low") as "high" | "medium" | "low",
+    likelyRealityForThem: scenario.likelyRealityForThem,
+    triggeringMoment: scenario.triggeringMoment,
+    howTheyFeel: scenario.howTheyFeel,
   };
 }
 
 // ============================================================================
-// STEP 7: MICRO COMMITMENT
+// STEP 7: ASK CONTEXT (What's the natural smallest ask)
 // ============================================================================
 
-function generateMicroCommitment(stage: RelationshipStage) {
-  const commitments: Record<RelationshipStage, { ask: string; responseOptions: string[] }> = {
-    0: { ask: "", responseOptions: [] },
+function generateAskContext(
+  stage: RelationshipStage
+): typeof RelationshipReasoning.prototype.askContext {
+  const contexts: Record<
+    RelationshipStage,
+    {
+      naturalNextStep: string;
+      minimumCommitment: string;
+      whyThisAsk: string;
+    }
+  > = {
+    0: {
+      naturalNextStep: "",
+      minimumCommitment: "",
+      whyThisAsk: "",
+    },
     1: {
-      ask: "Do you see yourself ever using this account?",
-      responseOptions: ["yes", "maybe", "no"],
+      naturalNextStep:
+        "They reply with yes/maybe/no to let us know if this is even relevant.",
+      minimumCommitment: "A single word: Yes, Maybe, or No",
+      whyThisAsk:
+        "At this stage, just knowing if they've experienced the problem is enough.",
     },
     2: {
-      ask: "Would you try us on your next overflow delivery?",
-      responseOptions: ["yes", "maybe", "no"],
+      naturalNextStep:
+        "They agree to use us for their next overflow delivery to test us.",
+      minimumCommitment: "Commit to one test delivery",
+      whyThisAsk:
+        "Proof happens in action, not conversation. First delivery is the real test.",
     },
     3: {
-      ask: "Should we set up your regular delivery schedule?",
-      responseOptions: ["yes", "let's discuss", "not yet"],
+      naturalNextStep:
+        "If first delivery went well, they agree to set up regular use.",
+      minimumCommitment: "Move from test to regular",
+      whyThisAsk:
+        "We've proven ourselves. Now it's about making it official and regular.",
     },
     4: {
-      ask: "Are you happy with how that's working?",
-      responseOptions: ["yes", "mostly", "let's talk"],
+      naturalNextStep:
+        "They share feedback on how the arrangement is working for them.",
+      minimumCommitment: "Honest conversation about what's working",
+      whyThisAsk:
+        "Ongoing partnership requires feedback. We need to know if we're actually solving their problem.",
     },
     5: {
-      ask: "Should we explore a dedicated driver arrangement?",
-      responseOptions: ["yes", "maybe", "not now"],
+      naturalNextStep: "They explore a dedicated driver arrangement.",
+      minimumCommitment: "Explore the option of dedicated capacity",
+      whyThisAsk:
+        "Volume justifies more formal arrangement. No point asking without proof of need.",
     },
     6: {
-      ask: "Ready to build a long-term logistics partnership?",
-      responseOptions: ["yes", "let's explore", "not yet"],
+      naturalNextStep:
+        "They commit to a long-term strategic partnership arrangement.",
+      minimumCommitment:
+        "Discuss formal partnership terms and mutual goals",
+      whyThisAsk:
+        "At this level, both sides are aligned on the relationship being long-term.",
     },
   };
 
-  const commitment = commitments[stage];
+  const context = contexts[stage];
 
   return {
-    ask: commitment.ask,
-    responseOptions: commitment.responseOptions,
-    cognitiveLoad: (stage <= 2 ? "minimal" : stage <= 4 ? "low" : "medium") as "minimal" | "low" | "medium",
+    naturalNextStep: context.naturalNextStep,
+    minimumCommitment: context.minimumCommitment,
+    whyThisAsk: context.whyThisAsk,
   };
 }
 
@@ -610,31 +709,14 @@ export function generateRelationshipCommunication(
   // STEP 3: Assess relationship stage
   const currentStage = assessRelationshipStage(profile, history);
 
-  // STEP 4: Generate trust strategy
-  const trustStrategy = generateTrustStrategy(profile, currentStage);
+  // STEP 4-7: Generate context (not prescriptions)
+  // These provide reasoning context for Layer 2, not communication prescriptions
+  const trustContext = generateTrustContext(profile, currentStage);
+  const qualificationContext = generateQualificationContext(profile, currentStage);
+  const scenarioContext = generateScenarioContext(profile, potentialNeeds, currentStage);
+  const askContext = generateAskContext(currentStage);
 
-  // STEP 5: Generate inverse incentive
-  const inverseIncentive = generateInverseIncentive(profile, currentStage);
-
-  // STEP 6: Generate mental simulation
-  const mentalSimulation = generateMentalSimulation(profile, potentialNeeds, currentStage);
-
-  // STEP 7: Generate micro commitment
-  const microCommitment = generateMicroCommitment(currentStage);
-
-  // STEP 8a: Generate permission line (Stage 1 only)
-  const permissionLine = generatePermissionLineForStage(currentStage, profile);
-
-  // STEP 8b: Predict internal dialogue BEFORE email generation
-  // This is the blueprint. Email merely manifests this dialogue.
-  const internalDialogue = predictInternalDialogue(
-    currentStage,
-    profile.industry,
-    profile.location,
-    permissionLine?.text
-  );
-
-  // BUILD COMPLETE REASONING
+  // BUILD COMPLETE REASONING (Context Provider)
   const reasoning: RelationshipReasoning = {
     businessAnalysis,
     potentialNeeds,
@@ -643,54 +725,15 @@ export function generateRelationshipCommunication(
       stageName: getStageName(currentStage),
       stageObjective: getStageObjective(currentStage),
     },
-    trustStrategy,
-    inverseIncentive,
-    mentalSimulation,
-    microCommitment,
-    permissionLine,
-    internalDialogue,
-    communicationParams: {
-      targetWordCount: currentStage === 1 ? 60 : currentStage === 2 ? 75 : 50,
-      tone: (currentStage <= 2 ? "conversational" : "professional") as "conversational" | "professional",
-      optimizedFor: "reply",
-    },
+    trustContext,
+    qualificationContext,
+    scenarioContext,
+    askContext,
   };
 
-  // STEP 8c: Only AFTER all reasoning AND dialogue prediction, generate email using Communication Decision Engine
-  const emailWithPD = generateEmailWithPD(reasoning);
-
-  // Convert to standard email format with PD metadata
-  const email = {
-    subject: emailWithPD.subject,
-    body: emailWithPD.body,
-    wordCount: emailWithPD.body.split(/\s+/).length,
-    pdMetadata: emailWithPD.pdMetadata,
-  };
-
-  // STAGE PROGRESSION LOGIC
-  const nextStage = Math.min(6, currentStage + 1) as RelationshipStage;
-  const triggerForProgression =
-    currentStage === 1 ? "Reply received (yes/maybe)" :
-    currentStage === 2 ? "Agreed to first delivery" :
-    currentStage === 3 ? "First delivery completed" :
-    currentStage === 4 ? "3+ deliveries completed" :
-    currentStage === 5 ? "Dedicated driver agreement signed" :
-    "Strategic partnership established";
-
-  return {
-    reasoning,
-    email,
-    stageProgression: {
-      currentStage,
-      nextStage,
-      triggerForProgression,
-    },
-    metadata: {
-      generatedAt: new Date().toISOString(),
-      industry: profile.industry,
-      relationshipObjective: getStageObjective(currentStage),
-    },
-  };
+  // Return reasoning context only
+  // Email generation is Layer 2's responsibility
+  return reasoning;
 }
 
 // ============================================================================
