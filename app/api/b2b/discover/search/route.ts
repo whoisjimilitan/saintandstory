@@ -30,6 +30,14 @@ export async function GET(request: Request) {
       return /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(pc);
     };
 
+    // VALIDATE: Reject non-UK postcodes
+    if (postcode && !isUKPostcode(postcode)) {
+      return NextResponse.json(
+        { error: "Invalid UK postcode format", success: false, leads: [] },
+        { status: 400 }
+      );
+    }
+
     const leads = await prisma.b2bLead.findMany({
       where: {
         ...(query && {

@@ -97,11 +97,18 @@ function parseSearchResults(results: any[], params: any): Array<{
     const website = result.link || "";
     const snippet = result.snippet || "";
 
+    // VALIDATE: Must be UK-based (check title and snippet for location)
+    // This filters out US states, postcodes, and other countries
+    if (!isUKLocation(businessName + " " + snippet)) {
+      console.log(`[DORK SEARCH] Filtering non-UK result: ${businessName}`);
+      continue;
+    }
+
     // Extract contact info from snippet (may be empty)
     const email = extractEmailFromText(snippet);
     const phone = extractPhoneFromText(snippet);
 
-    // Include ALL results with business name
+    // Include results with business name (must pass UK validation)
     // Email/phone are optional - they may not be in snippet
     if (businessName && website) {
       cleaned.push({
@@ -126,6 +133,69 @@ function extractEmailFromText(text: string): string | undefined {
 function extractPhoneFromText(text: string): string | undefined {
   const phoneMatch = text.match(/(?:\+44|0)\d{3,4}\s?\d{3,4}\s?\d{3,4}|(?:\+44|0)\d{10,11}/);
   return phoneMatch ? phoneMatch[0] : undefined;
+}
+
+// Validate that a location/title is UK-based
+function isUKLocation(text: string): boolean {
+  if (!text) return true; // No text = assume UK if params.location is UK
+
+  const lowerText = text.toLowerCase();
+
+  // REJECT: US States
+  const usStates = [
+    'alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado',
+    'connecticut', 'delaware', 'florida', 'georgia', 'hawaii', 'idaho',
+    'illinois', 'indiana', 'iowa', 'kansas', 'kentucky', 'louisiana',
+    'maine', 'maryland', 'massachusetts', 'michigan', 'minnesota',
+    'mississippi', 'missouri', 'montana', 'nebraska', 'nevada',
+    'new hampshire', 'new jersey', 'new mexico', 'new york', 'north carolina',
+    'north dakota', 'ohio', 'oklahoma', 'oregon', 'pennsylvania',
+    'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+    'utah', 'vermont', 'virginia', 'washington', 'west virginia',
+    'wisconsin', 'wyoming'
+  ];
+
+  // REJECT: US State abbreviations
+  const usStateAbbreviations = [
+    'al', 'ak', 'az', 'ar', 'ca', 'co', 'ct', 'de', 'fl', 'ga', 'hi', 'id',
+    'il', 'in', 'ia', 'ks', 'ky', 'la', 'me', 'md', 'ma', 'mi', 'mn', 'ms',
+    'mo', 'mt', 'ne', 'nv', 'nh', 'nj', 'nm', 'ny', 'nc', 'nd', 'oh', 'ok',
+    'or', 'pa', 'ri', 'sc', 'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv',
+    'wi', 'wy'
+  ];
+
+  // REJECT: US ZIP codes (5 digits or 5+4 format)
+  if (/\b\d{5}(?:-\d{4})?\b/.test(text)) {
+    return false;
+  }
+
+  // Check for US states by name
+  for (const state of usStates) {
+    if (lowerText.includes(state)) return false;
+  }
+
+  // Check for US state abbreviations (with word boundaries)
+  for (const abbr of usStateAbbreviations) {
+    if (new RegExp(`\\b${abbr}\\b|\\s${abbr}\\s|,\\s*${abbr}\\b`).test(lowerText)) {
+      return false;
+    }
+  }
+
+  // REJECT: Other countries
+  const nonUKCountries = [
+    'usa', 'us ', 'united states', 'america', 'american',
+    'canada', 'canadian', 'australia', 'australian', 'france', 'french',
+    'germany', 'german', 'spain', 'spanish', 'italy', 'italian',
+    'japan', 'japanese', 'china', 'chinese', 'india', 'indian',
+    'mexico', 'mexican', 'brazil', 'brazilian'
+  ];
+
+  for (const country of nonUKCountries) {
+    if (lowerText.includes(country)) return false;
+  }
+
+  // ACCEPT: If no red flags, assume UK (params.location will be UK)
+  return true;
 }
 
 export async function POST(request: NextRequest) {
