@@ -30,6 +30,14 @@ export async function GET(request: Request) {
       return /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(pc);
     };
 
+    // US location detection - reject US-based results
+    const isUSLocation = (loc: string | null | undefined) => {
+      if (!loc) return false;
+      const upperLoc = loc.toUpperCase().trim();
+      const usStates = ['CA', 'NY', 'TX', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC', 'MI', 'NJ', 'VA', 'WA', 'AZ', 'MA', 'TN', 'IN', 'MO', 'MD', 'WI', 'CO', 'MN', 'SC', 'AL', 'LA', 'KY', 'OR', 'OK', 'CT', 'UT', 'NM', 'NV', 'AR', 'MS', 'KS', 'IA', 'NE', 'ID', 'HI', 'NH', 'ME', 'MT', 'RI', 'DE', 'SD', 'ND', 'AK', 'WY', 'VT'];
+      return usStates.includes(upperLoc) || /^\d{5}(-\d{4})?$/.test(loc);
+    };
+
     // VALIDATE: Reject non-UK postcodes
     if (postcode && !isUKPostcode(postcode)) {
       return NextResponse.json(
@@ -83,14 +91,19 @@ export async function GET(request: Request) {
         painPoint: true,
         businessEvidence: true,
       },
-      take: Math.min(limit, 500),
+      take: Math.min(limit, 1000),
       orderBy: { createdAt: "desc" },
     });
 
+    // Filter out US-based results (Issue 2: No US results)
+    const ukOnlyLeads = leads.filter(lead =>
+      !isUSLocation(lead.city) && !isUSLocation(lead.postcode)
+    );
+
     return NextResponse.json({
       success: true,
-      count: leads.length,
-      results: leads,
+      count: ukOnlyLeads.length,
+      results: ukOnlyLeads,
     });
   } catch (error) {
     console.error("[B2B DISCOVER] Error:", error);

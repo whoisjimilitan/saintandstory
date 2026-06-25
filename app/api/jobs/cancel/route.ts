@@ -3,6 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { neon } from "@neondatabase/serverless";
 import { Resend } from "resend";
 import { triggerAdminRefresh } from "@/lib/triggerAdminRefresh";
+import Pusher from "pusher";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -28,9 +29,9 @@ export async function POST(request: NextRequest) {
   const sql = neon(process.env.DATABASE_URL!);
 
   const rows = await sql`
-    SELECT customer_email, customer_name, reference
+    SELECT customer_email, customer_name, reference, status
     FROM jobs
-    WHERE id = ${jobId} AND status IN ('pending_review', 'offered')
+    WHERE id = ${jobId} AND status IN ('pending_review', 'offered', 'assigned', 'in_progress')
     LIMIT 1
   `;
   if (!rows[0]) return NextResponse.json({ error: "Job not found or cannot be cancelled" }, { status: 404 });
@@ -64,6 +65,23 @@ export async function POST(request: NextRequest) {
         </div>
       `,
     });
+  }
+
+  // Notify dashboard subscribers of cancellation
+  try {
+    const pusher = new Pusher({
+      appId: process.env.PUSHER_APP_ID!,
+      key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
+      secret: process.env.PUSHER_SECRET!,
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    });
+    await pusher.trigger("admin-jobs", "job-cancelled", {
+      jobId,
+      status: "cancelled",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[cancel] Pusher notification failed:", err);
   }
 
   triggerAdminRefresh("job-cancelled").catch(() => {});

@@ -88,7 +88,44 @@ export function OperatorNav() {
       </div>
 
       {/* Menu Button - Top Right */}
-      <div className="relative ml-4"></div>
+      <div className="absolute right-6 top-8">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="p-2 hover:bg-[#F9F9F9] rounded-lg transition-colors"
+          title="Menu"
+        >
+          <svg className="w-6 h-6 text-[#0D0D0D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        {/* Dropdown Menu */}
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E8E8E8] rounded-lg shadow-lg z-40">
+            <a
+              href="/operator/settings"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              ⚙️ Settings
+            </a>
+            <a
+              href="/operator"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              📊 Dashboard
+            </a>
+            <a
+              href="/admin"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              🔐 Admin
+            </a>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }

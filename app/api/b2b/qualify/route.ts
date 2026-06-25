@@ -42,6 +42,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // VALIDATION: Check prospect exists before updating
+    const prospectExists = await prisma.b2bLead.findUnique({
+      where: { id: prospectId },
+      select: { id: true },
+    });
+
+    if (!prospectExists) {
+      return notFoundError("Prospect not found");
+    }
+
     // DATABASE CALL: Update prospect with qualification data
     const result = await safeDbCall(
       prisma.b2bLead.update({
@@ -61,10 +71,6 @@ export async function POST(request: NextRequest) {
         { error: errorMsg },
         { status: 500 }
       );
-    }
-
-    if (!result.data) {
-      return notFoundError("Prospect not found");
     }
 
     // SUCCESS: Return qualification result

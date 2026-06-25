@@ -117,12 +117,6 @@ export default async function TrackPage({ params }: { params: Promise<{ token: s
               <p className="font-sans font-semibold text-[#0D0D0D] text-sm text-right">{job.service_type as string}</p>
             </div>
           )}
-          {job.price && (
-            <div className="flex items-center justify-between border-t border-[#E8E8E8] pt-3">
-              <p className="text-[#888888] text-xs uppercase tracking-[0.1em]">Fixed price</p>
-              <p className="font-sans font-black text-[#0D0D0D] text-base">£{job.price as number}</p>
-            </div>
-          )}
         </div>
 
         {/* Driver card */}
