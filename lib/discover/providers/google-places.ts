@@ -88,10 +88,14 @@ export class GooglePlacesProvider extends BusinessProvider {
         query.limit
       );
 
+      // Process results: filter THEN slice
+      // Fetch extra results so after filtering we still have enough
+      const targetLimit = query.limit || 1000;
+
       const businesses: Business[] = results
         .filter((place) => place.business_status === "OPERATIONAL")
         .filter((place) => this.isUKLocation(place.formatted_address))
-        .slice(0, query.limit || 100)
+        .slice(0, targetLimit)
         .map((place) => this.normalizePlaceResult(place));
 
       this.log(`Found ${businesses.length} UK businesses`);
