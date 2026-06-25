@@ -90,10 +90,11 @@ export class GooglePlacesProvider extends BusinessProvider {
 
       const businesses: Business[] = results
         .filter((place) => place.business_status === "OPERATIONAL")
+        .filter((place) => this.isUKLocation(place.formatted_address))
         .slice(0, query.limit || 100)
         .map((place) => this.normalizePlaceResult(place));
 
-      this.log(`Found ${businesses.length} businesses`);
+      this.log(`Found ${businesses.length} UK businesses`);
 
       return {
         businesses,
@@ -238,6 +239,39 @@ export class GooglePlacesProvider extends BusinessProvider {
     }
 
     return "Business Services";
+  }
+
+  private isUKLocation(address: string | undefined): boolean {
+    if (!address) return false;
+    const upperAddress = address.toUpperCase();
+
+    // REJECT: US state abbreviations and ZIP codes
+    const usStates = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'];
+
+    // Check for US state abbreviations (usually after comma: "City, OR 97302")
+    for (const state of usStates) {
+      if (upperAddress.includes(`, ${state}`) || upperAddress.includes(` ${state} `)) {
+        return false;
+      }
+    }
+
+    // Reject ZIP code pattern (5 digits or 5+4)
+    if (/\s\d{5}(-\d{4})?\s*$/.test(address.trim())) {
+      return false;
+    }
+
+    // ACCEPT: Contains UK indicators
+    const ukIndicators = ['UNITED KINGDOM', 'UK', 'ENGLAND', 'SCOTLAND', 'WALES', 'NORTHERN IRELAND', 'LONDON', 'MANCHESTER', 'BIRMINGHAM', 'LEEDS', 'BRISTOL', 'EDINBURGH', 'CARDIFF', 'BELFAST'];
+    if (ukIndicators.some(indicator => upperAddress.includes(indicator))) {
+      return true;
+    }
+
+    // Check for UK postcode format (e.g., SW1A 1AA, E1 6AN)
+    if (/[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}|[A-Z]{1,2}\d[A-Z]\s?\d[A-Z]{2}/i.test(address)) {
+      return true;
+    }
+
+    return false;
   }
 
   private extractPostcode(address: string): string | undefined {
