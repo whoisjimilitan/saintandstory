@@ -267,12 +267,15 @@ export default function OperatorBriefing() {
 
   const handleAssignJob = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!assignForm.driver_id || !assignForm.prospect_name) {
-      alert("Please select driver and enter prospect name");
+    console.log("[Assign Job] Starting...", assignForm);
+
+    if (!assignForm.driver_id || !assignForm.prospect_name || !assignForm.postcode_from || !assignForm.postcode_to) {
+      alert("Please fill in: Driver, Prospect Name, From, and To postcodes");
       return;
     }
 
     try {
+      console.log("[Assign Job] Sending request...");
       const response = await fetch("/api/admin/active-drivers", {
         method: "POST",
         headers: {
@@ -285,13 +288,16 @@ export default function OperatorBriefing() {
           prospect_name: assignForm.prospect_name,
           postcode_from: assignForm.postcode_from,
           postcode_to: assignForm.postcode_to,
-          price: parseFloat(assignForm.price),
+          price: parseFloat(assignForm.price) || 0,
         }),
       });
 
+      console.log("[Assign Job] Response status:", response.status);
+      const data = await response.json();
+      console.log("[Assign Job] Response data:", data);
+
       if (response.ok) {
-        const data = await response.json();
-        alert(`✓ Job assigned: ${data.job.reference}\n15-20% commission`);
+        alert(`✓ Job assigned: ${data.job?.reference || 'SUCCESS'}\n15-20% commission`);
         setAssignForm({ driver_id: "", prospect_name: "", postcode_from: "", postcode_to: "", price: "100" });
         setShowAssignJob(false);
         // Refresh driver stats
@@ -306,8 +312,7 @@ export default function OperatorBriefing() {
           setDriversList(statsData.live_drivers?.drivers || []);
         }
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMsg = errorData.error || `Server error: ${response.status}`;
+        const errorMsg = data.error || `Server error: ${response.status}`;
         alert(`Error: ${errorMsg}`);
       }
     } catch (error) {
@@ -692,7 +697,7 @@ export default function OperatorBriefing() {
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
-                  <p className="text-xs text-[#666666]">from assignments</p>
+                  <p className="text-xs text-[#666666]">from drivers</p>
                 </div>
               </div>
             )}
