@@ -159,6 +159,7 @@ export default function OperatorBriefing() {
     price: "100",
   });
   const [actionItemsExpanded, setActionItemsExpanded] = useState(true);
+  const [outreachActivityExpanded, setOutreachActivityExpanded] = useState(true);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -899,19 +900,28 @@ export default function OperatorBriefing() {
       {sentEmails.length > 0 && (
         <div className="mb-16 px-4 md:px-0">
           <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
-            <div className="mb-6">
-              <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
-                Outreach Activity
-              </p>
-              <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-2">
-                {sentEmails.length}
-              </p>
-              <p className="text-sm text-[#666666]">
-                email{sentEmails.length !== 1 ? 's' : ''} sent today
-              </p>
+            <div className="mb-6 flex items-start justify-between">
+              <div className="flex-1">
+                <button
+                  onClick={() => setOutreachActivityExpanded(!outreachActivityExpanded)}
+                  className="flex items-center gap-2 mb-3 hover:opacity-70 transition-opacity"
+                >
+                  <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase">
+                    Outreach Activity
+                  </p>
+                  <span className="text-[#888888]">{outreachActivityExpanded ? "−" : "+"}</span>
+                </button>
+                <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-2">
+                  {sentEmails.length}
+                </p>
+                <p className="text-sm text-[#666666]">
+                  email{sentEmails.length !== 1 ? 's' : ''} sent today
+                </p>
+              </div>
             </div>
 
             {/* Email List */}
+            {outreachActivityExpanded && (
             <div className="space-y-2">
               {sentEmails.map((email) => (
                 <div
@@ -997,6 +1007,7 @@ export default function OperatorBriefing() {
                 </div>
               ))}
             </div>
+            )}
 
             {/* Summary */}
             <div className="mt-6 pt-6 border-t border-[#E8E8E8] space-y-2">
