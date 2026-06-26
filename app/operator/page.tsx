@@ -146,6 +146,9 @@ export default function OperatorBriefing() {
   const [phoneOutreachCount, setPhoneOutreachCount] = useState(0);
   const [emailsSentCount, setEmailsSentCount] = useState(0);
   const [campaignPerformance, setCampaignPerformance] = useState<any>(null);
+  const [activeDrivers, setActiveDrivers] = useState(0);
+  const [driversAvailable, setDriversAvailable] = useState(0);
+  const [todayRevenue, setTodayRevenue] = useState("£0");
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -226,6 +229,28 @@ export default function OperatorBriefing() {
 
     loadCampaignData();
     loadEmailStats();
+  }, []);
+
+  useEffect(() => {
+    const loadDriverStats = async () => {
+      try {
+        const res = await fetch("/api/admin/active-drivers", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setActiveDrivers(data.live_drivers?.total_active || 0);
+          setDriversAvailable(data.live_drivers?.available_now || 0);
+          setTodayRevenue(data.revenue_today?.total_earned || "£0");
+        }
+      } catch (error) {
+        console.error("Failed to load driver stats:", error);
+      }
+    };
+
+    loadDriverStats();
+    const interval = setInterval(loadDriverStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleMetricClick = (metric: string) => {
@@ -482,38 +507,32 @@ export default function OperatorBriefing() {
       </div>
 
       {/* AVAILABLE DRIVERS WIDGET */}
-      <div className="mb-16 px-4 md:px-0">
-        <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest">
-              Available Drivers Today
+      {activeDrivers > 0 && (
+        <div className="mb-16 px-4 md:px-0">
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+              Driver Pool Live
             </p>
-            <button
-              onClick={() => window.open("https://www.courierexchange.com", "_blank")}
-              className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-1.5 rounded hover:bg-[#F5F5F5] transition-colors"
-            >
-              Post Jobs
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-xs text-[#888888] font-semibold mb-1">Posted Today</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">5</p>
-              <p className="text-xs text-[#666666]">drivers active</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] font-semibold mb-1">Jobs Available</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666]">from prospect calls</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] font-semibold mb-1">Commission Today</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">£0</p>
-              <p className="text-xs text-[#666666]">15-20% per job</p>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-[#888888] font-semibold mb-1">Active Now</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{activeDrivers}</p>
+                <p className="text-xs text-[#666666]">drivers online</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
+                <p className="text-xs text-[#666666]">ready for jobs</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
+                <p className="text-xs text-[#666666]">from assignments</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ACTIVE PROSPECTS SPOTLIGHT */}
       {activeProspects.length > 0 && (
