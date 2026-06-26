@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   try {
     const sql = neon(process.env.DATABASE_URL!);
 
-    // Get ACTIVE drivers (currently online) WITH current job details
+    // Get ACTIVE drivers (currently online) - SYNCED WITH ADMIN PAGE
     const activeDrivers = await sql`
       SELECT
         d.id,
@@ -31,16 +31,25 @@ export async function GET(request: NextRequest) {
         d.vehicle_type,
         d.phone,
         d.rating_avg,
+        d.rating_count,
         d.last_seen_at,
-        CAST((SELECT COUNT(*) FROM jobs j WHERE j.driver_id = d.id AND j.status IN ('confirmed', 'in_progress')) AS INTEGER) as current_jobs,
-        (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status,
+        (
+          SELECT AVG(EXTRACT(EPOCH FROM (j.updated_at - j.offered_at)) / 60)::int
+          FROM jobs j
+          WHERE j.driver_id = d.id
+            AND j.status IN ('confirmed', 'in_progress', 'completed')
+            AND j.offered_at IS NOT NULL
+        ) as avg_response_mins,
+        (SELECT customer_name FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_customer,
         (SELECT reference FROM jobs j3 WHERE j3.driver_id = d.id AND j3.status IN ('confirmed','in_progress') ORDER BY j3.updated_at DESC LIMIT 1) as current_job_ref,
-        (SELECT CONCAT(postcode_from, ' → ', postcode_to) FROM jobs j4 WHERE j4.driver_id = d.id AND j4.status IN ('confirmed','in_progress') ORDER BY j4.updated_at DESC LIMIT 1) as current_job_route,
-        (SELECT price FROM jobs j5 WHERE j5.driver_id = d.id AND j5.status IN ('confirmed','in_progress') ORDER BY j5.updated_at DESC LIMIT 1) as current_job_price
+        (SELECT postcode_from FROM jobs j4 WHERE j4.driver_id = d.id AND j4.status IN ('confirmed','in_progress') ORDER BY j4.updated_at DESC LIMIT 1) as current_job_from,
+        (SELECT postcode_to FROM jobs j5 WHERE j5.driver_id = d.id AND j5.status IN ('confirmed','in_progress') ORDER BY j5.updated_at DESC LIMIT 1) as current_job_to,
+        (SELECT status FROM jobs j6 WHERE j6.driver_id = d.id AND j6.status IN ('confirmed','in_progress') ORDER BY j6.updated_at DESC LIMIT 1) as current_job_status,
+        (SELECT price FROM jobs j7 WHERE j7.driver_id = d.id AND j7.status IN ('confirmed','in_progress') ORDER BY j7.updated_at DESC LIMIT 1) as current_job_price,
+        CAST((SELECT COUNT(*) FROM jobs j8 WHERE j8.driver_id = d.id AND j8.status IN ('confirmed', 'in_progress')) AS INTEGER) as current_jobs_count
       FROM drivers d
       WHERE d.profile_live = true
-      ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST
-      LIMIT 50
+      ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST, d.full_name ASC
     `;
 
     // Get today's B2B jobs (assigned to any driver)
@@ -87,7 +96,7 @@ export async function GET(request: NextRequest) {
         available_now: availableCount,
         busy: drivers.length - availableCount,
         drivers: drivers.map((d: any) => {
-          const jobCount = Number(d.current_jobs) || 0;
+          const jobCount = Number(d.current_jobs_count) || 0;
           return {
             id: d.id,
             name: d.full_name,
@@ -95,12 +104,16 @@ export async function GET(request: NextRequest) {
             vehicle_type: d.vehicle_type,
             phone: d.phone,
             rating: d.rating_avg,
+            rating_count: d.rating_count,
             current_jobs: jobCount,
             status: jobCount > 0 ? "busy" : "available",
             last_seen: d.last_seen_at,
+            avg_response_mins: d.avg_response_mins,
             current_job: jobCount > 0 ? {
               reference: d.current_job_ref,
-              route: d.current_job_route,
+              customer: d.current_job_customer,
+              from: d.current_job_from,
+              to: d.current_job_to,
               price: d.current_job_price,
               status: d.current_job_status,
             } : null,
