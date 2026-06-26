@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const sql = neon(process.env.DATABASE_URL!);
 
     // Get today's recommendation
-    const recommendationQuery = `
+    const categoryScores = await sql`
       SELECT
         COUNT(*) as count,
         CASE
@@ -36,9 +36,7 @@ export async function GET(request: NextRequest) {
       FROM b2b_standing_orders
       WHERE created_at >= DATE_TRUNC('month', NOW())
       GROUP BY category
-    `;
-
-    const categoryScores = await sql(recommendationQuery).catch(() => []);
+    `.catch(() => []);
 
     // Determine top category
     let topCategory = "events"; // default
