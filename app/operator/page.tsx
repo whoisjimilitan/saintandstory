@@ -444,35 +444,23 @@ export default function OperatorBriefing() {
                 <Icons.TrendingUp />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
                   Hidden Gem Opportunities
                 </p>
-                <p className="text-xs text-[#666666] mb-3">
-                  High-margin B2B categories underserved by standard couriers. Specialization beats volume.
-                </p>
-                <ul className="space-y-2 text-xs text-[#666666]">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">1.</span>
-                    <span>
-                      <span className="text-[#0D0D0D] font-semibold">Event Planning & Catering</span> — Recurring (weekly+), 35-50% premium, desperate for reliability. 8,000+ UK opportunities.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">2.</span>
-                    <span>
-                      <span className="text-[#0D0D0D] font-semibold">Film & TV Production</span> — £2-5k/hour idle cost, 40-60% premium, 2,500+ UK companies.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">3.</span>
-                    <span>
-                      <span className="text-[#0D0D0D] font-semibold">Art & Auction Houses</span> — £50k-500k per move, 50-80% premium, 3,000+ specialists needed.
-                    </span>
-                  </li>
-                </ul>
-                <p className="text-xs text-[#888888] mt-3">
-                  Combined potential: £10.5-17.7k/month with 15-25 targeted accounts. Start with Events.
-                </p>
+                <div className="space-y-2 text-xs text-[#666666] font-mono">
+                  <div>
+                    <span className="text-[#0D0D0D] font-semibold">Events</span> • £200-400/mo per client • 8k+ UK targets
+                  </div>
+                  <div>
+                    <span className="text-[#0D0D0D] font-semibold">Film/TV</span> • £2-5k/hr idle cost • 2.5k+ targets
+                  </div>
+                  <div>
+                    <span className="text-[#0D0D0D] font-semibold">Art/Auction</span> • £50k-500k moves • 3k+ targets
+                  </div>
+                  <div className="pt-2 border-t border-[#E8E8E8] text-[#0D0D0D] font-semibold">
+                    15-25 accounts = £10.5-17.7k/month. Start: Events
+                  </div>
+                </div>
               </div>
             </div>
 
