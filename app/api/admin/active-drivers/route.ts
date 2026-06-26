@@ -157,28 +157,30 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Generate unique reference and tracking token
+      const reference = `B2B-${Date.now()}`;
+      const trackingToken = `TRK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
       // Create job in jobs table
       const job = await sql`
         INSERT INTO jobs (
+          reference,
+          tracking_token,
           driver_id,
           customer_name,
           postcode_from,
           postcode_to,
           status,
-          price,
-          reference,
-          created_at,
-          updated_at
+          price
         ) VALUES (
+          ${reference},
+          ${trackingToken},
           ${body.driver_id},
           ${body.prospect_name},
           ${body.postcode_from},
           ${body.postcode_to},
-          'offered',
-          ${body.price || 0},
-          ${body.job_reference || `B2B-${Date.now()}`},
-          NOW(),
-          NOW()
+          'new',
+          ${body.price || 0}
         )
         RETURNING id, reference, price
       `;
@@ -186,7 +188,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         status: "job_assigned",
         job: job[0],
-        message: `Job assigned to driver. Status: offered (awaiting acceptance)`,
+        message: `✓ Job assigned: ${reference}`,
       });
     }
 
