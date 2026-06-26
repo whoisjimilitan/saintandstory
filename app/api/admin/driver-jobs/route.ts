@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
         completed: j.completed || 0,
       },
       commission_today: {
-        total_earned: `£${(j.total_commission || 0).toFixed(2)}`,
+        total_earned: `£${Number(j.total_commission || 0).toFixed(2)}`,
         commission_rate: "15-20%",
         next_job_value: "From prospect calls",
       },
