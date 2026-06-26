@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
-import { runDailyB2BOrchestration } from "@/lib/b2b-orchestrator";
 
 /**
  * Temporary endpoint: Sets up facility manager discovery and triggers orchestration NOW
@@ -61,10 +60,6 @@ export async function POST(request: NextRequest) {
       ORDER BY priority DESC
     `;
 
-    // 3. RUN ORCHESTRATION NOW
-    console.log("[setup-facility-discovery] Starting orchestration...");
-    const orchResult = await runDailyB2BOrchestration();
-
     return NextResponse.json({
       status: "success",
       config: config[0],
@@ -74,17 +69,11 @@ export async function POST(request: NextRequest) {
         cities: c.locations.length,
         target: c.target_count,
       })),
-      orchestration: {
-        executionId: orchResult.executionId,
-        success: orchResult.success,
-        discoveredCount: orchResult.stages.discovery.count,
-        durationMs: orchResult.totalDurationMs,
-      },
       nextSteps: [
         "✅ Facility manager config created and enabled",
-        "✅ Orchestration ran immediately",
-        `✅ ${orchResult.stages.discovery.count} prospects discovered`,
-        "🔍 Check /operator/pipeline now to see results",
+        "📋 Active configs ready for orchestration",
+        "⏳ Cron will run at 02:00 UTC tomorrow",
+        "🚀 Or trigger manually via /api/orchestrate/b2b-daily",
       ],
     });
   } catch (error) {
