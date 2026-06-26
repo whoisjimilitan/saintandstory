@@ -304,10 +304,14 @@ export default function OperatorBriefing() {
           setTodayRevenue(statsData.revenue_today?.total_earned || "£0");
           setDriversList(statsData.live_drivers?.drivers || []);
         }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error || `Server error: ${response.status}`;
+        alert(`Error: ${errorMsg}`);
       }
     } catch (error) {
       console.error("Failed to assign job:", error);
-      alert("Failed to assign job");
+      alert(`Failed: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
