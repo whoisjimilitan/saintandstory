@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         business_name,
         city,
         website,
-        rating,
+        COALESCE(rating, 0) as rating,
         discovery_metadata,
         created_at
       FROM b2b_leads
