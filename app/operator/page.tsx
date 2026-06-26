@@ -149,6 +149,15 @@ export default function OperatorBriefing() {
   const [activeDrivers, setActiveDrivers] = useState(0);
   const [driversAvailable, setDriversAvailable] = useState(0);
   const [todayRevenue, setTodayRevenue] = useState("£0");
+  const [driversList, setDriversList] = useState<any[]>([]);
+  const [showAssignJob, setShowAssignJob] = useState(false);
+  const [assignForm, setAssignForm] = useState({
+    driver_id: "",
+    prospect_name: "",
+    postcode_from: "",
+    postcode_to: "",
+    price: "100",
+  });
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -242,6 +251,7 @@ export default function OperatorBriefing() {
           setActiveDrivers(data.live_drivers?.total_active || 0);
           setDriversAvailable(data.live_drivers?.available_now || 0);
           setTodayRevenue(data.revenue_today?.total_earned || "£0");
+          setDriversList(data.live_drivers?.drivers || []);
         }
       } catch (error) {
         console.error("Failed to load driver stats:", error);
@@ -252,6 +262,53 @@ export default function OperatorBriefing() {
     const interval = setInterval(loadDriverStats, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleAssignJob = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignForm.driver_id || !assignForm.prospect_name) {
+      alert("Please select driver and enter prospect name");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/active-drivers", {
+        method: "POST",
+        headers: {
+          "x-admin-email": "whoisjimi.today@gmail.com",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "assign_job_to_driver",
+          driver_id: assignForm.driver_id,
+          prospect_name: assignForm.prospect_name,
+          postcode_from: assignForm.postcode_from,
+          postcode_to: assignForm.postcode_to,
+          price: parseFloat(assignForm.price),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`✓ Job assigned: ${data.job.reference}\n15-20% commission`);
+        setAssignForm({ driver_id: "", prospect_name: "", postcode_from: "", postcode_to: "", price: "100" });
+        setShowAssignJob(false);
+        // Refresh driver stats
+        const statsRes = await fetch("/api/admin/active-drivers", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setActiveDrivers(statsData.live_drivers?.total_active || 0);
+          setDriversAvailable(statsData.live_drivers?.available_now || 0);
+          setTodayRevenue(statsData.revenue_today?.total_earned || "£0");
+          setDriversList(statsData.live_drivers?.drivers || []);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to assign job:", error);
+      alert("Failed to assign job");
+    }
+  };
 
   const handleMetricClick = (metric: string) => {
     switch (metric) {
@@ -510,26 +567,123 @@ export default function OperatorBriefing() {
       {activeDrivers > 0 && (
         <div className="mb-16 px-4 md:px-0">
           <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
-            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-              Driver Pool Live
-            </p>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <p className="text-xs text-[#888888] font-semibold mb-1">Active Now</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">{activeDrivers}</p>
-                <p className="text-xs text-[#666666]">drivers online</p>
-              </div>
-              <div>
-                <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
-                <p className="text-xs text-[#666666]">ready for jobs</p>
-              </div>
-              <div>
-                <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
-                <p className="text-xs text-[#666666]">from assignments</p>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+                Driver Pool Live
+              </p>
+              {driversAvailable > 0 && (
+                <button
+                  onClick={() => setShowAssignJob(!showAssignJob)}
+                  className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-1.5 rounded hover:bg-[#F5F5F5] transition-colors"
+                >
+                  {showAssignJob ? "Close" : "Assign Job"}
+                </button>
+              )}
             </div>
+
+            {showAssignJob ? (
+              <form onSubmit={handleAssignJob} className="space-y-3 mb-4 p-4 border border-[#E8E8E8] rounded bg-white">
+                <div>
+                  <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">Select Driver</label>
+                  <select
+                    value={assignForm.driver_id}
+                    onChange={(e) => setAssignForm({ ...assignForm, driver_id: e.target.value })}
+                    className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded hover:border-[#0D0D0D]"
+                    required
+                  >
+                    <option value="">-- Choose Driver --</option>
+                    {driversList
+                      .filter((d: any) => d.status === "available")
+                      .map((d: any) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name} ({d.area})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">Prospect Name</label>
+                  <input
+                    type="text"
+                    placeholder="Event organizer or company name"
+                    value={assignForm.prospect_name}
+                    onChange={(e) => setAssignForm({ ...assignForm, prospect_name: e.target.value })}
+                    className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded hover:border-[#0D0D0D]"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">From</label>
+                    <input
+                      type="text"
+                      placeholder="Postcode or area"
+                      value={assignForm.postcode_from}
+                      onChange={(e) => setAssignForm({ ...assignForm, postcode_from: e.target.value })}
+                      className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded hover:border-[#0D0D0D]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">To</label>
+                    <input
+                      type="text"
+                      placeholder="Postcode or area"
+                      value={assignForm.postcode_to}
+                      onChange={(e) => setAssignForm({ ...assignForm, postcode_to: e.target.value })}
+                      className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded hover:border-[#0D0D0D]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">Job Value (£)</label>
+                  <input
+                    type="number"
+                    value={assignForm.price}
+                    onChange={(e) => setAssignForm({ ...assignForm, price: e.target.value })}
+                    className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded hover:border-[#0D0D0D]"
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-[#0D0D0D] text-white text-xs font-semibold px-3 py-2 rounded hover:bg-[#333333] transition-colors"
+                  >
+                    Assign Job
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAssignJob(false)}
+                    className="flex-1 text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-2 rounded hover:bg-[#F5F5F5]"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Active Now</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{activeDrivers}</p>
+                  <p className="text-xs text-[#666666]">drivers online</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
+                  <p className="text-xs text-[#666666]">ready for jobs</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
+                  <p className="text-xs text-[#666666]">from assignments</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
