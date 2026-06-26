@@ -181,7 +181,9 @@ export async function POST(request: NextRequest) {
           postcode_from,
           postcode_to,
           status,
-          price
+          price,
+          created_at,
+          updated_at
         ) VALUES (
           gen_random_uuid(),
           ${reference},
@@ -191,7 +193,9 @@ export async function POST(request: NextRequest) {
           ${body.postcode_from},
           ${body.postcode_to},
           'new',
-          ${body.price || 0}
+          ${body.price || 0},
+          NOW(),
+          NOW()
         )
         RETURNING id, reference, price
       `;
