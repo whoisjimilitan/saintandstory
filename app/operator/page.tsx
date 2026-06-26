@@ -160,6 +160,8 @@ export default function OperatorBriefing() {
   });
   const [actionItemsExpanded, setActionItemsExpanded] = useState(true);
   const [outreachActivityExpanded, setOutreachActivityExpanded] = useState(true);
+  const [activeJobs, setActiveJobs] = useState<any[]>([]);
+  const [dailyRecommendation, setDailyRecommendation] = useState<any>(null);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -260,8 +262,26 @@ export default function OperatorBriefing() {
       }
     };
 
+    const loadRecommendation = async () => {
+      try {
+        const res = await fetch("/api/admin/daily-recommendation", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDailyRecommendation(data);
+        }
+      } catch (error) {
+        console.error("Failed to load recommendation:", error);
+      }
+    };
+
     loadDriverStats();
-    const interval = setInterval(loadDriverStats, 30000);
+    loadRecommendation();
+    const interval = setInterval(() => {
+      loadDriverStats();
+      loadRecommendation();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -537,28 +557,46 @@ export default function OperatorBriefing() {
               </div>
             )}
 
-            {/* Hidden Gems - High-Margin B2B Opportunities */}
-            <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
-              <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
-                <Icons.TrendingUp />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
-                  Hidden Gems
-                </p>
-                <div className="space-y-1 text-xs text-[#666666]">
-                  <div>
-                    <span className="text-[#0D0D0D] font-semibold">Events</span> • Weekly recurring, logistics critical
-                  </div>
-                  <div>
-                    <span className="text-[#0D0D0D] font-semibold">Film/TV</span> • Idle time = £2-5k/hour
-                  </div>
-                  <div>
-                    <span className="text-[#0D0D0D] font-semibold">Art/Auction</span> • High-value, specialists only
+            {/* TODAY'S RECOMMENDATION - Dynamic based on pipeline */}
+            {dailyRecommendation && dailyRecommendation.today_recommendation && (
+              <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+                <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                  <Icons.TrendingUp />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                    Today's Target
+                  </p>
+                  <div className="space-y-2 text-xs">
+                    <div>
+                      <p className="font-semibold text-[#0D0D0D] mb-1">
+                        {dailyRecommendation.today_recommendation.category}
+                      </p>
+                      <p className="text-[#666666]">
+                        {dailyRecommendation.today_recommendation.key_insight}
+                      </p>
+                    </div>
+                    {dailyRecommendation.action_today?.prospects?.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-[#E8E8E8]">
+                        <p className="text-[#888888] font-semibold mb-1">
+                          {dailyRecommendation.action_today.prospects.length} prospects to call:
+                        </p>
+                        <div className="space-y-1">
+                          {dailyRecommendation.action_today.prospects.map((prospect: any, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between text-[#666666]">
+                              <span className="truncate">{prospect.business_name}</span>
+                              <span className="font-mono text-[10px] text-[#0D0D0D] ml-2 flex-shrink-0">
+                                {prospect.phone}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Market Insight */}
             {industryData.length > 0 && (
