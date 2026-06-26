@@ -143,6 +143,8 @@ export default function OperatorBriefing() {
   const [dateStr, setDateStr] = useState("");
   const [sentEmails, setSentEmails] = useState<any[]>([]);
   const [expandedEmails, setExpandedEmails] = useState<Set<string>>(new Set());
+  const [phoneOutreachCount, setPhoneOutreachCount] = useState(0);
+  const [emailsSentCount, setEmailsSentCount] = useState(0);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -189,6 +191,39 @@ export default function OperatorBriefing() {
       }
     };
     loadSentEmails();
+  }, []);
+
+  useEffect(() => {
+    const loadCampaignData = async () => {
+      try {
+        const res = await fetch("/api/admin/phone-outreach", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPhoneOutreachCount(data.phone_outreach_queue?.ready_to_call || 0);
+        }
+      } catch (error) {
+        console.error("Failed to load phone outreach data:", error);
+      }
+    };
+
+    const loadEmailStats = async () => {
+      try {
+        const res = await fetch("/api/admin/campaign-attribution", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setEmailsSentCount(data.email_channel?.emails_sent || 0);
+        }
+      } catch (error) {
+        console.error("Failed to load campaign data:", error);
+      }
+    };
+
+    loadCampaignData();
+    loadEmailStats();
   }, []);
 
   const handleMetricClick = (metric: string) => {
@@ -357,6 +392,26 @@ export default function OperatorBriefing() {
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
                         • {state.data?.metrics.actionItemsBreakdown?.readyToClose} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) !== 1 ? 's' : ''} ready to close
+                      </button>
+                    </li>
+                  )}
+                  {phoneOutreachCount > 0 && (
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/phone-outreach")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • {phoneOutreachCount} prospect{phoneOutreachCount !== 1 ? 's' : ''} ready to call
+                      </button>
+                    </li>
+                  )}
+                  {emailsSentCount > 0 && (
+                    <li>
+                      <button
+                        onClick={() => router.push("/operator/campaigns")}
+                        className="text-[#0D0D0D] font-semibold hover:underline"
+                      >
+                        • Check campaign performance ({emailsSentCount} emails sent)
                       </button>
                     </li>
                   )}

@@ -107,14 +107,14 @@ export function OperatorNav() {
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors font-semibold"
               onClick={() => setMenuOpen(false)}
             >
-              📊 Campaigns
+              Campaigns
             </a>
             <a
               href="/operator/phone-outreach"
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors font-semibold"
               onClick={() => setMenuOpen(false)}
             >
-              ☎️ Phone Outreach
+              Phone Outreach
             </a>
             <a
               href="/operator/settings"
