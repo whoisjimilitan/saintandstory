@@ -32,12 +32,11 @@ export async function GET(request: NextRequest) {
         business_name,
         city,
         website,
-        COALESCE(rating, 0) as rating,
         discovery_metadata,
         created_at
       FROM b2b_leads
       WHERE phone IS NULL OR phone = ''
-      ORDER BY rating DESC NULLS LAST, created_at DESC
+      ORDER BY created_at DESC
       LIMIT 100
     `;
 
@@ -76,7 +75,6 @@ export async function GET(request: NextRequest) {
           business_name: lead.business_name,
           city: lead.city,
           website: lead.website,
-          rating: lead.rating,
           found_phone: extractedPhone,
           needs_manual_research: !extractedPhone,
         };
