@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         d.phone,
         d.rating_avg,
         d.last_seen_at,
-        (SELECT COUNT(*) FROM jobs j WHERE j.driver_id = d.id AND j.status IN ('confirmed', 'in_progress')) as current_jobs,
+        CAST((SELECT COUNT(*) FROM jobs j WHERE j.driver_id = d.id AND j.status IN ('confirmed', 'in_progress')) AS INTEGER) as current_jobs,
         (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status
       FROM drivers d
       WHERE d.profile_live = true
