@@ -113,7 +113,7 @@ export async function getCustomerJourney(
       // Try to find mission info
       const missionInfo = await sql`
         SELECT niche, locations
-        FROM discovery_config dc
+        FROM b2b_discovery_config dc
         WHERE dc.niche ILIKE lead.niche OR dc.locations @> ARRAY[${lead.city}]
         LIMIT 1
       `;
