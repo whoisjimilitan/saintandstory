@@ -445,20 +445,17 @@ export default function OperatorBriefing() {
               </div>
               <div className="flex-1">
                 <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
-                  Hidden Gem Opportunities
+                  Hidden Gems
                 </p>
-                <div className="space-y-2 text-xs text-[#666666] font-mono">
+                <div className="space-y-1 text-xs text-[#666666]">
                   <div>
-                    <span className="text-[#0D0D0D] font-semibold">Events</span> • £200-400/mo per client • 8k+ UK targets
+                    <span className="text-[#0D0D0D] font-semibold">Events</span> • Weekly recurring, logistics critical
                   </div>
                   <div>
-                    <span className="text-[#0D0D0D] font-semibold">Film/TV</span> • £2-5k/hr idle cost • 2.5k+ targets
+                    <span className="text-[#0D0D0D] font-semibold">Film/TV</span> • Idle time = £2-5k/hour
                   </div>
                   <div>
-                    <span className="text-[#0D0D0D] font-semibold">Art/Auction</span> • £50k-500k moves • 3k+ targets
-                  </div>
-                  <div className="pt-2 border-t border-[#E8E8E8] text-[#0D0D0D] font-semibold">
-                    15-25 accounts = £10.5-17.7k/month. Start: Events
+                    <span className="text-[#0D0D0D] font-semibold">Art/Auction</span> • High-value, specialists only
                   </div>
                 </div>
               </div>
