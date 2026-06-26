@@ -162,6 +162,7 @@ export default function OperatorBriefing() {
   const [outreachActivityExpanded, setOutreachActivityExpanded] = useState(true);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [dailyRecommendation, setDailyRecommendation] = useState<any>(null);
+  const [callSprint, setCallSprint] = useState<any>(null);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -277,11 +278,27 @@ export default function OperatorBriefing() {
       }
     };
 
+    const loadCallSprint = async () => {
+      try {
+        const res = await fetch("/api/admin/recommended-call-sprint", {
+          headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCallSprint(data);
+        }
+      } catch (error) {
+        console.error("Failed to load call sprint:", error);
+      }
+    };
+
     loadDriverStats();
     loadRecommendation();
+    loadCallSprint();
     const interval = setInterval(() => {
       loadDriverStats();
       loadRecommendation();
+      loadCallSprint();
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -591,6 +608,54 @@ export default function OperatorBriefing() {
                               </span>
                             </div>
                           ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* FIX #4: CALL SPRINT - Focused phone calling for today */}
+            {callSprint && callSprint.call_sprint && (
+              <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+                <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                  <Icons.TrendingUp />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                    🔥 Call Sprint Today
+                  </p>
+                  <div className="space-y-2 text-xs">
+                    <div>
+                      <p className="font-semibold text-[#0D0D0D] mb-1">
+                        {callSprint.call_sprint.description}
+                      </p>
+                      <p className="text-[#666666]">
+                        {callSprint.call_sprint.why}
+                      </p>
+                    </div>
+                    {callSprint.call_sprint.priority_prospects && callSprint.call_sprint.priority_prospects.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-[#E8E8E8]">
+                        <p className="text-[#888888] font-semibold mb-1">
+                          {callSprint.call_sprint.sprint_size} prospects to call ({callSprint.metrics.warm_leads} warm, {callSprint.metrics.cold_leads} cold):
+                        </p>
+                        <div className="space-y-1">
+                          {callSprint.call_sprint.priority_prospects.slice(0, 5).map((prospect: any, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between text-[#666666]">
+                              <span className="truncate text-[10px]">
+                                {prospect.priority === "WARM_LEAD" ? "✉️" : "❄️"} {prospect.business_name}
+                              </span>
+                              <span className="font-mono text-[10px] text-[#0D0D0D] ml-2 flex-shrink-0">
+                                {prospect.phone}
+                              </span>
+                            </div>
+                          ))}
+                          {callSprint.call_sprint.sprint_size > 5 && (
+                            <p className="text-[#888888] text-[10px] mt-1">
+                              +{callSprint.call_sprint.sprint_size - 5} more in this sprint
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
