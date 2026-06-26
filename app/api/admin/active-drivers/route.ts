@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   try {
     const sql = neon(process.env.DATABASE_URL!);
 
-    // Get ACTIVE drivers (currently online)
+    // Get ACTIVE drivers (currently online) WITH current job details
     const activeDrivers = await sql`
       SELECT
         d.id,
@@ -33,7 +33,10 @@ export async function GET(request: NextRequest) {
         d.rating_avg,
         d.last_seen_at,
         CAST((SELECT COUNT(*) FROM jobs j WHERE j.driver_id = d.id AND j.status IN ('confirmed', 'in_progress')) AS INTEGER) as current_jobs,
-        (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status
+        (SELECT status FROM jobs j2 WHERE j2.driver_id = d.id AND j2.status IN ('confirmed','in_progress') ORDER BY j2.updated_at DESC LIMIT 1) as current_job_status,
+        (SELECT reference FROM jobs j3 WHERE j3.driver_id = d.id AND j3.status IN ('confirmed','in_progress') ORDER BY j3.updated_at DESC LIMIT 1) as current_job_ref,
+        (SELECT CONCAT(postcode_from, ' → ', postcode_to) FROM jobs j4 WHERE j4.driver_id = d.id AND j4.status IN ('confirmed','in_progress') ORDER BY j4.updated_at DESC LIMIT 1) as current_job_route,
+        (SELECT price FROM jobs j5 WHERE j5.driver_id = d.id AND j5.status IN ('confirmed','in_progress') ORDER BY j5.updated_at DESC LIMIT 1) as current_job_price
       FROM drivers d
       WHERE d.profile_live = true
       ORDER BY d.last_seen_at DESC NULLS LAST, d.rating_avg DESC NULLS LAST
@@ -95,6 +98,12 @@ export async function GET(request: NextRequest) {
             current_jobs: jobCount,
             status: jobCount > 0 ? "busy" : "available",
             last_seen: d.last_seen_at,
+            current_job: jobCount > 0 ? {
+              reference: d.current_job_ref,
+              route: d.current_job_route,
+              price: d.current_job_price,
+              status: d.current_job_status,
+            } : null,
           };
         }),
       },
