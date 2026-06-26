@@ -173,6 +173,7 @@ export async function POST(request: NextRequest) {
       // Create job in jobs table
       const job = await sql`
         INSERT INTO jobs (
+          id,
           reference,
           tracking_token,
           driver_id,
@@ -182,6 +183,7 @@ export async function POST(request: NextRequest) {
           status,
           price
         ) VALUES (
+          gen_random_uuid(),
           ${reference},
           ${trackingToken},
           ${body.driver_id},
