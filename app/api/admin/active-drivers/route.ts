@@ -67,7 +67,8 @@ export async function GET(request: NextRequest) {
 
     const drivers = Array.isArray(activeDrivers) ? activeDrivers : [];
     const jobs = Array.isArray(todayJobs) ? todayJobs : [];
-    const revenue = Array.isArray(todayRevenue) ? todayRevenue[0] : { total: 0 };
+    const revenueData = Array.isArray(todayRevenue) ? todayRevenue[0] : null;
+    const revenueTotal = revenueData ? Number(revenueData.total || 0) : 0;
 
     const availableCount = drivers.filter((d: any) => !d.current_jobs || d.current_jobs === 0).length;
     const assignedCount = jobs.filter((j: any) => j.status === "confirmed" || j.status === "in_progress").length;
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
         })),
       },
       revenue_today: {
-        total_earned: `£${(revenue.total || 0).toFixed(2)}`,
+        total_earned: `£${revenueTotal.toFixed(2)}`,
         from_jobs: jobs.length,
       },
       commission_model: {
