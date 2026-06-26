@@ -413,7 +413,7 @@ export default function OperatorBriefing() {
                         onClick={() => router.push("/operator/campaigns")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • Check campaign performance ({emailsSentCount} emails sent)
+                        • Check campaign performance
                       </button>
                     </li>
                   )}
