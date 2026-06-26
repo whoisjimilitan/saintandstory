@@ -198,7 +198,8 @@ export default function OperatorBriefing() {
   useEffect(() => {
     const loadSentEmails = async () => {
       try {
-        const res = await fetch("/api/operator/sent-emails-today");
+        // FIX #1: Use email-status endpoint to get actual delivery status from webhooks
+        const res = await fetch("/api/operator/email-status-today");
         if (res.ok) {
           const data = await res.json();
           setSentEmails(data.emails || []);
@@ -998,10 +999,10 @@ export default function OperatorBriefing() {
                       <div className="flex items-center gap-3 ml-4 flex-shrink-0">
                         <div className="text-right">
                           <div className="text-xs font-semibold text-[#0D0D0D]">
-                            {email.status === "sent" ? "✅ Sent" : "⏳ Pending"}
+                            {email.status === "opened" ? "👁️ Opened" : email.status === "clicked" ? "🔗 Clicked" : email.status === "delivered" ? "✅ Delivered" : email.status === "sent" ? "📤 Sent" : "⏳ Pending"}
                           </div>
                           <div className="text-[10px] text-[#888888] mt-0.5">
-                            {new Date(email.sentAt).toLocaleTimeString("en-GB", {
+                            {email.opens > 0 || email.clicks > 0 ? `${email.opens}📂 ${email.clicks}🔗` : new Date(email.sentAt).toLocaleTimeString("en-GB", {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
