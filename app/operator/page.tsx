@@ -145,6 +145,7 @@ export default function OperatorBriefing() {
   const [expandedEmails, setExpandedEmails] = useState<Set<string>>(new Set());
   const [phoneOutreachCount, setPhoneOutreachCount] = useState(0);
   const [emailsSentCount, setEmailsSentCount] = useState(0);
+  const [campaignPerformance, setCampaignPerformance] = useState<any>(null);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -216,6 +217,7 @@ export default function OperatorBriefing() {
         if (res.ok) {
           const data = await res.json();
           setEmailsSentCount(data.email_channel?.emails_sent || 0);
+          setCampaignPerformance(data.email_channel);
         }
       } catch (error) {
         console.error("Failed to load campaign data:", error);
@@ -418,6 +420,23 @@ export default function OperatorBriefing() {
                 </ul>
               </div>
             </div>
+
+            {/* Campaign Performance Summary */}
+            {campaignPerformance && emailsSentCount > 0 && (
+              <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+                <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                  <Icons.TrendingUp />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                    Campaign Performance
+                  </p>
+                  <p className="text-xs text-[#666666] font-mono">
+                    {emailsSentCount} emails sent | {campaignPerformance.response_rate_percent}% responded | {campaignPerformance.yes_responses} said YES
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Market Insight */}
             {industryData.length > 0 && (
