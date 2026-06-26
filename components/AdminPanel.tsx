@@ -714,17 +714,18 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
 
   function removeJob(jobId: string) {
     setPending(prev => prev.filter(j => j.id !== jobId));
-    router.refresh();
+    setTimeout(() => window.location.reload(), 500);
   }
 
   function removeOffered(jobId: string) {
     setOffered(prev => prev.filter(j => j.id !== jobId));
-    router.refresh();
+    setTimeout(() => window.location.reload(), 500);
   }
 
   function removeConfirmed(jobId: string) {
     setConfirmed(prev => prev.filter(j => j.id !== jobId));
-    router.refresh();
+    // Force full page reload to recalculate confirmed jobs count from server
+    setTimeout(() => window.location.reload(), 500);
   }
 
   const typedDrivers = drivers as unknown as Driver[];
@@ -757,7 +758,7 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                 key={job.id}
                 job={job}
                 type="in_progress"
-                onCancelled={() => router.refresh()}
+                onCancelled={() => setTimeout(() => window.location.reload(), 500)}
               />
             ))}
           </div>
