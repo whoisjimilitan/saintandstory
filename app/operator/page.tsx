@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import Pusher from "pusher-js";
 
 // Premium single-color icons
 const Icons = {
@@ -301,6 +302,38 @@ export default function OperatorBriefing() {
       loadCallSprint();
     }, 30000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Real-time sync: Listen for job cancellations and updates from admin panel
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_PUSHER_KEY) return;
+
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "us2",
+    });
+
+    const channel = pusher.subscribe("admin-jobs");
+
+    channel.bind("job-cancelled", (data: any) => {
+      console.log("[Pusher] Job cancelled:", data.jobId);
+      // Refresh dashboard to show updated counts
+      setTimeout(() => window.location.reload(), 500);
+    });
+
+    channel.bind("job-accepted", (data: any) => {
+      console.log("[Pusher] Job accepted:", data.jobId);
+      setTimeout(() => window.location.reload(), 500);
+    });
+
+    channel.bind("job-completed", (data: any) => {
+      console.log("[Pusher] Job completed:", data.jobId);
+      setTimeout(() => window.location.reload(), 500);
+    });
+
+    return () => {
+      channel.unbind_all();
+      pusher.unsubscribe("admin-jobs");
+    };
   }, []);
 
   const handleAssignJob = async (e: React.FormEvent) => {

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import JobCard from "@/components/JobCard";
 import ActiveJobPhotos from "@/components/ActiveJobPhotos";
 import { useCallback } from "react";
+import Pusher from "pusher-js";
 
 interface Job {
   id: string;
@@ -48,6 +49,29 @@ export default function ActiveJobsList({ jobs, driverId, driverName, onStatusUpd
 
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [cancelledJobs, setCancelledJobs] = useState<Set<string>>(new Set());
+
+  // Listen for job cancellations from operator
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_PUSHER_KEY || !driverId) return;
+
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "us2",
+    });
+
+    const channel = pusher.subscribe("admin-jobs");
+
+    channel.bind("job-cancelled", (data: any) => {
+      console.log("[Driver] Job cancelled from operator:", data.jobId);
+      setCancelledJobs((prev) => new Set([...prev, data.jobId]));
+      setTimeout(() => window.location.reload(), 500);
+    });
+
+    return () => {
+      channel.unbind_all();
+      pusher.unsubscribe("admin-jobs");
+    };
+  }, [driverId]);
 
   const handleStatusUpdate = useCallback(
     async (jobId: string, newStatus: string) => {
