@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { ensureB2BSchema } from "@/lib/b2b-schema";
+import { runDailyB2BOrchestration } from "@/lib/b2b-orchestrator";
 
 /**
- * Temporary endpoint: Sets up facility manager discovery and triggers orchestration
+ * Temporary endpoint: Sets up facility manager discovery and triggers orchestration NOW
  * DELETE THIS ENDPOINT AFTER 2026-06-26
  */
 
@@ -60,6 +61,10 @@ export async function POST(request: NextRequest) {
       ORDER BY priority DESC
     `;
 
+    // 3. RUN ORCHESTRATION NOW
+    console.log("[setup-facility-discovery] Starting orchestration...");
+    const orchResult = await runDailyB2BOrchestration();
+
     return NextResponse.json({
       status: "success",
       config: config[0],
@@ -69,11 +74,17 @@ export async function POST(request: NextRequest) {
         cities: c.locations.length,
         target: c.target_count,
       })),
+      orchestration: {
+        executionId: orchResult.executionId,
+        success: orchResult.success,
+        discoveredCount: orchResult.stages.discovery.count,
+        durationMs: orchResult.totalDurationMs,
+      },
       nextSteps: [
-        "1. Vercel auto-deployed the API fix",
-        "2. Facility manager config is created and enabled",
-        "3. Cron will run at 02:00 UTC tomorrow",
-        "4. Results visible in /operator/pipeline by 07:00 UTC",
+        "✅ Facility manager config created and enabled",
+        "✅ Orchestration ran immediately",
+        `✅ ${orchResult.stages.discovery.count} prospects discovered`,
+        "🔍 Check /operator/pipeline now to see results",
       ],
     });
   } catch (error) {
