@@ -58,14 +58,17 @@ export async function POST(request: NextRequest) {
     enabled?: boolean;
     priority?: number;
     minScore?: number;
+    targetCount?: number;
+    expiresAt?: string;
   };
 
   const config = await sql`
     INSERT INTO discovery_config (
-      mode, niche, locations, enabled, priority, min_score, created_by
+      mode, niche, locations, enabled, priority, min_score, target_count, expires_at, created_by
     ) VALUES (
       ${body.mode}, ${body.niche}, ${JSON.stringify(body.locations)},
-      ${body.enabled !== false}, ${body.priority || 50}, ${body.minScore || 40}, ${email}
+      ${body.enabled !== false}, ${body.priority || 50}, ${body.minScore || 40},
+      ${body.targetCount || null}, ${body.expiresAt || null}, ${email}
     ) RETURNING *
   `;
 
@@ -85,6 +88,8 @@ export async function PATCH(request: NextRequest) {
     enabled?: boolean;
     priority?: number;
     minScore?: number;
+    targetCount?: number;
+    expiresAt?: string;
   };
 
   await sql`
@@ -93,6 +98,8 @@ export async function PATCH(request: NextRequest) {
       enabled = COALESCE(${body.enabled ?? null}, enabled),
       priority = COALESCE(${body.priority ?? null}, priority),
       min_score = COALESCE(${body.minScore ?? null}, min_score),
+      target_count = COALESCE(${body.targetCount ?? null}, target_count),
+      expires_at = COALESCE(${body.expiresAt ?? null}, expires_at),
       updated_at = NOW()
     WHERE id = ${body.id}
   `;
