@@ -438,6 +438,44 @@ export default function OperatorBriefing() {
               </div>
             )}
 
+            {/* Hidden Gems - High-Margin B2B Opportunities */}
+            <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
+              <div className="text-[#0D0D0D] mt-0.5 flex-shrink-0">
+                <Icons.TrendingUp />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
+                  Hidden Gem Opportunities
+                </p>
+                <p className="text-xs text-[#666666] mb-3">
+                  High-margin B2B categories underserved by standard couriers. Specialization beats volume.
+                </p>
+                <ul className="space-y-2 text-xs text-[#666666]">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">1.</span>
+                    <span>
+                      <span className="text-[#0D0D0D] font-semibold">Event Planning & Catering</span> — Recurring (weekly+), 35-50% premium, desperate for reliability. 8,000+ UK opportunities.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">2.</span>
+                    <span>
+                      <span className="text-[#0D0D0D] font-semibold">Film & TV Production</span> — £2-5k/hour idle cost, 40-60% premium, 2,500+ UK companies.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#0D0D0D] font-semibold flex-shrink-0">3.</span>
+                    <span>
+                      <span className="text-[#0D0D0D] font-semibold">Art & Auction Houses</span> — £50k-500k per move, 50-80% premium, 3,000+ specialists needed.
+                    </span>
+                  </li>
+                </ul>
+                <p className="text-xs text-[#888888] mt-3">
+                  Combined potential: £10.5-17.7k/month with 15-25 targeted accounts. Start with Events.
+                </p>
+              </div>
+            </div>
+
             {/* Market Insight */}
             {industryData.length > 0 && (
               <div className="flex items-start gap-3 pt-3 border-t border-[#E8E8E8]">
