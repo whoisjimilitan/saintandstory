@@ -70,7 +70,10 @@ export async function GET(request: NextRequest) {
     const revenueData = Array.isArray(todayRevenue) ? todayRevenue[0] : null;
     const revenueTotal = revenueData ? Number(revenueData.total || 0) : 0;
 
-    const availableCount = drivers.filter((d: any) => !d.current_jobs || d.current_jobs === 0).length;
+    const availableCount = drivers.filter((d: any) => {
+      const jobCount = Number(d.current_jobs) || 0;
+      return jobCount === 0;
+    }).length;
     const assignedCount = jobs.filter((j: any) => j.status === "confirmed" || j.status === "in_progress").length;
     const completedCount = jobs.filter((j: any) => j.status === "completed").length;
 
@@ -80,17 +83,20 @@ export async function GET(request: NextRequest) {
         total_active: drivers.length,
         available_now: availableCount,
         busy: drivers.length - availableCount,
-        drivers: drivers.map((d: any) => ({
-          id: d.id,
-          name: d.full_name,
-          area: d.area,
-          vehicle_type: d.vehicle_type,
-          phone: d.phone,
-          rating: d.rating_avg,
-          current_jobs: d.current_jobs || 0,
-          status: d.current_jobs && d.current_jobs > 0 ? "busy" : "available",
-          last_seen: d.last_seen_at,
-        })),
+        drivers: drivers.map((d: any) => {
+          const jobCount = Number(d.current_jobs) || 0;
+          return {
+            id: d.id,
+            name: d.full_name,
+            area: d.area,
+            vehicle_type: d.vehicle_type,
+            phone: d.phone,
+            rating: d.rating_avg,
+            current_jobs: jobCount,
+            status: jobCount > 0 ? "busy" : "available",
+            last_seen: d.last_seen_at,
+          };
+        }),
       },
       today_jobs: {
         total_jobs: jobs.length,

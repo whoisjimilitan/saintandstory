@@ -158,6 +158,7 @@ export default function OperatorBriefing() {
     postcode_to: "",
     price: "100",
   });
+  const [actionItemsExpanded, setActionItemsExpanded] = useState(true);
   const firstName = user?.firstName || "";
 
   useEffect(() => {
@@ -435,9 +436,14 @@ export default function OperatorBriefing() {
                 <Icons.AlertCircle />
               </div>
               <div>
-                <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2">
-                  Action Items
-                </p>
+                <button
+                  onClick={() => setActionItemsExpanded(!actionItemsExpanded)}
+                  className="flex items-center gap-2 text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-2 hover:text-[#666666]"
+                >
+                  <span>Action Items</span>
+                  <span className="text-[#888888]">{actionItemsExpanded ? "−" : "+"}</span>
+                </button>
+                {actionItemsExpanded && (
                 <ul className="space-y-2 text-xs text-[#666666]">
                   {(state.data?.metrics.actionItemsBreakdown?.readyToQualify ?? 0) > 0 && (
                     <li>
@@ -500,6 +506,7 @@ export default function OperatorBriefing() {
                     </li>
                   )}
                 </ul>
+                )}
               </div>
             </div>
 
