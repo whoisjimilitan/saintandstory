@@ -47,7 +47,7 @@ export async function getMissionROI(
   try {
     const mission = await sql`
       SELECT id, niche, locations, enabled, created_at, last_discovery
-      FROM b2b_discovery_config
+      FROM discovery_config
       WHERE id = ${missionId}
       LIMIT 1
     `;
@@ -149,7 +149,7 @@ export async function getAllMissionROIs(sql: any): Promise<MissionROI[]> {
   try {
     const missions = await sql`
       SELECT id
-      FROM b2b_discovery_config
+      FROM discovery_config
       ORDER BY created_at DESC
     `;
 
