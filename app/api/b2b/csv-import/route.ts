@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
           placeId: `csv_${lead.business_name.replace(/\s+/g, "_")}_${lead.city.replace(/\s+/g, "_")}`,
           name: lead.business_name,
           address: `${lead.city}, UK`,
-          postcode: lead.city,
+          postcode: lead.postcode || "",
           category: lead.business_category,
           source: "csv",
           reviews: undefined,

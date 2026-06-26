@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         placeId: `manual_${body.business_name.replace(/\s+/g, "_")}_${body.city.replace(/\s+/g, "_")}`,
         name: body.business_name,
         address: `${body.city}, UK`,
-        postcode: body.city,
+        postcode: body.postcode || "",
         category: body.business_category,
         source: "manual",
         reviews: undefined,

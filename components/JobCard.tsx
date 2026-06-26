@@ -156,11 +156,30 @@ export default function JobCard({
 
       {/* DriverLocationShare: Activates when confirmed → in_progress */}
       {status === "confirmed" && onUpdateStatus && (
-        <DriverLocationShare
-          job={job}
-          onArrived={() => onUpdateStatus("in_progress")}
-          arriving={updating}
-        />
+        <div className="space-y-3">
+          <DriverLocationShare
+            job={job}
+            onArrived={() => onUpdateStatus("in_progress")}
+            arriving={updating}
+          />
+          <button
+            onClick={async () => {
+              if (confirm("Cancel this job?")) {
+                const res = await fetch("/api/jobs/cancel", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ jobId: job.id }),
+                });
+                if (res.ok) {
+                  window.location.reload();
+                }
+              }
+            }}
+            className="w-full text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 font-medium py-2.5 rounded-full text-sm transition-colors"
+          >
+            Cancel job
+          </button>
+        </div>
       )}
 
       {/* LocationIndicator: Shows live status when in_progress (driver is delivering) */}

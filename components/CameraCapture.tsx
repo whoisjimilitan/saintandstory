@@ -112,13 +112,38 @@ export default function CameraCapture({
     <div className="w-full space-y-3">
       {/* Preview mode: Show camera button */}
       {mode === "preview" && !capturedImage && (
-        <button
-          onClick={startCamera}
-          className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3.5 rounded-full text-sm transition-colors flex items-center justify-center gap-2"
-        >
-          <Camera size={18} />
-          {label}
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={startCamera}
+            className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3.5 rounded-full text-sm transition-colors flex items-center justify-center gap-2"
+          >
+            <Camera size={18} />
+            {label}
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-3.5 rounded-full text-sm transition-colors"
+          >
+            Choose from library
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                setCapturedImage(event.target?.result as string);
+                setMode("review");
+              };
+              reader.readAsDataURL(file);
+            }}
+          />
+        </div>
       )}
 
       {/* Capture mode: Show video stream */}
