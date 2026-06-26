@@ -104,14 +104,14 @@ export function OperatorNav() {
           <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E8E8E8] rounded-lg shadow-lg z-40">
             <a
               href="/operator/campaigns"
-              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors font-semibold"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
               onClick={() => setMenuOpen(false)}
             >
               Campaigns
             </a>
             <a
               href="/operator/phone-outreach"
-              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors font-semibold"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
               onClick={() => setMenuOpen(false)}
             >
               Phone Outreach
