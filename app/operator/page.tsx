@@ -753,7 +753,12 @@ export default function OperatorBriefing() {
               </form>
             ) : (
               <div>
-                <div className="grid grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-4 gap-6 mb-6">
+                  <div>
+                    <p className="text-xs text-[#888888] font-semibold mb-2">Total Drivers</p>
+                    <p className="text-2xl font-black text-[#0D0D0D]">{totalDrivers}</p>
+                    <p className="text-xs text-[#666666]">in system</p>
+                  </div>
                   <div>
                     <p className="text-xs text-[#888888] font-semibold mb-2">Offline</p>
                     <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
