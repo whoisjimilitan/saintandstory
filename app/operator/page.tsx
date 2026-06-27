@@ -764,7 +764,7 @@ export default function OperatorBriefing() {
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-2">Offline</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
-                  <p className="text-xs text-[#666666]">need to verify</p>
+                  <p className="text-xs text-[#666666]">not ready to work</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-2">Online</p>
