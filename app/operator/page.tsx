@@ -754,19 +754,19 @@ export default function OperatorBriefing() {
             ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Total Drivers</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{totalDrivers}</p>
+                  <p className="text-xs text-[#666666]">in system</p>
+                </div>
+                <div>
                   <p className="text-xs text-[#888888] font-semibold mb-1">Offline</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
-                  <p className="text-xs text-[#666666]">total drivers</p>
+                  <p className="text-xs text-[#666666]">but offline</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Online for Jobs</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
-                  <p className="text-xs text-[#666666]">for jobs online</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
-                  <p className="text-xs text-[#666666]">from drivers</p>
+                  <p className="text-xs text-[#666666]">ready now</p>
                 </div>
               </div>
             )}
