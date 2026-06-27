@@ -510,10 +510,9 @@ export default function OperatorBriefing() {
       <div className="mb-8 px-4 md:px-0">
         <button
           onClick={() => router.push("/dashboard/crm")}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors"
+          className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors text-xs font-semibold text-[#0D0D0D]"
         >
-          <span className="text-base">🔍</span>
-          <span className="text-xs font-semibold text-[#0D0D0D]">Search prospects in CRM</span>
+          Search prospects in CRM
         </button>
       </div>
 
@@ -663,14 +662,12 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
                 Driver Pool
               </p>
-              {driversAvailable > 0 && (
-                <button
-                  onClick={() => setShowAssignJob(!showAssignJob)}
-                  className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-1.5 rounded hover:bg-[#F5F5F5] transition-colors"
-                >
-                  {showAssignJob ? "Close" : "Assign Job"}
-                </button>
-              )}
+              <button
+                onClick={() => setShowAssignJob(!showAssignJob)}
+                className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-1.5 rounded hover:bg-[#F5F5F5] transition-colors"
+              >
+                {showAssignJob ? "Close" : "Assign Job"}
+              </button>
             </div>
 
             {showAssignJob ? (
@@ -765,14 +762,14 @@ export default function OperatorBriefing() {
             ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-1">Offline</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
-                  <p className="text-xs text-[#666666]">total drivers</p>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Total Drivers</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{totalDrivers}</p>
+                  <p className="text-xs text-[#666666]">but offline: {driversOffline}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Online for Jobs</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
-                  <p className="text-xs text-[#666666]">for jobs online</p>
+                  <p className="text-xs text-[#666666]">ready now</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
