@@ -189,8 +189,8 @@ export default async function AdminPage() {
       <AdminLocationUpdater />
 
       {/* Premium Header Section */}
-      <div className="px-4 md:px-8 lg:px-12 pt-8 md:pt-10 lg:pt-12 pb-8 md:pb-10 lg:pb-12">
-        <div className="flex items-start justify-between mb-10 md:mb-12 lg:mb-16">
+      <div className="px-4 md:px-8 lg:px-12 pt-24 pb-12">
+        <div className="flex items-start justify-between mb-12">
           <div></div>
 
           {/* Hamburger Menu - All Screens */}
@@ -214,25 +214,25 @@ export default async function AdminPage() {
         </div>
 
         {/* Date Header - Subtle Context */}
-        <p className="text-xs font-semibold text-[#999999] uppercase tracking-[0.15em] mb-6 md:mb-8">
-          Today, {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.05em] mb-6">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
 
         {/* Hero Section - Premium Bold Aesthetic */}
-        <div className="mb-12 md:mb-16 lg:mb-20">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0D0D0D] leading-none mb-4 md:mb-6 tracking-tight">
-            Fleet<br />Dashboard
+        <div className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+            Fleet dashboard.
           </h1>
-          <p className="text-sm md:text-base text-[#888888] max-w-md">
-            Live job dispatch and driver status
+          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+            Live job dispatch and driver status.
           </p>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="px-4 md:px-8 lg:px-12 pb-8 md:pb-10 lg:pb-12">
+      <div className="px-4 md:px-8 lg:px-12 pb-12">
 
-        <div className="mb-8 md:mb-10">
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex gap-2 flex-nowrap overflow-x-auto">
               {statLinks
