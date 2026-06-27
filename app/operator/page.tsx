@@ -658,17 +658,9 @@ export default function OperatorBriefing() {
       {totalDrivers > 0 && (
         <div className="mb-16 px-4 md:px-0">
           <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-                Driver Pool
-              </p>
-              <button
-                onClick={() => setShowAssignJob(!showAssignJob)}
-                className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-3 py-1.5 rounded hover:bg-[#F5F5F5] transition-colors"
-              >
-                {showAssignJob ? "Close" : "Assign Job"}
-              </button>
-            </div>
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+              Driver Pool
+            </p>
 
             {showAssignJob ? (
               <form onSubmit={handleAssignJob} className="space-y-3 mb-4 p-4 border border-[#E8E8E8] rounded bg-white">
@@ -760,21 +752,31 @@ export default function OperatorBriefing() {
                 </div>
               </form>
             ) : (
-              <div className="grid grid-cols-3 gap-6">
-                <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-2">Offline</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
-                  <p className="text-xs text-[#666666]">not ready to work</p>
+              <div>
+                <div className="grid grid-cols-3 gap-6 mb-6">
+                  <div>
+                    <p className="text-xs text-[#888888] font-semibold mb-2">Offline</p>
+                    <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
+                    <p className="text-xs text-[#666666]">not ready to work</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#888888] font-semibold mb-2">Online</p>
+                    <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
+                    <p className="text-xs text-[#666666]">ready to work</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#888888] font-semibold mb-2">Revenue Today</p>
+                    <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
+                    <p className="text-xs text-[#666666]">from drivers</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-2">Online</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
-                  <p className="text-xs text-[#666666]">ready to work</p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-2">Revenue Today</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{todayRevenue}</p>
-                  <p className="text-xs text-[#666666]">from drivers</p>
+                <div className="flex justify-center pt-4 border-t border-[#E8E8E8]">
+                  <button
+                    onClick={() => setShowAssignJob(!showAssignJob)}
+                    className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-4 py-2 rounded hover:border-[#0D0D0D] hover:bg-white transition-colors"
+                  >
+                    {showAssignJob ? "Close" : "Assign Job"}
+                  </button>
                 </div>
               </div>
             )}
