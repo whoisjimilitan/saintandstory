@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Prospect {
   id: string;
@@ -48,6 +48,7 @@ interface ProspectDetail {
 }
 
 export default function CRMPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const prospectIdParam = searchParams.get("id");
 
@@ -101,125 +102,154 @@ export default function CRMPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-[#0D0D0D] mb-2">CRM Search</h1>
-          <p className="text-[#888888]">Find prospects and view all communications</p>
+    <div className="min-h-screen bg-white pt-24 pb-12">
+      <div className="px-4 md:px-8 lg:px-12">
+        {/* Header with Back Button */}
+        <div className="mb-12 flex items-center justify-between">
+          <div>
+            <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+              Prospect search
+            </p>
+            <p className="text-xs text-[#888888] mt-2">
+              Find prospects and view all communications
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/operator")}
+            className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-4 py-2 rounded hover:bg-[#F9F9F9] transition-colors"
+          >
+            Back to TODAY
+          </button>
         </div>
 
-        {/* Search Box */}
-        <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              placeholder="Search by business name, email, phone, or city..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 px-4 py-3 border border-[#E8E8E8] rounded-lg focus:outline-none focus:border-[#0D0D0D]"
-            />
-            <button
-              type="submit"
-              disabled={searchQuery.length < 2 || searching}
-              className="px-6 py-3 bg-[#0D0D0D] text-white rounded-lg font-semibold hover:bg-[#333333] disabled:opacity-50"
-            >
-              {searching ? "Searching..." : "Search"}
-            </button>
+        {/* Google-Style Search Bar */}
+        <form onSubmit={handleSearch} className="mb-12">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center gap-3 px-6 py-4 border border-[#E8E8E8] rounded-full bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
+              <input
+                type="text"
+                placeholder="Search prospects by name, email, phone, or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 text-sm text-[#0D0D0D] bg-transparent focus:outline-none placeholder-[#CCCCCC]"
+              />
+              <button
+                type="submit"
+                disabled={searchQuery.length < 2 || searching}
+                className="text-xs font-semibold text-[#0D0D0D] px-4 py-1.5 rounded hover:bg-[#F9F9F9] disabled:opacity-50 transition-colors"
+              >
+                {searching ? "Searching..." : "Search"}
+              </button>
+            </div>
           </div>
         </form>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Search Results */}
-          <div className="lg:col-span-1 bg-white rounded-lg border border-[#E8E8E8] p-6 max-h-[600px] overflow-y-auto">
-            <h2 className="font-semibold text-[#0D0D0D] mb-4">
-              Results ({searchResults.length})
-            </h2>
-            {searchResults.length === 0 && searchQuery.length >= 2 && (
-              <p className="text-[#888888] text-sm">No results found</p>
-            )}
-            <div className="space-y-2">
-              {searchResults.map((prospect) => (
-                <button
-                  key={prospect.id}
-                  onClick={() => loadProspectDetail(prospect.id)}
-                  className={`w-full text-left p-3 rounded border transition-all ${
-                    selectedProspect?.prospect.id === prospect.id
-                      ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
-                      : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F5F5F5]"
-                  }`}
-                >
-                  <p className="font-semibold text-sm">{prospect.businessName}</p>
-                  <p className="text-xs opacity-70">{prospect.email}</p>
-                  <div className="flex gap-2 mt-1 text-xs opacity-60">
-                    <span>{prospect.emailCount} emails</span>
-                    <span>•</span>
-                    <span>{prospect.totalOpens} opens</span>
-                  </div>
-                </button>
-              ))}
+          <div className="lg:col-span-1">
+            <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white max-h-[600px] overflow-y-auto sticky top-24">
+              <h2 className="font-semibold text-[#0D0D0D] mb-4 text-sm">
+                Results ({searchResults.length})
+              </h2>
+              {searchResults.length === 0 && searchQuery.length >= 2 && (
+                <p className="text-xs text-[#888888]">No results found</p>
+              )}
+              <div className="space-y-2">
+                {searchResults.map((prospect) => (
+                  <button
+                    key={prospect.id}
+                    onClick={() => loadProspectDetail(prospect.id)}
+                    className={`w-full text-left p-3 rounded border transition-all ${
+                      selectedProspect?.prospect.id === prospect.id
+                        ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
+                        : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
+                    }`}
+                  >
+                    <p className="font-semibold text-xs">{prospect.businessName}</p>
+                    <p className={`text-[10px] mt-1 ${
+                      selectedProspect?.prospect.id === prospect.id
+                        ? "opacity-80"
+                        : "text-[#888888]"
+                    }`}>
+                      {prospect.email}
+                    </p>
+                    <div className={`flex gap-2 mt-1.5 text-[10px] ${
+                      selectedProspect?.prospect.id === prospect.id
+                        ? "opacity-70"
+                        : "text-[#CCCCCC]"
+                    }`}>
+                      <span>{prospect.emailCount} emails</span>
+                      <span>•</span>
+                      <span>{prospect.totalOpens} opens</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Prospect Detail */}
           <div className="lg:col-span-2">
             {loading ? (
-              <div className="bg-white rounded-lg border border-[#E8E8E8] p-12 text-center">
-                <p className="text-[#888888]">Loading...</p>
+              <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
+                <p className="text-sm text-[#888888]">Loading...</p>
               </div>
             ) : selectedProspect ? (
               <div className="space-y-6">
-                {/* Prospect Info */}
-                <div className="bg-white rounded-lg border border-[#E8E8E8] p-6">
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                {/* Prospect Info Card */}
+                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white">
+                  <div className="mb-6 pb-6 border-b border-[#E8E8E8]">
+                    <p className="text-xs text-[#888888] font-semibold mb-2">Business Name</p>
+                    <p className="text-2xl font-black text-[#0D0D0D]">
+                      {selectedProspect.prospect.businessName}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">Business</p>
-                      <p className="font-semibold text-[#0D0D0D]">
-                        {selectedProspect.prospect.businessName}
-                      </p>
+                      <p className="text-xs text-[#888888] font-semibold mb-2">Category</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.category}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">Category</p>
-                      <p className="text-[#0D0D0D]">{selectedProspect.prospect.category}</p>
+                      <p className="text-xs text-[#888888] font-semibold mb-2">City</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.city}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">Email</p>
-                      <p className="text-[#0D0D0D]">{selectedProspect.prospect.email}</p>
+                      <p className="text-xs text-[#888888] font-semibold mb-2">Email</p>
+                      <p className="text-sm text-[#0D0D0D] break-all">{selectedProspect.prospect.email}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">Phone</p>
-                      <p className="text-[#0D0D0D]">{selectedProspect.prospect.phone || "—"}</p>
+                      <p className="text-xs text-[#888888] font-semibold mb-2">Phone</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.phone || "—"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">City</p>
-                      <p className="text-[#0D0D0D]">{selectedProspect.prospect.city}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] font-semibold mb-1">Status</p>
-                      <p className="text-[#0D0D0D] capitalize">{selectedProspect.prospect.status}</p>
+                      <p className="text-xs text-[#888888] font-semibold mb-2">Status</p>
+                      <p className="text-sm text-[#0D0D0D] capitalize">{selectedProspect.prospect.status}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Engagement Summary */}
-                <div className="bg-white rounded-lg border border-[#E8E8E8] p-6">
-                  <h3 className="font-semibold text-[#0D0D0D] mb-4">Engagement</h3>
-                  <div className="grid grid-cols-3 gap-4">
+                {/* Engagement Card */}
+                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white">
+                  <p className="text-xs text-[#888888] font-semibold mb-6 uppercase tracking-widest">
+                    Engagement
+                  </p>
+                  <div className="grid grid-cols-3 gap-6">
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Emails Sent</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">
+                      <p className="text-xs text-[#888888] mb-2">Emails Sent</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalSent}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Total Opens</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">
+                      <p className="text-xs text-[#888888] mb-2">Total Opens</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalOpens}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Total Clicks</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">
+                      <p className="text-xs text-[#888888] mb-2">Total Clicks</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalClicks}
                       </p>
                     </div>
@@ -228,14 +258,16 @@ export default function CRMPage() {
 
                 {/* Email History */}
                 {selectedProspect.emails.length > 0 && (
-                  <div className="bg-white rounded-lg border border-[#E8E8E8] p-6">
-                    <h3 className="font-semibold text-[#0D0D0D] mb-4">Email History</h3>
+                  <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white">
+                    <p className="text-xs text-[#888888] font-semibold mb-6 uppercase tracking-widest">
+                      Email History
+                    </p>
                     <div className="space-y-3">
                       {selectedProspect.emails.map((email) => (
-                        <div key={email.id} className="border border-[#E8E8E8] rounded p-3">
-                          <div className="flex items-start justify-between mb-2">
-                            <p className="font-semibold text-sm text-[#0D0D0D]">{email.subject}</p>
-                            <span className="text-[10px] px-2 py-1 bg-[#F5F5F5] rounded">
+                        <div key={email.id} className="border border-[#E8E8E8] rounded p-4 hover:bg-[#F9F9F9] transition-colors">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <p className="font-semibold text-sm text-[#0D0D0D] flex-1">{email.subject}</p>
+                            <span className="text-[10px] px-2 py-1 bg-[#F9F9F9] text-[#0D0D0D] rounded font-semibold whitespace-nowrap">
                               {email.status}
                             </span>
                           </div>
@@ -255,8 +287,8 @@ export default function CRMPage() {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-lg border border-[#E8E8E8] p-12 text-center">
-                <p className="text-[#888888]">Select a prospect to view details</p>
+              <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
+                <p className="text-sm text-[#888888]">Search for a prospect to view details</p>
               </div>
             )}
           </div>
