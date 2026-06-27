@@ -147,7 +147,8 @@ export default function OperatorBriefing() {
   const [phoneOutreachCount, setPhoneOutreachCount] = useState(0);
   const [emailsSentCount, setEmailsSentCount] = useState(0);
   const [campaignPerformance, setCampaignPerformance] = useState<any>(null);
-  const [activeDrivers, setActiveDrivers] = useState(0);
+  const [totalDrivers, setTotalDrivers] = useState(0);
+  const [driversOffline, setDriversOffline] = useState(0);
   const [driversAvailable, setDriversAvailable] = useState(0);
   const [todayRevenue, setTodayRevenue] = useState("£0");
   const [driversList, setDriversList] = useState<any[]>([]);
@@ -266,7 +267,11 @@ export default function OperatorBriefing() {
           // Count available drivers (online and have no current jobs)
           const availableDrivers = onlineDrivers.filter((d: any) => Number(d.current_jobs) === 0);
 
-          setActiveDrivers(onlineDrivers.length);
+          // Count offline drivers
+          const offlineCount = drivers.length - onlineDrivers.length;
+
+          setTotalDrivers(drivers.length);
+          setDriversOffline(offlineCount);
           setDriversAvailable(availableDrivers.length);
           setTodayRevenue(data.revenue_today?.total_earned || "£0");
           setDriversList(drivers);
@@ -669,7 +674,12 @@ export default function OperatorBriefing() {
                   >
                     <option value="">-- Choose Driver --</option>
                     {driversList
-                      .filter((d: any) => d.status === "available")
+                      .filter((d: any) => {
+                        // Only show drivers who are online (seen in last 5 min)
+                        const lastSeen = d.last_seen as string | null;
+                        const isOnline = lastSeen && Date.now() - new Date(lastSeen).getTime() < 5 * 60 * 1000;
+                        return isOnline && d.status === "available";
+                      })
                       .map((d: any) => (
                         <option key={d.id} value={d.id}>
                           {d.name} ({d.area})
@@ -744,14 +754,14 @@ export default function OperatorBriefing() {
             ) : (
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs text-[#888888] font-semibold mb-1">Active Now</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">{activeDrivers}</p>
-                  <p className="text-xs text-[#666666]">drivers online</p>
+                  <p className="text-xs text-[#888888] font-semibold mb-1">Offline</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{driversOffline}</p>
+                  <p className="text-xs text-[#666666]">total drivers</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-1">Available</p>
                   <p className="text-2xl font-black text-[#0D0D0D]">{driversAvailable}</p>
-                  <p className="text-xs text-[#666666]">ready for jobs</p>
+                  <p className="text-xs text-[#666666]">for jobs online</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#888888] font-semibold mb-1">Revenue Today</p>
