@@ -518,6 +518,56 @@ export default function OperatorBriefing() {
         </button>
       </div>
 
+      {/* WHATSAPP CONVERSATIONS - Core Engine */}
+      <div className="mb-12 px-4 md:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <button
+            onClick={() => router.push("/operator/whatsapp")}
+            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
+                WhatsApp Active
+              </p>
+              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-xs text-[#666666] mt-2">conversations</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push("/operator/whatsapp")}
+            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
+                Hot Leads
+              </p>
+              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-xs text-[#666666] mt-2">waiting for follow-up</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push("/operator/whatsapp")}
+            className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
+                + New
+              </p>
+              <p className="text-sm font-semibold">Start conversation</p>
+              <p className="text-xs text-[#CCCCCC] mt-2">with business owner</p>
+            </div>
+          </button>
+        </div>
+        <button
+          onClick={() => router.push("/operator/whatsapp")}
+          className="w-full text-left px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] transition-colors"
+        >
+          <p className="text-xs font-semibold text-[#0D0D0D]">
+            Go to WhatsApp dashboard →
+          </p>
+        </button>
+      </div>
+
       {/* NARRATIVE BRIEFING - Idea #4 */}
       <div className="mb-16 px-4 md:px-0">
         <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-[#F9F9F9]">

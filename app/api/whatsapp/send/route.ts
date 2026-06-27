@@ -5,26 +5,33 @@ import {
   markMessageDelivered,
   getConversation,
 } from "@/lib/whatsapp-conversation";
+import { generateOutreachMessage } from "@/lib/outreach-message-generator";
 
 /**
  * POST /api/whatsapp/send
  *
- * Send WhatsApp message
+ * Send WhatsApp message with psychology-locked framework
  *
  * REQUEST BODY:
  * {
  *   "conversationId": string
  *   "phoneNumber": string
- *   "message": string
+ *   "message": string (optional - if not provided, will be generated)
  *   "businessName": string
+ *   "firstName": string (optional - for message generation)
+ *   "description": string (optional - for message generation)
+ *   "groupName": string (optional - for message generation)
  * }
  *
  * RESPONSE:
  * {
  *   "success": boolean
  *   "messageId": string
+ *   "message": string (the message that was sent)
+ *   "strategy": string (which strategy was used)
  *   "status": "sent" | "delivered" | "error"
  *   "timestamp": ISO timestamp
+ *   "psychologyValidation": { noAsk: boolean, introPresent: boolean, charLimit: boolean }
  * }
  */
 
@@ -56,11 +63,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { conversationId, phoneNumber, message, businessName } = body;
+    const {
+      conversationId,
+      phoneNumber,
+      message,
+      businessName,
+      firstName,
+      description,
+      groupName,
+    } = body;
 
-    if (!conversationId || !phoneNumber || !message) {
+    if (!conversationId || !phoneNumber) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "conversationId and phoneNumber are required" },
         { status: 400 }
       );
     }
@@ -74,8 +89,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate message if not provided
+    let finalMessage = message;
+    let strategy = "custom";
+
+    if (!message) {
+      console.log("[WHATSAPP SEND] Generating message using psychology framework");
+      const generated = generateOutreachMessage({
+        firstName: firstName || "there",
+        company: businessName,
+        description,
+        groupName,
+        linkedinProfile: undefined,
+        email: undefined,
+      });
+
+      finalMessage = generated.message;
+      strategy = generated.strategy;
+
+      // Validate psychology framework
+      if (!generated.psychologyValidation.noAsk) {
+        console.warn("[WHATSAPP SEND] ⚠️ Message contains 'Worth a chat?' - fixing");
+        finalMessage = finalMessage.replace(/Worth a chat\?/g, "").trim();
+      }
+
+      console.log(
+        `[WHATSAPP SEND] Generated message via ${strategy}: "${finalMessage.substring(0, 50)}..."`
+      );
+    }
+
     // Add message to conversation
-    const addedMessage = addMessage(conversationId, message, "user", "sent");
+    const addedMessage = addMessage(conversationId, finalMessage, "user", "sent");
     if (!addedMessage) {
       return NextResponse.json(
         { error: "Failed to add message" },
@@ -85,25 +129,14 @@ export async function POST(request: NextRequest) {
 
     console.log(`[WHATSAPP SEND] Message created: ${addedMessage.id}`);
 
-    // TODO: Send via WhatsApp API
-    // For now, mock the send with immediate delivery
-    // In production:
-    // const response = await whatsappClient.messages.create({
-    //   messaging_product: "whatsapp",
-    //   recipient_type: "individual",
-    //   to: phoneNumber,
-    //   type: "text",
-    //   text: { body: message }
-    // });
-    // const whatsappMessageId = response.messages[0].id;
-
+    // Mock WhatsApp API send (replace with real API when credentials available)
     const whatsappMessageId = `wamid_${Date.now()}`;
 
-    // Mark as delivered (immediately, for mock)
+    // Mark as delivered
     markMessageDelivered(conversationId, addedMessage.id, whatsappMessageId);
 
     console.log(
-      `[WHATSAPP SEND] ✓ Message sent to ${phoneNumber}: ${whatsappMessageId}`
+      `[WHATSAPP SEND] ✓ Message sent to ${phoneNumber} via ${strategy}`
     );
 
     // Audit logging
@@ -119,21 +152,30 @@ export async function POST(request: NextRequest) {
             messageId: addedMessage.id,
             whatsappMessageId,
             businessName,
+            strategy,
+            message: finalMessage,
           },
         }),
       }).catch(() => {
-        // Silently fail audit logging
+        // Silently fail
       });
     } catch (auditError) {
-      // Continue even if audit logging fails
+      // Continue
     }
 
     return NextResponse.json({
       success: true,
       messageId: addedMessage.id,
+      message: finalMessage,
+      strategy,
       whatsappMessageId,
       status: "delivered",
       timestamp: new Date().toISOString(),
+      psychologyValidation: {
+        noAsk: !finalMessage.includes("Worth a chat?"),
+        introPresent: finalMessage.includes("I") || finalMessage.includes("we"),
+        charLimit: finalMessage.length <= 180,
+      },
     });
   } catch (error) {
     console.error("[WHATSAPP SEND] ✗ Error:", error);
