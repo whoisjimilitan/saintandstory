@@ -255,10 +255,21 @@ export default function OperatorBriefing() {
         });
         if (res.ok) {
           const data = await res.json();
-          setActiveDrivers(data.live_drivers?.total_active || 0);
-          setDriversAvailable(data.live_drivers?.available_now || 0);
+          const drivers = data.live_drivers?.drivers || [];
+
+          // Count only drivers who are actually online (seen in last 5 minutes)
+          const onlineDrivers = drivers.filter((d: any) => {
+            const lastSeen = d.last_seen as string | null;
+            return lastSeen && Date.now() - new Date(lastSeen).getTime() < 5 * 60 * 1000;
+          });
+
+          // Count available drivers (online and have no current jobs)
+          const availableDrivers = onlineDrivers.filter((d: any) => Number(d.current_jobs) === 0);
+
+          setActiveDrivers(onlineDrivers.length);
+          setDriversAvailable(availableDrivers.length);
           setTodayRevenue(data.revenue_today?.total_earned || "£0");
-          setDriversList(data.live_drivers?.drivers || []);
+          setDriversList(drivers);
         }
       } catch (error) {
         console.error("Failed to load driver stats:", error);
