@@ -107,10 +107,10 @@ export default function CRMPage() {
         {/* Header with Back Button */}
         <div className="mb-12 flex items-center justify-between">
           <div>
-            <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+            <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
               Prospect search
-            </p>
-            <p className="text-xs text-[#888888] mt-2">
+            </h1>
+            <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
               Find prospects and view all communications
             </p>
           </div>
@@ -161,23 +161,15 @@ export default function CRMPage() {
                     onClick={() => loadProspectDetail(prospect.id)}
                     className={`w-full text-left p-3 rounded border transition-all ${
                       selectedProspect?.prospect.id === prospect.id
-                        ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
+                        ? "border-[#0D0D0D] bg-[#F9F9F9]"
                         : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
                     }`}
                   >
-                    <p className="font-semibold text-xs">{prospect.businessName}</p>
-                    <p className={`text-[10px] mt-1 ${
-                      selectedProspect?.prospect.id === prospect.id
-                        ? "opacity-80"
-                        : "text-[#888888]"
-                    }`}>
+                    <p className="font-semibold text-xs text-[#0D0D0D]">{prospect.businessName}</p>
+                    <p className="text-[10px] mt-1 text-[#888888]">
                       {prospect.email}
                     </p>
-                    <div className={`flex gap-2 mt-1.5 text-[10px] ${
-                      selectedProspect?.prospect.id === prospect.id
-                        ? "opacity-70"
-                        : "text-[#CCCCCC]"
-                    }`}>
+                    <div className="flex gap-2 mt-1.5 text-[10px] text-[#CCCCCC]">
                       <span>{prospect.emailCount} emails</span>
                       <span>•</span>
                       <span>{prospect.totalOpens} opens</span>
