@@ -185,7 +185,7 @@ export default function JobCard({
                 }
               }
             }}
-            className="w-full text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 font-medium py-2.5 rounded-full text-sm transition-colors"
+            className="w-full text-[#0D0D0D] hover:text-[#333333] border border-[#0D0D0D] hover:border-[#333333] font-medium py-2.5 rounded-full text-sm transition-colors"
           >
             Cancel job
           </button>
