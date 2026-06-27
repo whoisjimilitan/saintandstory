@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   const rows = await sql`
     SELECT customer_email, customer_name, reference, status
     FROM jobs
-    WHERE id = ${jobId} AND status IN ('pending_review', 'offered', 'assigned', 'in_progress')
+    WHERE id = ${jobId} AND status IN ('pending_review', 'offered', 'assigned', 'confirmed', 'in_progress')
     LIMIT 1
   `;
   if (!rows[0]) return NextResponse.json({ error: "Job not found or cannot be cancelled" }, { status: 404 });
