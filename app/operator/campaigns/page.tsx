@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import CampaignBuilder from "./campaign-builder";
 
 interface CampaignData {
   campaign_overview: {
@@ -227,6 +228,22 @@ export default function CampaignsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* CAMPAIGN BUILDER */}
+      <div className="mb-16 px-4 md:px-0 py-8 border-t border-[#E8E8E8]">
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
+            <p className="text-xs font-semibold text-[#0D0D0D] font-mono">NEW CAMPAIGN</p>
+          </div>
+          <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">
+            Launch Multi-Source Campaign
+          </h2>
+          <p className="text-base text-[#666666] max-w-3xl">
+            Generate psychologically-primed outreach messages for any combination of sources (Facebook, Email, LinkedIn, WhatsApp). Auto-detect the best strategy and preview before sending.
+          </p>
+        </div>
+        <CampaignBuilder />
       </div>
 
       {/* INSIGHTS & ACTIONS */}
