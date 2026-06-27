@@ -645,12 +645,12 @@ export default function OperatorBriefing() {
       </div>
 
       {/* AVAILABLE DRIVERS WIDGET */}
-      {activeDrivers > 0 && (
+      {totalDrivers > 0 && (
         <div className="mb-16 px-4 md:px-0">
           <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
             <div className="flex items-center justify-between mb-4">
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-                Driver Pool Live
+                Driver Pool
               </p>
               {driversAvailable > 0 && (
                 <button
