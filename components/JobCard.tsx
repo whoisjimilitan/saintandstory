@@ -165,13 +165,23 @@ export default function JobCard({
           <button
             onClick={async () => {
               if (confirm("Cancel this job?")) {
-                const res = await fetch("/api/jobs/cancel", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ jobId: job.id }),
-                });
-                if (res.ok) {
-                  window.location.reload();
+                try {
+                  const res = await fetch("/api/jobs/cancel", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ jobId: job.id }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert("Job cancelled successfully");
+                    window.location.reload();
+                  } else {
+                    alert(`Cancel failed: ${data.error || "Unknown error"}`);
+                    console.error("Cancel error:", data);
+                  }
+                } catch (error) {
+                  alert(`Error: ${error instanceof Error ? error.message : "Failed to cancel"}`);
+                  console.error("Cancel exception:", error);
                 }
               }
             }}

@@ -25,7 +25,7 @@ export default function CameraCapture({
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Start camera
+  // Start camera (with fallback to file input)
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -38,7 +38,9 @@ export default function CameraCapture({
         setMode("capture");
       }
     } catch (err) {
-      onError("Camera access denied or unavailable");
+      // Fallback to file input if camera unavailable
+      console.log("Camera unavailable, using file picker:", err);
+      fileInputRef.current?.click();
     }
   };
 
@@ -110,21 +112,15 @@ export default function CameraCapture({
 
   return (
     <div className="w-full space-y-3">
-      {/* Preview mode: Show camera button */}
+      {/* Preview mode: Show single photo button with fallback */}
       {mode === "preview" && !capturedImage && (
-        <div className="space-y-2">
+        <>
           <button
             onClick={startCamera}
             className="w-full bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3.5 rounded-full text-sm transition-colors flex items-center justify-center gap-2"
           >
             <Camera size={18} />
-            {label}
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-[#F5F5F5] hover:bg-[#E8E8E8] text-[#0D0D0D] font-semibold py-3.5 rounded-full text-sm transition-colors"
-          >
-            Choose from library
+            Take Photo
           </button>
           <input
             ref={fileInputRef}
@@ -143,7 +139,7 @@ export default function CameraCapture({
               reader.readAsDataURL(file);
             }}
           />
-        </div>
+        </>
       )}
 
       {/* Capture mode: Show video stream */}
