@@ -188,24 +188,33 @@ export default function PipelinePage() {
                   ) : (
                     <>
                       {topProspects.map((prospect) => (
-                        <Link
-                          key={prospect.id}
-                          href={`/operator/understand?prospectId=${prospect.id}`}
-                        >
-                          <div className="p-2 bg-[#F9F9F9] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-white transition-all cursor-pointer">
-                            <p className="text-xs font-semibold text-[#0D0D0D] truncate">
-                              {prospect.businessName}
-                            </p>
-                            <p className="text-[10px] text-[#999999] truncate mt-0.5">
-                              {prospect.city}
-                            </p>
-                            {prospect.confidenceScore && (
-                              <p className="text-[10px] text-[#666666] mt-1">
-                                Score: {prospect.confidenceScore}%
+                        <div key={prospect.id} className="flex gap-2">
+                          <Link
+                            href={`/operator/understand?prospectId=${prospect.id}`}
+                            className="flex-1"
+                          >
+                            <div className="p-2 bg-[#F9F9F9] border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-white transition-all cursor-pointer h-full">
+                              <p className="text-xs font-semibold text-[#0D0D0D] truncate">
+                                {prospect.businessName}
                               </p>
-                            )}
-                          </div>
-                        </Link>
+                              <p className="text-[10px] text-[#999999] truncate mt-0.5">
+                                {prospect.city}
+                              </p>
+                              {prospect.confidenceScore && (
+                                <p className="text-[10px] text-[#666666] mt-1">
+                                  Score: {prospect.confidenceScore}%
+                                </p>
+                              )}
+                            </div>
+                          </Link>
+                          <Link
+                            href={`/dashboard/crm?id=${prospect.id}`}
+                            className="flex items-center justify-center w-8 h-full border border-[#E8E8E8] rounded hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+                            title="View in CRM"
+                          >
+                            <span className="text-[10px] font-semibold text-[#0D0D0D]">📋</span>
+                          </Link>
+                        </div>
                       ))}
 
                       {/* View All Link */}

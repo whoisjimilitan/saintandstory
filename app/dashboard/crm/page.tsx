@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Prospect {
   id: string;
@@ -47,11 +48,21 @@ interface ProspectDetail {
 }
 
 export default function CRMPage() {
+  const searchParams = useSearchParams();
+  const prospectIdParam = searchParams.get("id");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Prospect[]>([]);
   const [selectedProspect, setSelectedProspect] = useState<ProspectDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
+
+  // Auto-load prospect if id is in URL
+  useEffect(() => {
+    if (prospectIdParam) {
+      loadProspectDetail(prospectIdParam);
+    }
+  }, [prospectIdParam]);
 
   // Search prospects
   const handleSearch = async (e: React.FormEvent) => {

@@ -506,6 +506,17 @@ export default function OperatorBriefing() {
         </p>
       </div>
 
+      {/* Quick CRM Search */}
+      <div className="mb-8 px-4 md:px-0">
+        <button
+          onClick={() => router.push("/dashboard/crm")}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors"
+        >
+          <span className="text-base">🔍</span>
+          <span className="text-xs font-semibold text-[#0D0D0D]">Search prospects in CRM</span>
+        </button>
+      </div>
+
       {/* NARRATIVE BRIEFING - Idea #4 */}
       <div className="mb-16 px-4 md:px-0">
         <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-[#F9F9F9]">
