@@ -57,6 +57,12 @@ export interface OutreachMessage {
     introducesExpertise: boolean;
     noSalesPressure: boolean;
   };
+  // Confidence checks for display
+  confidenceChecks: {
+    charLimit: boolean;
+    noAsk: boolean;
+    introPresent: boolean;
+  };
 }
 
 /**
@@ -244,6 +250,12 @@ function validateOutreachMessage(
     underCharLimit &&
     Object.values(psychology).every(v => v);
 
+  const confidenceChecks = {
+    charLimit: underCharLimit,
+    noAsk: !message.endsWith("?") && !hasForbiddenText,
+    introPresent: hasExpertIntro
+  };
+
   return {
     message,
     charCount,
@@ -252,7 +264,8 @@ function validateOutreachMessage(
     isValid,
     askPresent: message.includes("?"),
     questionMarkAtEnd: message.endsWith("?"),
-    psychology
+    psychology,
+    confidenceChecks
   };
 }
 

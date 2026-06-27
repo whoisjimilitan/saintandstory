@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { generateOutreachMessage, OutreachContext } from "@/lib/outreach-message-generator";
+import { formatCampaignResponse, renderCampaignTree } from "@/lib/outreach-response-formatter";
 
 /**
  * POST /api/b2b/campaigns/generate-messages
@@ -183,35 +184,36 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Format response with psychological confidence building
+    const formattedResponse = formatCampaignResponse(campaignName, messages as any[]);
+    const treeDisplay = renderCampaignTree(formattedResponse);
+
     console.log("[CAMPAIGN MESSAGES] ═══════════════════════════════════════");
-    console.log("[CAMPAIGN MESSAGES] SUMMARY");
-    console.log(`[CAMPAIGN MESSAGES]   Total processed: ${messages.length}`);
-    console.log(`[CAMPAIGN MESSAGES]   Valid messages: ${validCount}`);
-    console.log(`[CAMPAIGN MESSAGES]   Invalid messages: ${invalidCount}`);
-    console.log("[CAMPAIGN MESSAGES] STRATEGY BREAKDOWN:");
-    console.log(`[CAMPAIGN MESSAGES]   AI Personalized: ${strategyCount.ai_personalized}`);
-    console.log(`[CAMPAIGN MESSAGES]   Template: ${strategyCount.template}`);
-    console.log(`[CAMPAIGN MESSAGES]   Email: ${strategyCount.email}`);
-    console.log(`[CAMPAIGN MESSAGES]   LinkedIn: ${strategyCount.linkedin}`);
-    console.log(`[CAMPAIGN MESSAGES]   Generic: ${strategyCount.generic}`);
-    console.log("[CAMPAIGN MESSAGES] CHANNEL BREAKDOWN:");
-    console.log(`[CAMPAIGN MESSAGES]   WhatsApp: ${channelCount.whatsapp}`);
-    console.log(`[CAMPAIGN MESSAGES]   Email: ${channelCount.email}`);
-    console.log(`[CAMPAIGN MESSAGES]   LinkedIn: ${channelCount.linkedin}`);
-    console.log(`[CAMPAIGN MESSAGES]   SMS: ${channelCount.sms}`);
+    console.log("[CAMPAIGN MESSAGES]" + treeDisplay);
     console.log("[CAMPAIGN MESSAGES] ═══════════════════════════════════════");
 
     return NextResponse.json({
       success: true,
-      campaignName,
-      totalLeads: leads.length,
-      messages,
-      strategyBreakdown: strategyCount,
-      channelBreakdown: channelCount,
-      validityReport: {
-        valid: validCount,
-        invalid: invalidCount,
-        invalidMessages
+      formatted: {
+        campaignName: formattedResponse.campaignName,
+        totalLeads: formattedResponse.totalLeads,
+        messageGenerationSummary: formattedResponse.messageGenerationSummary,
+        strategyGroups: formattedResponse.strategyGroups.map(g => ({
+          strategy: g.strategy,
+          count: g.count,
+          sampleMessage: g.sample.message,
+          confidenceChecks: g.confidenceChecks,
+          description: g.description
+        })),
+        grandSummary: formattedResponse.grandSummary,
+        validityReport: formattedResponse.validityReport,
+        actions: formattedResponse.actions
+      },
+      // Keep raw data for programmatic access
+      raw: {
+        messages,
+        strategyBreakdown: strategyCount,
+        channelBreakdown: channelCount
       }
     });
   } catch (error) {
