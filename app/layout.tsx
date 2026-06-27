@@ -3,6 +3,7 @@ import { Inter, Cormorant_Garamond } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ModalProvider from "@/components/ModalProvider";
+import { ToastProvider } from "@/app/providers/ToastProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,18 +94,20 @@ export default function RootLayout({
 
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}
-        >
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-          {children}
-          <ModalProvider />
-        </body>
-      </html>
+      <ToastProvider>
+        <html lang="en">
+          <body
+            className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}
+          >
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            {children}
+            <ModalProvider />
+          </body>
+        </html>
+      </ToastProvider>
     </ClerkProvider>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Pusher from "pusher-js";
+import { useToast } from "@/app/providers/ToastProvider";
 
 // Premium single-color icons
 const Icons = {
@@ -135,6 +136,7 @@ interface PageState {
 export default function OperatorBriefing() {
   const router = useRouter();
   const { user } = useUser();
+  const { showToast } = useToast();
   const [state, setState] = useState<PageState>({
     loading: true,
     error: null,
@@ -354,15 +356,19 @@ export default function OperatorBriefing() {
 
   const handleAssignJob = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[Assign Job] Starting...", assignForm);
 
     if (!assignForm.driver_id || !assignForm.prospect_name || !assignForm.postcode_from || !assignForm.postcode_to) {
-      alert("Please fill in: Driver, Prospect Name, From, and To postcodes");
+      showToast("Please fill in: Driver, Prospect Name, From, and To postcodes", "error");
       return;
     }
 
+    // Optimistic UI update - show success immediately
+    const formData = { ...assignForm };
+    setAssignForm({ driver_id: "", prospect_name: "", postcode_from: "", postcode_to: "", price: "100" });
+    setShowAssignJob(false);
+    showToast("Job assigned successfully.", "success");
+
     try {
-      console.log("[Assign Job] Sending request...");
       const response = await fetch("/api/admin/active-drivers", {
         method: "POST",
         headers: {
@@ -371,23 +377,18 @@ export default function OperatorBriefing() {
         },
         body: JSON.stringify({
           action: "assign_job_to_driver",
-          driver_id: assignForm.driver_id,
-          prospect_name: assignForm.prospect_name,
-          postcode_from: assignForm.postcode_from,
-          postcode_to: assignForm.postcode_to,
-          price: parseFloat(assignForm.price) || 0,
+          driver_id: formData.driver_id,
+          prospect_name: formData.prospect_name,
+          postcode_from: formData.postcode_from,
+          postcode_to: formData.postcode_to,
+          price: parseFloat(formData.price) || 0,
         }),
       });
 
-      console.log("[Assign Job] Response status:", response.status);
       const data = await response.json();
-      console.log("[Assign Job] Response data:", data);
 
       if (response.ok) {
-        alert(`✓ Job assigned: ${data.job?.reference || 'SUCCESS'}\n15-20% commission`);
-        setAssignForm({ driver_id: "", prospect_name: "", postcode_from: "", postcode_to: "", price: "100" });
-        setShowAssignJob(false);
-        // Refresh driver stats
+        // Refresh driver stats in background
         const statsRes = await fetch("/api/admin/active-drivers", {
           headers: { "x-admin-email": "whoisjimi.today@gmail.com" },
         });
@@ -399,12 +400,13 @@ export default function OperatorBriefing() {
           setDriversList(statsData.live_drivers?.drivers || []);
         }
       } else {
+        // Show error if request fails
         const errorMsg = data.error || `Server error: ${response.status}`;
-        alert(`Error: ${errorMsg}`);
+        showToast(`Error: ${errorMsg}`, "error");
       }
     } catch (error) {
-      console.error("Failed to assign job:", error);
-      alert(`Failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+      // Show error if network fails
+      showToast(`Failed: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     }
   };
 
