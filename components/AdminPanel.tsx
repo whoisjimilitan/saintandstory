@@ -931,14 +931,37 @@ export default function AdminPanel({ pendingJobs, offeredJobs, confirmedJobs, in
                           </p>
                         )}
                       </div>
-                      {driver.phone && (
-                        <div className="flex items-center gap-3 shrink-0">
-                          <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline whitespace-nowrap">
-                            {driver.phone}
-                          </a>
-                          <SmsButton phone={driver.phone} driverName={driver.full_name} />
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3 shrink-0">
+                        {driver.phone && (
+                          <>
+                            <a href={`tel:${driver.phone}`} className="text-[#0D0D0D] text-xs font-semibold hover:underline whitespace-nowrap">
+                              {driver.phone}
+                            </a>
+                            <SmsButton phone={driver.phone} driverName={driver.full_name} />
+                          </>
+                        )}
+                        {!online && (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch("/api/admin/set-driver-online", {
+                                method: "POST",
+                                headers: {
+                                  "x-admin-email": "whoisjimi.today@gmail.com",
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ driver_id: driver.id }),
+                              });
+                              if (res.ok) {
+                                alert("Driver set to online");
+                                window.location.reload();
+                              }
+                            }}
+                            className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-2 py-1 rounded font-semibold whitespace-nowrap"
+                          >
+                            Set Online
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
