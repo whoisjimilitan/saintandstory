@@ -512,7 +512,7 @@ export default function OperatorBriefing() {
           onClick={() => router.push("/dashboard/crm")}
           className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors text-xs font-semibold text-[#0D0D0D]"
         >
-          Search prospects in CRM
+          Prospect & customer database
         </button>
       </div>
 
