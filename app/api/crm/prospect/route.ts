@@ -68,6 +68,27 @@ export async function GET(request: NextRequest) {
       LIMIT 100
     `;
 
+    // Get job/order history
+    const jobs = await sql`
+      SELECT
+        id,
+        business_name,
+        price,
+        service_type,
+        active,
+        created_at,
+        next_scheduled_at
+      FROM b2b_standing_orders
+      WHERE lead_id = ${prospectId}
+      ORDER BY created_at DESC
+    `;
+
+    // Calculate customer metrics
+    const jobCount = jobs.length;
+    const totalSpent = jobs.reduce((sum: number, job: any) => sum + (Number(job.price) || 0), 0);
+    const lastJobDate = jobs.length > 0 ? jobs[0].created_at : null;
+    const isCustomer = jobCount > 0;
+
     return NextResponse.json({
       status: "success",
       prospect: {
@@ -106,6 +127,20 @@ export async function GET(request: NextRequest) {
         createdAt: e.created_at,
         metadata: e.metadata,
       })),
+      customer: {
+        isCustomer,
+        jobCount,
+        totalSpent,
+        lastJobDate,
+        jobs: jobs.map((j: any) => ({
+          id: j.id,
+          serviceType: j.service_type,
+          price: j.price,
+          active: j.active,
+          createdAt: j.created_at,
+          nextScheduledAt: j.next_scheduled_at,
+        })),
+      },
     });
   } catch (error) {
     console.error("[crm-prospect] Error:", error);

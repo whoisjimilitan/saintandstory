@@ -27,6 +27,15 @@ interface Email {
   clicks: number;
 }
 
+interface Job {
+  id: string;
+  serviceType: string;
+  price: number;
+  active: boolean;
+  createdAt: string;
+  nextScheduledAt?: string;
+}
+
 interface ProspectDetail {
   prospect: {
     id: string;
@@ -44,6 +53,13 @@ interface ProspectDetail {
     totalSent: number;
     totalOpens: number;
     totalClicks: number;
+  };
+  customer: {
+    isCustomer: boolean;
+    jobCount: number;
+    totalSpent: number;
+    lastJobDate?: string;
+    jobs: Job[];
   };
 }
 
@@ -107,10 +123,10 @@ export default function CRMPage() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
-            Prospect search.
+            Prospect & customer database.
           </h1>
           <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
-            Find prospects and view all communications.
+            Find prospects and customers, view all communications and history.
           </p>
         </div>
 
@@ -215,6 +231,55 @@ export default function CRMPage() {
                   </div>
                 </div>
 
+                {/* Customer Status */}
+                <div className={`border rounded-lg p-6 md:p-8 ${
+                  selectedProspect.customer.isCustomer
+                    ? "border-[#0D0D0D] bg-white"
+                    : "border-[#E8E8E8] bg-[#F9F9F9]"
+                }`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase">
+                      Status
+                    </p>
+                    <span className={`text-xs font-semibold px-3 py-1.5 rounded ${
+                      selectedProspect.customer.isCustomer
+                        ? "bg-[#0D0D0D] text-white"
+                        : "bg-[#E8E8E8] text-[#0D0D0D]"
+                    }`}>
+                      {selectedProspect.customer.isCustomer ? "Customer" : "Prospect"}
+                    </span>
+                  </div>
+
+                  {selectedProspect.customer.isCustomer ? (
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-xs text-[#888888] mb-2">Jobs Completed</p>
+                        <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                          {selectedProspect.customer.jobCount}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#888888] mb-2">Total Spent</p>
+                        <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                          £{selectedProspect.customer.totalSpent.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#888888] mb-2">Last Service</p>
+                        <p className="text-sm text-[#0D0D0D]">
+                          {selectedProspect.customer.lastJobDate
+                            ? new Date(selectedProspect.customer.lastJobDate).toLocaleDateString()
+                            : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#666666]">
+                      This prospect has not yet placed any orders. They are in the discovery/qualification phase.
+                    </p>
+                  )}
+                </div>
+
                 {/* Engagement Overview */}
                 <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
                   <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
@@ -275,6 +340,44 @@ export default function CRMPage() {
                 {selectedProspect.emails.length === 0 && (
                   <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
                     <p className="text-sm text-[#888888]">No communication history yet</p>
+                  </div>
+                )}
+
+                {/* Job History */}
+                {selectedProspect.customer.isCustomer && selectedProspect.customer.jobs.length > 0 && (
+                  <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+                    <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
+                      Order History
+                    </p>
+                    <div className="space-y-3">
+                      {selectedProspect.customer.jobs.map((job) => (
+                        <div key={job.id} className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm text-[#0D0D0D]">{job.serviceType}</p>
+                              <p className="text-xs text-[#888888] mt-1">
+                                {new Date(job.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-black text-lg text-[#0D0D0D]">£{job.price.toLocaleString()}</p>
+                              <span className={`text-[10px] px-2.5 py-1 rounded font-semibold whitespace-nowrap inline-block mt-1 ${
+                                job.active
+                                  ? "bg-[#0D0D0D] text-white"
+                                  : "bg-[#E8E8E8] text-[#0D0D0D]"
+                              }`}>
+                                {job.active ? "Active" : "Completed"}
+                              </span>
+                            </div>
+                          </div>
+                          {job.nextScheduledAt && (
+                            <p className="text-xs text-[#888888] mt-2">
+                              Next scheduled: {new Date(job.nextScheduledAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
