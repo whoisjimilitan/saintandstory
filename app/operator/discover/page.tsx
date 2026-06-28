@@ -332,7 +332,7 @@ export default function DiscoverPage() {
         {/* Sub-Hero */}
         <div className="mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8]">
           <p className="text-lg font-bold text-[#0D0D0D] mb-4 md:mb-6 leading-relaxed">
-            Search for prospects and build your pipeline
+            Upload to pipeline or search for prospects
           </p>
           <button
             onClick={() => setShowManualAddForm(true)}
