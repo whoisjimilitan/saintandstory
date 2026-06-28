@@ -346,16 +346,6 @@ export default function DiscoverPage() {
       <div className="mb-12 flex items-center justify-between border-b border-[#E8E8E8] pb-0">
         <div className="flex gap-0">
           <button
-            onClick={() => setActiveTab("google-places")}
-            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
-              activeTab === "google-places"
-                ? "text-[#0D0D0D] border-[#0D0D0D]"
-                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-            }`}
-          >
-            Google Places
-          </button>
-          <button
             onClick={() => setActiveTab("batch-upload")}
             className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
               activeTab === "batch-upload"
@@ -364,6 +354,16 @@ export default function DiscoverPage() {
             }`}
           >
             Batch Upload
+          </button>
+          <button
+            onClick={() => setActiveTab("google-places")}
+            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+              activeTab === "google-places"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Google Places
           </button>
         </div>
 
