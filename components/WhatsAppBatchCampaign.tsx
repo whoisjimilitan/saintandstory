@@ -40,13 +40,22 @@ interface CampaignResponse {
   };
 }
 
-export default function WhatsAppBatchCampaign() {
+interface WhatsAppBatchCampaignProps {
+  channel?: "email" | "whatsapp";
+  onCampaignCreated?: () => void;
+}
+
+export default function WhatsAppBatchCampaign({
+  channel = "whatsapp",
+  onCampaignCreated
+}: WhatsAppBatchCampaignProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [response, setResponse] = useState<CampaignResponse | null>(null);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
+  const [campaignId, setCampaignId] = useState<string | null>(null);
 
   // Detect company size from company name/description
   const detectCompanySize = (company?: string, description?: string): "small" | "medium" | "enterprise" => {
@@ -145,6 +154,7 @@ export default function WhatsAppBatchCampaign() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           campaignName: campaignName.trim(),
+          channel: channel,
           leads: parsedLeads.slice(0, 100),
         }),
       });
@@ -303,8 +313,37 @@ export default function WhatsAppBatchCampaign() {
         </div>
 
         {/* Action Button */}
-        <button className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors">
-          Send {response.formatted.validityReport.valid} Messages
+        <button
+          onClick={async () => {
+            try {
+              const res = await fetch("/api/b2b/campaigns/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  campaignName: fileName,
+                  channel: channel,
+                  leads: leads.map(l => ({
+                    businessName: l.company,
+                    email: l.email,
+                    phone: l.phoneNumber,
+                    firstName: l.firstName,
+                    companySize: l.companySize,
+                  })),
+                }),
+              });
+
+              if (res.ok) {
+                const data = await res.json();
+                setCampaignId(data.campaignId);
+                onCampaignCreated?.();
+              }
+            } catch (err) {
+              setError("Failed to create campaign");
+            }
+          }}
+          className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors"
+        >
+          Create Campaign
         </button>
       </div>
     );

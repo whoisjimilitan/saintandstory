@@ -40,6 +40,7 @@ export default function DiscoverPage() {
     currentFilter: "all",
   });
   const [activeTab, setActiveTab] = useState<"google-places" | "batch-upload">("batch-upload");
+  const [selectedChannel, setSelectedChannel] = useState<"email" | "whatsapp" | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
@@ -411,7 +412,52 @@ export default function DiscoverPage() {
       {/* BATCH UPLOAD TAB */}
       {activeTab === "batch-upload" && (
         <div className="mb-12">
-          <WhatsAppBatchCampaign />
+          {!selectedChannel ? (
+            <div className="max-w-2xl">
+              <div className="mb-8">
+                <h3 className="text-xl font-black text-[#0D0D0D] mb-2">Upload for Campaign</h3>
+                <p className="text-sm text-[#666666]">
+                  Choose which channel this upload is for
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setSelectedChannel("email")}
+                  className="p-6 border-2 border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all text-left"
+                >
+                  <p className="text-sm font-black text-[#0D0D0D] mb-2">Email Campaign</p>
+                  <p className="text-xs text-[#666666]">Medium & enterprise businesses</p>
+                </button>
+
+                <button
+                  onClick={() => setSelectedChannel("whatsapp")}
+                  className="p-6 border-2 border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all text-left"
+                >
+                  <p className="text-sm font-black text-[#0D0D0D] mb-2">WhatsApp Campaign</p>
+                  <p className="text-xs text-[#666666]">Small businesses & real-time outreach</p>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-[#888888] uppercase font-semibold tracking-[0.05em] mb-1">Campaign Type</p>
+                  <p className="text-sm font-black text-[#0D0D0D]">
+                    {selectedChannel === "email" ? "Email Campaign" : "WhatsApp Campaign"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedChannel(null)}
+                  className="text-xs text-[#0D0D0D] hover:text-[#666666] transition-colors"
+                >
+                  Change
+                </button>
+              </div>
+              <WhatsAppBatchCampaign channel={selectedChannel} onCampaignCreated={() => setSelectedChannel(null)} />
+            </div>
+          )}
         </div>
       )}
 
