@@ -1093,12 +1093,8 @@ export default function OperatorBriefing() {
                 <p className="text-2xl font-black text-[#0D0D0D]">50</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
-                <p className="text-xs text-[#666666]">Waiting for reply</p>
+                <p className="text-xs text-[#666666]">Replied</p>
                 <p className="text-2xl font-black text-[#0D0D0D]">8</p>
-              </div>
-              <div className="border-t border-[#E8E8E8] pt-3">
-                <p className="text-xs text-[#666666]">Hot leads</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">3</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Standing orders</p>
