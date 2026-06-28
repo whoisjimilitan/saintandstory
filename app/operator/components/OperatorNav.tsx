@@ -7,9 +7,7 @@ import { useState } from "react";
 const stages = [
   { name: "Today", href: "/operator" },
   { name: "Discover", href: "/operator/discover" },
-  { name: "Qualify", href: "/operator/understand" },
-  { name: "Enrich", href: "/operator/enrich" },
-  { name: "Responses", href: "/operator/responses" },
+  { name: "Reach", href: "/operator/whatsapp" },
   { name: "Orders", href: "/operator/orders" },
 ];
 
@@ -19,9 +17,8 @@ export function OperatorNav() {
 
   const getCurrentStageIndex = () => {
     if (pathname === "/operator" || pathname === "/operator/") return 0;
-    const segment = pathname.split("/")[2]?.toLowerCase();
-    if (segment === "understand") return 2;
-    return stages.findIndex((s) => s.href === `/operator/${segment}`) || 0;
+    const stageIndex = stages.findIndex((s) => pathname.startsWith(s.href));
+    return stageIndex >= 0 ? stageIndex : 0;
   };
 
   const currentStageIndex = getCurrentStageIndex();
