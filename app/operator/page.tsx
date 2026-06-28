@@ -518,8 +518,9 @@ export default function OperatorBriefing() {
         </button>
       </div>
 
-      {/* WHATSAPP CONVERSATIONS - Core Engine */}
+      {/* WHATSAPP QUEUE - Real-Time Conversations */}
       <div className="mb-12 px-4 md:px-0">
+        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">WhatsApp Queue (Real-Time)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <button
             onClick={() => router.push("/operator/whatsapp")}
@@ -527,10 +528,10 @@ export default function OperatorBriefing() {
           >
             <div className="text-left">
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                WhatsApp Active
+                Active Conversations
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666] mt-2">conversations</p>
+              <p className="text-xs text-[#666666] mt-2">send messages now</p>
             </div>
           </button>
           <button
@@ -539,10 +540,10 @@ export default function OperatorBriefing() {
           >
             <div className="text-left">
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                Hot Leads
+                Ready to Message
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666] mt-2">waiting for follow-up</p>
+              <p className="text-xs text-[#666666] mt-2">small businesses</p>
             </div>
           </button>
           <button
@@ -551,10 +552,10 @@ export default function OperatorBriefing() {
           >
             <div className="text-left">
               <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
-                + New
+                + New Conversation
               </p>
-              <p className="text-sm font-semibold">Start conversation</p>
-              <p className="text-xs text-[#CCCCCC] mt-2">with business owner</p>
+              <p className="text-sm font-semibold">Start with business owner</p>
+              <p className="text-xs text-[#CCCCCC] mt-2">instant messaging</p>
             </div>
           </button>
         </div>
@@ -563,7 +564,58 @@ export default function OperatorBriefing() {
           className="w-full text-left px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] transition-colors"
         >
           <p className="text-xs font-semibold text-[#0D0D0D]">
-            Go to WhatsApp dashboard →
+            Go to WhatsApp Queue →
+          </p>
+        </button>
+      </div>
+
+      {/* EMAIL CAMPAIGN - Batch Automation */}
+      <div className="mb-12 px-4 md:px-0">
+        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Email Campaign (Batch)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <button
+            onClick={() => router.push("/operator/outreach")}
+            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
+                In Campaign
+              </p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{emailsSentCount || 0}</p>
+              <p className="text-xs text-[#666666] mt-2">medium/enterprise</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push("/operator/outreach")}
+            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
+                Opened Today
+              </p>
+              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-xs text-[#666666] mt-2">auto-sequences running</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push("/operator/outreach")}
+            className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors"
+          >
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
+                Upload Leads
+              </p>
+              <p className="text-sm font-semibold">Create new campaign</p>
+              <p className="text-xs text-[#CCCCCC] mt-2">batch send emails</p>
+            </div>
+          </button>
+        </div>
+        <button
+          onClick={() => router.push("/operator/outreach")}
+          className="w-full text-left px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] transition-colors"
+        >
+          <p className="text-xs font-semibold text-[#0D0D0D]">
+            Go to Email Campaign →
           </p>
         </button>
       </div>
