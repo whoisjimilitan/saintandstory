@@ -109,7 +109,7 @@ export default function WhatsAppWidget({
     // Operator will respond with: Acknowledge → Problem → Intro (I head logistics...)
     const message = `Hi, we're in ${userCity} and need urgent same-day delivery. Are you available today?`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappNumber = "447700000000"; // Replace with actual number
+    const whatsappNumber = "442030519243";
     const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     window.open(url, "_blank");
   };
