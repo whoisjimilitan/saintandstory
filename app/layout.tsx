@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ModalProvider from "@/components/ModalProvider";
 import { ToastProvider } from "@/app/providers/ToastProvider";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -105,6 +106,7 @@ export default function RootLayout({
             />
             {children}
             <ModalProvider />
+            <WhatsAppWidget />
           </body>
         </html>
       </ToastProvider>
