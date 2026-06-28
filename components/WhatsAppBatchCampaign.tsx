@@ -216,23 +216,6 @@ export default function WhatsAppBatchCampaign() {
             <p className="text-sm text-[#666666]">Processing file...</p>
           </div>
         )}
-
-        {/* Supported Fields */}
-        <div className="mt-8 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-          <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">
-            Auto-Detected Fields
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-xs text-[#666666]">
-            <div>✓ firstName</div>
-            <div>✓ lastName</div>
-            <div>✓ email</div>
-            <div>✓ phoneNumber</div>
-            <div>✓ company</div>
-            <div>✓ groupName</div>
-            <div>✓ description</div>
-            <div>✓ linkedinProfile</div>
-          </div>
-        </div>
       </div>
     );
   }
