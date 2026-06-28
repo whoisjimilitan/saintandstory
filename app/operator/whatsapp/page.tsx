@@ -36,7 +36,7 @@ export default function WhatsAppDashboard() {
   return (
     <div className="min-h-screen bg-white pt-20">
       {/* Header */}
-      <div className="border-b border-[#E8E8E8] px-4 md:px-0 py-8">
+      <div className="mb-8 px-4 md:px-0 py-8">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">WhatsApp</h1>
           <p className="text-base text-[#666666]">Send messages and manage conversations in real-time</p>
@@ -44,7 +44,7 @@ export default function WhatsAppDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
+      <div className="mb-12 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
         <div className="max-w-2xl mx-auto">
           <div className="grid grid-cols-3 gap-4">
               <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
