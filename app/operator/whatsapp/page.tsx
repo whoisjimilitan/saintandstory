@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import ConversationsList from "@/components/ConversationsList";
+import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
 import { getAllConversations, createConversation } from "@/lib/whatsapp-conversation";
 
+type Tab = "conversations" | "batch";
+
 export default function WhatsAppDashboard() {
+  const [activeTab, setActiveTab] = useState<Tab>("conversations");
   const [conversations, setConversations] = useState(getAllConversations());
   const [showNewConversationForm, setShowNewConversationForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -37,30 +41,57 @@ export default function WhatsAppDashboard() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="border-b border-[#E8E8E8] px-6 py-8">
-        <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">WhatsApp</h1>
-        <p className="text-base text-[#666666]">Manage conversations and close orders in real-time</p>
-      </div>
+        <h1 className="text-4xl font-black text-[#0D0D0D] mb-4">WhatsApp</h1>
+        <p className="text-base text-[#666666] mb-6">Real-time conversations and batch campaigns</p>
 
-      {/* Stats */}
-      <div className="px-6 py-6 border-b border-[#E8E8E8]">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-            <p className="text-xs text-[#888888] mb-1">Active</p>
-            <p className="text-2xl font-black text-[#0D0D0D]">{stats.active}</p>
-          </div>
-          <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-            <p className="text-xs text-[#888888] mb-1">Hot</p>
-            <p className="text-2xl font-black text-[#0D0D0D]">{stats.hot}</p>
-          </div>
-          <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-            <p className="text-xs text-[#888888] mb-1">Total</p>
-            <p className="text-2xl font-black text-[#0D0D0D]">{stats.total}</p>
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-8">
+          <button
+            onClick={() => setActiveTab("conversations")}
+            className={`text-sm font-semibold pb-3 border-b-2 transition-colors ${
+              activeTab === "conversations"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Conversations
+          </button>
+          <button
+            onClick={() => setActiveTab("batch")}
+            className={`text-sm font-semibold pb-3 border-b-2 transition-colors ${
+              activeTab === "batch"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Batch Campaign
+          </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex h-[calc(100vh-300px)]">
+      {/* TAB CONTENT */}
+      {activeTab === "conversations" && (
+        <>
+          {/* Stats */}
+          <div className="px-6 py-6 border-b border-[#E8E8E8]">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+                <p className="text-xs text-[#888888] mb-1">Active</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{stats.active}</p>
+              </div>
+              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+                <p className="text-xs text-[#888888] mb-1">Hot</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{stats.hot}</p>
+              </div>
+              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+                <p className="text-xs text-[#888888] mb-1">Total</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{stats.total}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex h-[calc(100vh-300px)]">
         {/* Sidebar */}
         <div className="w-80 flex-shrink-0">
           <ConversationsList
@@ -123,6 +154,15 @@ export default function WhatsAppDashboard() {
           )}
         </div>
       </div>
+        </>
+      )}
+
+      {/* BATCH CAMPAIGN TAB */}
+      {activeTab === "batch" && (
+        <div className="px-6 py-8">
+          <WhatsAppBatchCampaign />
+        </div>
+      )}
     </div>
   );
 }
