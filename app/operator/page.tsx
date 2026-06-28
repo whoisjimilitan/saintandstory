@@ -554,7 +554,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
                 + New Conversation
               </p>
-              <p className="text-sm font-semibold">Start with business owner</p>
+              <p className="text-sm font-semibold">Start chatting</p>
               <p className="text-xs text-[#CCCCCC] mt-2">instant messaging</p>
             </div>
           </button>
@@ -606,7 +606,7 @@ export default function OperatorBriefing() {
                 Upload Leads
               </p>
               <p className="text-sm font-semibold">Create new campaign</p>
-              <p className="text-xs text-[#CCCCCC] mt-2">batch send emails</p>
+              <p className="text-xs text-[#CCCCCC] mt-2">send emails</p>
             </div>
           </button>
         </div>
@@ -693,16 +693,6 @@ export default function OperatorBriefing() {
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
                         • {state.data?.metrics.actionItemsBreakdown?.readyToClose} prospect{(state.data?.metrics.actionItemsBreakdown?.readyToClose ?? 0) !== 1 ? 's' : ''} ready to close
-                      </button>
-                    </li>
-                  )}
-                  {phoneOutreachCount > 0 && (
-                    <li>
-                      <button
-                        onClick={() => router.push("/operator/phone-outreach")}
-                        className="text-[#0D0D0D] font-semibold hover:underline"
-                      >
-                        • {phoneOutreachCount} prospect{phoneOutreachCount !== 1 ? 's' : ''} ready to call
                       </button>
                     </li>
                   )}
@@ -1091,113 +1081,67 @@ export default function OperatorBriefing() {
         </div>
       </div>
 
-      {/* PIPELINE CONFIDENCE */}
+      {/* CHANNEL STATUS */}
       <div className="mb-16 px-4 md:px-0">
-        <div className="mb-6">
-          <h2 className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase mb-3">
-            Pipeline Confidence
-          </h2>
-          <p className="text-xs text-[#888888]">
-            {totalPipelineProspects} prospects across qualification stages.
-          </p>
-        </div>
+        <h2 className="text-xs font-semibold text-[#0D0D0D] tracking-[0.15em] uppercase mb-6">
+          Channel Status
+        </h2>
 
-        <div className="border border-[#E8E8E8] rounded-lg p-8 md:p-12 bg-white overflow-x-auto">
-          <div className="flex justify-between items-end gap-4 min-w-min md:min-w-0">
-            {/* Discover */}
-            <button
-              onClick={() => handlePipelineStageClick("discover")}
-              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
-            >
-              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
-                <div
-                  className="h-full bg-[#0D0D0D]"
-                  style={{ width: `${(state.data.pipeline.discover / totalPipelineProspects) * 100}%` }}
-                ></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* WhatsApp Status */}
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-4">
+              WhatsApp Queue (Real-Time)
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs text-[#666666]">Ready to message</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">50</p>
+                </div>
+                <div className="text-right text-xs text-[#888888]">small businesses</div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
-                Discover
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
-                {state.data.pipeline.discover}
-              </p>
-            </button>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Waiting for reply</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">8</p>
+              </div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Hot leads</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">3</p>
+              </div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Standing orders created</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              </div>
+            </div>
+          </div>
 
-            {/* Enrich */}
-            <button
-              onClick={() => handlePipelineStageClick("enrich")}
-              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
-            >
-              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
-                <div
-                  className="h-full bg-[#0D0D0D]"
-                  style={{ width: `${(state.data.pipeline.enrich / totalPipelineProspects) * 100}%` }}
-                ></div>
+          {/* Email Status */}
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-4">
+              Email Campaign (Batch)
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs text-[#666666]">Sent</p>
+                  <p className="text-2xl font-black text-[#0D0D0D]">443</p>
+                </div>
+                <div className="text-right text-xs text-[#888888]">medium/enterprise</div>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
-                Enrich
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
-                {state.data.pipeline.enrich}
-              </p>
-            </button>
-
-            {/* Qualify */}
-            <button
-              onClick={() => handlePipelineStageClick("qualify")}
-              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
-            >
-              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
-                <div
-                  className="h-full bg-[#0D0D0D]"
-                  style={{ width: `${(state.data.pipeline.qualify / totalPipelineProspects) * 100}%` }}
-                ></div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Opened today</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
-                Qualify
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
-                {state.data.pipeline.qualify}
-              </p>
-            </button>
-
-            {/* Propose */}
-            <button
-              onClick={() => handlePipelineStageClick("propose")}
-              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
-            >
-              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
-                <div
-                  className="h-full bg-[#0D0D0D]"
-                  style={{ width: `${(state.data.pipeline.propose / totalPipelineProspects) * 100}%` }}
-                ></div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Clicked links</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
-                Propose
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
-                {state.data.pipeline.propose}
-              </p>
-            </button>
-
-            {/* Orders */}
-            <button
-              onClick={() => handlePipelineStageClick("orders")}
-              className="text-center flex-1 min-w-[80px] hover:opacity-70 transition-opacity"
-            >
-              <div className="h-2 bg-[#E8E8E8] rounded-full mb-4 overflow-hidden">
-                <div
-                  className="h-full bg-[#0D0D0D]"
-                  style={{ width: `${(state.data.pipeline.orders / totalPipelineProspects) * 100}%` }}
-                ></div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-xs text-[#666666]">Replied</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.05em] mb-1">
-                Orders
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D] tracking-tight">
-                {state.data.pipeline.orders}
-              </p>
-            </button>
+            </div>
           </div>
         </div>
       </div>
