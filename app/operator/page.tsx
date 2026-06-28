@@ -169,6 +169,12 @@ export default function OperatorBriefing() {
   const [callSprint, setCallSprint] = useState<any>(null);
   const firstName = user?.firstName || "";
 
+  // Real-time stats from new APIs
+  const [whatsappStats, setWhatsappStats] = useState({ activeConversations: 0, readyToMessage: 0, replied: 0, standsToday: 0 });
+  const [emailStats, setEmailStats] = useState({ inCampaign: 0, openedToday: 0, clickedToday: 0, repliedToday: 0 });
+  const [driverStats, setDriverStats] = useState({ totalDrivers: 0, driversOnline: 0, driversAvailableToday: 0 });
+  const [revenueStats, setRevenueStats] = useState({ totalRevenue: "£0", standingOrderRevenue: "£0", jobRevenue: "£0" });
+
   useEffect(() => {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, "0");
@@ -354,6 +360,78 @@ export default function OperatorBriefing() {
     };
   }, []);
 
+  // Fetch real WhatsApp stats
+  useEffect(() => {
+    const fetchWhatsAppStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats/whatsapp");
+        if (res.ok) {
+          const data = await res.json();
+          setWhatsappStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch WhatsApp stats:", error);
+      }
+    };
+    fetchWhatsAppStats();
+    const interval = setInterval(fetchWhatsAppStats, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch real Email stats
+  useEffect(() => {
+    const fetchEmailStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats/email");
+        if (res.ok) {
+          const data = await res.json();
+          setEmailStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch Email stats:", error);
+      }
+    };
+    fetchEmailStats();
+    const interval = setInterval(fetchEmailStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch real Driver stats
+  useEffect(() => {
+    const fetchDriverStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats/drivers");
+        if (res.ok) {
+          const data = await res.json();
+          setDriverStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch Driver stats:", error);
+      }
+    };
+    fetchDriverStats();
+    const interval = setInterval(fetchDriverStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch real Revenue stats
+  useEffect(() => {
+    const fetchRevenueStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats/revenue");
+        if (res.ok) {
+          const data = await res.json();
+          setRevenueStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch Revenue stats:", error);
+      }
+    };
+    fetchRevenueStats();
+    const interval = setInterval(fetchRevenueStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleAssignJob = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -530,7 +608,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
                 Active Conversations
               </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.activeConversations}</p>
             </div>
           </button>
           <button
@@ -541,7 +619,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
                 Ready to Message
               </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.readyToMessage}</p>
             </div>
           </button>
           <button
@@ -578,7 +656,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
                 In Campaign
               </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{emailsSentCount || 0}</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.inCampaign}</p>
             </div>
           </button>
           <button
@@ -589,7 +667,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
                 Opened Today
               </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.openedToday}</p>
             </div>
           </button>
           <button
@@ -1057,7 +1135,7 @@ export default function OperatorBriefing() {
             Money Made Today
           </p>
           <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-4">
-            {todayRevenue}
+            {revenueStats.totalRevenue}
           </p>
           <p className="text-sm text-[#666666] mb-6">
             Standing orders + driver jobs (resets at 00:00)
@@ -1090,15 +1168,15 @@ export default function OperatorBriefing() {
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-[#666666]">Ready to message</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">50</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.readyToMessage}</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Replied</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">8</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.replied}</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Standing orders</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.standsToday}</p>
               </div>
             </div>
           </div>
@@ -1111,19 +1189,19 @@ export default function OperatorBriefing() {
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-[#666666]">Sent</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">443</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.inCampaign}</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Opened today</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.openedToday}</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Clicked</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.clickedToday}</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Replied</p>
-                <p className="text-2xl font-black text-[#0D0D0D]">0</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.repliedToday}</p>
               </div>
             </div>
           </div>
