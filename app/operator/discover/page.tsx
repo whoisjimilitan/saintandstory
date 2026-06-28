@@ -39,7 +39,7 @@ export default function DiscoverPage() {
     totalCount: 0,
     currentFilter: "all",
   });
-  const [activeTab, setActiveTab] = useState<"google-places" | "batch-upload">("google-places");
+  const [activeTab, setActiveTab] = useState<"google-places" | "batch-upload">("batch-upload");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
