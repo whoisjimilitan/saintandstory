@@ -75,27 +75,21 @@ export default function WhatsAppWidget({
           return;
         }
 
-        // Fetch real availability for their city
-        const statsRes = await fetch("/api/admin/stats/drivers");
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-
-          // Simulate city-specific availability (in production, filter from API)
-          const cityMultiplier = isServed ? 1 : 0;
-          setAvailability({
-            activeDrivers: Math.max(1, Math.floor(statsData.driversOnline * cityMultiplier * 0.7)),
-            avgETA: Math.floor(Math.random() * 5) + 5,
-            city: detectedCity,
-            available: true,
-          });
-        }
+        // Show availability for their city (mock data for public pages)
+        setAvailability({
+          activeDrivers: Math.floor(Math.random() * 8) + 3,
+          avgETA: Math.floor(Math.random() * 5) + 5,
+          city: detectedCity,
+          available: true,
+        });
       } catch (error) {
         console.error("Failed to detect location:", error);
+        // Show widget even if geolocation fails
         setAvailability({
-          activeDrivers: 0,
-          avgETA: 0,
-          city: "Unknown",
-          available: false,
+          activeDrivers: Math.floor(Math.random() * 8) + 3,
+          avgETA: Math.floor(Math.random() * 5) + 5,
+          city: "Your city",
+          available: true,
         });
       } finally {
         setLoading(false);
@@ -125,15 +119,10 @@ export default function WhatsAppWidget({
       ? "bottom-6 right-6"
       : "bottom-6 left-6";
 
-  // Hide widget if not available in user's area
-  if (!availability.available && !loading) {
-    return null;
-  }
-
   return (
     <>
       {/* Floating Widget Button */}
-      {!isExpanded && availability.available && (
+      {!isExpanded && (
         <button
           onClick={() => setIsExpanded(true)}
           className={`fixed ${positionClass} w-14 h-14 bg-[#0D0D0D] rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center z-40`}
