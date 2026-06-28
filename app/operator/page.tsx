@@ -1054,13 +1054,13 @@ export default function OperatorBriefing() {
       <div className="mb-16 px-4 md:px-0">
         <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
           <p className="text-xs font-semibold text-[#888888] tracking-[0.15em] uppercase mb-3">
-            Revenue Status
+            Money Made Today
           </p>
           <p className="text-3xl md:text-4xl font-black text-[#0D0D0D] tracking-tight mb-4">
-            {metrics.closedToday}
+            {todayRevenue}
           </p>
           <p className="text-sm text-[#666666] mb-6">
-            Deal{metrics.closedToday !== 1 ? 's' : ''} closed today.
+            Standing orders + driver jobs (resets at 00:00)
           </p>
 
           <div className="flex gap-3">
