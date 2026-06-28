@@ -232,8 +232,8 @@ export default function PhoneOutreachPage() {
                   <li>• Capture email addresses when you reach decision makers</li>
                   <li>• Log outcomes even for voicemails (helps us track reach rate)</li>
                   <li>
-                    <Link href="/operator/campaigns" className="text-[#0D0D0D] font-semibold hover:underline">
-                      View campaign performance →
+                    <Link href="/operator/whatsapp" className="text-[#0D0D0D] font-semibold hover:underline">
+                      View WhatsApp conversations →
                     </Link>
                   </li>
                 </ul>

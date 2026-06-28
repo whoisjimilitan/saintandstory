@@ -657,10 +657,10 @@ export default function OperatorBriefing() {
                   {emailsSentCount > 0 && (
                     <li>
                       <button
-                        onClick={() => router.push("/operator/campaigns")}
+                        onClick={() => router.push("/operator/whatsapp")}
                         className="text-[#0D0D0D] font-semibold hover:underline"
                       >
-                        • Check campaign performance
+                        • Check WhatsApp conversations
                       </button>
                     </li>
                   )}
