@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface Lead {
   firstName: string;
@@ -39,13 +39,12 @@ interface CampaignResponse {
 }
 
 export default function WhatsAppBatchCampaign() {
-  const [campaignName, setCampaignName] = useState("");
-  const [csvData, setCsvData] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [response, setResponse] = useState<CampaignResponse | null>(null);
   const [error, setError] = useState("");
-  const [step, setStep] = useState<"input" | "preview" | "sending">("input");
+  const [fileName, setFileName] = useState("");
 
   // Parse CSV data
   const parseCSV = (text: string): Lead[] => {
@@ -79,37 +78,45 @@ export default function WhatsAppBatchCampaign() {
     return parsedLeads;
   };
 
-  // Handle CSV upload
-  const handleCsvChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    setCsvData(text);
-    const parsed = parseCSV(text);
-    setLeads(parsed);
+  // Handle file upload
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFileName(file.name);
     setError("");
+    setIsGenerating(true);
+
+    try {
+      const text = await file.text();
+      const parsed = parseCSV(text);
+
+      if (parsed.length === 0) {
+        setError("No valid leads found in file");
+        setIsGenerating(false);
+        return;
+      }
+
+      setLeads(parsed);
+
+      // Auto-generate messages immediately
+      const campaignName = file.name.replace(/\.[^/.]+$/, "");
+      await generateMessages(parsed, campaignName);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to read file");
+      setIsGenerating(false);
+    }
   };
 
   // Generate messages
-  const handleGenerateMessages = async () => {
-    if (!campaignName.trim()) {
-      setError("Campaign name is required");
-      return;
-    }
-
-    if (leads.length === 0) {
-      setError("Please provide CSV data with at least one lead");
-      return;
-    }
-
-    setIsGenerating(true);
-    setError("");
-
+  const generateMessages = async (parsedLeads: Lead[], campaignName: string) => {
     try {
       const res = await fetch("/api/b2b/campaigns/generate-messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           campaignName: campaignName.trim(),
-          leads: leads.slice(0, 100),
+          leads: parsedLeads.slice(0, 100),
         }),
       });
 
@@ -119,7 +126,6 @@ export default function WhatsAppBatchCampaign() {
 
       const data: CampaignResponse = await res.json();
       setResponse(data);
-      setStep("preview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate messages");
     } finally {
@@ -127,90 +133,98 @@ export default function WhatsAppBatchCampaign() {
     }
   };
 
-  // STEP 1: Input
-  if (step === "input") {
+  // Upload new file
+  const handleUploadNew = () => {
+    setResponse(null);
+    setLeads([]);
+    setFileName("");
+    setError("");
+    fileInputRef.current?.click();
+  };
+
+  // No file uploaded yet - show upload interface
+  if (!response && leads.length === 0) {
     return (
-      <div className="max-w-4xl">
+      <div className="max-w-2xl">
         <div className="mb-8">
-          <h3 className="text-xl font-black text-[#0D0D0D] mb-2">Upload CSV</h3>
+          <h3 className="text-xl font-black text-[#0D0D0D] mb-2">Upload Lead File</h3>
           <p className="text-sm text-[#666666]">
-            Paste your lead data below. The system will auto-detect fields and generate WhatsApp messages.
+            Upload CSV, Excel, or Google Sheets export. System auto-detects fields and generates messages instantly.
           </p>
         </div>
 
-        <div className="space-y-6">
-          {/* Campaign Name */}
-          <div>
-            <label className="block text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-              Campaign Name
-            </label>
-            <input
-              type="text"
-              value={campaignName}
-              onChange={(e) => setCampaignName(e.target.value)}
-              placeholder="e.g. Manchester Q3 Outreach"
-              className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-            />
+        {/* File Upload Area */}
+        <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-12 text-center hover:border-[#0D0D0D] transition-colors cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <div className="mb-4">
+            <p className="text-3xl mb-2">📄</p>
           </div>
+          <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
+            Drag file here or click to browse
+          </p>
+          <p className="text-xs text-[#888888]">
+            Supports: CSV, XLSX, XLS
+          </p>
+        </div>
 
-          {/* CSV Input */}
-          <div>
-            <label className="block text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-              CSV Data
-            </label>
-            <textarea
-              value={csvData}
-              onChange={handleCsvChange}
-              placeholder="firstName,email,company,groupName,description
-Sarah,sarah@company.com,Acme Trading,Manchester Business,Owner
-Mike,mike@company.com,ABC Corp,SME Support,Manager
-Tom,,,,Operations Director"
-              rows={8}
-              className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none font-mono"
-            />
-            <p className="text-xs text-[#666666] mt-2">
-              Detected: {leads.length} leads | Supported fields: firstName, email, company, groupName, description, linkedinProfile, phoneNumber
-            </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,.xlsx,.xls"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+
+        {error && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+            {error}
           </div>
+        )}
 
-          {/* Error */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-              {error}
-            </div>
-          )}
+        {isGenerating && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-[#666666]">Processing file...</p>
+          </div>
+        )}
 
-          {/* Generate Button */}
-          <button
-            onClick={handleGenerateMessages}
-            disabled={isGenerating || leads.length === 0}
-            className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isGenerating ? "Generating messages..." : `Generate Messages (${leads.length} leads)`}
-          </button>
+        {/* Supported Fields */}
+        <div className="mt-8 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+          <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">
+            Auto-Detected Fields
+          </p>
+          <div className="grid grid-cols-2 gap-2 text-xs text-[#666666]">
+            <div>✓ firstName</div>
+            <div>✓ lastName</div>
+            <div>✓ email</div>
+            <div>✓ phoneNumber</div>
+            <div>✓ company</div>
+            <div>✓ groupName</div>
+            <div>✓ description</div>
+            <div>✓ linkedinProfile</div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // STEP 2: Preview
-  if (step === "preview" && response) {
+  // Messages generated - show results
+  if (response) {
     return (
       <div className="max-w-4xl">
         <div className="mb-8">
-          <button
-            onClick={() => {
-              setStep("input");
-              setResponse(null);
-            }}
-            className="text-sm text-[#0D0D0D] mb-4 hover:underline"
-          >
-            ← Back to upload
-          </button>
-          <h2 className="text-2xl font-black text-[#0D0D0D] mb-2">{response.formatted.campaignName}</h2>
-          <p className="text-sm text-[#666666]">
-            Message Generation Complete • {response.formatted.totalLeads} leads processed
+          <h2 className="text-2xl font-black text-[#0D0D0D] mb-2">
+            {fileName}
+          </h2>
+          <p className="text-sm text-[#666666] mb-4">
+            ✓ Generated {response.formatted.totalLeads} messages
           </p>
+          <button
+            onClick={handleUploadNew}
+            className="text-sm text-[#0D0D0D] hover:underline"
+          >
+            ← Upload another file
+          </button>
         </div>
 
         {/* Strategy Groups */}
@@ -222,7 +236,7 @@ Tom,,,,Operations Director"
                 <div className="flex-1">
                   <div className="mb-3">
                     <p className="text-sm font-semibold text-[#0D0D0D]">
-                      Strategy: {group.description}
+                      {group.description}
                     </p>
                     <p className="text-xs text-[#666666] mt-1">({group.count} leads)</p>
                   </div>
@@ -247,90 +261,22 @@ Tom,,,,Operations Director"
         {/* Grand Summary */}
         <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-6 mb-6">
           <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
-            Total: {response.formatted.grandSummary.totalGenerated} messages generated
+            Total: {response.formatted.grandSummary.totalGenerated} messages ready to send
           </p>
           <div className="space-y-2">
             <p className="text-xs text-[#0D0D0D]">
-              ✓ All messages follow: Acknowledge → Problem → Intro pattern
+              ✓ All messages follow psychology framework
             </p>
             <p className="text-xs text-[#0D0D0D]">
-              ✓ Zero messages end with sales language
-            </p>
-            <p className="text-xs text-[#0D0D0D]">
-              ✓ 100% professionally positioned
+              ✓ {response.formatted.validityReport.valid} valid • {response.formatted.validityReport.invalid} invalid
             </p>
           </div>
         </div>
 
-        {/* Validity Report */}
-        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-6 mb-6">
-          <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Validity Report</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-[#888888] mb-1">Valid Messages</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">
-                {response.formatted.validityReport.valid}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] mb-1">Invalid Messages</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">
-                {response.formatted.validityReport.invalid}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setStep("input");
-              setResponse(null);
-            }}
-            className="flex-1 px-6 py-3 border border-[#E8E8E8] text-[#0D0D0D] font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors"
-          >
-            Regenerate All
-          </button>
-          <button
-            onClick={() => setStep("sending")}
-            className="flex-1 px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors"
-          >
-            Send All Messages
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 3: Sending
-  if (step === "sending") {
-    return (
-      <div className="max-w-4xl">
-        <div className="mb-8">
-          <button
-            onClick={() => setStep("preview")}
-            className="text-sm text-[#0D0D0D] mb-4 hover:underline"
-          >
-            ← Back to preview
-          </button>
-          <h2 className="text-2xl font-black text-[#0D0D0D] mb-2">Send Campaign</h2>
-          <p className="text-sm text-[#666666]">
-            This feature is coming soon. Messages are queued and will be sent via WhatsApp API.
-          </p>
-        </div>
-
-        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-8 text-center">
-          <p className="text-sm text-[#888888] mb-4">
-            Configure WhatsApp API credentials in .env.local to enable live sending
-          </p>
-          <button
-            onClick={() => setStep("preview")}
-            className="px-6 py-3 border border-[#E8E8E8] text-[#0D0D0D] font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors"
-          >
-            Back to Preview
-          </button>
-        </div>
+        {/* Action Button */}
+        <button className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors">
+          Send {response.formatted.validityReport.valid} Messages
+        </button>
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { QueueCenter } from "./queue-center";
 import { DorkInjectModal } from "./dork-inject-modal";
+import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
 
 interface Prospect {
   id: string;
@@ -38,7 +39,7 @@ export default function DiscoverPage() {
     totalCount: 0,
     currentFilter: "all",
   });
-  const [activeTab, setActiveTab] = useState<"google-places">("google-places");
+  const [activeTab, setActiveTab] = useState<"google-places" | "batch-upload">("google-places");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
@@ -354,6 +355,16 @@ export default function DiscoverPage() {
           >
             Google Places
           </button>
+          <button
+            onClick={() => setActiveTab("batch-upload")}
+            className={`px-4 py-3 text-xs font-semibold uppercase tracking-[0.1em] border-b-2 transition-colors ${
+              activeTab === "batch-upload"
+                ? "text-[#0D0D0D] border-[#0D0D0D]"
+                : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+            }`}
+          >
+            Batch Upload
+          </button>
         </div>
 
         {/* ONE-CLICK INJECTION BUTTON */}
@@ -397,7 +408,15 @@ export default function DiscoverPage() {
       {/* Divider */}
       <div className="h-px bg-[#E8E8E8] mb-12"></div>
 
-      {/* Search Section */}
+      {/* BATCH UPLOAD TAB */}
+      {activeTab === "batch-upload" && (
+        <div className="mb-12">
+          <WhatsAppBatchCampaign />
+        </div>
+      )}
+
+      {/* GOOGLE PLACES TAB */}
+      {activeTab === "google-places" && (
       <section className="mb-12">
         <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-6">
           Search Prospects
@@ -493,8 +512,10 @@ export default function DiscoverPage() {
           </label>
         </div>
       </section>
+      )}
 
       {/* Results Section */}
+      {activeTab === "google-places" && (
       <section>
         <div className="mb-6">
           <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em]">
@@ -605,6 +626,7 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+      )}
         </>
       )}
 
