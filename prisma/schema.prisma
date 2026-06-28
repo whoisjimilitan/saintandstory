@@ -254,6 +254,8 @@ model B2bLead {
   engaged_today               Boolean?                     @default(false)
   last_engagement_type        String?
   pipeline_stage              String?                      @default("NEW") @map("pipeline_stage")
+  channel                     String?                      @default("whatsapp") @map("channel")
+  company_size                String?                      @map("company_size")
   b2b_email_events            b2b_email_events[]
   b2b_email_link_clicks       b2b_email_link_clicks[]
   b2b_heat_score_history      b2b_heat_score_history[]

@@ -12,6 +12,8 @@ interface Lead {
   linkedinProfile?: string;
   description?: string;
   businessType?: string;
+  companySize?: "small" | "medium" | "enterprise";
+  channel?: "whatsapp" | "email" | "phone";
 }
 
 interface StrategyGroup {
@@ -46,6 +48,30 @@ export default function WhatsAppBatchCampaign() {
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
 
+  // Detect company size from company name/description
+  const detectCompanySize = (company?: string, description?: string): "small" | "medium" | "enterprise" => {
+    const text = `${company || ""} ${description || ""}`.toLowerCase();
+
+    // Enterprise indicators
+    if (text.match(/\b(plc|ltd|limited|corporation|corp|inc|incorporated|group|holdings|global|international|nationwide|multi-branch|head office)\b/i)) {
+      return "enterprise";
+    }
+
+    // Medium indicators
+    if (text.match(/\b(partnership|associates|consultancy|services|solutions|management|consulting|firm)\b/i)) {
+      return "medium";
+    }
+
+    // Default to small
+    return "small";
+  };
+
+  // Assign channel based on company size
+  const assignChannel = (companySize: "small" | "medium" | "enterprise"): "whatsapp" | "email" => {
+    if (companySize === "small") return "whatsapp";
+    return "email";
+  };
+
   // Parse CSV data
   const parseCSV = (text: string): Lead[] => {
     const lines = text.trim().split("\n");
@@ -71,6 +97,9 @@ export default function WhatsAppBatchCampaign() {
       };
 
       if (lead.firstName) {
+        // Auto-detect company size and assign channel
+        lead.companySize = detectCompanySize(lead.company, lead.description);
+        lead.channel = assignChannel(lead.companySize);
         parsedLeads.push(lead);
       }
     }
@@ -263,13 +292,30 @@ export default function WhatsAppBatchCampaign() {
           <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
             Total: {response.formatted.grandSummary.totalGenerated} messages ready to send
           </p>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <p className="text-xs text-[#0D0D0D]">
               ✓ All messages follow psychology framework
             </p>
             <p className="text-xs text-[#0D0D0D]">
               ✓ {response.formatted.validityReport.valid} valid • {response.formatted.validityReport.invalid} invalid
             </p>
+          </div>
+
+          {/* Channel Breakdown */}
+          <div className="border-t border-[#E8E8E8] pt-4">
+            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">Auto-Routed to Channels</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-white border border-[#E8E8E8] rounded">
+                <p className="text-xs text-[#888888] mb-1">WhatsApp Queue</p>
+                <p className="text-lg font-black text-[#0D0D0D]">{leads.filter(l => l.channel === "whatsapp").length}</p>
+                <p className="text-xs text-[#666666] mt-1">small businesses</p>
+              </div>
+              <div className="p-3 bg-white border border-[#E8E8E8] rounded">
+                <p className="text-xs text-[#888888] mb-1">Email Campaign</p>
+                <p className="text-lg font-black text-[#0D0D0D]">{leads.filter(l => l.channel === "email").length}</p>
+                <p className="text-xs text-[#666666] mt-1">medium/enterprise</p>
+              </div>
+            </div>
           </div>
         </div>
 
