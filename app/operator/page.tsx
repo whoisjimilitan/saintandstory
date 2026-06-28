@@ -520,7 +520,7 @@ export default function OperatorBriefing() {
 
       {/* WHATSAPP QUEUE - Real-Time Conversations */}
       <div className="mb-12 px-4 md:px-0">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">WhatsApp Queue (Real-Time)</h2>
+        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">WhatsApp Queue</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <button
             onClick={() => router.push("/operator/whatsapp")}
@@ -531,7 +531,6 @@ export default function OperatorBriefing() {
                 Active Conversations
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666] mt-2">send messages now</p>
             </div>
           </button>
           <button
@@ -543,7 +542,6 @@ export default function OperatorBriefing() {
                 Ready to Message
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666] mt-2">small businesses</p>
             </div>
           </button>
           <button
@@ -555,7 +553,6 @@ export default function OperatorBriefing() {
                 + New Conversation
               </p>
               <p className="text-sm font-semibold">Start chatting</p>
-              <p className="text-xs text-[#CCCCCC] mt-2">instant messaging</p>
             </div>
           </button>
         </div>
@@ -571,7 +568,7 @@ export default function OperatorBriefing() {
 
       {/* EMAIL CAMPAIGN - Batch Automation */}
       <div className="mb-12 px-4 md:px-0">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Email Campaign (Batch)</h2>
+        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Email Campaign</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <button
             onClick={() => router.push("/operator/outreach")}
@@ -582,7 +579,6 @@ export default function OperatorBriefing() {
                 In Campaign
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">{emailsSentCount || 0}</p>
-              <p className="text-xs text-[#666666] mt-2">medium/enterprise</p>
             </div>
           </button>
           <button
@@ -594,7 +590,6 @@ export default function OperatorBriefing() {
                 Opened Today
               </p>
               <p className="text-2xl font-black text-[#0D0D0D]">0</p>
-              <p className="text-xs text-[#666666] mt-2">auto-sequences running</p>
             </div>
           </button>
           <button
@@ -605,8 +600,7 @@ export default function OperatorBriefing() {
               <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
                 Upload Leads
               </p>
-              <p className="text-sm font-semibold">Create new campaign</p>
-              <p className="text-xs text-[#CCCCCC] mt-2">send emails</p>
+              <p className="text-sm font-semibold">Create campaign</p>
             </div>
           </button>
         </div>
@@ -1091,15 +1085,12 @@ export default function OperatorBriefing() {
           {/* WhatsApp Status */}
           <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
             <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-4">
-              WhatsApp Queue (Real-Time)
+              WhatsApp
             </p>
             <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs text-[#666666]">Ready to message</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">50</p>
-                </div>
-                <div className="text-right text-xs text-[#888888]">small businesses</div>
+              <div>
+                <p className="text-xs text-[#666666]">Ready to message</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">50</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Waiting for reply</p>
@@ -1110,7 +1101,7 @@ export default function OperatorBriefing() {
                 <p className="text-2xl font-black text-[#0D0D0D]">3</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
-                <p className="text-xs text-[#666666]">Standing orders created</p>
+                <p className="text-xs text-[#666666]">Standing orders</p>
                 <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
             </div>
@@ -1119,22 +1110,19 @@ export default function OperatorBriefing() {
           {/* Email Status */}
           <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
             <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-4">
-              Email Campaign (Batch)
+              Email
             </p>
             <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs text-[#666666]">Sent</p>
-                  <p className="text-2xl font-black text-[#0D0D0D]">443</p>
-                </div>
-                <div className="text-right text-xs text-[#888888]">medium/enterprise</div>
+              <div>
+                <p className="text-xs text-[#666666]">Sent</p>
+                <p className="text-2xl font-black text-[#0D0D0D]">443</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
                 <p className="text-xs text-[#666666]">Opened today</p>
                 <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
-                <p className="text-xs text-[#666666]">Clicked links</p>
+                <p className="text-xs text-[#666666]">Clicked</p>
                 <p className="text-2xl font-black text-[#0D0D0D]">0</p>
               </div>
               <div className="border-t border-[#E8E8E8] pt-3">
