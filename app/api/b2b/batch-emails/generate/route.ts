@@ -1,18 +1,18 @@
 /**
  * BATCH EMAIL GENERATION ENDPOINT
  *
- * Uses B2B Email Reasoning Engine (locked 2026-06-25)
+ * Uses Email Engine v4 (Psychology-Locked)
  * Generates ONE optimized email per prospect following:
- * - Four lightbulb ideas
- * - Pain identification by category
- * - Locked email template
- * - No modifications without approval
+ * - Consequence-tier hierarchy (Tier 1/2/3)
+ * - Dynamic pain/promise injection per business type
+ * - Locked sender voice profiles
+ * - Psychology-locked template
  */
 
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateB2BOutreachEmail } from "@/lib/b2b-email-reasoning-engine";
+import { generateEmailV4 } from "@/lib/email-engine-v4";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -100,12 +100,11 @@ export async function POST(request: Request) {
 
     for (const prospect of prospects) {
       try {
-        // Generate email using B2B Email Reasoning Engine (locked)
-        const generatedEmail = generateB2BOutreachEmail(
+        // Generate email using Email Engine v4 (psychology-locked)
+        const emailV4 = generateEmailV4(
           {
             id: prospect.id,
             businessName: prospect.businessName,
-            businessCategory: prospect.businessCategory,
             city: prospect.city,
             email: prospect.email,
           },
@@ -113,17 +112,19 @@ export async function POST(request: Request) {
         );
 
         results.push({
-          prospectId: generatedEmail.prospectId,
-          businessName: generatedEmail.businessName,
-          email: generatedEmail.email,
-          subject: generatedEmail.subject,
-          body: generatedEmail.body,
-          wordCount: generatedEmail.wordCount,
+          prospectId: prospect.id,
+          businessName: prospect.businessName,
+          email: prospect.email,
+          subject: emailV4.subjectLine,
+          body: emailV4.bodyText,
+          wordCount: emailV4.bodyText.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,
           status: "success",
-          painPoint: generatedEmail.painPoint,
-          hasPicture: generatedEmail.hasPicture,
+          pain: emailV4.specificPain,
+          promise: emailV4.specificPromise,
+          consequenceTier: emailV4.consequenceTier,
+          senderVoice: emailV4.senderVoice,
         });
       } catch (prospectError) {
         console.error(
