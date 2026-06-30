@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { QueueCenter } from "./queue-center";
@@ -77,6 +77,7 @@ function detectCategory(businessName: string): string {
 export default function DiscoverPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<DiscoverState>({
     loading: true,
     error: null,
@@ -267,10 +268,16 @@ export default function DiscoverPage() {
         totalCount: data.totalCount || 0,
         currentFilter: `imported from file (${data.importedCount || 0} leads)`,
       }));
-      setShowQueueCenter(true);
+      // Don't use QueueCenter for CSV uploads - show normal results list instead
+      // This provides consistent UX with Google search results
 
       // Reset file input
       e.target.value = "";
+
+      // Auto-scroll to results section
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Upload failed";
@@ -644,6 +651,7 @@ export default function DiscoverPage() {
       )}
 
       {/* Results Section */}
+      <div ref={resultsRef}>
       {activeTab === "google-places" && (
       <section>
         <div className="mb-6">
@@ -828,6 +836,7 @@ export default function DiscoverPage() {
         )}
       </section>
       )}
+      </div>
         </>
       )}
 
