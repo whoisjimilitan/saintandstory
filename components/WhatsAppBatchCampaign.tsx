@@ -167,20 +167,28 @@ export default function WhatsAppBatchCampaign({
           </p>
         </div>
 
-        {/* File Upload Area */}
-        <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-12 text-center hover:border-[#0D0D0D] transition-colors cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <div className="mb-4">
-            <p className="text-3xl mb-2">📄</p>
+        {isGenerating ? (
+          <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-12 text-center">
+            <div className="inline-flex flex-col items-center">
+              <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mb-4"></div>
+              <p className="text-sm text-[#666666]">Processing file...</p>
+            </div>
           </div>
-          <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
-            Drag file here or click to browse
-          </p>
-          <p className="text-xs text-[#888888]">
-            Supports: CSV, XLSX, XLS
-          </p>
-        </div>
+        ) : (
+          <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-12 text-center hover:border-[#0D0D0D] transition-colors cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <div className="mb-4">
+              <p className="text-3xl mb-2">📄</p>
+            </div>
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-2">
+              Drag file here or click to browse
+            </p>
+            <p className="text-xs text-[#888888]">
+              Supports: CSV, XLSX, XLS
+            </p>
+          </div>
+        )}
 
         <input
           ref={fileInputRef}
@@ -188,19 +196,51 @@ export default function WhatsAppBatchCampaign({
           accept=".csv,.xlsx,.xls"
           onChange={handleFileUpload}
           className="hidden"
+          disabled={isGenerating}
         />
 
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-            {error}
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm font-semibold text-red-900 mb-2">Error</p>
+            <p className="text-sm text-red-800 mb-4">{error}</p>
+            <button
+              onClick={() => {
+                setError("");
+                setLeads([]);
+                setFileName("");
+                fileInputRef.current?.click();
+              }}
+              className="text-sm font-semibold text-red-700 hover:text-red-900 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         )}
+      </div>
+    );
+  }
 
-        {isGenerating && (
-          <div className="mt-6 text-center">
-            <p className="text-sm text-[#666666]">Processing file...</p>
-          </div>
-        )}
+  // Show error state if anything failed
+  if (error) {
+    return (
+      <div className="max-w-2xl">
+        <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm font-semibold text-red-900 mb-2">Error Processing Campaign</p>
+          <p className="text-sm text-red-800 mb-4">{error}</p>
+          <button
+            onClick={() => {
+              setError("");
+              setLeads([]);
+              setFileName("");
+              setResponse(null);
+              setCampaignId(null);
+              fileInputRef.current?.click();
+            }}
+            className="px-4 py-2 bg-red-700 text-white rounded text-sm font-semibold hover:bg-red-800 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
