@@ -165,7 +165,10 @@ export async function POST(request: NextRequest) {
           strategy: message.strategy,
           channel: message.channel,
           isValid: message.isValid,
-          psychology: message.psychology
+          askPresent: message.askPresent,
+          questionMarkAtEnd: message.questionMarkAtEnd,
+          psychology: message.psychology,
+          confidenceChecks: message.confidenceChecks
         });
 
         console.log(
