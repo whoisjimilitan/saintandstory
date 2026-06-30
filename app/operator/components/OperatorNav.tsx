@@ -7,7 +7,7 @@ import { useState } from "react";
 const stages = [
   { name: "Today", href: "/operator" },
   { name: "Discover", href: "/operator/discover" },
-  { name: "Reach", href: "/operator/whatsapp" },
+  { name: "Reach", href: "/operator/reach" },
   { name: "Orders", href: "/operator/orders" },
 ];
 
