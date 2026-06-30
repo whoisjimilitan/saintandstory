@@ -62,6 +62,12 @@ export default function EnrichPage() {
   const [editBody, setEditBody] = useState("");
   const [templateMode, setTemplateMode] = useState<"master" | "batch" | null>(null);
 
+  // Campaign metadata state
+  const [campaignName, setCampaignName] = useState(`Campaign ${new Date().toLocaleDateString()}`);
+  const [showSendConfirmation, setShowSendConfirmation] = useState(false);
+  const [campaignSent, setCampaignSent] = useState(false);
+  const [sentCampaignId, setSentCampaignId] = useState<string | null>(null);
+
   // FIXED: Warn before navigating with unsent emails
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -166,7 +172,27 @@ export default function EnrichPage() {
     }
   };
 
-  const handleSendAll = async () => {
+  // Calculate tier breakdown from generated emails
+  const getTierBreakdown = () => {
+    const breakdown = { tier1: 0, tier2: 0, tier3: 0 };
+    generatedEmails.forEach(email => {
+      const prospect = prospects.find(p => p.id === email.prospectId);
+      if (prospect && 'tier' in prospect) {
+        const tier = (prospect as any).tier;
+        if (tier === 1) breakdown.tier1++;
+        else if (tier === 2) breakdown.tier2++;
+        else breakdown.tier3++;
+      }
+    });
+    return breakdown;
+  };
+
+  const handleSendAll = () => {
+    // Show confirmation modal instead of immediately sending
+    setShowSendConfirmation(true);
+  };
+
+  const confirmSend = async () => {
     setSending(true);
     try {
       console.log("[ENRICH] Sending emails:", generatedEmails.length);
@@ -206,14 +232,22 @@ export default function EnrichPage() {
       }));
 
       setSentEmails(sentList);
+      // Generate campaign ID (in P5 this will come from DB)
+      const campaignId = `campaign-${Date.now()}`;
+      setSentCampaignId(campaignId);
+
+      // Mark campaign as sent
+      setCampaignSent(true);
+      setShowSendConfirmation(false);
+
       // FIXED: Clear draft after sending (emails can't be in both draft AND sent)
       setGeneratedEmails([]);
       setActiveTab("sent");
       setCurrentIndex(0);
-      alert(`✓ Sent ${data.sent || sentList.length} emails successfully`);
     } catch (error) {
       console.error("Error sending:", error);
       alert(`Failed to send: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setShowSendConfirmation(false);
     } finally {
       setSending(false);
     }
@@ -225,6 +259,66 @@ export default function EnrichPage() {
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-sm text-[#666666]">Generating emails...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Post-send success screen
+  if (campaignSent && sentEmails.length > 0) {
+    return (
+      <div className="min-h-screen bg-[#F9F9F9] pt-32">
+        <div className="max-w-2xl mx-auto px-4 md:px-0 py-12">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-[#0D0D0D] rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl text-white">✓</span>
+            </div>
+            <h1 className="text-3xl font-black text-[#0D0D0D] mb-3">Campaign sent successfully</h1>
+            <p className="text-lg text-[#666666] mb-8">
+              {sentEmails.length} email{sentEmails.length !== 1 ? 's' : ''} queued for delivery
+            </p>
+          </div>
+
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white mb-8">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Campaign</p>
+                <p className="text-lg font-semibold text-[#0D0D0D]">{campaignName}</p>
+              </div>
+              <div className="border-t border-[#E8E8E8] pt-4">
+                <p className="text-xs text-[#888888] uppercase font-semibold mb-3">Tier breakdown</p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm font-black text-[#0D0D0D]">{getTierBreakdown().tier1}</p>
+                    <p className="text-xs text-[#888888]">Tier 1</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-[#0D0D0D]">{getTierBreakdown().tier2}</p>
+                    <p className="text-xs text-[#888888]">Tier 2</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-[#0D0D0D]">{getTierBreakdown().tier3}</p>
+                    <p className="text-xs text-[#888888]">Tier 3</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push("/operator/reach")}
+              className="flex-1 px-6 py-3 bg-[#0D0D0D] text-white rounded-lg text-sm font-semibold hover:bg-[#333333] transition-colors"
+            >
+              View in REACH
+            </button>
+            <button
+              onClick={() => router.push("/operator/discover")}
+              className="flex-1 px-6 py-3 border border-[#E8E8E8] text-[#0D0D0D] rounded-lg text-sm font-semibold hover:border-[#0D0D0D] transition-colors"
+            >
+              New Campaign
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -516,6 +610,69 @@ export default function EnrichPage() {
                     className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
                   >
                     💾 Save as Master Template
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SEND CONFIRMATION MODAL */}
+        {showSendConfirmation && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full">
+              {/* Modal Header */}
+              <div className="border-b border-[#E8E8E8] p-6">
+                <h2 className="text-lg font-black text-[#0D0D0D]">Send Campaign?</h2>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase block mb-2">Campaign Name</label>
+                  <input
+                    type="text"
+                    value={campaignName}
+                    onChange={(e) => setCampaignName(e.target.value)}
+                    className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+
+                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-4">
+                  <p className="text-xs font-semibold text-[#0D0D0D] mb-3">Tier Breakdown</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-[#0D0D0D]">{getTierBreakdown().tier1}</p>
+                      <p className="text-[10px] text-[#888888] mt-1">Tier 1</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-[#0D0D0D]">{getTierBreakdown().tier2}</p>
+                      <p className="text-[10px] text-[#888888] mt-1">Tier 2</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-[#0D0D0D]">{getTierBreakdown().tier3}</p>
+                      <p className="text-[10px] text-[#888888] mt-1">Tier 3</p>
+                    </div>
+                  </div>
+                  <div className="border-t border-[#E8E8E8] mt-4 pt-4">
+                    <p className="text-sm font-black text-[#0D0D0D]">Total: {generatedEmails.length} emails</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={confirmSend}
+                    disabled={sending}
+                    className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                  >
+                    {sending ? "Sending..." : "✓ Send Campaign"}
+                  </button>
+                  <button
+                    onClick={() => setShowSendConfirmation(false)}
+                    disabled={sending}
+                    className="flex-1 px-4 py-3 border border-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:border-[#0D0D0D] disabled:opacity-50 transition-colors"
+                  >
+                    Cancel
                   </button>
                 </div>
               </div>
