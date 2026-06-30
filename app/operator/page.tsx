@@ -586,6 +586,29 @@ export default function OperatorBriefing() {
         </p>
       </div>
 
+      {/* START CAMPAIGN HERO */}
+      <div className="mb-12 px-4 md:px-0">
+        <button
+          onClick={() => router.push("/operator/discover")}
+          className="w-full bg-[#0D0D0D] text-white rounded-lg p-8 hover:bg-[#1A1A1A] transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.15em] uppercase mb-2">
+                Ready to reach new prospects?
+              </p>
+              <h3 className="text-2xl md:text-3xl font-black text-white mb-1">
+                Start Campaign
+              </h3>
+              <p className="text-sm text-[#AAAAAA]">
+                Upload leads or search by location
+              </p>
+            </div>
+            <div className="text-4xl">→</div>
+          </div>
+        </button>
+      </div>
+
       {/* Quick CRM Search */}
       <div className="mb-8 px-4 md:px-0">
         <button
