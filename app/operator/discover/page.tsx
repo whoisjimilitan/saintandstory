@@ -6,6 +6,7 @@ import Link from "next/link";
 import { QueueCenter } from "./queue-center";
 import { DorkInjectModal } from "./dork-inject-modal";
 import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
+import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 
 interface Prospect {
   id: string;
@@ -18,6 +19,8 @@ interface Prospect {
   status?: string;
   pressureSignal?: string;
   trustSource?: string;
+  tier?: 1 | 2 | 3;
+  category?: string;
 }
 
 interface DiscoverState {
@@ -27,6 +30,48 @@ interface DiscoverState {
   totalCount: number;
   currentFilter: string;
   uploadProgress?: number;
+}
+
+// Helper to detect category from business name
+function detectCategory(businessName: string): string {
+  const name = businessName.toLowerCase();
+
+  // Legal
+  if (name.includes("solicitor") || name.includes("lawyer") || name.includes("legal")) return "Solicitor";
+  if (name.includes("court") || name.includes("bailiff")) return "Legal";
+
+  // Healthcare
+  if (name.includes("hospital") || name.includes("clinic")) return "Hospital";
+  if (name.includes("pharmacy") || name.includes("chemist")) return "Pharmacy";
+  if (name.includes("dental") || name.includes("dentist")) return "Dentist";
+
+  // Real Estate
+  if (name.includes("estate agent") || name.includes("estate") || name.includes("realtor")) return "Estate Agent";
+  if (name.includes("letting") || name.includes("lettings")) return "Lettings";
+  if (name.includes("property")) return "Property";
+
+  // Finance
+  if (name.includes("accountant") || name.includes("accounting")) return "Accountant";
+  if (name.includes("tax")) return "Tax Service";
+  if (name.includes("bookkeeper")) return "Bookkeeper";
+
+  // Trades
+  if (name.includes("plumber") || name.includes("plumbing")) return "Plumber";
+  if (name.includes("electrician") || name.includes("electric")) return "Electrician";
+  if (name.includes("builder") || name.includes("construction")) return "Builder";
+  if (name.includes("architect")) return "Architect";
+
+  // Services
+  if (name.includes("florist")) return "Florist";
+  if (name.includes("restaurant") || name.includes("cafe")) return "Restaurant";
+  if (name.includes("retail") || name.includes("shop")) return "Retail";
+  if (name.includes("event")) return "Event Planning";
+
+  // Production
+  if (name.includes("film") || name.includes("production")) return "Film Production";
+  if (name.includes("tv") || name.includes("television")) return "TV Production";
+
+  return "Business";
 }
 
 export default function DiscoverPage() {
@@ -94,16 +139,23 @@ export default function DiscoverPage() {
         const data = await res.json();
         const resultsData = Array.isArray(data) ? data : data.results || [];
 
+        // Enrich results with tier and category
+        const enrichedResults = resultsData.map((prospect: any) => ({
+          ...prospect,
+          tier: getConsequenceTier(prospect.businessName),
+          category: detectCategory(prospect.businessName),
+        }));
+
         // Store discovery results in sessionStorage for access in Understand page
         if (typeof window !== "undefined") {
-          sessionStorage.setItem("discover_results", JSON.stringify(resultsData));
+          sessionStorage.setItem("discover_results", JSON.stringify(enrichedResults));
           sessionStorage.setItem("discover_timestamp", new Date().toISOString());
         }
 
         setState((s) => ({
           ...s,
           loading: false,
-          results: resultsData,
+          results: enrichedResults,
           totalCount: data.totalCount || (Array.isArray(data) ? data.length : 0),
         }));
       } catch (error) {
@@ -154,10 +206,18 @@ export default function DiscoverPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}: Search failed`);
 
       const data = await res.json();
+
+      // Enrich results with tier and category
+      const enrichedResults = (data.results || []).map((prospect: any) => ({
+        ...prospect,
+        tier: getConsequenceTier(prospect.businessName),
+        category: detectCategory(prospect.businessName),
+      }));
+
       setState((s) => ({
         ...s,
         loading: false,
-        results: data.results || [],
+        results: enrichedResults,
         totalCount: data.totalCount || 0,
         currentFilter: `search="${searchTerm}"${isPostcodeSearch ? ` within ${searchRadius}km` : ""}`,
       }));
@@ -193,10 +253,17 @@ export default function DiscoverPage() {
 
       const data = await res.json();
 
+      // Enrich results with tier and category
+      const enrichedResults = (data.results || []).map((prospect: any) => ({
+        ...prospect,
+        tier: getConsequenceTier(prospect.businessName),
+        category: detectCategory(prospect.businessName),
+      }));
+
       setState((s) => ({
         ...s,
         uploadProgress: undefined,
-        results: data.results || [],
+        results: enrichedResults,
         totalCount: data.totalCount || 0,
         currentFilter: `imported from file (${data.importedCount || 0} leads)`,
       }));
@@ -701,6 +768,24 @@ export default function DiscoverPage() {
                       </p>
                       <p className="text-[9px] text-[#888888]">confidence</p>
                     </div>
+                  )}
+                </div>
+
+                {/* Tier Badge + Category Tag */}
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  {prospect.tier && (
+                    <span className={`text-[10px] font-semibold px-2 py-1 rounded ${
+                      prospect.tier === 1 ? "bg-[#0D0D0D] text-white" :
+                      prospect.tier === 2 ? "bg-[#333333] text-white" :
+                      "bg-[#E8E8E8] text-[#0D0D0D]"
+                    }`}>
+                      TIER {prospect.tier}
+                    </span>
+                  )}
+                  {prospect.category && (
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded border border-[#E8E8E8] text-[#666666]">
+                      {prospect.category}
+                    </span>
                   )}
                 </div>
 
