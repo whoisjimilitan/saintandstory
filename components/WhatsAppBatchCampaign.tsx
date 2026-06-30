@@ -135,13 +135,17 @@ export default function WhatsAppBatchCampaign({
       });
 
       if (!res.ok) {
-        throw new Error("Failed to generate messages");
+        const errorData = await res.json().catch(() => ({}));
+        const errorMsg = errorData?.error || `HTTP ${res.status}: Failed to generate messages`;
+        throw new Error(errorMsg);
       }
 
       const data: CampaignResponse = await res.json();
       setResponse(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate messages");
+      const message = err instanceof Error ? err.message : "Failed to generate messages";
+      console.error("[Campaign Generation Error]", message);
+      setError(message);
     } finally {
       setIsGenerating(false);
     }
