@@ -56,6 +56,7 @@ export default function DiscoverPage() {
   });
   const [manualAddLoading, setManualAddLoading] = useState(false);
   const [showQueueCenter, setShowQueueCenter] = useState(false);
+  const [selectedProspectsForEnrich, setSelectedProspectsForEnrich] = useState<Set<string>>(new Set());
 
   // Parse filter from URL
   const status = searchParams.get("status");
@@ -262,6 +263,21 @@ export default function DiscoverPage() {
       uploadProgress: undefined,
     });
     router.push("/operator/discover");
+  };
+
+  const handlePreviewAndPersonalise = () => {
+    const selectedLeads = state.results.filter(p => selectedProspectsForEnrich.has(p.id));
+    if (selectedLeads.length === 0) {
+      alert("Please select at least one prospect");
+      return;
+    }
+
+    // Store selected leads for ENRICH to use
+    sessionStorage.setItem('enrich_prospects', JSON.stringify(selectedLeads));
+    sessionStorage.setItem('enrich_mode', 'campaign');
+
+    // Navigate to ENRICH
+    router.push('/operator/enrich?mode=campaign');
   };
 
   const handleManualAddSubmit = async (e: React.FormEvent) => {
@@ -607,15 +623,67 @@ export default function DiscoverPage() {
         )}
 
         {!state.loading && !state.error && state.results.length > 0 && (
-          <div className="space-y-4">
+          <div>
+            {/* Selection Bar - Email Channel Only */}
+            {selectedChannel === "email" && (
+              <div className="mb-6 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {selectedProspectsForEnrich.size} selected
+                  </p>
+                  <div className="flex gap-3">
+                    {selectedProspectsForEnrich.size > 0 && (
+                      <>
+                        <button
+                          onClick={handlePreviewAndPersonalise}
+                          className="px-6 py-2 bg-[#0D0D0D] text-white rounded text-sm font-semibold hover:bg-[#333333] transition-colors"
+                        >
+                          Preview & Personalise
+                        </button>
+                        <button
+                          onClick={() => setSelectedProspectsForEnrich(new Set())}
+                          className="px-6 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded text-sm font-semibold hover:border-[#0D0D0D] transition-colors"
+                        >
+                          Clear
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
             {state.results.map((prospect) => (
-              <button
+              <div
                 key={prospect.id}
-                onClick={() => handleProspectClick(prospect)}
-                className="w-full text-left border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all cursor-pointer group"
+                className="flex items-start gap-4 border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:shadow-md transition-all group"
               >
-                {/* Header: Company + Confidence */}
-                <div className="flex items-start justify-between mb-3">
+                {/* Checkbox for Email Channel */}
+                {selectedChannel === "email" && (
+                  <input
+                    type="checkbox"
+                    checked={selectedProspectsForEnrich.has(prospect.id)}
+                    onChange={(e) => {
+                      const newSelected = new Set(selectedProspectsForEnrich);
+                      if (e.target.checked) {
+                        newSelected.add(prospect.id);
+                      } else {
+                        newSelected.delete(prospect.id);
+                      }
+                      setSelectedProspectsForEnrich(newSelected);
+                    }}
+                    className="w-4 h-4 mt-2 accent-[#0D0D0D] cursor-pointer flex-shrink-0"
+                  />
+                )}
+
+                {/* Prospect Info */}
+                <button
+                  onClick={() => handleProspectClick(prospect)}
+                  className="flex-1 text-left cursor-pointer"
+                >
+                  {/* Header: Company + Confidence */}
+                  <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-[#0D0D0D] group-hover:text-[#333333]">
                       {prospect.businessName}
@@ -667,8 +735,10 @@ export default function DiscoverPage() {
                 <p className="text-xs text-[#0D0D0D] font-semibold group-hover:text-[#666666] transition-colors">
                   Qualify This Prospect →
                 </p>
-              </button>
+                </button>
+              </div>
             ))}
+            </div>
           </div>
         )}
       </section>
