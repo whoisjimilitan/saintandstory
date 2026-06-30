@@ -650,10 +650,10 @@ export default function DiscoverPage() {
       </section>
       )}
 
-      {/* Results Section */}
+      {/* Results Section - Shows for both tabs when results exist */}
       <div ref={resultsRef}>
-      {activeTab === "google-places" && (
-      <section>
+      {state.results.length > 0 || state.loading || state.error ? (
+      <section className="mt-12 pt-12 border-t border-[#E8E8E8]">
         <div className="mb-6">
           <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.15em]">
             Results
@@ -835,7 +835,7 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
-      )}
+      ) : null}
       </div>
         </>
       )}

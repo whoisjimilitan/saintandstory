@@ -56,30 +56,8 @@ export default function WhatsAppBatchCampaign({
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [campaignId, setCampaignId] = useState<string | null>(null);
+  const [isCreatingCampaign, setIsCreatingCampaign] = useState(false);
 
-  // Detect company size from company name/description
-  const detectCompanySize = (company?: string, description?: string): "small" | "medium" | "enterprise" => {
-    const text = `${company || ""} ${description || ""}`.toLowerCase();
-
-    // Enterprise indicators
-    if (text.match(/\b(plc|ltd|limited|corporation|corp|inc|incorporated|group|holdings|global|international|nationwide|multi-branch|head office)\b/i)) {
-      return "enterprise";
-    }
-
-    // Medium indicators
-    if (text.match(/\b(partnership|associates|consultancy|services|solutions|management|consulting|firm)\b/i)) {
-      return "medium";
-    }
-
-    // Default to small
-    return "small";
-  };
-
-  // Assign channel based on company size
-  const assignChannel = (companySize: "small" | "medium" | "enterprise"): "whatsapp" | "email" => {
-    if (companySize === "small") return "whatsapp";
-    return "email";
-  };
 
   // Parse CSV data
   const parseCSV = (text: string): Lead[] => {
@@ -106,9 +84,6 @@ export default function WhatsAppBatchCampaign({
       };
 
       if (lead.firstName) {
-        // Auto-detect company size and assign channel
-        lead.companySize = detectCompanySize(lead.company, lead.description);
-        lead.channel = assignChannel(lead.companySize);
         parsedLeads.push(lead);
       }
     }
@@ -294,57 +269,83 @@ export default function WhatsAppBatchCampaign({
             </p>
           </div>
 
-          {/* Channel Breakdown */}
+          {/* Channel Info */}
           <div className="border-t border-[#E8E8E8] pt-4">
-            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">Auto-Routed to Channels</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-white border border-[#E8E8E8] rounded">
-                <p className="text-xs text-[#888888] mb-1">WhatsApp Queue</p>
-                <p className="text-lg font-black text-[#0D0D0D]">{leads.filter(l => l.channel === "whatsapp").length}</p>
-                <p className="text-xs text-[#666666] mt-1">small businesses</p>
-              </div>
-              <div className="p-3 bg-white border border-[#E8E8E8] rounded">
-                <p className="text-xs text-[#888888] mb-1">Email Campaign</p>
-                <p className="text-lg font-black text-[#0D0D0D]">{leads.filter(l => l.channel === "email").length}</p>
-                <p className="text-xs text-[#666666] mt-1">medium/enterprise</p>
-              </div>
+            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">Sending Via</p>
+            <div className="p-3 bg-white border border-[#E8E8E8] rounded">
+              <p className="text-xs text-[#888888] mb-1">{channel === "email" ? "Email Campaign" : "WhatsApp Campaign"}</p>
+              <p className="text-lg font-black text-[#0D0D0D]">{leads.length}</p>
+              <p className="text-xs text-[#666666] mt-1">{channel === "email" ? "leads queued for email" : "leads queued for WhatsApp"}</p>
             </div>
           </div>
         </div>
 
         {/* Action Button */}
-        <button
-          onClick={async () => {
-            try {
-              const res = await fetch("/api/b2b/campaigns/create", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  campaignName: fileName,
-                  channel: channel,
-                  leads: leads.map(l => ({
-                    businessName: l.company,
-                    email: l.email,
-                    phone: l.phoneNumber,
-                    firstName: l.firstName,
-                    companySize: l.companySize,
-                  })),
-                }),
-              });
+        {!campaignId ? (
+          <button
+            onClick={async () => {
+              setIsCreatingCampaign(true);
+              try {
+                const res = await fetch("/api/b2b/campaigns/create", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    campaignName: fileName,
+                    channel: channel,
+                    leads: leads.map(l => ({
+                      businessName: l.company,
+                      email: l.email,
+                      phone: l.phoneNumber,
+                      firstName: l.firstName,
+                      companySize: l.companySize,
+                    })),
+                  }),
+                });
 
-              if (res.ok) {
-                const data = await res.json();
-                setCampaignId(data.campaignId);
-                onCampaignCreated?.();
+                if (res.ok) {
+                  const data = await res.json();
+                  setCampaignId(data.campaignId);
+                } else {
+                  setError("Failed to create campaign");
+                }
+              } catch (err) {
+                setError("Failed to create campaign");
+              } finally {
+                setIsCreatingCampaign(false);
               }
-            } catch (err) {
-              setError("Failed to create campaign");
-            }
-          }}
-          className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors"
-        >
-          Create Campaign
-        </button>
+            }}
+            disabled={isCreatingCampaign}
+            className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isCreatingCampaign ? "Creating Campaign..." : "Create Campaign"}
+          </button>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-6 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg text-center">
+              <p className="text-2xl mb-2">✓</p>
+              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Campaign Created</p>
+              <p className="text-xs text-[#666666]">
+                {leads.length} leads queued for {channel === "email" ? "email" : "WhatsApp"} outreach
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleUploadNew}
+                className="flex-1 px-6 py-3 border border-[#E8E8E8] text-[#0D0D0D] font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors"
+              >
+                Upload Another
+              </button>
+              <button
+                onClick={() => {
+                  onCampaignCreated?.();
+                }}
+                className="flex-1 px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#1A1A1A] transition-colors"
+              >
+                View Campaign
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
