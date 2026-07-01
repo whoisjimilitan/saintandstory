@@ -27,6 +27,7 @@ export interface BusinessPainPromise {
   tier: ConsequenceTier;
   subjectLineVariation: string; // Consequence-based subject line
   description?: string; // Internal note about why this tier
+  closingQuestion?: string; // V5: Specific closing question that forces reply
 }
 
 /**
@@ -122,6 +123,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLineVariation: "Relief timing",
     description: "Pharmacies face patient impact and liability for delayed prescriptions",
+    closingQuestion: "Real question. When a prescription comes in urgent, would a backup courier you can call on demand help you get it out same-day?",
   },
 
   // LEGAL SERVICES (Existing - recategorize to Tier 1)
@@ -140,6 +142,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLineVariation: "Brief timing",
     description: "Lawyers face compliance violations for missed filings",
+    closingQuestion: "Real question. When a brief deadline gets tight, would a backup courier you can call same-day help you sleep better?",
   },
   solicitor: {
     pain: "You operate on thin margins. One missed document deadline = lost client.",
@@ -148,6 +151,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLineVariation: "Brief timing",
     description: "Solicitors lose clients over missed deadlines",
+    closingQuestion: "Genuine question. When a filing deadline gets tight, would a backup courier you can call same-day actually help?",
   },
   attorney: {
     pain: "You handle time-sensitive cases. One missed deadline = case delayed, client frustrated.",

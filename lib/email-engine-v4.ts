@@ -65,15 +65,20 @@ export function generateEmailV4(
   // Mail merge: use firstName if available, fallback to [Name]
   const greeting = prospect.firstName ? prospect.firstName : "[Name]";
 
+  // V5 template: Industry insight + consequence + promise + curiosity question
+  // Get category-specific closing question from pain-promise map
+  const ppmEntry = detectBusinessType(prospect.businessName);
+  const closingQuestion = ppmEntry.closingQuestion || "Real question. When this becomes critical, would a same-day backup help?";
+
   const bodyText = `Hi ${greeting},
 
-Reaching out cold—I know it's bold. But I noticed something with ${seedPlant}
+Apologies. I know it's bold. But I noticed something with ${seedPlant}
 
 ${pain}
 
-We ${promise}
+That's what we do. ${promise}
 
-I'm not saying you need us. You might already have this solved. But if this matters to you, worth a quick conversation.
+${closingQuestion}
 
 ${senderName}
 Saint & Story Logistics`;
