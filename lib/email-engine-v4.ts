@@ -65,17 +65,15 @@ export function generateEmailV4(
   const senderOpening = getSenderOpening(senderName);
   const senderCloser = getSenderCloser(senderName);
 
-  // Detect business type and get pain/promise + consequence-based subject
-  const { pain, promise, subjectLineVariation, tier } = detectBusinessType(prospect.businessName);
+  // Detect business type and get pain/promise + trust-first subject lines
+  const { pain, promise, subjectLines, tier } = detectBusinessType(prospect.businessName);
 
   const city = prospect.city || "your area";
-  const businessType = prospect.businessName.toLowerCase();
+  const businessType = detectBusinessCategory(prospect.businessName);
 
-  // SUBJECT LINE: Dynamic based on business category + tier
-  const subjectLine = subjectLineVariation.replace("{{city}}", city);
-
-  // Get seed plant for this business type
-  const seedPlant = getSeedPlant(businessType, city);
+  // SUBJECT LINE: Intelligently choose from trust-first options (Observation, Human, Shared World, Zero-Marketing)
+  // Pick the first option (can be randomized for A/B testing if needed)
+  const subjectLine = subjectLines && subjectLines.length > 0 ? subjectLines[0] : "One thing I've learnt";
 
   // Mail merge: use firstName if available, fallback to [Name]
   const greeting = prospect.firstName ? prospect.firstName : "[Name]";
