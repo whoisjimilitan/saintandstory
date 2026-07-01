@@ -63,12 +63,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
-      <div className="px-4 md:px-12">
-        {/* Header - Minimal */}
+    <div className="min-h-screen bg-white pt-16 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        {/* Header */}
         <div className="mb-12">
-          <p className="text-lg font-bold text-[#0D0D0D] leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
             Auto Discovery
+          </h1>
+          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
+            Configure discovery settings and manage automated discovery campaigns.
           </p>
         </div>
 

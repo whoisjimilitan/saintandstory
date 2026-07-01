@@ -1,29 +1,34 @@
 import { NextResponse } from "next/server";
-import { generateTrustSignalEmailV2, validateEmailV2 } from "@/lib/trust-signal-email-engine-v2";
-import { getIndustryProfile } from "@/lib/industry-blocker-mapper";
+import { generateEmailV4, type EmailV4 } from "@/lib/email-engine-v4";
 
 /**
- * BATCH 2 REBOOT - Email Generation with Trust Signals
+ * EMAIL GENERATION - VERSION 5 (Production)
  *
- * Generates industry-specific, trust-signal-first emails
- * that reference the specific blocker this business likely faces.
+ * Generates psychology-locked, ready-to-send cold outreach emails
+ * using EMAIL ENGINE V5 (refined post-V4):
  *
- * Not generic pressure templates.
- * Not salesy.
- * Sound like a peer who understands their world.
+ * ✅ 40+ business categories with dynamic seed plants
+ * ✅ Consequence-based pain & promise mappings
+ * ✅ V5 Psychology Stack: Honest opening → Seed Plant → Pain → Promise → Humanized Closer
+ * ✅ Operator preview for further personalization
+ *
+ * SUBJECT: Benefit-focused, category-specific, optimized for opens
+ * BODY: V5 Version with improved grammar and humanized closer
+ *   - Opening: "Some people I know well, others I've barely talked with."
+ *   - Closer: "Just curious if you'd reply. It means a lot. Real conversation starts there."
  */
 
 interface GenerateEmailRequest {
   leadId: string;
   businessName: string;
-  businessCategory?: string;
-  pressureGroup?: string; // Legacy, ignored - we use blocker instead
+  city?: string;
+  senderName?: string;
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json() as GenerateEmailRequest;
-    const { leadId, businessName, businessCategory } = body;
+    const { leadId, businessName, city, senderName = "James" } = body;
 
     if (!leadId || !businessName) {
       return NextResponse.json(
@@ -32,59 +37,63 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate V2 email (concise, psychologically dense, intelligent YES/MAYBE/NO)
-    const emailResult = generateTrustSignalEmailV2({
-      businessName,
-      businessCategory,
-      city: "London" // TODO: Extract from lead data when available
-    });
+    // Generate V5 email using V4 engine (already contains V5 text)
+    const emailV5: EmailV4 = generateEmailV4(
+      {
+        id: leadId,
+        businessName,
+        city: city || "your area",
+        email: undefined
+      },
+      senderName
+    );
 
-    if (!emailResult) {
+    if (!emailV5) {
       return NextResponse.json(
         {
-          error: "Unable to determine industry for this business",
-          category: businessCategory
+          error: "Unable to generate email for this business",
+          businessName
         },
         { status: 400 }
       );
     }
 
-    // Validate for authenticity (conciseness, density, no salesy language)
-    const validation = validateEmailV2(emailResult);
+    console.log("[GENERATE-EMAIL-V5] Generated for:", {
+      businessName,
+      consequenceTier: emailV5.consequenceTier,
+      senderVoice: emailV5.senderVoice
+    });
 
-    if (!validation.isValid) {
-      console.warn("[EMAIL-VALIDATION] Email validation issues:", validation.issues);
-    }
-
-    // Return email with metadata
+    // Return email with full metadata
     return NextResponse.json({
       success: true,
-      phase: "BATCH 2 REBOOT V2 - Concise Trust Signal Email",
+      phase: "EMAIL ENGINE V5 (Production)",
       email: {
         leadId,
         businessName,
-        businessCategory,
+        city: city || "your area",
 
-        // Email content
-        subject: emailResult.subject,
-        body: emailResult.body,
+        // Email content (V5)
+        subject: emailV5.subjectLine,
+        body: emailV5.bodyText,
 
-        // Metadata
-        wordCount: emailResult.wordCount,
-        humanAnchors: emailResult.humanAnchors,
+        // Psychology metadata
+        pain: emailV5.specificPain,
+        promise: emailV5.specificPromise,
+        tier: emailV5.consequenceTier,
+        senderVoice: emailV5.senderVoice,
 
-        // Validation
-        authenticityValid: validation.isValid,
-        validationIssues: validation.issues,
-
-        // Ready?
-        readyForPreview: validation.isValid
+        // System info
+        engine: "email-engine-v4 (contains V5 text)",
+        readyForPreview: true,
+        readyForSend: true,
+        operatorCanEdit: true
       },
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error("[GENERATE-EMAIL] Error:", error);
+    console.error("[GENERATE-EMAIL-V5] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Server error: ${message}` },
