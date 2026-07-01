@@ -111,11 +111,6 @@ export function EmailPreviewModal({
                     {email.body}
                   </div>
                 </div>
-
-                <div className="border-t border-[#E8E8E8] pt-4 flex gap-2 text-[9px] text-[#888888]">
-                  <span>🔹 Pattern: {email.pattern}</span>
-                  <span>🔹 Framework: {email.framework}</span>
-                </div>
               </div>
 
               {/* Action Buttons */}
