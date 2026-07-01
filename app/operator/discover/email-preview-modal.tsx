@@ -7,6 +7,9 @@ interface EmailPreviewModalProps {
   lead: {
     id: string;
     businessName: string;
+    city?: string;
+    email?: string;
+    phone?: string;
   };
   onClose: () => void;
   onApprove: (email: any) => void;
@@ -33,7 +36,8 @@ export function EmailPreviewModal({
         body: JSON.stringify({
           leadId: lead.id,
           businessName: lead.businessName,
-          pressureGroup
+          city: lead.city,
+          senderName: "James"
         })
       });
 
