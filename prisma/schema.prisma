@@ -1325,6 +1325,67 @@ model B2bActivityLog {
   @@map("b2b_activity_log")
 }
 
+model B2bCampaign {
+  id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  channel         String                @map("channel") // email | whatsapp | phone
+  operatorId      String?               @map("operator_id")
+  campaignName    String                @map("campaign_name")
+  totalLeads      Int                   @default(0) @map("total_leads")
+  tierBreakdown   Json?                 @map("tier_breakdown") // {tier1: 10, tier2: 20, tier3: 15}
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  sentAt          DateTime?             @map("sent_at") @db.Timestamptz(6)
+  status          String                @default("draft") @map("status") // draft | sent | paused | completed
+  emails          B2bCampaignEmail[]
+  whatsapp        B2bCampaignWhatsApp[]
+
+  @@index([channel], map: "idx_b2b_campaign_channel")
+  @@index([status], map: "idx_b2b_campaign_status")
+  @@index([sentAt(sort: Desc)], map: "idx_b2b_campaign_sent")
+  @@map("b2b_campaigns")
+}
+
+model B2bCampaignEmail {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campaignId      String    @map("campaign_id") @db.Uuid
+  prospectId      String?   @map("prospect_id") @db.Uuid
+  prospectEmail   String    @map("prospect_email")
+  prospectName    String    @map("prospect_name")
+  tier            Int?      @map("tier") // 1, 2, or 3
+  category        String?   @map("category")
+  subject         String    @map("subject")
+  body            String    @map("body")
+  emailSentAt     DateTime? @map("email_sent_at") @db.Timestamptz(6)
+  openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
+  clickedAt       DateTime? @map("clicked_at") @db.Timestamptz(6)
+  repliedAt       DateTime? @map("replied_at") @db.Timestamptz(6)
+  status          String    @default("pending") @map("status") // pending | sent | opened | clicked | replied
+  campaign        B2bCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId], map: "idx_b2b_campaign_email_campaign")
+  @@index([status], map: "idx_b2b_campaign_email_status")
+  @@index([emailSentAt(sort: Desc)], map: "idx_b2b_campaign_email_sent")
+  @@map("b2b_campaign_emails")
+}
+
+model B2bCampaignWhatsApp {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campaignId      String    @map("campaign_id") @db.Uuid
+  prospectId      String?   @map("prospect_id") @db.Uuid
+  phoneNumber     String    @map("phone_number")
+  prospectName    String    @map("prospect_name")
+  firstMessage    String    @map("first_message")
+  sentAt          DateTime? @map("sent_at") @db.Timestamptz(6)
+  lastMessageAt   DateTime? @map("last_message_at") @db.Timestamptz(6)
+  messageCount    Int       @default(0) @map("message_count")
+  status          String    @default("pending") @map("status") // pending | sent | delivered | read | replied
+  campaign        B2bCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId], map: "idx_b2b_campaign_whatsapp_campaign")
+  @@index([status], map: "idx_b2b_campaign_whatsapp_status")
+  @@index([sentAt(sort: Desc)], map: "idx_b2b_campaign_whatsapp_sent")
+  @@map("b2b_campaign_whatsapp")
+}
+
 enum SignalClassification {
   supports
   contradicts
