@@ -79,7 +79,6 @@ ${promise}
 
 ${closingQuestion}
 
-${senderName}
 Saint & Story
 ${signature}`;
 

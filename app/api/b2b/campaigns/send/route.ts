@@ -11,10 +11,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Map of admin emails to sender info (verified domain only)
 const ADMIN_MAP: Record<string, { name: string; email: string }> = {
-  "whoisjimi.today@gmail.com": { name: "James", email: "james@saintandstoryltd.co.uk" },
-  "james@saintandstoryltd.co.uk": { name: "James", email: "james@saintandstoryltd.co.uk" },
-  "oye@saintandstoryltd.co.uk": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
-  "oyedeleoyepeju2014@gmail.com": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+  "whoisjimi.today@gmail.com": { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" },
+  "james@saintandstoryltd.co.uk": { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" },
+  "oye@saintandstoryltd.co.uk": { name: "Saint & Story", email: "oye@saintandstoryltd.co.uk" },
+  "oyedeleoyepeju2014@gmail.com": { name: "Saint & Story", email: "oye@saintandstoryltd.co.uk" },
 };
 
 interface EmailPayload {
@@ -37,21 +37,28 @@ async function getSenderInfo(): Promise<{ name: string; email: string }> {
       return ADMIN_MAP[userEmail];
     }
 
-    // Fallback to James if admin not mapped
-    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+    // Fallback to Saint & Story if admin not mapped
+    return { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" };
   } catch (error) {
     console.error("[CAMPAIGN SEND] Error getting sender info:", error);
-    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+    return { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" };
   }
 }
 
 function buildEmailHtml(email: EmailPayload, sender: { name: string; email: string }): string {
-  const senderPhone = sender.name === "James" ? "+44 20 3318 1234" : "+44 20 3318 5678";
+  // Use phone based on email domain
+  const senderPhone = sender.email.includes("james@") ? "+44 20 3318 1234" : "+44 20 3318 5678";
   const senderAddress = "Saint & Story, London, UK";
   const websiteUrl = "https://saintandstoryltd.co.uk";
 
   // Build CTA link with pre-populated form
   const ctaLink = `mailto:${sender.email}?subject=Re: Let's talk&body=Hi ${sender.name},%0A%0AI'd like to discuss how Saint & Story could help us improve our deliveries.%0A%0AName:%0ARole:%0ACompany: ${email.prospectName || ""}%0ABest time to reach me:%0A%0AThanks`;
+
+  // Parse body to separate main content from tagline (last 2 lines: "Saint & Story" + signature)
+  const lines = email.body.split("\n");
+  const taglineStartIndex = Math.max(0, lines.length - 2);
+  const mainContent = lines.slice(0, taglineStartIndex).join("\n").trim();
+  const taglineText = lines.slice(taglineStartIndex).join("\n").trim();
 
   return `
 <!DOCTYPE html>
@@ -64,6 +71,7 @@ function buildEmailHtml(email: EmailPayload, sender: { name: string; email: stri
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
     .greeting { margin-bottom: 16px; }
     .body-text { margin-bottom: 16px; white-space: pre-wrap; }
+    .tagline-section { margin-top: 16px; font-size: 11px; color: #999999; white-space: pre-wrap; }
     .cta-section { margin: 24px 0; }
     .cta-button {
       display: inline-block;
@@ -84,7 +92,9 @@ function buildEmailHtml(email: EmailPayload, sender: { name: string; email: stri
   <div class="container">
     <div class="greeting">Hi ${email.prospectName},</div>
 
-    <div class="body-text">${email.body}</div>
+    <div class="body-text">${mainContent}</div>
+
+    <div class="tagline-section">${taglineText}</div>
 
     <div class="cta-section">
       <a href="${ctaLink}" class="cta-button">Let's talk</a>

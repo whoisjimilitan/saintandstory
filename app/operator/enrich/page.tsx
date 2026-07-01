@@ -198,15 +198,18 @@ export default function EnrichPage() {
       console.log("[ENRICH] Sending campaign:", campaignName);
 
       // Build emails payload with full metadata for campaign tracking
-      const emailsToSend = generatedEmails.map(email => ({
-        prospectId: email.prospectId,
-        prospectName: email.businessName,
-        prospectEmail: email.email,
-        subject: email.subject,
-        body: email.body,
-        tier: email.characterMeta?.tier || 1,
-        category: email.characterMeta?.category || "Business",
-      }));
+      const emailsToSend = generatedEmails.map(email => {
+        const prospect = prospects.find(p => p.id === email.prospectId);
+        return {
+          prospectId: email.prospectId,
+          prospectName: prospect?.contactName || email.prospectName || "[Name]",
+          prospectEmail: email.email,
+          subject: email.subject,
+          body: email.body,
+          tier: email.characterMeta?.tier || 1,
+          category: email.characterMeta?.category || "Business",
+        };
+      });
 
       console.log("[ENRICH] Campaign:", { campaignName, emails: emailsToSend.length });
 
@@ -232,14 +235,17 @@ export default function EnrichPage() {
       console.log("[ENRICH] Campaign sent:", data);
 
       // Show sent emails with real campaign ID from database
-      const sentList = generatedEmails.map(email => ({
-        id: email.prospectId,
-        prospectName: email.businessName,
-        prospectEmail: email.email,
-        subject: email.subject,
-        sentAt: new Date().toISOString(),
-        replied: false
-      }));
+      const sentList = generatedEmails.map(email => {
+        const prospect = prospects.find(p => p.id === email.prospectId);
+        return {
+          id: email.prospectId,
+          prospectName: prospect?.contactName || email.prospectName || "[Name]",
+          prospectEmail: email.email,
+          subject: email.subject,
+          sentAt: new Date().toISOString(),
+          replied: false
+        };
+      });
 
       setSentEmails(sentList);
       // Use real campaign ID from database response
