@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const stages = [
-  { name: "Today", href: "/operator" },
-  { name: "Discover", href: "/operator/discover" },
-  { name: "Reach", href: "/operator/reach" },
-  { name: "Contracts", href: "/operator/contracts" },
+  { name: "Today", href: "/operator", desc: "Command center" },
+  { name: "Discover", href: "/operator/discover", desc: "Upload leads" },
+  { name: "Reach", href: "/operator/reach", desc: "Send campaigns" },
+  { name: "Responses", href: "/operator/responses", desc: "Monitor replies" },
+  { name: "Contracts", href: "/operator/contracts", desc: "Track outcomes" },
 ];
 
 export function OperatorNav() {
