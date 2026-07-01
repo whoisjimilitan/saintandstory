@@ -69,7 +69,7 @@ ${pain}
 
 We ${promise}
 
-Should we be talking? Your reply matters. Lasting relationships form from boldness like this :)
+Should we be talking? Your reply matters. Lasting relationships form from conversations that start this way :)
 
 ${senderName}
 Saint & Story Logistics`;
