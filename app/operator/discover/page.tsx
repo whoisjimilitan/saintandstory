@@ -379,7 +379,7 @@ export default function DiscoverPage() {
                       type="checkbox"
                       checked={selectedLeads.has(prospect.id)}
                       onChange={() => {}}
-                      className="w-4 h-4 cursor-pointer"
+                      className="w-4 h-4 cursor-pointer accent-[#0D0D0D]"
                     />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-[#0D0D0D]">{prospect.businessName}</p>
