@@ -80,26 +80,22 @@ export function generateEmailV4(
   // Mail merge: use firstName if available, fallback to [Name]
   const greeting = prospect.firstName ? prospect.firstName : "[Name]";
 
-  // V5 template: Industry insight + consequence + promise + curiosity question
-  // Get category-specific data from pain-promise map
+  // Get category-specific closing question from pain-promise map
   const ppmEntry = detectBusinessType(prospect.businessName);
-  const closingQuestion = ppmEntry.closingQuestion || "Real question. When this becomes critical, would a same-day backup help?";
-  const industryInsight = ppmEntry.industryInsight || `the increase in missed deadlines with ${seedPlant}`;
+  const closingQuestion = ppmEntry.closingQuestion || "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?";
 
   // Dynamic tagline: "Simplifying Logistics for [Category]"
   const businessCategory = formatBusinessTypeForTagline(businessType);
   const dynamicTagline = `Simplifying Logistics for ${businessCategory}`;
 
-  // V5 opening: Industry trend + their specific seed plant
-  const openingObservation = `But I noticed ${industryInsight}.`;
-
+  // Trust-first template: Disarm → Understand → Demonstrate character → Invite conversation
   const bodyText = `Hi ${greeting},
 
-Apologies. I know it's bold emailing you cold. ${openingObservation}
+Apologies. I know it's unusual emailing you out of the blue.
 
 ${pain}
 
-That's what we do. ${promise}
+${promise}
 
 ${closingQuestion}
 
