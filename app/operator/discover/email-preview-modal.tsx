@@ -32,7 +32,13 @@ export function EmailPreviewModal({
     setError(null);
 
     try {
-      const senderName = user?.firstName || "James";
+      // Map Clerk firstName to preferred signature name
+      const nameMap: Record<string, string> = {
+        "Jimi": "James",
+        "Oye": "Oye"
+      };
+      const firstName = user?.firstName || "James";
+      const senderName = nameMap[firstName] || firstName;
       const res = await fetch("/api/b2b/dork-search/generate-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
