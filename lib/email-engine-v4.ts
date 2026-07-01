@@ -81,17 +81,21 @@ export function generateEmailV4(
   const greeting = prospect.firstName ? prospect.firstName : "[Name]";
 
   // V5 template: Industry insight + consequence + promise + curiosity question
-  // Get category-specific closing question from pain-promise map
+  // Get category-specific data from pain-promise map
   const ppmEntry = detectBusinessType(prospect.businessName);
   const closingQuestion = ppmEntry.closingQuestion || "Real question. When this becomes critical, would a same-day backup help?";
+  const industryInsight = ppmEntry.industryInsight || `the increase in missed deadlines with ${seedPlant}`;
 
   // Dynamic tagline: "Simplifying Logistics for [Category]"
   const businessCategory = formatBusinessTypeForTagline(businessType);
   const dynamicTagline = `Simplifying Logistics for ${businessCategory}`;
 
+  // V5 opening: Industry trend + their specific seed plant
+  const openingObservation = `But I noticed ${industryInsight}.`;
+
   const bodyText = `Hi ${greeting},
 
-Apologies. I know it's bold emailing you cold. But I noticed something with ${seedPlant}
+Apologies. I know it's bold emailing you cold. ${openingObservation}
 
 ${pain}
 
