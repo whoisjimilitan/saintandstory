@@ -189,7 +189,7 @@ export default async function AdminPage() {
       <AdminLocationUpdater />
 
       {/* Premium Header Section */}
-      <div className="px-4 md:px-8 lg:px-12 pt-24 pb-12">
+      <div className="px-4 md:px-8 lg:px-12 pt-16 pb-16">
         <div className="flex items-start justify-between mb-12">
           <div></div>
 
@@ -220,10 +220,10 @@ export default async function AdminPage() {
 
         {/* Hero Section - Premium Bold Aesthetic */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
             Fleet dashboard.
           </h1>
-          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
             Live job dispatch and driver status.
           </p>
         </div>

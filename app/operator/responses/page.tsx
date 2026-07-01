@@ -44,6 +44,15 @@ export default function ResponsesPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // ESC key closes modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedReply(null);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
   const filteredReplies =
     filterTier === "all" ? replies : replies.filter(r => r.tier === filterTier);
 
@@ -73,7 +82,7 @@ export default function ResponsesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-16 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-12">
@@ -90,7 +99,7 @@ export default function ResponsesPage() {
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Summary
           </p>
-          <div className="grid grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
@@ -117,7 +126,7 @@ export default function ResponsesPage() {
               <button
                 key={tier}
                 onClick={() => setFilterTier(tier === "all" ? "all" : tier)}
-                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                className={`px-4 py-2 rounded text-sm font-semibold transition-colors duration-200 ${
                   filterTier === tier
                     ? "bg-[#0D0D0D] text-white"
                     : "bg-[#F9F9F9] text-[#0D0D0D] hover:bg-[#E8E8E8]"
@@ -152,7 +161,7 @@ export default function ResponsesPage() {
                   <div
                     key={reply.id}
                     onClick={() => setSelectedReply(reply)}
-                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors cursor-pointer"
+                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors duration-200 cursor-pointer"
                   >
                     <div className="flex items-start justify-between">
                     <div className="flex-1">

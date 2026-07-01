@@ -94,7 +94,7 @@ export default function ReachPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-16 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-12">
@@ -111,7 +111,7 @@ export default function ReachPage() {
           <div className="flex gap-8">
             <button
               onClick={() => setActiveTab("email")}
-              className={`pb-3 border-b-2 font-semibold text-sm transition-colors ${
+              className={`pb-3 border-b-2 font-semibold text-sm transition-colors duration-200 ${
                 activeTab === "email"
                   ? "text-[#0D0D0D] border-[#0D0D0D]"
                   : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
@@ -121,7 +121,7 @@ export default function ReachPage() {
             </button>
             <button
               onClick={() => setActiveTab("whatsapp")}
-              className={`pb-3 border-b-2 font-semibold text-sm transition-colors ${
+              className={`pb-3 border-b-2 font-semibold text-sm transition-colors duration-200 ${
                 activeTab === "whatsapp"
                   ? "text-[#0D0D0D] border-[#0D0D0D]"
                   : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
@@ -137,7 +137,7 @@ export default function ReachPage() {
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Summary
           </p>
-          <div className="grid grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">{activeTab === "email" ? "Sent" : "Active"}</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.active}</p>
@@ -171,7 +171,7 @@ export default function ReachPage() {
             ) : (
               <div className="space-y-4">
                 {activeCampaigns.map(campaign => (
-                  <div key={campaign.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors">
+                  <div key={campaign.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors duration-200">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[#0D0D0D]">{campaign.campaignName}</p>
