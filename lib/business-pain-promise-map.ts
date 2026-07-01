@@ -52,7 +52,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   // ═══════════════════════════════════════════════════════════════════
 
   court: {
-    pain: "One thing I've learnt is that it's rarely the case itself that gets stalled. It's usually when documents don't get served by the deadline.",
+    pain: "Court cases rarely get stalled because of the legal work itself. It's usually when service of documents—like those with court deadlines—doesn't happen on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -66,7 +66,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   bailiff: {
-    pain: "One thing I've learnt is that it's rarely the enforcement work that fails. It's usually when service deadlines are tight and timing matters most.",
+    pain: "Enforcement actions rarely fail because of the legal work itself. It's usually when service—like those with specific date requirements—has to happen on schedule.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -80,7 +80,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   process_server: {
-    pain: "One thing I've learnt is that it's rarely the process that stalls prosecutions. It's usually when service windows close and deadlines pass.",
+    pain: "Prosecutions rarely stall because of the process itself. It's usually when service of documents—like those with court-ordered deadlines—needs to happen on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -95,7 +95,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
 
   insurance_company: {
-    pain: "One thing I've learnt is that it's rarely the policies that cause compliance issues. It's usually when regulatory deadlines get missed in the process.",
+    pain: "Compliance rarely fails because of the policies themselves. It's usually when regulatory filings—like those with fixed deadlines—need to be submitted on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -109,7 +109,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   insurance_broker: {
-    pain: "One thing I've learnt is that it's rarely the insurance that disappoints clients. It's usually when policies don't get delivered when promised.",
+    pain: "Client relationships rarely break because of the insurance itself. It's usually when policy documents—like those needed for coverage—don't arrive when promised.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -124,7 +124,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
 
   hospital: {
-    pain: "One thing I've learnt is that it's rarely the procedure that gets delayed. It's usually when supplies don't arrive exactly when they're needed most.",
+    pain: "Patient care rarely gets delayed because of the procedure itself. It's usually when supplies or equipment—like those needed for surgery—don't arrive exactly when scheduled.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -138,7 +138,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   surgical_supplies: {
-    pain: "One thing I've learnt is that it's rarely the supply chain planning that creates problems. It's usually when something unexpected happens and timing becomes critical.",
+    pain: "Operating schedules rarely slip because of supply planning itself. It's usually when critical supplies—like those for the scheduled procedure—don't arrive on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -152,7 +152,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   medical_devices: {
-    pain: "One thing I've learnt is that it's rarely the equipment that causes problems. It's usually when something changes and the original timeline no longer works.",
+    pain: "Procedures rarely get postponed because of the equipment itself. It's usually when devices—like those needed for the scheduled procedure—don't arrive on the scheduled date.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -166,7 +166,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   clinic: {
-    pain: "One thing I've learnt is that it's rarely the care plan that becomes the problem. It's usually when something urgent changes and timing becomes critical.",
+    pain: "Patient care rarely suffers because of the treatment plan itself. It's usually when supplies—like those needed for urgent care—don't arrive when the patient does.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -180,7 +180,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   pharmacy: {
-    pain: "One thing I've learnt is that it's rarely the medicine that causes the problem. It's usually when someone's relief depends on timing.",
+    pain: "Patient relief rarely gets delayed because of the medicine itself. It's usually when prescriptions need to be filled and delivered on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -209,7 +209,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   lawyer: {
-    pain: "One thing I've learnt is that it's rarely the legal work that misses court deadlines. It's usually when filing documents don't reach the court on time.",
+    pain: "Case deadlines rarely slip because of the legal preparation. It's usually when documents need to be filed and timing becomes critical.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -223,7 +223,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   solicitor: {
-    pain: "One thing I've learnt is that it's rarely the legal work that misses filing deadlines. It's usually when delivery becomes the variable you can't control.",
+    pain: "Filing deadlines rarely become stressful because of the legal work itself. It's usually when something outside your control—like a time-critical delivery—doesn't go to plan.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
@@ -256,7 +256,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   // ═══════════════════════════════════════════════════════════════════
 
   film_production: {
-    pain: "One thing I've learnt is that it's rarely the creative work that blows the budget. It's usually when equipment doesn't arrive exactly when you need to shoot.",
+    pain: "Shoots rarely run over budget because of the creative work itself. It's usually when equipment—like cameras or lighting—needs to arrive exactly when filming starts.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
@@ -362,7 +362,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   // ═══════════════════════════════════════════════════════════════════
 
   estate_agent: {
-    pain: "One thing I've learnt is that it's rarely the property that falls through. It's usually when paperwork becomes the thing that slips.",
+    pain: "Property sales rarely collapse because of the properties themselves. It's usually when completion documents—like those needed to exchange—don't arrive on the agreed date.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
@@ -419,7 +419,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
 
   accounting: {
-    pain: "One thing I've learnt is that it's rarely the accounting that misses tax deadlines. It's usually when documents don't arrive when they're due.",
+    pain: "Tax deadlines rarely cause problems because of the accounting work itself. It's usually when filings—like those that are time-sensitive—need to be submitted on the deadline.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
@@ -433,8 +433,8 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   accountant: {
-    pain: "One thing I've learnt is that tax deadlines rarely stress you because of the accounting work itself. It's usually when document delivery gets delayed.",
-    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    pain: "Tax deadlines rarely stress you because of the accounting itself. It's usually when documents—like those needed for filing—don't arrive when they're due.",
+    promise: "If that ever happens with us, we'll take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When deadlines matter"],
@@ -447,8 +447,8 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   tax: {
-    pain: "One thing I've learnt is that audit risk rarely increases because of the filings themselves. It's usually when deadline deliveries become unreliable.",
-    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    pain: "Audit risk rarely increases because of the filings themselves. It's usually when compliance documents—like those for regulatory deadlines—don't arrive on time.",
+    promise: "If that ever happens with us, we'll take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When filings matter"],
@@ -476,7 +476,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
 
   construction: {
-    pain: "One thing I've learnt is that it's rarely the building plans that cause delays. It's usually when materials don't show up on the schedule you need them.",
+    pain: "Projects rarely slip because of the building plans themselves. It's usually when materials—like those needed for the next phase—don't arrive on schedule.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
@@ -633,7 +633,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
 
   florist: {
-    pain: "One thing I've learnt is that it's rarely the flowers that disappoint. It's usually when delivery timing slips and the moment passes.",
+    pain: "Weddings rarely look wrong because of the flowers themselves. It's usually when arrangements—like those needed for the ceremony—don't arrive exactly on time.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
@@ -647,7 +647,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   event_planning: {
-    pain: "One thing I've learnt is that it's rarely the event plan that fails. It's usually when suppliers don't deliver exactly when they promised.",
+    pain: "Events rarely fall apart because of the planning itself. It's usually when supplier deliveries—like decorations or catering materials—need to arrive on event day.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
@@ -675,7 +675,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   restaurant: {
-    pain: "One thing I've learnt is that it's rarely the food quality that causes service problems. It's usually when critical supplies aren't there before doors open.",
+    pain: "Service quality rarely fails because of the food itself. It's usually when critical supplies—like ingredients or stock—don't arrive before doors open.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
