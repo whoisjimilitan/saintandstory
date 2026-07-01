@@ -178,42 +178,43 @@ export default function ContractsPage() {
                     onClick={() => setSelectedContract(contract)}
                     className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors cursor-pointer"
                   >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">
-                          {contract.businessName}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <p className="text-sm font-semibold text-[#0D0D0D]">
+                            {contract.businessName}
+                          </p>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-semibold ${
+                              contract.active
+                                ? "bg-[#0D0D0D] text-white"
+                                : "bg-[#E8E8E8] text-[#0D0D0D]"
+                            }`}
+                          >
+                            {contract.active ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#888888] mb-1">
+                          {contract.contactName || "No contact"} •{" "}
+                          {contract.contactEmail || contract.contactPhone || "No contact info"}
                         </p>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${
-                            contract.active
-                              ? "bg-[#0D0D0D] text-white"
-                              : "bg-[#E8E8E8] text-[#0D0D0D]"
-                          }`}
-                        >
-                          {contract.active ? "Active" : "Inactive"}
-                        </span>
+                        <p className="text-xs text-[#666666]">
+                          {contract.serviceType || "Service"} • {getFrequencyLabel(contract.frequency)} •{" "}
+                          {getDayName(contract.dayOfWeek)}
+                        </p>
                       </div>
-                      <p className="text-xs text-[#888888] mb-1">
-                        {contract.contactName || "No contact"} •{" "}
-                        {contract.contactEmail || contract.contactPhone || "No contact info"}
-                      </p>
-                      <p className="text-xs text-[#666666]">
-                        {contract.serviceType || "Service"} • {getFrequencyLabel(contract.frequency)} •{" "}
-                        {getDayName(contract.dayOfWeek)}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end flex-shrink-0">
-                      <p className="text-sm font-black text-[#0D0D0D] mb-1">
-                        £{parseFloat(contract.price || "0").toFixed(2)}
-                      </p>
-                      <p className="text-xs text-[#888888]">
-                        {formatDate(contract.createdAt)}
-                      </p>
+                      <div className="flex flex-col items-end flex-shrink-0">
+                        <p className="text-sm font-black text-[#0D0D0D] mb-1">
+                          £{parseFloat(contract.price || "0").toFixed(2)}
+                        </p>
+                        <p className="text-xs text-[#888888]">
+                          {formatDate(contract.createdAt)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>
