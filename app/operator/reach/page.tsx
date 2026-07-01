@@ -51,8 +51,8 @@ export default function ReachPage() {
     };
 
     fetchCampaigns();
-    // Refresh every 5 seconds for near-real-time updates
-    const interval = setInterval(fetchCampaigns, 5000);
+    // Refresh every 15 seconds silently (background only)
+    const interval = setInterval(fetchCampaigns, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -103,7 +103,7 @@ export default function ReachPage() {
               Reach
             </h1>
             <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-              Track campaign performance across email and WhatsApp. Auto-refreshes every 5 seconds.
+              Track campaign performance across email and WhatsApp.
             </p>
           </div>
           <button
