@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { getTier1Businesses, getTier2Businesses } from "@/lib/business-pain-promise-map";
+import { useToast } from "@/app/providers/ToastProvider";
+import { getTier1Businesses, getTier2Businesses, getTier3Businesses } from "@/lib/business-pain-promise-map";
 
 interface TierConfig {
   tier: 1 | 2 | 3;
@@ -19,9 +20,13 @@ const TIER_DESCRIPTIONS = {
 };
 
 export default function SettingsPage() {
+  const { showToast } = useToast();
   const tier1Categories = getTier1Businesses();
   const tier2Categories = getTier2Businesses();
-  const tier3Categories = ["estate_agent", "realtor", "lettings", "accounting_firm", "tax_service", "architecture_firm", "construction_company", "florist", "event_planning", "retail", "hospitality", "restaurant", "cafe"];
+  const tier3Categories = getTier3Businesses();
+
+  const [discoveryRunning, setDiscoveryRunning] = useState(false);
+  const [discoveryResult, setDiscoveryResult] = useState<any>(null);
 
   const [configs, setConfigs] = useState<TierConfig[]>([
     {
@@ -56,6 +61,44 @@ export default function SettingsPage() {
 
   const handleChangePriority = (tier: 1 | 2 | 3, priority: number) => {
     setConfigs(configs.map((c) => (c.tier === tier ? { ...c, priority } : c)));
+  };
+
+  const handleStartDiscovery = async () => {
+    setDiscoveryRunning(true);
+    setDiscoveryResult(null);
+
+    try {
+      const res = await fetch("/api/operator/trigger-discovery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tiers: configs }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setDiscoveryResult(data);
+        showToast({
+          title: "Discovery Started",
+          description: `Found ${data.leadsFound} leads across ${data.tiersProcessed} tiers.`,
+          type: "success",
+        });
+      } else {
+        showToast({
+          title: "Discovery Failed",
+          description: data.error || "Failed to start discovery",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      showToast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to start discovery",
+        type: "error",
+      });
+    } finally {
+      setDiscoveryRunning(false);
+    }
   };
 
   const enabledTiers = configs.filter((c) => c.enabled);
@@ -137,6 +180,47 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
+
+        {/* Start Discovery Button */}
+        <div className="mt-8 pt-8 border-t border-[#E8E8E8]">
+          <button
+            onClick={handleStartDiscovery}
+            disabled={discoveryRunning || enabledTiers.length === 0}
+            className={`px-6 py-3 font-semibold rounded text-white text-sm transition-all ${
+              discoveryRunning || enabledTiers.length === 0
+                ? "bg-[#CCCCCC] cursor-not-allowed"
+                : "bg-[#0D0D0D] hover:bg-[#333333]"
+            }`}
+          >
+            {discoveryRunning ? "🔄 Discovery Running..." : "Start Discovery Now"}
+          </button>
+          <p className="text-xs text-[#888888] mt-2">
+            {enabledTiers.length === 0
+              ? "Enable at least one tier to start discovery"
+              : "Searches all enabled tiers across UK cities. Takes 2-5 minutes."}
+          </p>
+        </div>
+
+        {/* Discovery Results */}
+        {discoveryResult && (
+          <div className="mt-8 p-6 bg-[#F0F9FF] border border-[#B3E5FC] rounded-lg">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">✅ Discovery Complete</p>
+            <div className="space-y-2 text-xs text-[#666666]">
+              <p>
+                <span className="font-semibold">{discoveryResult.leadsFound}</span> leads found
+              </p>
+              <p>
+                <span className="font-semibold">{discoveryResult.tiersProcessed}</span> tiers processed
+              </p>
+              <p>
+                <span className="font-semibold">{discoveryResult.leadsTotal}</span> total leads in database
+              </p>
+              <p className="text-[#999999] mt-3">
+                Results will appear on the TODAY page within 30 seconds.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Info */}
         <div className="mt-12 p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">

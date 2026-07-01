@@ -511,6 +511,15 @@ export function getTier2Businesses(): string[] {
 }
 
 /**
+ * Get all Tier 3 (MOTIVATED) business types
+ */
+export function getTier3Businesses(): string[] {
+  return Object.entries(BUSINESS_PAIN_PROMISE_MAP)
+    .filter(([_, value]) => value.tier === 3)
+    .map(([key, _]) => key);
+}
+
+/**
  * Check if business is Tier 1 (ULTRA_MOTIVATED)
  */
 export function isTier1(businessName: string): boolean {
