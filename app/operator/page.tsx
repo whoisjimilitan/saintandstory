@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Pusher from "pusher-js";
 import { useToast } from "@/app/providers/ToastProvider";
+import { OperatorCommandCenter } from "@/components/OperatorCommandCenter";
 
 // Premium single-color icons
 const Icons = {
@@ -174,6 +175,34 @@ export default function OperatorBriefing() {
   const [emailStats, setEmailStats] = useState({ inCampaign: 0, openedToday: 0, clickedToday: 0, repliedToday: 0 });
   const [driverStats, setDriverStats] = useState({ totalDrivers: 0, driversOnline: 0, driversAvailableToday: 0 });
   const [revenueStats, setRevenueStats] = useState({ totalRevenue: "£0", standingOrderRevenue: "£0", jobRevenue: "£0" });
+
+  // NEW: Command center stats from new campaign system
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+
+  // NEW: Load live campaign dashboard stats (command center)
+  useEffect(() => {
+    const loadDashboardStats = async () => {
+      try {
+        setDashboardLoading(true);
+        const res = await fetch("/api/operator/dashboard-stats");
+        if (res.ok) {
+          const data = await res.json();
+          setDashboardStats(data);
+          console.log("[TODAY] Loaded dashboard stats:", data);
+        }
+      } catch (error) {
+        console.error("[TODAY] Failed to load dashboard stats:", error);
+      } finally {
+        setDashboardLoading(false);
+      }
+    };
+
+    loadDashboardStats();
+    // Refresh every 30 seconds for live updates
+    const interval = setInterval(loadDashboardStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const today = new Date();
@@ -585,6 +614,9 @@ export default function OperatorBriefing() {
           Here's what needs your attention today.
         </p>
       </div>
+
+      {/* COMMAND CENTER - Real-time dashboard for new campaign system */}
+      <OperatorCommandCenter />
 
       {/* START CAMPAIGN HERO */}
       <div className="mb-12 px-4 md:px-0">
