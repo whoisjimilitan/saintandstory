@@ -253,73 +253,60 @@ export default function WhatsAppBatchCampaign({
   if (response) {
     return (
       <div className="max-w-4xl">
-        <div className="mb-8">
-          <h2 className="text-2xl font-black text-[#0D0D0D] mb-2">
-            {fileName}
-          </h2>
-          <p className="text-sm text-[#666666] mb-4">
-            ✓ Generated {response.formatted.totalLeads} messages
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-[#0D0D0D] mb-1">{fileName}</h2>
+            <p className="text-xs text-[#666666]">{response.formatted.totalLeads} messages generated</p>
+          </div>
           <button
             onClick={handleUploadNew}
-            className="text-sm text-[#0D0D0D] hover:underline"
+            className="text-xs text-[#0D0D0D] hover:text-[#666666] transition-colors"
           >
-            ← Upload another file
+            Upload another
           </button>
         </div>
 
-        {/* Strategy Groups */}
-        <div className="bg-white border border-[#E8E8E8] rounded-lg p-6 mb-6">
+        {/* Minimal Results Table */}
+        <div className="space-y-3 mb-8">
           {response.formatted.strategyGroups.map((group, idx) => (
-            <div key={idx} className="mb-6 pb-6 border-b border-[#E8E8E8] last:border-0">
-              <div className="flex items-start gap-4">
-                <div className="text-sm font-mono text-[#888888] pt-1">├─</div>
-                <div className="flex-1">
-                  <div className="mb-3">
-                    <p className="text-sm font-semibold text-[#0D0D0D]">
-                      {group.description}
-                    </p>
-                    <p className="text-xs text-[#666666] mt-1">({group.count} leads)</p>
-                  </div>
+            <div key={idx} className="border border-[#E8E8E8] rounded-lg p-4">
+              <div className="grid grid-cols-12 gap-4 items-start">
+                {/* Count */}
+                <div className="col-span-2">
+                  <p className="text-xs text-[#888888] mb-1">Lead count</p>
+                  <p className="text-lg font-semibold text-[#0D0D0D]">{group.count}</p>
+                </div>
 
-                  <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-3 mb-3">
-                    <p className="text-sm text-[#0D0D0D] leading-relaxed">"{group.sampleMessage}"</p>
-                  </div>
+                {/* Strategy */}
+                <div className="col-span-3">
+                  <p className="text-xs text-[#888888] mb-1">Strategy</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">{group.description}</p>
+                </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    {group.confidenceChecks.map((check, cIdx) => (
-                      <span key={cIdx} className="text-xs text-[#0D0D0D] bg-white border border-[#E8E8E8] px-2 py-1 rounded">
-                        {check}
-                      </span>
-                    ))}
-                  </div>
+                {/* Sample Message */}
+                <div className="col-span-7">
+                  <p className="text-xs text-[#888888] mb-1">Sample</p>
+                  <p className="text-sm text-[#0D0D0D] line-clamp-2">{group.sampleMessage}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Grand Summary */}
-        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-6 mb-6">
-          <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
-            Total: {response.formatted.grandSummary.totalGenerated} messages ready to send
-          </p>
-          <div className="space-y-2 mb-4">
-            <p className="text-xs text-[#0D0D0D]">
-              ✓ All messages follow psychology framework
-            </p>
-            <p className="text-xs text-[#0D0D0D]">
-              ✓ {response.formatted.validityReport.valid} valid • {response.formatted.validityReport.invalid} invalid
-            </p>
-          </div>
-
-          {/* Channel Info */}
-          <div className="border-t border-[#E8E8E8] pt-4">
-            <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-3">Sending Via</p>
-            <div className="p-3 bg-white border border-[#E8E8E8] rounded">
-              <p className="text-xs text-[#888888] mb-1">{channel === "email" ? "Email Campaign" : "WhatsApp Campaign"}</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{leads.length}</p>
-              <p className="text-xs text-[#666666] mt-1">{channel === "email" ? "leads queued for email" : "leads queued for WhatsApp"}</p>
+        {/* Summary */}
+        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-4 mb-8">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-xs text-[#888888] mb-2">Total ready</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{response.formatted.validityReport.valid}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#888888] mb-2">Needs review</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{response.formatted.validityReport.invalid}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#888888] mb-2">Channel</p>
+              <p className="text-sm font-semibold text-[#0D0D0D]">{channel === "email" ? "Email" : "WhatsApp"}</p>
             </div>
           </div>
         </div>
