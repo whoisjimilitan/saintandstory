@@ -149,32 +149,6 @@ export default function DiscoverPage() {
           </p>
         </div>
 
-        {/* === SUPPORTED CATEGORIES INFO === */}
-        <div className="mb-16 p-6 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-          <details className="group cursor-pointer">
-            <summary className="flex items-center gap-2 font-semibold text-sm text-[#0D0D0D] select-none">
-              <span className="group-open:hidden">▶</span>
-              <span className="hidden group-open:inline">▼</span>
-              40+ Business Categories Supported (Auto-Detected)
-            </summary>
-            <div className="mt-4 space-y-4 text-xs">
-              <div>
-                <p className="font-semibold text-[#0D0D0D] mb-2">TIER 1 - ULTRA MOTIVATED (Legal/Health/Compliance):</p>
-                <p className="text-[#666666]">Solicitor, Lawyer, Attorney, Legal, Court, Bailiff, Process Server, Hospital, Surgical Supplies, Clinic, Pharmacy, Medical Devices, Insurance Company, Insurance Broker</p>
-              </div>
-              <div>
-                <p className="font-semibold text-[#0D0D0D] mb-2">TIER 2 - HIGHLY MOTIVATED (Premium/High-Value):</p>
-                <p className="text-[#666666]">Film Production, TV Production, University Research, Auction House, Jewelry Store, Luxury Goods, Fashion Design</p>
-              </div>
-              <div>
-                <p className="font-semibold text-[#0D0D0D] mb-2">TIER 3 - MOTIVATED (Operational):</p>
-                <p className="text-[#666666]">Estate Agent, Realtor, Lettings, Accounting Firm, Tax Service, Architecture Firm, Construction Company, Florist, Event Planning, Retail, Hospitality, Restaurant, Cafe</p>
-              </div>
-              <p className="text-[#888888] italic">System auto-detects category and generates category-specific emails with dynamic seed plants and pain/promise mappings.</p>
-            </div>
-          </details>
-        </div>
-
         {/* === STEP 1: CHANNEL SELECTION === */}
         <div className="mb-16">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
