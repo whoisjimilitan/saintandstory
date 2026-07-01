@@ -45,6 +45,65 @@ async function getSenderInfo(): Promise<{ name: string; email: string }> {
   }
 }
 
+function buildEmailHtml(email: EmailPayload, sender: { name: string; email: string }): string {
+  const senderPhone = sender.name === "James" ? "+44 20 3318 1234" : "+44 20 3318 5678";
+  const senderAddress = "Saint & Story, London, UK";
+  const websiteUrl = "https://saintandstoryltd.co.uk";
+
+  // Build CTA link with pre-populated form
+  const ctaLink = `mailto:${sender.email}?subject=Re: Let's talk&body=Hi ${sender.name},%0A%0AI'd like to discuss how Saint & Story could help us improve our deliveries.%0A%0AName:%0ARole:%0ACompany: ${email.prospectName || ""}%0ABest time to reach me:%0A%0AThanks`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0D0D0D; line-height: 1.6; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .greeting { margin-bottom: 16px; }
+    .body-text { margin-bottom: 16px; white-space: pre-wrap; }
+    .cta-section { margin: 24px 0; }
+    .cta-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #0D0D0D;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .signature { margin-top: 32px; border-top: 1px solid #E8E8E8; padding-top: 16px; }
+    .signature-name { font-weight: 600; margin-bottom: 4px; }
+    .signature-details { font-size: 12px; color: #666666; line-height: 1.4; }
+    .signature-details a { color: #0D0D0D; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="greeting">Hi ${email.prospectName},</div>
+
+    <div class="body-text">${email.body}</div>
+
+    <div class="cta-section">
+      <a href="${ctaLink}" class="cta-button">Let's talk</a>
+    </div>
+
+    <div class="signature">
+      <div class="signature-name">${sender.name}</div>
+      <div class="signature-details">
+        <a href="${websiteUrl}">Saint & Story</a><br>
+        ${senderPhone}<br>
+        ${senderAddress}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
 export async function POST(request: NextRequest) {
   console.log("[CAMPAIGN SEND] Starting campaign send");
 
@@ -109,11 +168,15 @@ export async function POST(request: NextRequest) {
           // Send via Resend
           const sender = await getSenderInfo();
           console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email}`);
+
+          // Build HTML email with personalization, signature, and CTA
+          const emailHtml = buildEmailHtml(email, sender);
+
           const response = await resend.emails.send({
             from: `${sender.name} <${sender.email}>`,
             to: email.prospectEmail,
             subject: email.subject,
-            html: `<p>${email.body.replace(/\n/g, "</p><p>")}</p>`,
+            html: emailHtml,
           });
 
           console.log(`[CAMPAIGN SEND] Resend response:`, {

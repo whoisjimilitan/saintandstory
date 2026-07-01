@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-import { recordEmailEvent } from "@/lib/engagement-tracking";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Resend Webhook Receiver
@@ -12,25 +11,8 @@ import { recordEmailEvent } from "@/lib/engagement-tracking";
  * - email.complained
  * - email.delivered
  *
- * Records events in b2b_email_events table
- * Updates engagement score in real-time
+ * Updates B2bCampaignEmail status and timestamps
  */
-
-interface ResendEvent {
-  type: string;
-  created_at: string;
-  data?: {
-    email_id?: string;
-    email?: string;
-    timestamp?: string;
-    user_agent?: string;
-    ip_address?: string;
-    link?: {
-      href: string;
-      text?: string;
-    };
-  };
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,12 +23,12 @@ export async function POST(request: NextRequest) {
     };
 
     const eventType = body.type;
-    const timestamp = body.created_at || new Date().toISOString();
+    const timestamp = new Date(body.created_at || new Date().toISOString());
     const data = body.data || {};
 
     console.log(`[WEBHOOK] Resend event: ${eventType}`, {
+      messageId: data.email_id,
       email: data.email,
-      timestamp,
     });
 
     // Map Resend event types to our event types
@@ -64,98 +46,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    // Find the outreach record by email_id or resend_message_id
-    const sql = neon(process.env.DATABASE_URL!);
+    // Find campaign email by resend message ID
+    const campaignEmail = await prisma.b2bCampaignEmail.findUnique({
+      where: { resendMessageId: data.email_id },
+    });
 
-    let outreach;
-    if (data.email_id) {
-      outreach = await sql`
-        SELECT o.*, l.id as lead_id
-        FROM b2b_outreach o
-        JOIN b2b_leads l ON o.lead_id = l.id
-        WHERE o.resend_message_id = ${data.email_id}
-        LIMIT 1
-      `;
-    } else if (data.email) {
-      // Fallback: match by email address (less precise)
-      outreach = await sql`
-        SELECT o.*, l.id as lead_id
-        FROM b2b_outreach o
-        JOIN b2b_leads l ON o.lead_id = l.id
-        WHERE l.email = ${data.email}
-        ORDER BY o.sent_at DESC
-        LIMIT 1
-      `;
-    }
-
-    if (!outreach || outreach.length === 0) {
-      console.warn(`[WEBHOOK] No outreach record found for email: ${data.email}`);
+    if (!campaignEmail) {
+      console.warn(`[WEBHOOK] No campaign email found for message ID: ${data.email_id}, email: ${data.email}`);
       return NextResponse.json({ received: true, matched: false });
     }
 
-    const outreachRecord = outreach[0];
-    const leadId = outreachRecord.lead_id as string;
-    const outreachId = outreachRecord.id as string;
+    console.log(`[WEBHOOK] Found campaign email: ${campaignEmail.id}`);
 
-    // Record the event
-    const metadata = {
-      email: data.email,
-      user_agent: data.user_agent || null,
-      ip_address: data.ip_address || null,
-      link_url:
-        mappedEventType === "clicked" ? data.link?.href : null,
-      link_text:
-        mappedEventType === "clicked" ? data.link?.text : null,
-      timestamp: timestamp,
-    };
+    // Update status and timestamp based on event type
+    const updateData: any = { status: mappedEventType };
 
-    const recorded = await recordEmailEvent(
-      sql,
-      leadId,
-      outreachId,
-      mappedEventType as
-        | "opened"
-        | "clicked"
-        | "bounced"
-        | "complained"
-        | "delivered",
-      metadata
-    );
-
-    if (!recorded) {
-      console.error(`[WEBHOOK] Failed to record event for lead ${leadId}`);
-      return NextResponse.json(
-        { error: "Failed to record event" },
-        { status: 500 }
-      );
+    if (mappedEventType === "opened") {
+      updateData.openedAt = timestamp;
+    } else if (mappedEventType === "clicked") {
+      updateData.clickedAt = timestamp;
+    } else if (mappedEventType === "replied") {
+      updateData.repliedAt = timestamp;
+      updateData.status = "replied";
     }
 
-    // Handle bounce/complaint: flag as invalid and disqualify
-    if (mappedEventType === "bounced" || mappedEventType === "complained") {
-      try {
-        await sql`
-          UPDATE b2b_leads
-          SET
-            status = 'invalid_email',
-            engagement_score = 0,
-            notes = CONCAT(COALESCE(notes, ''), CHAR(10), '[SYSTEM] Email ', ${mappedEventType}, ' at ', NOW())
-          WHERE id = ${leadId}
-        `;
-        console.log(`[WEBHOOK] ⚠️ Marked lead ${leadId} as invalid_email (${mappedEventType})`);
-      } catch (err) {
-        console.error(`[WEBHOOK] Error flagging invalid email:`, err);
-      }
-    }
+    await prisma.b2bCampaignEmail.update({
+      where: { id: campaignEmail.id },
+      data: updateData,
+    });
 
-    console.log(
-      `[WEBHOOK] ✓ Recorded ${mappedEventType} for lead ${leadId}`
-    );
+    console.log(`[WEBHOOK] ✓ Updated campaign email ${campaignEmail.id} to status: ${mappedEventType}`);
 
     return NextResponse.json({
       received: true,
       matched: true,
       event: mappedEventType,
-      lead_id: leadId,
+      campaignEmailId: campaignEmail.id,
     });
   } catch (error) {
     console.error("[WEBHOOK] Error processing Resend webhook:", error);
