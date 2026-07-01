@@ -195,33 +195,42 @@ export default function EnrichPage() {
   const confirmSend = async () => {
     setSending(true);
     try {
-      console.log("[ENRICH] Sending emails:", generatedEmails.length);
+      console.log("[ENRICH] Sending campaign:", campaignName);
 
+      // Build emails payload with full metadata for campaign tracking
       const emailsToSend = generatedEmails.map(email => ({
         prospectId: email.prospectId,
+        prospectName: email.businessName,
+        prospectEmail: email.email,
         subject: email.subject,
         body: email.body,
-        toEmail: email.email,
+        tier: email.characterMeta?.tier || 1,
+        category: email.characterMeta?.category || "Business",
       }));
 
-      console.log("[ENRICH] Payload:", emailsToSend);
+      console.log("[ENRICH] Campaign:", { campaignName, emails: emailsToSend.length });
 
-      const res = await fetch("/api/b2b/batch-emails/send", {
+      // Call new campaigns endpoint that saves to DB + sends emails
+      const res = await fetch("/api/b2b/campaigns/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emails: emailsToSend }),
+        body: JSON.stringify({
+          campaignName: campaignName,
+          channel: "email", // TODO: pull from DISCOVER selection
+          emails: emailsToSend,
+        }),
       });
 
       if (!res.ok) {
         const error = await res.json();
         console.error("[ENRICH] API error:", error);
-        throw new Error(error.error || "Failed to send");
+        throw new Error(error.error || "Failed to send campaign");
       }
 
       const data = await res.json();
-      console.log("[ENRICH] API response:", data);
+      console.log("[ENRICH] Campaign sent:", data);
 
-      // Show sent emails
+      // Show sent emails with real campaign ID from database
       const sentList = generatedEmails.map(email => ({
         id: email.prospectId,
         prospectName: email.businessName,
@@ -232,20 +241,19 @@ export default function EnrichPage() {
       }));
 
       setSentEmails(sentList);
-      // Generate campaign ID (in P5 this will come from DB)
-      const campaignId = `campaign-${Date.now()}`;
-      setSentCampaignId(campaignId);
+      // Use real campaign ID from database response
+      setSentCampaignId(data.campaignId);
 
       // Mark campaign as sent
       setCampaignSent(true);
       setShowSendConfirmation(false);
 
-      // FIXED: Clear draft after sending (emails can't be in both draft AND sent)
+      // Clear draft after sending (emails can't be in both draft AND sent)
       setGeneratedEmails([]);
       setActiveTab("sent");
       setCurrentIndex(0);
     } catch (error) {
-      console.error("Error sending:", error);
+      console.error("Error sending campaign:", error);
       alert(`Failed to send: ${error instanceof Error ? error.message : "Unknown error"}`);
       setShowSendConfirmation(false);
     } finally {
