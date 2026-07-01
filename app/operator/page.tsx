@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Pusher from "pusher-js";
 import { useToast } from "@/app/providers/ToastProvider";
-import { TodayExecutiveBrief } from "@/components/TodayExecutiveBrief";
+import { TodayOperational } from "@/components/TodayOperational";
 
 // Premium single-color icons
 const Icons = {
@@ -615,8 +615,8 @@ export default function OperatorBriefing() {
         </p>
       </div>
 
-      {/* TODAY BRIEF - Minimal, focused CEO report for daily decisions */}
-      <TodayExecutiveBrief />
+      {/* OPERATIONAL STATUS - What matters right now */}
+      <TodayOperational />
 
       {/* START CAMPAIGN HERO */}
       <div className="mb-12 px-4 md:px-0">
