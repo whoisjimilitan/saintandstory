@@ -60,17 +60,36 @@ export async function POST(request: NextRequest) {
     );
 
     if (!discoveryRes.ok) {
-      const error = await discoveryRes.json();
+      const responseText = await discoveryRes.text();
+      console.error(`[OPERATOR-TRIGGER] Admin endpoint returned ${discoveryRes.status}:`, responseText.substring(0, 500));
+
+      let errorMessage = "Discovery failed";
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.error || "Discovery failed";
+      } catch {
+        errorMessage = `Discovery failed (HTTP ${discoveryRes.status})`;
+      }
+
       return NextResponse.json(
         {
-          error: error.error || "Discovery failed",
+          error: errorMessage,
           success: false,
         },
         { status: 500 }
       );
     }
 
-    const discoveryData = await discoveryRes.json();
+    let discoveryData;
+    try {
+      discoveryData = await discoveryRes.json();
+    } catch (jsonError) {
+      console.error(`[OPERATOR-TRIGGER] Failed to parse discovery response:`, jsonError);
+      return NextResponse.json(
+        { error: "Failed to parse discovery response", success: false },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,

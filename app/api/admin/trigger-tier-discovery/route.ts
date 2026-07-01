@@ -49,8 +49,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const tierConfigs: TierConfig[] = body.tiers || getDefaultTiers();
+    let body: any;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error("[TIER-DISCOVERY] JSON parse error:", parseError);
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    let tierConfigs: TierConfig[];
+    try {
+      tierConfigs = body.tiers || getDefaultTiers();
+    } catch (tierError) {
+      console.error("[TIER-DISCOVERY] Error getting tier config:", tierError);
+      return NextResponse.json({ error: "Failed to get tier configuration" }, { status: 500 });
+    }
 
     console.log(`[TIER-DISCOVERY] Starting autonomous discovery for ${email}`);
     console.log(`[TIER-DISCOVERY] Tiers:`, tierConfigs.map((t) => `Tier ${t.tier} (${t.enabled ? "ON" : "OFF"})`));
@@ -87,21 +100,39 @@ export async function POST(request: NextRequest) {
             console.log(`[TIER-DISCOVERY] Searching: "${query}"`);
 
             // Call dork-search endpoint
-            const dorkRes = await fetch(
-              `${process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "http://localhost:3000"}/api/b2b/dork-search`,
-              {
+            const baseUrl = process.env.VERCEL_URL
+              ? `https://${process.env.VERCEL_URL}`
+              : "http://localhost:3000";
+
+            const dorkUrl = `${baseUrl}/api/b2b/dork-search`;
+            console.log(`[TIER-DISCOVERY] Calling dork-search at ${dorkUrl}`);
+
+            let dorkRes;
+            try {
+              dorkRes = await fetch(dorkUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query }),
-              }
-            );
-
-            if (!dorkRes.ok) {
-              console.error(`[TIER-DISCOVERY] Dork search failed for "${query}"`);
+              });
+            } catch (fetchError) {
+              console.error(`[TIER-DISCOVERY] Fetch error for dork-search:`, fetchError);
               continue;
             }
 
-            const dorkData = await dorkRes.json();
+            if (!dorkRes.ok) {
+              const errorText = await dorkRes.text();
+              console.error(`[TIER-DISCOVERY] Dork search failed (${dorkRes.status}) for "${query}":`, errorText.substring(0, 200));
+              continue;
+            }
+
+            let dorkData;
+            try {
+              dorkData = await dorkRes.json();
+            } catch (jsonError) {
+              console.error(`[TIER-DISCOVERY] JSON parse error from dork-search:`, jsonError);
+              continue;
+            }
+
             const leadsCreated = dorkData.leadsCreated || 0;
 
             if (leadsCreated > 0) {
