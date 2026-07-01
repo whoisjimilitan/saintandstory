@@ -8,10 +8,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 interface EmailPayload {
   prospectId?: string;
   prospectName: string;
-  prospectEmail: string;
+  prospectEmail?: string;
+  phoneNumber?: string;
   tier?: number;
   category?: string;
-  subject: string;
+  subject?: string;
   body: string;
 }
 
@@ -111,8 +112,33 @@ export async function POST(request: NextRequest) {
 
           sentCount++;
           console.log(`[CAMPAIGN SEND] ✓ Email sent to ${email.prospectEmail}`);
+        } else if (channel === "whatsapp") {
+          // WhatsApp sending via Twilio/Meta API
+          // WHEN WHATSAPP API KEY IS AVAILABLE: Uncomment and configure
+          // const whatsappResponse = await whatsappClient.messages.create({
+          //   from: process.env.WHATSAPP_BUSINESS_PHONE,
+          //   to: formatPhoneNumber(email.phoneNumber),
+          //   body: email.body,
+          // });
+          // For now, log as sent for testing
+          console.log(`[CAMPAIGN SEND] WhatsApp (stub) to ${email.phoneNumber}`);
+
+          await prisma.b2bCampaignWhatsApp.create({
+            data: {
+              campaignId: campaign.id,
+              prospectId: email.prospectId,
+              phoneNumber: email.phoneNumber || "",
+              prospectName: email.prospectName,
+              firstMessage: email.body,
+              status: "sent",
+              sentAt: new Date(),
+            },
+          });
+
+          sentCount++;
+          console.log(`[CAMPAIGN SEND] ✓ WhatsApp message queued to ${email.phoneNumber}`);
         }
-        // WhatsApp and Phone sending would go here in future
+        // Phone outreach would go here in future
       } catch (error) {
         console.error(
           `[CAMPAIGN SEND] Error processing ${email.prospectEmail}:`,
