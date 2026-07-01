@@ -20,6 +20,29 @@ interface Prospect {
 type Channel = "email" | "whatsapp" | "phone";
 type ActionMode = "upload" | "search" | "manual" | null;
 
+// Premium monochrome icons
+const Icons = {
+  Upload: () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  ),
+  Search: () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  ),
+  Plus: () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+};
+
 function detectCategory(businessName: string): string {
   const name = businessName.toLowerCase();
   if (name.includes("solicitor") || name.includes("lawyer")) return "Solicitor";
@@ -37,20 +60,15 @@ function detectCategory(businessName: string): string {
 export default function DiscoverPage() {
   const router = useRouter();
 
-  // Channel selection
   const [selectedChannel, setSelectedChannel] = useState<Channel>("email");
-
-  // Action mode
   const [actionMode, setActionMode] = useState<ActionMode>(null);
 
-  // Search state
   const [searchTerm, setSearchTerm] = useState("");
   const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<Prospect[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Manual add state
   const [manualForm, setManualForm] = useState({
     businessName: "",
     contactName: "",
@@ -60,11 +78,9 @@ export default function DiscoverPage() {
     postcode: "",
   });
 
-  // Selected leads for batch
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Enrich results with tier and category
   const enrichResults = (prospects: Prospect[]): Prospect[] =>
     prospects.map(p => ({
       ...p,
@@ -72,7 +88,6 @@ export default function DiscoverPage() {
       category: detectCategory(p.businessName),
     }));
 
-  // Search handler
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
@@ -102,7 +117,6 @@ export default function DiscoverPage() {
     }
   };
 
-  // Manual add handler
   const handleManualAdd = () => {
     if (!manualForm.businessName.trim()) return;
 
@@ -116,7 +130,6 @@ export default function DiscoverPage() {
     setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
   };
 
-  // Toggle lead selection
   const toggleLead = (prospectId: string) => {
     const newSelected = new Set(selectedLeads);
     if (newSelected.has(prospectId)) {
@@ -127,7 +140,6 @@ export default function DiscoverPage() {
     setSelectedLeads(newSelected);
   };
 
-  // Proceed to ENRICH
   const handleReviewAndSend = () => {
     if (selectedLeads.size === 0) {
       alert("Please select at least one lead");
@@ -140,22 +152,31 @@ export default function DiscoverPage() {
     router.push("/operator/enrich");
   };
 
-  // Summary stats
   const tier1Count = searchResults.filter(p => p.tier === 1 && selectedLeads.has(p.id)).length;
   const tier2Count = searchResults.filter(p => p.tier === 2 && selectedLeads.has(p.id)).length;
   const tier3Count = searchResults.filter(p => p.tier === 3 && selectedLeads.has(p.id)).length;
   const categories = [...new Set(searchResults.filter(p => selectedLeads.has(p.id)).map(p => p.category))];
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] pt-32">
-      <div className="px-4 md:px-12 py-10 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-white pt-24 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
 
-        {/* STEP 1: CHANNEL SELECTION */}
-        <div className="mb-12">
-          <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-6">
+        {/* === HEADER === */}
+        <div className="mb-16">
+          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+            Discover & Qualify
+          </h1>
+          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+            Build your prospect list. Choose your channel, add leads, and prepare them for outreach.
+          </p>
+        </div>
+
+        {/* === STEP 1: CHANNEL SELECTION === */}
+        <div className="mb-16">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Step 1: Choose Channel
           </p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               onClick={() => setSelectedChannel("email")}
               className={`p-6 rounded-lg border-2 transition-all ${
@@ -165,7 +186,7 @@ export default function DiscoverPage() {
               }`}
             >
               <p className="font-bold text-base mb-1">Email Campaign</p>
-              <p className="text-xs text-opacity-70">Professional outreach</p>
+              <p className="text-xs opacity-70">Professional outreach</p>
             </button>
 
             <button
@@ -177,7 +198,7 @@ export default function DiscoverPage() {
               }`}
             >
               <p className="font-bold text-base mb-1">WhatsApp Campaign</p>
-              <p className="text-xs text-opacity-70">Real-time messaging</p>
+              <p className="text-xs opacity-70">Real-time messaging</p>
             </button>
 
             <button
@@ -189,56 +210,63 @@ export default function DiscoverPage() {
               }`}
             >
               <p className="font-bold text-base mb-1">Phone Campaign</p>
-              <p className="text-xs text-opacity-70">Direct calls</p>
+              <p className="text-xs opacity-70">Direct calls</p>
             </button>
           </div>
         </div>
 
-        <div className="h-px bg-[#E8E8E8] mb-12"></div>
-
-        {/* STEP 2: ACTION SELECTION */}
-        <div className="mb-12">
-          <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-6">
+        {/* === STEP 2: ADD LEADS === */}
+        <div className="mb-16">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Step 2: Add Leads
           </p>
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <button
               onClick={() => setActionMode(actionMode === "upload" ? null : "upload")}
-              className={`p-4 rounded-lg border transition-all ${
+              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
                 actionMode === "upload"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-semibold text-sm text-[#0D0D0D]">📤 Upload CSV</p>
+              <div className="text-[#0D0D0D]">
+                <Icons.Upload />
+              </div>
+              <p className="font-semibold text-sm text-[#0D0D0D]">Upload CSV</p>
             </button>
 
             <button
               onClick={() => setActionMode(actionMode === "search" ? null : "search")}
-              className={`p-4 rounded-lg border transition-all ${
+              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
                 actionMode === "search"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-semibold text-sm text-[#0D0D0D]">🔍 Search Businesses</p>
+              <div className="text-[#0D0D0D]">
+                <Icons.Search />
+              </div>
+              <p className="font-semibold text-sm text-[#0D0D0D]">Search</p>
             </button>
 
             <button
               onClick={() => setActionMode(actionMode === "manual" ? null : "manual")}
-              className={`p-4 rounded-lg border transition-all ${
+              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
                 actionMode === "manual"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-semibold text-sm text-[#0D0D0D]">➕ Add Manually</p>
+              <div className="text-[#0D0D0D]">
+                <Icons.Plus />
+              </div>
+              <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
             </button>
           </div>
 
           {/* UPLOAD MODE */}
           {actionMode === "upload" && selectedChannel !== "phone" && (
-            <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8 bg-white">
+            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
               {selectedChannel === "email" && (
                 <WhatsAppBatchCampaign channel="email" />
               )}
@@ -249,15 +277,15 @@ export default function DiscoverPage() {
           )}
 
           {actionMode === "upload" && selectedChannel === "phone" && (
-            <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8 bg-white text-center">
+            <div className="rounded-lg p-12 mb-8 bg-[#F9F9F9] text-center">
               <p className="text-sm text-[#666666]">Phone outreach CSV upload coming soon</p>
             </div>
           )}
 
           {/* SEARCH MODE */}
           {actionMode === "search" && (
-            <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8 bg-white">
-              <div className="mb-4 flex gap-4">
+            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
+              <div className="mb-6 flex gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
@@ -279,8 +307,8 @@ export default function DiscoverPage() {
               </div>
 
               {isPostcodeSearch && (
-                <div className="mb-4">
-                  <label className="text-sm font-semibold text-[#0D0D0D] block mb-2">
+                <div className="mb-6">
+                  <label className="text-sm font-semibold text-[#0D0D0D] block mb-3">
                     Radius: {searchRadius}km
                   </label>
                   <input
@@ -315,7 +343,7 @@ export default function DiscoverPage() {
 
           {/* MANUAL ADD MODE */}
           {actionMode === "manual" && (
-            <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8 bg-white">
+            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
               <div className="space-y-3">
                 <input
                   type="text"
@@ -363,21 +391,19 @@ export default function DiscoverPage() {
           )}
         </div>
 
-        {/* RESULTS */}
+        {/* === RESULTS === */}
         {searchResults.length > 0 && (
           <>
-            <div className="h-px bg-[#E8E8E8] mb-12"></div>
-
-            <div ref={resultsRef}>
-              <p className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-[0.1em] mb-6">
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
                 Step 3: Select Leads ({selectedLeads.size}/{searchResults.length})
               </p>
 
-              <div className="space-y-2 mb-8">
+              <div className="space-y-3 mb-12">
                 {searchResults.map((prospect) => (
                   <div
                     key={prospect.id}
-                    className="border border-[#E8E8E8] rounded-lg p-4 bg-white hover:bg-[#F9F9F9] flex items-center gap-4 cursor-pointer"
+                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] flex items-center gap-4 cursor-pointer"
                     onClick={() => toggleLead(prospect.id)}
                   >
                     <input
@@ -388,54 +414,52 @@ export default function DiscoverPage() {
                     />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-[#0D0D0D]">{prospect.businessName}</p>
-                      <p className="text-xs text-[#888888]">
+                      <p className="text-xs text-[#888888] mt-1">
                         {prospect.category} • {prospect.city || "Unknown"}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {prospect.tier && (
-                        <span
-                          className={`text-xs font-semibold px-2 py-1 rounded ${
-                            prospect.tier === 1
-                              ? "bg-[#0D0D0D] text-white"
-                              : prospect.tier === 2
-                              ? "bg-[#333333] text-white"
-                              : "bg-[#E8E8E8] text-[#0D0D0D]"
-                          }`}
-                        >
-                          Tier {prospect.tier}
-                        </span>
-                      )}
-                    </div>
+                    {prospect.tier && (
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded ${
+                          prospect.tier === 1
+                            ? "bg-[#0D0D0D] text-white"
+                            : prospect.tier === 2
+                            ? "bg-[#333333] text-white"
+                            : "bg-[#E8E8E8] text-[#0D0D0D]"
+                        }`}
+                      >
+                        Tier {prospect.tier}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
 
               {/* SUMMARY */}
               {selectedLeads.size > 0 && (
-                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9] mb-8">
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-4">Ready to send?</p>
-                  <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="rounded-lg p-8 bg-[#F9F9F9]">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-6">Ready to send?</p>
+                  <div className="grid grid-cols-4 gap-8 mb-8">
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Total</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">{selectedLeads.size}</p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">{selectedLeads.size}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Tier 1</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">{tier1Count}</p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 1</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">{tier1Count}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Tier 2</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">{tier2Count}</p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">{tier2Count}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-1">Tier 3</p>
-                      <p className="text-2xl font-black text-[#0D0D0D]">{tier3Count}</p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 3</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">{tier3Count}</p>
                     </div>
                   </div>
                   {categories.length > 0 && (
-                    <div className="mb-6">
-                      <p className="text-xs text-[#888888] mb-2">Categories</p>
+                    <div className="mb-8">
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Categories</p>
                       <p className="text-sm text-[#0D0D0D]">{categories.join(" • ")}</p>
                     </div>
                   )}
