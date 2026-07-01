@@ -36,7 +36,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   court: {
     pain: "One thing I've learnt is that court cases rarely stall because of the legal arguments themselves. It's usually when service deadlines get missed outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "One deadline",
@@ -45,7 +45,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   bailiff: {
     pain: "One thing I've learnt is that bailiff services rarely fail because of the legal documentation. It's usually when service deadlines slip outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Service timing",
@@ -54,7 +54,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   process_server: {
     pain: "One thing I've learnt is that prosecutions rarely stall because of the process itself. It's usually when service deadlines become impossible to meet.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "One deadline. Case stalls.",
@@ -64,7 +64,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   insurance_company: {
     pain: "One thing I've learnt is that regulatory compliance rarely fails because of the policies themselves. It's usually when deadline requirements slip outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Regulatory deadline",
@@ -73,7 +73,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   insurance_broker: {
     pain: "One thing I've learnt is that client relationships rarely break because of the insurance itself. It's usually when policy delivery gets delayed outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Policy timing",
@@ -83,7 +83,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   hospital: {
     pain: "One thing I've learnt is that surgery schedules rarely slip because of the procedure itself. It's usually when supplies or equipment arrive late.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Surgery scheduled",
@@ -92,7 +92,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   surgical_supplies: {
     pain: "One thing I've learnt is that operating theatres rarely sit idle because of the supply chain planning. It's usually when critical deliveries get delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "OR timing",
@@ -101,7 +101,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   medical_devices: {
     pain: "One thing I've learnt is that procedures rarely get postponed because of the equipment itself. It's usually when delivery timelines get disrupted.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Surgery scheduled. Can't be late.",
@@ -110,7 +110,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   clinic: {
     pain: "One thing I've learnt is that patient care rarely suffers because of the treatment plan. It's usually when urgent supplies don't arrive on time.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Patient care timing",
@@ -119,7 +119,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   pharmacy: {
     pain: "One thing I've learnt is that patient relief rarely gets delayed because of the medicine itself. It's usually when urgent prescriptions get held up in delivery.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Relief timing",
@@ -129,7 +129,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   legal: {
     pain: "One thing I've learnt is that cases rarely collapse because of the legal strategy. It's usually when document delivery gets in the way.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Document deadline",
@@ -138,7 +138,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   lawyer: {
     pain: "One thing I've learnt is that filings rarely miss deadlines because of the legal work itself. It's usually when courier logistics slip outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Brief timing",
@@ -147,7 +147,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   solicitor: {
     pain: "One thing I've learnt is that filing deadlines rarely become stressful because of the legal work itself. It's usually when something outside your control gets in the way.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Brief timing",
@@ -156,7 +156,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   attorney: {
     pain: "One thing I've learnt is that cases rarely stall because of the legal preparation. It's usually when document delivery becomes unreliable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Case timeline",
@@ -170,7 +170,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   film_production: {
     pain: "One thing I've learnt is that film shoots rarely run over budget because of the creative work. It's usually when equipment doesn't arrive on set when it's needed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Equipment delay",
@@ -179,7 +179,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   tv_production: {
     pain: "One thing I've learnt is that shooting schedules rarely slip because of the production planning. It's usually when equipment delivery gets delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Equipment delay",
@@ -189,7 +189,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   university_research: {
     pain: "One thing I've learnt is that research rarely fails because of the methodology. It's usually when time-sensitive samples don't arrive on schedule.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Sample timing",
@@ -199,7 +199,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   auction_house: {
     pain: "One thing I've learnt is that auction sales rarely fall through because of the lots themselves. It's usually when delivery windows get missed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Delivery timing",
@@ -208,7 +208,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   jewelry_store: {
     pain: "One thing I've learnt is that customer satisfaction rarely drops because of the jewelry itself. It's usually when delivery timing becomes unpredictable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Customer timing",
@@ -217,7 +217,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   luxury_goods: {
     pain: "One thing I've learnt is that premium clients rarely disappear because of the products. It's usually when delivery expectations don't get met.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Delivery timing",
@@ -227,7 +227,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   fashion_design: {
     pain: "One thing I've learnt is that orders rarely fall through because of the designs themselves. It's usually when sample deliveries get delayed past buyer meetings.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Fashion sample delivery",
@@ -241,7 +241,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   estate_agent: {
     pain: "One thing I've learnt is that property sales rarely collapse because of the properties themselves. It's usually when completion documents don't arrive on time.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Completion timing",
@@ -250,7 +250,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   realtor: {
     pain: "One thing I've learnt is that deals rarely die because of the negotiation. It's usually when closing documents get delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Closing window",
@@ -259,7 +259,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   lettings: {
     pain: "One thing I've learnt is that tenancies rarely fail to start because of the agreement itself. It's usually when paperwork delivery gets held up.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tenancy timing",
@@ -268,7 +268,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   property: {
     pain: "One thing I've learnt is that transactions rarely stall because of the legal work. It's usually when document delivery becomes unpredictable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Transaction timing",
@@ -278,7 +278,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   accounting: {
     pain: "One thing I've learnt is that tax season rarely causes problems because of the accounting itself. It's usually when filing deadlines slip outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
@@ -287,7 +287,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   accountant: {
     pain: "One thing I've learnt is that tax deadlines rarely stress you because of the accounting work itself. It's usually when document delivery gets delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
@@ -296,7 +296,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   tax: {
     pain: "One thing I've learnt is that audit risk rarely increases because of the filings themselves. It's usually when deadline deliveries become unreliable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
@@ -305,7 +305,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   bookkeeper: {
     pain: "One thing I've learnt is that month-end rarely becomes chaotic because of the data itself. It's usually when document delivery holds up financial reporting.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your month-end deadlines",
@@ -315,7 +315,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   construction: {
     pain: "One thing I've learnt is that project delays rarely happen because of the planning itself. It's usually when material delivery gets disrupted.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Project timing",
@@ -324,7 +324,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   builder: {
     pain: "One thing I've learnt is that build timelines rarely blow out because of the construction itself. It's usually when material delivery becomes unpredictable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Build timing",
@@ -333,7 +333,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   contractor: {
     pain: "One thing I've learnt is that site work rarely stalls because of the labour itself. It's usually when supply delivery gets delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Site timing",
@@ -342,7 +342,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   plumber: {
     pain: "One thing I've learnt is that appointment schedules rarely break because of the plumbing itself. It's usually when supply pickups get held up.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Job timing",
@@ -351,7 +351,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   electrician: {
     pain: "One thing I've learnt is that installation dates rarely slip because of the electrical work itself. It's usually when equipment delivery gets delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Install timing",
@@ -361,7 +361,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   architecture: {
     pain: "One thing I've learnt is that construction rarely stalls because of the plans themselves. It's usually when drawing delivery gets held up.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Timeline timing",
@@ -370,7 +370,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   architect: {
     pain: "One thing I've learnt is that projects rarely get delayed because of the drawings themselves. It's usually when delivery timelines slip outside your control.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
@@ -379,7 +379,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   engineering: {
     pain: "One thing I've learnt is that builds rarely fall behind because of the specs themselves. It's usually when specification delivery gets delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
@@ -389,7 +389,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   ecommerce: {
     pain: "One thing I've learnt is that customer satisfaction rarely drops because of the products. It's usually when delivery speed becomes unpredictable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
@@ -398,7 +398,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   retailer: {
     pain: "One thing I've learnt is that inventory rarely runs out because of the ordering itself. It's usually when delivery windows get missed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
@@ -407,7 +407,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   retail: {
     pain: "One thing I've learnt is that peak season rarely becomes chaotic because of the products themselves. It's usually when inventory delivery gets disrupted.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your inventory",
@@ -417,7 +417,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
 
   florist: {
     pain: "One thing I've learnt is that weddings rarely look wrong because of the flowers themselves. It's usually when delivery timing slips on the day.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your event deliveries",
@@ -426,7 +426,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   event_planning: {
     pain: "One thing I've learnt is that events rarely fall apart because of the planning itself. It's usually when supplier deliveries get delayed.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your event deliveries",
@@ -435,7 +435,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   hospitality: {
     pain: "One thing I've learnt is that service quality rarely suffers because of the food itself. It's usually when supply delivery becomes unreliable.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your service",
@@ -444,7 +444,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   restaurant: {
     pain: "One thing I've learnt is that service quality rarely fails because of the food itself. It's usually when critical supplies show up after doors open.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your service",
@@ -453,7 +453,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   },
   cafe: {
     pain: "One thing I've learnt is that morning service rarely fails because of the coffee itself. It's usually when stock delivery doesn't arrive before opening.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your opening",
@@ -509,7 +509,7 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
 
   return {
     pain: "One thing I've learnt is that deliveries rarely fail because of the work itself. It's usually when something outside your control gets in the way.",
-    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
