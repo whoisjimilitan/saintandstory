@@ -154,7 +154,7 @@ export default function ResponsesPage() {
                     onClick={() => setSelectedReply(reply)}
                     className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors cursor-pointer"
                   >
-                  <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <p className="text-sm font-semibold text-[#0D0D0D]">
@@ -178,9 +178,10 @@ export default function ResponsesPage() {
                         {formatDate(reply.repliedAt)}
                       </p>
                     </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>
