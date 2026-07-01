@@ -94,18 +94,20 @@ export default function ReachPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-20">
-      {/* Header */}
-      <div className="mb-8 px-4 md:px-0 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">Reach</h1>
-          <p className="text-base text-[#666666]">Live campaign tracking</p>
+    <div className="min-h-screen bg-white pt-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+            Reach
+          </h1>
+          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+            Monitor campaign performance live. Track sends, opens, and replies across all channels.
+          </p>
         </div>
-      </div>
 
-      {/* Channel Tabs */}
-      <div className="mb-8 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
+        {/* Channel Tabs */}
+        <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
           <div className="flex gap-8">
             <button
               onClick={() => setActiveTab("email")}
@@ -129,32 +131,34 @@ export default function ReachPage() {
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Stats */}
-      <div className="mb-12 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">{activeTab === "email" ? "Sent" : "Active"}</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.active}</p>
+        {/* Stats */}
+        <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+            Summary
+          </p>
+          <div className="grid grid-cols-3 gap-12">
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">{activeTab === "email" ? "Sent" : "Active"}</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.active}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">{activeTab === "email" ? "Replied" : "Hot"}</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.hot}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">{activeTab === "email" ? "Replied" : "Hot"}</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.hot}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Total</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.total}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Email Campaigns */}
-      {activeTab === "email" && (
-        <div className="px-4 md:px-0 pb-12">
-          <div className="max-w-4xl mx-auto">
+        {/* Email Campaigns */}
+        {activeTab === "email" && (
+          <div>
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+              Campaigns
+            </p>
             {loading ? (
               <div className="text-center py-12">
                 <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
@@ -165,9 +169,9 @@ export default function ReachPage() {
                 <p className="text-sm text-[#666666]">No email campaigns yet</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {activeCampaigns.map(campaign => (
-                  <div key={campaign.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors">
+                  <div key={campaign.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[#0D0D0D]">{campaign.campaignName}</p>
@@ -195,15 +199,16 @@ export default function ReachPage() {
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* WhatsApp Conversations */}
-      {activeTab === "whatsapp" && (
-        <div className="px-4 md:px-0 pb-12">
-          <div className="max-w-4xl mx-auto">
+        {/* WhatsApp Conversations */}
+        {activeTab === "whatsapp" && (
+          <div>
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+              Conversations
+            </p>
             {showNewConversationForm && (
-              <form onSubmit={handleCreateConversation} className="mb-8 border border-[#E8E8E8] rounded-lg p-6 bg-white">
+              <form onSubmit={handleCreateConversation} className="mb-8 rounded-lg p-6 bg-[#F9F9F9]">
                 <h3 className="font-bold text-[#0D0D0D] mb-4">Start Conversation</h3>
                 <div className="space-y-3">
                   <input
@@ -242,9 +247,9 @@ export default function ReachPage() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {conversations.map(conversation => (
-                  <div key={conversation.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors">
+                  <div key={conversation.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-[#0D0D0D]">{conversation.businessName}</p>

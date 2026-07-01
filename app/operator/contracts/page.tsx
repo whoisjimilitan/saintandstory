@@ -89,42 +89,45 @@ export default function ContractsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-20">
-      {/* Header */}
-      <div className="mb-8 px-4 md:px-0 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">Contracts</h1>
-          <p className="text-base text-[#666666]">Standing orders and ongoing relationships</p>
+    <div className="min-h-screen bg-white pt-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+            B2B Contracts
+          </h1>
+          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+            Track all standing orders and ongoing customer relationships. Monitor active contracts and revenue.
+          </p>
         </div>
-      </div>
 
-      {/* Stats */}
-      <div className="mb-12 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Total</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.total}</p>
+        {/* Stats */}
+        <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+            Summary
+          </p>
+          <div className="grid grid-cols-4 gap-12">
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Active</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.active}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Active</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.active}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Inactive</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.inactive}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Inactive</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.inactive}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Value</p>
-              <p className="text-lg font-black text-[#0D0D0D]">{stats.totalValue}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Value</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{stats.totalValue}</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Filter */}
-      <div className="mb-8 px-4 md:px-0 py-4 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
+        {/* Filter */}
+        <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
           <div className="flex gap-3">
             {["all", "active", "inactive"].map(status => (
               <button
@@ -149,11 +152,9 @@ export default function ContractsPage() {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Contracts */}
-      <div className="px-4 md:px-0 pb-12">
-        <div className="max-w-4xl mx-auto">
+        {/* Contracts */}
+        <div>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
@@ -166,13 +167,17 @@ export default function ContractsPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredContracts.map(contract => (
-                <div
-                  key={contract.id}
-                  onClick={() => setSelectedContract(contract)}
-                  className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors cursor-pointer"
-                >
+            <div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                Contracts
+              </p>
+              <div className="space-y-4">
+                {filteredContracts.map(contract => (
+                  <div
+                    key={contract.id}
+                    onClick={() => setSelectedContract(contract)}
+                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors cursor-pointer"
+                  >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">

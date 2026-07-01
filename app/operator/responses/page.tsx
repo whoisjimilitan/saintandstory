@@ -73,42 +73,45 @@ export default function ResponsesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-20">
-      {/* Header */}
-      <div className="mb-8 px-4 md:px-0 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">Responses</h1>
-          <p className="text-base text-[#666666]">Email replies from campaigns</p>
+    <div className="min-h-screen bg-white pt-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
+            Responses
+          </h1>
+          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
+            Review all email replies from your campaigns. Prioritize and respond to high-value prospects.
+          </p>
         </div>
-      </div>
 
-      {/* Stats */}
-      <div className="mb-12 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Total</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.total}</p>
+        {/* Stats */}
+        <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+            Summary
+          </p>
+          <div className="grid grid-cols-4 gap-12">
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Tier 1</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.tier1}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 1</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier1}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Tier 2</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.tier2}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier2}</p>
             </div>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Tier 3</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{stats.tier3}</p>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 3</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier3}</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Filter */}
-      <div className="mb-8 px-4 md:px-0 py-4 border-b border-[#E8E8E8]">
-        <div className="max-w-4xl mx-auto">
+        {/* Filter */}
+        <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
           <div className="flex gap-3">
             {["all", 1, 2, 3].map(tier => (
               <button
@@ -125,11 +128,9 @@ export default function ResponsesPage() {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Replies */}
-      <div className="px-4 md:px-0 pb-12">
-        <div className="max-w-4xl mx-auto">
+        {/* Replies */}
+        <div>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
@@ -142,13 +143,17 @@ export default function ResponsesPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredReplies.map(reply => (
-                <div
-                  key={reply.id}
-                  onClick={() => setSelectedReply(reply)}
-                  className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors cursor-pointer"
-                >
+            <div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                Replies
+              </p>
+              <div className="space-y-4">
+                {filteredReplies.map(reply => (
+                  <div
+                    key={reply.id}
+                    onClick={() => setSelectedReply(reply)}
+                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors cursor-pointer"
+                  >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
