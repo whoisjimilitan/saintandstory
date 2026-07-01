@@ -20,28 +20,6 @@ interface Prospect {
 type Channel = "email" | "whatsapp" | "phone";
 type ActionMode = "upload" | "search" | "manual" | null;
 
-// Premium monochrome icons
-const Icons = {
-  Upload: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="17 8 12 3 7 8" />
-      <line x1="12" y1="3" x2="12" y2="15" />
-    </svg>
-  ),
-  Search: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.35-4.35" />
-    </svg>
-  ),
-  Plus: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  ),
-};
 
 function detectCategory(businessName: string): string {
   const name = businessName.toLowerCase();
@@ -223,43 +201,34 @@ export default function DiscoverPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <button
               onClick={() => setActionMode(actionMode === "upload" ? null : "upload")}
-              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
+              className={`p-4 rounded-lg border transition-all ${
                 actionMode === "upload"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <div className="text-[#0D0D0D]">
-                <Icons.Upload />
-              </div>
               <p className="font-semibold text-sm text-[#0D0D0D]">Upload CSV</p>
             </button>
 
             <button
               onClick={() => setActionMode(actionMode === "search" ? null : "search")}
-              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
+              className={`p-4 rounded-lg border transition-all ${
                 actionMode === "search"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <div className="text-[#0D0D0D]">
-                <Icons.Search />
-              </div>
               <p className="font-semibold text-sm text-[#0D0D0D]">Search</p>
             </button>
 
             <button
               onClick={() => setActionMode(actionMode === "manual" ? null : "manual")}
-              className={`p-4 rounded-lg border transition-all flex items-center gap-3 ${
+              className={`p-4 rounded-lg border transition-all ${
                 actionMode === "manual"
                   ? "border-[#0D0D0D] bg-[#F9F9F9]"
                   : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
               }`}
             >
-              <div className="text-[#0D0D0D]">
-                <Icons.Plus />
-              </div>
               <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
             </button>
           </div>
