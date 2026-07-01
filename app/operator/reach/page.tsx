@@ -209,6 +209,28 @@ export default function ReachPage() {
                           <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.replied || 0}</p>
                           <p className="text-xs text-[#888888]">replied</p>
                         </div>
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Delete "${campaign.campaignName}"? This cannot be undone.`)) return;
+                            try {
+                              const res = await fetch("/api/b2b/campaigns/delete", {
+                                method: "DELETE",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ campaignId: campaign.id }),
+                              });
+                              if (!res.ok) throw new Error("Failed to delete");
+                              setCampaigns(campaigns.filter(c => c.id !== campaign.id));
+                            } catch (error) {
+                              alert(`Error deleting campaign: ${error instanceof Error ? error.message : "Unknown error"}`);
+                            }
+                          }}
+                          className="text-[#888888] hover:text-[#D32F2F] transition-colors"
+                          title="Delete campaign"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   </div>
