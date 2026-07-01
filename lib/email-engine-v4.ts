@@ -69,7 +69,7 @@ ${pain}
 
 We ${promise}
 
-Should we be talking? A reply back surely means a lot. Lasting relationships often form from these kinds of boldness :)
+Should we be talking? Your reply matters. Lasting relationships form from boldness like this :)
 
 ${senderName}
 Saint & Story Logistics`;
