@@ -51,8 +51,8 @@ export default function ReachPage() {
     };
 
     fetchCampaigns();
-    // Refresh every 30 seconds for live updates
-    const interval = setInterval(fetchCampaigns, 30000);
+    // Refresh every 5 seconds for near-real-time updates
+    const interval = setInterval(fetchCampaigns, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -97,13 +97,30 @@ export default function ReachPage() {
     <div className="min-h-screen bg-white pt-16 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
-            Reach
-          </h1>
-          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-            Track campaign performance across email and WhatsApp.
-          </p>
+        <div className="mb-12 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
+              Reach
+            </h1>
+            <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
+              Track campaign performance across email and WhatsApp. Auto-refreshes every 5 seconds.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setLoading(true);
+              fetch("/api/b2b/campaigns/list")
+                .then(res => res.json())
+                .then(data => {
+                  setCampaigns(data.campaigns || []);
+                  setLoading(false);
+                })
+                .catch(() => setLoading(false));
+            }}
+            className="px-4 py-2 border border-[#E8E8E8] rounded text-xs font-semibold text-[#0D0D0D] hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors flex-shrink-0"
+          >
+            Refresh Now
+          </button>
         </div>
 
         {/* Channel Tabs */}
