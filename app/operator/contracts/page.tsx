@@ -89,15 +89,15 @@ export default function ContractsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-24">
+    <div className="min-h-screen bg-white pt-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
-            B2B Contracts
+        <div className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
+            Contracts
           </h1>
-          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
-            Track all standing orders and ongoing customer relationships. Monitor active contracts and revenue.
+          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
+            Track standing orders and ongoing customer relationships.
           </p>
         </div>
 

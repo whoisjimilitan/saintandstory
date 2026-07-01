@@ -136,16 +136,16 @@ export default function DiscoverPage() {
   const categories = [...new Set(searchResults.filter(p => selectedLeads.has(p.id)).map(p => p.category))];
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-16 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
 
         {/* === HEADER === */}
-        <div className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
-            Discover & Qualify
+        <div className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
+            Discover
           </h1>
-          <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
-            Build your prospect list. Choose your channel, add leads, and prepare them for outreach.
+          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
+            Build your prospect list and prepare for outreach.
           </p>
         </div>
 
@@ -260,7 +260,7 @@ export default function DiscoverPage() {
                     type="radio"
                     checked={!isPostcodeSearch}
                     onChange={() => setIsPostcodeSearch(false)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 accent-[#0D0D0D]"
                   />
                   <span className="text-sm text-[#0D0D0D]">Keyword</span>
                 </label>
@@ -269,7 +269,7 @@ export default function DiscoverPage() {
                     type="radio"
                     checked={isPostcodeSearch}
                     onChange={() => setIsPostcodeSearch(true)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 accent-[#0D0D0D]"
                   />
                   <span className="text-sm text-[#0D0D0D]">Postcode</span>
                 </label>
@@ -286,7 +286,7 @@ export default function DiscoverPage() {
                     max="25"
                     value={searchRadius}
                     onChange={(e) => setSearchRadius(parseInt(e.target.value))}
-                    className="w-full"
+                    className="w-full accent-[#0D0D0D]"
                   />
                 </div>
               )}
