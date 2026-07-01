@@ -1,21 +1,52 @@
 /**
- * EMAIL ENGINE v4
+ * EMAIL ENGINE v4 (V5 PSYCHOLOGY-LOCKED)
  *
- * Generates psychology-locked, ready-to-send cold outreach emails
- * with LOCKED SENDER VOICE and CONSEQUENCE-BASED SUBJECT LINES.
+ * Generates trust-first, market-aware cold outreach emails.
+ *
+ * ═══════════════════════════════════════════════════════════════════
+ * STRATEGIC FRAMEWORK (LOCKED)
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ * V5 POSITIONING STRATEGY:
+ *
+ * Each email simultaneously:
+ * 1. Observes a REAL industry trend (missed deadlines, capacity constraints)
+ * 2. Highlights competitor weakness (others are failing)
+ * 3. Implies Saint & Story is different (we solve what they can't)
+ * 4. Creates contrast (market problem → our solution)
+ *
+ * WHY THIS WORKS:
+ * ✅ Credible (observable market fact, not opinion)
+ * ✅ Non-attacking (observational, not critical of competitors)
+ * ✅ Urgent (happening RIGHT NOW in their industry)
+ * ✅ Positions us as insider who understands their world
+ * ✅ Makes the problem feel shared, not just theirs
+ *
+ * CRITICAL REQUIREMENT:
+ * This positioning is ONLY ethical and effective if we can deliver:
+ * - Consistent same-day delivery
+ * - Zero missed deadlines
+ * - Genuine backup for failures ("if it ever fails on us, we own it")
+ *
+ * If we cannot deliver on this promise, this positioning backfires immediately.
+ * Prospects will see us as making claims we can't keep.
+ *
+ * RISK/REWARD:
+ * Risk: If we miss a deadline, we lose all credibility (we claimed to solve this)
+ * Reward: If we deliver, we're unbeatable (we're solving a real, visible problem)
+ *
+ * ═══════════════════════════════════════════════════════════════════
  *
  * Template structure (LOCKED):
- * 1. Honest cold outreach (A to Z contacts) + acknowledge boldness
- * 2. Seed plant (third-party observation of their real concerns)
- * 3. Specific pain (dynamic, business-type specific)
- * 4. Specific promise (dynamic, business-type specific)
- * 5. Self-discovery signal (yes/maybe/no)
- * 6. Emotional close (sender-specific)
+ * 1. Apology (acknowledge cold outreach)
+ * 2. Industry insight (market trend observation)
+ * 3. Specific pain (category-specific consequence)
+ * 4. Promise (what we do, backed by risk)
+ * 5. Curiosity question (makes them expert, forces reply)
+ * 6. Dynamic signature (personalized tagline)
  *
- * Consequence Hierarchy:
- * TIER 1 (ULTRA_MOTIVATED): Subject = "We're expanding with you in mind"
- * TIER 2 (HIGHLY_MOTIVATED): Subject = "We're expanding with you in mind"
- * TIER 3 (MOTIVATED): Subject = "We're expanding with you in mind"
+ * Mail merge: First names for personalization
+ * Consequence Hierarchy: Tier-based pricing and urgency
  */
 
 import { detectBusinessType } from "./business-pain-promise-map";
@@ -60,6 +91,28 @@ export function generateEmailV4(
   },
   senderName: string = "James"
 ): EmailV4 {
+  /**
+   * V5 REASONING FRAMEWORK (Applied to every email)
+   *
+   * 1. HONESTY: Industry insight must be truthful + observable
+   *    We're not criticizing competitors, we're observing market reality
+   *
+   * 2. RESTRAINT: Tone stays observational, never attacking
+   *    "Couriers are stretched" not "Your courier sucks"
+   *
+   * 3. CLARITY: Promise is specific and deliverable
+   *    "If it ever fails on us, we own the re-delivery" = we take the risk
+   *
+   * 4. CONSEQUENCE: Closing question makes them expert, forces engagement
+   *    Not a yes/no question, but an evaluation of our solution
+   *
+   * This framework ensures every email is ethically positioned AND
+   * operationally backed by our actual delivery capability.
+   *
+   * CRITICAL: This positioning only works if we deliver consistently.
+   * If we miss deadlines, we lose all credibility immediately.
+   */
+
   // Get sender voice profile (ensures consistency across all emails)
   const voiceProfile = getSenderVoiceProfile(senderName);
   const senderOpening = getSenderOpening(senderName);
