@@ -27,7 +27,7 @@ export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
     `briefs that can't miss their filing deadline.`,
 
   legal: (city: string) =>
-    `documents where one late delivery collapses the case.`,
+    `case files with court deadlines.`,
 
   court: (city: string) =>
     `service documents that have no second chances.`,
@@ -42,10 +42,10 @@ export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
     `surgical supplies that can't be delayed.`,
 
   surgical_supplies: (city: string) =>
-    `sterile equipment that must arrive before surgery starts.`,
+    `equipment that surgery depends on.`,
 
   clinic: (city: string) =>
-    `urgent medical deliveries where timing is life-critical.`,
+    `supplies that can't wait.`,
 
   pharmacy: (city: string) =>
     `prescriptions where delays mean patients wait in pain.`,
@@ -91,7 +91,7 @@ export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
   // ═══════════════════════════════════════════════════════════════════
 
   estate_agent: (city: string) =>
-    `completion documents where delays kill sales.`,
+    `papers needed to close the sale.`,
 
   realtor: (city: string) =>
     `closing papers where one day late can collapse a deal.`,
@@ -109,7 +109,7 @@ export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
     `project plans where late deliveries halt construction.`,
 
   construction_company: (city: string) =>
-    `materials where delays cost thousands in crew idle time.`,
+    `materials that construction waits for.`,
 
   // ═══════════════════════════════════════════════════════════════════
   // TIER 4: TIME-WINDOW DEPENDENT
@@ -120,7 +120,7 @@ export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
     `wedding flowers where the delivery window is exactly 4 hours.`,
 
   event_planning: (city: string) =>
-    `decorations where late arrival means last-minute scrambling.`,
+    `setup where timing is critical.`,
 
   retail: (city: string) =>
     `seasonal stock where late arrivals lose you the entire season.`,
