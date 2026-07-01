@@ -18,24 +18,10 @@
  * TIER 3 (MOTIVATED): Subject = "We're expanding with you in mind"
  */
 
-import { detectBusinessType } from "./business-pain-promise-map";
+import { detectBusinessType, selectSignature } from "./business-pain-promise-map";
 import { getSenderVoiceProfile, getSenderOpening, getSenderCloser } from "./sender-voice-profile";
 import { getSeedPlant } from "./seed-plant-map";
 
-// Format business type for tagline (e.g., "solicitor" → "Solicitors")
-function formatBusinessTypeForTagline(businessType: string): string {
-  const formatted = businessType
-    .replace(/_/g, " ")
-    .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-
-  // Make plural if not already
-  if (!formatted.endsWith("s")) {
-    return formatted + "s";
-  }
-  return formatted;
-}
 
 export interface EmailV4 {
   subjectLine: string;
@@ -68,9 +54,6 @@ export function generateEmailV4(
   // Detect business type and get pain/promise + trust-first subject lines
   const { pain, promise, subjectLines, tier } = detectBusinessType(prospect.businessName);
 
-  const city = prospect.city || "your area";
-  const businessType = detectBusinessCategory(prospect.businessName);
-
   // SUBJECT LINE: Intelligently choose from trust-first options (Observation, Human, Shared World, Zero-Marketing)
   // Pick the first option (can be randomized for A/B testing if needed)
   const subjectLine = subjectLines && subjectLines.length > 0 ? subjectLines[0] : "One thing I've learnt";
@@ -78,13 +61,12 @@ export function generateEmailV4(
   // Mail merge: use firstName if available, fallback to [Name]
   const greeting = prospect.firstName ? prospect.firstName : "[Name]";
 
-  // Get category-specific closing question from pain-promise map
+  // Get category-specific closing question and identity from pain-promise map
   const ppmEntry = detectBusinessType(prospect.businessName);
   const closingQuestion = ppmEntry.closingQuestion || "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?";
 
-  // Dynamic tagline: "Simplifying Logistics for [Category]"
-  const businessCategory = formatBusinessTypeForTagline(businessType);
-  const dynamicTagline = `Simplifying Logistics for ${businessCategory}`;
+  // Dynamic signature: Use hierarchical identity (principle > outcome > positioning)
+  const signature = selectSignature(ppmEntry.identity);
 
   // Trust-first template: Disarm → Understand → Demonstrate character → Invite conversation
   const bodyText = `Hi ${greeting},
@@ -99,7 +81,7 @@ ${closingQuestion}
 
 ${senderName}
 Saint & Story
-${dynamicTagline}`;
+${signature}`;
 
   return {
     subjectLine,
