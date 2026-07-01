@@ -1,135 +1,173 @@
 /**
- * SEED PLANT MAP - PROBLEM-BASED
+ * SEED PLANT MAP - FUNCTIONAL PROBLEMS
  *
- * Seeds prospect's mind with FUNCTIONAL PROBLEMS they face, not category labels.
- * Focus: The actual need/constraint, not the business type
- * Psychology: "I see your real problem" not "I see you're a [category]"
+ * Recognition moment: "I see your real operational problem"
+ * Not category labels. Not industry speak. Functional consequences.
  *
- * Used in Email Engine v5 to generate recognition moment.
- * More specific, more visceral, more pass-able across roles.
+ * Psychology: Prospect sees themselves BEFORE the email mentions what we do.
+ * Structure: "I've noticed something with [functional constraint]"
+ *
+ * Used in EMAIL ENGINE V5:
+ * Seeds prospect's mind → Pain consequence → Our promise → Boldness frame
  */
 
 export const SEED_PLANT_MAP: Record<string, (city: string) => string> = {
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 1: ULTRA MOTIVATED (Legal/Compliance/Health)
+  // TIER 1: CASE/OUTCOME DEPENDENT
+  // (One late delivery = case dismissed, patient suffers, fine imposed)
   // ═══════════════════════════════════════════════════════════════════
 
   solicitor: (city: string) =>
-    `I've noticed something with legal document shipments that can't be late. When that brief misses its deadline, the case gets dismissed.`,
+    `legal documents that have court deadlines.`,
 
   lawyer: (city: string) =>
-    `I've noticed something with court filings that have hard deadlines. Miss the window by an hour and the motion gets rejected.`,
+    `court filings that determine case outcomes.`,
 
   attorney: (city: string) =>
-    `I've noticed something with legal service documents that determine case outcomes. If it doesn't arrive on time, the case falls apart.`,
+    `briefs that can't miss their filing deadline.`,
 
   legal: (city: string) =>
-    `I've noticed something with documents that clients are waiting for. When they arrive late, clients lose trust fast.`,
+    `documents where one late delivery collapses the case.`,
 
   court: (city: string) =>
-    `I've noticed something with legal filings that have court dates. There are no second chances with court deadlines.`,
+    `service documents that have no second chances.`,
 
   bailiff: (city: string) =>
-    `I've noticed something with service documents that have court deadlines. If the summons doesn't reach the defendant on time, the case stalls.`,
+    `summons that must reach defendants on time.`,
 
   process_server: (city: string) =>
-    `I've noticed something with papers that need to reach defendants by a certain date. Miss that window and the case never moves forward.`,
+    `papers where the deadline decides if a case moves forward.`,
 
   hospital: (city: string) =>
-    `I've noticed something with surgical supplies that need to arrive before the operating theatre starts. Delays cascade into cancelled surgeries.`,
+    `surgical supplies that can't be delayed.`,
 
   surgical_supplies: (city: string) =>
-    `I've noticed something with sterile equipment that needs to be there before the first surgery. If it's not, the OR sits empty.`,
+    `sterile equipment that must arrive before surgery starts.`,
 
   clinic: (city: string) =>
-    `I've noticed something with urgent medical deliveries that patients need today. When they're late, patients suffer.`,
+    `urgent medical deliveries where timing is life-critical.`,
 
   pharmacy: (city: string) =>
-    `I've noticed something with prescriptions that patients need immediately. When those arrive late, people wait in pain.`,
+    `prescriptions where delays mean patients wait in pain.`,
 
   medical_devices: (city: string) =>
-    `I've noticed something with equipment for procedures scheduled tomorrow. If it doesn't arrive on time, the surgery gets postponed.`,
+    `equipment where one late arrival means postponed procedures.`,
 
   insurance_company: (city: string) =>
-    `I've noticed something with compliance filings that have regulatory deadlines. Miss those and fines follow.`,
+    `compliance filings that have regulatory deadlines.`,
 
   insurance_broker: (city: string) =>
-    `I've noticed something with policy documents that clients need before they close. When those are late, deals fall apart.`,
+    `policy documents where delays kill deals.`,
 
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 2: HIGHLY MOTIVATED (Premium/High-Value)
+  // TIER 2: HIGH-VALUE FINANCIAL IMPACT
+  // (One late delivery = lost client, production shutdown, significant loss)
   // ═══════════════════════════════════════════════════════════════════
 
   film_production: (city: string) =>
-    `I've noticed something with camera packages that need to arrive before tomorrow's shoot. If they're late, the production shuts down.`,
+    `camera equipment where one day late shuts down a shoot.`,
 
   tv_production: (city: string) =>
-    `I've noticed something with equipment that has to be there with no time to spare. Late arrivals mean reshoots and wasted crew days.`,
+    `production gear where delays mean thousands in wasted crew costs.`,
 
   university_research: (city: string) =>
-    `I've noticed something with research samples that can't be repeated. If they arrive damaged or late, months of work gets lost.`,
+    `research samples where damage or delay means months of work lost.`,
 
   auction_house: (city: string) =>
-    `I've noticed something with high-value lots that need to arrive before bidding starts. If they miss that window, the auction is compromised.`,
+    `high-value lots where timing directly impacts the sale.`,
 
   jewelry_store: (city: string) =>
-    `I've noticed something with pieces that need secure, on-time arrival. Late deliveries mean customers walk away angry.`,
+    `pieces where late arrival means losing customers.`,
 
   luxury_goods: (city: string) =>
-    `I've noticed something with premium items for VIP customers. When those arrive late, you lose the client.`,
+    `premium items where delays cost you VIP clients.`,
 
   fashion_design: (city: string) =>
-    `I've noticed something with pitch samples for buyer meetings. If they don't arrive on time, the order never happens.`,
+    `samples where one late pitch means the order never happens.`,
 
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 3: MOTIVATED (Operational)
+  // TIER 3: DEAL-DEPENDENT
+  // (One late delivery = deal collapses, relationship fractures)
   // ═══════════════════════════════════════════════════════════════════
 
   estate_agent: (city: string) =>
-    `I've noticed something with completion documents that close deals. When those arrive late, the sale collapses.`,
+    `completion documents where delays kill sales.`,
 
   realtor: (city: string) =>
-    `I've noticed something with closing documents that have hard deadlines. Miss those and the deal dies.`,
+    `closing papers where one day late can collapse a deal.`,
 
   lettings: (city: string) =>
-    `I've noticed something with tenancy documents that need signatures on time. Delays mean the letting stalls.`,
+    `tenancy documents where timing delays the entire letting.`,
 
   accounting_firm: (city: string) =>
-    `I've noticed something with tax season documents that have April 15 stamped on them. Late submissions mean penalties.`,
+    `tax filings where one late submission means penalties for clients.`,
 
   tax_service: (city: string) =>
-    `I've noticed something with returns that need to file by the tax deadline. Miss that and your clients get audited.`,
+    `returns where missing the deadline means audits.`,
 
   architecture_firm: (city: string) =>
-    `I've noticed something with project plans that keep construction on schedule. If those arrive late, crews sit idle.`,
+    `project plans where late deliveries halt construction.`,
 
   construction_company: (city: string) =>
-    `I've noticed something with materials that crews are waiting for. Late arrivals cost thousands in crew downtime.`,
+    `materials where delays cost thousands in crew idle time.`,
+
+  // ═══════════════════════════════════════════════════════════════════
+  // TIER 4: TIME-WINDOW DEPENDENT
+  // (One late delivery = event ruined, service disrupted, revenue lost)
+  // ═══════════════════════════════════════════════════════════════════
 
   florist: (city: string) =>
-    `I've noticed something with wedding flowers that have a 4-hour window. If they arrive outside that window, the wedding looks wrong.`,
+    `wedding flowers where the delivery window is exactly 4 hours.`,
 
   event_planning: (city: string) =>
-    `I've noticed something with decorations that arrive before event setup. Late deliveries mean frantic last-minute scrambling.`,
+    `decorations where late arrival means last-minute scrambling.`,
 
   retail: (city: string) =>
-    `I've noticed something with seasonal inventory before the holiday rush. If it's late, you lose the season.`,
+    `seasonal stock where late arrivals lose you the entire season.`,
 
   hospitality: (city: string) =>
-    `I've noticed something with supplies that arrive before Friday dinner service. Late deliveries mean empty tables.`,
+    `supplies where delays mean Friday dinner service gets disrupted.`,
 
   restaurant: (city: string) =>
-    `I've noticed something with ingredients that arrive before service starts. If they're late, you can't open for dinner.`,
+    `ingredients where one late delivery means you can't open for service.`,
 
   cafe: (city: string) =>
-    `I've noticed something with morning deliveries before opening. Late arrivals mean you open late and lose customers.`,
+    `morning stock where delays mean you open late and lose customers.`,
 
-  // Fallback for unknown categories
+  // Fallback
   default: (city: string) =>
-    `I've noticed something with time-sensitive deliveries that matter to your operation. When those arrive late, everything stops.`,
+    `deliveries that directly impact your operation's timeline.`,
 };
 
-export function getSeedPlant(businessType: string, city: string): string {
-  const seedPlantFn = SEED_PLANT_MAP[businessType.toLowerCase()] || SEED_PLANT_MAP.default;
-  return seedPlantFn(city);
+export function getSeedPlant(businessName: string, city: string): string {
+  // Normalize the business name
+  let cleanName = businessName
+    .toLowerCase()
+    // Remove UK postcodes (e.g., EC4Y 0HA)
+    .replace(/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/gi, "")
+    // Remove US zipcode (e.g., 12345)
+    .replace(/\b\d{5}(?:-\d{4})?\b/g, "")
+    // Remove line breaks and extra spaces
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Exact matches first
+  for (const [key, seedPlantFn] of Object.entries(SEED_PLANT_MAP)) {
+    if (key === "default") continue;
+    if (cleanName.includes(key.replace(/_/g, " "))) {
+      return seedPlantFn(city);
+    }
+  }
+
+  // Partial matches as fallback
+  for (const [key, seedPlantFn] of Object.entries(SEED_PLANT_MAP)) {
+    if (key === "default") continue;
+    const keywords = key.split("_");
+    if (keywords.some((kw) => cleanName.includes(kw))) {
+      return seedPlantFn(city);
+    }
+  }
+
+  // Default fallback
+  return SEED_PLANT_MAP.default(city);
 }

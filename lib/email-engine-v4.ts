@@ -63,18 +63,16 @@ export function generateEmailV4(
 
   const bodyText = `Hi [Name],
 
-Sorry for my randomness. I know reaching out cold is bold, but I'm contacting everyone A-Z in my phone. Some people I know well, others I've barely talked with. My apologies.
-
-${seedPlant}
+Reaching out cold—I know it's bold. But I noticed something with ${seedPlant}
 
 ${pain}
 
-Our promise to all new customers like yours is that ${promise}
+We ${promise}
 
-Just curious if you'd reply. It means a lot. Real conversation starts there.
+Should we be talking? A reply back surely means a lot. Lasting relationships often form from these kinds of boldness :)
 
 ${senderName}
-Saint & Story`;
+Saint & Story Logistics`;
 
   return {
     subjectLine,

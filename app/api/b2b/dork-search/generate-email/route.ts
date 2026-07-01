@@ -4,18 +4,19 @@ import { generateEmailV4, type EmailV4 } from "@/lib/email-engine-v4";
 /**
  * EMAIL GENERATION - VERSION 5 (Production)
  *
- * Generates psychology-locked, ready-to-send cold outreach emails
- * using EMAIL ENGINE V5 (refined post-V4):
+ * Generates psychology-locked, ready-to-send cold outreach emails.
  *
- * ✅ 40+ business categories with dynamic seed plants
+ * ✅ 34+ business categories with functional problem seed plants
  * ✅ Consequence-based pain & promise mappings
- * ✅ V5 Psychology Stack: Honest opening → Seed Plant → Pain → Promise → Humanized Closer
+ * ✅ V5 Psychology Stack: Bold recognition → Specific pain → Locked promise → Boldness frame
  * ✅ Operator preview for further personalization
  *
- * SUBJECT: Benefit-focused, category-specific, optimized for opens
- * BODY: V5 Version with improved grammar and humanized closer
- *   - Opening: "Some people I know well, others I've barely talked with."
- *   - Closer: "Just curious if you'd reply. It means a lot. Real conversation starts there."
+ * TEMPLATE (LOCKED):
+ *   - Opening: "Reaching out cold—I know it's bold. But I noticed something with [functional problem]."
+ *   - Pain: "You operate on [constraint]. One missed delivery = [consequence]."
+ *   - Promise: "We built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost."
+ *   - Closer: "Should we be talking? A reply back surely means a lot. Lasting relationships often form from these kinds of boldness :)"
+ *   - Signature: "James\nSaint & Story Logistics"
  */
 
 interface GenerateEmailRequest {
