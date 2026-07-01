@@ -118,22 +118,24 @@ export default function CRMPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12">
-      <div className="px-4 md:px-8 lg:px-12">
-        {/* Header */}
-        <div className="mb-12">
+    <div className="min-h-screen bg-white pt-24 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+
+        {/* === HEADER === */}
+        <div className="mb-16">
+          <p className="text-xs text-[#888888] tracking-widest uppercase mb-3">Search & view</p>
           <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
-            Prospect & customer database.
+            Prospect Database
           </h1>
           <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
-            Find prospects and customers, view all communications and history.
+            Find prospects and customers. View all communications, engagement history, and transaction records.
           </p>
         </div>
 
-        {/* Google-Style Search Bar */}
+        {/* === SEARCH === */}
         <form onSubmit={handleSearch} className="mb-16">
           <div className="max-w-2xl mx-auto">
-            <div className="flex items-center gap-3 px-6 py-4 border border-[#E8E8E8] rounded-full bg-white hover:border-[#0D0D0D] hover:shadow-sm transition-all">
+            <div className="flex items-center gap-3 px-6 py-4 border border-[#E8E8E8] rounded-full bg-white hover:border-[#0D0D0D] focus-within:border-[#0D0D0D] transition-all">
               <input
                 type="text"
                 placeholder="Search by business name, email, phone, or city..."
@@ -152,96 +154,95 @@ export default function CRMPage() {
           </div>
         </form>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* === RESULTS LAYOUT === */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
           {/* Search Results Sidebar */}
           <div className="lg:col-span-1">
-            <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white max-h-[600px] overflow-y-auto sticky top-24">
-              <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-4">
-                Results ({searchResults.length})
-              </p>
+            <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
+              Results ({searchResults.length})
+            </p>
 
-              {searchResults.length === 0 && searchQuery.length >= 2 && (
-                <p className="text-xs text-[#888888]">No results found</p>
-              )}
+            {searchResults.length === 0 && searchQuery.length >= 2 && (
+              <p className="text-sm text-[#888888]">No results found</p>
+            )}
 
-              <div className="space-y-2">
-                {searchResults.map((prospect) => (
-                  <button
-                    key={prospect.id}
-                    onClick={() => loadProspectDetail(prospect.id)}
-                    className={`w-full text-left p-3 rounded border transition-all ${
-                      selectedProspect?.prospect.id === prospect.id
-                        ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                        : "border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
-                    }`}
-                  >
-                    <p className="font-semibold text-xs text-[#0D0D0D]">{prospect.businessName}</p>
-                    <p className="text-[10px] mt-1 text-[#888888]">{prospect.email}</p>
-                    <div className="flex gap-2 mt-2 text-[10px] text-[#CCCCCC]">
-                      <span>{prospect.emailCount} emails</span>
-                      <span>•</span>
-                      <span>{prospect.totalOpens} opens</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+            {searchResults.length === 0 && searchQuery.length === 0 && (
+              <p className="text-sm text-[#888888]">Search to begin</p>
+            )}
+
+            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              {searchResults.map((prospect) => (
+                <button
+                  key={prospect.id}
+                  onClick={() => loadProspectDetail(prospect.id)}
+                  className={`w-full text-left p-3 rounded-lg transition-all ${
+                    selectedProspect?.prospect.id === prospect.id
+                      ? "bg-[#0D0D0D] text-white"
+                      : "bg-white border border-[#E8E8E8] hover:border-[#0D0D0D] hover:bg-[#F9F9F9]"
+                  }`}
+                >
+                  <p className={`font-semibold text-xs ${selectedProspect?.prospect.id === prospect.id ? 'text-white' : 'text-[#0D0D0D]'}`}>
+                    {prospect.businessName}
+                  </p>
+                  <p className={`text-[10px] mt-1.5 ${selectedProspect?.prospect.id === prospect.id ? 'text-[#CCCCCC]' : 'text-[#888888]'}`}>
+                    {prospect.email}
+                  </p>
+                  <div className={`flex gap-2 mt-2.5 text-[10px] ${selectedProspect?.prospect.id === prospect.id ? 'text-[#AAAAAA]' : 'text-[#CCCCCC]'}`}>
+                    <span>{prospect.emailCount} emails</span>
+                    <span>•</span>
+                    <span>{prospect.totalOpens} opens</span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Prospect Details */}
           <div className="lg:col-span-2">
             {loading ? (
-              <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
-                <p className="text-sm text-[#888888]">Loading prospect details...</p>
+              <div className="text-center py-12">
+                <p className="text-sm text-[#888888]">Loading...</p>
               </div>
             ) : selectedProspect ? (
-              <div className="space-y-8">
-                {/* Prospect Header Card */}
-                <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-[#F9F9F9]">
-                  <div>
-                    <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-3">
-                      Business Profile
-                    </p>
-                    <h2 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-6 tracking-tight leading-tight">
-                      {selectedProspect.prospect.businessName}
-                    </h2>
+              <div className="space-y-16">
 
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-xs text-[#888888] font-semibold mb-1">Category</p>
-                        <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.category}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#888888] font-semibold mb-1">City</p>
-                        <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.city}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#888888] font-semibold mb-1">Email</p>
-                        <p className="text-sm text-[#0D0D0D] break-all">{selectedProspect.prospect.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#888888] font-semibold mb-1">Phone</p>
-                        <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.phone || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#888888] font-semibold mb-1">Status</p>
-                        <p className="text-sm text-[#0D0D0D] capitalize">{selectedProspect.prospect.status}</p>
-                      </div>
+                {/* Business Profile */}
+                <div>
+                  <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-4">
+                    Business profile
+                  </p>
+                  <h2 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-8 tracking-tight leading-tight">
+                    {selectedProspect.prospect.businessName}
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-12 pb-12 border-b border-[#E8E8E8]">
+                    <div>
+                      <p className="text-xs text-[#888888] font-semibold uppercase tracking-widest mb-2">Category</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.category}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#888888] font-semibold uppercase tracking-widest mb-2">City</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.city}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#888888] font-semibold uppercase tracking-widest mb-2">Email</p>
+                      <p className="text-sm text-[#0D0D0D] break-all">{selectedProspect.prospect.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#888888] font-semibold uppercase tracking-widest mb-2">Phone</p>
+                      <p className="text-sm text-[#0D0D0D]">{selectedProspect.prospect.phone || "—"}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Customer Status */}
-                <div className={`border rounded-lg p-6 md:p-8 ${
-                  selectedProspect.customer.isCustomer
-                    ? "border-[#0D0D0D] bg-white"
-                    : "border-[#E8E8E8] bg-[#F9F9F9]"
-                }`}>
-                  <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="flex items-center justify-between mb-6">
                     <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase">
                       Status
                     </p>
-                    <span className={`text-xs font-semibold px-3 py-1.5 rounded ${
+                    <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
                       selectedProspect.customer.isCustomer
                         ? "bg-[#0D0D0D] text-white"
                         : "bg-[#E8E8E8] text-[#0D0D0D]"
@@ -251,21 +252,21 @@ export default function CRMPage() {
                   </div>
 
                   {selectedProspect.customer.isCustomer ? (
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-3 gap-12 pb-12 border-b border-[#E8E8E8]">
                       <div>
-                        <p className="text-xs text-[#888888] mb-2">Jobs Completed</p>
-                        <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                        <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Jobs</p>
+                        <p className="text-3xl font-black text-[#0D0D0D]">
                           {selectedProspect.customer.jobCount}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-[#888888] mb-2">Total Spent</p>
-                        <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                        <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total spent</p>
+                        <p className="text-3xl font-black text-[#0D0D0D]">
                           £{selectedProspect.customer.totalSpent.toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-[#888888] mb-2">Last Service</p>
+                        <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Last service</p>
                         <p className="text-sm text-[#0D0D0D]">
                           {selectedProspect.customer.lastJobDate
                             ? new Date(selectedProspect.customer.lastJobDate).toLocaleDateString()
@@ -274,33 +275,33 @@ export default function CRMPage() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-[#666666]">
-                      This prospect has not yet placed any orders. They are in the discovery/qualification phase.
+                    <p className="text-sm text-[#666666] pb-12 border-b border-[#E8E8E8]">
+                      This prospect has not yet placed any orders. They are in discovery and qualification.
                     </p>
                   )}
                 </div>
 
                 {/* Engagement Overview */}
-                <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+                <div>
                   <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
-                    Engagement Overview
+                    Engagement
                   </p>
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-3 gap-12 pb-12 border-b border-[#E8E8E8]">
                     <div>
-                      <p className="text-xs text-[#888888] mb-2">Emails Sent</p>
-                      <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Emails sent</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalSent}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-2">Total Opens</p>
-                      <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total opens</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalOpens}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] mb-2">Total Clicks</p>
-                      <p className="text-3xl font-black text-[#0D0D0D] tracking-tight">
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total clicks</p>
+                      <p className="text-3xl font-black text-[#0D0D0D]">
                         {selectedProspect.emailsSummary.totalClicks}
                       </p>
                     </div>
@@ -309,22 +310,21 @@ export default function CRMPage() {
 
                 {/* Communication History */}
                 {selectedProspect.emails.length > 0 && (
-                  <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+                  <div>
                     <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
-                      Communication History
+                      Communication history
                     </p>
-                    <div className="space-y-3">
+                    <div className="space-y-6">
                       {selectedProspect.emails.map((email) => (
-                        <div key={email.id} className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors">
+                        <div key={email.id} className="pb-6 border-b border-[#E8E8E8] last:border-0">
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <p className="font-semibold text-sm text-[#0D0D0D] flex-1">{email.subject}</p>
-                            <span className="text-[10px] px-2.5 py-1 bg-white border border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold whitespace-nowrap">
+                            <span className="text-[10px] px-2.5 py-1 bg-[#E8E8E8] text-[#0D0D0D] rounded-full font-semibold whitespace-nowrap">
                               {email.status}
                             </span>
                           </div>
                           <p className="text-xs text-[#888888] mb-2">
-                            {new Date(email.sentAt).toLocaleDateString()} at{" "}
-                            {new Date(email.sentAt).toLocaleTimeString()}
+                            {new Date(email.sentAt).toLocaleDateString()}
                           </p>
                           <div className="flex gap-3 text-xs text-[#666666]">
                             <span>Opens: {email.opens}</span>
@@ -338,20 +338,20 @@ export default function CRMPage() {
                 )}
 
                 {selectedProspect.emails.length === 0 && (
-                  <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
-                    <p className="text-sm text-[#888888]">No communication history yet</p>
+                  <div className="text-center py-12 text-[#888888]">
+                    <p className="text-sm">No communication history yet</p>
                   </div>
                 )}
 
-                {/* Job History */}
+                {/* Order History */}
                 {selectedProspect.customer.isCustomer && selectedProspect.customer.jobs.length > 0 && (
-                  <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+                  <div>
                     <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
-                      Order History
+                      Order history
                     </p>
-                    <div className="space-y-3">
+                    <div className="space-y-6">
                       {selectedProspect.customer.jobs.map((job) => (
-                        <div key={job.id} className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors">
+                        <div key={job.id} className="pb-6 border-b border-[#E8E8E8] last:border-0">
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="flex-1">
                               <p className="font-semibold text-sm text-[#0D0D0D]">{job.serviceType}</p>
@@ -361,7 +361,7 @@ export default function CRMPage() {
                             </div>
                             <div className="text-right">
                               <p className="font-black text-lg text-[#0D0D0D]">£{job.price.toLocaleString()}</p>
-                              <span className={`text-[10px] px-2.5 py-1 rounded font-semibold whitespace-nowrap inline-block mt-1 ${
+                              <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap inline-block mt-1 ${
                                 job.active
                                   ? "bg-[#0D0D0D] text-white"
                                   : "bg-[#E8E8E8] text-[#0D0D0D]"
@@ -372,7 +372,7 @@ export default function CRMPage() {
                           </div>
                           {job.nextScheduledAt && (
                             <p className="text-xs text-[#888888] mt-2">
-                              Next scheduled: {new Date(job.nextScheduledAt).toLocaleDateString()}
+                              Next: {new Date(job.nextScheduledAt).toLocaleDateString()}
                             </p>
                           )}
                         </div>
@@ -380,23 +380,24 @@ export default function CRMPage() {
                     </div>
                   </div>
                 )}
+
               </div>
             ) : (
-              <div className="border border-[#E8E8E8] rounded-lg p-12 bg-white text-center">
+              <div className="text-center py-16">
                 <p className="text-base text-[#0D0D0D] font-semibold mb-2">No prospect selected</p>
-                <p className="text-sm text-[#888888]">Search for a prospect to view their full profile and communication history</p>
+                <p className="text-sm text-[#888888]">Search to view their profile and communication history</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Back Button */}
+        {/* Footer */}
         <div className="mt-16 flex justify-center">
           <button
             onClick={() => router.push("/operator")}
-            className="text-xs font-semibold text-[#0D0D0D] border border-[#E8E8E8] px-4 py-2 rounded hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
+            className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
           >
-            Back to TODAY
+            ← Back to TODAY
           </button>
         </div>
       </div>
