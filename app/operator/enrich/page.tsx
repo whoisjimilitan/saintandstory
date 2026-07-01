@@ -408,30 +408,6 @@ export default function EnrichPage() {
                   <p className="text-xs text-[#666666] mt-1">{currentEmail.businessName} • {currentEmail.city}</p>
                 </div>
 
-                {/* V4 Metadata (If Available) */}
-                {(currentEmail.pain || currentEmail.promise || currentEmail.consequenceTier) && (
-                  <div className="pb-4 border-b border-[#E8E8E8] bg-[#F9F9F9] -mx-6 -my-4 px-6 py-4">
-                    <p className="text-xs text-[#888888] uppercase font-semibold mb-3">Email Intelligence (V4)</p>
-                    <div className="space-y-2 text-xs text-[#0D0D0D]">
-                      {currentEmail.pain && (
-                        <div>
-                          <span className="font-semibold text-[#666666]">Pain:</span> {currentEmail.pain}
-                        </div>
-                      )}
-                      {currentEmail.promise && (
-                        <div>
-                          <span className="font-semibold text-[#666666]">Promise:</span> {currentEmail.promise}
-                        </div>
-                      )}
-                      {currentEmail.consequenceTier && (
-                        <div>
-                          <span className="font-semibold text-[#666666]">Tier:</span> {currentEmail.consequenceTier}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
                 {/* SUBJECT */}
                 <div className="pb-4 border-b border-[#E8E8E8]">
                   <p className="text-xs text-[#888888] uppercase font-semibold mb-1">Subject</p>
