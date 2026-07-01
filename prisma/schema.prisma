@@ -990,14 +990,19 @@ model b2b_prospect_qualifications {
 
 model b2b_responses {
   id                    String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lead_id               String?     @db.Uuid
   outreach_id           String      @db.Uuid
   response_type         String
+  response_body         String?
+  response_summary      String?
   responded_at          DateTime    @default(now())
   response_time_minutes Int?
   tracking_token        String?     @unique @map("tracking_token")
   created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt @map("updated_at")
   b2b_outreach          B2bOutreach @relation(fields: [outreach_id], references: [id], onDelete: Cascade)
 
+  @@index([lead_id])
   @@index([outreach_id])
   @@index([responded_at(sort: Desc)])
   @@index([response_type])
