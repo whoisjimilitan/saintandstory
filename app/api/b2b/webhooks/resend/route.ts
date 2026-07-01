@@ -130,6 +130,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle bounce/complaint: flag as invalid and disqualify
+    if (mappedEventType === "bounced" || mappedEventType === "complained") {
+      try {
+        await sql`
+          UPDATE b2b_leads
+          SET
+            status = 'invalid_email',
+            engagement_score = 0,
+            notes = CONCAT(COALESCE(notes, ''), CHAR(10), '[SYSTEM] Email ', ${mappedEventType}, ' at ', NOW())
+          WHERE id = ${leadId}
+        `;
+        console.log(`[WEBHOOK] ⚠️ Marked lead ${leadId} as invalid_email (${mappedEventType})`);
+      } catch (err) {
+        console.error(`[WEBHOOK] Error flagging invalid email:`, err);
+      }
+    }
+
     console.log(
       `[WEBHOOK] ✓ Recorded ${mappedEventType} for lead ${leadId}`
     );
