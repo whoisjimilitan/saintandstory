@@ -62,196 +62,196 @@ export function TodayOperational() {
       }
     };
     fetch();
-    const interval = setInterval(fetch, 30000); // Live updates every 30s
+    const interval = setInterval(fetch, 30000);
     return () => clearInterval(interval);
   }, []);
 
   if (loading || !data) return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      {/* AVAILABILITY RIGHT NOW */}
-      <div className="mb-12">
+    <div className="max-w-4xl mx-auto px-4 py-8">
+
+      {/* === THE MOMENT: What matters right now === */}
+      <div className="mb-16">
+        {/* Primary state indicator */}
         <div className="flex items-center gap-2 mb-4">
-          <div className="text-[#0D0D0D]">
-            <Icons.Drivers />
-          </div>
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-            Drivers Available
-          </p>
-        </div>
-        <div className="flex items-baseline gap-4">
-          <p className="text-4xl font-black text-[#0D0D0D]">{data.driversOnline}</p>
-          <p className="text-sm text-[#888888]">online for interception jobs</p>
-        </div>
-        <p className="text-xs text-[#666666] mt-3">
-          {data.driversTotalPool} total • {data.driversOffline} offline
-        </p>
-      </div>
-
-      {/* ACTUAL PIPELINE MOVES */}
-      <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="text-[#0D0D0D]">
-            <Icons.TrendingUp />
-          </div>
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-            Pipeline Today
-          </p>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineQualified}</p>
-            <p className="text-xs text-[#888888] mt-1">qualified today</p>
-          </div>
-          <div>
-            <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineProposed}</p>
-            <p className="text-xs text-[#888888] mt-1">proposals sent</p>
-          </div>
-          <div>
-            <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineClosedToday}</p>
-            <p className="text-xs text-[#888888] mt-1">closed today</p>
-          </div>
-        </div>
-      </div>
-
-      {/* CAMPAIGNS SNAPSHOT - What's happening now */}
-      <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
-        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-          Campaign Activity
-        </p>
-
-        {/* Email Campaigns */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="text-[#0D0D0D]">
-              <Icons.Message />
+          {data.statusMessage?.includes("Pipeline healthy") && (
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5F5F5] border border-[#E8E8E8]">
+              <div className="w-2 h-2 rounded-full bg-[#0D0D0D]"></div>
+              <p className="text-xs font-medium text-[#0D0D0D]">System operational</p>
             </div>
-            <p className="text-sm font-semibold text-[#0D0D0D]">Email</p>
-          </div>
-          <div className="grid grid-cols-4 gap-3">
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.emailSent}</p>
-              <p className="text-xs text-[#888888] mt-1">sent</p>
-            </div>
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.emailOpened}</p>
-              <p className="text-xs text-[#888888] mt-1">opened</p>
-            </div>
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.emailClicked}</p>
-              <p className="text-xs text-[#888888] mt-1">clicked</p>
-            </div>
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.emailReplied}</p>
-              <p className="text-xs text-[#888888] mt-1">replied</p>
-            </div>
-          </div>
-        </div>
-
-        {/* WhatsApp Campaigns */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="text-[#0D0D0D]">
-              <Icons.Message />
-            </div>
-            <p className="text-sm font-semibold text-[#0D0D0D]">WhatsApp</p>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappActive}</p>
-              <p className="text-xs text-[#888888] mt-1">active</p>
-            </div>
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappReady}</p>
-              <p className="text-xs text-[#888888] mt-1">ready</p>
-            </div>
-            <div>
-              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappReplied}</p>
-              <p className="text-xs text-[#888888] mt-1">replied</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* WAITING RESPONSES */}
-      <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="text-[#0D0D0D]">
-            <Icons.Clock />
-          </div>
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-            Responses Waiting
-          </p>
-        </div>
-        <div className="flex items-baseline gap-3">
-          <p className="text-3xl font-black text-[#0D0D0D]">{data.repliesWaiting}</p>
-          <p className="text-sm text-[#888888]">email replies to contact</p>
-        </div>
-        <p className="text-xs text-[#666666] mt-3">Oldest: {data.oldestReplyHours} hours waiting</p>
-      </div>
-
-      {/* IMMEDIATE ACTIONS */}
-      <div className="mb-8">
-        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-          Right Now
-        </p>
-        <div className="space-y-3">
-          {/* Contact replies */}
+          )}
           {data.repliesWaiting > 0 && (
-            <Link href="/operator/responses">
-              <div className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Icons.Clock />
-                    <p className="font-semibold text-sm">Contact {data.repliesWaiting} replies</p>
-                  </div>
-                  <p className="text-xs text-[#CCCCCC]">→</p>
-                </div>
-              </div>
-            </Link>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D0D0D] text-white">
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <p className="text-xs font-medium">{data.repliesWaiting} reply{data.repliesWaiting !== 1 ? 's' : ''} waiting</p>
+            </div>
           )}
+        </div>
 
-          {/* Assign drivers */}
-          {data.driversOnline > 0 && (
-            <Link href="/operator/understand">
-              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] transition-colors cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="text-[#0D0D0D]">
-                      <Icons.Drivers />
-                    </div>
-                    <p className="font-semibold text-sm text-[#0D0D0D]">Assign {data.driversOnline} drivers to jobs</p>
-                  </div>
-                  <p className="text-xs text-[#888888]">→</p>
-                </div>
-              </div>
-            </Link>
-          )}
+        {/* Main insight */}
+        <div className="mb-8">
+          <p className="text-sm text-[#888888] tracking-widest uppercase mb-3">Right now</p>
+          <div className="flex items-baseline gap-4">
+            <p className="text-5xl font-black text-[#0D0D0D]">{data.driversOnline}</p>
+            <p className="text-lg text-[#666666] font-light">
+              driver{data.driversOnline !== 1 ? 's' : ''} available for immediate dispatch
+            </p>
+          </div>
+          <p className="text-xs text-[#888888] mt-2">{data.driversTotalPool} in pool • {data.driversOffline} offline</p>
+        </div>
 
-          {/* Follow up stalled prospects */}
-          {data.prospectsStalled > 0 && (
-            <Link href="/operator/pipeline">
-              <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] transition-colors cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="text-[#0D0D0D]">
-                      <Icons.AlertCircle />
-                    </div>
-                    <p className="font-semibold text-sm text-[#0D0D0D]">Follow up {data.prospectsStalled} stalled</p>
-                  </div>
-                  <p className="text-xs text-[#888888]">→</p>
+        {/* Context: What's in motion */}
+        {(data.pipelineQualified + data.pipelineProposed + data.pipelineClosedToday > 0) && (
+          <div className="mb-8 pb-8 border-b border-[#E8E8E8]">
+            <p className="text-xs text-[#888888] tracking-widest uppercase mb-3">Pipeline today</p>
+            <div className="flex gap-12">
+              {data.pipelineQualified > 0 && (
+                <div>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineQualified}</p>
+                  <p className="text-xs text-[#888888] mt-1">qualified</p>
+                </div>
+              )}
+              {data.pipelineProposed > 0 && (
+                <div>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineProposed}</p>
+                  <p className="text-xs text-[#888888] mt-1">proposals sent</p>
+                </div>
+              )}
+              {data.pipelineClosedToday > 0 && (
+                <div>
+                  <p className="text-2xl font-black text-[#0D0D0D]">{data.pipelineClosedToday}</p>
+                  <p className="text-xs text-[#888888] mt-1">closed today</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* === CAMPAIGN PULSE: Unified view of outreach === */}
+      <div className="mb-16">
+        <p className="text-xs text-[#888888] tracking-widest uppercase mb-6">Campaign pulse</p>
+
+        <div className="grid grid-cols-2 gap-8 mb-12">
+          {/* Email */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-[#0D0D0D]">
+                <Icons.Message />
+              </div>
+              <p className="text-sm font-semibold text-[#0D0D0D]">Email</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-3xl font-black text-[#0D0D0D]">{data.emailSent}</p>
+                <p className="text-xs text-[#888888] mt-1">sent today</p>
+              </div>
+              <div className="flex gap-6 text-sm">
+                <div>
+                  <p className="font-semibold text-[#0D0D0D]">{data.emailOpened}</p>
+                  <p className="text-xs text-[#888888]">opened</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#0D0D0D]">{data.emailReplied}</p>
+                  <p className="text-xs text-[#888888]">replied</p>
                 </div>
               </div>
-            </Link>
-          )}
+            </div>
+            {data.emailSent > 0 && (
+              <Link href="/operator/outreach" className="inline-flex items-center gap-2 mt-4 text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors">
+                View campaign <span className="text-[#888888]">→</span>
+              </Link>
+            )}
+          </div>
+
+          {/* WhatsApp */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="text-[#0D0D0D]">
+                <Icons.Message />
+              </div>
+              <p className="text-sm font-semibold text-[#0D0D0D]">WhatsApp</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-3xl font-black text-[#0D0D0D]">{data.whatsappActive}</p>
+                <p className="text-xs text-[#888888] mt-1">active conversations</p>
+              </div>
+              <div className="flex gap-6 text-sm">
+                <div>
+                  <p className="font-semibold text-[#0D0D0D]">{data.whatsappReady}</p>
+                  <p className="text-xs text-[#888888]">ready</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#0D0D0D]">{data.whatsappReplied}</p>
+                  <p className="text-xs text-[#888888]">replied</p>
+                </div>
+              </div>
+            </div>
+            {data.whatsappActive > 0 && (
+              <Link href="/operator/whatsapp" className="inline-flex items-center gap-2 mt-4 text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors">
+                View conversations <span className="text-[#888888]">→</span>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* STATUS CHECK */}
+      {/* === IMMEDIATE ACTIONS: What to do next === */}
+      {(data.repliesWaiting > 0 || data.driversOnline > 0 || data.prospectsStalled > 0) && (
+        <div className="mb-12">
+          <p className="text-xs text-[#888888] tracking-widest uppercase mb-6">Your move</p>
+          <div className="space-y-3">
+            {data.repliesWaiting > 0 && (
+              <Link href="/operator/responses">
+                <div className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors cursor-pointer group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-semibold mb-1">Contact {data.repliesWaiting} email reply{data.repliesWaiting !== 1 ? 's' : ''}</p>
+                      <p className="text-xs text-[#CCCCCC]">Oldest waiting {data.oldestReplyHours}h</p>
+                    </div>
+                    <span className="text-[#CCCCCC] group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {data.driversOnline > 0 && (
+              <Link href="/operator/understand">
+                <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] transition-colors cursor-pointer group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Assign {data.driversOnline} driver{data.driversOnline !== 1 ? 's' : ''} to jobs</p>
+                      <p className="text-xs text-[#888888]">Interception work available</p>
+                    </div>
+                    <span className="text-[#888888] group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {data.prospectsStalled > 0 && (
+              <Link href="/operator/pipeline">
+                <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] transition-colors cursor-pointer group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Follow up {data.prospectsStalled} stalled prospect{data.prospectsStalled !== 1 ? 's' : ''}</p>
+                      <p className="text-xs text-[#888888]">3+ days without movement</p>
+                    </div>
+                    <span className="text-[#888888] group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* === STATUS: System health === */}
       {data.statusMessage && (
-        <div className="p-4 bg-[#F9F9F9] rounded-lg border border-[#E8E8E8]">
-          <p className="text-sm text-[#0D0D0D]">{data.statusMessage}</p>
+        <div className="text-sm text-[#666666] p-4 bg-[#F9F9F9] rounded-lg border border-[#E8E8E8]">
+          {data.statusMessage}
         </div>
       )}
     </div>

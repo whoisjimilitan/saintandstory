@@ -618,132 +618,19 @@ export default function OperatorBriefing() {
       {/* OPERATIONAL STATUS - What matters right now */}
       <TodayOperational />
 
-      {/* WHATSAPP QUEUE - Real-Time Conversations */}
-      <div className="mb-12 px-4 md:px-0">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">WhatsApp Queue</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <button
-            onClick={() => router.push("/operator/whatsapp")}
-            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                Active Conversations
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.activeConversations}</p>
-            </div>
-          </button>
-          <button
-            onClick={() => router.push("/operator/whatsapp")}
-            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                Ready to Message
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{whatsappStats.readyToMessage}</p>
-            </div>
-          </button>
-          <button
-            onClick={() => router.push("/operator/whatsapp")}
-            className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
-                + New Conversation
-              </p>
-              <p className="text-sm font-semibold">Start chatting</p>
-            </div>
-          </button>
-        </div>
-        <button
-          onClick={() => router.push("/operator/whatsapp")}
-          className="w-full text-left px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] transition-colors"
-        >
-          <p className="text-xs font-semibold text-[#0D0D0D]">
-            Go to WhatsApp Queue →
-          </p>
-        </button>
-      </div>
-
-      {/* EMAIL CAMPAIGN - Batch Automation */}
-      <div className="mb-12 px-4 md:px-0">
-        <h2 className="text-sm font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Email Campaign</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <button
-            onClick={() => router.push("/operator/outreach")}
-            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                In Campaign
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.inCampaign}</p>
-            </div>
-          </button>
-          <button
-            onClick={() => router.push("/operator/outreach")}
-            className="p-4 bg-white border border-[#E8E8E8] rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                Opened Today
-              </p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{emailStats.openedToday}</p>
-            </div>
-          </button>
-          <button
-            onClick={() => router.push("/operator/outreach")}
-            className="p-4 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors"
-          >
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.05em] uppercase mb-2">
-                Upload Leads
-              </p>
-              <p className="text-sm font-semibold">Create campaign</p>
-            </div>
-          </button>
-        </div>
-        <button
-          onClick={() => router.push("/operator/outreach")}
-          className="w-full text-left px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] transition-colors"
-        >
-          <p className="text-xs font-semibold text-[#0D0D0D]">
-            Go to Email Campaign →
-          </p>
-        </button>
-      </div>
-
-      {/* START CAMPAIGN HERO */}
-      <div className="mb-12 px-4 md:px-0">
+      {/* QUICK NAVIGATION */}
+      <div className="mb-16 px-4 md:px-0 flex gap-3">
         <button
           onClick={() => router.push("/operator/discover")}
-          className="w-full bg-[#0D0D0D] text-white rounded-lg p-8 hover:bg-[#1A1A1A] transition-colors"
+          className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#1A1A1A] transition-colors text-sm font-semibold"
         >
-          <div className="flex items-center justify-between">
-            <div className="text-left">
-              <p className="text-xs font-semibold text-[#CCCCCC] tracking-[0.15em] uppercase mb-2">
-                Ready to reach new prospects?
-              </p>
-              <h3 className="text-2xl md:text-3xl font-black text-white mb-1">
-                Start Campaign
-              </h3>
-              <p className="text-sm text-[#AAAAAA]">
-                Upload leads or search by location
-              </p>
-            </div>
-            <div className="text-4xl">→</div>
-          </div>
+          New campaign
         </button>
-      </div>
-
-      {/* Quick CRM Search */}
-      <div className="mb-8 px-4 md:px-0">
         <button
           onClick={() => router.push("/dashboard/crm")}
-          className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors text-xs font-semibold text-[#0D0D0D]"
+          className="flex-1 px-4 py-3 border border-[#E8E8E8] rounded-lg hover:bg-[#F9F9F9] hover:border-[#0D0D0D] transition-colors text-sm font-semibold text-[#0D0D0D]"
         >
-          Prospect & customer database
+          Database
         </button>
       </div>
 
