@@ -258,21 +258,30 @@ export default function WhatsAppBatchCampaign({
 
           <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8">
             <div className="text-center">
-              <p className="text-5xl font-black text-[#0D0D0D] mb-2">{leads.length}</p>
-              <p className="text-sm text-[#666666]">leads ready to send via {channel === "email" ? "email" : "WhatsApp"}</p>
+              <p className="text-5xl font-black text-[#0D0D0D] mb-2">{leads.filter(l => l.email).length}</p>
+              <p className="text-sm text-[#666666]">leads with email addresses ready to send</p>
+              {leads.filter(l => !l.email).length > 0 && (
+                <p className="text-xs text-[#888888] mt-3">{leads.filter(l => !l.email).length} lead(s) without email will be skipped</p>
+              )}
             </div>
           </div>
 
           <div className="flex gap-3">
             <button
               onClick={() => {
+                const leadsWithEmails = leads.filter(lead => lead.email);
+                if (leadsWithEmails.length === 0) {
+                  alert("No leads with email addresses. Please upload a CSV with email column.");
+                  return;
+                }
+
                 sessionStorage.setItem('enrich_prospects', JSON.stringify(
-                  leads.map((lead, idx) => ({
-                    id: `${idx}-${lead.firstName}`,
-                    businessName: lead.company || "Unknown Business",
+                  leadsWithEmails.map((lead) => ({
+                    id: lead.email,
+                    businessName: lead.company || "Business",
                     contactName: lead.firstName,
                     city: "Unknown",
-                    email: `${lead.firstName?.toLowerCase().replace(/\s+/g, '.')}@${lead.company?.toLowerCase().replace(/\s+/g, '-')}.com` || `lead${idx}@example.com`,
+                    email: lead.email,
                     businessCategory: "Business"
                   }))
                 ));
