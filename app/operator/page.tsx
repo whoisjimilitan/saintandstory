@@ -1080,7 +1080,7 @@ export default function OperatorBriefing() {
             {revenueStats.totalRevenue}
           </p>
           <p className="text-sm text-[#666666] mb-6">
-            Standing orders + driver jobs (resets at 00:00)
+            B2B Contracts (resets at 00:00)
           </p>
 
           <div className="flex gap-3">
