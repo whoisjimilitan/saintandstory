@@ -168,7 +168,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Premium production delivery guarantee",
+    subjectLineVariation: "Equipment delay",
     description: "Film production has extreme daily costs for delays",
   },
   tv_production: {
@@ -176,7 +176,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Premium production delivery guarantee",
+    subjectLineVariation: "Equipment delay",
     description: "TV production budgets cannot absorb delivery delays",
   },
 
@@ -186,7 +186,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Research delivery guarantee",
+    subjectLineVariation: "Sample timing",
     description: "Universities cannot repeat experiments; samples are irreplaceable",
   },
 
@@ -196,7 +196,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Premium luxury delivery",
+    subjectLineVariation: "Delivery timing",
     description: "Auction houses lose entire transactions over missed deliveries",
   },
   jewelry_store: {
@@ -204,7 +204,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Premium jewelry delivery",
+    subjectLineVariation: "Customer timing",
     description: "Jewelry stores need guaranteed secure delivery for high-value items",
   },
   luxury_goods: {
@@ -212,7 +212,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
-    subjectLineVariation: "Premium luxury delivery",
+    subjectLineVariation: "Delivery timing",
     description: "Luxury goods retailers have premium pricing; cannot lose clients",
   },
 
@@ -236,7 +236,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your completions",
+    subjectLineVariation: "Completion timing",
     description: "Estate agents have standard operational delays",
   },
   realtor: {
@@ -244,7 +244,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your closings",
+    subjectLineVariation: "Closing window",
     description: "Realtors handle standard real estate deadlines",
   },
   lettings: {
@@ -252,7 +252,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your tenancy deadlines",
+    subjectLineVariation: "Tenancy timing",
     description: "Lettings companies handle standard tenancy paperwork",
   },
   property: {
@@ -260,7 +260,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your transactions",
+    subjectLineVariation: "Transaction timing",
     description: "Property companies handle standard transaction deadlines",
   },
 
@@ -270,7 +270,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your tax deadlines",
+    subjectLineVariation: "Tax deadline",
     description: "Accountants handle standard tax season deadlines",
   },
   accountant: {
@@ -278,7 +278,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your tax deadlines",
+    subjectLineVariation: "Tax deadline",
     description: "Accountants handle standard tax filing deadlines",
   },
   tax: {
@@ -286,7 +286,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your tax deadlines",
+    subjectLineVariation: "Tax deadline",
     description: "Tax services handle standard tax compliance",
   },
   bookkeeper: {
@@ -304,7 +304,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your project schedule",
+    subjectLineVariation: "Project timing",
     description: "Construction has operational delays (not mission-critical)",
   },
   builder: {
@@ -312,7 +312,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your build schedule",
+    subjectLineVariation: "Build timing",
     description: "Builders handle standard material delivery schedules",
   },
   contractor: {
@@ -320,7 +320,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your site schedule",
+    subjectLineVariation: "Site timing",
     description: "Contractors manage standard supply chain delays",
   },
   plumber: {
@@ -328,7 +328,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your job schedule",
+    subjectLineVariation: "Job timing",
     description: "Plumbers handle standard job schedules",
   },
   electrician: {
@@ -336,7 +336,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your installation schedule",
+    subjectLineVariation: "Install timing",
     description: "Electricians handle standard equipment schedules",
   },
 
@@ -346,7 +346,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "Protecting your project timeline",
+    subjectLineVariation: "Timeline timing",
     description: "Architects handle standard plan delivery schedules",
   },
   architect: {
@@ -354,7 +354,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "We're expanding to {{city}}",
+    subjectLineVariation: "Delivery timing",
     description: "Architects manage standard drawing deadlines",
   },
   engineering: {
@@ -362,7 +362,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "We're expanding to {{city}}",
+    subjectLineVariation: "Delivery timing",
     description: "Engineers handle standard specification delivery",
   },
 
@@ -372,7 +372,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "We're expanding to {{city}}",
+    subjectLineVariation: "Delivery timing",
     description: "E-commerce handles standard order fulfillment",
   },
   retailer: {
@@ -380,7 +380,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "We're expanding to {{city}}",
+    subjectLineVariation: "Delivery timing",
     description: "Retailers manage standard inventory delivery",
   },
   retail: {
@@ -472,7 +472,7 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
-    subjectLineVariation: "We're expanding to {{city}}",
+    subjectLineVariation: "Delivery timing",
     description: "Unknown business type - using default tier 3",
   };
 }
