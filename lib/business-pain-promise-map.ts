@@ -44,7 +44,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Legal deadline protection",
+    subjectLineVariation: "One deadline",
     description: "Court services have highest consequence: litigation failure",
   },
   bailiff: {
@@ -52,7 +52,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Service delivery guarantee",
+    subjectLineVariation: "Service timing",
     description: "Bailiffs need guaranteed service by court deadline",
   },
   process_server: {
@@ -60,7 +60,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Service delivery guarantee",
+    subjectLineVariation: "One deadline. Case stalls.",
     description: "Process servers have zero tolerance for missed deliveries",
   },
 
@@ -70,7 +70,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Regulatory deadline protection",
+    subjectLineVariation: "Regulatory deadline",
     description: "Insurance companies face regulatory fines for missed deadlines",
   },
   insurance_broker: {
@@ -78,7 +78,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Compliance deadline protection",
+    subjectLineVariation: "Policy timing",
     description: "Insurance brokers need guaranteed delivery for regulatory compliance",
   },
 
@@ -88,7 +88,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Surgical delivery guarantee",
+    subjectLineVariation: "Surgery scheduled",
     description: "Hospitals cannot tolerate surgical supply delays (patient impact)",
   },
   surgical_supplies: {
@@ -96,7 +96,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Surgical delivery guarantee",
+    subjectLineVariation: "OR timing",
     description: "Surgical supply companies serve hospitals with zero tolerance",
   },
   medical_devices: {
@@ -104,7 +104,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Medical delivery guarantee",
+    subjectLineVariation: "Surgery scheduled. Can't be late.",
     description: "Medical device companies have highest stakes (patient care)",
   },
   clinic: {
@@ -112,7 +112,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Urgent medical delivery",
+    subjectLineVariation: "Patient care timing",
     description: "Clinics need guaranteed urgent delivery for patient care",
   },
   pharmacy: {
@@ -120,7 +120,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Urgent prescription delivery",
+    subjectLineVariation: "Relief timing",
     description: "Pharmacies face patient impact and liability for delayed prescriptions",
   },
 
@@ -130,7 +130,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Legal deadline protection",
+    subjectLineVariation: "Document deadline",
     description: "Legal firms face case dismissal for missed deadlines",
   },
   lawyer: {
@@ -138,7 +138,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Legal deadline protection",
+    subjectLineVariation: "Brief timing",
     description: "Lawyers face compliance violations for missed filings",
   },
   solicitor: {
@@ -146,7 +146,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Legal deadline protection",
+    subjectLineVariation: "Brief timing",
     description: "Solicitors lose clients over missed deadlines",
   },
   attorney: {
@@ -154,7 +154,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
-    subjectLineVariation: "Legal deadline protection",
+    subjectLineVariation: "Case timeline",
     description: "Attorneys face case dismissal for missed deadlines",
   },
 
