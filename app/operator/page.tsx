@@ -500,7 +500,7 @@ export default function OperatorBriefing() {
         router.push("/operator/pipeline?stage=propose");
         break;
       case "closed":
-        router.push("/operator/orders");
+        router.push("/operator/contracts");
         break;
     }
   };
@@ -1166,7 +1166,7 @@ export default function OperatorBriefing() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => router.push("/operator/orders")}
+              onClick={() => router.push("/operator/contracts")}
               className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded-lg hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors"
             >
               <Icons.Eye />

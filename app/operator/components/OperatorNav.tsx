@@ -8,7 +8,7 @@ const stages = [
   { name: "Today", href: "/operator" },
   { name: "Discover", href: "/operator/discover" },
   { name: "Reach", href: "/operator/reach" },
-  { name: "Orders", href: "/operator/orders" },
+  { name: "Contracts", href: "/operator/contracts" },
 ];
 
 export function OperatorNav() {

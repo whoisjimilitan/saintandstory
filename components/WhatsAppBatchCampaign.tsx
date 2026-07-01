@@ -249,67 +249,51 @@ export default function WhatsAppBatchCampaign({
     );
   }
 
-  // Messages generated - show results
+  // Messages generated - show minimal summary
   if (response) {
     return (
-      <div className="max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-[#0D0D0D] mb-1">{fileName}</h2>
-            <p className="text-xs text-[#666666]">{response.formatted.totalLeads} messages generated</p>
-          </div>
-          <button
-            onClick={handleUploadNew}
-            className="text-xs text-[#0D0D0D] hover:text-[#666666] transition-colors"
-          >
-            Upload another
-          </button>
-        </div>
+      <div className="max-w-2xl">
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-[#0D0D0D] mb-6">{fileName}</h2>
 
-        {/* Minimal Results Table */}
-        <div className="space-y-3 mb-8">
-          {response.formatted.strategyGroups.map((group, idx) => (
-            <div key={idx} className="border border-[#E8E8E8] rounded-lg p-4">
-              <div className="grid grid-cols-12 gap-4 items-start">
-                {/* Count */}
-                <div className="col-span-2">
-                  <p className="text-xs text-[#888888] mb-1">Lead count</p>
-                  <p className="text-lg font-semibold text-[#0D0D0D]">{group.count}</p>
-                </div>
-
-                {/* Strategy */}
-                <div className="col-span-3">
-                  <p className="text-xs text-[#888888] mb-1">Strategy</p>
-                  <p className="text-sm font-semibold text-[#0D0D0D]">{group.description}</p>
-                </div>
-
-                {/* Sample Message */}
-                <div className="col-span-7">
-                  <p className="text-xs text-[#888888] mb-1">Sample</p>
-                  <p className="text-sm text-[#0D0D0D] line-clamp-2">{group.sampleMessage}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Summary */}
-        <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg p-4 mb-8">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-xs text-[#888888] mb-2">Total ready</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{response.formatted.validityReport.valid}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] mb-2">Needs review</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{response.formatted.validityReport.invalid}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] mb-2">Channel</p>
-              <p className="text-sm font-semibold text-[#0D0D0D]">{channel === "email" ? "Email" : "WhatsApp"}</p>
+          <div className="border border-[#E8E8E8] rounded-lg p-6 mb-8">
+            <div className="text-center">
+              <p className="text-5xl font-black text-[#0D0D0D] mb-2">{leads.length}</p>
+              <p className="text-sm text-[#666666]">leads ready to send via {channel === "email" ? "email" : "WhatsApp"}</p>
             </div>
           </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                sessionStorage.setItem('enrich_prospects', JSON.stringify(
+                  leads.map((lead, idx) => ({
+                    id: `${idx}-${lead.firstName}`,
+                    businessName: lead.company || "Unknown Business",
+                    contactName: lead.firstName,
+                    city: "Unknown",
+                    email: `${lead.firstName?.toLowerCase().replace(/\s+/g, '.')}@${lead.company?.toLowerCase().replace(/\s+/g, '-')}.com` || `lead${idx}@example.com`,
+                    businessCategory: "Business"
+                  }))
+                ));
+                sessionStorage.setItem('enrich_mode', 'campaign');
+                window.location.href = '/operator/enrich';
+              }}
+              className="flex-1 px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+            >
+              Review & Send
+            </button>
+            <button
+              onClick={handleUploadNew}
+              className="px-6 py-3 border border-[#E8E8E8] text-[#0D0D0D] font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors"
+            >
+              Upload Another
+            </button>
+          </div>
         </div>
+      </div>
+    );
+  }
 
         {/* Action Button */}
         {!campaignId ? (
