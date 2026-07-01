@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 interface EmailPreviewModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export function EmailPreviewModal({
   onClose,
   onApprove
 }: EmailPreviewModalProps) {
+  const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,7 @@ export function EmailPreviewModal({
     setError(null);
 
     try {
+      const senderName = user?.firstName || "James";
       const res = await fetch("/api/b2b/dork-search/generate-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,7 +40,7 @@ export function EmailPreviewModal({
           leadId: lead.id,
           businessName: lead.businessName,
           city: lead.city,
-          senderName: "James"
+          senderName
         })
       });
 
