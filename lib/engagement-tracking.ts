@@ -95,12 +95,11 @@ export async function calculateEngagementScore(
       GROUP BY event_type
     `;
 
-    const outreach = await sql`
-      SELECT replied, replied_at
-      FROM b2b_outreach
+    // Check if ANY outreach record has a reply (not just the most recent)
+    const responseRecords = await sql`
+      SELECT COUNT(*) as reply_count
+      FROM b2b_responses
       WHERE lead_id = ${leadId}
-      ORDER BY sent_at DESC
-      LIMIT 1
     `;
 
     let score = 0;
@@ -118,8 +117,8 @@ export async function calculateEngagementScore(
     const clicks = Math.min(eventMap.clicked || 0, 1) * 20; // First click = +20
     score += clicks;
 
-    // Reply: +20
-    if (outreach.length > 0 && outreach[0].replied) {
+    // Reply: +20 (check if ANY response exists, not just latest outreach)
+    if (responseRecords.length > 0 && responseRecords[0].reply_count > 0) {
       score += 20;
     }
 
