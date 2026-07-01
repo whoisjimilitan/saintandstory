@@ -21,9 +21,18 @@ const TIER_DESCRIPTIONS = {
 
 export default function SettingsPage() {
   const { showToast } = useToast();
-  const tier1Categories = getTier1Businesses();
-  const tier2Categories = getTier2Businesses();
-  const tier3Categories = getTier3Businesses();
+
+  let tier1Categories: string[] = [];
+  let tier2Categories: string[] = [];
+  let tier3Categories: string[] = [];
+
+  try {
+    tier1Categories = getTier1Businesses();
+    tier2Categories = getTier2Businesses();
+    tier3Categories = getTier3Businesses();
+  } catch (error) {
+    console.error("[SETTINGS] Error loading tier categories:", error);
+  }
 
   const [discoveryRunning, setDiscoveryRunning] = useState(false);
   const [discoveryResult, setDiscoveryResult] = useState<any>(null);
