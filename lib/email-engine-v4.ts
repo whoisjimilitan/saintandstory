@@ -22,6 +22,21 @@ import { detectBusinessType } from "./business-pain-promise-map";
 import { getSenderVoiceProfile, getSenderOpening, getSenderCloser } from "./sender-voice-profile";
 import { getSeedPlant } from "./seed-plant-map";
 
+// Format business type for tagline (e.g., "solicitor" → "Solicitors")
+function formatBusinessTypeForTagline(businessType: string): string {
+  const formatted = businessType
+    .replace(/_/g, " ")
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  // Make plural if not already
+  if (!formatted.endsWith("s")) {
+    return formatted + "s";
+  }
+  return formatted;
+}
+
 export interface EmailV4 {
   subjectLine: string;
   bodyText: string;
@@ -70,9 +85,13 @@ export function generateEmailV4(
   const ppmEntry = detectBusinessType(prospect.businessName);
   const closingQuestion = ppmEntry.closingQuestion || "Real question. When this becomes critical, would a same-day backup help?";
 
+  // Dynamic tagline: "Simplifying Logistics for [Category]"
+  const businessCategory = formatBusinessTypeForTagline(businessType);
+  const dynamicTagline = `Simplifying Logistics for ${businessCategory}`;
+
   const bodyText = `Hi ${greeting},
 
-Apologies. I know it's bold. But I noticed something with ${seedPlant}
+Apologies. I know it's bold emailing you cold. But I noticed something with ${seedPlant}
 
 ${pain}
 
@@ -81,7 +100,8 @@ That's what we do. ${promise}
 ${closingQuestion}
 
 ${senderName}
-Saint & Story Logistics`;
+Saint & Story
+${dynamicTagline}`;
 
   return {
     subjectLine,
