@@ -1,16 +1,60 @@
 "use client";
 
-import { useState } from "react";
-import ConversationsList from "@/components/ConversationsList";
+import { useEffect, useState } from "react";
 import { getAllConversations, createConversation } from "@/lib/whatsapp-conversation";
 
+interface Campaign {
+  id: string;
+  campaignName: string;
+  channel: string;
+  totalLeads: number;
+  sentAt: string;
+  status: string;
+  emailStats?: {
+    sent: number;
+    opened: number;
+    replied: number;
+  };
+  whatsappStats?: {
+    sent: number;
+    delivered: number;
+    replied: number;
+  };
+}
+
 export default function ReachPage() {
-  const [activeTab, setActiveTab] = useState<"whatsapp" | "email">("whatsapp");
+  const [activeTab, setActiveTab] = useState<"email" | "whatsapp">("email");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState(getAllConversations());
   const [showNewConversationForm, setShowNewConversationForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+
+  // Fetch campaigns on mount
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/b2b/campaigns/list");
+        if (!res.ok) throw new Error("Failed to fetch campaigns");
+
+        const data = await res.json();
+        setCampaigns(data.campaigns || []);
+        console.log("[REACH] Loaded campaigns:", data.campaigns?.length);
+      } catch (error) {
+        console.error("[REACH] Failed to fetch campaigns:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+    // Refresh every 30 seconds for live updates
+    const interval = setInterval(fetchCampaigns, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCreateConversation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,44 +72,41 @@ export default function ReachPage() {
     }
   };
 
-  const whatsappStats = {
-    active: conversations.filter((c) => c.status === "active").length,
-    hot: conversations.filter((c) => c.messages.length > 5).length,
-    total: conversations.length,
-  };
+  // Filter campaigns by active tab
+  const activeCampaigns = campaigns.filter(c => c.channel === activeTab);
 
-  const emailStats = {
-    active: 0,
-    hot: 0,
-    total: 0,
-  };
+  // Calculate aggregate stats
+  let stats = { active: 0, hot: 0, total: 0 };
 
-  const stats = activeTab === "whatsapp" ? whatsappStats : emailStats;
+  if (activeTab === "email") {
+    stats = {
+      total: activeCampaigns.reduce((sum, c) => sum + c.totalLeads, 0),
+      active: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.sent || 0), 0),
+      hot: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.replied || 0), 0),
+    };
+  } else {
+    const whatsappConversations = conversations.filter(c => c.status === "active");
+    stats = {
+      total: whatsappConversations.length,
+      active: whatsappConversations.length,
+      hot: whatsappConversations.filter(c => c.messages.length > 5).length,
+    };
+  }
 
   return (
     <div className="min-h-screen bg-white pt-20">
       {/* Header */}
       <div className="mb-8 px-4 md:px-0 py-8">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-black text-[#0D0D0D] mb-2">Reach</h1>
-          <p className="text-base text-[#666666]">Manage conversations across WhatsApp and Email</p>
+          <p className="text-base text-[#666666]">Live campaign tracking</p>
         </div>
       </div>
 
       {/* Channel Tabs */}
       <div className="mb-8 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab("whatsapp")}
-              className={`pb-3 border-b-2 font-semibold text-sm transition-colors ${
-                activeTab === "whatsapp"
-                  ? "text-[#0D0D0D] border-[#0D0D0D]"
-                  : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-              }`}
-            >
-              WhatsApp
-            </button>
             <button
               onClick={() => setActiveTab("email")}
               className={`pb-3 border-b-2 font-semibold text-sm transition-colors ${
@@ -74,7 +115,17 @@ export default function ReachPage() {
                   : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
               }`}
             >
-              Email
+              Email Campaigns
+            </button>
+            <button
+              onClick={() => setActiveTab("whatsapp")}
+              className={`pb-3 border-b-2 font-semibold text-sm transition-colors ${
+                activeTab === "whatsapp"
+                  ? "text-[#0D0D0D] border-[#0D0D0D]"
+                  : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
+              }`}
+            >
+              WhatsApp Conversations
             </button>
           </div>
         </div>
@@ -82,14 +133,14 @@ export default function ReachPage() {
 
       {/* Stats */}
       <div className="mb-12 px-4 md:px-0 py-6 border-b border-[#E8E8E8]">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Active</p>
+              <p className="text-xs text-[#888888] mb-1">{activeTab === "email" ? "Sent" : "Active"}</p>
               <p className="text-2xl font-black text-[#0D0D0D]">{stats.active}</p>
             </div>
             <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
-              <p className="text-xs text-[#888888] mb-1">Hot</p>
+              <p className="text-xs text-[#888888] mb-1">{activeTab === "email" ? "Replied" : "Hot"}</p>
               <p className="text-2xl font-black text-[#0D0D0D]">{stats.hot}</p>
             </div>
             <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg">
@@ -100,85 +151,114 @@ export default function ReachPage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="px-4 md:px-0">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex h-[calc(100vh-400px)]">
-            {/* Sidebar */}
-            <div className="w-80 flex-shrink-0">
-              {activeTab === "whatsapp" ? (
-                <ConversationsList
-                  conversations={conversations}
-                  onStartNew={() => setShowNewConversationForm(true)}
-                />
-              ) : (
-                <div className="border-r border-[#E8E8E8] pr-4 h-full flex flex-col">
-                  <button className="w-full p-3 bg-[#0D0D0D] text-white rounded font-semibold text-sm hover:bg-[#333333] transition-colors mb-4">
-                    + New Email Campaign
-                  </button>
-                  <div className="flex-1 flex items-center justify-center text-[#888888] text-sm">
-                    No email conversations yet
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Main Area */}
-            <div className="flex-1 flex items-center justify-center p-6">
-              {activeTab === "whatsapp" ? (
-                showNewConversationForm ? (
-                  <div className="w-full max-w-md">
-                    <form onSubmit={handleCreateConversation} className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                          Business Name
-                        </label>
-                        <input
-                          type="text"
-                          value={businessName}
-                          onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="e.g. Acme Trading"
-                          className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-                        />
+      {/* Email Campaigns */}
+      {activeTab === "email" && (
+        <div className="px-4 md:px-0 pb-12">
+          <div className="max-w-4xl mx-auto">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-sm text-[#666666]">Loading campaigns...</p>
+              </div>
+            ) : activeCampaigns.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-[#666666]">No email campaigns yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {activeCampaigns.map(campaign => (
+                  <div key={campaign.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-[#0D0D0D]">{campaign.campaignName}</p>
+                        <p className="text-xs text-[#888888] mt-1">
+                          {new Date(campaign.sentAt).toLocaleDateString()} • {campaign.totalLeads} leads
+                        </p>
                       </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-[#888888] tracking-[0.05em] uppercase mb-2">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="+44 20 1234 5678"
-                          className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-                        />
+                      <div className="flex gap-4 text-right flex-shrink-0">
+                        <div>
+                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.sent || 0}</p>
+                          <p className="text-xs text-[#888888]">sent</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.opened || 0}</p>
+                          <p className="text-xs text-[#888888]">opened</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.replied || 0}</p>
+                          <p className="text-xs text-[#888888]">replied</p>
+                        </div>
                       </div>
-                      <button
-                        type="submit"
-                        disabled={isCreating}
-                        className="w-full py-3 bg-[#0D0D0D] text-white rounded-lg font-semibold text-sm hover:bg-[#333333] disabled:opacity-50 transition-colors"
-                      >
-                        {isCreating ? "Creating..." : "Start Conversation"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowNewConversationForm(false)}
-                        className="w-full py-3 border border-[#E8E8E8] text-[#0D0D0D] rounded-lg font-semibold text-sm hover:bg-[#F9F9F9] transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </form>
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-[#888888]">Select a conversation or start a new one</p>
-                )
-              ) : (
-                <p className="text-[#888888]">Select an email campaign or create a new one</p>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* WhatsApp Conversations */}
+      {activeTab === "whatsapp" && (
+        <div className="px-4 md:px-0 pb-12">
+          <div className="max-w-4xl mx-auto">
+            {showNewConversationForm && (
+              <form onSubmit={handleCreateConversation} className="mb-8 border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                <h3 className="font-bold text-[#0D0D0D] mb-4">Start Conversation</h3>
+                <div className="space-y-3">
+                  <input
+                    type="tel"
+                    placeholder="Phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Business name"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isCreating}
+                    className="w-full px-4 py-2 bg-[#0D0D0D] text-white rounded text-sm font-semibold hover:bg-[#333333] disabled:opacity-50"
+                  >
+                    {isCreating ? "Creating..." : "Start"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {conversations.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-[#666666] mb-4">No conversations yet</p>
+                <button
+                  onClick={() => setShowNewConversationForm(!showNewConversationForm)}
+                  className="px-4 py-2 bg-[#0D0D0D] text-white rounded text-sm font-semibold hover:bg-[#333333]"
+                >
+                  + Start Conversation
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {conversations.map(conversation => (
+                  <div key={conversation.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-[#F9F9F9] hover:bg-white transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-[#0D0D0D]">{conversation.businessName}</p>
+                        <p className="text-xs text-[#888888] mt-1">{conversation.phoneNumber}</p>
+                      </div>
+                      <p className="text-xs text-[#0D0D0D] font-semibold">{conversation.messages.length} messages</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
