@@ -9,6 +9,14 @@ if (!process.env.RESEND_API_KEY) {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Map of admin emails to sender info (verified domain only)
+const ADMIN_MAP: Record<string, { name: string; email: string }> = {
+  "whoisjimi.today@gmail.com": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "james@saintandstoryltd.co.uk": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "oye@saintandstoryltd.co.uk": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+  "oyedeleoyepeju2014@gmail.com": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+};
+
 interface EmailPayload {
   prospectId?: string;
   prospectName: string;
@@ -18,6 +26,23 @@ interface EmailPayload {
   category?: string;
   subject?: string;
   body: string;
+}
+
+async function getSenderInfo(): Promise<{ name: string; email: string }> {
+  try {
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses[0]?.emailAddress ?? "";
+
+    if (userEmail && ADMIN_MAP[userEmail]) {
+      return ADMIN_MAP[userEmail];
+    }
+
+    // Fallback to James if admin not mapped
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+  } catch (error) {
+    console.error("[CAMPAIGN SEND] Error getting sender info:", error);
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -82,9 +107,10 @@ export async function POST(request: NextRequest) {
       try {
         if (channel === "email") {
           // Send via Resend
-          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail}`);
+          const sender = await getSenderInfo();
+          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email}`);
           const response = await resend.emails.send({
-            from: "Saint & Story <noreply@saintandstory.co.uk>",
+            from: `${sender.name} <${sender.email}>`,
             to: email.prospectEmail,
             subject: email.subject,
             html: `<p>${email.body.replace(/\n/g, "</p><p>")}</p>`,
