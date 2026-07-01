@@ -3,6 +3,10 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 
+if (!process.env.RESEND_API_KEY) {
+  console.error("[CAMPAIGN SEND] CRITICAL: RESEND_API_KEY is not set!");
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailPayload {
@@ -78,6 +82,7 @@ export async function POST(request: NextRequest) {
       try {
         if (channel === "email") {
           // Send via Resend
+          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail}`);
           const response = await resend.emails.send({
             from: "Saint & Story <noreply@saintandstory.co.uk>",
             to: email.prospectEmail,
@@ -85,10 +90,24 @@ export async function POST(request: NextRequest) {
             html: `<p>${email.body.replace(/\n/g, "</p><p>")}</p>`,
           });
 
+          console.log(`[CAMPAIGN SEND] Resend response:`, {
+            hasError: !!response.error,
+            messageId: response.data?.id,
+            error: response.error
+          });
+
           if (response.error) {
             console.error(
               `[CAMPAIGN SEND] Failed to send to ${email.prospectEmail}:`,
               response.error
+            );
+            failedCount++;
+            continue;
+          }
+
+          if (!response.data?.id) {
+            console.error(
+              `[CAMPAIGN SEND] No message ID returned for ${email.prospectEmail} - Resend may have rejected the email`
             );
             failedCount++;
             continue;
