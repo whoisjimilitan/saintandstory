@@ -1354,6 +1354,7 @@ model B2bCampaignEmail {
   category        String?   @map("category")
   subject         String    @map("subject")
   body            String    @map("body")
+  resendMessageId String?   @unique @map("resend_message_id") // For webhook matching
   emailSentAt     DateTime? @map("email_sent_at") @db.Timestamptz(6)
   openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
   clickedAt       DateTime? @map("clicked_at") @db.Timestamptz(6)

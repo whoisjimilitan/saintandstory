@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          // Log in database
+          // Log in database with Resend message ID for webhook matching
           await prisma.b2bCampaignEmail.create({
             data: {
               campaignId: campaign.id,
@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
               category: email.category,
               subject: email.subject,
               body: email.body,
+              resendMessageId: response.id, // Store Resend message ID for webhooks
               status: "sent",
               emailSentAt: new Date(),
             },
