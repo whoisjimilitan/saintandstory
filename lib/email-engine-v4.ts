@@ -41,6 +41,7 @@ export function generateEmailV4(
     businessName: string;
     city?: string;
     email?: string;
+    firstName?: string; // Contact first name for personalization
   },
   senderName: string = "James"
 ): EmailV4 {
@@ -61,7 +62,10 @@ export function generateEmailV4(
   // Get seed plant for this business type
   const seedPlant = getSeedPlant(businessType, city);
 
-  const bodyText = `Hi [Name],
+  // Mail merge: use firstName if available, fallback to [Name]
+  const greeting = prospect.firstName ? prospect.firstName : "[Name]";
+
+  const bodyText = `Hi ${greeting},
 
 Reaching out cold—I know it's bold. But I noticed something with ${seedPlant}
 
@@ -93,6 +97,7 @@ export function generateEmailsV4Batch(
     businessName: string;
     city?: string;
     email?: string;
+    firstName?: string;
   }>,
   senderName: string = "James"
 ): Array<{

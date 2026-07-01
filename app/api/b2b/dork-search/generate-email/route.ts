@@ -23,13 +23,14 @@ interface GenerateEmailRequest {
   leadId: string;
   businessName: string;
   city?: string;
+  firstName?: string; // Contact first name for personalization
   senderName?: string;
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json() as GenerateEmailRequest;
-    const { leadId, businessName, city, senderName = "James" } = body;
+    const { leadId, businessName, city, firstName, senderName = "James" } = body;
 
     if (!leadId || !businessName) {
       return NextResponse.json(
@@ -44,7 +45,8 @@ export async function POST(request: Request) {
         id: leadId,
         businessName,
         city: city || "your area",
-        email: undefined
+        email: undefined,
+        firstName: firstName || undefined
       },
       senderName
     );

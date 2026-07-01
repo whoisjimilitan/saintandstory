@@ -80,6 +80,7 @@ export async function POST(request: Request) {
           businessCategory: true,
           city: true,
           email: true,
+          contactName: true,
           website: true,
           painPoint: true,
           engagement_score: true,
@@ -100,6 +101,11 @@ export async function POST(request: Request) {
 
     for (const prospect of prospects) {
       try {
+        // Extract first name from contact name for mail merge
+        const firstName = prospect.contactName
+          ? prospect.contactName.split(" ")[0]
+          : undefined;
+
         // Generate email using Email Engine v4 (psychology-locked)
         const emailV4 = generateEmailV4(
           {
@@ -107,6 +113,7 @@ export async function POST(request: Request) {
             businessName: prospect.businessName,
             city: prospect.city,
             email: prospect.email,
+            firstName: firstName,
           },
           senderName
         );
