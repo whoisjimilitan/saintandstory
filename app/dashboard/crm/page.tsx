@@ -123,12 +123,11 @@ export default function CRMPage() {
 
         {/* === HEADER === */}
         <div className="mb-16">
-          <p className="text-xs text-[#888888] tracking-widest uppercase mb-3">Search & view</p>
           <h1 className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight leading-tight">
             Prospect Database
           </h1>
           <p className="text-base text-[#666666] leading-relaxed max-w-3xl font-normal">
-            Find prospects and customers. View all communications, engagement history, and transaction records.
+            Find prospects. View their complete history.
           </p>
         </div>
 

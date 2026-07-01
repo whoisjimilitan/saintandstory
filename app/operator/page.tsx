@@ -601,7 +601,7 @@ export default function OperatorBriefing() {
   return (
     <div className="min-h-screen bg-white pt-24">
       {/* HEADER */}
-      <div className="mb-8 px-4 md:px-0">
+      <div className="mb-16 px-4 md:px-0">
         <div className="inline-flex items-center gap-2 mb-6 bg-[#F5F5F5] px-3 py-1.5 rounded-full border border-[#E8E8E8]">
           <p className="text-xs font-semibold text-[#0D0D0D] font-mono">
             {dateStr}
