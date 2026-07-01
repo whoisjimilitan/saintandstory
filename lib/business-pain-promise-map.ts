@@ -1,15 +1,14 @@
 /**
- * BUSINESS PAIN & PROMISE MAP WITH CONSEQUENCE HIERARCHY
+ * BUSINESS PAIN & PROMISE MAP - TRUST-FIRST EDITION
  *
- * Maps business types to:
- * - Specific pain they recognize
- * - Specific promise we make
- * - Consequence level (ULTRA_MOTIVATED, HIGHLY_MOTIVATED, MOTIVATED)
- * - Tier (1=Ultra, 2=Premium, 3=Operational)
- * - Subject line variation based on consequence
+ * Maps business types to trust-first observations that demonstrate
+ * understanding without claiming or asserting.
  *
- * Used by email generation engine to create dynamic,
- * business-specific emails with consequence-based prioritization.
+ * Structure:
+ * - observation: "One thing I've learnt is that [X] rarely fail because of [Y].
+ *                 It's usually when something outside your control gets in the way."
+ * - promise: Our guarantee (constant across all categories)
+ * - Tier-based consequences for lead prioritization
  *
  * Consequence Hierarchy:
  * TIER 1 (ULTRA_MOTIVATED): Legal/Compliance/Health - Highest urgency + highest LTV
@@ -21,452 +20,486 @@ export type ConsequenceLevel = "ULTRA_MOTIVATED" | "HIGHLY_MOTIVATED" | "MOTIVAT
 export type ConsequenceTier = 1 | 2 | 3;
 
 export interface BusinessPainPromise {
-  pain: string;
-  promise: string;
+  pain: string; // Trust-first observation (demonstrates understanding)
+  promise: string; // Our guarantee (constant across all)
   consequenceLevel: ConsequenceLevel;
   tier: ConsequenceTier;
-  subjectLineVariation: string; // Consequence-based subject line
-  description?: string; // Internal note about why this tier
-  closingQuestion?: string; // V5: Specific closing question that forces reply
-  industryInsight?: string; // V5: Current industry trend observation (capacity, delays, etc)
+  subjectLineVariation: string;
+  description?: string;
+  closingQuestion?: string; // Genuine curiosity question (mostly constant)
 }
 
-/**
- * PAIN & PROMISE BY BUSINESS TYPE WITH CONSEQUENCE TIERS
- * Consequence Hierarchy drives lead prioritization and email strategy
- */
 export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 1: ULTRA MOTIVATED (Legal/Compliance/Health Consequences)
+  // TIER 1: ULTRA MOTIVATED (Legal/Compliance/Health)
   // ═══════════════════════════════════════════════════════════════════
 
-  // COURTS & LEGAL SERVICES
   court: {
-    pain: "You operate on hard court deadlines. One missed service = case dismissed. Full stop.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that court cases rarely stall because of the legal arguments themselves. It's usually when service deadlines get missed outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "One deadline",
     description: "Court services have highest consequence: litigation failure",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   bailiff: {
-    pain: "You have strict court-mandated service deadlines. One missed service = case collapses.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that bailiff services rarely fail because of the legal documentation. It's usually when service deadlines slip outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Service timing",
     description: "Bailiffs need guaranteed service by court deadline",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   process_server: {
-    pain: "Your service deadlines determine whether prosecutions move forward. One miss = case delayed indefinitely.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that prosecutions rarely stall because of the process itself. It's usually when service deadlines become impossible to meet.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "One deadline. Case stalls.",
     description: "Process servers have zero tolerance for missed deliveries",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // INSURANCE & COMPLIANCE
   insurance_company: {
-    pain: "You operate under regulatory oversight. One missed compliance deadline = fines. That's unacceptable.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that regulatory compliance rarely fails because of the policies themselves. It's usually when deadline requirements slip outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Regulatory deadline",
     description: "Insurance companies face regulatory fines for missed deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   insurance_broker: {
-    pain: "Your clients depend on timely policy delivery. One missed deadline = lost client + compliance risk.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that client relationships rarely break because of the insurance itself. It's usually when policy delivery gets delayed outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Policy timing",
     description: "Insurance brokers need guaranteed delivery for regulatory compliance",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // MEDICAL & SURGICAL
   hospital: {
-    pain: "Your operating theatres run on strict schedules. One missed supply delivery = cancelled surgery.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that surgery schedules rarely slip because of the procedure itself. It's usually when supplies or equipment arrive late.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Surgery scheduled",
-    description: "Hospitals cannot tolerate surgical supply delays (patient impact)",
+    description: "Hospitals cannot tolerate surgical supply delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   surgical_supplies: {
-    pain: "Your hospitals depend on you. One missed delivery = operating theatre sits idle.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that operating theatres rarely sit idle because of the supply chain planning. It's usually when critical deliveries get delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "OR timing",
     description: "Surgical supply companies serve hospitals with zero tolerance",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   medical_devices: {
-    pain: "You supply hospitals and clinics with life-critical equipment. One missed delivery = procedure delayed.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that procedures rarely get postponed because of the equipment itself. It's usually when delivery timelines get disrupted.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Surgery scheduled. Can't be late.",
-    description: "Medical device companies have highest stakes (patient care)",
+    description: "Medical device companies have highest stakes",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   clinic: {
-    pain: "Your patients need urgent care. One delayed delivery = patient suffering + liability.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that patient care rarely suffers because of the treatment plan. It's usually when urgent supplies don't arrive on time.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Patient care timing",
     description: "Clinics need guaranteed urgent delivery for patient care",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   pharmacy: {
-    pain: "Your customers need prescriptions immediately. One delayed delivery = patient in pain + liability.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that patient relief rarely gets delayed because of the medicine itself. It's usually when urgent prescriptions get held up in delivery.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Relief timing",
-    description: "Pharmacies face patient impact and liability for delayed prescriptions",
-    closingQuestion: "Real question. When a prescription comes in urgent, would a backup courier you can call on demand help you get it out same-day?",
-    industryInsight: "prescription delivery delays are increasingly common across couriers right now—capacity constraints hitting everyone",
+    description: "Pharmacies face patient impact for delayed prescriptions",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // LEGAL SERVICES (Existing - recategorize to Tier 1)
   legal: {
-    pain: "You operate on strict court deadlines. One missed document delivery = case collapses.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that cases rarely collapse because of the legal strategy. It's usually when document delivery gets in the way.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Document deadline",
     description: "Legal firms face case dismissal for missed deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   lawyer: {
-    pain: "Your court filings have hard deadlines. One missed delivery = case dismissed.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that filings rarely miss deadlines because of the legal work itself. It's usually when courier logistics slip outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Brief timing",
     description: "Lawyers face compliance violations for missed filings",
-    closingQuestion: "Real question. When a brief deadline gets tight, would a backup courier you can call same-day help you sleep better?",
-    industryInsight: "the surge in missed court filing deadlines among couriers this year—most are capacity-constrained",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   solicitor: {
-    pain: "You operate on thin margins. One missed document deadline = lost client.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that filing deadlines rarely become stressful because of the legal work itself. It's usually when something outside your control gets in the way.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Brief timing",
     description: "Solicitors lose clients over missed deadlines",
-    closingQuestion: "Genuine question. When a filing deadline gets tight, would a backup courier you can call same-day actually help?",
-    industryInsight: "the increase in missed filing deadlines among couriers right now due to capacity constraints",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   attorney: {
-    pain: "You handle time-sensitive cases. One missed deadline = case delayed, client frustrated.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that cases rarely stall because of the legal preparation. It's usually when document delivery becomes unreliable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLineVariation: "Case timeline",
     description: "Attorneys face case dismissal for missed deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 2: HIGHLY MOTIVATED (Premium/High-Value Consequences)
+  // TIER 2: HIGHLY MOTIVATED (Premium/High-Value)
   // ═══════════════════════════════════════════════════════════════════
 
-  // FILM & TV PRODUCTION
   film_production: {
-    pain: "Your budgets are tight. One missed equipment delivery costs $10k+ in crew idle time.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that film shoots rarely run over budget because of the creative work. It's usually when equipment doesn't arrive on set when it's needed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Equipment delay",
     description: "Film production has extreme daily costs for delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   tv_production: {
-    pain: "Your shooting schedules are strict. One missed delivery = expensive crew sitting idle.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that shooting schedules rarely slip because of the production planning. It's usually when equipment delivery gets delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Equipment delay",
     description: "TV production budgets cannot absorb delivery delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // UNIVERSITIES & RESEARCH
   university_research: {
-    pain: "Your research samples can't be repeated. One missed delivery = months of work lost.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that research rarely fails because of the methodology. It's usually when time-sensitive samples don't arrive on schedule.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Sample timing",
     description: "Universities cannot repeat experiments; samples are irreplaceable",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // LUXURY & AUCTION HOUSES
   auction_house: {
-    pain: "Your high-value lots have auction windows. One missed delivery = deal lost forever.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that auction sales rarely fall through because of the lots themselves. It's usually when delivery windows get missed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Delivery timing",
     description: "Auction houses lose entire transactions over missed deliveries",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   jewelry_store: {
-    pain: "You handle premium items. One missed delivery = customer lost + reputation risk.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that customer satisfaction rarely drops because of the jewelry itself. It's usually when delivery timing becomes unpredictable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Customer timing",
     description: "Jewelry stores need guaranteed secure delivery for high-value items",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   luxury_goods: {
-    pain: "Your VIP customers expect perfection. One missed delivery = premium client lost.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that premium clients rarely disappear because of the products. It's usually when delivery expectations don't get met.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Delivery timing",
     description: "Luxury goods retailers have premium pricing; cannot lose clients",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // FASHION & DESIGN
   fashion_design: {
-    pain: "Your buyer meetings are tight windows. One missed sample delivery = order never happens.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that orders rarely fall through because of the designs themselves. It's usually when sample deliveries get delayed past buyer meetings.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "HIGHLY_MOTIVATED",
     tier: 2,
     subjectLineVariation: "Fashion sample delivery",
     description: "Fashion designers lose orders over missed sample deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
   // ═══════════════════════════════════════════════════════════════════
-  // TIER 3: MOTIVATED (Operational Consequences)
+  // TIER 3: MOTIVATED (Operational)
   // ═══════════════════════════════════════════════════════════════════
 
-  // REAL ESTATE / LETTINGS
   estate_agent: {
-    pain: "Your completion deadlines are hard dates. One delayed document = sale collapses.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that property sales rarely collapse because of the properties themselves. It's usually when completion documents don't arrive on time.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Completion timing",
     description: "Estate agents have standard operational delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   realtor: {
-    pain: "Your closing window is limited. One missed document delivery = deal dies.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that deals rarely die because of the negotiation. It's usually when closing documents get delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Closing window",
     description: "Realtors handle standard real estate deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   lettings: {
-    pain: "Your tenancy timelines matter. One delayed document = late tenancy start.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that tenancies rarely fail to start because of the agreement itself. It's usually when paperwork delivery gets held up.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tenancy timing",
     description: "Lettings companies handle standard tenancy paperwork",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   property: {
-    pain: "Your transaction deadlines are fixed. One missed document = delayed closing.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that transactions rarely stall because of the legal work. It's usually when document delivery becomes unpredictable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Transaction timing",
     description: "Property companies handle standard transaction deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // ACCOUNTING / TAX (Recategorize: Tax has compliance consequences = Tier 1)
   accounting: {
-    pain: "Tax season means tight deadlines. One missed filing = penalties for your clients.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that tax season rarely causes problems because of the accounting itself. It's usually when filing deadlines slip outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
     description: "Accountants handle standard tax season deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   accountant: {
-    pain: "Your tax deadlines are April 15. One missed delivery = penalties + angry clients.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that tax deadlines rarely stress you because of the accounting work itself. It's usually when document delivery gets delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
     description: "Accountants handle standard tax filing deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   tax: {
-    pain: "Your filing deadlines are strict. One missed document = client audit risk.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that audit risk rarely increases because of the filings themselves. It's usually when deadline deliveries become unreliable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Tax deadline",
     description: "Tax services handle standard tax compliance",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   bookkeeper: {
-    pain: "Month-end is chaos. One missed deadline = financial reporting delayed.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that month-end rarely becomes chaotic because of the data itself. It's usually when document delivery holds up financial reporting.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your month-end deadlines",
     description: "Bookkeepers handle standard monthly deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // CONSTRUCTION / TRADES
   construction: {
-    pain: "Your project timelines are locked. One delayed material delivery = whole site falls behind.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that project delays rarely happen because of the planning itself. It's usually when material delivery gets disrupted.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Project timing",
-    description: "Construction has operational delays (not mission-critical)",
+    description: "Construction has operational delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   builder: {
-    pain: "Your build schedules are tight. One missed material delivery = cost overruns.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that build timelines rarely blow out because of the construction itself. It's usually when material delivery becomes unpredictable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Build timing",
     description: "Builders handle standard material delivery schedules",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   contractor: {
-    pain: "Your site depends on supplies arriving on time. One delay = whole crew idle.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that site work rarely stalls because of the labour itself. It's usually when supply delivery gets delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Site timing",
     description: "Contractors manage standard supply chain delays",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   plumber: {
-    pain: "Your appointments are booked tight. One missed pickup = schedule chaos.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that appointment schedules rarely break because of the plumbing itself. It's usually when supply pickups get held up.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Job timing",
     description: "Plumbers handle standard job schedules",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   electrician: {
-    pain: "Your installation dates are fixed. One delayed equipment = client waiting.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that installation dates rarely slip because of the electrical work itself. It's usually when equipment delivery gets delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Install timing",
     description: "Electricians handle standard equipment schedules",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // ARCHITECTURE / ENGINEERING
   architecture: {
-    pain: "Your project plans drive construction schedules. One late delivery = site crew waits.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that construction rarely stalls because of the plans themselves. It's usually when drawing delivery gets held up.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Timeline timing",
     description: "Architects handle standard plan delivery schedules",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   architect: {
-    pain: "Your drawings have tight delivery windows. One missed deadline = construction delayed.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that projects rarely get delayed because of the drawings themselves. It's usually when delivery timelines slip outside your control.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
     description: "Architects manage standard drawing deadlines",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   engineering: {
-    pain: "Your specifications drive build timelines. One late delivery = crews sit idle.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that builds rarely fall behind because of the specs themselves. It's usually when specification delivery gets delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
     description: "Engineers handle standard specification delivery",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // E-COMMERCE / RETAIL
   ecommerce: {
-    pain: "Your customers expect fast delivery. One delayed order = bad review + lost customer.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that customer satisfaction rarely drops because of the products. It's usually when delivery speed becomes unpredictable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
     description: "E-commerce handles standard order fulfillment",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   retailer: {
-    pain: "Your inventory windows are tight. One missed delivery = empty shelves.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that inventory rarely runs out because of the ordering itself. It's usually when delivery windows get missed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
     description: "Retailers manage standard inventory delivery",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   retail: {
-    pain: "Peak season is chaos. One missed delivery = lost sales + unhappy customers.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that peak season rarely becomes chaotic because of the products themselves. It's usually when inventory delivery gets disrupted.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your inventory",
     description: "Retail businesses handle seasonal inventory peaks",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
-  // HOSPITALITY / FOOD SERVICE
   florist: {
-    pain: "Wedding day has a delivery window. One late flower delivery = wedding looks wrong.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that weddings rarely look wrong because of the flowers themselves. It's usually when delivery timing slips on the day.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your event deliveries",
     description: "Florists have tight event-day windows",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   event_planning: {
-    pain: "Event setup is timing-critical. One late decoration delivery = chaos.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that events rarely fall apart because of the planning itself. It's usually when supplier deliveries get delayed.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your event deliveries",
     description: "Event planners depend on precise timing",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   hospitality: {
-    pain: "Friday dinner service is sacred. One late supply delivery = service disrupted.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that service quality rarely suffers because of the food itself. It's usually when supply delivery becomes unreliable.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your service",
     description: "Hospitality venues depend on consistent supply timing",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   restaurant: {
-    pain: "Service starts at 6pm. One late ingredient delivery = you can't open.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that service quality rarely fails because of the food itself. It's usually when critical supplies show up after doors open.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your service",
     description: "Restaurants cannot open without ingredients",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
   cafe: {
-    pain: "Opening time is 7am. One late delivery = you open late and lose customers.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that morning service rarely fails because of the coffee itself. It's usually when stock delivery doesn't arrive before opening.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Protecting your opening",
     description: "Cafes need stock before opening",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 };
 
-/**
- * Detect business type from name and return pain + promise + consequence
- * Looks for keywords in business name, returns best match
- */
-export function detectBusinessType(businessName: string): BusinessPainPromise {
-  // Strip postcode/postal code patterns (UK: XXXX XXX, US: XXXXX, etc)
+export function detectBusinessCategory(businessName: string): string {
   let cleanName = businessName
     .toLowerCase()
-    // Remove UK postcodes (e.g., EC4Y 0HA)
     .replace(/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/gi, "")
-    // Remove US zipcode (e.g., 12345)
     .replace(/\b\d{5}(?:-\d{4})?\b/g, "")
-    // Remove line breaks and extra spaces
     .replace(/\s+/g, " ")
     .trim();
 
-  // Exact matches first
+  for (const key of Object.keys(BUSINESS_PAIN_PROMISE_MAP)) {
+    if (cleanName.includes(key.replace(/_/g, " "))) {
+      return key;
+    }
+  }
+
+  for (const key of Object.keys(BUSINESS_PAIN_PROMISE_MAP)) {
+    const keywords = key.split("_");
+    if (keywords.some((kw) => cleanName.includes(kw))) {
+      return key;
+    }
+  }
+
+  return "courier";
+}
+
+export function detectBusinessType(businessName: string): BusinessPainPromise {
+  let cleanName = businessName
+    .toLowerCase()
+    .replace(/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/gi, "")
+    .replace(/\b\d{5}(?:-\d{4})?\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
   for (const [key, value] of Object.entries(BUSINESS_PAIN_PROMISE_MAP)) {
     if (cleanName.includes(key.replace(/_/g, " "))) {
       return value;
     }
   }
 
-  // Partial matches as fallback
   for (const [key, value] of Object.entries(BUSINESS_PAIN_PROMISE_MAP)) {
     const keywords = key.split("_");
     if (keywords.some((kw) => cleanName.includes(kw))) {
@@ -474,62 +507,43 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
     }
   }
 
-  // Default fallback (Tier 3, operational)
   return {
-    pain: "Your deliveries matter to your operation. One missed delivery = everything stops.",
-    promise: "built our courier service to stop that permanently—if it ever fails on us, we own the re-delivery. No cost.",
+    pain: "One thing I've learnt is that deliveries rarely fail because of the work itself. It's usually when something outside your control gets in the way.",
+    promise: "That's why we built our courier service. If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLineVariation: "Delivery timing",
     description: "Unknown business type - using default tier 3",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   };
 }
 
-/**
- * Get consequence tier for a business name
- * Returns 1, 2, or 3
- */
-export function getConsequenceTier(businessName: string): ConsequenceTier {
+export function getConsequenceTier(businessName: string) {
   return detectBusinessType(businessName).tier;
 }
 
-/**
- * Get consequence level for a business name
- */
-export function getConsequenceLevel(businessName: string): ConsequenceLevel {
+export function getConsequenceLevel(businessName: string) {
   return detectBusinessType(businessName).consequenceLevel;
 }
 
-/**
- * Get all Tier 1 (ULTRA_MOTIVATED) business types
- */
 export function getTier1Businesses(): string[] {
   return Object.entries(BUSINESS_PAIN_PROMISE_MAP)
     .filter(([_, value]) => value.tier === 1)
     .map(([key, _]) => key);
 }
 
-/**
- * Get all Tier 2 (HIGHLY_MOTIVATED) business types
- */
 export function getTier2Businesses(): string[] {
   return Object.entries(BUSINESS_PAIN_PROMISE_MAP)
     .filter(([_, value]) => value.tier === 2)
     .map(([key, _]) => key);
 }
 
-/**
- * Get all Tier 3 (MOTIVATED) business types
- */
 export function getTier3Businesses(): string[] {
   return Object.entries(BUSINESS_PAIN_PROMISE_MAP)
     .filter(([_, value]) => value.tier === 3)
     .map(([key, _]) => key);
 }
 
-/**
- * Check if business is Tier 1 (ULTRA_MOTIVATED)
- */
 export function isTier1(businessName: string): boolean {
   return getConsequenceTier(businessName) === 1;
 }
