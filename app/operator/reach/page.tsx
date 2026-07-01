@@ -262,8 +262,8 @@ export default function ReachPage() {
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
