@@ -69,6 +69,31 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // ===== EMAIL CAMPAIGN SNAPSHOT =====
+    const emailSent = await prisma.b2bCampaignEmail.count({
+      where: { emailSentAt: { gte: today } },
+    });
+    const emailOpened = await prisma.b2bCampaignEmail.count({
+      where: { openedAt: { gte: today } },
+    });
+    const emailClicked = await prisma.b2bCampaignEmail.count({
+      where: { clickedAt: { gte: today } },
+    });
+    const emailReplied = await prisma.b2bCampaignEmail.count({
+      where: { repliedAt: { gte: today } },
+    });
+
+    // ===== WHATSAPP CAMPAIGN SNAPSHOT =====
+    const whatsappActive = await prisma.b2bCampaignWhatsApp.count({
+      where: { lastMessageAt: { gte: today } },
+    });
+    const whatsappReady = await prisma.b2bCampaignWhatsApp.count({
+      where: { status: "ready" },
+    });
+    const whatsappReplied = await prisma.b2bCampaignWhatsApp.count({
+      where: { messageCount: { gt: 1 } },
+    });
+
     // ===== STATUS MESSAGE =====
     let statusMessage = "";
     if (driversOnline === 0) {
@@ -96,6 +121,13 @@ export async function GET(request: NextRequest) {
         oldestReplyHours,
         prospectsStalled,
         statusMessage,
+        emailSent,
+        emailOpened,
+        emailClicked,
+        emailReplied,
+        whatsappActive,
+        whatsappReady,
+        whatsappReplied,
       },
       lastUpdated: new Date().toISOString(),
     });

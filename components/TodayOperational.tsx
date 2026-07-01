@@ -115,19 +115,78 @@ export function TodayOperational() {
         </div>
       </div>
 
+      {/* CAMPAIGNS SNAPSHOT - What's happening now */}
+      <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
+        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+          Campaign Activity
+        </p>
+
+        {/* Email Campaigns */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="text-[#0D0D0D]">
+              <Icons.Message />
+            </div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">Email</p>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.emailSent}</p>
+              <p className="text-xs text-[#888888] mt-1">sent</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.emailOpened}</p>
+              <p className="text-xs text-[#888888] mt-1">opened</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.emailClicked}</p>
+              <p className="text-xs text-[#888888] mt-1">clicked</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.emailReplied}</p>
+              <p className="text-xs text-[#888888] mt-1">replied</p>
+            </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Campaigns */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="text-[#0D0D0D]">
+              <Icons.Message />
+            </div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">WhatsApp</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappActive}</p>
+              <p className="text-xs text-[#888888] mt-1">active</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappReady}</p>
+              <p className="text-xs text-[#888888] mt-1">ready</p>
+            </div>
+            <div>
+              <p className="text-lg font-black text-[#0D0D0D]">{data.whatsappReplied}</p>
+              <p className="text-xs text-[#888888] mt-1">replied</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* WAITING RESPONSES */}
       <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
         <div className="flex items-center gap-2 mb-4">
           <div className="text-[#0D0D0D]">
-            <Icons.Message />
+            <Icons.Clock />
           </div>
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-            Email Replies Waiting
+            Responses Waiting
           </p>
         </div>
         <div className="flex items-baseline gap-3">
           <p className="text-3xl font-black text-[#0D0D0D]">{data.repliesWaiting}</p>
-          <p className="text-sm text-[#888888]">prospects ready to contact</p>
+          <p className="text-sm text-[#888888]">email replies to contact</p>
         </div>
         <p className="text-xs text-[#666666] mt-3">Oldest: {data.oldestReplyHours} hours waiting</p>
       </div>
