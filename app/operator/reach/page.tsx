@@ -51,9 +51,9 @@ export default function ReachPage() {
     };
 
     fetchCampaigns();
-    // Refresh every 15 seconds silently (background only)
-    const interval = setInterval(fetchCampaigns, 15000);
-    return () => clearInterval(interval);
+    // No auto-refresh - use manual "Refresh Now" button only
+    // Auto-polling causes visible flashing and poor UX
+    return () => {};
   }, []);
 
   const handleCreateConversation = async (e: React.FormEvent) => {

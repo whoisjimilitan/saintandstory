@@ -95,21 +95,27 @@ export async function POST(request: NextRequest) {
           }
 
           // Log in database with Resend message ID for webhook matching
-          await prisma.b2bCampaignEmail.create({
-            data: {
-              campaignId: campaign.id,
-              prospectId: email.prospectId,
-              prospectEmail: email.prospectEmail,
-              prospectName: email.prospectName,
-              tier: email.tier,
-              category: email.category,
-              subject: email.subject,
-              body: email.body,
-              resendMessageId: response.id, // Store Resend message ID for webhooks
-              status: "sent",
-              emailSentAt: new Date(),
-            },
-          });
+          try {
+            await prisma.b2bCampaignEmail.create({
+              data: {
+                campaignId: campaign.id,
+                prospectId: email.prospectId,
+                prospectEmail: email.prospectEmail,
+                prospectName: email.prospectName,
+                tier: email.tier,
+                category: email.category,
+                subject: email.subject,
+                body: email.body,
+                resendMessageId: response.id, // Store Resend message ID for webhooks
+                status: "sent",
+                emailSentAt: new Date(),
+              },
+            });
+            console.log(`[CAMPAIGN SEND] ✓ Logged email ${response.id} to database`);
+          } catch (dbError) {
+            console.error(`[CAMPAIGN SEND] Database error logging email:`, dbError);
+            // Continue anyway - email was sent even if logging failed
+          }
 
           sentCount++;
           console.log(`[CAMPAIGN SEND] ✓ Email sent to ${email.prospectEmail}`);
