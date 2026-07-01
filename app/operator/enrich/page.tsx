@@ -214,6 +214,7 @@ export default function EnrichPage() {
       const res = await fetch("/api/b2b/campaigns/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // CRITICAL: Include auth cookies
         body: JSON.stringify({
           campaignName: campaignName,
           channel: "email", // TODO: pull from DISCOVER selection

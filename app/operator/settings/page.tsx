@@ -71,6 +71,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/operator/trigger-discovery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ tiers: configs }),
       });
 
