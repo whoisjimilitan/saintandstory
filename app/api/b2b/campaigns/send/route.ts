@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           const emailHtml = buildEmailHtml(email, sender);
 
           const response = await resend.emails.send({
-            from: `${sender.name} <${sender.email}>`,
+            from: `Saint & Story <${sender.email}>`,
             to: email.prospectEmail,
             subject: email.subject,
             html: emailHtml,

@@ -15,11 +15,16 @@ export function buildEmailHtml(
   const websiteUrl = "https://saintandstoryltd.co.uk";
   const logoUrl = "https://saintandstoryltd.co.uk/logo-mark.svg";
 
-  // Parse body to separate main content from tagline
+  // Parse body to separate main content from signature
   const lines = email.body.split("\n");
-  const taglineStartIndex = Math.max(0, lines.length - 2);
-  const mainContent = lines.slice(0, taglineStartIndex).join("\n").trim();
-  const taglineText = lines.slice(taglineStartIndex).join("\n").trim();
+
+  // Get non-empty lines from the end
+  const nonEmptyLines = lines.filter(l => l.trim());
+  const companyNameFromBody = nonEmptyLines[nonEmptyLines.length - 1] || "Saint & Story";
+  const senderNameFromBody = nonEmptyLines[nonEmptyLines.length - 2] || "James";
+
+  // Main content is everything except the last 2 non-empty lines
+  const mainContent = lines.slice(0, -3).join("\n").trim();
 
   return `
 <!DOCTYPE html>
@@ -104,21 +109,11 @@ export function buildEmailHtml(
       padding-top: 20px;
       border-top: 1px solid #E8E8E8;
     }
-    .signature-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .signature-logo {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-    }
     .signature-sender {
       font-weight: 600;
       font-size: 15px;
       color: #0D0D0D;
+      margin-bottom: 4px;
     }
     .signature-details {
       font-size: 13px;
@@ -153,31 +148,22 @@ export function buildEmailHtml(
 
       <!-- Main Content -->
       <div class="content">
-        <div class="greeting">Hi ${email.prospectName},</div>
         <div class="body-text">${mainContent}</div>
       </div>
 
       <!-- Divider -->
       <div class="divider"></div>
 
-      <!-- Tagline -->
-      <div class="tagline-section">${taglineText}</div>
-
       <!-- CTA Button -->
       <div class="cta-section">
-        <a href="mailto:${sender.email}?subject=Re:%20Let's%20talk&body=Hi%20${sender.name},%0A%0AI'd%20like%20to%20discuss%20how%20Saint%20%26%20Story%20could%20help%20us.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Let's talk</a>
+        <a href="mailto:${sender.email}?subject=Re:%20Let's%20talk&body=Hi%20${senderNameFromBody},%0A%0AI'd%20like%20to%20discuss%20how%20Saint%20%26%20Story%20could%20help%20us.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Let's talk</a>
       </div>
 
       <!-- Signature -->
       <div class="signature-section">
-        <div class="signature-header">
-          <img src="${logoUrl}" alt="" class="signature-logo" width="36" height="36">
-          <div class="signature-sender">${sender.name}</div>
-        </div>
+        <div class="signature-sender">${senderNameFromBody}</div>
         <div class="signature-details">
-          <a href="${websiteUrl}">Saint & Story</a><br>
-          ${senderPhone}<br>
-          ${senderAddress}
+          <a href="${websiteUrl}">${companyNameFromBody}</a>
         </div>
       </div>
     </div>
