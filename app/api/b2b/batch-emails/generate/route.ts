@@ -13,6 +13,7 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateEmailV4 } from "@/lib/email-engine-v4";
+import { detectBusinessType } from "@/lib/business-pain-promise-map";
 import { buildEmailHtml } from "@/lib/email-html-builder";
 
 const ADMIN_EMAILS = [
@@ -119,13 +120,21 @@ export async function POST(request: Request) {
           senderName
         );
 
+        // Get sender role from business type if available
+        const businessType = detectBusinessType(prospect.businessName);
+        const senderRole = businessType.identity?.senderRole;
+
         // Generate HTML preview for the enrich page
         const htmlPreview = buildEmailHtml(
           {
             prospectName: firstName || "[Name]",
             body: emailV4.bodyText,
           },
-          { name: senderName, email: prospect.email || "contact@saintandstoryltd.co.uk" }
+          {
+            name: senderName,
+            email: prospect.email || "contact@saintandstoryltd.co.uk",
+            role: senderRole
+          }
         );
 
         results.push({

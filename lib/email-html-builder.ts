@@ -7,7 +7,7 @@ export function buildEmailHtml(
     body: string;
     subject?: string;
   },
-  sender: { name: string; email: string }
+  sender: { name: string; email: string; role?: string }
 ): string {
   // Use phone based on email domain
   const senderPhone = sender.email.includes("james@") ? "+44 20 3318 1234" : "+44 20 3318 5678";
@@ -89,6 +89,9 @@ export function buildEmailHtml(
     }
     .cta-section {
       margin: 32px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .cta-button {
       display: inline-block;
@@ -104,6 +107,15 @@ export function buildEmailHtml(
     .cta-button:hover {
       background: #333333;
     }
+    .website-link {
+      font-size: 14px;
+      color: #0D0D0D;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .website-link:hover {
+      text-decoration: underline;
+    }
     .signature-section {
       margin-top: 40px;
       padding-top: 20px;
@@ -113,6 +125,11 @@ export function buildEmailHtml(
       font-weight: 600;
       font-size: 15px;
       color: #0D0D0D;
+      margin-bottom: 2px;
+    }
+    .signature-role {
+      font-size: 12px;
+      color: #888888;
       margin-bottom: 4px;
     }
     .signature-details {
@@ -154,14 +171,16 @@ export function buildEmailHtml(
       <!-- Divider -->
       <div class="divider"></div>
 
-      <!-- CTA Button -->
+      <!-- CTA Button & Website Link -->
       <div class="cta-section">
         <a href="mailto:${sender.email}?subject=Re:%20Let's%20talk&body=Hi%20${senderNameFromBody},%0A%0AI'd%20like%20to%20discuss%20how%20Saint%20%26%20Story%20could%20help%20us.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Let's talk</a>
+        <a href="${websiteUrl}" class="website-link">Check out our website</a>
       </div>
 
       <!-- Signature -->
       <div class="signature-section">
         <div class="signature-sender">${senderNameFromBody}</div>
+        ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
         <div class="signature-details">
           <a href="${websiteUrl}">${companyNameFromBody}</a>
         </div>

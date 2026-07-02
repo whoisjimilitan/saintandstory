@@ -91,8 +91,9 @@ export function selectSignature(identity: BusinessIdentity): string {
 }
 
 export interface BusinessIdentity {
-  tagline: string;   // Outcome-focused tagline (e.g., "Keeping Legal Deadlines Moving")
+  tagline?: string;   // Outcome-focused tagline (optional, e.g., "Keeping Legal Deadlines Moving")
   signatureName?: string; // Signature name (e.g., "James" or "Saint & Story")
+  senderRole?: string; // Role/title (e.g., "Co-Founder", "Founder", "Operations")
 }
 
 export interface BusinessPainPromise {
@@ -390,16 +391,18 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   solicitor: {
     pain: "Filing deadlines rarely become stressful because of the legal work itself. The real problem is when delivery becomes the variable you can't control.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
-    bridge: "Helping solicitors with time-critical legal deliveries has taught me one thing.",
-    sharedReality: "Filing deadlines rarely become stressful because of the legal work itself.",
+    bridge: "Helping solicitors deliver time-critical documents has taught me one thing.",
+    sharedReality: "Filing deadlines are rarely missed because of the legal work itself.",
     rootCause: "They're usually missed when one small dependency becomes the biggest risk.",
-    dependencyReveal: "Quite often, that's the delivery.",
+    dependencyReveal: "For many firms, that dependency is simply getting the documents there on time.",
     businessPhilosophy: "That's why we built Saint & Story the way we did.",
     promiseStatement: "If a delivery ever fails with us, we'll take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines get tight"],
-    identity: {},
+    identity: {
+      senderRole: "Co-Founder"
+    },
     description: "Solicitors lose clients over missed deadlines",
     closingQuestion: "Out of curiosity, does your team ever need a same-day backup courier when deadlines get tight?",
   },

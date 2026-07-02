@@ -3,6 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import { buildEmailHtml } from "@/lib/email-html-builder";
+import { detectBusinessType } from "@/lib/business-pain-promise-map";
 
 if (!process.env.RESEND_API_KEY) {
   console.error("[CAMPAIGN SEND] CRITICAL: RESEND_API_KEY is not set!");
