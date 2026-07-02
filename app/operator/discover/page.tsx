@@ -129,11 +129,14 @@ export default function DiscoverPage() {
           business_name: manualForm.businessName,
           business_category: "Manual Entry",
           city: manualForm.city,
-          email: manualForm.email,
-          phone: manualForm.phone,
+          email: manualForm.email || undefined,
+          phone: manualForm.phone || undefined,
+          postcode: manualForm.postcode || undefined,
           notes: "Manually added from Discover page"
         }),
       });
+
+      const data = await res.json();
 
       if (res.ok) {
         // Add to search results with unique ID
@@ -148,7 +151,8 @@ export default function DiscoverPage() {
         setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
         alert("✓ Lead saved successfully");
       } else {
-        alert("Failed to save lead");
+        console.error("[MANUAL-ADD] API Error:", data);
+        alert(`Failed to save lead: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error saving manual lead:", error);
