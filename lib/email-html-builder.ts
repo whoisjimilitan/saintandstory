@@ -179,7 +179,7 @@ export function buildEmailHtml(
         ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
         <div class="signature-details">
           <a href="${websiteUrl}">${companyNameFromBody}</a><br>
-          <a href="${websiteUrl}" class="website-link-subtle" style="display: block; margin-top: 12px;">Check out our website</a>
+          <a href="${websiteUrl}" class="website-link-subtle" style="display: inline-block; margin-top: 12px; padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px;">Check out our website</a>
         </div>
       </div>
     </div>
