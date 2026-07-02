@@ -172,7 +172,7 @@ export function buildEmailHtml(
 
       <!-- CTA Button -->
       <div class="cta-section">
-        <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0A%0AYes,%20occasionally%20we%20do.%0A%0AThanks," class="cta-button">Reply</a>
+        <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0A%0AYes,%20occasionally%20we%20do.%0A%0AThanks,%0A%5BYour%20Name%5D" class="cta-button">Reply</a>
       </div>
 
       <!-- Signature -->
