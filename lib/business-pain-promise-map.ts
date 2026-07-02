@@ -20,19 +20,15 @@ export type ConsequenceLevel = "ULTRA_MOTIVATED" | "HIGHLY_MOTIVATED" | "MOTIVAT
 export type ConsequenceTier = 1 | 2 | 3;
 
 /**
- * Select signature based on identity hierarchy:
- * Principle (native, earned) > Outcome (strong) > Positioning (default)
+ * Get tagline for email signature
+ * Outcome-focused: speaks to business value, not brand philosophy
  */
 export function selectSignature(identity: BusinessIdentity): string {
-  if (identity.principle) return identity.principle;
-  if (identity.outcome) return identity.outcome;
-  return identity.positioning || "Simplifying Logistics";
+  return identity.tagline || "Simplifying Logistics";
 }
 
 export interface BusinessIdentity {
-  principle?: string;   // Native to industry, feels earned, describes reality
-  outcome?: string;     // Strong fallback, outcome-focused
-  positioning?: string; // Default positioning, "Simplifying Logistics for [Category]"
+  tagline: string;   // Outcome-focused tagline (e.g., "Keeping Legal Deadlines Moving")
 }
 
 export interface BusinessPainPromise {
@@ -58,9 +54,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines matter"],
     identity: {
-      principle: "Justice Can't Wait",
-      outcome: "Keeping Justice on Schedule",
-      positioning: "Simplifying Logistics for Courts"
+      tagline: "Keeping Justice on Schedule"
     },
     description: "Court services have highest consequence: litigation failure",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -72,9 +66,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When service matters"],
     identity: {
-      principle: "Service Dates Are Fixed",
-      outcome: "Keeping Enforcement on Time",
-      positioning: "Simplifying Logistics for Bailiffs"
+      tagline: "Keeping Enforcement on Time"
     },
     description: "Bailiffs need guaranteed service by court deadline",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -86,9 +78,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "Things outside your control"],
     identity: {
-      principle: "Court Dates Don't Move",
-      outcome: "Keeping Service on Schedule",
-      positioning: "Simplifying Logistics for Process Servers"
+      tagline: "Keeping Service on Schedule"
     },
     description: "Process servers have zero tolerance for missed deliveries",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -101,9 +91,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "A thought", "When compliance matters"],
     identity: {
-      principle: "Compliance Isn't Negotiable",
-      outcome: "Keeping Compliance on Schedule",
-      positioning: "Simplifying Logistics for Insurance Companies"
+      tagline: "Keeping Compliance on Schedule"
     },
     description: "Insurance companies face regulatory fines for missed deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -115,9 +103,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines matter"],
     identity: {
-      principle: "Coverage Can't Be Late",
-      outcome: "Keeping Coverage Moving",
-      positioning: "Simplifying Logistics for Insurance Brokers"
+      tagline: "Keeping Coverage Moving"
     },
     description: "Insurance brokers need guaranteed delivery for regulatory compliance",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -130,9 +116,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've noticed", "Out of curiosity", "When supplies matter"],
     identity: {
-      principle: "Surgery Waits for Nothing",
-      outcome: "Keeping Surgery on Schedule",
-      positioning: "Simplifying Logistics for Hospitals"
+      tagline: "Keeping Surgery on Schedule"
     },
     description: "Hospitals cannot tolerate surgical supply delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -144,9 +128,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When OR time matters"],
     identity: {
-      principle: "Operating Rooms Don't Wait",
-      outcome: "Keeping Surgery on Track",
-      positioning: "Simplifying Logistics for Surgical Suppliers"
+      tagline: "Keeping Surgery on Track"
     },
     description: "Surgical supply companies serve hospitals with zero tolerance",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -158,9 +140,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've noticed", "A thought", "When procedures matter"],
     identity: {
-      principle: "Procedures Start on Schedule",
-      outcome: "Keeping Procedures on Time",
-      positioning: "Simplifying Logistics for Medical Device Companies"
+      tagline: "Keeping Procedures on Time"
     },
     description: "Medical device companies have highest stakes",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -172,9 +152,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When urgency matters"],
     identity: {
-      principle: "Treatment Can't Wait",
-      outcome: "Keeping Care Moving",
-      positioning: "Simplifying Logistics for Clinics"
+      tagline: "Keeping Care Moving"
     },
     description: "Clinics need guaranteed urgent delivery for patient care",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -186,9 +164,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "A thought", "When relief matters"],
     identity: {
-      principle: "Prescriptions Can't Be Late",
-      outcome: "Keeping Relief Moving",
-      positioning: "Simplifying Logistics for Pharmacies"
+      tagline: "Keeping Relief Moving"
     },
     description: "Pharmacies face patient impact for delayed prescriptions",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -201,9 +177,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When cases matter"],
     identity: {
-      principle: "Cases Turn on Deadlines",
-      outcome: "Keeping Cases Moving",
-      positioning: "Simplifying Logistics for Legal Firms"
+      tagline: "Keeping Cases Moving"
     },
     description: "Legal firms face case dismissal for missed deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -215,9 +189,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When briefs matter"],
     identity: {
-      principle: "Filings Can't Slip",
-      outcome: "Keeping Filings on Time",
-      positioning: "Simplifying Logistics for Lawyers"
+      tagline: "Keeping Filings on Time"
     },
     description: "Lawyers face compliance violations for missed filings",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -229,9 +201,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines get tight"],
     identity: {
-      principle: "Deadlines Set the Rules",
-      outcome: "Keeping Deadlines Moving",
-      positioning: "Simplifying Logistics for Solicitors"
+      tagline: "Keeping Deadlines Moving"
     },
     description: "Solicitors lose clients over missed deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -243,9 +213,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 1,
     subjectLines: ["One thing I've learnt", "A thought", "When cases matter"],
     identity: {
-      principle: "Court Dates Don't Move",
-      outcome: "Keeping Cases on Schedule",
-      positioning: "Simplifying Logistics for Attorneys"
+      tagline: "Keeping Cases on Schedule"
     },
     description: "Attorneys face case dismissal for missed deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -262,9 +230,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've learnt", "Quick question", "When equipment arrives"],
     identity: {
-      principle: "Creativity Stops for No One",
-      outcome: "Keeping Sets on Schedule",
-      positioning: "Simplifying Logistics for Film Production"
+      tagline: "Keeping Sets on Schedule"
     },
     description: "Film production has extreme daily costs for delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -276,9 +242,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've noticed", "A thought", "When schedules matter"],
     identity: {
-      principle: "Sets Run on Schedule",
-      outcome: "Keeping Production on Time",
-      positioning: "Simplifying Logistics for TV Production"
+      tagline: "Keeping Production on Time"
     },
     description: "TV production budgets cannot absorb delivery delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -291,9 +255,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When samples matter"],
     identity: {
-      principle: "Science Doesn't Pause",
-      outcome: "Keeping Research on Timeline",
-      positioning: "Simplifying Logistics for Research"
+      tagline: "Keeping Research on Timeline"
     },
     description: "Universities cannot repeat experiments; samples are irreplaceable",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -306,9 +268,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've noticed", "Quick question", "When deadlines matter"],
     identity: {
-      principle: "Bids Don't Wait",
-      outcome: "Keeping Auctions on Time",
-      positioning: "Simplifying Logistics for Auction Houses"
+      tagline: "Keeping Auctions on Time"
     },
     description: "Auction houses lose entire transactions over missed deliveries",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -320,9 +280,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've learnt", "A thought", "When timing matters"],
     identity: {
-      principle: "Precious Moments Demand Precision",
-      outcome: "Keeping Deliveries on Time",
-      positioning: "Simplifying Logistics for Jewelry Stores"
+      tagline: "Keeping Deliveries on Time"
     },
     description: "Jewelry stores need guaranteed secure delivery for high-value items",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -334,9 +292,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've learnt", "Quick question", "When customers matter"],
     identity: {
-      principle: "Premium Standards Demand Precision",
-      outcome: "Keeping Premium Service Moving",
-      positioning: "Simplifying Logistics for Luxury Goods"
+      tagline: "Keeping Premium Service Moving"
     },
     description: "Luxury goods retailers have premium pricing; cannot lose clients",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -349,9 +305,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 2,
     subjectLines: ["One thing I've noticed", "Out of curiosity", "When samples matter"],
     identity: {
-      principle: "Seasons Move on Schedule",
-      outcome: "Keeping Collections Moving",
-      positioning: "Simplifying Logistics for Fashion Design"
+      tagline: "Keeping Collections Moving"
     },
     description: "Fashion designers lose orders over missed sample deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -368,9 +322,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When completions matter"],
     identity: {
-      principle: "Property Chains Keep Moving",
-      outcome: "Keeping Completions on Time",
-      positioning: "Simplifying Logistics for Estate Agents"
+      tagline: "Keeping Completions on Time"
     },
     description: "Estate agents have standard operational delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -382,9 +334,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "A thought", "When closings matter"],
     identity: {
-      principle: "Transactions Don't Pause",
-      outcome: "Keeping Closings on Time",
-      positioning: "Simplifying Logistics for Realtors"
+      tagline: "Keeping Closings on Time"
     },
     description: "Realtors handle standard real estate deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -396,9 +346,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When tenancies matter"],
     identity: {
-      principle: "Tenancies Start on Schedule",
-      outcome: "Keeping Lettings on Time",
-      positioning: "Simplifying Logistics for Lettings"
+      tagline: "Keeping Lettings on Time"
     },
     description: "Lettings companies handle standard tenancy paperwork",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -410,9 +358,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When transactions matter"],
     identity: {
-      principle: "Deals Move at Deadlines",
-      outcome: "Keeping Transactions Moving",
-      positioning: "Simplifying Logistics for Property Companies"
+      tagline: "Keeping Transactions Moving"
     },
     description: "Property companies handle standard transaction deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -425,9 +371,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When tax season arrives"],
     identity: {
-      principle: "Tax Season Has Fixed Rules",
-      outcome: "Keeping Tax Filings on Time",
-      positioning: "Simplifying Logistics for Accounting"
+      tagline: "Keeping Tax Filings on Time"
     },
     description: "Accountants handle standard tax season deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -439,9 +383,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When deadlines matter"],
     identity: {
-      principle: "Tax Deadlines Don't Move",
-      outcome: "Keeping Tax Deadlines on Time",
-      positioning: "Simplifying Logistics for Accountants"
+      tagline: "Keeping Tax Deadlines on Time"
     },
     description: "Accountants handle standard tax filing deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -453,9 +395,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When filings matter"],
     identity: {
-      principle: "Filings Have Deadlines",
-      outcome: "Keeping Filings on Schedule",
-      positioning: "Simplifying Logistics for Tax Services"
+      tagline: "Keeping Filings on Schedule"
     },
     description: "Tax services handle standard tax compliance",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -467,9 +407,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When month-end matters"],
     identity: {
-      principle: "Month-End Can't Wait",
-      outcome: "Keeping Month-End on Time",
-      positioning: "Simplifying Logistics for Bookkeepers"
+      tagline: "Keeping Month-End on Time"
     },
     description: "Bookkeepers handle standard monthly deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -482,9 +420,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When projects matter"],
     identity: {
-      principle: "Sites Stay on Schedule",
-      outcome: "Keeping Projects on Time",
-      positioning: "Simplifying Logistics for Construction"
+      tagline: "Keeping Projects on Time"
     },
     description: "Construction has operational delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -496,9 +432,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When materials arrive"],
     identity: {
-      principle: "Projects Move at Plan",
-      outcome: "Keeping Builds on Time",
-      positioning: "Simplifying Logistics for Builders"
+      tagline: "Keeping Builds on Time"
     },
     description: "Builders handle standard material delivery schedules",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -510,9 +444,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When supplies matter"],
     identity: {
-      principle: "Schedules Keep Moving",
-      outcome: "Keeping Schedules on Time",
-      positioning: "Simplifying Logistics for Contractors"
+      tagline: "Keeping Schedules on Time"
     },
     description: "Contractors manage standard supply chain delays",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -524,9 +456,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When pickups matter"],
     identity: {
-      principle: "Appointments Keep to Time",
-      outcome: "Keeping Appointments on Schedule",
-      positioning: "Simplifying Logistics for Plumbers"
+      tagline: "Keeping Appointments on Schedule"
     },
     description: "Plumbers handle standard job schedules",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -538,9 +468,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "A thought", "When installations matter"],
     identity: {
-      principle: "Installations Stay on Schedule",
-      outcome: "Keeping Installations on Time",
-      positioning: "Simplifying Logistics for Electricians"
+      tagline: "Keeping Installations on Time"
     },
     description: "Electricians handle standard equipment schedules",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -553,9 +481,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When drawings matter"],
     identity: {
-      principle: "Projects Move at the Speed of Decisions",
-      outcome: "Keeping Projects Moving",
-      positioning: "Simplifying Logistics for Architecture"
+      tagline: "Keeping Projects Moving"
     },
     description: "Architects handle standard plan delivery schedules",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -567,9 +493,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When deadlines matter"],
     identity: {
-      principle: "Projects Move When Drawings Arrive",
-      outcome: "Keeping Drawings on Schedule",
-      positioning: "Simplifying Logistics for Architects"
+      tagline: "Keeping Drawings on Schedule"
     },
     description: "Architects manage standard drawing deadlines",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -581,9 +505,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When specs matter"],
     identity: {
-      principle: "Builds Move at Spec Pace",
-      outcome: "Keeping Specs on Schedule",
-      positioning: "Simplifying Logistics for Engineering"
+      tagline: "Keeping Specs on Schedule"
     },
     description: "Engineers handle standard specification delivery",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -596,9 +518,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When deliveries matter"],
     identity: {
-      principle: "Inventory Has to Arrive",
-      outcome: "Keeping Orders on Time",
-      positioning: "Simplifying Logistics for E-Commerce"
+      tagline: "Keeping Orders on Time"
     },
     description: "E-commerce handles standard order fulfillment",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -610,9 +530,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When inventory arrives"],
     identity: {
-      principle: "Inventory Demands Precision",
-      outcome: "Keeping Inventory on Schedule",
-      positioning: "Simplifying Logistics for Retailers"
+      tagline: "Keeping Inventory on Schedule"
     },
     description: "Retailers manage standard inventory delivery",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -624,9 +542,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Out of curiosity", "When season peaks"],
     identity: {
-      principle: "Seasons Peak on Dates",
-      outcome: "Keeping Seasons on Schedule",
-      positioning: "Simplifying Logistics for Retail"
+      tagline: "Keeping Seasons on Schedule"
     },
     description: "Retail businesses handle seasonal inventory peaks",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -639,9 +555,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When events matter"],
     identity: {
-      principle: "Events Happen on One Day",
-      outcome: "Keeping Events on Time",
-      positioning: "Simplifying Logistics for Florists"
+      tagline: "Keeping Events on Time"
     },
     description: "Florists have tight event-day windows",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -653,9 +567,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "A thought", "When timing matters"],
     identity: {
-      principle: "No Event Moves Twice",
-      outcome: "Keeping Events on Schedule",
-      positioning: "Simplifying Logistics for Event Planning"
+      tagline: "Keeping Events on Schedule"
     },
     description: "Event planners depend on precise timing",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -667,9 +579,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "Quick question", "When service matters"],
     identity: {
-      principle: "Service Starts on Time",
-      outcome: "Keeping Service Moving",
-      positioning: "Simplifying Logistics for Hospitality"
+      tagline: "Keeping Service Moving"
     },
     description: "Hospitality venues depend on consistent supply timing",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -681,9 +591,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought", "When timing matters"],
     identity: {
-      principle: "Doors Open on Schedule",
-      outcome: "Keeping Restaurants on Time",
-      positioning: "Simplifying Logistics for Restaurants"
+      tagline: "Keeping Restaurants on Time"
     },
     description: "Restaurants cannot open without ingredients",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
@@ -695,9 +603,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     tier: 3,
     subjectLines: ["One thing I've noticed", "Quick question", "When opening matters"],
     identity: {
-      principle: "Opening Happens on Time",
-      outcome: "Keeping Cafes on Schedule",
-      positioning: "Simplifying Logistics for Cafes"
+      tagline: "Keeping Cafes on Schedule"
     },
     description: "Cafes need stock before opening",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
