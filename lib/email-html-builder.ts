@@ -177,11 +177,11 @@ export function buildEmailHtml(
       <div class="signature-section">
         <div class="signature-sender">${senderNameFromBody}</div>
         ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
-        <div class="signature-details" style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <a href="${websiteUrl}">${companyNameFromBody}</a>
-          </div>
-          <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; white-space: nowrap;">Check out our website</a>
+        <div class="signature-details">
+          <a href="${websiteUrl}">${companyNameFromBody}</a>
+        </div>
+        <div style="margin-top: 16px;">
+          <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
         </div>
       </div>
     </div>

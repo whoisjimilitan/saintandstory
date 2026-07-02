@@ -5,6 +5,12 @@ import { Resend } from "resend";
 import { buildEmailHtml } from "@/lib/email-html-builder";
 import { detectBusinessType } from "@/lib/business-pain-promise-map";
 
+interface SenderInfo {
+  name: string;
+  email: string;
+  role?: string;
+}
+
 if (!process.env.RESEND_API_KEY) {
   console.error("[CAMPAIGN SEND] CRITICAL: RESEND_API_KEY is not set!");
 }
@@ -31,17 +37,21 @@ interface EmailPayload {
   body: string;
 }
 
-async function getSenderInfo(): Promise<{ name: string; email: string }> {
+async function getSenderInfo(category?: string): Promise<SenderInfo> {
   try {
     const user = await currentUser();
     const userEmail = user?.emailAddresses[0]?.emailAddress ?? "";
 
-    if (userEmail && ADMIN_MAP[userEmail]) {
-      return ADMIN_MAP[userEmail];
+    const baseInfo = userEmail && ADMIN_MAP[userEmail] ? ADMIN_MAP[userEmail] : { name: "James", email: "james@saintandstoryltd.co.uk" };
+
+    // Get sender role from category if available
+    let role: string | undefined;
+    if (category) {
+      const businessType = detectBusinessType(category);
+      role = businessType.identity?.senderRole;
     }
 
-    // Fallback to James if admin not mapped (safety default)
-    return { name: "James", email: "james@saintandstoryltd.co.uk" };
+    return { ...baseInfo, role };
   } catch (error) {
     console.error("[CAMPAIGN SEND] Error getting sender info:", error);
     return { name: "James", email: "james@saintandstoryltd.co.uk" };
@@ -110,8 +120,8 @@ export async function POST(request: NextRequest) {
       try {
         if (channel === "email") {
           // Send via Resend
-          const sender = await getSenderInfo();
-          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email}`);
+          const sender = await getSenderInfo(email.category);
+          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email} (role: ${sender.role || 'none'})`);
 
           // Build HTML email with personalization, signature, and CTA
           const emailHtml = buildEmailHtml(email, sender);
