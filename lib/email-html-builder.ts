@@ -88,7 +88,7 @@ export function buildEmailHtml(
       line-height: 1.5;
     }
     .cta-section {
-      margin: 32px 0;
+      margin: 32px 0 12px 0;
     }
     .cta-button {
       display: inline-block;
@@ -135,11 +135,11 @@ export function buildEmailHtml(
     }
     .website-link-subtle {
       font-size: 13px;
-      color: #999999;
+      color: #D0D0D0;
       text-decoration: none;
     }
     .website-link-subtle:hover {
-      color: #0D0D0D;
+      color: #888888;
       text-decoration: underline;
     }
     @media (max-width: 600px) {
@@ -179,7 +179,7 @@ export function buildEmailHtml(
         ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
         <div class="signature-details">
           <a href="${websiteUrl}">${companyNameFromBody}</a><br>
-          <a href="${websiteUrl}" class="website-link-subtle" style="display: inline-block; margin-top: 8px;">Check out our website</a>
+          <a href="${websiteUrl}" class="website-link-subtle" style="display: block; margin-top: 12px;">Check out our website</a>
         </div>
       </div>
     </div>
