@@ -394,7 +394,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     bridge: "Helping solicitors deliver time-critical documents has taught me one thing.",
     sharedReality: "Filing deadlines are rarely missed because of the legal work itself.",
     rootCause: "They're usually missed when one small dependency becomes the biggest risk.",
-    dependencyReveal: "For many firms, that dependency is simply making sure the documents get there on time.",
+    dependencyReveal: "For many firms, that dependency is knowing the documents will arrive when they're needed.",
     businessPhilosophy: "That's why we built Saint & Story the way we did.",
     promiseStatement: "If a delivery ever fails with us, we'll take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
