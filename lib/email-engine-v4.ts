@@ -73,7 +73,7 @@ export function generateEmailV4(
 
 Apologies. I know it's unusual emailing you out of the blue.
 
-${pain}
+Working in same-day logistics, one thing I've learnt is this: ${pain}
 
 ${promise}
 
