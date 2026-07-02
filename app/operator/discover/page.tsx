@@ -117,47 +117,18 @@ export default function DiscoverPage() {
     }
   };
 
-  const handleManualAdd = async () => {
+  const handleManualAdd = () => {
     if (!manualForm.businessName.trim()) return;
 
-    try {
-      // Save to database via API
-      const res = await fetch("/api/b2b/manual-entry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          business_name: manualForm.businessName,
-          business_category: "Manual Entry",
-          city: manualForm.city,
-          email: manualForm.email || undefined,
-          phone: manualForm.phone || undefined,
-          postcode: manualForm.postcode || undefined,
-          notes: "Manually added from Discover page"
-        }),
-      });
+    const newProspect: Prospect = {
+      id: `manual-${Date.now()}`,
+      ...manualForm,
+      businessCategory: "Manual Entry",
+    };
 
-      const data = await res.json();
-
-      if (res.ok) {
-        // Add to search results with unique ID
-        const newProspect: Prospect = {
-          id: `manual-${Date.now()}`,
-          ...manualForm,
-          businessCategory: "Manual Entry",
-        };
-
-        const enriched = enrichResults([newProspect]);
-        setSearchResults([enriched[0], ...searchResults]);
-        setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
-        alert("✓ Lead saved successfully");
-      } else {
-        console.error("[MANUAL-ADD] API Error:", data);
-        alert(`Failed to save lead: ${data.error || "Unknown error"}`);
-      }
-    } catch (error) {
-      console.error("Error saving manual lead:", error);
-      alert("Error saving lead");
-    }
+    const enriched = enrichResults([newProspect]);
+    setSearchResults([enriched[0], ...searchResults]);
+    setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
   };
 
   const toggleLead = (prospectId: string) => {
