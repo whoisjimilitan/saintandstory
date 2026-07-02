@@ -93,11 +93,11 @@ export function generateEmailV4(
 
 Apologies. I know it's unusual emailing you out of the blue.
 
-${bridge} ${ppmEntry.sharedReality} ${ppmEntry.rootCause}
+${bridge} ${ppmEntry.sharedReality}
 
 ${ppmEntry.dependencyReveal}
 
-We built Saint & Story around that reality. ${ppmEntry.promiseStatement}
+${ppmEntry.businessPhilosophy} ${ppmEntry.promiseStatement}
 
 ${closingQuestion}
 
