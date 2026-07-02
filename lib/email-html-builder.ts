@@ -108,12 +108,6 @@ export function buildEmailHtml(
       margin-top: 40px;
       padding-top: 20px;
       border-top: 1px solid #E8E8E8;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-    .signature-content {
-      flex: 1;
     }
     .signature-sender {
       font-weight: 600;
@@ -184,14 +178,20 @@ export function buildEmailHtml(
 
       <!-- Signature with Website Link -->
       <div class="signature-section">
-        <div class="signature-content">
-          <div class="signature-sender">${senderNameFromBody}</div>
-          ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
-          <div class="signature-details">
-            <a href="${websiteUrl}">${companyNameFromBody}</a>
-          </div>
-        </div>
-        <a href="${websiteUrl}" class="website-link-subtle">Check out our website</a>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="vertical-align: top; width: 70%;">
+              <div class="signature-sender">${senderNameFromBody}</div>
+              ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
+              <div class="signature-details">
+                <a href="${websiteUrl}">${companyNameFromBody}</a>
+              </div>
+            </td>
+            <td style="vertical-align: top; width: 30%; text-align: right;">
+              <a href="${websiteUrl}" class="website-link-subtle">Check out our website</a>
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
