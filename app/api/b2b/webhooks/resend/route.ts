@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 
 /**
  * Resend Webhook Receiver
@@ -12,19 +13,53 @@ import { prisma } from "@/lib/prisma";
  * - email.delivered
  *
  * Updates B2bCampaignEmail status and timestamps
+ * Verifies webhook signature for security
  */
+
+const RESEND_WEBHOOK_SECRET = process.env.RESEND_WEBHOOK_SECRET;
+
+function verifyResendWebhook(body: string, signature: string | null): boolean {
+  if (!RESEND_WEBHOOK_SECRET || !signature) {
+    console.warn("[WEBHOOK] No webhook secret or signature found, skipping verification");
+    return true; // Allow if not configured, but log warning
+  }
+
+  try {
+    // Resend uses HMAC-SHA256 for webhook signatures
+    const hash = crypto
+      .createHmac("sha256", RESEND_WEBHOOK_SECRET)
+      .update(body)
+      .digest("base64");
+
+    const isValid = crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature));
+    console.log(`[WEBHOOK] Signature ${isValid ? "✓ valid" : "✗ invalid"}`);
+    return isValid;
+  } catch (error) {
+    console.error("[WEBHOOK] Signature verification error:", error);
+    return false;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as {
+    const body = await request.text();
+    const signature = request.headers.get("x-resend-signature") || request.headers.get("svix-signature");
+
+    // Verify signature
+    if (!verifyResendWebhook(body, signature)) {
+      console.error("[WEBHOOK] Invalid webhook signature - rejecting");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    const parsedBody = JSON.parse(body) as {
       type: string;
       created_at: string;
       data: Record<string, any>;
     };
 
-    const eventType = body.type;
-    const timestamp = new Date(body.created_at || new Date().toISOString());
-    const data = body.data || {};
+    const eventType = parsedBody.type;
+    const timestamp = new Date(parsedBody.created_at || new Date().toISOString());
+    const data = parsedBody.data || {};
 
     console.log(`[WEBHOOK] Resend event: ${eventType}`, {
       messageId: data.email_id,
