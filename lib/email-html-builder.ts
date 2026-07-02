@@ -135,11 +135,8 @@ export function buildEmailHtml(
     }
     .website-link-subtle {
       font-size: 13px;
-      color: #AAAAAA;
+      color: #999999;
       text-decoration: none;
-      text-align: right;
-      flex-shrink: 0;
-      margin-left: 20px;
     }
     .website-link-subtle:hover {
       color: #0D0D0D;
@@ -173,25 +170,17 @@ export function buildEmailHtml(
 
       <!-- CTA Button -->
       <div class="cta-section">
-        <a href="mailto:${sender.email}?subject=Re:%20Let's%20talk&body=Hi%20${senderNameFromBody},%0A%0AI'd%20like%20to%20discuss%20how%20Saint%20%26%20Story%20could%20help%20us.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Let's talk</a>
+        <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0A%0AI%20received%20your%20email%20about%20critical%20document%20delivery.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Reply</a>
       </div>
 
-      <!-- Signature with Website Link -->
+      <!-- Signature -->
       <div class="signature-section">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="vertical-align: top; width: 70%;">
-              <div class="signature-sender">${senderNameFromBody}</div>
-              ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
-              <div class="signature-details">
-                <a href="${websiteUrl}">${companyNameFromBody}</a>
-              </div>
-            </td>
-            <td style="vertical-align: top; width: 30%; text-align: right;">
-              <a href="${websiteUrl}" class="website-link-subtle">Check out our website</a>
-            </td>
-          </tr>
-        </table>
+        <div class="signature-sender">${senderNameFromBody}</div>
+        ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
+        <div class="signature-details">
+          <a href="${websiteUrl}">${companyNameFromBody}</a><br>
+          <a href="${websiteUrl}" class="website-link-subtle" style="display: inline-block; margin-top: 8px;">Check out our website</a>
+        </div>
       </div>
     </div>
   </div>
