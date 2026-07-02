@@ -399,9 +399,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines get tight"],
-    identity: {
-      tagline: "Keeping Legal Deadlines Moving"
-    },
+    identity: {},
     description: "Solicitors lose clients over missed deadlines",
     closingQuestion: "Out of curiosity, does your team ever need a same-day backup courier when deadlines get tight?",
   },

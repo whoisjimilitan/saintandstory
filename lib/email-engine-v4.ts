@@ -103,9 +103,7 @@ ${closingQuestion}
 
 James
 
-Saint & Story
-
-${signature}`;
+Saint & Story`;
 
   return {
     subjectLine,
