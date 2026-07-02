@@ -78,16 +78,18 @@ export function generateEmailV4(
     ppmEntry.dependencyReveal &&
     ppmEntry.promiseStatement;
 
-  let bodyText: string;
+  // PERMANENT FIX: Only use v8.4 refined template.
+  // If any category lacks narrative structure, it will fail build-time validation.
+  // No fallback to legacy template - this ensures the engine is always correct.
+  if (!hasNarrativeStructure) {
+    throw new Error(
+      `[EMAIL_ENGINE] FATAL: ${prospect.businessName} detected as category missing narrative structure. ` +
+      `This should have been caught by build-time validation. ` +
+      `All categories must have: sharedReality, rootCause, dependencyReveal, promiseStatement.`
+    );
+  }
 
-  if (hasNarrativeStructure) {
-    // FINAL REFINED: Story that makes recipient think "They understand how my work actually works"
-    // Structure:
-    // - Bridge + Shared Reality + Root Cause (merged into flowing narrative)
-    // - Dependency Reveal (the insight moment)
-    // - Philosophy + Promise (business existence + guarantee)
-    // - Question (invitation to conversation)
-    bodyText = `Hi ${greeting},
+  const bodyText = `Hi ${greeting},
 
 Apologies. I know it's unusual emailing you out of the blue.
 
@@ -104,21 +106,6 @@ James
 Saint & Story
 
 ${signature}`;
-  } else {
-    // LEGACY: Fallback to old template (for categories not yet migrated)
-    bodyText = `Hi ${greeting},
-
-Apologies. I know it's unusual emailing you out of the blue.
-
-${bridge} ${pain}
-
-${promise}
-
-${closingQuestion}
-
-Saint & Story
-${signature}`;
-  }
 
   return {
     subjectLine,

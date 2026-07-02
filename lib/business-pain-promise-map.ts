@@ -115,6 +115,35 @@ export interface BusinessPainPromise {
   closingQuestion?: string; // Genuine curiosity question (mostly constant)
 }
 
+/**
+ * VALIDATION: Ensure all categories have complete narrative structure
+ * This prevents shipping emails that fall back to legacy templates
+ */
+function validateNarrativeStructure(map: Record<string, BusinessPainPromise>): void {
+  const incomplete: string[] = [];
+
+  Object.entries(map).forEach(([category, entry]) => {
+    const missing: string[] = [];
+    if (!entry.sharedReality) missing.push('sharedReality');
+    if (!entry.rootCause) missing.push('rootCause');
+    if (!entry.dependencyReveal) missing.push('dependencyReveal');
+    if (!entry.promiseStatement) missing.push('promiseStatement');
+
+    if (missing.length > 0) {
+      incomplete.push(`${category}: missing [${missing.join(', ')}]`);
+    }
+  });
+
+  if (incomplete.length > 0) {
+    throw new Error(
+      `NARRATIVE STRUCTURE INCOMPLETE: The following categories are missing required fields.\n` +
+      `This prevents using the refined v8.4 email template and will fall back to legacy.\n` +
+      `All categories MUST have: sharedReality, rootCause, dependencyReveal, promiseStatement\n\n` +
+      incomplete.join('\n')
+    );
+  }
+}
+
 export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   // ═══════════════════════════════════════════════════════════════════
   // TIER 1: ULTRA MOTIVATED (Legal/Compliance/Health)
@@ -143,9 +172,10 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     bridge: "Helping bailiffs with time-critical enforcement has taught me one thing.",
     sharedReality: "Enforcement actions rarely fail because of the legal work itself.",
-    rootCause: "The real problem is when service needs to happen on schedule.",
-    businessPhilosophy: "That's exactly why we built Saint & Story to take responsibility when enforcement matters.",
-    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
+    rootCause: "They fail when one small deadline becomes the enforcement.",
+    dependencyReveal: "For many enforcement teams, that's the service deadline.",
+    businessPhilosophy: "We built Saint & Story around that reality.",
+    promiseStatement: "If a delivery ever fails with us, we take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When service matters"],
@@ -161,6 +191,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     bridge: "Helping process servers with time-critical service has taught me one thing.",
     sharedReality: "Prosecutions rarely stall because of the process itself.",
     rootCause: "The real problem is when service of documents needs to happen on time.",
+    dependencyReveal: "For many enforcement cases, that's getting the documents served by deadline.",
     businessPhilosophy: "That's exactly why we built Saint & Story to take responsibility when service matters.",
     promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
@@ -298,6 +329,25 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
       tagline: "Keeping Relief Moving"
     },
     description: "Pharmacies face patient impact for delayed prescriptions",
+    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
+  },
+
+  pharma: {
+    pain: "Patient relief rarely gets delayed because of the medicine itself. The real problem is when prescriptions need to be filled and delivered on time.",
+    promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    bridge: "Supporting pharmaceutical companies with time-critical orders has taught me one thing.",
+    sharedReality: "Patient relief rarely gets delayed because of the medicine itself.",
+    rootCause: "It's delayed when one small delivery becomes the critical path.",
+    dependencyReveal: "For many pharmaceutical operations, that's prescription fulfillment on time.",
+    businessPhilosophy: "We built Saint & Story around that reality.",
+    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
+    consequenceLevel: "ULTRA_MOTIVATED",
+    tier: 1,
+    subjectLines: ["One thing I've learnt", "A thought", "When relief matters"],
+    identity: {
+      tagline: "Keeping Relief Moving"
+    },
+    description: "Pharmaceutical operations face patient impact for delayed prescriptions",
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 
@@ -950,6 +1000,10 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
   },
 };
+
+// RUN VALIDATION: Ensure all categories have complete narrative structure
+// This throws at build time if any category is incomplete, preventing fallback to legacy templates
+validateNarrativeStructure(BUSINESS_PAIN_PROMISE_MAP);
 
 export function detectBusinessCategory(businessName: string): string {
   let cleanName = businessName
