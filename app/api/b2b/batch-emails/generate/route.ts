@@ -13,6 +13,7 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateEmailV4 } from "@/lib/email-engine-v4";
+import { buildEmailHtml } from "@/lib/email-html-builder";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -118,12 +119,22 @@ export async function POST(request: Request) {
           senderName
         );
 
+        // Generate HTML preview for the enrich page
+        const htmlPreview = buildEmailHtml(
+          {
+            prospectName: firstName || "[Name]",
+            body: emailV4.bodyText,
+          },
+          { name: senderName, email: prospect.email || "contact@saintandstoryltd.co.uk" }
+        );
+
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
           subject: emailV4.subjectLine,
           body: emailV4.bodyText,
+          htmlBody: htmlPreview,
           wordCount: emailV4.bodyText.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,

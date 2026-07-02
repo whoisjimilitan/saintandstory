@@ -21,6 +21,7 @@ interface EnrichedEmail {
   email: string;
   subject: string;
   body: string;
+  htmlBody?: string;
   wordCount: number;
   senderName?: string;
   relationshipStage?: number;
@@ -157,6 +158,7 @@ export default function EnrichPage() {
           ...email,
           subject,
           body,
+          htmlBody: email.htmlBody,
           email: prospect?.email || "",
           senderName: user?.firstName || "Team Member"
         };
@@ -421,12 +423,22 @@ export default function EnrichPage() {
                   <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.subject}</p>
                 </div>
 
-                {/* BODY */}
+                {/* BODY - HTML PREVIEW */}
                 <div>
-                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Message</p>
-                  <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
-                    {currentEmail.body}
-                  </div>
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Message Preview (Premium Design)</p>
+                  {currentEmail.htmlBody ? (
+                    <iframe
+                      srcDoc={currentEmail.htmlBody}
+                      title="Email Preview"
+                      className="w-full border border-[#E8E8E8] rounded bg-white"
+                      style={{ minHeight: "600px" }}
+                      sandbox={{ allow: ['same-origin'] }}
+                    />
+                  ) : (
+                    <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
+                      {currentEmail.body}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
