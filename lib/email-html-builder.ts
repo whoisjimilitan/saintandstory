@@ -118,7 +118,7 @@ export function buildEmailHtml(
     .signature-role {
       font-size: 12px;
       color: #888888;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .signature-details {
       font-size: 13px;
