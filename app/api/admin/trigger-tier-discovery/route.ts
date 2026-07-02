@@ -183,12 +183,22 @@ export async function POST(request: NextRequest) {
  * Default tier configuration: Tier 1 + 2 enabled, Tier 3 disabled
  */
 function getDefaultTiers(): TierConfig[] {
-  const tier1 = getTier1Businesses();
-  const tier2 = getTier2Businesses();
+  try {
+    const tier1 = getTier1Businesses();
+    const tier2 = getTier2Businesses();
 
-  return [
-    { tier: 1, enabled: true, priority: 1, categories: tier1 },
-    { tier: 2, enabled: true, priority: 2, categories: tier2 },
-    { tier: 3, enabled: false, priority: 3, categories: [] },
-  ];
+    return [
+      { tier: 1, enabled: true, priority: 1, categories: tier1 },
+      { tier: 2, enabled: true, priority: 2, categories: tier2 },
+      { tier: 3, enabled: false, priority: 3, categories: [] },
+    ];
+  } catch (error) {
+    console.error("[TIER-DISCOVERY] Error loading default tiers:", error);
+    // Return safe fallback
+    return [
+      { tier: 1, enabled: true, priority: 1, categories: [] },
+      { tier: 2, enabled: true, priority: 2, categories: [] },
+      { tier: 3, enabled: false, priority: 3, categories: [] },
+    ];
+  }
 }
