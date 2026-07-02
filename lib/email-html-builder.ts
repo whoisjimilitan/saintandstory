@@ -89,9 +89,6 @@ export function buildEmailHtml(
     }
     .cta-section {
       margin: 32px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
     .cta-button {
       display: inline-block;
@@ -107,19 +104,16 @@ export function buildEmailHtml(
     .cta-button:hover {
       background: #333333;
     }
-    .website-link {
-      font-size: 14px;
-      color: #0D0D0D;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .website-link:hover {
-      text-decoration: underline;
-    }
     .signature-section {
       margin-top: 40px;
       padding-top: 20px;
       border-top: 1px solid #E8E8E8;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .signature-content {
+      flex: 1;
     }
     .signature-sender {
       font-weight: 600;
@@ -143,6 +137,18 @@ export function buildEmailHtml(
       font-weight: 500;
     }
     .signature-details a:hover {
+      text-decoration: underline;
+    }
+    .website-link-subtle {
+      font-size: 13px;
+      color: #AAAAAA;
+      text-decoration: none;
+      text-align: right;
+      flex-shrink: 0;
+      margin-left: 20px;
+    }
+    .website-link-subtle:hover {
+      color: #0D0D0D;
       text-decoration: underline;
     }
     @media (max-width: 600px) {
@@ -171,19 +177,21 @@ export function buildEmailHtml(
       <!-- Divider -->
       <div class="divider"></div>
 
-      <!-- CTA Button & Website Link -->
+      <!-- CTA Button -->
       <div class="cta-section">
         <a href="mailto:${sender.email}?subject=Re:%20Let's%20talk&body=Hi%20${senderNameFromBody},%0A%0AI'd%20like%20to%20discuss%20how%20Saint%20%26%20Story%20could%20help%20us.%0A%0AName:%0ARole:%0ACompany:%20${email.prospectName || ""}%0A%0AThanks" class="cta-button">Let's talk</a>
-        <a href="${websiteUrl}" class="website-link">Check out our website</a>
       </div>
 
-      <!-- Signature -->
+      <!-- Signature with Website Link -->
       <div class="signature-section">
-        <div class="signature-sender">${senderNameFromBody}</div>
-        ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
-        <div class="signature-details">
-          <a href="${websiteUrl}">${companyNameFromBody}</a>
+        <div class="signature-content">
+          <div class="signature-sender">${senderNameFromBody}</div>
+          ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
+          <div class="signature-details">
+            <a href="${websiteUrl}">${companyNameFromBody}</a>
+          </div>
         </div>
+        <a href="${websiteUrl}" class="website-link-subtle">Check out our website</a>
       </div>
     </div>
   </div>
