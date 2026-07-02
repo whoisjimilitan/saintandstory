@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { buildEmailHtml } from "@/lib/email-html-builder";
 
 interface Prospect {
   id: string;
@@ -572,12 +573,28 @@ export default function EnrichPage() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => {
-                      // Save to this email only
+                      // Save to this email only and regenerate HTML
                       const updated = [...generatedEmails];
+                      const currentEmail = updated[editingIndex];
+
+                      // Regenerate HTML preview with updated body
+                      const newHtmlBody = buildEmailHtml(
+                        {
+                          prospectName: currentEmail.prospectName,
+                          body: editBody,
+                          subject: editSubject,
+                        },
+                        {
+                          name: currentEmail.senderName || "James",
+                          email: currentEmail.email,
+                        }
+                      );
+
                       updated[editingIndex] = {
                         ...updated[editingIndex],
                         subject: editSubject,
                         body: editBody,
+                        htmlBody: newHtmlBody,
                       };
                       setGeneratedEmails(updated);
                       setEditingIndex(null);
@@ -589,12 +606,28 @@ export default function EnrichPage() {
                   </button>
                   <button
                     onClick={() => {
-                      // Save as master template
+                      // Save as master template and regenerate HTML
                       const updated = [...generatedEmails];
+                      const currentEmail = updated[editingIndex];
+
+                      // Regenerate HTML preview with updated body
+                      const newHtmlBody = buildEmailHtml(
+                        {
+                          prospectName: currentEmail.prospectName,
+                          body: editBody,
+                          subject: editSubject,
+                        },
+                        {
+                          name: currentEmail.senderName || "James",
+                          email: currentEmail.email,
+                        }
+                      );
+
                       updated[editingIndex] = {
                         ...updated[editingIndex],
                         subject: editSubject,
                         body: editBody,
+                        htmlBody: newHtmlBody,
                       };
                       setGeneratedEmails(updated);
                       setEditingIndex(null);
