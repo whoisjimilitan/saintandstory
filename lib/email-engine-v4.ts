@@ -93,7 +93,7 @@ export function generateEmailV4(
 
 Apologies. I know it's unusual emailing you out of the blue.
 
-${bridge} ${ppmEntry.sharedReality}
+${bridge} ${ppmEntry.sharedReality} ${ppmEntry.rootCause}
 
 ${ppmEntry.dependencyReveal}
 
