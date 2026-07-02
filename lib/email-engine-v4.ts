@@ -71,31 +71,41 @@ export function generateEmailV4(
   // Industry-specific bridge: Use from pain-promise map, or generate if not set
   const bridge = ppmEntry.bridge || generateBridge(prospect.businessName);
 
-  // Narrative story layers (if available, use new structure; otherwise fallback to old)
-  const hasNarrativeStructure = ppmEntry.sharedReality && ppmEntry.rootCause && ppmEntry.businessPhilosophy && ppmEntry.promiseStatement;
+  // Narrative story layers (check for complete refined structure)
+  const hasNarrativeStructure =
+    ppmEntry.sharedReality &&
+    ppmEntry.rootCause &&
+    ppmEntry.dependencyReveal &&
+    ppmEntry.promiseStatement;
 
   let bodyText: string;
 
   if (hasNarrativeStructure) {
-    // NEW: Story-based template (Shared Reality → Root Cause → Philosophy → Promise → Question)
+    // FINAL REFINED: Story that makes recipient think "They understand how my work actually works"
+    // Structure:
+    // - Bridge + Shared Reality + Root Cause (merged into flowing narrative)
+    // - Dependency Reveal (the insight moment)
+    // - Philosophy + Promise (business existence + guarantee)
+    // - Question (invitation to conversation)
     bodyText = `Hi ${greeting},
 
 Apologies. I know it's unusual emailing you out of the blue.
 
-${bridge}
-${ppmEntry.sharedReality}
+${bridge} ${ppmEntry.sharedReality} ${ppmEntry.rootCause}
 
-${ppmEntry.rootCause}
+${ppmEntry.dependencyReveal}
 
-${ppmEntry.businessPhilosophy}
-${ppmEntry.promiseStatement}
+We built Saint & Story around that reality. ${ppmEntry.promiseStatement}
 
 ${closingQuestion}
 
+James
+
 Saint & Story
+
 ${signature}`;
   } else {
-    // LEGACY: Fallback to old template (Bridge + Observation → Promise → Question)
+    // LEGACY: Fallback to old template (for categories not yet migrated)
     bodyText = `Hi ${greeting},
 
 Apologies. I know it's unusual emailing you out of the blue.

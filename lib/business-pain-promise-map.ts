@@ -92,19 +92,21 @@ export function selectSignature(identity: BusinessIdentity): string {
 
 export interface BusinessIdentity {
   tagline: string;   // Outcome-focused tagline (e.g., "Keeping Legal Deadlines Moving")
+  signatureName?: string; // Signature name (e.g., "James" or "Saint & Story")
 }
 
 export interface BusinessPainPromise {
   pain: string; // Legacy field (kept for backwards compatibility)
   promise: string; // Legacy field (kept for backwards compatibility)
 
-  // NEW: Narrative story layers (replaces old pain/promise structure)
-  sharedReality?: string; // What's universally true about their world (e.g., "Filing deadlines rarely become stressful because of the legal work itself.")
-  rootCause?: string; // The actual problem (e.g., "The real problem is when delivery becomes the variable you can't control.")
-  businessPhilosophy?: string; // Why we built this (e.g., "That's exactly why we built Saint & Story to take responsibility when timing matters most.")
-  promiseStatement?: string; // The guarantee (e.g., "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.")
+  // REFINED: Narrative story layers (final version - every sentence earns its place)
+  bridge?: string; // Bridge into shared reality (e.g., "Helping solicitors with time-critical legal deliveries has taught me one thing.")
+  sharedReality?: string; // What's universally true (e.g., "Filing deadlines rarely become stressful because of the legal work itself.")
+  rootCause?: string; // The hidden dependency (e.g., "They're usually missed when one small dependency becomes the biggest risk.")
+  dependencyReveal?: string; // The reveal of what dependency matters (e.g., "For many firms, that's the delivery.")
+  businessPhilosophy?: string; // Why we built this (e.g., "We built Saint & Story around that reality.")
+  promiseStatement?: string; // The guarantee (e.g., "If a delivery ever fails with us, we take responsibility and cover the re-delivery at no cost to you.")
 
-  bridge?: string; // Industry-specific credibility bridge (e.g., "Helping solicitors with time-critical legal deliveries has taught me one thing.")
   consequenceLevel: ConsequenceLevel;
   tier: ConsequenceTier;
   subjectLines: string[]; // Trust-first subject line options (Human, Observation, Shared World, Zero-Marketing)
@@ -330,17 +332,18 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
     bridge: "Helping solicitors with time-critical legal deliveries has taught me one thing.",
     sharedReality: "Filing deadlines rarely become stressful because of the legal work itself.",
-    rootCause: "The real problem is when delivery becomes the variable you can't control.",
-    businessPhilosophy: "That's exactly why we built Saint & Story to take responsibility when timing matters most.",
-    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
+    rootCause: "They're usually missed when one small dependency becomes the biggest risk.",
+    dependencyReveal: "For many firms, that's the delivery.",
+    businessPhilosophy: "We built Saint & Story around that reality.",
+    promiseStatement: "If a delivery ever fails with us, we take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines get tight"],
     identity: {
-      tagline: "Keeping Deadlines Moving"
+      tagline: "Keeping Legal Deadlines Moving"
     },
     description: "Solicitors lose clients over missed deadlines",
-    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
+    closingQuestion: "Out of curiosity, when deadlines get tight, does your team ever need a same-day backup courier?",
   },
   attorney: {
     pain: "One thing I've learnt is that cases rarely stall because of the legal preparation. The real problem is when document delivery becomes unreliable.",
