@@ -111,12 +111,12 @@ export function buildEmailHtml(
     }
     .signature-sender {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
       color: #0D0D0D;
       margin-bottom: 2px;
     }
     .signature-role {
-      font-size: 12px;
+      font-size: 13px;
       color: #888888;
       margin-bottom: 5px;
     }
