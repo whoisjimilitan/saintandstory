@@ -287,9 +287,6 @@ export default function EnrichPage() {
       <div className="min-h-screen bg-[#F9F9F9] pt-32">
         <div className="max-w-2xl mx-auto px-4 md:px-0 py-12">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-[#0D0D0D] rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl text-white">✓</span>
-            </div>
             <h1 className="text-3xl font-black text-[#0D0D0D] mb-3">Campaign sent successfully</h1>
             <p className="text-lg text-[#666666] mb-8">
               {sentEmails.length} email{sentEmails.length !== 1 ? 's' : ''} queued for delivery
@@ -451,11 +448,8 @@ export default function EnrichPage() {
                   setEditSubject(currentEmail.subject);
                   setEditBody(currentEmail.body);
                 }}
-                className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a2.25 2.25 0 112.828 2.828l-1.687 1.687m0 0a2.25 2.25 0 01-3.182 0m0 0l-6.364 6.364m0 0l1.414 1.414m0 0l6.364-6.364" />
-                </svg>
                 Edit & Personalize
               </button>
               <button
@@ -463,7 +457,7 @@ export default function EnrichPage() {
                 disabled={sending}
                 className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] disabled:opacity-50 transition-colors"
               >
-                {sending ? "Sending..." : `✓ Send All (${generatedEmails.length})`}
+                {sending ? "Sending..." : `Send All (${generatedEmails.length})`}
               </button>
               <button
                 onClick={() => router.back()}
@@ -587,11 +581,11 @@ export default function EnrichPage() {
                       };
                       setGeneratedEmails(updated);
                       setEditingIndex(null);
-                      alert("✓ Email updated for this batch");
+                      alert("Email updated for this batch");
                     }}
                     className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors"
                   >
-                    ✓ Save for This Batch
+                    Save for This Batch
                   </button>
                   <button
                     onClick={() => {
@@ -608,11 +602,11 @@ export default function EnrichPage() {
                         subject: editSubject,
                         body: editBody
                       }));
-                      alert("✓ Saved as master template for future use");
+                      alert("Saved as master template for future use");
                     }}
                     className="flex-1 px-4 py-3 border border-[#0D0D0D] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#F5F5F5] transition-colors"
                   >
-                    💾 Save as Master Template
+                    Save as Master Template
                   </button>
                 </div>
               </div>
@@ -668,7 +662,7 @@ export default function EnrichPage() {
                     disabled={sending}
                     className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
                   >
-                    {sending ? "Sending..." : "✓ Send Campaign"}
+                    {sending ? "Sending..." : "Send Campaign"}
                   </button>
                   <button
                     onClick={() => setShowSendConfirmation(false)}
