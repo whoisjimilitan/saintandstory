@@ -1050,25 +1050,17 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
     }
   }
 
-  return {
-    pain: "One thing I've learnt is that deliveries rarely fail because of the work itself. The real problem is when something outside your control gets in the way.",
+  // For unknown business types, use solicitor template as preview default
+  // User can manually customize in the preview/enrich page
+  return BUSINESS_PAIN_PROMISE_MAP.solicitor || {
+    pain: "Filing deadlines rarely become stressful because of the legal work itself. The real problem is when delivery becomes the variable you can't control.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
-    bridge: "Working with businesses on time-critical deliveries has taught me one thing.",
-    sharedReality: "Deliveries rarely fail because of the work itself.",
-    rootCause: "The real problem is when something outside your control gets in the way.",
-    dependencyReveal: "For many businesses, that's reliable same-day delivery exactly when deadlines matter most.",
-    businessPhilosophy: "We built Saint & Story around that reality.",
-    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
-    consequenceLevel: "MOTIVATED",
-    tier: 3,
-    subjectLines: ["One thing I've learnt", "A thought"],
-    identity: {
-      principle: undefined,
-      outcome: "Keeping Deliveries on Time",
-      positioning: "Simplifying Logistics"
-    },
-    description: "Unknown business type - using default tier 3",
-    closingQuestion: "Out of curiosity, when deadlines get tight, is having a same-day backup courier something your team ever needs?",
+    consequenceLevel: "ULTRA_MOTIVATED",
+    tier: 1,
+    subjectLines: ["One thing I've learnt"],
+    identity: { tagline: "Keeping Legal Deadlines Moving" },
+    description: "Unknown business type - using solicitor template as preview (customize manually)",
+    closingQuestion: "Out of curiosity, when deadlines get tight, does your team ever need a same-day backup courier?",
   };
 }
 
