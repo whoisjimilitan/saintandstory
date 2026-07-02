@@ -18,7 +18,7 @@
  * TIER 3 (MOTIVATED): Subject = "We're expanding with you in mind"
  */
 
-import { detectBusinessType, selectSignature } from "./business-pain-promise-map";
+import { detectBusinessType, selectSignature, generateBridge } from "./business-pain-promise-map";
 import { getSenderVoiceProfile, getSenderOpening, getSenderCloser } from "./sender-voice-profile";
 import { getSeedPlant } from "./seed-plant-map";
 
@@ -68,12 +68,15 @@ export function generateEmailV4(
   // Dynamic signature: Use hierarchical identity (principle > outcome > positioning)
   const signature = selectSignature(ppmEntry.identity);
 
+  // Industry-specific bridge: Use from pain-promise map, or generate if not set
+  const bridge = ppmEntry.bridge || generateBridge(prospect.businessName);
+
   // Trust-first template: Disarm → Understand → Demonstrate character → Invite conversation
   const bodyText = `Hi ${greeting},
 
 Apologies. I know it's unusual emailing you out of the blue.
 
-Working in same-day logistics, one thing I've learnt is this: ${pain}
+${bridge} ${pain}
 
 ${promise}
 

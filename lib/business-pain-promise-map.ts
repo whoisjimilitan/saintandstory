@@ -20,6 +20,69 @@ export type ConsequenceLevel = "ULTRA_MOTIVATED" | "HIGHLY_MOTIVATED" | "MOTIVAT
 export type ConsequenceTier = 1 | 2 | 3;
 
 /**
+ * Generate industry-specific bridge for credibility
+ * Pattern: "Helping [industry] with [their challenge] has taught me that..."
+ * Only used if bridge not manually set in BusinessPainPromise
+ */
+export function generateBridge(businessType: string): string {
+  // Map of industry patterns to bridge templates
+  const bridgeMap: Record<string, string> = {
+    // Legal
+    solicitor: "Helping solicitors with time-critical legal deadlines has taught me that",
+    lawyer: "Helping law firms with time-critical deliveries has taught me that",
+    court: "Helping courts with time-critical service of documents has taught me that",
+    bailiff: "Helping bailiffs with time-critical enforcement has taught me that",
+    process_server: "Helping process servers with time-critical service has taught me that",
+    legal: "Helping legal teams with time-critical deadlines has taught me that",
+
+    // Healthcare
+    hospital: "Supporting healthcare teams with urgent deliveries has taught me that",
+    pharmacy: "Supporting pharmacies with time-critical orders has taught me that",
+    clinic: "Supporting clinics with urgent deliveries has taught me that",
+    health: "Supporting healthcare providers with urgent deliveries has taught me that",
+    medical: "Supporting medical facilities with time-critical supplies has taught me that",
+
+    // Food & Hospitality
+    restaurant: "Working with restaurants on last-minute deliveries has taught me that",
+    cafe: "Working with cafes on morning deliveries has taught me that",
+    pub: "Working with pubs on supply runs has taught me that",
+    food: "Working with food businesses on time-critical deliveries has taught me that",
+    hospitality: "Working with hospitality teams on urgent orders has taught me that",
+
+    // Finance & Accounting
+    accountant: "Helping accountants meet time-sensitive financial deadlines has taught me that",
+    accounting: "Helping accounting firms with deadline-critical deliveries has taught me that",
+    tax: "Helping tax professionals with time-critical filings has taught me that",
+    insurance: "Helping insurance teams with compliance deadlines has taught me that",
+
+    // Real Estate & Property
+    estate_agent: "Helping estate agents prevent delayed completions has taught me that",
+    property: "Helping property teams with time-critical documentation has taught me that",
+    real_estate: "Helping real estate professionals with deadline-critical deliveries has taught me that",
+
+    // Construction & Manufacturing
+    construction: "Helping construction teams avoid site delays has taught me that",
+    architect: "Helping architects keep projects on schedule has taught me that",
+    engineering: "Helping engineering firms with time-critical deliveries has taught me that",
+
+    // Retail & E-commerce
+    retail: "Helping retail teams meet customer delivery promises has taught me that",
+    ecommerce: "Helping e-commerce businesses meet promised delivery windows has taught me that",
+  };
+
+  // Find matching bridge
+  const lowerType = businessType.toLowerCase().replace(/[^a-z0-9_]/g, "");
+  for (const [pattern, bridge] of Object.entries(bridgeMap)) {
+    if (lowerType.includes(pattern)) {
+      return bridge;
+    }
+  }
+
+  // Fallback: generic but defensible bridge
+  return "Working in same-day logistics, one thing I've learnt is that";
+}
+
+/**
  * Get tagline for email signature
  * Outcome-focused: speaks to business value, not brand philosophy
  */
@@ -34,6 +97,7 @@ export interface BusinessIdentity {
 export interface BusinessPainPromise {
   pain: string; // Trust-first observation (demonstrates understanding)
   promise: string; // Our guarantee (constant across all)
+  bridge?: string; // Industry-specific credibility bridge (e.g., "Helping solicitors with time-critical deadlines has taught me that...")
   consequenceLevel: ConsequenceLevel;
   tier: ConsequenceTier;
   subjectLines: string[]; // Trust-first subject line options (Human, Observation, Shared World, Zero-Marketing)
