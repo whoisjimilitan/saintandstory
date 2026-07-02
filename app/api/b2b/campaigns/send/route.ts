@@ -10,11 +10,12 @@ if (!process.env.RESEND_API_KEY) {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Map of admin emails to sender info (verified domain only)
+// Sender name matches the logged-in user, email matches their company email
 const ADMIN_MAP: Record<string, { name: string; email: string }> = {
-  "whoisjimi.today@gmail.com": { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" },
-  "james@saintandstoryltd.co.uk": { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" },
-  "oye@saintandstoryltd.co.uk": { name: "Saint & Story", email: "oye@saintandstoryltd.co.uk" },
-  "oyedeleoyepeju2014@gmail.com": { name: "Saint & Story", email: "oye@saintandstoryltd.co.uk" },
+  "whoisjimi.today@gmail.com": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "james@saintandstoryltd.co.uk": { name: "James", email: "james@saintandstoryltd.co.uk" },
+  "oye@saintandstoryltd.co.uk": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
+  "oyedeleoyepeju2014@gmail.com": { name: "Oye", email: "oye@saintandstoryltd.co.uk" },
 };
 
 interface EmailPayload {
@@ -37,11 +38,11 @@ async function getSenderInfo(): Promise<{ name: string; email: string }> {
       return ADMIN_MAP[userEmail];
     }
 
-    // Fallback to Saint & Story if admin not mapped
-    return { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" };
+    // Fallback to James if admin not mapped (safety default)
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
   } catch (error) {
     console.error("[CAMPAIGN SEND] Error getting sender info:", error);
-    return { name: "Saint & Story", email: "james@saintandstoryltd.co.uk" };
+    return { name: "James", email: "james@saintandstoryltd.co.uk" };
   }
 }
 
