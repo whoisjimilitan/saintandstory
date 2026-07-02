@@ -394,7 +394,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
     bridge: "Helping solicitors deliver time-critical documents has taught me one thing.",
     sharedReality: "Filing deadlines are rarely missed because of the legal work itself.",
     rootCause: "They're usually missed when one small dependency becomes the biggest risk.",
-    dependencyReveal: "For many firms, that dependency is simply getting the documents there on time.",
+    dependencyReveal: "For many firms, that dependency is simply making sure the documents get there on time.",
     businessPhilosophy: "That's why we built Saint & Story the way we did.",
     promiseStatement: "If a delivery ever fails with us, we'll take responsibility and cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
@@ -404,7 +404,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
       senderRole: "Co-Founder"
     },
     description: "Solicitors lose clients over missed deadlines",
-    closingQuestion: "Out of curiosity, does your team ever need a same-day backup courier when deadlines get tight?",
+    closingQuestion: "Out of curiosity, when deadlines get tight, does your team ever need a same-day backup courier?",
   },
   attorney: {
     pain: "One thing I've learnt is that cases rarely stall because of the legal preparation. The real problem is when document delivery becomes unreliable.",
