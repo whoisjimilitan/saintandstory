@@ -45,10 +45,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as ManualEntryRequest;
 
-    // Validate required fields
-    if (!body.business_name || !body.business_category || !body.city) {
+    // Validate required fields (only business_name is truly required)
+    if (!body.business_name) {
       return NextResponse.json(
-        { error: "Required fields: business_name, business_category, city" },
+        { error: "Business name is required" },
         { status: 400 }
       );
     }
@@ -95,12 +95,13 @@ export async function POST(request: NextRequest) {
       console.log(`[MANUAL-ENTRY] PIPELINE: ${body.business_name}`);
 
       // Create RawBusinessDiscovery object
+      const cityForUrl = (body.city || "Unknown").replace(/\s+/g, "_");
       const business: RawBusinessDiscovery = {
-        placeId: `manual_${body.business_name.replace(/\s+/g, "_")}_${body.city.replace(/\s+/g, "_")}`,
+        placeId: `manual_${body.business_name.replace(/\s+/g, "_")}_${cityForUrl}`,
         name: body.business_name,
-        address: `${body.city}, UK`,
+        address: `${body.city || "UK"}, UK`,
         postcode: body.postcode || "",
-        category: body.business_category,
+        category: body.business_category || "Business",
         source: "manual",
         reviews: undefined,
         website: body.website,
