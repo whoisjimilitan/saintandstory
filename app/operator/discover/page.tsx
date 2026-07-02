@@ -18,7 +18,7 @@ interface Prospect {
 }
 
 type Channel = "email" | "whatsapp" | "phone";
-type ActionMode = "upload" | "search" | "manual" | null;
+type ActionMode = "upload" | "search" | "manual" | "search_leads" | null;
 
 
 function detectCategory(businessName: string): string {
@@ -95,17 +95,65 @@ export default function DiscoverPage() {
     }
   };
 
-  const handleManualAdd = () => {
+  const handleSearchMyLeads = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+
+    setSearchLoading(true);
+    try {
+      const res = await fetch(`/api/b2b/leads?q=${encodeURIComponent(searchTerm)}`, { method: "GET" });
+      if (!res.ok) throw new Error("Search failed");
+
+      const data = await res.json();
+      const results = enrichResults(data.leads || []);
+      setSearchResults(results);
+
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    } catch (error) {
+      console.error("Search error:", error);
+      alert("Failed to search leads");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleManualAdd = async () => {
     if (!manualForm.businessName.trim()) return;
 
-    const newProspect: Prospect = {
-      id: `manual-${Date.now()}`,
-      ...manualForm,
-    };
+    try {
+      // Save to database via API
+      const res = await fetch("/api/b2b/manual-entry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_name: manualForm.businessName,
+          business_category: "Manual Entry",
+          city: manualForm.city,
+          email: manualForm.email,
+          phone: manualForm.phone,
+          notes: "Manually added from Discover page"
+        }),
+      });
 
-    const enriched = enrichResults([newProspect]);
-    setSearchResults([enriched[0], ...searchResults]);
-    setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
+      if (res.ok) {
+        // Add to search results with unique ID
+        const newProspect: Prospect = {
+          id: `manual-${Date.now()}`,
+          ...manualForm,
+          businessCategory: "Manual Entry",
+        };
+
+        const enriched = enrichResults([newProspect]);
+        setSearchResults([enriched[0], ...searchResults]);
+        setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
+        alert("✓ Lead saved successfully");
+      } else {
+        alert("Failed to save lead");
+      }
+    } catch (error) {
+      console.error("Error saving manual lead:", error);
+      alert("Error saving lead");
+    }
   };
 
   const toggleLead = (prospectId: string) => {
@@ -230,6 +278,17 @@ export default function DiscoverPage() {
               }`}
             >
               <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
+            </button>
+
+            <button
+              onClick={() => setActionMode(actionMode === "search_leads" ? null : "search_leads")}
+              className={`p-4 rounded-lg border transition-all ${
+                actionMode === "search_leads"
+                  ? "border-[#0D0D0D] bg-[#F9F9F9]"
+                  : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
+              }`}
+            >
+              <p className="font-semibold text-sm text-[#0D0D0D]">Find My Leads</p>
             </button>
           </div>
 
@@ -358,6 +417,29 @@ export default function DiscoverPage() {
               </div>
             </div>
           )}
+
+          {/* SEARCH MY LEADS MODE */}
+          {actionMode === "search_leads" && (
+            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
+              <form onSubmit={handleSearchMyLeads} className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Search by business name, email, or city..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                />
+                <button
+                  type="submit"
+                  disabled={searchLoading}
+                  className="px-6 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded hover:bg-[#333333] disabled:opacity-50"
+                >
+                  {searchLoading ? "Searching..." : "Search"}
+                </button>
+              </form>
+              <p className="text-xs text-[#666666]">Search through all leads you've added (manually or via discovery)</p>
+            </div>
+          )}
         </div>
 
         {/* === RESULTS === */}
@@ -400,6 +482,23 @@ export default function DiscoverPage() {
                         Tier {prospect.tier}
                       </span>
                     )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(`Delete "${prospect.businessName}"?`)) {
+                          fetch(`/api/b2b/leads?id=${prospect.id}`, { method: "DELETE" })
+                            .then(() => {
+                              setSearchResults(searchResults.filter(p => p.id !== prospect.id));
+                              alert("Lead deleted");
+                            })
+                            .catch(() => alert("Failed to delete lead"));
+                        }
+                      }}
+                      className="text-xs px-2 py-1 text-[#999999] hover:text-[#CC0000] transition-colors"
+                      title="Delete this lead"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>
