@@ -124,6 +124,8 @@ export function buildEmailHtml(
       font-size: 13px;
       color: #666666;
       line-height: 1.6;
+      margin-top: 0;
+      margin-bottom: 0;
     }
     .signature-details a {
       color: #0D0D0D;
@@ -177,7 +179,7 @@ export function buildEmailHtml(
       <div class="signature-section">
         <div class="signature-sender">${senderNameFromBody}</div>
         ${sender.role ? `<div class="signature-role">${sender.role}</div>` : ''}
-        <div class="signature-details">
+        <div class="signature-details" style="margin-top: 0; margin-bottom: 0;">
           <a href="${websiteUrl}">${companyNameFromBody}</a>
         </div>
         <div style="margin-top: 16px;">
