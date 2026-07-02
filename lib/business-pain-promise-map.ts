@@ -391,7 +391,7 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   solicitor: {
     pain: "Filing deadlines rarely become stressful because of the legal work itself. The real problem is when delivery becomes the variable you can't control.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
-    bridge: "Helping solicitors deliver time-critical documents has taught me one thing.",
+    bridge: "Helping solicitors get critical documents where they need to be has taught me one thing.",
     sharedReality: "Filing deadlines are rarely missed because of the legal work itself.",
     rootCause: "They're usually missed when one small dependency becomes the biggest risk.",
     dependencyReveal: "For many firms, that dependency is the delivery.",
