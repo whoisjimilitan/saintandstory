@@ -1053,6 +1053,12 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
   return {
     pain: "One thing I've learnt is that deliveries rarely fail because of the work itself. The real problem is when something outside your control gets in the way.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    bridge: "Working with businesses on time-critical deliveries has taught me one thing.",
+    sharedReality: "Deliveries rarely fail because of the work itself.",
+    rootCause: "The real problem is when something outside your control gets in the way.",
+    dependencyReveal: "For many businesses, that's having reliable same-day delivery when it matters.",
+    businessPhilosophy: "We built Saint & Story around that reality.",
+    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
     consequenceLevel: "MOTIVATED",
     tier: 3,
     subjectLines: ["One thing I've learnt", "A thought"],
