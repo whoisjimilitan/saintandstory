@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/app/providers/ToastProvider";
 import { getTier1Businesses, getTier2Businesses, getTier3Businesses } from "@/lib/business-pain-promise-map";
 
@@ -21,48 +21,55 @@ const TIER_DESCRIPTIONS = {
 
 export default function SettingsPage() {
   const { showToast } = useToast();
+  const [configs, setConfigs] = useState<TierConfig[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  let tier1Categories: string[] = [];
-  let tier2Categories: string[] = [];
-  let tier3Categories: string[] = [];
+  useEffect(() => {
+    try {
+      const tier1Categories = getTier1Businesses();
+      const tier2Categories = getTier2Businesses();
+      const tier3Categories = getTier3Businesses();
 
-  try {
-    tier1Categories = getTier1Businesses();
-    tier2Categories = getTier2Businesses();
-    tier3Categories = getTier3Businesses();
-  } catch (error) {
-    console.error("[SETTINGS] Error loading tier categories:", error);
-  }
+      setConfigs([
+        {
+          tier: 1,
+          name: "Tier 1: Ultra-Motivated",
+          description: TIER_DESCRIPTIONS[1],
+          categories: tier1Categories,
+          enabled: true,
+          priority: 1,
+        },
+        {
+          tier: 2,
+          name: "Tier 2: Highly-Motivated",
+          description: TIER_DESCRIPTIONS[2],
+          categories: tier2Categories,
+          enabled: true,
+          priority: 2,
+        },
+        {
+          tier: 3,
+          name: "Tier 3: Operational",
+          description: TIER_DESCRIPTIONS[3],
+          categories: tier3Categories,
+          enabled: false,
+          priority: 3,
+        },
+      ]);
+    } catch (error) {
+      console.error("[SETTINGS] Error loading tier categories:", error);
+      showToast({
+        title: "Error",
+        description: "Failed to load tier configurations",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
 
   const [discoveryRunning, setDiscoveryRunning] = useState(false);
   const [discoveryResult, setDiscoveryResult] = useState<any>(null);
-
-  const [configs, setConfigs] = useState<TierConfig[]>([
-    {
-      tier: 1,
-      name: "Tier 1: Ultra-Motivated",
-      description: TIER_DESCRIPTIONS[1],
-      categories: tier1Categories,
-      enabled: true,
-      priority: 1,
-    },
-    {
-      tier: 2,
-      name: "Tier 2: Highly-Motivated",
-      description: TIER_DESCRIPTIONS[2],
-      categories: tier2Categories,
-      enabled: true,
-      priority: 2,
-    },
-    {
-      tier: 3,
-      name: "Tier 3: Operational",
-      description: TIER_DESCRIPTIONS[3],
-      categories: tier3Categories,
-      enabled: false,
-      priority: 3,
-    },
-  ]);
 
   const handleToggleTier = (tier: 1 | 2 | 3) => {
     setConfigs(configs.map((c) => (c.tier === tier ? { ...c, enabled: !c.enabled } : c)));
@@ -113,6 +120,16 @@ export default function SettingsPage() {
 
   const enabledTiers = configs.filter((c) => c.enabled);
   const totalCategories = enabledTiers.reduce((sum, c) => sum + c.categories.length, 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white pt-16 pb-16 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-sm text-[#666666]">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pt-16 pb-16">
