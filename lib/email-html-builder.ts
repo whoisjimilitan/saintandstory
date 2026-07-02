@@ -137,11 +137,11 @@ export function buildEmailHtml(
     }
     .website-link-subtle {
       font-size: 13px;
-      color: #D0D0D0;
+      color: rgba(0, 0, 0, 0.4);
       text-decoration: none;
     }
     .website-link-subtle:hover {
-      color: #888888;
+      color: #333333;
       text-decoration: underline;
     }
     @media (max-width: 600px) {
