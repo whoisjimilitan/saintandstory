@@ -71,8 +71,32 @@ export function generateEmailV4(
   // Industry-specific bridge: Use from pain-promise map, or generate if not set
   const bridge = ppmEntry.bridge || generateBridge(prospect.businessName);
 
-  // Trust-first template: Disarm → Understand → Demonstrate character → Invite conversation
-  const bodyText = `Hi ${greeting},
+  // Narrative story layers (if available, use new structure; otherwise fallback to old)
+  const hasNarrativeStructure = ppmEntry.sharedReality && ppmEntry.rootCause && ppmEntry.businessPhilosophy && ppmEntry.promiseStatement;
+
+  let bodyText: string;
+
+  if (hasNarrativeStructure) {
+    // NEW: Story-based template (Shared Reality → Root Cause → Philosophy → Promise → Question)
+    bodyText = `Hi ${greeting},
+
+Apologies. I know it's unusual emailing you out of the blue.
+
+${bridge}
+${ppmEntry.sharedReality}
+
+${ppmEntry.rootCause}
+
+${ppmEntry.businessPhilosophy}
+${ppmEntry.promiseStatement}
+
+${closingQuestion}
+
+Saint & Story
+${signature}`;
+  } else {
+    // LEGACY: Fallback to old template (Bridge + Observation → Promise → Question)
+    bodyText = `Hi ${greeting},
 
 Apologies. I know it's unusual emailing you out of the blue.
 
@@ -84,6 +108,7 @@ ${closingQuestion}
 
 Saint & Story
 ${signature}`;
+  }
 
   return {
     subjectLine,

@@ -95,13 +95,20 @@ export interface BusinessIdentity {
 }
 
 export interface BusinessPainPromise {
-  pain: string; // Trust-first observation (demonstrates understanding)
-  promise: string; // Our guarantee (constant across all)
-  bridge?: string; // Industry-specific credibility bridge (e.g., "Helping solicitors with time-critical deadlines has taught me that...")
+  pain: string; // Legacy field (kept for backwards compatibility)
+  promise: string; // Legacy field (kept for backwards compatibility)
+
+  // NEW: Narrative story layers (replaces old pain/promise structure)
+  sharedReality?: string; // What's universally true about their world (e.g., "Filing deadlines rarely become stressful because of the legal work itself.")
+  rootCause?: string; // The actual problem (e.g., "The real problem is when delivery becomes the variable you can't control.")
+  businessPhilosophy?: string; // Why we built this (e.g., "That's exactly why we built Saint & Story to take responsibility when timing matters most.")
+  promiseStatement?: string; // The guarantee (e.g., "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.")
+
+  bridge?: string; // Industry-specific credibility bridge (e.g., "Helping solicitors with time-critical legal deliveries has taught me one thing.")
   consequenceLevel: ConsequenceLevel;
   tier: ConsequenceTier;
   subjectLines: string[]; // Trust-first subject line options (Human, Observation, Shared World, Zero-Marketing)
-  identity: BusinessIdentity; // NEW: Hierarchical identity (principle > outcome > positioning)
+  identity: BusinessIdentity;
   description?: string;
   closingQuestion?: string; // Genuine curiosity question (mostly constant)
 }
@@ -261,6 +268,11 @@ export const BUSINESS_PAIN_PROMISE_MAP: Record<string, BusinessPainPromise> = {
   solicitor: {
     pain: "Filing deadlines rarely become stressful because of the legal work itself. The real problem is when delivery becomes the variable you can't control.",
     promise: "If a delivery ever fails, we take responsibility and cover the re-delivery ourselves.",
+    bridge: "Helping solicitors with time-critical legal deliveries has taught me one thing.",
+    sharedReality: "Filing deadlines rarely become stressful because of the legal work itself.",
+    rootCause: "The real problem is when delivery becomes the variable you can't control.",
+    businessPhilosophy: "That's exactly why we built Saint & Story to take responsibility when timing matters most.",
+    promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
     consequenceLevel: "ULTRA_MOTIVATED",
     tier: 1,
     subjectLines: ["One thing I've learnt", "Quick question", "When deadlines get tight"],
