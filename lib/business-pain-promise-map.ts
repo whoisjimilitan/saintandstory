@@ -1056,7 +1056,7 @@ export function detectBusinessType(businessName: string): BusinessPainPromise {
     bridge: "Working with businesses on time-critical deliveries has taught me one thing.",
     sharedReality: "Deliveries rarely fail because of the work itself.",
     rootCause: "The real problem is when something outside your control gets in the way.",
-    dependencyReveal: "For many businesses, that's having reliable same-day delivery when it matters.",
+    dependencyReveal: "For many businesses, that's reliable same-day delivery exactly when deadlines matter most.",
     businessPhilosophy: "We built Saint & Story around that reality.",
     promiseStatement: "If a delivery ever fails with us, we'll cover the re-delivery at no cost to you.",
     consequenceLevel: "MOTIVATED",
