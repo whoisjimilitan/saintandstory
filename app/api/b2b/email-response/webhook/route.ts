@@ -77,38 +77,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, reason: "unknown_event" });
     }
 
-    console.log("[WEBHOOK HANDLER] ⟳ Looking for email with messageId:", messageId);
+    console.error("🔴 [WEBHOOK HANDLER] Looking for email - trying messageId:", messageId, "email:", email);
 
-    // Find email by Resend message ID
-    const campaignEmail = await prisma.b2bCampaignEmail.findUnique({
+    // Try to find email by resendMessageId first
+    let campaignEmail = await prisma.b2bCampaignEmail.findUnique({
       where: { resendMessageId: messageId },
     });
 
-    if (!campaignEmail) {
-      console.warn("[WEBHOOK HANDLER] ✗ No email found for messageId:", messageId);
+    // If not found by messageId, try matching by email address + recent send time
+    // (in case message IDs don't match between API response and webhook)
+    if (!campaignEmail && email) {
+      console.error("🔴 [WEBHOOK HANDLER] No match by messageId, trying by email:", email);
 
-      // Debug: Show sample of what IDs exist
-      const sampleEmails = await prisma.b2bCampaignEmail.findMany({
-        take: 5,
-        select: {
-          id: true,
-          resendMessageId: true,
-          prospectEmail: true,
-          status: true,
-          emailSentAt: true,
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      campaignEmail = await prisma.b2bCampaignEmail.findFirst({
+        where: {
+          prospectEmail: email,
+          emailSentAt: { gte: oneHourAgo },
+          status: "sent", // Only match if still in "sent" status
         },
         orderBy: { emailSentAt: "desc" },
       });
-      console.warn("[WEBHOOK HANDLER] Sample emails in DB:", sampleEmails);
 
-      // Check for NULL messageIds
-      const nullCount = await prisma.b2bCampaignEmail.count({
-        where: { resendMessageId: null },
-      });
-      if (nullCount > 0) {
-        console.error("[WEBHOOK HANDLER] ⚠️  Found", nullCount, "emails with NULL resendMessageId!");
+      if (campaignEmail) {
+        console.error("🔴 [WEBHOOK HANDLER] ✓ Found email by address match:", email);
       }
+    }
 
+    if (!campaignEmail) {
+      console.error("🔴 [WEBHOOK HANDLER] ✗ No email found for messageId:", messageId, "email:", email);
       return NextResponse.json({ received: true, matched: false });
     }
 
