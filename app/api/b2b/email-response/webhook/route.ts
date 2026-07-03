@@ -91,35 +91,25 @@ export async function POST(request: NextRequest) {
       where: { resendMessageId: messageId },
     });
 
-    // If not found by messageId, match by email address (most recent)
+    // If not found by messageId, match by email address (normalized)
     if (!campaignEmail && email) {
+      const normalizedEmail = email.toLowerCase().trim();
+
       campaignEmail = await prisma.b2bCampaignEmail.findFirst({
         where: {
-          prospectEmail: email,
+          prospectEmail: {
+            equals: normalizedEmail,
+            mode: "insensitive",
+          },
         },
         orderBy: { emailSentAt: "desc" },
         take: 1,
       });
     }
 
-    // If still no match, try updating the most recent unmatched email
     if (!campaignEmail) {
-      // Find the most recent email with status "sent"
-      campaignEmail = await prisma.b2bCampaignEmail.findFirst({
-        where: { status: "sent" },
-        orderBy: { emailSentAt: "desc" },
-        take: 1,
-      });
-
-      if (!campaignEmail) {
-        console.log("[WEBHOOK HANDLER] No emails found to update");
-        return NextResponse.json({ received: true, matched: false });
-      }
-
-      console.log("[WEBHOOK HANDLER] Using fallback - updating most recent email:", {
-        id: campaignEmail.id,
-        email: campaignEmail.prospectEmail,
-      });
+      console.log("[WEBHOOK HANDLER] No email found for:", { messageId, email });
+      return NextResponse.json({ received: true, matched: false });
     }
 
     // Build update data
