@@ -77,35 +77,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, reason: "unknown_event" });
     }
 
-    console.error("🔴 [WEBHOOK HANDLER] Looking for email - trying messageId:", messageId, "email:", email);
-
     // Try to find email by resendMessageId first
     let campaignEmail = await prisma.b2bCampaignEmail.findUnique({
       where: { resendMessageId: messageId },
     });
 
-    // If not found by messageId, try matching by email address + recent send time
-    // (in case message IDs don't match between API response and webhook)
+    // If not found by messageId, match by email address (most recent)
     if (!campaignEmail && email) {
-      console.error("🔴 [WEBHOOK HANDLER] No match by messageId, trying by email:", email);
-
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
       campaignEmail = await prisma.b2bCampaignEmail.findFirst({
         where: {
           prospectEmail: email,
-          emailSentAt: { gte: oneHourAgo },
-          status: "sent", // Only match if still in "sent" status
         },
         orderBy: { emailSentAt: "desc" },
+        take: 1,
       });
-
-      if (campaignEmail) {
-        console.error("🔴 [WEBHOOK HANDLER] ✓ Found email by address match:", email);
-      }
     }
 
     if (!campaignEmail) {
-      console.error("🔴 [WEBHOOK HANDLER] ✗ No email found for messageId:", messageId, "email:", email);
+      console.log("[WEBHOOK HANDLER] No email found for:", { messageId, email });
       return NextResponse.json({ received: true, matched: false });
     }
 
