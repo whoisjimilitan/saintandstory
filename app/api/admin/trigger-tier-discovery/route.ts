@@ -178,14 +178,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(responseData);
   } catch (error) {
     console.error("[TIER-DISCOVERY] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[TIER-DISCOVERY] ERROR DETAILS:", {
+      name: error instanceof Error ? error.name : "unknown",
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : "no stack",
+    });
+
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Discovery failed",
+        error: errorMessage,
         success: false,
+        details: "Autonomous discovery encountered an error",
       },
       { status: 500 }
     );
   }
+}
+
+// Fallback to catch any unhandled errors
+export function GET() {
+  return NextResponse.json({
+    status: "ready",
+    endpoint: "/api/admin/trigger-tier-discovery",
+    description: "Autonomous tier-based discovery engine",
+  });
 }
 
 /**

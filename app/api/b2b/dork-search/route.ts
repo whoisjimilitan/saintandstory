@@ -200,7 +200,9 @@ function isUKLocation(text: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("[DORK-SEARCH] POST handler called");
     const body = (await request.json()) as { query?: string };
+    console.log("[DORK-SEARCH] Request body:", { queryLength: body?.query?.length });
     const query = body?.query?.trim();
 
     if (!query) {
