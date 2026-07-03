@@ -43,6 +43,15 @@ export default function ReachPage() {
         const data = await res.json();
         setCampaigns(data.campaigns || []);
         console.log("[REACH] Loaded campaigns:", data.campaigns?.length);
+
+        // Debug: log each campaign's stats
+        data.campaigns?.forEach((c: Campaign) => {
+          console.log(`[REACH] Campaign "${c.campaignName}":`, {
+            totalLeads: c.totalLeads,
+            emailStats: c.emailStats,
+            whatsappStats: c.whatsappStats,
+          });
+        });
       } catch (error) {
         console.error("[REACH] Failed to fetch campaigns:", error);
       } finally {
@@ -75,6 +84,11 @@ export default function ReachPage() {
   // Filter campaigns by active tab
   const activeCampaigns = campaigns.filter(c => c.channel === activeTab);
 
+  console.log("[REACH RENDER] activeTab:", activeTab, "activeCampaigns:", activeCampaigns.length);
+  activeCampaigns.forEach(c => {
+    console.log(`[REACH RENDER]   - "${c.campaignName}": sent=${c.emailStats?.sent}, opened=${c.emailStats?.opened}`);
+  });
+
   // Calculate aggregate stats
   let stats = { active: 0, hot: 0, total: 0 };
 
@@ -84,6 +98,7 @@ export default function ReachPage() {
       active: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.sent || 0), 0),
       hot: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.replied || 0), 0),
     };
+    console.log("[REACH RENDER] Calculated stats:", stats);
   } else {
     const whatsappConversations = conversations.filter(c => c.status === "active");
     stats = {
@@ -112,10 +127,17 @@ export default function ReachPage() {
               fetch("/api/b2b/campaigns/list")
                 .then(res => res.json())
                 .then(data => {
+                  console.log("[REACH REFRESH] Got campaigns:", data.campaigns?.length);
+                  data.campaigns?.forEach((c: Campaign) => {
+                    console.log(`[REACH REFRESH] "${c.campaignName}" - channel: ${c.channel}, sent: ${c.emailStats?.sent}`);
+                  });
                   setCampaigns(data.campaigns || []);
                   setLoading(false);
                 })
-                .catch(() => setLoading(false));
+                .catch((err) => {
+                  console.error("[REACH REFRESH] Error:", err);
+                  setLoading(false);
+                });
             }}
             className="px-4 py-2 border border-[#E8E8E8] rounded text-xs font-semibold text-[#0D0D0D] hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors flex-shrink-0"
           >
