@@ -59,35 +59,47 @@ async function getSenderInfo(category?: string): Promise<SenderInfo> {
 }
 
 export async function POST(request: NextRequest) {
+  console.error("🔴🔴🔴 [CAMPAIGN SEND] ⭐️ EMERGENCY: POST HANDLER CALLED 🔴🔴🔴");
   console.log("[CAMPAIGN SEND] Starting campaign send");
 
-  const { userId } = await auth();
-  const user = await currentUser();
-
-  if (!userId) {
-    console.log("[CAMPAIGN SEND] ✗ Unauthorized");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const operatorEmail = user?.emailAddresses[0]?.emailAddress ?? "";
-  console.log(`[CAMPAIGN SEND] Operator: ${operatorEmail}`);
-
   try {
-    const { campaignName, channel, emails } = await request.json() as {
+    const { userId } = await auth();
+    console.error("🔴 [CAMPAIGN SEND] Auth check - userId:", userId);
+
+    const user = await currentUser();
+    console.error("🔴 [CAMPAIGN SEND] Current user:", user?.emailAddresses?.[0]?.emailAddress);
+
+    if (!userId) {
+      console.error("🔴 [CAMPAIGN SEND] ✗ Unauthorized - returning 401");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const operatorEmail = user?.emailAddresses[0]?.emailAddress ?? "";
+    console.error(`🔴 [CAMPAIGN SEND] Operator: ${operatorEmail}`);
+
+    const body = await request.json();
+    console.error("🔴 [CAMPAIGN SEND] Request body received:", {
+      campaignName: body.campaignName,
+      channel: body.channel,
+      emailCount: body.emails?.length,
+    });
+
+    const { campaignName, channel, emails } = body as {
       campaignName: string;
       channel: "email" | "whatsapp" | "phone";
       emails: EmailPayload[];
     };
 
     if (!campaignName || !channel || !emails || emails.length === 0) {
+      console.error("🔴 [CAMPAIGN SEND] ✗ Missing fields - returning 400");
       return NextResponse.json(
         { error: "Missing required fields: campaignName, channel, emails" },
         { status: 400 }
       );
     }
 
-    console.log(
-      `[CAMPAIGN SEND] Campaign: ${campaignName} | Channel: ${channel} | Total: ${emails.length}`
+    console.error(
+      `🔴 [CAMPAIGN SEND] ✓ Valid request: ${campaignName} | ${channel} | ${emails.length} emails`
     );
 
     // Calculate tier breakdown
@@ -98,6 +110,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Create campaign record
+    console.error("🔴 [CAMPAIGN SEND] Creating campaign in database...");
     const campaign = await prisma.b2bCampaign.create({
       data: {
         channel,
@@ -110,18 +123,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(`[CAMPAIGN SEND] Campaign created: ${campaign.id}`);
+    console.error(`🔴 [CAMPAIGN SEND] ✓ Campaign created: ${campaign.id}`);
 
     // Send emails and track in database
+    console.error(`🔴 [CAMPAIGN SEND] ✓ Starting to send ${emails.length} emails...`);
     let sentCount = 0;
     let failedCount = 0;
 
     for (const email of emails) {
+      console.error(`🔴 [CAMPAIGN SEND] Processing email ${sentCount + failedCount + 1}/${emails.length}: ${email.prospectEmail}`);
       try {
         if (channel === "email") {
           // Send via Resend
           const sender = await getSenderInfo(email.category);
-          console.log(`[CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email} (role: ${sender.role || 'none'})`);
+          console.error(`🔴 [CAMPAIGN SEND] Calling Resend for ${email.prospectEmail} from ${sender.email} (role: ${sender.role || 'none'})`);
 
           // Build HTML email with personalization, signature, and CTA
           const emailHtml = buildEmailHtml(email, sender);
@@ -241,10 +256,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(
-      `[CAMPAIGN SEND] Complete: ${sentCount} sent, ${failedCount} failed`
+    console.error(
+      `🔴 [CAMPAIGN SEND] ✓✓ COMPLETE: ${sentCount} sent, ${failedCount} failed`
     );
 
+    console.error(`🔴 [CAMPAIGN SEND] Returning success response with campaignId: ${campaign.id}`);
     return NextResponse.json({
       success: true,
       campaignId: campaign.id,
@@ -254,7 +270,9 @@ export async function POST(request: NextRequest) {
       tierBreakdown,
     });
   } catch (error) {
-    console.error("[CAMPAIGN SEND] Fatal error:", error);
+    console.error("🔴🔴🔴 [CAMPAIGN SEND] FATAL ERROR:", error);
+    console.error("🔴 Error type:", error instanceof Error ? error.constructor.name : typeof error);
+    console.error("🔴 Error message:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Campaign send failed" },
       { status: 500 }
