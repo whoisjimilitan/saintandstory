@@ -58,11 +58,7 @@ export default function SettingsPage() {
       ]);
     } catch (error) {
       console.error("[SETTINGS] Error loading tier categories:", error);
-      showToast({
-        title: "Error",
-        description: "Failed to load tier configurations",
-        type: "error",
-      });
+      showToast("Failed to load tier configurations", "error");
     } finally {
       setLoading(false);
     }
@@ -95,24 +91,12 @@ export default function SettingsPage() {
 
       if (res.ok) {
         setDiscoveryResult(data);
-        showToast({
-          title: "Discovery Started",
-          description: `Found ${data.leadsFound} leads across ${data.tiersProcessed} tiers.`,
-          type: "success",
-        });
+        showToast(`Found ${data.leadsFound} leads across ${data.tiersProcessed} tiers`, "success");
       } else {
-        showToast({
-          title: "Discovery Failed",
-          description: data.error || "Failed to start discovery",
-          type: "error",
-        });
+        showToast(data.error || "Failed to start discovery", "error");
       }
     } catch (error) {
-      showToast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to start discovery",
-        type: "error",
-      });
+      showToast(error instanceof Error ? error.message : "Failed to start discovery", "error");
     } finally {
       setDiscoveryRunning(false);
     }

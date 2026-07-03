@@ -72,10 +72,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, reason: "unknown_event" });
     }
 
-    // Try to find email by resendMessageId first
+    // Try to find email by resendMessageId first (exact match)
     let campaignEmail = await prisma.b2bCampaignEmail.findUnique({
       where: { resendMessageId: messageId },
     });
+
+    console.log("[WEBHOOK HANDLER] Query #1 - Exact messageId match:", { messageId, found: !!campaignEmail });
+
+    // If not found by messageId, try case-insensitive messageId match
+    if (!campaignEmail && messageId) {
+      campaignEmail = await prisma.b2bCampaignEmail.findFirst({
+        where: {
+          resendMessageId: {
+            equals: messageId,
+            mode: "insensitive",
+          },
+        },
+        take: 1,
+      });
+      console.log("[WEBHOOK HANDLER] Query #2 - Case-insensitive messageId match:", { messageId, found: !!campaignEmail });
+    }
 
     // If not found by messageId, match by email address (normalized)
     if (!campaignEmail && email) {
@@ -91,10 +107,28 @@ export async function POST(request: NextRequest) {
         orderBy: { emailSentAt: "desc" },
         take: 1,
       });
+      console.log("[WEBHOOK HANDLER] Query #3 - Email address match:", { email: normalizedEmail, found: !!campaignEmail });
     }
 
     if (!campaignEmail) {
-      console.log("[WEBHOOK HANDLER] No email found for:", { messageId, email });
+      console.log("[WEBHOOK HANDLER] ✗ No email found for:", { messageId, email });
+
+      // Debug: Show what's in the database
+      const recentEmails = await prisma.b2bCampaignEmail.findMany({
+        where: { emailSentAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+        select: { resendMessageId: true, prospectEmail: true, emailSentAt: true },
+        orderBy: { emailSentAt: "desc" },
+        take: 10,
+      });
+
+      console.log("[WEBHOOK HANDLER] Sample emails in database (last 24h):",
+        recentEmails.map(e => ({
+          messageId: e.resendMessageId ? `${e.resendMessageId.substring(0, 10)}...` : 'null',
+          email: e.prospectEmail,
+          sentAt: e.emailSentAt?.toISOString()
+        }))
+      );
+
       return NextResponse.json({ received: true, matched: false });
     }
 
