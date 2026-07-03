@@ -175,14 +175,9 @@ export function buildEmailHtml(
         <div style="font-size: 15px; color: #0D0D0D; font-weight: 500; margin-bottom: 16px;">${senderNameFromBody}</div>
         ${sender.role ? `<div style="font-size: 14px; color: #666666; margin-bottom: 20px;">${sender.role} at Saint & Story</div>` : ''}
         <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0D%0A%0D%0AYes,%20occasionally%20we%20do.%0D%0A%0D%0AThanks,%0D%0A%5BYour%20Name%5D" class="cta-button">Reply</a>
-      </div>
-
-      <!-- Divider -->
-      <div class="divider"></div>
-
-      <!-- Website Link (standalone) -->
-      <div>
-        <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
+        <div style="margin-top: 20px;">
+          <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
+        </div>
       </div>
     </div>
   </div>
