@@ -57,6 +57,15 @@ export async function GET(request: NextRequest) {
         replied: campaign.whatsapp.filter(w => w.status === "replied").length,
       };
 
+      // DEBUG: Log email count and status breakdown
+      if (campaign.emails.length > 0 || campaign.totalLeads > 0) {
+        const statusBreakdown: Record<string, number> = {};
+        campaign.emails.forEach(e => {
+          statusBreakdown[e.status] = (statusBreakdown[e.status] || 0) + 1;
+        });
+        console.log(`[CAMPAIGNS LIST] "${campaign.campaignName}" - emails: ${campaign.emails.length}/${campaign.totalLeads}, status breakdown:`, statusBreakdown);
+      }
+
       return {
         ...campaign,
         emailStats,

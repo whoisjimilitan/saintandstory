@@ -39,9 +39,13 @@ function verifyResendWebhook(body: string, signature: string | null): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("[WEBHOOK] ◆ Incoming webhook request");
+
   try {
     const body = await request.text();
     const signature = request.headers.get("x-resend-signature") || request.headers.get("svix-signature");
+
+    console.log("[WEBHOOK] Body length:", body.length, "Signature present:", !!signature);
 
     // Verify signature
     if (!verifyResendWebhook(body, signature)) {
@@ -59,9 +63,10 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date(parsedBody.created_at || new Date().toISOString());
     const data = parsedBody.data || {};
 
-    console.log(`[WEBHOOK] Resend event: ${eventType}`, {
+    console.log(`[WEBHOOK] ◆ Event: ${eventType}`, {
       messageId: data.id,
       email: data.email,
+      timestamp: timestamp.toISOString(),
     });
 
     // Map Resend event types to our event types
@@ -80,16 +85,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Find campaign email by resend message ID (Resend sends it in 'id' field)
+    console.log(`[WEBHOOK] ⟳ Looking for email with resendMessageId: ${data.id}`);
+
     const campaignEmail = await prisma.b2bCampaignEmail.findUnique({
       where: { resendMessageId: data.id },
     });
 
     if (!campaignEmail) {
-      console.warn(`[WEBHOOK] No campaign email found for message ID: ${data.id}, email: ${data.email}`);
+      console.warn(`[WEBHOOK] ✗ No match for message ID: ${data.id}, email: ${data.email}`);
+
+      // Debug: Show a sample of what IDs exist
+      const sampleEmails = await prisma.b2bCampaignEmail.findMany({
+        take: 3,
+        select: { id: true, resendMessageId: true, prospectEmail: true },
+        orderBy: { emailSentAt: "desc" },
+      });
+      console.log(`[WEBHOOK] Sample emails in DB:`, sampleEmails);
+
       return NextResponse.json({ received: true, matched: false });
     }
 
-    console.log(`[WEBHOOK] Found campaign email: ${campaignEmail.id}`);
+    console.log(`[WEBHOOK] ✓ Matched campaign email: ${campaignEmail.id}, current status: ${campaignEmail.status}`);
 
     // Update status and timestamp based on event type
     const updateData: any = { status: mappedEventType };
@@ -103,12 +119,18 @@ export async function POST(request: NextRequest) {
       updateData.status = "replied";
     }
 
-    await prisma.b2bCampaignEmail.update({
+    const updated = await prisma.b2bCampaignEmail.update({
       where: { id: campaignEmail.id },
       data: updateData,
+      select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
     });
 
-    console.log(`[WEBHOOK] ✓ Updated campaign email ${campaignEmail.id} to status: ${mappedEventType}`);
+    console.log(`[WEBHOOK] ✓✓ Updated ${campaignEmail.id}:`, {
+      newStatus: updated.status,
+      openedAt: updated.openedAt,
+      clickedAt: updated.clickedAt,
+      repliedAt: updated.repliedAt,
+    });
 
     return NextResponse.json({
       received: true,
