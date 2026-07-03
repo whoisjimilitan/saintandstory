@@ -28,23 +28,22 @@ export async function POST(request: NextRequest) {
     console.error("🔴 [WEBHOOK HANDLER] REQUEST HEADERS:", allHeaders);
     console.error("🔴 [WEBHOOK HANDLER] REQUEST BODY:", JSON.stringify(body));
 
-    // Try to find message ID in multiple possible locations (Resend/Svix format variations)
+    // Webhook structure: { created_at, data: { type, id, email, ... } }
+    const data = body.data || body;
+
+    // Extract from data object (Resend/Svix wraps everything in data)
     const messageId =
+      data.id ||
+      data.messageId ||
+      data.message_id ||
       body.id ||
       body.messageId ||
-      body.message_id ||
-      body.data?.id ||
-      body.data?.messageId ||
-      body.data?.message_id ||
-      body.message?.id ||
-      // Also check headers
       request.headers.get("x-svix-id") ||
-      request.headers.get("x-resend-id") ||
-      request.headers.get("x-message-id");
+      request.headers.get("x-resend-id");
 
-    const eventType = body.type;
-    const email = body.email || body.data?.email;
-    const timestamp = new Date(body.created_at || body.data?.created_at || new Date().toISOString());
+    const eventType = data.type || body.type;
+    const email = data.email || body.email;
+    const timestamp = new Date(data.created_at || body.created_at || new Date().toISOString());
 
     console.log("[WEBHOOK HANDLER] ◆ Event received:", {
       type: eventType,
