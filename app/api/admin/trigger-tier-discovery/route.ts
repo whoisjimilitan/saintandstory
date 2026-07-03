@@ -153,7 +153,13 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ GET FINAL COUNTS
-    const totalLeads = await prisma.b2bLead.count();
+    let totalLeads = 0;
+    try {
+      totalLeads = await prisma.b2bLead.count();
+    } catch (countError) {
+      console.error("[TIER-DISCOVERY] Error counting leads:", countError);
+      totalLeads = 0;
+    }
     results.leadsTotal = totalLeads;
 
     console.log(`[TIER-DISCOVERY] Complete:`, {
@@ -162,11 +168,14 @@ export async function POST(request: NextRequest) {
       totalLeads: results.leadsTotal,
     });
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       message: `Autonomous discovery complete. Found ${results.leadsFound} leads across ${results.tiersProcessed} tiers.`,
       ...results,
-    });
+    };
+
+    console.log("[TIER-DISCOVERY] Returning response:", JSON.stringify(responseData).substring(0, 200));
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("[TIER-DISCOVERY] Error:", error);
     return NextResponse.json(

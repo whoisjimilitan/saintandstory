@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000";
 
+    console.log(`[OPERATOR-TRIGGER] Calling admin endpoint at ${baseUrl}/api/admin/trigger-tier-discovery`);
+
     const discoveryRes = await fetch(
       `${baseUrl}/api/admin/trigger-tier-discovery`,
       {
@@ -58,6 +60,8 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({ tiers }),
       }
     );
+
+    console.log(`[OPERATOR-TRIGGER] Admin endpoint returned: ${discoveryRes.status}`);
 
     if (!discoveryRes.ok) {
       const responseText = await discoveryRes.text();
@@ -84,9 +88,16 @@ export async function POST(request: NextRequest) {
     try {
       discoveryData = await discoveryRes.json();
     } catch (jsonError) {
-      console.error(`[OPERATOR-TRIGGER] Failed to parse discovery response:`, jsonError);
+      // Get the raw response to debug
+      const rawText = await discoveryRes.text();
+      console.error(`[OPERATOR-TRIGGER] Failed to parse discovery response:`, {
+        error: jsonError,
+        rawResponse: rawText.substring(0, 1000),
+        contentType: discoveryRes.headers.get('content-type'),
+        status: discoveryRes.status,
+      });
       return NextResponse.json(
-        { error: "Failed to parse discovery response", success: false },
+        { error: "Failed to parse discovery response. Admin endpoint may have crashed.", success: false },
         { status: 500 }
       );
     }
