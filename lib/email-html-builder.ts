@@ -180,6 +180,11 @@ export function buildEmailHtml(
       <div class="cta-section">
         <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0D%0A%0D%0AYes,%20occasionally%20we%20do.%0D%0A%0D%0AThanks,%0D%0A%5BYour%20Name%5D" class="cta-button">Reply</a>
       </div>
+
+      <!-- Website Link -->
+      <div style="margin-top: 20px;">
+        <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
+      </div>
     </div>
   </div>
 </body>
