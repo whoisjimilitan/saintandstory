@@ -15,27 +15,13 @@ import { prisma } from "@/lib/prisma";
  */
 
 export async function POST(request: NextRequest) {
-  console.log("[WEBHOOK HANDLER] ◆ Incoming webhook request");
-
   try {
     const body = await request.json();
 
-    // Log raw webhook to database for debugging
-    const allHeaders: Record<string, string> = {};
-    request.headers.forEach((value, key) => {
-      allHeaders[key] = value;
-    });
-
-    try {
-      await prisma.webhookLog.create({
-        data: {
-          rawBody: body,
-          headers: allHeaders,
-        },
-      });
-    } catch (logError) {
-      console.error("[WEBHOOK HANDLER] Failed to log webhook:", logError);
-    }
+    // Log FULL webhook body for debugging (visible in Vercel logs for 1 hour)
+    console.log("[WEBHOOK BODY]", JSON.stringify(body, null, 2));
+    console.log("[WEBHOOK TYPE]", body.type);
+    console.log("[WEBHOOK DATA]", body.data ? JSON.stringify(body.data, null, 2) : "NO DATA FIELD");
 
     // Webhook structure: { created_at, data: { type, id, email, ... } }
     const data = body.data || body;
