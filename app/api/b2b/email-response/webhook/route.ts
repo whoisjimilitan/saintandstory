@@ -20,6 +20,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Log all headers to understand what Resend is sending
+    const allHeaders: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      allHeaders[key] = value;
+    });
+    console.error("🔴 [WEBHOOK HANDLER] REQUEST HEADERS:", allHeaders);
+    console.error("🔴 [WEBHOOK HANDLER] REQUEST BODY:", JSON.stringify(body));
+
     // Try to find message ID in multiple possible locations (Resend/Svix format variations)
     const messageId =
       body.id ||
@@ -28,7 +36,11 @@ export async function POST(request: NextRequest) {
       body.data?.id ||
       body.data?.messageId ||
       body.data?.message_id ||
-      body.message?.id;
+      body.message?.id ||
+      // Also check headers
+      request.headers.get("x-svix-id") ||
+      request.headers.get("x-resend-id") ||
+      request.headers.get("x-message-id");
 
     const eventType = body.type;
     const email = body.email || body.data?.email;
