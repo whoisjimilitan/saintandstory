@@ -42,10 +42,15 @@ export async function POST(request: NextRequest) {
 
     console.log("[WEBHOOK HANDLER] ◆ Event received:", {
       type: eventType,
-      messageId,
+      messageId: messageId ? `${messageId.substring(0, 20)}...` : null,
       email,
       timestamp: timestamp.toISOString(),
     });
+
+    console.log("[WEBHOOK HANDLER] Webhook structure - Top level keys:", Object.keys(body));
+    if (body.data) {
+      console.log("[WEBHOOK HANDLER] Webhook structure - data.* keys:", Object.keys(body.data));
+    }
 
     if (!eventType || !messageId) {
       console.warn("[WEBHOOK HANDLER] ✗ Missing required fields", {
@@ -93,7 +98,43 @@ export async function POST(request: NextRequest) {
       console.log("[WEBHOOK HANDLER] Query #2 - Case-insensitive messageId match:", { messageId, found: !!campaignEmail });
     }
 
-    // If not found by messageId, match by email address (normalized)
+    // If not found by messageId, try partial/suffix match (in case Resend truncates)
+    if (!campaignEmail && messageId && messageId.length > 10) {
+      const messageSuffix = messageId.slice(-20); // Last 20 chars
+      campaignEmail = await prisma.b2bCampaignEmail.findFirst({
+        where: {
+          resendMessageId: {
+            endsWith: messageSuffix,
+          },
+        },
+        orderBy: { emailSentAt: "desc" },
+        take: 1,
+      });
+      console.log("[WEBHOOK HANDLER] Query #3 - Suffix match:", { suffix: messageSuffix, found: !!campaignEmail });
+    }
+
+    // If not found by messageId, match by email address (normalized) sent recently
+    if (!campaignEmail && email) {
+      const normalizedEmail = email.toLowerCase().trim();
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+
+      campaignEmail = await prisma.b2bCampaignEmail.findFirst({
+        where: {
+          prospectEmail: {
+            equals: normalizedEmail,
+            mode: "insensitive",
+          },
+          emailSentAt: {
+            gte: tenMinutesAgo,
+          },
+        },
+        orderBy: { emailSentAt: "desc" },
+        take: 1,
+      });
+      console.log("[WEBHOOK HANDLER] Query #4 - Email + recent time match:", { email: normalizedEmail, found: !!campaignEmail });
+    }
+
+    // Fallback: match by email address alone (widest net)
     if (!campaignEmail && email) {
       const normalizedEmail = email.toLowerCase().trim();
 
@@ -107,7 +148,7 @@ export async function POST(request: NextRequest) {
         orderBy: { emailSentAt: "desc" },
         take: 1,
       });
-      console.log("[WEBHOOK HANDLER] Query #3 - Email address match:", { email: normalizedEmail, found: !!campaignEmail });
+      console.log("[WEBHOOK HANDLER] Query #5 - Email fallback match:", { email: normalizedEmail, found: !!campaignEmail });
     }
 
     if (!campaignEmail) {
