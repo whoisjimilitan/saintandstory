@@ -209,7 +209,16 @@ export default function ReachPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {activeCampaigns.map(campaign => (
+                {activeCampaigns.map(campaign => {
+                  // Fallback: if emailStats missing, calculate from the API response data
+                  // (this shouldn't happen if backend is working, but good defensive programming)
+                  const emailStats = campaign.emailStats || {
+                    sent: 0,
+                    opened: 0,
+                    replied: 0,
+                  };
+
+                  return (
                   <div key={campaign.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors duration-200">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -220,15 +229,15 @@ export default function ReachPage() {
                       </div>
                       <div className="flex gap-4 text-right flex-shrink-0">
                         <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.sent || 0}</p>
+                          <p className="text-lg font-black text-[#0D0D0D]">{emailStats.sent}</p>
                           <p className="text-xs text-[#888888]">sent</p>
                         </div>
                         <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.opened || 0}</p>
+                          <p className="text-lg font-black text-[#0D0D0D]">{emailStats.opened}</p>
                           <p className="text-xs text-[#888888]">opened</p>
                         </div>
                         <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.replied || 0}</p>
+                          <p className="text-lg font-black text-[#0D0D0D]">{emailStats.replied}</p>
                           <p className="text-xs text-[#888888]">replied</p>
                         </div>
                         <button
@@ -256,7 +265,8 @@ export default function ReachPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

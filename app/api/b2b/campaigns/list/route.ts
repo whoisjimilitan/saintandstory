@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         campaign.emails.forEach(e => {
           statusBreakdown[e.status] = (statusBreakdown[e.status] || 0) + 1;
         });
-        console.log(`[CAMPAIGNS LIST] "${campaign.campaignName}" - emails: ${campaign.emails.length}/${campaign.totalLeads}, status breakdown:`, statusBreakdown);
+        console.log(`[CAMPAIGNS LIST] "${campaign.campaignName}" - channel: ${campaign.channel}, emails: ${campaign.emails.length}/${campaign.totalLeads}, emailStats:`, emailStats, "status breakdown:", statusBreakdown);
       }
 
       return {
