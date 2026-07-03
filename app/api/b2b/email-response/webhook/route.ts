@@ -20,13 +20,22 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Log all headers to understand what Resend is sending
+    // Log raw webhook to database for debugging
     const allHeaders: Record<string, string> = {};
     request.headers.forEach((value, key) => {
       allHeaders[key] = value;
     });
-    console.error("🔴 [WEBHOOK HANDLER] REQUEST HEADERS:", allHeaders);
-    console.error("🔴 [WEBHOOK HANDLER] REQUEST BODY:", JSON.stringify(body));
+
+    try {
+      await prisma.webhookLog.create({
+        data: {
+          rawBody: body,
+          headers: allHeaders,
+        },
+      });
+    } catch (logError) {
+      console.error("[WEBHOOK HANDLER] Failed to log webhook:", logError);
+    }
 
     // Webhook structure: { created_at, data: { type, id, email, ... } }
     const data = body.data || body;

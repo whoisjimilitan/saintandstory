@@ -1392,6 +1392,16 @@ model B2bCampaignWhatsApp {
   @@map("b2b_campaign_whatsapp")
 }
 
+model WebhookLog {
+  id        String   @id @default(cuid())
+  rawBody   Json     @map("raw_body")
+  headers   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)], map: "idx_webhook_log_created")
+  @@map("webhook_logs")
+}
+
 enum SignalClassification {
   supports
   contradicts
