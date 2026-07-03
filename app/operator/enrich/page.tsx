@@ -204,7 +204,7 @@ export default function EnrichPage() {
       const emailsToSend = generatedEmails.map(email => {
         const prospect = prospects.find(p => p.id === email.prospectId);
         return {
-          prospectId: email.prospectId,
+          // Note: prospectId is optional in the database, skip it to avoid UUID validation errors
           prospectName: prospect?.contactName || email.prospectName || "[Name]",
           prospectEmail: email.email,
           subject: email.subject,
