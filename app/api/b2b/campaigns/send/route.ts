@@ -190,19 +190,20 @@ export async function POST(request: NextRequest) {
 
           console.log(`[CAMPAIGN SEND] ◆ Storing email with resendMessageId: ${messageId}`);
 
-          // Log in database with Resend message ID for webhook matching
+          // Store in database with Resend message ID for webhook matching
+          let stored;
           try {
-            const stored = await prisma.b2bCampaignEmail.create({
+            stored = await prisma.b2bCampaignEmail.create({
               data: {
                 campaignId: campaign.id,
-                prospectId: email.prospectId,
+                prospectId: email.prospectId || undefined,
                 prospectEmail: email.prospectEmail,
                 prospectName: email.prospectName,
                 tier: email.tier,
                 category: email.category,
                 subject: email.subject,
                 body: email.body,
-                resendMessageId: messageId, // Store Resend message ID for webhooks
+                resendMessageId: messageId,
                 status: "sent",
                 emailSentAt: new Date(),
               },
@@ -214,8 +215,14 @@ export async function POST(request: NextRequest) {
               status: stored.status,
             });
           } catch (dbError) {
-            console.error(`[CAMPAIGN SEND] Database error logging email:`, dbError);
-            // Continue anyway - email was sent even if logging failed
+            console.error(`[CAMPAIGN SEND] ✗✗ CRITICAL: Database save failed for ${email.prospectEmail}:`, {
+              error: dbError instanceof Error ? dbError.message : String(dbError),
+              email: email.prospectEmail,
+              campaignId: campaign.id,
+              messageId,
+            });
+            failedCount++;
+            continue;
           }
 
           sentCount++;
