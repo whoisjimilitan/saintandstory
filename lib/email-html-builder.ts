@@ -167,21 +167,18 @@ export function buildEmailHtml(
         <div class="body-text">${mainContent}</div>
       </div>
 
+      <!-- Quick Note (Sender signature as part of body flow) -->
+      <div style="margin-top: 24px; margin-bottom: 24px;">
+        <div style="font-size: 15px; color: #0D0D0D; font-weight: 500;">${senderNameFromBody}</div>
+        ${sender.role ? `<div style="font-size: 14px; color: #666666; margin-top: 4px;">${sender.role} at Saint & Story</div>` : ''}
+      </div>
+
       <!-- Divider -->
       <div class="divider"></div>
 
-      <!-- CTA Button -->
+      <!-- CTA Button (Reply) -->
       <div class="cta-section">
         <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0D%0A%0D%0AYes,%20occasionally%20we%20do.%0D%0A%0D%0AThanks,%0D%0A%5BYour%20Name%5D" class="cta-button">Reply</a>
-      </div>
-
-      <!-- Signature -->
-      <div class="signature-section">
-        <div class="signature-sender">${senderNameFromBody}</div>
-        ${sender.role ? `<div class="signature-role">${sender.role} at Saint & Story</div>` : ''}
-        <div style="margin-top: 16px;">
-          <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
-        </div>
       </div>
     </div>
   </div>
