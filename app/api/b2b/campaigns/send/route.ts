@@ -102,14 +102,6 @@ export async function POST(request: NextRequest) {
       `🔴 [CAMPAIGN SEND] ✓ Valid request: ${campaignName} | ${channel} | ${emails.length} emails`
     );
 
-    // Verify campaign was created
-    console.error(`🔴 [CAMPAIGN SEND] Campaign created:`, {
-      id: campaign.id,
-      name: campaign.campaignName,
-      status: campaign.status,
-      sentAt: campaign.sentAt,
-    });
-
     // Calculate tier breakdown
     const tierBreakdown = {
       tier1: emails.filter(e => e.tier === 1).length,
@@ -132,6 +124,14 @@ export async function POST(request: NextRequest) {
     });
 
     console.error(`🔴 [CAMPAIGN SEND] ✓ Campaign created: ${campaign.id}`);
+
+    // Verify campaign was created
+    console.error(`🔴 [CAMPAIGN SEND] Campaign details:`, {
+      id: campaign.id,
+      name: campaign.campaignName,
+      status: campaign.status,
+      sentAt: campaign.sentAt,
+    });
 
     // Send emails and track in database
     console.error(`🔴 [CAMPAIGN SEND] ✓ Starting to send ${emails.length} emails...`);
