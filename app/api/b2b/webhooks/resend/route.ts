@@ -85,27 +85,53 @@ export async function POST(request: NextRequest) {
     }
 
     // Find campaign email by resend message ID (Resend sends it in 'id' field)
-    console.log(`[WEBHOOK] ⟳ Looking for email with resendMessageId: ${data.id}`);
-
-    const campaignEmail = await prisma.b2bCampaignEmail.findUnique({
-      where: { resendMessageId: data.id },
+    console.log(`[WEBHOOK] ⟳ Looking for email with resendMessageId`, {
+      type: typeof data.id,
+      value: data.id,
+      isEmpty: !data.id,
     });
 
-    if (!campaignEmail) {
-      console.warn(`[WEBHOOK] ✗ No match for message ID: ${data.id}, email: ${data.email}`);
-
-      // Debug: Show a sample of what IDs exist
-      const sampleEmails = await prisma.b2bCampaignEmail.findMany({
-        take: 3,
-        select: { id: true, resendMessageId: true, prospectEmail: true },
-        orderBy: { emailSentAt: "desc" },
-      });
-      console.log(`[WEBHOOK] Sample emails in DB:`, sampleEmails);
-
-      return NextResponse.json({ received: true, matched: false });
+    // VALIDATION: Check if we have a valid ID to search for
+    if (!data.id) {
+      console.error(`[WEBHOOK] ✗ CRITICAL: No message ID in webhook data!`);
+      console.error(`[WEBHOOK] Full data object:`, JSON.stringify(data));
+      console.error(`[WEBHOOK] Full parsed body:`, JSON.stringify(parsedBody));
+      return NextResponse.json({ received: true, matched: false, reason: "no_message_id" });
     }
 
-    console.log(`[WEBHOOK] ✓ Matched campaign email: ${campaignEmail.id}, current status: ${campaignEmail.status}`);
+    let campaignEmail;
+    try {
+      campaignEmail = await prisma.b2bCampaignEmail.findUnique({
+        where: { resendMessageId: data.id as string },
+      });
+
+      if (!campaignEmail) {
+        console.warn(`[WEBHOOK] ✗ No match for message ID: ${data.id}, email: ${data.email}`);
+
+        // Debug: Show a sample of what IDs exist
+        const sampleEmails = await prisma.b2bCampaignEmail.findMany({
+          take: 5,
+          select: { id: true, resendMessageId: true, prospectEmail: true, status: true, emailSentAt: true },
+          orderBy: { emailSentAt: "desc" },
+        });
+        console.warn(`[WEBHOOK] Sample ${sampleEmails.length} emails in DB:`, sampleEmails);
+
+        // Also check if there are ANY emails with NULL resendMessageId
+        const nullMessageIds = await prisma.b2bCampaignEmail.count({
+          where: { resendMessageId: null },
+        });
+        if (nullMessageIds > 0) {
+          console.error(`[WEBHOOK] ⚠️  WARNING: Found ${nullMessageIds} emails with NULL resendMessageId!`);
+        }
+
+        return NextResponse.json({ received: true, matched: false, reason: "email_not_found" });
+      }
+
+      console.log(`[WEBHOOK] ✓ Matched campaign email: ${campaignEmail.id}, current status: ${campaignEmail.status}`);
+    } catch (lookupError) {
+      console.error(`[WEBHOOK] ✗ Database lookup failed:`, lookupError);
+      return NextResponse.json({ received: true, matched: false, reason: "lookup_error" });
+    }
 
     // Update status and timestamp based on event type
     const updateData: any = { status: mappedEventType };
@@ -119,18 +145,23 @@ export async function POST(request: NextRequest) {
       updateData.status = "replied";
     }
 
-    const updated = await prisma.b2bCampaignEmail.update({
-      where: { id: campaignEmail.id },
-      data: updateData,
-      select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
-    });
+    try {
+      const updated = await prisma.b2bCampaignEmail.update({
+        where: { id: campaignEmail.id },
+        data: updateData,
+        select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
+      });
 
-    console.log(`[WEBHOOK] ✓✓ Updated ${campaignEmail.id}:`, {
-      newStatus: updated.status,
-      openedAt: updated.openedAt,
-      clickedAt: updated.clickedAt,
-      repliedAt: updated.repliedAt,
-    });
+      console.log(`[WEBHOOK] ✓✓ Updated ${campaignEmail.id}:`, {
+        newStatus: updated.status,
+        openedAt: updated.openedAt,
+        clickedAt: updated.clickedAt,
+        repliedAt: updated.repliedAt,
+      });
+    } catch (updateError) {
+      console.error(`[WEBHOOK] ✗ Database update failed:`, updateError);
+      return NextResponse.json({ received: true, matched: true, reason: "update_failed" });
+    }
 
     return NextResponse.json({
       received: true,

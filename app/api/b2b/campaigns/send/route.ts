@@ -152,11 +152,27 @@ export async function POST(request: NextRequest) {
             console.error(
               `[CAMPAIGN SEND] No message ID returned for ${email.prospectEmail} - Resend may have rejected the email`
             );
+            console.error(`[CAMPAIGN SEND] Full response:`, response);
             failedCount++;
             continue;
           }
 
           const messageId = response.data.id;
+          console.log(`[CAMPAIGN SEND] ◆ CRITICAL: Message ID received`, {
+            type: typeof messageId,
+            value: messageId,
+            length: typeof messageId === 'string' ? messageId.length : 'N/A',
+            isEmpty: messageId === '' || messageId === null || messageId === undefined,
+          });
+
+          // VALIDATION: Ensure messageId is a non-empty string
+          if (typeof messageId !== 'string' || messageId.length === 0) {
+            console.error(`[CAMPAIGN SEND] ✗ INVALID Message ID! Type: ${typeof messageId}, Value: ${messageId}`);
+            console.error(`[CAMPAIGN SEND] Full Resend response:`, JSON.stringify(response));
+            failedCount++;
+            continue;
+          }
+
           console.log(`[CAMPAIGN SEND] ◆ Storing email with resendMessageId: ${messageId}`);
 
           // Log in database with Resend message ID for webhook matching
