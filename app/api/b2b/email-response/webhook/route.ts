@@ -18,26 +18,50 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Log FULL webhook body for debugging (visible in Vercel logs for 1 hour)
-    console.log("[WEBHOOK BODY]", JSON.stringify(body, null, 2));
-    console.log("[WEBHOOK TYPE]", body.type);
-    console.log("[WEBHOOK DATA]", body.data ? JSON.stringify(body.data, null, 2) : "NO DATA FIELD");
+    // Log FULL webhook body for debugging
+    console.log("[WEBHOOK RECEIVED] ◆◆◆ FULL WEBHOOK BODY ◆◆◆");
+    console.log(JSON.stringify(body, null, 2));
+    console.log("[WEBHOOK RECEIVED] ◆◆◆ END BODY ◆◆◆");
+    console.log("[WEBHOOK RECEIVED] Top-level keys:", Object.keys(body));
+    console.log("[WEBHOOK RECEIVED] All values:",
+      Object.entries(body).map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+    );
 
-    // Webhook structure: { created_at, data: { type, id, email, ... } }
+    // Also log headers that might contain message ID
+    console.log("[WEBHOOK RECEIVED] Request headers (relevant):", {
+      "x-svix-id": request.headers.get("x-svix-id"),
+      "x-resend-id": request.headers.get("x-resend-id"),
+      "x-message-id": request.headers.get("x-message-id"),
+      "content-type": request.headers.get("content-type"),
+    });
+
+    // Webhook structure: could be { type, ... } or { data: { type, ... } }
     const data = body.data || body;
 
-    // Extract from data object (Resend/Svix wraps everything in data)
+    // Extract messageId from many possible locations
     const messageId =
       data.id ||
       data.messageId ||
       data.message_id ||
+      data.email_id ||
       body.id ||
       body.messageId ||
+      body.message_id ||
+      body.email_id ||
+      body.messageId ||
       request.headers.get("x-svix-id") ||
-      request.headers.get("x-resend-id");
+      request.headers.get("x-resend-id") ||
+      request.headers.get("x-message-id");
 
+    // Extract event type
     const eventType = data.type || body.type;
-    const email = data.email || body.email;
+
+    // Extract email from many possible locations
+    const email =
+      data.email ||
+      data.recipient ||
+      body.email ||
+      body.recipient;
     const timestamp = new Date(data.created_at || body.created_at || new Date().toISOString());
 
     console.log("[WEBHOOK HANDLER] ◆ Event received:", {
@@ -52,14 +76,40 @@ export async function POST(request: NextRequest) {
       console.log("[WEBHOOK HANDLER] Webhook structure - data.* keys:", Object.keys(body.data));
     }
 
-    if (!eventType || !messageId) {
-      console.warn("[WEBHOOK HANDLER] ✗ Missing required fields", {
-        hasType: !!eventType,
-        hasMessageId: !!messageId,
+    if (!eventType) {
+      console.warn("[WEBHOOK HANDLER] ✗ Missing event type (critical)", {
         bodyKeys: Object.keys(body),
         dataKeys: body.data ? Object.keys(body.data) : [],
       });
-      return NextResponse.json({ received: true, reason: "missing_fields" });
+      return NextResponse.json({ received: true, reason: "missing_event_type" });
+    }
+
+    if (!messageId) {
+      console.warn("[WEBHOOK HANDLER] ⚠️  Missing messageId - will attempt email-based matching", {
+        email,
+        eventType,
+        bodyKeys: Object.keys(body),
+      });
+    }
+
+    if (!email) {
+      console.warn("[WEBHOOK HANDLER] ⚠️  Missing email address", {
+        messageId: messageId ? `${messageId.substring(0, 20)}...` : null,
+        eventType,
+      });
+    }
+
+    // If we have neither messageId nor email, we can't match at all
+    if (!messageId && !email) {
+      console.error("[WEBHOOK HANDLER] ✗ Cannot match - missing both messageId and email", {
+        eventType,
+        bodyKeys: Object.keys(body),
+      });
+      return NextResponse.json({
+        received: true,
+        reason: "cannot_match_no_id_or_email",
+        note: "Webhook has no messageId or email field to match against",
+      });
     }
 
     // Map Resend event types to our status values
