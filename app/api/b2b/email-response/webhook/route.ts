@@ -20,26 +20,33 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.error("🔴🔴🔴 [WEBHOOK HANDLER] FULL BODY:", JSON.stringify(body, null, 2));
-    console.error("🔴 [WEBHOOK HANDLER] BODY KEYS:", Object.keys(body));
+    // Try to find message ID in multiple possible locations (Resend/Svix format variations)
+    const messageId =
+      body.id ||
+      body.messageId ||
+      body.message_id ||
+      body.data?.id ||
+      body.data?.messageId ||
+      body.data?.message_id ||
+      body.message?.id;
+
+    const eventType = body.type;
+    const email = body.email || body.data?.email;
+    const timestamp = new Date(body.created_at || body.data?.created_at || new Date().toISOString());
 
     console.log("[WEBHOOK HANDLER] ◆ Event received:", {
-      type: body.type,
-      messageId: body.id || body.message?.id,
-      email: body.email,
-      timestamp: body.created_at,
+      type: eventType,
+      messageId,
+      email,
+      timestamp: timestamp.toISOString(),
     });
-
-    // Parse the webhook
-    const eventType = body.type;
-    const messageId = body.id || body.message?.id;
-    const email = body.email;
-    const timestamp = new Date(body.created_at || new Date().toISOString());
 
     if (!eventType || !messageId) {
       console.warn("[WEBHOOK HANDLER] ✗ Missing required fields", {
         hasType: !!eventType,
         hasMessageId: !!messageId,
+        bodyKeys: Object.keys(body),
+        dataKeys: body.data ? Object.keys(body.data) : [],
       });
       return NextResponse.json({ received: true, reason: "missing_fields" });
     }
