@@ -102,6 +102,14 @@ export async function POST(request: NextRequest) {
       `🔴 [CAMPAIGN SEND] ✓ Valid request: ${campaignName} | ${channel} | ${emails.length} emails`
     );
 
+    // Verify campaign was created
+    console.error(`🔴 [CAMPAIGN SEND] Campaign created:`, {
+      id: campaign.id,
+      name: campaign.campaignName,
+      status: campaign.status,
+      sentAt: campaign.sentAt,
+    });
+
     // Calculate tier breakdown
     const tierBreakdown = {
       tier1: emails.filter(e => e.tier === 1).length,
@@ -267,6 +275,21 @@ export async function POST(request: NextRequest) {
       `🔴 [CAMPAIGN SEND] ✓✓ COMPLETE: ${sentCount} sent, ${failedCount} failed`
     );
 
+    // Verify emails were actually created in database
+    const emailsInDb = await prisma.b2bCampaignEmail.findMany({
+      where: { campaignId: campaign.id },
+      select: { id: true, prospectEmail: true, status: true },
+    });
+
+    console.error(`🔴 [CAMPAIGN SEND] Verification: Found ${emailsInDb.length} emails in database for campaign ${campaign.id}`);
+    if (emailsInDb.length > 0) {
+      const statusBreakdown: Record<string, number> = {};
+      emailsInDb.forEach(e => {
+        statusBreakdown[e.status] = (statusBreakdown[e.status] || 0) + 1;
+      });
+      console.error(`🔴 [CAMPAIGN SEND] Email status breakdown:`, statusBreakdown);
+    }
+
     console.error(`🔴 [CAMPAIGN SEND] Returning success response with campaignId: ${campaign.id}`);
     return NextResponse.json({
       success: true,
@@ -274,6 +297,7 @@ export async function POST(request: NextRequest) {
       sentCount,
       failedCount,
       totalLeads: emails.length,
+      emailsCreated: emailsInDb.length,
       tierBreakdown,
     });
   } catch (error) {
