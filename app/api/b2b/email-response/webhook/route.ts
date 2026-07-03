@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    console.error("🔴🔴🔴 [WEBHOOK HANDLER] FULL BODY:", JSON.stringify(body, null, 2));
+    console.error("🔴 [WEBHOOK HANDLER] BODY KEYS:", Object.keys(body));
+
     console.log("[WEBHOOK HANDLER] ◆ Event received:", {
       type: body.type,
       messageId: body.id || body.message?.id,
