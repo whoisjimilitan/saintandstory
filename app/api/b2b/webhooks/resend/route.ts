@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const data = parsedBody.data || {};
 
     console.log(`[WEBHOOK] Resend event: ${eventType}`, {
-      messageId: data.email_id,
+      messageId: data.id,
       email: data.email,
     });
 
@@ -79,13 +79,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    // Find campaign email by resend message ID
+    // Find campaign email by resend message ID (Resend sends it in 'id' field)
     const campaignEmail = await prisma.b2bCampaignEmail.findUnique({
-      where: { resendMessageId: data.email_id },
+      where: { resendMessageId: data.id },
     });
 
     if (!campaignEmail) {
-      console.warn(`[WEBHOOK] No campaign email found for message ID: ${data.email_id}, email: ${data.email}`);
+      console.warn(`[WEBHOOK] No campaign email found for message ID: ${data.id}, email: ${data.email}`);
       return NextResponse.json({ received: true, matched: false });
     }
 
