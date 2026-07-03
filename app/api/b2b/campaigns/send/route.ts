@@ -172,23 +172,23 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          const messageId = response.data.id;
-          console.log(`[CAMPAIGN SEND] ◆ CRITICAL: Message ID received`, {
-            type: typeof messageId,
-            value: messageId,
-            length: typeof messageId === 'string' ? messageId.length : 'N/A',
-            isEmpty: messageId === '' || messageId === null || messageId === undefined,
+          // Resend returns email_id as response.data.id - this is what we store for webhook matching
+          const emailId = response.data.id;
+          console.log(`[CAMPAIGN SEND] ◆ Resend response:`, {
+            emailId,
+            type: typeof emailId,
+            isEmpty: !emailId,
           });
 
-          // VALIDATION: Ensure messageId is a non-empty string
-          if (typeof messageId !== 'string' || messageId.length === 0) {
-            console.error(`[CAMPAIGN SEND] ✗ INVALID Message ID! Type: ${typeof messageId}, Value: ${messageId}`);
+          // VALIDATION: Ensure emailId is a non-empty string
+          if (typeof emailId !== 'string' || emailId.length === 0) {
+            console.error(`[CAMPAIGN SEND] ✗ INVALID Email ID! Type: ${typeof emailId}, Value: ${emailId}`);
             console.error(`[CAMPAIGN SEND] Full Resend response:`, JSON.stringify(response));
             failedCount++;
             continue;
           }
 
-          console.log(`[CAMPAIGN SEND] ◆ Storing email with resendMessageId: ${messageId}`);
+          console.log(`[CAMPAIGN SEND] ◆ Storing email with resendMessageId: ${emailId}`);
 
           // Store in database with Resend message ID for webhook matching
           let stored;
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
                 category: email.category,
                 subject: email.subject,
                 body: email.body,
-                resendMessageId: messageId,
+                resendMessageId: emailId,
                 status: "sent",
                 emailSentAt: new Date(),
               },

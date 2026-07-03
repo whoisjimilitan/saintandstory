@@ -35,29 +35,19 @@ export async function POST(request: NextRequest) {
       "content-type": request.headers.get("content-type"),
     });
 
-    // Webhook structure: could be { type, ... } or { data: { type, ... } }
+    // Webhook structure: { type, data: { type, email_id, to: [...], ... } }
     const data = body.data || body;
 
-    // Extract messageId from many possible locations
-    const messageId =
-      data.id ||
-      data.messageId ||
-      data.message_id ||
-      data.email_id ||
-      body.id ||
-      body.messageId ||
-      body.message_id ||
-      body.email_id ||
-      body.messageId ||
-      request.headers.get("x-svix-id") ||
-      request.headers.get("x-resend-id") ||
-      request.headers.get("x-message-id");
+    // Extract Resend email_id (this matches what we stored in resendMessageId)
+    const messageId = data.email_id || data.id || data.messageId || data.message_id;
 
     // Extract event type
     const eventType = data.type || body.type;
 
-    // Extract email from many possible locations
+    // Extract email address from webhook
+    // Resend sends 'to' as array of recipients, we need the first one
     const email =
+      (Array.isArray(data.to) && data.to.length > 0 ? data.to[0] : null) ||
       data.email ||
       data.recipient ||
       body.email ||
