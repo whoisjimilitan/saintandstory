@@ -1421,3 +1421,47 @@ enum ObservationSource {
   conversation
   outcome
 }
+
+model OpportunityFeed {
+  id                    String   @id @default(cuid())
+
+  // CSV Input
+  companyName           String
+  website               String?
+  contactName           String?
+  contactEmail          String?
+  sourcePlatform        String
+  sourceUrl             String?
+  postedDate            DateTime
+  originalWording       String   @db.Text
+  confidence            Int
+
+  // Extracted
+  extractedNeed         String?  @db.Text
+  extractedUrgency      String?
+  extractedContext      String?  @db.Text
+  extractedQuote        String?  @db.Text
+
+  // Generated
+  briefHtml             String?  @db.Text
+  emailSubject          String?
+  emailBody             String?  @db.Text
+
+  // Status
+  status                String   @default("imported")
+
+  // Tracking
+  sentAt                DateTime?
+  openedAt              DateTime?
+  clickedAt             DateTime?
+  repliedAt             DateTime?
+  replyContent          String?  @db.Text
+
+  // Timestamps
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("opportunity_feed")
+}
