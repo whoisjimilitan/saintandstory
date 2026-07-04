@@ -14,10 +14,16 @@ interface Opportunity {
   status: string;
 }
 
-const urgencyColors: Record<string, string> = {
-  High: "bg-[#FFEBEE] text-[#C62828]",
-  Medium: "bg-[#FFF3E0] text-[#E65100]",
-  Low: "bg-[#F1F5FE] text-[#1565C0]",
+const urgencyBg: Record<string, string> = {
+  High: "bg-[#FFEBEE]",
+  Medium: "bg-[#FFF3E0]",
+  Low: "bg-[#F1F5FE]",
+};
+
+const urgencyText: Record<string, string> = {
+  High: "text-[#C62828]",
+  Medium: "text-[#E65100]",
+  Low: "text-[#1565C0]",
 };
 
 export default function OpportunityFeedPage() {
@@ -26,6 +32,23 @@ export default function OpportunityFeedPage() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [sending, setSending] = useState<string | null>(null);
   const [sendingAll, setSendingAll] = useState(false);
+
+  useEffect(() => {
+    // Load opportunities on mount
+    loadQueue();
+  }, []);
+
+  const loadQueue = async () => {
+    try {
+      const response = await fetch("/api/operator/opportunity-feed/queue");
+      const data = await response.json();
+      if (data.success) {
+        setOpportunities(data.opportunities.filter((o: any) => o.status === "queued"));
+      }
+    } catch (error) {
+      console.error("Failed to load queue:", error);
+    }
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -71,12 +94,9 @@ export default function OpportunityFeedPage() {
       const generateData = await generateRes.json();
       if (!generateData.success) throw new Error(generateData.error);
 
-      // Fetch and display queue
-      const finalQueueRes = await fetch("/api/operator/opportunity-feed/queue");
-      const finalQueueData = await finalQueueRes.json();
-      setOpportunities(
-        finalQueueData.opportunities.filter((o: any) => o.status === "queued")
-      );
+      // Reload queue
+      await loadQueue();
+      setFile(null);
     } catch (error) {
       alert(`Error: ${error instanceof Error ? error.message : "Unknown"}`);
     } finally {
@@ -119,6 +139,7 @@ export default function OpportunityFeedPage() {
       const data = await response.json();
       if (data.success) {
         setOpportunities([]);
+        setFile(null);
       } else {
         alert(`Failed: ${data.error}`);
       }
@@ -130,108 +151,107 @@ export default function OpportunityFeedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-20 pb-20">
-      <div className="px-4 md:px-12 max-w-5xl">
-        {/* Upload Section - Prominent, Minimal */}
-        <div className="mb-16">
-          <label className="block cursor-pointer">
-            <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-12 text-center hover:border-[#0D0D0D] transition-colors">
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleUpload}
-                disabled={uploading}
-                className="hidden"
-              />
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-1">
-                {file ? file.name : "Select CSV"}
-              </p>
-              <p className="text-xs text-[#888888]">
-                {uploading ? "Processing..." : "Click to choose or drag and drop"}
-              </p>
-            </div>
-          </label>
-        </div>
-
-        {/* Queue - All Actionable */}
-        {opportunities.length > 0 && (
-          <div>
-            {/* Queue Header with Send All */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-lg font-bold text-[#0D0D0D]">
-                  {opportunities.length} ready to send
-                </p>
-              </div>
-              <button
-                onClick={handleSendAll}
-                disabled={sendingAll}
-                className="px-6 py-2.5 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors disabled:opacity-50"
-              >
-                {sendingAll ? "Sending all..." : "Send all"}
-              </button>
-            </div>
-
-            {/* Opportunity Cards - Each is an Action */}
-            <div className="space-y-2">
-              {opportunities.map((opp) => (
-                <div
-                  key={opp.id}
-                  className="border border-[#E8E8E8] rounded-lg p-4 hover:border-[#0D0D0D] transition-colors flex items-center justify-between gap-4"
-                >
-                  {/* Left: Company Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <p className="text-sm font-semibold text-[#0D0D0D] truncate">
-                        {opp.companyName}
-                      </p>
-                      <span
-                        className={`px-2 py-1 rounded text-[10px] font-semibold whitespace-nowrap ${
-                          urgencyColors[opp.extractedUrgency] || urgencyColors.Medium
-                        }`}
-                      >
-                        {opp.extractedUrgency}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#666666] mb-1 truncate">
-                      {opp.extractedNeed}
-                    </p>
-                    <p className="text-[10px] text-[#888888]">
-                      {opp.extractedContext}
-                    </p>
-                  </div>
-
-                  {/* Right: Actions */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <a
-                      href={`/api/operator/opportunity-feed/brief/${opp.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:border-[#0D0D0D] transition-colors"
-                    >
-                      Brief
-                    </a>
-                    <button
-                      onClick={() => handleSend(opp.id)}
-                      disabled={sending === opp.id}
-                      className="px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors disabled:opacity-50"
-                    >
-                      {sending === opp.id ? "Sending..." : "Send"}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+    <div className="min-h-screen">
+      {/* Upload Section - Always Visible */}
+      <div className="mb-12">
+        <p className="text-lg font-bold text-[#0D0D0D] mb-4">Upload CSV</p>
+        <label className="block cursor-pointer">
+          <div className="border-2 border-dashed border-[#E8E8E8] rounded-lg p-8 text-center hover:border-[#0D0D0D] transition-colors">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleUpload}
+              disabled={uploading}
+              className="hidden"
+            />
+            <p className="text-sm font-semibold text-[#0D0D0D]">
+              {file ? file.name : "Choose CSV file"}
+            </p>
+            <p className="text-xs text-[#888888] mt-1">
+              {uploading ? "Processing..." : "Click to select"}
+            </p>
           </div>
-        )}
-
-        {/* Empty State */}
-        {!uploading && opportunities.length === 0 && file && (
-          <div className="text-center py-12 border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
-            <p className="text-sm text-[#888888]">No opportunities to send</p>
-          </div>
-        )}
+        </label>
       </div>
+
+      {/* Queue Section */}
+      {opportunities.length > 0 && (
+        <div>
+          {/* Header with Send All */}
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E8E8E8]">
+            <p className="text-lg font-bold text-[#0D0D0D]">
+              {opportunities.length} ready
+            </p>
+            <button
+              onClick={handleSendAll}
+              disabled={sendingAll}
+              className="px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors disabled:opacity-50"
+            >
+              {sendingAll ? "Sending..." : "Send all"}
+            </button>
+          </div>
+
+          {/* Opportunities Grid */}
+          <div className="space-y-3">
+            {opportunities.map((opp) => (
+              <div
+                key={opp.id}
+                className="border border-[#E8E8E8] rounded-lg p-4 hover:border-[#0D0D0D] transition-colors"
+              >
+                {/* Top Row: Company + Urgency */}
+                <div className="flex items-start justify-between mb-2">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {opp.companyName}
+                  </p>
+                  <span
+                    className={`px-2.5 py-1 rounded text-[10px] font-semibold whitespace-nowrap ${
+                      urgencyBg[opp.extractedUrgency] || urgencyBg.Medium
+                    } ${urgencyText[opp.extractedUrgency] || urgencyText.Medium}`}
+                  >
+                    {opp.extractedUrgency}
+                  </span>
+                </div>
+
+                {/* Need */}
+                <p className="text-xs text-[#666666] mb-2">
+                  {opp.extractedNeed}
+                </p>
+
+                {/* Context */}
+                <p className="text-[10px] text-[#888888] mb-3">
+                  {opp.extractedContext}
+                </p>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/api/operator/opportunity-feed/brief/${opp.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-xs font-semibold rounded hover:border-[#0D0D0D] transition-colors"
+                  >
+                    Brief
+                  </a>
+                  <button
+                    onClick={() => handleSend(opp.id)}
+                    disabled={sending === opp.id}
+                    className="px-3 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded hover:bg-[#333333] transition-colors disabled:opacity-50 ml-auto"
+                  >
+                    {sending === opp.id ? "Sending..." : "Send"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!uploading && opportunities.length === 0 && !file && (
+        <div className="text-center py-12 text-[#888888]">
+          <p className="text-sm">No opportunities waiting</p>
+        </div>
+      )}
     </div>
   );
 }

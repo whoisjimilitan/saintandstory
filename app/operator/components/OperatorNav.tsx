@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const stages = [
   { name: "Today", href: "/operator", desc: "Command center" },
+  { name: "Feed", href: "/operator/opportunity-feed", desc: "Opportunity feed" },
   { name: "Discover", href: "/operator/discover", desc: "Upload leads" },
   { name: "Reach", href: "/operator/reach", desc: "Send campaigns" },
   { name: "Responses", href: "/operator/responses", desc: "Monitor replies" },
