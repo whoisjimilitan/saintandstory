@@ -87,16 +87,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create campaign record for tracking
-    const campaignId = `campaign_${Date.now()}`;
+    // Create campaign record in database
+    const campaign = await prisma.b2bCampaign.create({
+      data: {
+        channel: "whatsapp",
+        campaignName: campaignName || `WhatsApp Campaign ${new Date().toISOString()}`,
+        totalLeads: leadsWithPhone.length,
+        status: "sent",
+        sentAt: new Date(),
+      },
+    });
 
-    // Queue messages - send with rate limiting (1 per second = 60/min)
+    const campaignId = campaign.id;
+
+    // Create WhatsApp campaign records for tracking
     let successCount = 0;
     let errorCount = 0;
 
     for (let i = 0; i < leadsWithPhone.length; i++) {
       const lead = leadsWithPhone[i];
       const delay = i * 1000; // 1 second delay between messages
+
+      // Create WhatsApp message record for tracking
+      await prisma.b2bCampaignWhatsApp.create({
+        data: {
+          campaignId: campaign.id,
+          prospectId: lead.id,
+          phoneNumber: lead.phone!,
+          prospectName: lead.businessName,
+          firstMessage: message,
+          status: "pending",
+        },
+      });
 
       // Send async (non-blocking)
       setTimeout(async () => {
@@ -124,8 +146,21 @@ export async function POST(request: NextRequest) {
             }
           );
 
+          const sendData = await res.json();
+
           if (res.ok) {
             successCount++;
+            // Update message status to sent
+            await prisma.b2bCampaignWhatsApp.updateMany({
+              where: {
+                campaignId: campaign.id,
+                prospectId: lead.id,
+              },
+              data: {
+                status: "sent",
+                sentAt: new Date(),
+              },
+            });
             console.log(
               `[WHATSAPP CAMPAIGN] ✓ Sent to ${lead.businessName} (${i + 1}/${leadsWithPhone.length})`
             );
