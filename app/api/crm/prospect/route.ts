@@ -56,6 +56,21 @@ export async function GET(request: NextRequest) {
       ORDER BY o.sent_at DESC
     `;
 
+    // Get all conversation events (emails + whatsapp)
+    const conversationEvents = await sql`
+      SELECT
+        type,
+        direction,
+        subject,
+        body,
+        metadata,
+        created_at
+      FROM b2b_conversation_events
+      WHERE lead_id = ${prospectId}
+      ORDER BY created_at DESC
+      LIMIT 100
+    `;
+
     // Get all events/interactions
     const events = await sql`
       SELECT
@@ -121,6 +136,18 @@ export async function GET(request: NextRequest) {
         totalSent: emails.length,
         totalOpens: emails.reduce((sum: number, e: any) => sum + (Number(e.opens) || 0), 0),
         totalClicks: emails.reduce((sum: number, e: any) => sum + (Number(e.clicks) || 0), 0),
+      },
+      conversationEvents: conversationEvents.map((e: any) => ({
+        type: e.type,
+        direction: e.direction,
+        subject: e.subject,
+        body: e.body,
+        metadata: e.metadata,
+        createdAt: e.created_at,
+      })),
+      whatsappSummary: {
+        totalMessages: conversationEvents.filter((e: any) => e.type === 'whatsapp').length,
+        inboundReplies: conversationEvents.filter((e: any) => e.type === 'whatsapp' && e.direction === 'inbound').length,
       },
       events: events.map((e: any) => ({
         type: e.event_type,

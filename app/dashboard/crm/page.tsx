@@ -285,39 +285,41 @@ export default function CRMPage() {
                   <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
                     Engagement
                   </p>
-                  <div className="grid grid-cols-3 gap-12 pb-12 border-b border-[#E8E8E8]">
+                  <div className="grid grid-cols-2 gap-12 pb-12 border-b border-[#E8E8E8]">
                     <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Emails sent</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">
-                        {selectedProspect.emailsSummary.totalSent}
-                      </p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Emails</p>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-black text-[#0D0D0D]">{selectedProspect.emailsSummary.totalSent}</p>
+                        <p className="text-xs text-[#CCCCCC]">{selectedProspect.emailsSummary.totalOpens} opens • {selectedProspect.emailsSummary.totalClicks} clicks</p>
+                      </div>
                     </div>
                     <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total opens</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">
-                        {selectedProspect.emailsSummary.totalOpens}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total clicks</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">
-                        {selectedProspect.emailsSummary.totalClicks}
-                      </p>
+                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">WhatsApp</p>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-black text-[#0D0D0D]">{selectedProspect.whatsappSummary?.totalMessages || 0}</p>
+                        <p className="text-xs text-[#CCCCCC]">{selectedProspect.whatsappSummary?.inboundReplies || 0} replies</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Communication History */}
-                {selectedProspect.emails.length > 0 && (
+                {/* Communication History - All Channels */}
+                {selectedProspect.emails.length > 0 || (selectedProspect.conversationEvents && selectedProspect.conversationEvents.length > 0) ? (
                   <div>
                     <p className="text-xs font-semibold text-[#0D0D0D] tracking-[0.05em] uppercase mb-6">
                       Communication history
                     </p>
                     <div className="space-y-6">
+                      {/* Email Communications */}
                       {selectedProspect.emails.map((email) => (
                         <div key={email.id} className="pb-6 border-b border-[#E8E8E8] last:border-0">
                           <div className="flex items-start justify-between gap-3 mb-2">
-                            <p className="font-semibold text-sm text-[#0D0D0D] flex-1">{email.subject}</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] px-2 py-0.5 bg-[#E8E8E8] text-[#0D0D0D] rounded font-semibold">EMAIL</span>
+                                <p className="font-semibold text-sm text-[#0D0D0D]">{email.subject}</p>
+                              </div>
+                            </div>
                             <span className="text-[10px] px-2.5 py-1 bg-[#E8E8E8] text-[#0D0D0D] rounded-full font-semibold whitespace-nowrap">
                               {email.status}
                             </span>
@@ -332,11 +334,29 @@ export default function CRMPage() {
                           </div>
                         </div>
                       ))}
+
+                      {/* WhatsApp Communications */}
+                      {selectedProspect.conversationEvents && selectedProspect.conversationEvents.map((event: any, idx: number) => (
+                        event.type === 'whatsapp' && (
+                          <div key={idx} className="pb-6 border-b border-[#E8E8E8] last:border-0">
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-[10px] px-2 py-0.5 bg-[#0D0D0D] text-white rounded font-semibold">WHATSAPP</span>
+                                  <span className="text-[10px] text-[#888888]">{event.direction === 'inbound' ? 'Received' : 'Sent'}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-xs text-[#666666] mb-2 italic max-w-xl">"{event.body?.substring(0, 100)}..."</p>
+                            <p className="text-xs text-[#888888]">
+                              {new Date(event.createdAt).toLocaleDateString()} at {new Date(event.createdAt).toLocaleTimeString()}
+                            </p>
+                          </div>
+                        )
+                      ))}
                     </div>
                   </div>
-                )}
-
-                {selectedProspect.emails.length === 0 && (
+                ) : (
                   <div className="text-center py-12 text-[#888888]">
                     <p className="text-sm">No communication history yet</p>
                   </div>
