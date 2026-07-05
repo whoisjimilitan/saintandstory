@@ -56,6 +56,7 @@ export default function TodayPage() {
     postcode_to: "",
     price: "100",
   });
+  const [searchProspect, setSearchProspect] = useState("");
 
   useEffect(() => {
     const loadTodayData = async () => {
@@ -231,7 +232,36 @@ export default function TodayPage() {
               )}
             </div>
 
-            {/* QUICK NAVIGATION - Reordered: Feed first, Email campaigns third */}
+            {/* FIND PROSPECT - Quick search to CRM */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Find Prospect</p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchProspect.length >= 2) {
+                    router.push(`/dashboard/crm?search=${encodeURIComponent(searchProspect)}`);
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  placeholder="Search by name, email, phone, or city..."
+                  value={searchProspect}
+                  onChange={(e) => setSearchProspect(e.target.value)}
+                  className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none transition-colors placeholder-[#CCCCCC]"
+                />
+                <button
+                  type="submit"
+                  disabled={searchProspect.length < 2}
+                  className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+
+            {/* QUICK NAVIGATION - All channels + Database */}
             <div>
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Next Step</p>
 
@@ -245,27 +275,27 @@ export default function TodayPage() {
                 </Link>
 
                 <Link
-                  href="/operator/enrich"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
-                >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Enrich</p>
-                  <p className="text-xs text-[#888888]">Personalize</p>
-                </Link>
-
-                <Link
                   href="/operator/reach"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Email Campaign</p>
-                  <p className="text-xs text-[#888888]">Campaign metrics</p>
+                  <p className="text-xs text-[#888888]">Send & track</p>
                 </Link>
 
                 <Link
                   href="/operator/responses"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
-                  <p className="text-xs text-[#888888]">Incoming replies</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">All Responses</p>
+                  <p className="text-xs text-[#888888]">All replies</p>
+                </Link>
+
+                <Link
+                  href="/dashboard/crm"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
+                >
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">CRM Database</p>
+                  <p className="text-xs text-[#888888]">View all history</p>
                 </Link>
               </div>
             </div>
