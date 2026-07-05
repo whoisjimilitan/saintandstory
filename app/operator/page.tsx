@@ -61,21 +61,23 @@ export default function TodayPage() {
     const loadTodayData = async () => {
       try {
         // Fetch all operation status and pipeline data
-        const [campaignRes, opportunitiesRes, driverRes, phoneRes] = await Promise.all([
+        const [campaignRes, opportunitiesRes, driverRes, phoneRes, whatsappRes] = await Promise.all([
           fetch("/api/operator/today-campaign-stats"),
           fetch("/api/operator/opportunities-waiting"),
           fetch("/api/operator/today-driver-stats"),
           fetch("/api/operator/today-phone-stats"),
+          fetch("/api/operator/today-whatsapp-stats"),
         ]);
 
         const campaign = campaignRes.ok ? await campaignRes.json() : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
         const opportunities = opportunitiesRes.ok ? await opportunitiesRes.json() : { count: 0 };
         const driverData = driverRes.ok ? await driverRes.json() : { available: 0, revenue: "£0" };
         const phoneData = phoneRes.ok ? await phoneRes.json() : { count: 0 };
+        const whatsappData = whatsappRes.ok ? await whatsappRes.json() : { active: 0, replied: 0 };
 
         setData({
           operation: {
-            whatsapp: { active: 12, replied: 3 }, // TODO: Wire WhatsApp API
+            whatsapp: { active: whatsappData.active || 0, replied: whatsappData.replied || 0 },
             email: campaign.stats || { sent: 0, opened: 0, clicked: 0, replied: 0 },
             phone: { readyToCall: phoneData.count || 0 },
             drivers: { available: driverData.available || 0, revenue: driverData.revenue || "£0" },
