@@ -6,40 +6,81 @@ interface EmailInput {
 }
 
 /**
- * Generate 5-sentence Opportunity Feed email.
+ * Generate email using exact template from user.
  *
- * Structure (LOCKED):
- * 1. "A little birdie pointed me toward..." (acknowledgement of public statement)
- * 2. "I went ahead and prepared..." (action taken)
- * 3. "Hopefully it saves you a little thinking..." (inverse incentive)
- * 4. "If you'd like us to turn it into..." (clear CTA)
- * 5. "James" (personal signature)
+ * Template (LOCKED):
+ * Hi [NAME],
+ * A little birdie told me about [SPECIFIC PROBLEM].
+ * Went ahead and made you a [DELIVERABLE TYPE]: [LINK]
+ * [ONE PUNCHY LINE about driver availability / capability for their specific need]
+ * Want me to build the full version? If not, keep this one.
+ * [YOUR NAME]
  *
- * Each email is unique based on extracted need.
- * No marketing language. Authentic. Direct.
+ * Dynamic content:
+ * - Name: from contact
+ * - Problem: from extracted need
+ * - Deliverable type: specific to their need (Same-Day Courier Brief, etc.)
+ * - Link: to their brief
+ * - Punchy line: generated based on their specific situation
  */
 export function generateOpportunityEmail(input: EmailInput): {
   subject: string;
   body: string;
 } {
   const contactName = input.contactName || "there";
-  const need = input.extractedNeed || "reliable delivery support";
+  const need = (input.extractedNeed || "reliable delivery support").toLowerCase();
 
-  // Subject: Company-specific, acknowledging the need
-  const subject = `Re: Your need for ${need}`;
+  // Determine deliverable type based on need
+  let deliverableType = "Courier Readiness Brief";
+  if (need.includes("dedicated")) deliverableType = "Dedicated Driver Proposal";
+  else if (need.includes("regular") || need.includes("collection")) deliverableType = "Regular Collections Brief";
+  else if (need.includes("medical")) deliverableType = "Medical Logistics Brief";
+  else if (need.includes("legal") || need.includes("document")) deliverableType = "Legal Courier Brief";
 
-  // 5-sentence body (LOCKED structure, dynamic content)
+  // Generate punchy line about driver availability specific to their need
+  const punchyLine = generatePunchyLine(need);
+
+  // Subject: Simple, company-specific
+  const subject = `${input.companyName} – Driver Availability`;
+
+  // Email body (EXACT template structure)
   const body = `Hi ${contactName},
 
-A little birdie pointed me toward your need for ${need}.
+A little birdie told me about your need for ${need}.
 
-I went ahead and prepared a Courier Readiness Brief based on what you described.
+Went ahead and made you a ${deliverableType}: ${input.briefUrl}
 
-Hopefully it saves you a little thinking whether you use us or not.
+${punchyLine}
 
-If you'd like us to turn it into a working delivery setup, just reply.
+Want me to build the full version? If not, keep this one.
 
 James`;
 
   return { subject, body };
+}
+
+function generatePunchyLine(need: string): string {
+  const needLower = need.toLowerCase();
+
+  if (needLower.includes("deadline") || needLower.includes("legal") || needLower.includes("document")) {
+    return "We have drivers ready to handle time-critical deliveries without the stress.";
+  }
+
+  if (needLower.includes("same-day") || needLower.includes("urgent")) {
+    return "We have drivers on standby who specialise in urgent, same-day operations.";
+  }
+
+  if (needLower.includes("regular") || needLower.includes("collection")) {
+    return "We have drivers who can handle your regular collections on a recurring basis.";
+  }
+
+  if (needLower.includes("dedicated")) {
+    return "We have dedicated drivers available to become part of your operations.";
+  }
+
+  if (needLower.includes("medical") || needLower.includes("pharmacy")) {
+    return "We have drivers trained for medical and pharmacy deliveries with proper handling.";
+  }
+
+  return "We have drivers ready to solve your specific logistics challenge.";
 }
