@@ -234,7 +234,7 @@ export default function TodayPage() {
 
             {/* FIND PROSPECT - Quick search to CRM */}
             <div className="mb-16">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Find Prospect</p>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Search</p>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
