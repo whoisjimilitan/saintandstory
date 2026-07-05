@@ -57,6 +57,7 @@ export default function EnrichPage() {
   const [sending, setSending] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
+  const [channel, setChannel] = useState<"email" | "whatsapp" | "feed">("email");
 
   // Email editing state
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -99,11 +100,12 @@ export default function EnrichPage() {
 
     try {
       const data = JSON.parse(prospectData) as Prospect[];
-      const channel = sessionStorage.getItem("enrich_channel") || "email";
+      const selectedChannel = (sessionStorage.getItem("enrich_channel") || "email") as "email" | "whatsapp" | "feed";
       setProspects(data);
+      setChannel(selectedChannel);
 
       // Feed channel: emails already generated, skip generation
-      if (channel === "feed" && data.length > 0 && (data[0] as any).emailBody) {
+      if (selectedChannel === "feed" && data.length > 0 && (data[0] as any).emailBody) {
         const feedEmails = data.map((p: any) => ({
           prospectId: p.id,
           prospectName: p.contactName || p.businessName,
@@ -220,35 +222,58 @@ export default function EnrichPage() {
   const confirmSend = async () => {
     setSending(true);
     try {
-      console.log("[ENRICH] Sending campaign:", campaignName);
+      console.log("[ENRICH] Sending campaign:", campaignName, "Channel:", channel);
 
-      // Build emails payload with full metadata for campaign tracking
-      const emailsToSend = generatedEmails.map(email => {
+      // Build payload with full metadata for campaign tracking
+      const payloadData = generatedEmails.map(email => {
         const prospect = prospects.find(p => p.id === email.prospectId);
         return {
-          // Note: prospectId is optional in the database, skip it to avoid UUID validation errors
           prospectName: prospect?.contactName || email.prospectName || "[Name]",
           prospectEmail: email.email,
+          phoneNumber: (prospect as any)?.phone,
           subject: email.subject,
           body: email.body,
-          tier: email.characterMeta?.tier || 1,
-          category: email.characterMeta?.category || "Business",
+          tier: (email as any).characterMeta?.tier || 1,
+          category: (email as any).characterMeta?.category || "Business",
         };
       });
 
-      console.log("[ENRICH] Campaign:", { campaignName, emails: emailsToSend.length });
+      console.log("[ENRICH] Campaign:", { campaignName, channel, count: payloadData.length });
 
-      // Call new campaigns endpoint that saves to DB + sends emails
-      const res = await fetch("/api/b2b/campaigns/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // CRITICAL: Include auth cookies
-        body: JSON.stringify({
-          campaignName: campaignName,
-          channel: "email", // TODO: pull from DISCOVER selection
-          emails: emailsToSend,
-        }),
-      });
+      // Route based on channel
+      let res;
+      if (channel === "whatsapp") {
+        // WhatsApp: use dedicated send-campaign endpoint
+        const leadIds = generatedEmails
+          .map(e => prospects.find(p => p.id === e.prospectId))
+          .filter(p => (p as any).phone)
+          .map(p => p.id);
+
+        res = await fetch("/api/whatsapp/send-campaign", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-email": user?.emailAddresses[0]?.emailAddress || "",
+          },
+          body: JSON.stringify({
+            leadIds,
+            message: generatedEmails[0]?.body || "Hello",
+            campaignName: campaignName,
+          }),
+        });
+      } else {
+        // Email & Feed: use unified campaigns endpoint
+        res = await fetch("/api/b2b/campaigns/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            campaignName: campaignName,
+            channel: channel,
+            emails: payloadData,
+          }),
+        });
+      }
 
       if (!res.ok) {
         const error = await res.json();

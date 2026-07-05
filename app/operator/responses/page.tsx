@@ -2,35 +2,35 @@
 
 import { useEffect, useState } from "react";
 
-interface EmailReply {
+interface UnifiedReply {
   id: string;
-  campaignName: string;
+  channel: "email" | "whatsapp";
   prospectName: string;
-  prospectEmail: string;
-  subject: string;
-  category: string;
-  tier: number;
-  emailSentAt: string;
-  repliedAt: string;
-  body: string;
+  from: string;
+  message: string;
+  timestamp: string;
+  category?: string;
+  tier?: number;
+  sentAt?: string;
 }
 
 export default function ResponsesPage() {
-  const [replies, setReplies] = useState<EmailReply[]>([]);
+  const [replies, setReplies] = useState<UnifiedReply[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterTier, setFilterTier] = useState<number | "all">("all");
-  const [selectedReply, setSelectedReply] = useState<EmailReply | null>(null);
+  const [filterChannel, setFilterChannel] = useState<"all" | "email" | "whatsapp">("all");
+  const [selectedReply, setSelectedReply] = useState<UnifiedReply | null>(null);
 
   useEffect(() => {
     const fetchReplies = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/b2b/campaign-replies");
+        const res = await fetch("/api/operator/unified-replies");
         if (!res.ok) throw new Error("Failed to fetch replies");
 
         const data = await res.json();
         setReplies(data.replies || []);
-        console.log("[RESPONSES] Loaded replies:", data.replies?.length);
+        console.log("[RESPONSES] Loaded replies:", data.total);
       } catch (error) {
         console.error("[RESPONSES] Failed to fetch replies:", error);
       } finally {
@@ -53,11 +53,16 @@ export default function ResponsesPage() {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  const filteredReplies =
-    filterTier === "all" ? replies : replies.filter(r => r.tier === filterTier);
+  const filteredReplies = replies.filter(r => {
+    const tierMatch = filterTier === "all" || r.tier === filterTier;
+    const channelMatch = filterChannel === "all" || r.channel === filterChannel;
+    return tierMatch && channelMatch;
+  });
 
   const stats = {
     total: replies.length,
+    email: replies.filter(r => r.channel === "email").length,
+    whatsapp: replies.filter(r => r.channel === "whatsapp").length,
     tier1: replies.filter(r => r.tier === 1).length,
     tier2: replies.filter(r => r.tier === 2).length,
     tier3: replies.filter(r => r.tier === 3).length,
@@ -90,7 +95,7 @@ export default function ResponsesPage() {
             Responses
           </h1>
           <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-            Review and respond to email replies from campaigns.
+            Monitor replies from email and WhatsApp campaigns.
           </p>
         </div>
 
@@ -99,28 +104,50 @@ export default function ResponsesPage() {
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Summary
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12">
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Email</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.email}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">WhatsApp</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.whatsapp}</p>
             </div>
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 1</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier1}</p>
             </div>
             <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier2}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 3</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier3}</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2/3</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier2 + stats.tier3}</p>
             </div>
           </div>
         </div>
 
-        {/* Filter */}
+        {/* Filters */}
         <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Channel</p>
+          <div className="flex gap-3 mb-6">
+            {(["all", "email", "whatsapp"] as const).map(ch => (
+              <button
+                key={ch}
+                onClick={() => setFilterChannel(ch)}
+                className={`px-4 py-2 rounded text-sm font-semibold transition-colors duration-200 ${
+                  filterChannel === ch
+                    ? "bg-[#0D0D0D] text-white"
+                    : "bg-[#F9F9F9] text-[#0D0D0D] hover:bg-[#E8E8E8]"
+                }`}
+              >
+                {ch === "all" ? "All Channels" : ch === "email" ? "Email" : "WhatsApp"}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Tier</p>
           <div className="flex gap-3">
             {["all", 1, 2, 3].map(tier => (
               <button
@@ -156,37 +183,48 @@ export default function ResponsesPage() {
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
                 Replies
               </p>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filteredReplies.map(reply => (
                   <div
                     key={reply.id}
                     onClick={() => setSelectedReply(reply)}
                     className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors duration-200 cursor-pointer"
                   >
-                    <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">
-                          {reply.prospectName}
-                        </p>
-                        <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
-                          Tier {reply.tier}
-                        </span>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <p className="text-sm font-semibold text-[#0D0D0D]">
+                            {reply.prospectName}
+                          </p>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
+                              reply.channel === "email"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                            }`}
+                          >
+                            {reply.channel === "email" ? "Email" : "WhatsApp"}
+                          </span>
+                          {reply.tier && (
+                            <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
+                              Tier {reply.tier}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#888888] mb-1">{reply.from}</p>
+                        <p className="text-sm text-[#0D0D0D] line-clamp-2">{reply.message}</p>
                       </div>
-                      <p className="text-xs text-[#888888] mb-1">{reply.prospectEmail}</p>
-                      <p className="text-sm text-[#0D0D0D] font-medium mb-2">{reply.subject}</p>
-                      <p className="text-xs text-[#888888]">
-                        Campaign: {reply.campaignName} • {reply.category}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end flex-shrink-0">
-                      <p className="text-xs text-[#888888] mb-2">
-                        Replied {getDaysAgo(reply.repliedAt)}
-                      </p>
-                      <p className="text-xs text-[#0D0D0D]">
-                        {formatDate(reply.repliedAt)}
-                      </p>
-                    </div>
+                      <div className="flex flex-col items-end flex-shrink-0">
+                        <p className="text-xs text-[#888888] mb-1">
+                          {getDaysAgo(reply.timestamp)}
+                        </p>
+                        <p className="text-xs text-[#0D0D0D] font-medium">
+                          {new Date(reply.timestamp).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -212,7 +250,7 @@ export default function ResponsesPage() {
                   <h2 className="text-xl font-black text-[#0D0D0D] mb-1">
                     {selectedReply.prospectName}
                   </h2>
-                  <p className="text-sm text-[#666666]">{selectedReply.prospectEmail}</p>
+                  <p className="text-sm text-[#666666]">{selectedReply.from}</p>
                 </div>
                 <button
                   onClick={() => setSelectedReply(null)}
@@ -222,49 +260,41 @@ export default function ResponsesPage() {
                 </button>
               </div>
               <div className="flex gap-2 mb-4">
-                <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
-                  Tier {selectedReply.tier}
+                <span
+                  className={`px-2 py-1 rounded text-xs font-semibold ${
+                    selectedReply.channel === "email"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {selectedReply.channel === "email" ? "Email" : "WhatsApp"}
                 </span>
-                <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
-                  {selectedReply.category}
-                </span>
+                {selectedReply.tier && (
+                  <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
+                    Tier {selectedReply.tier}
+                  </span>
+                )}
+                {selectedReply.category && (
+                  <span className="px-2 py-1 bg-[#E8E8E8] rounded text-xs text-[#0D0D0D] font-semibold">
+                    {selectedReply.category}
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="p-6">
               <div className="mb-6">
-                <p className="text-xs text-[#888888] mb-1">Subject</p>
-                <p className="text-sm font-semibold text-[#0D0D0D]">{selectedReply.subject}</p>
-              </div>
-
-              <div className="mb-6">
-                <p className="text-xs text-[#888888] mb-2">Timeline</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-[#0D0D0D]">Email sent</span>
-                    <span className="text-[#666666]">
-                      {formatDate(selectedReply.emailSentAt)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#0D0D0D]">Reply received</span>
-                    <span className="text-[#666666]">
-                      {formatDate(selectedReply.repliedAt)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p className="text-xs text-[#888888] mb-2">Original Message</p>
-                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 text-sm text-[#0D0D0D] whitespace-pre-wrap">
-                  {selectedReply.body}
+                <p className="text-xs text-[#888888] mb-2">Reply</p>
+                <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 text-sm text-[#0D0D0D] leading-relaxed">
+                  {selectedReply.message}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-[#888888] mb-2">Campaign</p>
-                <p className="text-sm text-[#0D0D0D]">{selectedReply.campaignName}</p>
+                <p className="text-xs text-[#888888] mb-2">Received</p>
+                <p className="text-sm text-[#0D0D0D]">
+                  {formatDate(selectedReply.timestamp)}
+                </p>
               </div>
             </div>
 

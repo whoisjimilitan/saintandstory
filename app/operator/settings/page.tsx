@@ -167,138 +167,118 @@ export default function ApprovalQueuePage() {
               </div>
             </div>
 
-            {/* Opportunities */}
-            <div className="space-y-3">
+            {/* Opportunities - Clean list */}
+            <div className="space-y-2">
               {opportunities.map((opp) => (
                 <div
                   key={opp.id}
                   className="border border-[#E8E8E8] rounded-lg overflow-hidden transition-all"
                 >
-                  {/* Summary Row */}
+                  {/* Compact Row */}
                   <button
                     onClick={() =>
                       setExpandedId(expandedId === opp.id ? null : opp.id)
                     }
-                    className="w-full p-4 bg-white hover:bg-[#F9F9F9] text-left transition-colors flex items-center justify-between"
+                    className="w-full p-4 bg-white hover:bg-[#F9F9F9] text-left transition-colors"
                   >
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#0D0D0D]">
-                        {opp.companyName}
-                      </p>
-                      <p className="text-xs text-[#888888] mt-1">
-                        {opp.contactName && `${opp.contactName} • `}
-                        {opp.extractedNeed}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span
-                        className={`px-3 py-1 rounded text-xs font-semibold ${
-                          opp.extractedUrgency === "High"
-                            ? "bg-red-100 text-red-700"
-                            : opp.extractedUrgency === "Medium"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {opp.extractedUrgency}
-                      </span>
-                      <svg
-                        className={`w-5 h-5 text-[#0D0D0D] transition-transform ${
-                          expandedId === opp.id ? "rotate-180" : ""
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                        />
-                      </svg>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-[#0D0D0D] truncate">
+                          {opp.companyName}
+                        </p>
+                        <p className="text-xs text-[#888888] mt-1 line-clamp-2">
+                          {opp.extractedQuote || opp.originalWording}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
+                            opp.extractedUrgency === "High"
+                              ? "bg-red-100 text-red-700"
+                              : opp.extractedUrgency === "Medium"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {opp.extractedUrgency}
+                        </span>
+                        <svg
+                          className={`w-5 h-5 text-[#0D0D0D] transition-transform flex-shrink-0 ${
+                            expandedId === opp.id ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </button>
 
-                  {/* Expanded Content */}
+                  {/* Expanded - Clean data layout */}
                   {expandedId === opp.id && (
-                    <div className="border-t border-[#E8E8E8] bg-[#F9F9F9] p-6 space-y-6">
+                    <div className="border-t border-[#E8E8E8] bg-[#F9F9F9] p-6 space-y-5">
                       {/* Original Post */}
                       <div>
                         <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
                           Original Post
                         </p>
-                        <p className="text-sm text-[#0D0D0D] leading-relaxed">
+                        <p className="text-sm text-[#0D0D0D] leading-relaxed italic">
                           "{opp.originalWording}"
                         </p>
                       </div>
 
-                      {/* Extracted Data */}
+                      {/* Extracted Data - Grid layout */}
                       <div>
                         <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
                           Extracted Data
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-xs text-[#888888] mb-1">Need</p>
-                            <p className="text-sm font-medium text-[#0D0D0D]">
-                              {opp.extractedNeed}
-                            </p>
+                            <p className="text-xs text-[#888888] font-semibold mb-1">Need</p>
+                            <p className="text-sm text-[#0D0D0D]">{opp.extractedNeed}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#888888] mb-1">Urgency</p>
-                            <p className="text-sm font-medium text-[#0D0D0D]">
-                              {opp.extractedUrgency}
-                            </p>
+                            <p className="text-xs text-[#888888] font-semibold mb-1">Urgency</p>
+                            <p className="text-sm text-[#0D0D0D]">{opp.extractedUrgency}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#888888] mb-1">Context</p>
-                            <p className="text-sm font-medium text-[#0D0D0D]">
-                              {opp.extractedContext}
-                            </p>
+                            <p className="text-xs text-[#888888] font-semibold mb-1">Context</p>
+                            <p className="text-sm text-[#0D0D0D]">{opp.extractedContext}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#888888] mb-1">Quote</p>
-                            <p className="text-sm font-medium text-[#0D0D0D]">
-                              "{opp.extractedQuote}"
-                            </p>
+                            <p className="text-xs text-[#888888] font-semibold mb-1">Quote</p>
+                            <p className="text-sm text-[#0D0D0D] italic">"{opp.extractedQuote}"</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Brief Preview */}
-                      <div>
-                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
-                          Brief Preview
-                        </p>
-                        <div
-                          className="bg-white border border-[#E8E8E8] rounded p-4 text-xs leading-relaxed text-[#0D0D0D] max-h-48 overflow-y-auto"
-                          dangerouslySetInnerHTML={{
-                            __html: opp.briefHtml || "(Brief not generated)",
-                          }}
-                        />
-                      </div>
-
                       {/* Email Preview */}
                       <div>
-                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
-                          Email Draft
+                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                          Email to Send
                         </p>
                         <div className="bg-white border border-[#E8E8E8] rounded p-4">
-                          <p className="text-xs text-[#888888] mb-2">
-                            To: {opp.contactEmail || "(no email)"}
+                          <p className="text-xs text-[#888888] mb-1">
+                            <span className="font-semibold">To:</span> {opp.contactEmail || "(no email)"}
                           </p>
                           <p className="text-xs text-[#888888] mb-3">
-                            Subject: {opp.emailSubject}
+                            <span className="font-semibold">Subject:</span> {opp.emailSubject}
                           </p>
-                          <p className="text-xs leading-relaxed text-[#0D0D0D] whitespace-pre-wrap font-mono">
+                          <p className="text-xs leading-relaxed text-[#0D0D0D]">
                             {opp.emailBody}
                           </p>
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      <div className="flex gap-3 pt-4 border-t border-[#E8E8E8]">
+                      {/* Actions */}
+                      <div className="flex gap-3 pt-2 border-t border-[#E8E8E8]">
                         <button
                           onClick={() => handleSend(opp.id)}
                           disabled={sendingIds.has(opp.id)}
