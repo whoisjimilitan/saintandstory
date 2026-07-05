@@ -135,8 +135,8 @@ export default function TodayPage() {
                 <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] transition-colors">
                   <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
                   <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
-                  <p className="text-xs text-[#666666]">ready to call</p>
-                  <p className="text-xs text-[#666666] mt-2">Follow up</p>
+                  <p className="text-xs text-[#666666]">prospects with no email</p>
+                  <p className="text-xs text-[#666666] mt-2">Call to qualify</p>
                 </div>
 
                 {/* Drivers */}
