@@ -70,7 +70,11 @@ export default function TodayPage() {
 
   const today = new Date();
   const dayName = today.toLocaleDateString("en-UK", { weekday: "long" });
-  const dateStr = today.toLocaleDateString("en-UK", { month: "long", day: "numeric", year: "numeric" });
+  const dateNum = today.getDate();
+  const monthShort = today.toLocaleDateString("en-UK", { month: "short" });
+  const year = today.getFullYear();
+  const dateStr = `${String(dateNum).padStart(2, "0")}.${monthShort.toUpperCase()}.${year}`;
+  const greeting = user?.firstName ? `Good morning, ${user.firstName}` : "Good morning";
 
   // Determine primary action based on data
   const hasPendingReplies = data.replies.length > 0;
@@ -81,10 +85,10 @@ export default function TodayPage() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-3xl mx-auto px-4 md:px-8">
 
-        {/* Header */}
+        {/* Header - Upscale styling */}
         <div className="mb-12">
-          <p className="text-sm text-[#888888] mb-2">{dayName}</p>
-          <h1 className="text-4xl font-black text-[#0D0D0D] mb-1">{dateStr}</h1>
+          <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">{greeting}</h1>
+          <p className="text-sm font-semibold text-[#666666] uppercase tracking-widest">{dayName} • {dateStr}</p>
         </div>
 
         {loading ? (

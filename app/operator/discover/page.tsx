@@ -44,7 +44,7 @@ function detectCategory(businessName: string): string {
 export default function DiscoverPage() {
   const router = useRouter();
 
-  const [selectedChannel, setSelectedChannel] = useState<Channel>("email");
+  const [selectedChannel, setSelectedChannel] = useState<Channel>("feed");
   const [actionMode, setActionMode] = useState<ActionMode>(null);
 
   const [searchTerm, setSearchTerm] = useState("");

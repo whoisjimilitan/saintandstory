@@ -8,7 +8,7 @@ const stages = [
   { name: "Today", href: "/operator", desc: "Command center" },
   { name: "Discover", href: "/operator/discover", desc: "Find prospects" },
   { name: "Enrich", href: "/operator/enrich", desc: "Prepare to send" },
-  { name: "Reach", href: "/operator/reach", desc: "Send & track" },
+  { name: "Report", href: "/operator/reach", desc: "Campaign reports" },
   { name: "Responses", href: "/operator/responses", desc: "Monitor replies" },
 ];
 
@@ -100,6 +100,13 @@ export function OperatorNav() {
         {/* Dropdown Menu */}
         {menuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E8E8E8] rounded-lg shadow-lg z-40">
+            <a
+              href="/dashboard/admin"
+              className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              Fleet
+            </a>
             <a
               href="/operator/settings"
               className="block px-4 py-3 text-sm text-[#0D0D0D] hover:bg-[#F9F9F9] border-b border-[#E8E8E8] transition-colors"
