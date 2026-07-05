@@ -1,330 +1,578 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllConversations, createConversation } from "@/lib/whatsapp-conversation";
 
-interface Campaign {
+interface WhatsAppCampaign {
   id: string;
   campaignName: string;
-  channel: string;
-  totalLeads: number;
   sentAt: string;
-  status: string;
-  emailStats?: {
-    sent: number;
-    opened: number;
-    replied: number;
-  };
-  whatsappStats?: {
-    sent: number;
-    delivered: number;
-    replied: number;
-  };
+  totalLeads: number;
+  sent: number;
+  delivered: number;
+  replied: number;
+}
+
+interface Message {
+  id: string;
+  body: string;
+  direction: "inbound" | "outbound";
+  status: "sent" | "delivered" | "read";
+  createdAt: string;
+}
+
+interface Conversation {
+  id: string;
+  prospectName: string;
+  phoneNumber: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  messages: Message[];
+}
+
+interface EmailCampaign {
+  id: string;
+  campaignName: string;
+  totalLeads: number;
+  sent: number;
+  opened: number;
+  replied: number;
+  sentAt: string;
 }
 
 export default function ReachPage() {
   const [activeTab, setActiveTab] = useState<"email" | "whatsapp">("email");
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [emailCampaigns, setEmailCampaigns] = useState<EmailCampaign[]>([]);
+  const [whatsappCampaigns, setWhatsappCampaigns] = useState<WhatsAppCampaign[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [conversations, setConversations] = useState(getAllConversations());
-  const [showNewConversationForm, setShowNewConversationForm] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [showStartChat, setShowStartChat] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  const [newChatPhone, setNewChatPhone] = useState("");
+  const [newChatName, setNewChatName] = useState("");
 
-  // Fetch campaigns on mount
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch("/api/b2b/campaigns/list");
-        if (!res.ok) throw new Error("Failed to fetch campaigns");
-
-        const data = await res.json();
-        setCampaigns(data.campaigns || []);
-        console.log("[REACH] Loaded campaigns:", data.campaigns?.length);
-
-        // Debug: log each campaign's stats
-        data.campaigns?.forEach((c: Campaign) => {
-          console.log(`[REACH] Campaign "${c.campaignName}":`, {
-            totalLeads: c.totalLeads,
-            emailStats: c.emailStats,
-            whatsappStats: c.whatsappStats,
-          });
-        });
-      } catch (error) {
-        console.error("[REACH] Failed to fetch campaigns:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCampaigns();
-    // No auto-refresh - use manual "Refresh Now" button only
-    // Auto-polling causes visible flashing and poor UX
-    return () => {};
+    fetchData();
   }, []);
 
-  const handleCreateConversation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber.trim() || !businessName.trim()) return;
-
-    setIsCreating(true);
+  const fetchData = async () => {
     try {
-      const newConversation = createConversation(phoneNumber, businessName);
-      setConversations([newConversation, ...conversations]);
-      setPhoneNumber("");
-      setBusinessName("");
-      setShowNewConversationForm(false);
+      setLoading(true);
+      const [emailRes, whatsappRes, convoRes] = await Promise.all([
+        fetch("/api/b2b/campaigns/list"),
+        fetch("/api/operator/whatsapp-campaigns"),
+        fetch("/api/operator/whatsapp/conversations"),
+      ]);
+
+      if (emailRes.ok) {
+        const data = await emailRes.json();
+        setEmailCampaigns(
+          data.campaigns?.filter((c: any) => c.channel === "email") || []
+        );
+      }
+
+      if (whatsappRes.ok) {
+        const data = await whatsappRes.json();
+        setWhatsappCampaigns(data.campaigns || []);
+      }
+
+      if (convoRes.ok) {
+        const data = await convoRes.json();
+        setConversations(data.conversations || []);
+      }
+    } catch (error) {
+      console.error("[REACH] Error fetching data:", error);
     } finally {
-      setIsCreating(false);
+      setLoading(false);
     }
   };
 
-  // Filter campaigns by active tab
-  const activeCampaigns = campaigns.filter(c => c.channel === activeTab);
+  const handleSendReply = async () => {
+    if (!selectedConversation || !replyText.trim()) return;
 
-  console.log("[REACH RENDER] activeTab:", activeTab, "activeCampaigns:", activeCampaigns.length);
-  activeCampaigns.forEach(c => {
-    console.log(`[REACH RENDER]   - "${c.campaignName}": sent=${c.emailStats?.sent}, opened=${c.emailStats?.opened}`);
-  });
+    setSendingReply(true);
+    try {
+      const res = await fetch("/api/whatsapp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: selectedConversation.id,
+          phoneNumber: selectedConversation.phoneNumber,
+          message: replyText,
+          businessName: selectedConversation.prospectName,
+        }),
+      });
 
-  // Calculate aggregate stats
-  let stats = { active: 0, hot: 0, total: 0 };
+      if (res.ok) {
+        // Add message to conversation locally
+        const newMessage: Message = {
+          id: Date.now().toString(),
+          body: replyText,
+          direction: "outbound",
+          status: "delivered",
+          createdAt: new Date().toISOString(),
+        };
 
-  if (activeTab === "email") {
-    stats = {
-      total: activeCampaigns.reduce((sum, c) => sum + c.totalLeads, 0),
-      active: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.sent || 0), 0),
-      hot: activeCampaigns.reduce((sum, c) => sum + (c.emailStats?.replied || 0), 0),
-    };
-    console.log("[REACH RENDER] Calculated stats:", stats);
-  } else {
-    const whatsappConversations = conversations.filter(c => c.status === "active");
-    stats = {
-      total: whatsappConversations.length,
-      active: whatsappConversations.length,
-      hot: whatsappConversations.filter(c => c.messages.length > 5).length,
-    };
+        setSelectedConversation({
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, newMessage],
+        });
+
+        setReplyText("");
+      }
+    } catch (error) {
+      console.error("[REACH] Error sending reply:", error);
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
+  const handleStartChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newChatPhone.trim() || !newChatName.trim()) return;
+
+    try {
+      const res = await fetch("/api/operator/whatsapp/start-conversation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: newChatPhone,
+          prospectName: newChatName,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConversations([data.conversation, ...conversations]);
+        setNewChatPhone("");
+        setNewChatName("");
+        setShowStartChat(false);
+      }
+    } catch (error) {
+      console.error("[REACH] Error starting chat:", error);
+    }
+  };
+
+  const emailStats = emailCampaigns.reduce(
+    (acc, c) => ({
+      total: acc.total + c.sent,
+      opened: acc.opened + c.opened,
+      replied: acc.replied + c.replied,
+    }),
+    { total: 0, opened: 0, replied: 0 }
+  );
+
+  const whatsappStats = whatsappCampaigns.reduce(
+    (acc, c) => ({
+      total: acc.total + c.sent,
+      delivered: acc.delivered + c.delivered,
+      replied: acc.replied + c.replied,
+    }),
+    { total: 0, delivered: 0, replied: 0 }
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white pt-16 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-[#666666]">Loading campaigns...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-white pt-16 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-12 flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
-              Reach
-            </h1>
-            <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-              Track campaign performance across email and WhatsApp.
-            </p>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
+            Reach
+          </h1>
+          <p className="text-sm text-[#666666]">
+            Manage email and WhatsApp campaigns
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-12 flex gap-8 border-b border-[#E8E8E8] pb-4">
           <button
-            onClick={() => {
-              setLoading(true);
-              fetch("/api/b2b/campaigns/list")
-                .then(res => res.json())
-                .then(data => {
-                  console.log("[REACH REFRESH] Got campaigns:", data.campaigns?.length);
-                  data.campaigns?.forEach((c: Campaign) => {
-                    console.log(`[REACH REFRESH] "${c.campaignName}" - channel: ${c.channel}, sent: ${c.emailStats?.sent}`);
-                  });
-                  setCampaigns(data.campaigns || []);
-                  setLoading(false);
-                })
-                .catch((err) => {
-                  console.error("[REACH REFRESH] Error:", err);
-                  setLoading(false);
-                });
-            }}
-            className="px-4 py-2 border border-[#E8E8E8] rounded text-xs font-semibold text-[#0D0D0D] hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors flex-shrink-0"
+            onClick={() => setActiveTab("email")}
+            className={`text-sm font-semibold pb-3 transition-colors ${
+              activeTab === "email"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#888888]"
+            }`}
           >
-            Refresh Now
+            Email Campaigns
+          </button>
+          <button
+            onClick={() => setActiveTab("whatsapp")}
+            className={`text-sm font-semibold pb-3 transition-colors ${
+              activeTab === "whatsapp"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#888888]"
+            }`}
+          >
+            WhatsApp Campaigns
           </button>
         </div>
 
-        {/* Channel Tabs */}
-        <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
-          <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab("email")}
-              className={`pb-3 border-b-2 font-semibold text-sm transition-colors duration-200 ${
-                activeTab === "email"
-                  ? "text-[#0D0D0D] border-[#0D0D0D]"
-                  : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-              }`}
-            >
-              Email Campaigns
-            </button>
-            <button
-              onClick={() => setActiveTab("whatsapp")}
-              className={`pb-3 border-b-2 font-semibold text-sm transition-colors duration-200 ${
-                activeTab === "whatsapp"
-                  ? "text-[#0D0D0D] border-[#0D0D0D]"
-                  : "text-[#888888] border-transparent hover:text-[#0D0D0D]"
-              }`}
-            >
-              WhatsApp Conversations
-            </button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-            Summary
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">{activeTab === "email" ? "Sent" : "Active"}</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.active}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">{activeTab === "email" ? "Replied" : "Hot"}</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.hot}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Email Campaigns */}
+        {/* EMAIL TAB */}
         {activeTab === "email" && (
           <div>
-            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-              Campaigns
-            </p>
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-sm text-[#666666]">Loading campaigns...</p>
+            {/* Stats */}
+            <div className="mb-12 pb-8 border-b border-[#E8E8E8]">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                Summary
+              </p>
+              <div className="grid grid-cols-3 gap-12">
+                <div>
+                  <p className="text-xs text-[#888888] mb-2">Sent</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{emailStats.total}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#888888] mb-2">Opened</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{emailStats.opened}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#888888] mb-2">Replied</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{emailStats.replied}</p>
+                </div>
               </div>
-            ) : activeCampaigns.length === 0 ? (
-              <div className="text-center py-12">
+            </div>
+
+            {/* Campaigns List */}
+            <div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                Campaigns
+              </p>
+              {emailCampaigns.length === 0 ? (
                 <p className="text-sm text-[#666666]">No email campaigns yet</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {activeCampaigns.map(campaign => (
-                  <div key={campaign.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors duration-200">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">{campaign.campaignName}</p>
-                        <p className="text-xs text-[#888888] mt-1">
-                          {new Date(campaign.sentAt).toLocaleDateString()} • {campaign.totalLeads} leads
-                        </p>
-                      </div>
-                      <div className="flex gap-4 text-right flex-shrink-0">
+              ) : (
+                <div className="space-y-3">
+                  {emailCampaigns.map((campaign) => (
+                    <div
+                      key={campaign.id}
+                      className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.sent || 0}</p>
-                          <p className="text-xs text-[#888888]">sent</p>
+                          <p className="text-sm font-semibold text-[#0D0D0D]">
+                            {campaign.campaignName}
+                          </p>
+                          <p className="text-xs text-[#888888] mt-1">
+                            {campaign.totalLeads} leads •{" "}
+                            {new Date(campaign.sentAt).toLocaleDateString()}
+                          </p>
                         </div>
-                        <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.opened || 0}</p>
-                          <p className="text-xs text-[#888888]">opened</p>
+                        <div className="flex gap-6 text-right">
+                          <div>
+                            <p className="text-xs text-[#888888]">Sent</p>
+                            <p className="text-sm font-semibold text-[#0D0D0D]">
+                              {campaign.sent}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-[#888888]">Opened</p>
+                            <p className="text-sm font-semibold text-[#0D0D0D]">
+                              {campaign.opened}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-[#888888]">Replied</p>
+                            <p className="text-sm font-semibold text-[#0D0D0D]">
+                              {campaign.replied}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-lg font-black text-[#0D0D0D]">{campaign.emailStats?.replied || 0}</p>
-                          <p className="text-xs text-[#888888]">replied</p>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            if (!confirm(`Delete "${campaign.campaignName}"? This cannot be undone.`)) return;
-                            try {
-                              const res = await fetch("/api/b2b/campaigns/delete", {
-                                method: "DELETE",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ campaignId: campaign.id }),
-                              });
-                              if (!res.ok) throw new Error("Failed to delete");
-                              setCampaigns(campaigns.filter(c => c.id !== campaign.id));
-                            } catch (error) {
-                              alert(`Error deleting campaign: ${error instanceof Error ? error.message : "Unknown error"}`);
-                            }
-                          }}
-                          className="text-[#888888] hover:text-[#D32F2F] transition-colors"
-                          title="Delete campaign"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* WhatsApp Conversations */}
+        {/* WHATSAPP TAB */}
         {activeTab === "whatsapp" && (
-          <div>
-            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-              Conversations
-            </p>
-            {showNewConversationForm && (
-              <form onSubmit={handleCreateConversation} className="mb-8 rounded-lg p-6 bg-[#F9F9F9]">
-                <h3 className="font-bold text-[#0D0D0D] mb-4">Start Conversation</h3>
-                <div className="space-y-3">
-                  <input
-                    type="tel"
-                    placeholder="Phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Business name"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                  />
+          <div className="grid grid-cols-3 gap-8">
+            {/* Left: Campaigns & Conversations */}
+            <div className="col-span-2 space-y-8">
+              {/* Stats */}
+              <div className="pb-8 border-b border-[#E8E8E8]">
+                <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                  Summary
+                </p>
+                <div className="grid grid-cols-3 gap-12">
+                  <div>
+                    <p className="text-xs text-[#888888] mb-2">Sent</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">
+                      {whatsappStats.total}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#888888] mb-2">Delivered</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">
+                      {whatsappStats.delivered}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#888888] mb-2">Replied</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">
+                      {whatsappStats.replied}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Campaigns */}
+              {whatsappCampaigns.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                    Bulk Campaigns
+                  </p>
+                  <div className="space-y-3">
+                    {whatsappCampaigns.map((campaign) => (
+                      <div
+                        key={campaign.id}
+                        className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-[#0D0D0D]">
+                              {campaign.campaignName}
+                            </p>
+                            <p className="text-xs text-[#888888] mt-1">
+                              {campaign.totalLeads} leads •{" "}
+                              {new Date(campaign.sentAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-6 text-right">
+                            <div>
+                              <p className="text-xs text-[#888888]">Sent</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.sent}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#888888]">Delivered</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.delivered}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#888888]">Replied</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.replied}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Conversations */}
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+                    Active Conversations ({conversations.length})
+                  </p>
                   <button
-                    type="submit"
-                    disabled={isCreating}
-                    className="w-full px-4 py-2 bg-[#0D0D0D] text-white rounded text-sm font-semibold hover:bg-[#333333] disabled:opacity-50"
+                    onClick={() => setShowStartChat(true)}
+                    className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
                   >
-                    {isCreating ? "Creating..." : "Start"}
+                    + Start Chat
                   </button>
                 </div>
-              </form>
-            )}
 
-            {conversations.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-sm text-[#666666] mb-4">No conversations yet</p>
-                <button
-                  onClick={() => setShowNewConversationForm(!showNewConversationForm)}
-                  className="px-4 py-2 bg-[#0D0D0D] text-white rounded text-sm font-semibold hover:bg-[#333333]"
-                >
-                  + Start Conversation
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {conversations.map(conversation => (
-                  <div key={conversation.id} className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-[#0D0D0D]">{conversation.businessName}</p>
-                        <p className="text-xs text-[#888888] mt-1">{conversation.phoneNumber}</p>
-                      </div>
-                      <p className="text-xs text-[#0D0D0D] font-semibold">{conversation.messages.length} messages</p>
-                    </div>
+                {conversations.length === 0 ? (
+                  <p className="text-sm text-[#666666]">No active conversations</p>
+                ) : (
+                  <div className="space-y-3">
+                    {conversations.map((convo) => (
+                      <button
+                        key={convo.id}
+                        onClick={() => setSelectedConversation(convo)}
+                        className={`w-full text-left border border-[#E8E8E8] rounded-lg p-4 transition-colors ${
+                          selectedConversation?.id === convo.id
+                            ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
+                            : "hover:bg-[#F9F9F9]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p
+                              className={`text-sm font-semibold ${
+                                selectedConversation?.id === convo.id
+                                  ? "text-white"
+                                  : "text-[#0D0D0D]"
+                              }`}
+                            >
+                              {convo.prospectName}
+                            </p>
+                            <p
+                              className={`text-xs mt-1 line-clamp-1 ${
+                                selectedConversation?.id === convo.id
+                                  ? "text-white/70"
+                                  : "text-[#888888]"
+                              }`}
+                            >
+                              {convo.lastMessage}
+                            </p>
+                          </div>
+                          {convo.unreadCount > 0 && (
+                            <span
+                              className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                                selectedConversation?.id === convo.id
+                                  ? "bg-white/20 text-white"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {convo.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                ))}
+                )}
+              </div>
+            </div>
+
+            {/* Right: Message Thread */}
+            {selectedConversation && (
+              <div className="col-span-1 border border-[#E8E8E8] rounded-lg flex flex-col h-[600px] bg-[#F9F9F9]">
+                {/* Header */}
+                <div className="border-b border-[#E8E8E8] p-4 bg-white rounded-t-lg">
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {selectedConversation.prospectName}
+                  </p>
+                  <p className="text-xs text-[#888888]">{selectedConversation.phoneNumber}</p>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {selectedConversation.messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-xs px-4 py-2 rounded-lg ${
+                          msg.direction === "outbound"
+                            ? "bg-[#0D0D0D] text-white"
+                            : "bg-white border border-[#E8E8E8]"
+                        }`}
+                      >
+                        <p className="text-sm">{msg.body}</p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            msg.direction === "outbound" ? "text-white/60" : "text-[#888888]"
+                          }`}
+                        >
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}{" "}
+                          {msg.direction === "outbound" && msg.status === "delivered" && "✓"}
+                          {msg.direction === "outbound" && msg.status === "read" && "✓✓"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Reply Input */}
+                <div className="border-t border-[#E8E8E8] p-4 bg-white rounded-b-lg">
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendReply();
+                        }
+                      }}
+                      placeholder="Type message..."
+                      className="flex-1 text-sm px-3 py-2 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                    />
+                    <button
+                      onClick={handleSendReply}
+                      disabled={!replyText.trim() || sendingReply}
+                      className="px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                    >
+                      {sendingReply ? "..." : "Send"}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Start Chat Modal */}
+      {showStartChat && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h2 className="text-lg font-black text-[#0D0D0D] mb-6">Start New Chat</h2>
+
+            <form onSubmit={handleStartChat} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest mb-2 block">
+                  Business Name
+                </label>
+                <input
+                  type="text"
+                  value={newChatName}
+                  onChange={(e) => setNewChatName(e.target.value)}
+                  placeholder="e.g., Acme Corp"
+                  className="w-full text-sm px-4 py-2 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest mb-2 block">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={newChatPhone}
+                  onChange={(e) => setNewChatPhone(e.target.value)}
+                  placeholder="e.g., +441234567890"
+                  className="w-full text-sm px-4 py-2 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowStartChat(false)}
+                  className="flex-1 px-4 py-2 border border-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#F9F9F9] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                >
+                  Start Chat
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
