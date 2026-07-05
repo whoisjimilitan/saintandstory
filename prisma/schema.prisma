@@ -1484,3 +1484,110 @@ model OpportunityFeed {
   @@index([createdAt(sort: Desc)])
   @@map("opportunity_feed")
 }
+
+model SearchResult {
+  id                String   @id @default(cuid())
+  businessName      String
+  website           String?
+  sourceUrl         String
+  sourcePlatform    String   // linkedin, twitter, reddit, blog, etc
+  originalStatement String   @db.Text
+  opportunityType   String   // "direct_need" or "business_trigger"
+  extractedNeed     String?
+  confidence        String   // "high", "medium", "low"
+  reason            String?  @db.Text
+  industry          String?
+  city              String?
+  country           String?
+  postedDate        DateTime?
+  processedAt       DateTime?
+  status            String   @default("raw") // raw, processing, processed, queued, sent
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([confidence])
+  @@index([createdAt(sort: Desc)])
+  @@map("search_results")
+}
+
+model ProcessedOpportunity {
+  id                String   @id @default(cuid())
+  searchResultId    String
+  businessName      String
+  website           String?
+  originalStatement String   @db.Text
+  opportunityType   String   // "direct_need" or "business_trigger"
+  confidence        String   // "high", "medium", "low"
+
+  // Intelligence reasoning
+  deducedNeed       String   @db.Text // What they actually need
+  recommendedBrief  String   // Type of brief
+  whyTheyNeedIt     String   @db.Text // Personalized reason
+
+  // Generated assets
+  emailSubject      String?
+  emailBody         String?  @db.Text
+  briefUrl          String?
+  briefTitle        String?
+
+  // Status
+  status            String   @default("processed") // processed, queued, approved, sent, response_received
+
+  // Tracking
+  sentAt            DateTime?
+  responseAt        DateTime?
+  responseBody      String?  @db.Text
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([opportunityType])
+  @@index([createdAt(sort: Desc)])
+  @@map("processed_opportunities")
+}
+
+model GeneratedBrief {
+  id                    String   @id @default(cuid())
+  processedOpportunityId String
+  briefType             String   // courier_readiness, medical_logistics, temperature_controlled, etc
+  businessName          String
+  specificNeed          String   @db.Text
+  htmlContent           String   @db.Text
+  publicUrl             String   // URL where brief is hosted
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([processedOpportunityId])
+  @@map("generated_briefs")
+}
+
+model ApprovalQueue {
+  id                        String   @id @default(cuid())
+  processedOpportunityId    String
+  businessName              String
+  originalStatement         String   @db.Text
+  deducedNeed               String   @db.Text
+  emailPreview              String   @db.Text
+  briefUrl                  String?
+  confidence                String
+
+  // Operator action
+  approvedBy                String?
+  approvedAt                DateTime?
+  rejectedAt                DateTime?
+  rejectionReason           String?
+
+  // Status
+  status                    String   @default("pending") // pending, approved, rejected, sent
+  sentAt                    DateTime?
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("approval_queue")
+}
