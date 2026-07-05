@@ -21,6 +21,13 @@ interface Opportunity {
   createdAt: string;
 }
 
+interface EditingState {
+  [key: string]: {
+    subject: string;
+    body: string;
+  };
+}
+
 export default function ApprovalQueuePage() {
   const { showToast } = useToast();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -28,6 +35,8 @@ export default function ApprovalQueuePage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [sendingIds, setSendingIds] = useState<Set<string>>(new Set());
   const [sendingAll, setSendingAll] = useState(false);
+  const [editing, setEditing] = useState<EditingState>({});
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchQueue();
@@ -116,6 +125,64 @@ export default function ApprovalQueuePage() {
     }
   };
 
+  const startEditing = (opp: Opportunity) => {
+    setEditing((prev) => ({
+      ...prev,
+      [opp.id]: { subject: opp.emailSubject, body: opp.emailBody },
+    }));
+  };
+
+  const cancelEditing = (oppId: string) => {
+    setEditing((prev) => {
+      const next = { ...prev };
+      delete next[oppId];
+      return next;
+    });
+  };
+
+  const saveEdits = async (oppId: string) => {
+    const edits = editing[oppId];
+    if (!edits) return;
+
+    setSavingIds((prev) => new Set(prev).add(oppId));
+
+    try {
+      // Update in database
+      const res = await fetch(`/api/operator/opportunity-feed/${oppId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          emailSubject: edits.subject,
+          emailBody: edits.body,
+        }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setOpportunities((prev) =>
+          prev.map((o) =>
+            o.id === oppId
+              ? { ...o, emailSubject: edits.subject, emailBody: edits.body }
+              : o
+          )
+        );
+        cancelEditing(oppId);
+        showToast("Email updated", "success");
+      } else {
+        showToast("Failed to update email", "error");
+      }
+    } catch (error) {
+      console.error("[APPROVAL QUEUE] Save error:", error);
+      showToast("Error saving changes", "error");
+    } finally {
+      setSavingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(oppId);
+        return next;
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white pt-16 pb-16 flex items-center justify-center">
@@ -167,132 +234,196 @@ export default function ApprovalQueuePage() {
               </div>
             </div>
 
-            {/* Opportunities - Clean list */}
-            <div className="space-y-2">
+            {/* Opportunities - Modal-style preview */}
+            <div className="space-y-4">
               {opportunities.map((opp) => (
                 <div
                   key={opp.id}
-                  className="border border-[#E8E8E8] rounded-lg overflow-hidden transition-all"
+                  className="border border-[#E8E8E8] rounded-lg overflow-hidden bg-white transition-all"
                 >
-                  {/* Compact Row */}
+                  {/* Header Row - Collapsible */}
                   <button
                     onClick={() =>
                       setExpandedId(expandedId === opp.id ? null : opp.id)
                     }
-                    className="w-full p-4 bg-white hover:bg-[#F9F9F9] text-left transition-colors"
+                    className="w-full p-4 hover:bg-[#F9F9F9] text-left transition-colors flex items-center justify-between"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#0D0D0D] truncate">
-                          {opp.companyName}
-                        </p>
-                        <p className="text-xs text-[#888888] mt-1 line-clamp-2">
-                          {opp.extractedQuote || opp.originalWording}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
-                            opp.extractedUrgency === "High"
-                              ? "bg-red-100 text-red-700"
-                              : opp.extractedUrgency === "Medium"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-gray-100 text-gray-700"
-                          }`}
-                        >
-                          {opp.extractedUrgency}
-                        </span>
-                        <svg
-                          className={`w-5 h-5 text-[#0D0D0D] transition-transform flex-shrink-0 ${
-                            expandedId === opp.id ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                          />
-                        </svg>
-                      </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#0D0D0D]">
+                        {opp.companyName}
+                      </p>
+                      <p className="text-xs text-[#888888] mt-1">
+                        {opp.contactName && `${opp.contactName} • `}
+                        {opp.extractedNeed}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-3 py-1 rounded text-xs font-semibold ${
+                          opp.extractedUrgency === "High"
+                            ? "bg-red-100 text-red-700"
+                            : opp.extractedUrgency === "Medium"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {opp.extractedUrgency}
+                      </span>
+                      <svg
+                        className={`w-5 h-5 text-[#0D0D0D] transition-transform ${
+                          expandedId === opp.id ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
+                      </svg>
                     </div>
                   </button>
 
-                  {/* Expanded - Clean data layout */}
+                  {/* Expanded Modal View */}
                   {expandedId === opp.id && (
-                    <div className="border-t border-[#E8E8E8] bg-[#F9F9F9] p-6 space-y-5">
-                      {/* Original Post */}
+                    <div className="border-t border-[#E8E8E8] bg-white p-6 space-y-6">
+                      {/* Original Post - Show once, no repetition */}
                       <div>
-                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
                           Original Post
                         </p>
-                        <p className="text-sm text-[#0D0D0D] leading-relaxed italic">
+                        <p className="text-sm text-[#0D0D0D] leading-relaxed italic bg-[#F9F9F9] p-4 rounded border border-[#E8E8E8]">
                           "{opp.originalWording}"
                         </p>
                       </div>
 
-                      {/* Extracted Data - Grid layout */}
+                      {/* Extracted Data */}
                       <div>
                         <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
                           Extracted Data
                         </p>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-1">Need</p>
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Need</p>
                             <p className="text-sm text-[#0D0D0D]">{opp.extractedNeed}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-1">Urgency</p>
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Urgency</p>
                             <p className="text-sm text-[#0D0D0D]">{opp.extractedUrgency}</p>
                           </div>
-                          <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-1">Context</p>
+                          <div className="col-span-2">
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Context</p>
                             <p className="text-sm text-[#0D0D0D]">{opp.extractedContext}</p>
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Email - Full 5-sentence with edit/save */}
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+                            Email
+                          </p>
+                          {!editing[opp.id] ? (
+                            <button
+                              onClick={() => startEditing(opp)}
+                              className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
+                            >
+                              Edit
+                            </button>
+                          ) : null}
+                        </div>
+
+                        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4 space-y-3">
+                          {/* To/Subject */}
                           <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-1">Quote</p>
-                            <p className="text-sm text-[#0D0D0D] italic">"{opp.extractedQuote}"</p>
+                            <p className="text-xs text-[#888888] font-semibold mb-1">To</p>
+                            <p className="text-sm text-[#0D0D0D]">
+                              {opp.contactEmail || "(no email)"}
+                            </p>
+                          </div>
+
+                          <div className="border-t border-[#E8E8E8] pt-3">
+                            <p className="text-xs text-[#888888] font-semibold mb-1">Subject</p>
+                            {editing[opp.id] ? (
+                              <input
+                                type="text"
+                                value={editing[opp.id].subject}
+                                onChange={(e) =>
+                                  setEditing((prev) => ({
+                                    ...prev,
+                                    [opp.id]: { ...prev[opp.id], subject: e.target.value },
+                                  }))
+                                }
+                                className="w-full text-sm px-2 py-1 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                              />
+                            ) : (
+                              <p className="text-sm text-[#0D0D0D]">{opp.emailSubject}</p>
+                            )}
+                          </div>
+
+                          <div className="border-t border-[#E8E8E8] pt-3">
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Message</p>
+                            {editing[opp.id] ? (
+                              <textarea
+                                value={editing[opp.id].body}
+                                onChange={(e) =>
+                                  setEditing((prev) => ({
+                                    ...prev,
+                                    [opp.id]: { ...prev[opp.id], body: e.target.value },
+                                  }))
+                                }
+                                className="w-full text-sm px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none min-h-40"
+                              />
+                            ) : (
+                              <p className="text-sm text-[#0D0D0D] leading-relaxed whitespace-pre-wrap">
+                                {opp.emailBody}
+                              </p>
+                            )}
                           </div>
                         </div>
+
+                        {/* Edit/Save Actions */}
+                        {editing[opp.id] && (
+                          <div className="flex gap-3 mt-4">
+                            <button
+                              onClick={() => saveEdits(opp.id)}
+                              disabled={savingIds.has(opp.id)}
+                              className="flex-1 px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                            >
+                              {savingIds.has(opp.id) ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button
+                              onClick={() => cancelEditing(opp.id)}
+                              className="px-4 py-2 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Email Preview */}
-                      <div>
-                        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
-                          Email to Send
-                        </p>
-                        <div className="bg-white border border-[#E8E8E8] rounded p-4">
-                          <p className="text-xs text-[#888888] mb-1">
-                            <span className="font-semibold">To:</span> {opp.contactEmail || "(no email)"}
-                          </p>
-                          <p className="text-xs text-[#888888] mb-3">
-                            <span className="font-semibold">Subject:</span> {opp.emailSubject}
-                          </p>
-                          <p className="text-xs leading-relaxed text-[#0D0D0D]">
-                            {opp.emailBody}
-                          </p>
+                      {/* Send Actions */}
+                      {!editing[opp.id] && (
+                        <div className="flex gap-3 pt-4 border-t border-[#E8E8E8]">
+                          <button
+                            onClick={() => handleSend(opp.id)}
+                            disabled={sendingIds.has(opp.id)}
+                            className="flex-1 px-4 py-2.5 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                          >
+                            {sendingIds.has(opp.id) ? "Sending..." : "Send"}
+                          </button>
+                          <button
+                            onClick={() => setExpandedId(null)}
+                            className="px-4 py-2.5 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
+                          >
+                            Skip
+                          </button>
                         </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-3 pt-2 border-t border-[#E8E8E8]">
-                        <button
-                          onClick={() => handleSend(opp.id)}
-                          disabled={sendingIds.has(opp.id)}
-                          className="flex-1 px-4 py-2.5 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
-                        >
-                          {sendingIds.has(opp.id) ? "Sending..." : "Send"}
-                        </button>
-                        <button
-                          onClick={() => setExpandedId(null)}
-                          className="px-4 py-2.5 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
-                        >
-                          Skip
-                        </button>
-                      </div>
+                      )}
                     </div>
                   )}
                 </div>

@@ -17,7 +17,6 @@ interface UnifiedReply {
 export default function ResponsesPage() {
   const [replies, setReplies] = useState<UnifiedReply[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterTier, setFilterTier] = useState<number | "all">("all");
   const [filterChannel, setFilterChannel] = useState<"all" | "email" | "whatsapp">("all");
   const [selectedReply, setSelectedReply] = useState<UnifiedReply | null>(null);
 
@@ -54,18 +53,14 @@ export default function ResponsesPage() {
   }, []);
 
   const filteredReplies = replies.filter(r => {
-    const tierMatch = filterTier === "all" || r.tier === filterTier;
     const channelMatch = filterChannel === "all" || r.channel === filterChannel;
-    return tierMatch && channelMatch;
+    return channelMatch;
   });
 
   const stats = {
     total: replies.length,
     email: replies.filter(r => r.channel === "email").length,
     whatsapp: replies.filter(r => r.channel === "whatsapp").length,
-    tier1: replies.filter(r => r.tier === 1).length,
-    tier2: replies.filter(r => r.tier === 2).length,
-    tier3: replies.filter(r => r.tier === 3).length,
   };
 
   const formatDate = (dateString: string) => {
@@ -104,7 +99,7 @@ export default function ResponsesPage() {
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
             Summary
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.total}</p>
@@ -117,21 +112,13 @@ export default function ResponsesPage() {
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">WhatsApp</p>
               <p className="text-3xl font-black text-[#0D0D0D]">{stats.whatsapp}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 1</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier1}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2/3</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{stats.tier2 + stats.tier3}</p>
-            </div>
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filter - Channel only */}
         <div className="mb-16 pb-6 border-b border-[#E8E8E8]">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Channel</p>
-          <div className="flex gap-3 mb-6">
+          <div className="flex gap-3">
             {(["all", "email", "whatsapp"] as const).map(ch => (
               <button
                 key={ch}
@@ -143,23 +130,6 @@ export default function ResponsesPage() {
                 }`}
               >
                 {ch === "all" ? "All Channels" : ch === "email" ? "Email" : "WhatsApp"}
-              </button>
-            ))}
-          </div>
-
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Tier</p>
-          <div className="flex gap-3">
-            {["all", 1, 2, 3].map(tier => (
-              <button
-                key={tier}
-                onClick={() => setFilterTier(tier === "all" ? "all" : tier)}
-                className={`px-4 py-2 rounded text-sm font-semibold transition-colors duration-200 ${
-                  filterTier === tier
-                    ? "bg-[#0D0D0D] text-white"
-                    : "bg-[#F9F9F9] text-[#0D0D0D] hover:bg-[#E8E8E8]"
-                }`}
-              >
-                {tier === "all" ? "All" : `Tier ${tier}`}
               </button>
             ))}
           </div>

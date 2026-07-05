@@ -2,30 +2,65 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
+  console.log("[TODAY CAMPAIGN STATS] Fetching email campaign stats for today");
+
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Get live opportunity feed send stats from today
-    const sentCount = await prisma.opportunityFeed.count({
+    // Get email campaigns sent today
+    const sentEmails = await prisma.b2bCampaignEmail.count({
       where: {
-        status: "sent",
-        sentAt: {
+        emailSentAt: {
           gte: today,
         },
       },
     });
 
-    // Get opened count (when available in webhook tracking)
-    const openedCount = Math.round(sentCount * 0.25); // Placeholder: ~25% open rate
+    // Get opened emails (marked as openedAt is not null)
+    const openedEmails = await prisma.b2bCampaignEmail.count({
+      where: {
+        emailSentAt: {
+          gte: today,
+        },
+        openedAt: {
+          not: null,
+        },
+      },
+    });
+
+    // Get clicked emails
+    const clickedEmails = await prisma.b2bCampaignEmail.count({
+      where: {
+        emailSentAt: {
+          gte: today,
+        },
+        clickedAt: {
+          not: null,
+        },
+      },
+    });
+
+    // Get replied emails
+    const repliedEmails = await prisma.b2bCampaignEmail.count({
+      where: {
+        emailSentAt: {
+          gte: today,
+        },
+        repliedAt: {
+          not: null,
+        },
+      },
+    });
 
     const stats = {
-      sent: sentCount,
-      opened: openedCount,
-      clicked: Math.round(sentCount * 0.15),
-      replied: Math.round(sentCount * 0.08),
+      sent: sentEmails,
+      opened: openedEmails,
+      clicked: clickedEmails,
+      replied: repliedEmails,
     };
 
+    console.log("[TODAY CAMPAIGN STATS] Stats:", stats);
     return NextResponse.json({ stats }, { status: 200 });
   } catch (error) {
     console.error("[TODAY CAMPAIGN STATS] Error:", error);

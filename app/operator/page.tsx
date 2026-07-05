@@ -371,7 +371,7 @@ export default function TodayPage() {
             {activeModal === "phone" && (
               <div className="space-y-4">
                 <div className="border-b border-[#E8E8E8] pb-4">
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Prospects with No Email</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">No Email</p>
                   <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.phone.readyToCall}</p>
                 </div>
                 <p className="text-xs text-[#666666]">These prospects need to be contacted via phone. List of prospects and their details would appear here.</p>

@@ -399,9 +399,28 @@ export default function EnrichPage() {
   return (
     <div className="min-h-screen bg-[#F9F9F9] pt-32">
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
+        {/* Channel Indicator */}
+        <div className="mb-8">
+          <div
+            className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm ${
+              channel === "email"
+                ? "bg-blue-100 text-blue-700"
+                : channel === "whatsapp"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-purple-100 text-purple-700"
+            }`}
+          >
+            {channel === "email" ? "📧 Email Campaign" : channel === "whatsapp" ? "💬 WhatsApp Bulk Send" : "🎯 Opportunity Feed"}
+          </div>
+        </div>
+
         {/* Sub-Hero */}
         <p className="text-lg font-bold text-[#0D0D0D] mb-8 md:mb-12 pb-4 md:pb-8 border-b border-[#E8E8E8] leading-relaxed">
-          Generate personalized emails and send to prospects
+          {channel === "email"
+            ? "Generate personalized emails and send to prospects"
+            : channel === "whatsapp"
+              ? "Send bulk WhatsApp messages to your audience"
+              : "Review and send opportunity briefs"}
         </p>
 
         {/* Tabs */}
