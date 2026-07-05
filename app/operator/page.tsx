@@ -25,16 +25,9 @@ interface OperationStatus {
   };
 }
 
-interface PipelineState {
-  awaitingReply: number;
-  readyToQualify: number;
-  readyToSend: number;
-  opportunitiesQueued: number;
-}
-
 interface TodayData {
   operation: OperationStatus;
-  pipeline: PipelineState;
+  opportunitiesQueued: number;
   pendingReplies: number;
 }
 
@@ -48,13 +41,8 @@ export default function TodayPage() {
       phone: { readyToCall: 0 },
       drivers: { available: 0, revenue: "£0" },
     },
-    pipeline: {
-      awaitingReply: 0,
-      readyToQualify: 0,
-      readyToSend: 0,
-      opportunitiesQueued: 0,
-    },
-    pendingReplies: 0,
+    opportunitiesQueued: 0,
+    pendingReplies: 3,
   });
   const [loading, setLoading] = useState(true);
 
@@ -77,12 +65,7 @@ export default function TodayPage() {
             phone: { readyToCall: 15 }, // Placeholder - would fetch from phone system
             drivers: { available: 8, revenue: "£420" }, // Placeholder - would fetch from driver API
           },
-          pipeline: {
-            awaitingReply: 8,
-            readyToQualify: 12,
-            readyToSend: 4,
-            opportunitiesQueued: opportunities.count || 0,
-          },
+          opportunitiesQueued: opportunities.count || 0,
           pendingReplies: 3,
         });
       } catch (error) {
@@ -181,9 +164,9 @@ export default function TodayPage() {
                     Review Replies →
                   </Link>
                 </div>
-              ) : data.pipeline.opportunitiesQueued > 0 ? (
+              ) : data.opportunitiesQueued > 0 ? (
                 <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
-                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.pipeline.opportunitiesQueued} opportunities ready</h2>
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.opportunitiesQueued} opportunities ready</h2>
                   <p className="text-sm text-[#666666] mb-6">Your CSV upload is processed. Send these emails now.</p>
                   <Link
                     href="/operator/discover"
@@ -217,48 +200,17 @@ export default function TodayPage() {
               )}
             </div>
 
-            {/* SECTION 3: QUICK PIPELINE - What's in motion */}
-            <div className="mb-16">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Pipeline State</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Awaiting Reply</p>
-                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.awaitingReply}</p>
-                  <p className="text-xs text-[#666666] mt-2">prospects waiting for your response</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Ready to Qualify</p>
-                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.readyToQualify}</p>
-                  <p className="text-xs text-[#666666] mt-2">ready for next conversation</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Ready to Send</p>
-                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.readyToSend}</p>
-                  <p className="text-xs text-[#666666] mt-2">opportunities queued</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Email Today</p>
-                  <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.email.replied}</p>
-                  <p className="text-xs text-[#666666] mt-2">replied to your emails</p>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 4: QUICK NAVIGATION */}
+            {/* QUICK NAVIGATION - Reordered: Feed first, Email campaigns third */}
             <div>
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Quick Navigation</p>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Next Step</p>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Link
                   href="/operator/discover"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Discover</p>
-                  <p className="text-xs text-[#888888]">Upload & import CSV</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Opportunity Feed</p>
+                  <p className="text-xs text-[#888888]">Upload CSV</p>
                 </Link>
 
                 <Link
@@ -266,14 +218,14 @@ export default function TodayPage() {
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Enrich</p>
-                  <p className="text-xs text-[#888888]">Review & personalize</p>
+                  <p className="text-xs text-[#888888]">Personalize</p>
                 </Link>
 
                 <Link
                   href="/operator/reach"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Report</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Email Campaign</p>
                   <p className="text-xs text-[#888888]">Campaign metrics</p>
                 </Link>
 
@@ -282,7 +234,7 @@ export default function TodayPage() {
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
-                  <p className="text-xs text-[#888888]">Monitor replies</p>
+                  <p className="text-xs text-[#888888]">Incoming replies</p>
                 </Link>
               </div>
             </div>
