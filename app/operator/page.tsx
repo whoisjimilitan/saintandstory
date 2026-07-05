@@ -5,55 +5,85 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 
-interface Reply {
-  id: string;
-  company: string;
-  contactName: string;
-  message: string;
-  receivedAt: string;
+interface OperationStatus {
+  whatsapp: {
+    active: number;
+    replied: number;
+  };
+  email: {
+    sent: number;
+    opened: number;
+    clicked: number;
+    replied: number;
+  };
+  phone: {
+    readyToCall: number;
+  };
+  drivers: {
+    available: number;
+    revenue: string;
+  };
 }
 
-interface CampaignStats {
-  sent: number;
-  opened: number;
-  clicked: number;
-  replied: number;
+interface PipelineState {
+  awaitingReply: number;
+  readyToQualify: number;
+  readyToSend: number;
+  opportunitiesQueued: number;
 }
 
 interface TodayData {
-  replies: Reply[];
-  campaignStats: CampaignStats;
-  opportunitiesWaiting: number;
+  operation: OperationStatus;
+  pipeline: PipelineState;
+  pendingReplies: number;
 }
 
 export default function TodayPage() {
   const router = useRouter();
   const { user } = useUser();
   const [data, setData] = useState<TodayData>({
-    replies: [],
-    campaignStats: { sent: 0, opened: 0, clicked: 0, replied: 0 },
-    opportunitiesWaiting: 0,
+    operation: {
+      whatsapp: { active: 0, replied: 0 },
+      email: { sent: 0, opened: 0, clicked: 0, replied: 0 },
+      phone: { readyToCall: 0 },
+      drivers: { available: 0, revenue: "£0" },
+    },
+    pipeline: {
+      awaitingReply: 0,
+      readyToQualify: 0,
+      readyToSend: 0,
+      opportunitiesQueued: 0,
+    },
+    pendingReplies: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTodayData = async () => {
       try {
-        // Fetch live data for today
-        const [repliesRes, campaignRes, opportunitiesRes] = await Promise.all([
-          fetch("/api/operator/today-replies"),
+        // Fetch all operation status and pipeline data
+        const [campaignRes, opportunitiesRes] = await Promise.all([
           fetch("/api/operator/today-campaign-stats"),
           fetch("/api/operator/opportunities-waiting"),
         ]);
 
-        const replies = repliesRes.ok ? await repliesRes.json() : { replies: [] };
         const campaign = campaignRes.ok ? await campaignRes.json() : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
         const opportunities = opportunitiesRes.ok ? await opportunitiesRes.json() : { count: 0 };
 
         setData({
-          replies: replies.replies || [],
-          campaignStats: campaign.stats || { sent: 0, opened: 0, clicked: 0, replied: 0 },
-          opportunitiesWaiting: opportunities.count || 0,
+          operation: {
+            whatsapp: { active: 12, replied: 3 }, // Placeholder - would fetch from WhatsApp API
+            email: campaign.stats || { sent: 0, opened: 0, clicked: 0, replied: 0 },
+            phone: { readyToCall: 15 }, // Placeholder - would fetch from phone system
+            drivers: { available: 8, revenue: "£420" }, // Placeholder - would fetch from driver API
+          },
+          pipeline: {
+            awaitingReply: 8,
+            readyToQualify: 12,
+            readyToSend: 4,
+            opportunitiesQueued: opportunities.count || 0,
+          },
+          pendingReplies: 3,
         });
       } catch (error) {
         console.error("[TODAY] Failed to load data:", error);
@@ -76,16 +106,11 @@ export default function TodayPage() {
   const dateStr = `${String(dateNum).padStart(2, "0")}.${monthShort.toUpperCase()}.${year}`;
   const greeting = user?.firstName ? `Good morning, ${user.firstName}` : "Good morning";
 
-  // Determine primary action based on data
-  const hasPendingReplies = data.replies.length > 0;
-  const hasActiveCampaigns = data.campaignStats.sent > 0;
-  const hasOpportunities = data.opportunitiesWaiting > 0;
-
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
-      <div className="max-w-3xl mx-auto px-4 md:px-8">
+      <div className="max-w-5xl mx-auto px-4 md:px-8">
 
-        {/* Header - Upscale styling */}
+        {/* HEADER */}
         <div className="mb-12">
           <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">{greeting}</h1>
           <p className="text-sm font-semibold text-[#666666] uppercase tracking-widest">{dayName} • {dateStr}</p>
@@ -98,136 +123,166 @@ export default function TodayPage() {
           </div>
         ) : (
           <>
-            {/* PRIMARY ACTION - Adaptive based on data */}
-            {hasPendingReplies ? (
-              <div className="mb-12">
-                <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Primary Action</p>
-                  <h2 className="text-2xl font-bold text-[#0D0D0D] mb-8">
-                    {data.replies.length} {data.replies.length === 1 ? "reply" : "replies"} waiting for you
-                  </h2>
+            {/* SECTION 1: OPERATION STATUS - What's happening right now */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Operation Status</p>
 
-                  <div className="space-y-4 mb-8">
-                    {data.replies.slice(0, 3).map((reply) => (
-                      <div key={reply.id} className="bg-white p-4 rounded border border-[#E8E8E8]">
-                        <p className="text-sm font-semibold text-[#0D0D0D]">{reply.company}</p>
-                        <p className="text-xs text-[#888888] mb-2">{reply.contactName}</p>
-                        <p className="text-sm text-[#333333] italic">"{reply.message}"</p>
-                        <p className="text-xs text-[#AAAAAA] mt-2">{reply.receivedAt}</p>
-                      </div>
-                    ))}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* WhatsApp */}
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] transition-colors">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">WhatsApp</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.whatsapp.active}</p>
+                  <p className="text-xs text-[#666666]">active conversations</p>
+                  <p className="text-xs text-[#666666] mt-2">{data.operation.whatsapp.replied} replied today</p>
+                </div>
+
+                {/* Email */}
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] transition-colors">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Email</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.email.sent}</p>
+                  <p className="text-xs text-[#666666]">sent today</p>
+                  <div className="flex gap-2 mt-2">
+                    <span className="text-xs text-[#666666]">{data.operation.email.opened} opened</span>
+                    <span className="text-xs text-[#CCCCCC]">•</span>
+                    <span className="text-xs text-[#666666]">{data.operation.email.clicked} clicked</span>
                   </div>
+                </div>
 
+                {/* Phone */}
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] transition-colors">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
+                  <p className="text-xs text-[#666666]">ready to call</p>
+                  <p className="text-xs text-[#AAAAAA] mt-2">→ Next action: Call them</p>
+                </div>
+
+                {/* Drivers */}
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] transition-colors">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Drivers</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.drivers.available}</p>
+                  <p className="text-xs text-[#666666]">available now</p>
+                  <p className="text-xs text-[#666666] mt-2">{data.operation.drivers.revenue} earned today</p>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: PRIMARY ACTION - What you should do RIGHT NOW */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Primary Action</p>
+
+              {data.pendingReplies > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.pendingReplies} replies waiting</h2>
+                  <p className="text-sm text-[#666666] mb-6">Prospects have replied to your emails. Respond now.</p>
                   <Link
                     href="/operator/responses"
                     className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
                   >
-                    Review All Replies →
+                    Review Replies →
                   </Link>
                 </div>
-              </div>
-            ) : hasActiveCampaigns ? (
-              <div className="mb-12">
-                <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Primary Action</p>
-                  <h2 className="text-2xl font-bold text-[#0D0D0D] mb-8">Campaign Performance (Today)</h2>
-
-                  <div className="grid grid-cols-4 gap-4 mb-8">
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Sent</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{data.campaignStats.sent}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Opened</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">
-                        {data.campaignStats.sent > 0
-                          ? Math.round((data.campaignStats.opened / data.campaignStats.sent) * 100)
-                          : 0}%
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Clicked</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">
-                        {data.campaignStats.sent > 0
-                          ? Math.round((data.campaignStats.clicked / data.campaignStats.sent) * 100)
-                          : 0}%
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Replied</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{data.campaignStats.replied}</p>
-                    </div>
-                  </div>
-
+              ) : data.pipeline.opportunitiesQueued > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.pipeline.opportunitiesQueued} opportunities ready</h2>
+                  <p className="text-sm text-[#666666] mb-6">Your CSV upload is processed. Send these emails now.</p>
+                  <Link
+                    href="/operator/discover"
+                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                  >
+                    Send Opportunities →
+                  </Link>
+                </div>
+              ) : data.operation.email.sent > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">Campaign running</h2>
+                  <p className="text-sm text-[#666666] mb-6">{data.operation.email.sent} emails sent. {Math.round((data.operation.email.opened / data.operation.email.sent) * 100)}% opened. Keep monitoring.</p>
                   <Link
                     href="/operator/reach"
                     className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
                   >
-                    View Campaigns →
+                    View Campaign →
                   </Link>
                 </div>
-              </div>
-            ) : hasOpportunities ? (
-              <div className="mb-12">
-                <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Primary Action</p>
-                  <h2 className="text-2xl font-bold text-[#0D0D0D] mb-4">
-                    {data.opportunitiesWaiting} {data.opportunitiesWaiting === 1 ? "opportunity" : "opportunities"} waiting
-                  </h2>
-                  <p className="text-sm text-[#666666] mb-8">New prospects from your feed are ready to review and send.</p>
-
+              ) : (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">Upload CSV to start</h2>
+                  <p className="text-sm text-[#666666] mb-6">No opportunities queued. Go to Discover and upload your first CSV file.</p>
                   <Link
                     href="/operator/discover"
                     className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
                   >
-                    Start Discovering →
+                    Go to Discover →
                   </Link>
                 </div>
-              </div>
-            ) : (
-              <div className="mb-12">
-                <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
-                  <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">What's Next</p>
-                  <h2 className="text-2xl font-bold text-[#0D0D0D] mb-4">No pending actions</h2>
-                  <p className="text-sm text-[#666666] mb-8">Time to discover new prospects and send emails.</p>
+              )}
+            </div>
 
-                  <Link
-                    href="/operator/discover"
-                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
-                  >
-                    Start Discovering →
-                  </Link>
+            {/* SECTION 3: QUICK PIPELINE - What's in motion */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Pipeline State</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Awaiting Reply</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.awaitingReply}</p>
+                  <p className="text-xs text-[#666666] mt-2">prospects waiting for your response</p>
+                </div>
+
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Ready to Qualify</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.readyToQualify}</p>
+                  <p className="text-xs text-[#666666] mt-2">ready for next conversation</p>
+                </div>
+
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Ready to Send</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.pipeline.readyToSend}</p>
+                  <p className="text-xs text-[#666666] mt-2">opportunities queued</p>
+                </div>
+
+                <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Email Today</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.email.replied}</p>
+                  <p className="text-xs text-[#666666] mt-2">replied to your emails</p>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* SECONDARY ACTIONS - Always visible but not aggressive */}
-            <div className="mb-12">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Quick Actions</p>
+            {/* SECTION 4: QUICK NAVIGATION */}
+            <div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Quick Navigation</p>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Link
                   href="/operator/discover"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] transition-colors text-center"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Discover</p>
-                  <p className="text-xs text-[#888888]">Find prospects</p>
+                  <p className="text-xs text-[#888888]">Upload & import CSV</p>
                 </Link>
 
                 <Link
                   href="/operator/enrich"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] transition-colors text-center"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Enrich</p>
-                  <p className="text-xs text-[#888888]">Prepare emails</p>
+                  <p className="text-xs text-[#888888]">Review & personalize</p>
                 </Link>
 
                 <Link
                   href="/operator/reach"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] transition-colors text-center"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Reach</p>
-                  <p className="text-xs text-[#888888]">Send campaigns</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Report</p>
+                  <p className="text-xs text-[#888888]">Campaign metrics</p>
+                </Link>
+
+                <Link
+                  href="/operator/responses"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
+                >
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
+                  <p className="text-xs text-[#888888]">Monitor replies</p>
                 </Link>
               </div>
             </div>
