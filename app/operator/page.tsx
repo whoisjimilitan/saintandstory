@@ -42,7 +42,7 @@ export default function TodayPage() {
       drivers: { available: 0, revenue: "£0" },
     },
     opportunitiesQueued: 0,
-    pendingReplies: 3,
+    pendingReplies: 0,
   });
   const [loading, setLoading] = useState(true);
 
