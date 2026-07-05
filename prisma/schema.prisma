@@ -1452,6 +1452,7 @@ model OpportunityFeed {
 
   // Tracking
   sentAt                DateTime?
+  resendId              String?   @unique
   openedAt              DateTime?
   clickedAt             DateTime?
   repliedAt             DateTime?

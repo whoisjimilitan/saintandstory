@@ -100,40 +100,38 @@ export async function POST(request: NextRequest) {
     }
 
     let campaignEmail;
+    let opportunityFeed;
+    let updateType = null;
+
     try {
+      // Try to match in b2bCampaignEmail first (existing flow)
       campaignEmail = await prisma.b2bCampaignEmail.findUnique({
         where: { resendMessageId: data.id as string },
       });
 
-      if (!campaignEmail) {
-        console.warn(`[WEBHOOK] ✗ No match for message ID: ${data.id}, email: ${data.email}`);
-
-        // Debug: Show a sample of what IDs exist
-        const sampleEmails = await prisma.b2bCampaignEmail.findMany({
-          take: 5,
-          select: { id: true, resendMessageId: true, prospectEmail: true, status: true, emailSentAt: true },
-          orderBy: { emailSentAt: "desc" },
+      if (campaignEmail) {
+        updateType = "campaign_email";
+        console.log(`[WEBHOOK] ✓ Matched b2bCampaignEmail: ${campaignEmail.id}`);
+      } else {
+        // Try to match in opportunityFeed if no campaign email match
+        opportunityFeed = await prisma.opportunityFeed.findFirst({
+          where: { resendId: data.id as string },
         });
-        console.warn(`[WEBHOOK] Sample ${sampleEmails.length} emails in DB:`, sampleEmails);
 
-        // Also check if there are ANY emails with NULL resendMessageId
-        const nullMessageIds = await prisma.b2bCampaignEmail.count({
-          where: { resendMessageId: null },
-        });
-        if (nullMessageIds > 0) {
-          console.error(`[WEBHOOK] ⚠️  WARNING: Found ${nullMessageIds} emails with NULL resendMessageId!`);
+        if (opportunityFeed) {
+          updateType = "opportunity_feed";
+          console.log(`[WEBHOOK] ✓ Matched opportunityFeed: ${opportunityFeed.id}`);
+        } else {
+          console.warn(`[WEBHOOK] ✗ No match for message ID: ${data.id}, email: ${data.email}`);
+          return NextResponse.json({ received: true, matched: false, reason: "email_not_found" });
         }
-
-        return NextResponse.json({ received: true, matched: false, reason: "email_not_found" });
       }
-
-      console.log(`[WEBHOOK] ✓ Matched campaign email: ${campaignEmail.id}, current status: ${campaignEmail.status}`);
     } catch (lookupError) {
       console.error(`[WEBHOOK] ✗ Database lookup failed:`, lookupError);
       return NextResponse.json({ received: true, matched: false, reason: "lookup_error" });
     }
 
-    // Update status and timestamp based on event type
+    // Prepare update data based on event type
     const updateData: any = { status: mappedEventType };
 
     if (mappedEventType === "opened") {
@@ -145,30 +143,51 @@ export async function POST(request: NextRequest) {
       updateData.status = "replied";
     }
 
+    // Update the appropriate table
     try {
-      const updated = await prisma.b2bCampaignEmail.update({
-        where: { id: campaignEmail.id },
-        data: updateData,
-        select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
-      });
+      if (updateType === "campaign_email" && campaignEmail) {
+        const updated = await prisma.b2bCampaignEmail.update({
+          where: { id: campaignEmail.id },
+          data: updateData,
+          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
+        });
 
-      console.log(`[WEBHOOK] ✓✓ Updated ${campaignEmail.id}:`, {
-        newStatus: updated.status,
-        openedAt: updated.openedAt,
-        clickedAt: updated.clickedAt,
-        repliedAt: updated.repliedAt,
-      });
+        console.log(`[WEBHOOK] ✓✓ Updated b2bCampaignEmail ${campaignEmail.id}:`, {
+          newStatus: updated.status,
+        });
+
+        return NextResponse.json({
+          received: true,
+          matched: true,
+          event: mappedEventType,
+          campaignEmailId: campaignEmail.id,
+          type: "campaign_email",
+        });
+      } else if (updateType === "opportunity_feed" && opportunityFeed) {
+        const updated = await prisma.opportunityFeed.update({
+          where: { id: opportunityFeed.id },
+          data: updateData,
+          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
+        });
+
+        console.log(`[WEBHOOK] ✓✓ Updated opportunityFeed ${opportunityFeed.id}:`, {
+          newStatus: updated.status,
+        });
+
+        return NextResponse.json({
+          received: true,
+          matched: true,
+          event: mappedEventType,
+          opportunityFeedId: opportunityFeed.id,
+          type: "opportunity_feed",
+        });
+      }
     } catch (updateError) {
       console.error(`[WEBHOOK] ✗ Database update failed:`, updateError);
       return NextResponse.json({ received: true, matched: true, reason: "update_failed" });
     }
 
-    return NextResponse.json({
-      received: true,
-      matched: true,
-      event: mappedEventType,
-      campaignEmailId: campaignEmail.id,
-    });
+    return NextResponse.json({ received: true, matched: false, reason: "unknown_error" });
   } catch (error) {
     console.error("[WEBHOOK] Error processing Resend webhook:", error);
     return NextResponse.json(

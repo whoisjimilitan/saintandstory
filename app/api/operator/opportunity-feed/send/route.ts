@@ -58,12 +58,13 @@ export async function POST(request: NextRequest) {
           throw new Error(response.error?.message || "Failed to send email");
         }
 
-        // Update database
+        // Update database with Resend ID for webhook tracking
         await prisma.opportunityFeed.update({
           where: { id: opp.id },
           data: {
             status: "sent",
             sentAt: new Date(),
+            resendId: response.id, // Store for webhook matching
           },
         });
 
