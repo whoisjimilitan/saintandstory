@@ -136,7 +136,7 @@ export default function TodayPage() {
                   <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
                   <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
                   <p className="text-xs text-[#666666]">ready to call</p>
-                  <p className="text-xs text-[#AAAAAA] mt-2">→ Next action: Call them</p>
+                  <p className="text-xs text-[#666666] mt-2">Follow up</p>
                 </div>
 
                 {/* Drivers */}
