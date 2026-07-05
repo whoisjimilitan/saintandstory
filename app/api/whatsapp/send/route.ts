@@ -42,6 +42,8 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk",
 ];
 
+// Mock WhatsApp API send (replace with real API when credentials available)
+
 export async function POST(request: NextRequest) {
   console.log("[WHATSAPP SEND] Starting message send");
 

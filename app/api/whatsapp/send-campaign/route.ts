@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
           // Call send-message endpoint
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001"}/api/whatsapp/send-message`,
+            `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/whatsapp/send-message`,
             {
               method: "POST",
               headers: {
