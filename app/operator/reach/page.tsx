@@ -182,9 +182,9 @@ export default function ReachPage() {
 
   const emailStats = emailByWindow.today.reduce(
     (acc, c) => ({
-      total: acc.total + (c.sent || 0),
-      opened: acc.opened + (c.opened || 0),
-      replied: acc.replied + (c.replied || 0),
+      total: acc.total + ((c as any).emailStats?.sent || c.sent || 0),
+      opened: acc.opened + ((c as any).emailStats?.opened || c.opened || 0),
+      replied: acc.replied + ((c as any).emailStats?.replied || c.replied || 0),
     }),
     { total: 0, opened: 0, replied: 0 }
   );
@@ -298,19 +298,19 @@ export default function ReachPage() {
                           <div>
                             <p className="text-xs text-[#888888]">Sent</p>
                             <p className="text-sm font-semibold text-[#0D0D0D]">
-                              {campaign.sent}
+                              {(campaign as any).emailStats?.sent || 0}
                             </p>
                           </div>
                           <div>
                             <p className="text-xs text-[#888888]">Opened</p>
                             <p className="text-sm font-semibold text-[#0D0D0D]">
-                              {campaign.opened}
+                              {(campaign as any).emailStats?.opened || 0}
                             </p>
                           </div>
                           <div>
                             <p className="text-xs text-[#888888]">Replied</p>
                             <p className="text-sm font-semibold text-[#0D0D0D]">
-                              {campaign.replied}
+                              {(campaign as any).emailStats?.replied || 0}
                             </p>
                           </div>
                         </div>
@@ -436,19 +436,19 @@ export default function ReachPage() {
                             <div>
                               <p className="text-xs text-[#888888]">Sent</p>
                               <p className="text-sm font-semibold text-[#0D0D0D]">
-                                {campaign.sent}
+                                {(campaign as any).sent || 0}
                               </p>
                             </div>
                             <div>
                               <p className="text-xs text-[#888888]">Delivered</p>
                               <p className="text-sm font-semibold text-[#0D0D0D]">
-                                {campaign.delivered}
+                                {(campaign as any).delivered || 0}
                               </p>
                             </div>
                             <div>
                               <p className="text-xs text-[#888888]">Replied</p>
                               <p className="text-sm font-semibold text-[#0D0D0D]">
-                                {campaign.replied}
+                                {(campaign as any).replied || 0}
                               </p>
                             </div>
                           </div>
