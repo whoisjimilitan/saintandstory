@@ -210,7 +210,7 @@ export default function TodayPage() {
               ) : data.operation.email.sent > 0 ? (
                 <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
                   <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">Campaign running</h2>
-                  <p className="text-sm text-[#666666] mb-6">{data.operation.email.sent} emails sent. {Math.round((data.operation.email.opened / data.operation.email.sent) * 100)}% opened. Keep monitoring.</p>
+                  <p className="text-sm text-[#666666] mb-6">{data.operation.email.sent} emails sent. {data.operation.email.sent > 0 ? Math.round((data.operation.email.opened / data.operation.email.sent) * 100) : 0}% opened. Keep monitoring.</p>
                   <Link
                     href="/operator/reach"
                     className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"

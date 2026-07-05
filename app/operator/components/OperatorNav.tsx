@@ -8,7 +8,7 @@ const stages = [
   { name: "Today", href: "/operator", desc: "Command center" },
   { name: "Discover", href: "/operator/discover", desc: "Find prospects" },
   { name: "Enrich", href: "/operator/enrich", desc: "Prepare to send" },
-  { name: "Report", href: "/operator/reach", desc: "Campaign reports" },
+  { name: "Reach", href: "/operator/reach", desc: "Campaign reports" },
   { name: "Responses", href: "/operator/responses", desc: "Monitor replies" },
 ];
 
