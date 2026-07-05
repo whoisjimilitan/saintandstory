@@ -164,7 +164,7 @@ export default function TodayPage() {
                 >
                   <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
                   <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
-                  <p className="text-xs text-[#666666]">prospects with no email</p>
+                  <p className="text-xs text-[#666666]">no emails</p>
                   <p className="text-xs text-[#666666] mt-2">Call to qualify</p>
                 </button>
 
