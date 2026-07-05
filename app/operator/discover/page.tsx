@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
+import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 
 interface Prospect {
@@ -15,9 +16,14 @@ interface Prospect {
   phone?: string;
   tier?: 1 | 2 | 3;
   category?: string;
+  source?: "email" | "whatsapp" | "feed";
+  opportunityId?: string;
+  extractedNeed?: string;
+  briefHtml?: string;
+  emailBody?: string;
 }
 
-type Channel = "email" | "whatsapp" | "phone";
+type Channel = "email" | "whatsapp" | "feed";
 type ActionMode = "upload" | "search" | "manual" | null;
 
 
@@ -127,6 +133,8 @@ export default function DiscoverPage() {
     }
 
     const selectedProspects = searchResults.filter(p => selectedLeads.has(p.id));
+
+    // All channels (email, whatsapp, feed) flow through enrich
     sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
     sessionStorage.setItem("enrich_channel", selectedChannel);
     router.push("/operator/enrich");
@@ -182,15 +190,15 @@ export default function DiscoverPage() {
             </button>
 
             <button
-              onClick={() => setSelectedChannel("phone")}
+              onClick={() => setSelectedChannel("feed")}
               className={`p-6 rounded-lg border-2 transition-all ${
-                selectedChannel === "phone"
+                selectedChannel === "feed"
                   ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
                   : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-bold text-base mb-1">Phone Campaign</p>
-              <p className="text-xs opacity-70">Direct calls</p>
+              <p className="font-bold text-base mb-1">Opportunity Feed</p>
+              <p className="text-xs opacity-70">GPT-5 discovered</p>
             </button>
           </div>
         </div>
@@ -198,46 +206,71 @@ export default function DiscoverPage() {
         {/* === STEP 2: ADD LEADS === */}
         <div className="mb-16">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-            Step 2: Add Leads
+            {selectedChannel === "feed" ? "Upload Opportunities" : "Step 2: Add Leads"}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <button
-              onClick={() => setActionMode(actionMode === "upload" ? null : "upload")}
-              className={`p-4 rounded-lg border transition-all ${
-                actionMode === "upload"
-                  ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                  : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-              }`}
-            >
-              <p className="font-semibold text-sm text-[#0D0D0D]">Upload CSV</p>
-            </button>
 
-            <button
-              onClick={() => setActionMode(actionMode === "search" ? null : "search")}
-              className={`p-4 rounded-lg border transition-all ${
-                actionMode === "search"
-                  ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                  : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-              }`}
-            >
-              <p className="font-semibold text-sm text-[#0D0D0D]">Search</p>
-            </button>
+          {/* Feed Channel - CSV Upload Only */}
+          {selectedChannel === "feed" && (
+            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
+              <OpportunityCsvUpload
+                onUploadComplete={(opportunities) => {
+                  const converted: Prospect[] = opportunities.map((opp) => ({
+                    id: opp.id,
+                    businessName: opp.companyName,
+                    source: "feed",
+                    opportunityId: opp.id,
+                    extractedNeed: opp.extractedNeed,
+                    briefHtml: opp.briefHtml,
+                    emailBody: opp.emailBody,
+                    tier: getConsequenceTier(opp.companyName),
+                    category: "Opportunity Feed",
+                  }));
+                  setSearchResults([...converted, ...searchResults]);
+                }}
+              />
+            </div>
+          )}
 
-            <button
-              onClick={() => setActionMode(actionMode === "manual" ? null : "manual")}
-              className={`p-4 rounded-lg border transition-all ${
-                actionMode === "manual"
-                  ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                  : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-              }`}
-            >
-              <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
-            </button>
+          {/* Email/WhatsApp Channels - Multiple Options */}
+          {selectedChannel !== "feed" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <button
+                onClick={() => setActionMode(actionMode === "upload" ? null : "upload")}
+                className={`p-4 rounded-lg border transition-all ${
+                  actionMode === "upload"
+                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
+                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
+                }`}
+              >
+                <p className="font-semibold text-sm text-[#0D0D0D]">Upload CSV</p>
+              </button>
 
-          </div>
+              <button
+                onClick={() => setActionMode(actionMode === "search" ? null : "search")}
+                className={`p-4 rounded-lg border transition-all ${
+                  actionMode === "search"
+                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
+                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
+                }`}
+              >
+                <p className="font-semibold text-sm text-[#0D0D0D]">Search</p>
+              </button>
 
-          {/* UPLOAD MODE */}
-          {actionMode === "upload" && selectedChannel !== "phone" && (
+              <button
+                onClick={() => setActionMode(actionMode === "manual" ? null : "manual")}
+                className={`p-4 rounded-lg border transition-all ${
+                  actionMode === "manual"
+                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
+                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
+                }`}
+              >
+                <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
+              </button>
+            </div>
+          )}
+
+          {/* UPLOAD MODE - Email/WhatsApp Only */}
+          {actionMode === "upload" && selectedChannel !== "feed" && (
             <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
               {selectedChannel === "email" && (
                 <WhatsAppBatchCampaign channel="email" />
@@ -248,14 +281,8 @@ export default function DiscoverPage() {
             </div>
           )}
 
-          {actionMode === "upload" && selectedChannel === "phone" && (
-            <div className="rounded-lg p-12 mb-8 bg-[#F9F9F9] text-center">
-              <p className="text-sm text-[#666666]">Phone outreach CSV upload coming soon</p>
-            </div>
-          )}
-
-          {/* SEARCH MODE */}
-          {actionMode === "search" && (
+          {/* SEARCH MODE - Email/WhatsApp Only */}
+          {actionMode === "search" && selectedChannel !== "feed" && (
             <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
               <div className="mb-6 flex gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -313,8 +340,8 @@ export default function DiscoverPage() {
             </div>
           )}
 
-          {/* MANUAL ADD MODE */}
-          {actionMode === "manual" && (
+          {/* MANUAL ADD MODE - Email/WhatsApp Only */}
+          {actionMode === "manual" && selectedChannel !== "feed" && (
             <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
               <div className="space-y-3">
                 <input

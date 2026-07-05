@@ -6,11 +6,10 @@ import { useState } from "react";
 
 const stages = [
   { name: "Today", href: "/operator", desc: "Command center" },
-  { name: "Feed", href: "/operator/opportunity-feed", desc: "Opportunity feed" },
-  { name: "Discover", href: "/operator/discover", desc: "Upload leads" },
-  { name: "Reach", href: "/operator/reach", desc: "Send campaigns" },
+  { name: "Discover", href: "/operator/discover", desc: "Find prospects" },
+  { name: "Enrich", href: "/operator/enrich", desc: "Prepare to send" },
+  { name: "Reach", href: "/operator/reach", desc: "Send & track" },
   { name: "Responses", href: "/operator/responses", desc: "Monitor replies" },
-  { name: "Contracts", href: "/operator/contracts", desc: "Track outcomes" },
 ];
 
 export function OperatorNav() {

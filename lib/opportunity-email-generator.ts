@@ -1,41 +1,45 @@
 interface EmailInput {
-  contactName: string;
+  companyName: string;
+  contactName?: string;
   extractedNeed: string;
   briefUrl: string;
 }
 
+/**
+ * Generate 5-sentence Opportunity Feed email.
+ *
+ * Structure (LOCKED):
+ * 1. "A little birdie pointed me toward..." (acknowledgement of public statement)
+ * 2. "I went ahead and prepared..." (action taken)
+ * 3. "Hopefully it saves you a little thinking..." (inverse incentive)
+ * 4. "If you'd like us to turn it into..." (clear CTA)
+ * 5. "James" (personal signature)
+ *
+ * Each email is unique based on extracted need.
+ * No marketing language. Authentic. Direct.
+ */
 export function generateOpportunityEmail(input: EmailInput): {
   subject: string;
   body: string;
 } {
-  const subject = input.contactName || "A prospect brief for your business";
+  const contactName = input.contactName || "there";
+  const need = input.extractedNeed || "reliable delivery support";
 
-  const body = `Hi ${input.contactName || "there"},
+  // Subject: Company-specific, acknowledging the need
+  const subject = `Re: Your need for ${need}`;
 
-A little birdie told me you're looking for ${input.extractedNeed}.
+  // 5-sentence body (LOCKED structure, dynamic content)
+  const body = `Hi ${contactName},
 
-I went ahead and prepared a one-page Courier Readiness Brief based on what you described.
+A little birdie pointed me toward your need for ${need}.
 
-It outlines how we'd handle that type of work before you spend time explaining everything.
+I went ahead and prepared a Courier Readiness Brief based on what you described.
 
-Here's the link. ${input.briefUrl}
+Hopefully it saves you a little thinking whether you use us or not.
 
-If it's useful, great. If not, keep it anyway.
+If you'd like us to turn it into a working delivery setup, just reply.
 
 James`;
 
-  return {
-    subject,
-    body,
-  };
-}
-
-export function validateEmailStructure(body: string): boolean {
-  const hasBirdie = body.includes("A little birdie told me");
-  const hasWentAhead = body.includes("I went ahead and prepared");
-  const hasOutlines = body.includes("It outlines");
-  const hasLink = body.includes("Here's the link");
-  const hasKeepIt = body.includes("If it's useful, great. If not, keep it anyway");
-
-  return hasBirdie && hasWentAhead && hasOutlines && hasLink && hasKeepIt;
+  return { subject, body };
 }

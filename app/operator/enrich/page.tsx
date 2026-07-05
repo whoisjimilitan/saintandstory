@@ -99,9 +99,31 @@ export default function EnrichPage() {
 
     try {
       const data = JSON.parse(prospectData) as Prospect[];
+      const channel = sessionStorage.getItem("enrich_channel") || "email";
       setProspects(data);
-      generateEmails(data);
+
+      // Feed channel: emails already generated, skip generation
+      if (channel === "feed" && data.length > 0 && (data[0] as any).emailBody) {
+        const feedEmails = data.map((p: any) => ({
+          prospectId: p.id,
+          prospectName: p.contactName || p.businessName,
+          businessName: p.businessName,
+          city: p.city || "",
+          email: p.email || "",
+          subject: `Re: Your need for ${p.extractedNeed || "delivery support"}`,
+          body: p.emailBody,
+          htmlBody: undefined,
+          wordCount: (p.emailBody || "").split(" ").length,
+          senderName: "James"
+        }));
+        setGeneratedEmails(feedEmails);
+      } else {
+        // Email/WhatsApp: generate new emails
+        generateEmails(data);
+      }
+
       sessionStorage.removeItem("enrich_prospects");
+      sessionStorage.removeItem("enrich_channel");
     } catch (error) {
       console.error("Error parsing prospects:", error);
       router.push("/operator/discover");
