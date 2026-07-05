@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
+import WhatsAppCsvUpload from "@/components/WhatsAppCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 
 interface Prospect {
@@ -276,7 +277,22 @@ export default function DiscoverPage() {
                 <WhatsAppBatchCampaign channel="email" />
               )}
               {selectedChannel === "whatsapp" && (
-                <WhatsAppBatchCampaign channel="whatsapp" />
+                <WhatsAppCsvUpload
+                  onUploadComplete={(leads) => {
+                    const converted: Prospect[] = leads.map((lead) => ({
+                      id: lead.id,
+                      businessName: lead.businessName,
+                      phone: lead.phone,
+                      contactName: lead.contactName,
+                      city: lead.city,
+                      source: "whatsapp",
+                      tier: getConsequenceTier(lead.businessName),
+                      category: detectCategory(lead.businessName),
+                    }));
+                    setSearchResults([...converted, ...searchResults]);
+                    setActionMode(null);
+                  }}
+                />
               )}
             </div>
           )}
