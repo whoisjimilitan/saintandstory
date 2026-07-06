@@ -302,27 +302,27 @@ function getDiscoveryPhrase(problemType: string): string {
  */
 function getTeachingMoment(problemType: string): string {
   const teachings: Record<string, string> = {
-    court_deadline_delivery: "Filing deadlines aren't missed because of the law. They're missed because of dependencies that are out of your control.",
-    legal_document_delivery: "Legal deadlines fail not because of the law, but because of dependencies that are out of your control.",
-    hospital_supply_delivery: "Care delays aren't caused by medical skill. They're caused by dependencies that are out of your control.",
-    pharmacy_prescription_delivery: "Patient delays aren't caused by the medication. They're caused by dependencies that are out of your control.",
-    construction_material_delivery: "Project delays aren't caused by planning. They're caused by dependencies that are out of your control.",
-    estate_agent_document_delivery: "Deals don't fail because of negotiation. They fail because of dependencies that are out of your control.",
-    restaurant_supply_delivery: "Revenue loss isn't caused by your cooking. It's caused by dependencies that are out of your control.",
-    accounting_file_delivery: "Tax compliance isn't about calculations. It's about dependencies that are out of your control.",
-    architecture_drawing_delivery: "Building delays aren't about design. They're caused by dependencies that are out of your control.",
-    veterinary_supply_delivery: "Animal care doesn't fail from medical skill. It fails because of dependencies that are out of your control.",
-    dental_supply_delivery: "Dental delays don't come from treatment. They come from dependencies that are out of your control.",
-    retail_stock_delivery: "Store success isn't about your products. It's about dependencies that are out of your control.",
-    beauty_supply_delivery: "Client satisfaction doesn't depend on your service. It depends on dependencies that are out of your control.",
-    art_gallery_artwork_delivery: "Exhibition success isn't about the art. It's about dependencies that are out of your control.",
-    catering_supply_delivery: "Event success isn't about food quality. It's about dependencies that are out of your control.",
-    manufacturing_part_delivery: "Production targets miss not because of skill. They miss because of dependencies that are out of your control.",
-    film_production_equipment: "Films get made or delayed not because of talent. They depend on things out of your control.",
-    office_supply_delivery: "Productivity doesn't fail from work ethic. It fails because of dependencies that are out of your control."
+    court_deadline_delivery: "Delivering court documents isn't about legal expertise. It's about relying on dependencies that are out of your control.",
+    legal_document_delivery: "Delivering legal documents on time isn't about the law. It's about relying on dependencies that are out of your control.",
+    hospital_supply_delivery: "Delivering patient care isn't about medical skill. It's about relying on dependencies that are out of your control.",
+    pharmacy_prescription_delivery: "Delivering prescriptions on time isn't about the medication. It's about relying on dependencies that are out of your control.",
+    construction_material_delivery: "Delivering projects on schedule isn't about planning. It's about relying on dependencies that are out of your control.",
+    estate_agent_document_delivery: "Delivering completions on time isn't about negotiation. It's about relying on dependencies that are out of your control.",
+    restaurant_supply_delivery: "Delivering consistent service isn't about your cooking. It's about relying on dependencies that are out of your control.",
+    accounting_file_delivery: "Delivering tax compliance isn't about calculations. It's about relying on dependencies that are out of your control.",
+    architecture_drawing_delivery: "Delivering projects on schedule isn't about design. It's about relying on dependencies that are out of your control.",
+    veterinary_supply_delivery: "Delivering animal care on time isn't about medical skill. It's about relying on dependencies that are out of your control.",
+    dental_supply_delivery: "Delivering appointments on schedule isn't about treatment skill. It's about relying on dependencies that are out of your control.",
+    retail_stock_delivery: "Delivering store readiness isn't about your products. It's about relying on dependencies that are out of your control.",
+    beauty_supply_delivery: "Delivering client satisfaction isn't about your service. It's about relying on dependencies that are out of your control.",
+    art_gallery_artwork_delivery: "Delivering exhibitions on time isn't about the art. It's about relying on dependencies that are out of your control.",
+    catering_supply_delivery: "Delivering successful events isn't about food quality. It's about relying on dependencies that are out of your control.",
+    manufacturing_part_delivery: "Delivering production quotas isn't about skill. It's about relying on dependencies that are out of your control.",
+    film_production_equipment: "Delivering films on schedule isn't about talent. It's about relying on dependencies that are out of your control.",
+    office_supply_delivery: "Delivering productivity isn't about work ethic. It's about relying on dependencies that are out of your control."
   };
 
-  return teachings[problemType] || "Success always depends on one thing: dependencies you can't control.";
+  return teachings[problemType] || "Success always depends on one thing: relying on dependencies you can't control.";
 }
 
 /**
