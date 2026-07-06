@@ -111,7 +111,23 @@ export async function POST(request: Request) {
         // ============ STEP 1: Identify Real Problem ============
         console.log(`[PROPHECY-PIPELINE] Step 1: Identifying problem...`);
 
-        const categoryInference = inferProblemFromCategory(prospect.businessCategory || "");
+        // Support both 'category' (from Discover) and 'businessCategory' (from DB)
+        const category = (prospect.category || prospect.businessCategory || "").trim();
+        console.log(`[PROPHECY-PIPELINE] Prospect fields:`, {
+          businessName: prospect.businessName,
+          category: prospect.category,
+          businessCategory: prospect.businessCategory,
+          extractedNeed: prospect.extractedNeed,
+          finalCategory: category
+        });
+
+        const categoryInference = inferProblemFromCategory(category);
+        console.log(`[PROPHECY-PIPELINE] Category inference result:`, {
+          input: category,
+          primary_problem: categoryInference.primary_problem,
+          confidence: categoryInference.confidence
+        });
+
         const problemType = categoryInference.primary_problem || "court_deadline_delivery";
         const problem = getProblemType(problemType);
 

@@ -210,46 +210,44 @@ function generateBriefHTML(input: {
 /**
  * Generate SIMPLE email body using template format.
  *
- * PROPHECY STRUCTURE:
- * Line 1: Greeting (recognition)
- * Line 2: Discovery (what we learned about them)
- * Line 3: Action (brief prepared)
- * Line 4: Transformation (what becomes possible)
- * Line 5: CTA (low friction ask)
- * Line 6: Signature
+ * PROPHECY STRUCTURE (5 lines, perfectly simple):
+ * 1. Greeting (recognition)
+ * 2. Discovery (what we learned about them)
+ * 3. Action (brief prepared)
+ * 4. Transformation (what becomes possible)
+ * 5. CTA (low friction ask)
+ * 6. Signature
  *
- * Psychology is in the STRUCTURE, not the words.
+ * Psychology is in the STRUCTURE, not forced into words.
  */
 export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
   const name = input?.contact_name || "there";
-  const company = input?.company_name || "your company";
   const problemType = input?.problem_type || "";
   const problem = getProblemType(problemType);
 
   // Transform problem statement into discovery language
-  // "Your court deadlines shouldn't create anxiety" → "court deadlines creating stress"
-  const discoveryPhrase = problem
-    ? problem.brief_opening
-        .replace(/^Your /, "")
-        .replace(/^(\w+) /, (match, word) => word.toLowerCase())
-        .replace(/ shouldn't.*$/, " challenges")
-        .replace(/ don't.*$/, " issues")
-        .replace(/ affect.*$/, " affecting you")
-        .replace(/\.$/, "")
-    : "delivery challenges";
+  // "Your court deadlines shouldn't create anxiety" → "court deadlines challenges"
+  let discoveryPhrase = "delivery challenges";
+
+  if (problem && problem.brief_opening) {
+    discoveryPhrase = problem.brief_opening
+      .toLowerCase()
+      .replace(/^your /, "")
+      .replace(/shouldn't|don't|doesn't/, "")
+      .replace(/\.$/, "")
+      .trim();
+  }
 
   // Extract ONE punchy line from the possibility section (first sentence)
   const punchyLine = brief.possibility_section.split(".")[0] + ".";
 
-  return `Hi ${name},
-
-A little birdie told me about ${discoveryPhrase}.
-
-I went ahead and prepared a Brief based on what you described.
-
-${punchyLine} Hopefully it saves you some thinking whether you use us or not.
-
-If you'd like us to turn it into a working setup, just reply.
-
-James`;
+  // Perfect email format: each line separated by double newline for clarity
+  return [
+    `Hi ${name},`,
+    `A little birdie told me about ${discoveryPhrase}.`,
+    `I went ahead and prepared a Brief based on what you described.`,
+    `${punchyLine} Hopefully it saves you some thinking whether you use us or not.`,
+    `If you'd like us to turn it into a working setup, just reply.`,
+    `James`
+  ].join("\n\n");
 }
