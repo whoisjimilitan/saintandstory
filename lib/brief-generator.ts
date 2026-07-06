@@ -208,20 +208,20 @@ function generateBriefHTML(input: {
 }
 
 /**
- * Generate PROPHETIC email body - THE BREAKTHROUGH.
+ * Generate PROPHETIC email body - THE FINAL BREAKTHROUGH.
  *
- * PERFECT STRUCTURE (psychologically complete + discovery-first):
+ * PERFECT STRUCTURE (psychologically complete + authentically human):
  * 1. Greeting
- * 2. Apologies (permission to listen)
- * 3. Discovery ("A little birdie told me...")
- * 4. Teaching moment (humble authority + the real insight)
- * 5. Personalization (specific to THEM)
- * 6. Credibility/Proof (why we built this)
- * 7. Engagement question (soft CTA)
- * 8. Signature
- * 9. Reply button (in HTML)
+ * 2. Apology + Discovery (merged for natural flow)
+ * 3. Teaching + Reason (connected with "that's why I'm emailing")
+ * 4. Personalization (specific to THEM)
+ * 5. Credibility/Proof (why we built this)
+ * 6. Engagement question (soft CTA)
+ * 7. Signature
+ * 8. Reply button (in HTML)
  *
- * Psychology: Permission → Recognition → Authority → Insight → Personalization → Proof → Engagement
+ * Psychology: Permission → Recognition → Authority + Reason → Insight → Personalization → Proof → Engagement
+ * Authenticity: One person's flowing thought, not a template structure
  */
 export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
   const name = input?.contact_name || "there";
@@ -233,70 +233,68 @@ export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): st
     return "Brief generation failed.";
   }
 
-  // ============ BUILD THE BREAKTHROUGH EMAIL ============
+  // ============ BUILD THE FINAL BREAKTHROUGH EMAIL ============
 
-  // Line 1: GREETING
-  const line1 = `Hi ${name},`;
+  // SECTION 1: GREETING
+  const section1 = `Hi ${name},`;
 
-  // Line 2: APOLOGIES (Permission to listen)
-  const line2 = `\nApologies. I know it's unusual emailing you out of the blue.`;
+  // SECTION 2: APOLOGY + DISCOVERY (merged for natural flow)
+  // "Apologies. I know it's unusual emailing you out of the blue. It's because a little birdie told me that you handle..."
+  const discoveryPhrase = getDiscoveryPhrase(problemType);
+  const section2 = `Apologies. I know it's unusual emailing you out of the blue. It's because ${discoveryPhrase}`;
 
-  // Line 3: DISCOVERY ("A little birdie told me...")
-  // What we discovered specifically about them
-  const discoveryPhrase = getDiscoveryPhrase(problemType, company);
-  const line3 = `\n${discoveryPhrase}`;
-
-  // Line 4: TEACHING MOMENT (Humble Authority + Real Insight)
-  // "Working with [INDUSTRY] has taught me one thing. [The real gap]"
+  // SECTION 3: TEACHING MOMENT + REASON (connected)
+  // "Working with [INDUSTRY] has taught me one thing and that's the reason for my email. [The real insight]"
   const industryPhrase = getIndustryPhrase(problemType);
   const realInsight = getTeachingMoment(problemType);
-  const line4 = `\n${industryPhrase} has taught me one thing. ${realInsight}`;
+  const section3 = `${industryPhrase} has taught me one thing and that's the reason for my email. ${realInsight}`;
 
-  // Line 5: PERSONALIZATION (Specific to their situation)
+  // SECTION 4: PERSONALIZATION (specific to their situation, using company name once)
   const personalizationLine = getPersonalizationLine(problemType, company);
-  const line5 = `\n${personalizationLine}`;
+  const section4 = personalizationLine;
 
-  // Line 6: CREDIBILITY/PROOF (Why we built this)
+  // SECTION 5: CREDIBILITY/PROOF (why we built this)
   const credibilityLine = getCredibilityStatement(problemType);
-  const line6 = `\n${credibilityLine}`;
+  const section5 = credibilityLine;
 
-  // Line 7: ENGAGEMENT QUESTION (Soft CTA)
+  // SECTION 6: ENGAGEMENT QUESTION (soft CTA)
   const engagementQuestion = getEngagementQuestion(problemType);
-  const line7 = `\n${engagementQuestion}`;
+  const section6 = engagementQuestion;
 
-  // Line 8: SIGNATURE
-  const line8 = `\nJames\nCo-Founder at Saint & Story`;
+  // SECTION 7: SIGNATURE
+  const section7 = `James\nCo-Founder at Saint & Story`;
 
-  return line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8;
+  // ASSEMBLE: Merge sections with blank lines for readability
+  return [section1, section2, section3, section4, section5, section6, section7].join("\n\n");
 }
 
 /**
- * Discovery phrase: "A little birdie told me about..."
- * What we discovered about THEM specifically
+ * Discovery phrase: Uses "you handle" instead of company name for personal touch
+ * Makes it feel like we're talking TO them, not ABOUT them
  */
-function getDiscoveryPhrase(problemType: string, company: string): string {
+function getDiscoveryPhrase(problemType: string): string {
   const discoveries: Record<string, string> = {
-    court_deadline_delivery: `A little birdie told me that ${company} handles critical court deadlines.`,
-    legal_document_delivery: `A little birdie told me that ${company} needs documents at court on time.`,
-    hospital_supply_delivery: `A little birdie told me that ${company} manages urgent patient care supply chains.`,
-    pharmacy_prescription_delivery: `A little birdie told me that ${company} delivers prescriptions daily.`,
-    construction_material_delivery: `A little birdie told me that ${company} coordinates site material deliveries.`,
-    estate_agent_document_delivery: `A little birdie told me that ${company} closes property deals daily.`,
-    restaurant_supply_delivery: `A little birdie told me that ${company} depends on reliable supplier collections.`,
-    accounting_file_delivery: `A little birdie told me that ${company} manages tax deadline documents.`,
-    architecture_drawing_delivery: `A little birdie told me that ${company} sends plans to construction sites.`,
-    veterinary_supply_delivery: `A little birdie told me that ${company} coordinates urgent medication deliveries.`,
-    dental_supply_delivery: `A little birdie told me that ${company} relies on lab and supply timing.`,
-    retail_stock_delivery: `A little birdie told me that ${company} needs early morning stock delivery.`,
-    beauty_supply_delivery: `A little birdie told me that ${company} depends on product availability.`,
-    art_gallery_artwork_delivery: `A little birdie told me that ${company} coordinates exhibition openings.`,
-    catering_supply_delivery: `A little birdie told me that ${company} sources supplies for events.`,
-    manufacturing_part_delivery: `A little birdie told me that ${company} coordinates parts delivery for production.`,
-    film_production_equipment: `A little birdie told me that ${company} needs equipment on location fast.`,
-    office_supply_delivery: `A little birdie told me that ${company} needs supplies to stay productive.`
+    court_deadline_delivery: `a little birdie told me that you handle quite a number of critical court deadlines.`,
+    legal_document_delivery: `a little birdie told me that you need documents at court on time.`,
+    hospital_supply_delivery: `a little birdie told me that you manage urgent patient care supply chains.`,
+    pharmacy_prescription_delivery: `a little birdie told me that you deliver prescriptions daily.`,
+    construction_material_delivery: `a little birdie told me that you coordinate site material deliveries.`,
+    estate_agent_document_delivery: `a little birdie told me that you close property deals regularly.`,
+    restaurant_supply_delivery: `a little birdie told me that you depend on reliable supplier collections.`,
+    accounting_file_delivery: `a little birdie told me that you manage tax deadline documents.`,
+    architecture_drawing_delivery: `a little birdie told me that you send plans to construction sites.`,
+    veterinary_supply_delivery: `a little birdie told me that you coordinate urgent medication deliveries.`,
+    dental_supply_delivery: `a little birdie told me that you rely on lab and supply timing.`,
+    retail_stock_delivery: `a little birdie told me that you need early morning stock delivery.`,
+    beauty_supply_delivery: `a little birdie told me that you depend on product availability.`,
+    art_gallery_artwork_delivery: `a little birdie told me that you coordinate exhibition openings.`,
+    catering_supply_delivery: `a little birdie told me that you source supplies for events.`,
+    manufacturing_part_delivery: `a little birdie told me that you coordinate parts delivery for production.`,
+    film_production_equipment: `a little birdie told me that you need equipment on location fast.`,
+    office_supply_delivery: `a little birdie told me that you need supplies to stay productive.`
   };
 
-  return discoveries[problemType] || `A little birdie told me about ${company}.`;
+  return discoveries[problemType] || `a little birdie told me about what you do.`;
 }
 
 /**
