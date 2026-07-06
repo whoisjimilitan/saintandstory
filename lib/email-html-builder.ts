@@ -94,9 +94,9 @@ export function buildEmailHtml(
       ${contentHtml}
     </div>
 
-    <div style="margin-top: 24px; padding-top: 0;">
-      <p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
-      ${senderRoleFromBody ? `<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.65; color: #666666; font-weight: 400;">${senderRoleFromBody}</p>` : '<p style="margin: 0 0 24px 0;"></p>'}
+    <div style="margin-top: 48px; padding-top: 0;">
+      <p style="margin: 0 0 2px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
+      ${senderRoleFromBody ? `<p style="margin: 0; font-size: 15px; line-height: 1.65; color: #666666; font-weight: 400;">${senderRoleFromBody}</p>` : ''}
 
       <div style="margin-top: 24px;">
         <a href="${replyLink}" class="cta-button">Reply</a>
