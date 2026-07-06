@@ -59,6 +59,8 @@ export default function DiscoverPage() {
   });
 
   const [inferringProblem, setInferringProblem] = useState(false);
+  const [inferenceAttempted, setInferenceAttempted] = useState(false);
+  const [inferenceFailed, setInferenceFailed] = useState(false);
 
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -162,28 +164,67 @@ export default function DiscoverPage() {
       return;
     }
 
-    setInferringProblem(true);
-    try {
-      // Intelligently infer problem from description
-      const res = await fetch("/api/operator/infer-problem", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          problem_description: manualForm.problemDescription,
-          business_name: manualForm.businessName
-        })
-      });
+    // If inference failed before, require manual category selection
+    if (inferenceFailed && !manualForm.category.trim()) {
+      alert("Please select a category manually");
+      return;
+    }
 
-      if (!res.ok) {
-        const error = await res.json();
-        alert(`Could not infer problem: ${error.error}`);
+    // If inference hasn't been attempted yet, try it
+    if (!inferenceAttempted) {
+      setInferringProblem(true);
+      try {
+        const res = await fetch("/api/operator/infer-problem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            problem_description: manualForm.problemDescription,
+            business_name: manualForm.businessName
+          })
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          console.log("[DISCOVER] Inference failed, showing fallback");
+          setInferenceAttempted(true);
+          setInferenceFailed(true);
+          alert(error.error);
+          setInferringProblem(false);
+          return;
+        }
+
+        const inference = await res.json();
+        console.log("[DISCOVER] Inferred:", inference);
+
+        const newProspect: Prospect = {
+          id: `manual-${Date.now()}`,
+          businessName: manualForm.businessName,
+          contactName: manualForm.contactName,
+          email: manualForm.email,
+          phone: manualForm.phone,
+          city: manualForm.city,
+          postcode: manualForm.postcode,
+          tier: getConsequenceTier(manualForm.businessName),
+          category: inference.category,
+          source: "manual",
+          extractedNeed: inference.problem_type
+        };
+
+        setProspects([newProspect, ...prospects]);
+        setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
+        setInferenceAttempted(false);
+        setInferenceFailed(false);
+        alert(`✓ Added ${manualForm.businessName} (${inference.category})`);
+      } catch (error) {
+        console.error("[DISCOVER] Error inferring problem:", error);
+        alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        setInferenceAttempted(true);
+        setInferenceFailed(true);
+      } finally {
         setInferringProblem(false);
-        return;
       }
-
-      const inference = await res.json();
-      console.log("[DISCOVER] Inferred:", inference);
-
+    } else {
+      // Inference already attempted and failed, use manual category
       const newProspect: Prospect = {
         id: `manual-${Date.now()}`,
         businessName: manualForm.businessName,
@@ -193,19 +234,14 @@ export default function DiscoverPage() {
         city: manualForm.city,
         postcode: manualForm.postcode,
         tier: getConsequenceTier(manualForm.businessName),
-        category: inference.category,
-        source: "manual",
-        extractedNeed: inference.problem_type
+        category: manualForm.category,
+        source: "manual"
       };
 
       setProspects([newProspect, ...prospects]);
       setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
-      alert(`✓ Added ${manualForm.businessName} (${inference.category})`);
-    } catch (error) {
-      console.error("[DISCOVER] Error inferring problem:", error);
-      alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
-    } finally {
-      setInferringProblem(false);
+      setInferenceAttempted(false);
+      setInferenceFailed(false);
     }
   };
 
@@ -432,10 +468,39 @@ export default function DiscoverPage() {
                   className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none resize-none"
                   rows={3}
                 />
-                <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
+                {inferenceFailed ? (
+                  <p className="text-xs text-[#DD5533] mt-1">System couldn't confidently infer. Please select a category below.</p>
+                ) : (
+                  <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {inferenceFailed && (
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Category (Manual Selection) *
+                  </label>
+                  <select
+                    value={manualForm.category}
+                    onChange={(e) => setManualForm({ ...manualForm, category: e.target.value })}
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
+                  >
+                    <option value="">Select a category</option>
+                    <option value="Solicitor">Solicitors</option>
+                    <option value="Estate Agent">Estate Agents</option>
+                    <option value="Accountant">Accountants</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Hospital">Hospital</option>
+                    <option value="Restaurant">Restaurant</option>
+                    <option value="Constructor">Construction</option>
+                    <option value="Architect">Architect</option>
+                    <option value="Veterinary">Veterinary</option>
+                    <option value="Business">Other Business</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
                     Phone
@@ -448,21 +513,6 @@ export default function DiscoverPage() {
                     className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    value={manualForm.city}
-                    onChange={(e) => setManualForm({ ...manualForm, city: e.target.value })}
-                    placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
                     City
