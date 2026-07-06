@@ -1,20 +1,17 @@
 /**
  * BATCH EMAIL GENERATION ENDPOINT
  *
- * Uses Email Engine v4 (Psychology-Locked)
- * Generates ONE optimized email per prospect following:
- * - Consequence-tier hierarchy (Tier 1/2/3)
- * - Dynamic pain/promise injection per business type
- * - Locked sender voice profiles
- * - Psychology-locked template
+ * Uses Problem-Centric Brief Generator
+ * Generates ONE personalized brief per prospect following:
+ * - Problem type inference from business category
+ * - Psychology analysis (inverse incentives, loss aversion)
+ * - Problem-specific language with embedded psychology
+ * - Professional, human tone
  */
 
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateEmailV4 } from "@/lib/email-engine-v4";
-import { detectBusinessType } from "@/lib/business-pain-promise-map";
-import { buildEmailHtml } from "@/lib/email-html-builder";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -108,34 +105,56 @@ export async function POST(request: Request) {
           ? prospect.contactName.split(" ")[0]
           : undefined;
 
-        // Generate email using Email Engine v4 (psychology-locked)
-        const emailV4 = generateEmailV4(
-          {
-            id: prospect.id,
-            businessName: prospect.businessName,
-            city: prospect.city,
-            email: prospect.email,
-            firstName: firstName,
-          },
-          senderName
-        );
+        // Generate email using problem-centric brief generator
+        // First, infer problem type from business category
+        const { inferProblemFromCategory } = await import("@/lib/confession-inferencer");
+        const { getProblemType } = await import("@/lib/problems-map");
+        const { analyzePsychology } = await import("@/lib/psychology-analyzer");
+        const { generateBrief, generateEmailBody } = await import("@/lib/brief-generator");
 
-        // Get sender role from business type if available
-        const businessType = detectBusinessType(prospect.businessName);
-        const senderRole = businessType.identity?.senderRole;
+        const categoryInference = inferProblemFromCategory(prospect.businessCategory || "");
+        const problemType = categoryInference.primary_problem || "court_deadline_delivery";
+        const problem = getProblemType(problemType);
 
-        // Generate HTML preview for the enrich page
-        const htmlPreview = buildEmailHtml(
-          {
-            prospectName: firstName || "[Name]",
-            body: emailV4.bodyText,
-          },
-          {
-            name: senderName,
-            email: prospect.email || "contact@saintandstoryltd.co.uk",
-            role: senderRole
-          }
-        );
+        if (!problem) {
+          throw new Error(`Invalid problem type: ${problemType}`);
+        }
+
+        // Analyze psychology
+        const confession = `${prospect.businessName} in ${prospect.city || "UK"} (${prospect.businessCategory || "Business"})`;
+        const psychology = analyzePsychology({
+          confession_text: confession,
+          problem_type: problemType,
+          company_name: prospect.businessName,
+          location: prospect.city
+        });
+
+        if (!psychology) {
+          throw new Error("Failed to analyze psychology");
+        }
+
+        // Generate brief using problem-centric system
+        const brief = generateBrief({
+          confession_text: confession,
+          problem_type: problemType,
+          contact_name: firstName,
+          company_name: prospect.businessName,
+          location: prospect.city,
+          psychology
+        });
+
+        if (!brief) {
+          throw new Error("Failed to generate brief");
+        }
+
+        const emailV4 = {
+          subjectLine: brief.subject,
+          bodyText: generateEmailBody(brief),
+          specificPain: psychology.inverse_incentive,
+          specificPromise: psychology.loss_aversion_frame,
+          consequenceTier: 1,
+          senderVoice: "Professional"
+        };
 
         results.push({
           prospectId: prospect.id,
@@ -143,7 +162,7 @@ export async function POST(request: Request) {
           email: prospect.email,
           subject: emailV4.subjectLine,
           body: emailV4.bodyText,
-          htmlBody: htmlPreview,
+          htmlBody: brief.html, // Use problem-centric brief HTML
           wordCount: emailV4.bodyText.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,
@@ -152,6 +171,8 @@ export async function POST(request: Request) {
           promise: emailV4.specificPromise,
           consequenceTier: emailV4.consequenceTier,
           senderVoice: emailV4.senderVoice,
+          problemType: problemType,
+          psychologyAnalysis: psychology
         });
       } catch (prospectError) {
         console.error(

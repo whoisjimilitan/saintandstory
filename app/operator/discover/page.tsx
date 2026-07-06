@@ -179,7 +179,7 @@ export default function DiscoverPage() {
     setSelectedLeads(newSelected);
   };
 
-  const handleReviewAndSend = async () => {
+  const handleReviewAndSend = () => {
     if (selectedLeads.size === 0) {
       alert("Please select at least one prospect");
       return;
@@ -187,48 +187,11 @@ export default function DiscoverPage() {
 
     const selectedProspects = prospects.filter(p => selectedLeads.has(p.id));
 
-    try {
-      // Create OpportunityFeed records (unified persistence)
-      const res = await fetch("/api/operator/opportunity-feed/create-from-prospects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospects: selectedProspects })
-      });
+    // Store in sessionStorage (temporary, per-session)
+    sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Failed to create opportunity records");
-      }
-
-      const data = await res.json();
-      console.log("[DISCOVER] Created opportunities:", data);
-
-      // Show detailed error if all failed
-      if (data.created === 0 && data.errors > 0) {
-        const errorDetails = data.errorDetails
-          ? data.errorDetails.map((e: any) => `${e.businessName}: ${e.error}`).join("\n")
-          : "Unknown error";
-        console.error("[DISCOVER] Creation errors:", data.errorDetails);
-        alert(`Failed to create opportunities:\n\n${errorDetails}\n\nCheck browser console and Vercel logs.`);
-        return;
-      }
-
-      // Extract IDs of created records
-      const opportunityIds = data.opportunities
-        .filter((opp: any) => opp.status === "created" || opp.status === "already_exists")
-        .map((opp: any) => opp.opportunityId);
-
-      if (opportunityIds.length === 0) {
-        alert(`No prospects were processed successfully.\n\nMessage: ${data.message}`);
-        return;
-      }
-
-      // Navigate to Enrich with opportunity IDs
-      router.push(`/operator/enrich?opportunities=${opportunityIds.join(",")}`);
-    } catch (error) {
-      console.error("[DISCOVER] Error creating opportunities:", error);
-      alert(`Failed to prepare prospects: ${error instanceof Error ? error.message : "Unknown error"}`);
-    }
+    // Navigate to Enrich
+    router.push("/operator/enrich");
   };
 
   const tier1Count = prospects.filter(p => p.tier === 1 && selectedLeads.has(p.id)).length;
