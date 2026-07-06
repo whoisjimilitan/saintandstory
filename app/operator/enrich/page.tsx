@@ -401,17 +401,9 @@ export default function EnrichPage() {
       <div className="max-w-3xl mx-auto px-4 md:px-0 py-12">
         {/* Channel Indicator */}
         <div className="mb-8">
-          <div
-            className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm ${
-              channel === "email"
-                ? "bg-blue-100 text-blue-700"
-                : channel === "whatsapp"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-purple-100 text-purple-700"
-            }`}
-          >
-            {channel === "email" ? "📧 Email Campaign" : channel === "whatsapp" ? "💬 WhatsApp Bulk Send" : "🎯 Opportunity Feed"}
-          </div>
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+            {channel === "email" ? "Email Campaign" : channel === "whatsapp" ? "WhatsApp Campaign" : "Opportunity Feed"}
+          </p>
         </div>
 
         {/* Sub-Hero */}

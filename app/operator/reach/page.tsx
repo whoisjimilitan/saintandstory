@@ -157,18 +157,18 @@ export default function ReachPage() {
 
   const emailStats = emailCampaigns.reduce(
     (acc, c) => ({
-      total: acc.total + c.sent,
-      opened: acc.opened + c.opened,
-      replied: acc.replied + c.replied,
+      total: acc.total + (c.sent || 0),
+      opened: acc.opened + (c.opened || 0),
+      replied: acc.replied + (c.replied || 0),
     }),
     { total: 0, opened: 0, replied: 0 }
   );
 
   const whatsappStats = whatsappCampaigns.reduce(
     (acc, c) => ({
-      total: acc.total + c.sent,
-      delivered: acc.delivered + c.delivered,
-      replied: acc.replied + c.replied,
+      total: acc.total + (c.sent || 0),
+      delivered: acc.delivered + (c.delivered || 0),
+      replied: acc.replied + (c.replied || 0),
     }),
     { total: 0, delivered: 0, replied: 0 }
   );
