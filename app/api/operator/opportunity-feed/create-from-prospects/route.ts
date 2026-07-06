@@ -128,31 +128,38 @@ export async function POST(request: NextRequest) {
 
         // Step 6: Create OpportunityFeed record
         console.log(`[OPPORTUNITY-FEED-CREATE] Creating database record...`);
+
+        // Build data object, only including defined fields (Prisma doesn't accept undefined)
+        const createData: any = {
+          companyName: prospect.businessName,
+          sourcePlatform: "operator_search",
+          postedDate: new Date(),
+          originalWording: confession,
+          extractedNeed: problemType,
+          extractedUrgency: psychology.urgency_level,
+          extractedContext: confession,
+          extractedQuote: confession.substring(0, 200),
+          problemType,
+          psychologyAnalysis: psychology as unknown as Record<string, unknown>,
+          prePopulatedReply: problem.pre_populated_reply,
+          briefHtml: brief.html,
+          emailSubject: brief.subject,
+          emailBody: generateEmailBody(brief),
+          routingTier: problem.tier,
+          confidenceScore: confidence,
+          approvalStatus: "pending",
+          status: "discovered"
+        };
+
+        // Add optional fields only if defined
+        if (prospect.email) createData.contactEmail = prospect.email;
+        if (prospect.phone) createData.contactPhone = prospect.phone;
+        if (prospect.contactName) createData.contactName = prospect.contactName;
+        if (prospect.city) createData.location = prospect.city;
+        if (prospect.postcode) createData.postcode = prospect.postcode;
+
         const opportunity = await prisma.opportunityFeed.create({
-          data: {
-            companyName: prospect.businessName,
-            contactEmail: prospect.email,
-            contactPhone: prospect.phone,
-            location: prospect.city,
-            postcode: prospect.postcode,
-            sourcePlatform: "operator_search",
-            postedDate: new Date(),
-            originalWording: confession,
-            extractedNeed: problemType,
-            extractedUrgency: psychology.urgency_level,
-            extractedContext: confession,
-            extractedQuote: confession.substring(0, 200),
-            problemType,
-            psychologyAnalysis: psychology as unknown as Record<string, unknown>,
-            prePopulatedReply: problem.pre_populated_reply,
-            briefHtml: brief.html,
-            emailSubject: brief.subject,
-            emailBody: generateEmailBody(brief),
-            routingTier: problem.tier,
-            confidenceScore: confidence,
-            approvalStatus: "pending",
-            status: "discovered"
-          }
+          data: createData
         });
 
         created.push({
