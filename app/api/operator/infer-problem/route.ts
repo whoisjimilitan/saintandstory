@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { inferProblemFromConfession } from "@/lib/confession-inferencer";
+import { inferProblemFromDescription } from "@/lib/rule-based-inferencer";
 import { getProblemType } from "@/lib/problems-map";
 import { getProblemCategory } from "@/lib/category-map";
 
@@ -32,18 +32,23 @@ export async function POST(request: NextRequest) {
 
     console.log(`[INFER-PROBLEM] Analyzing: "${problem_description}" for ${business_name || "unknown"}`);
 
-    // Use the intelligent inference system
-    const inference = await inferProblemFromConfession(problem_description);
+    // Use rule-based inference (fast, free, no API calls)
+    const inference = inferProblemFromDescription(problem_description);
 
-    if (!inference.inferred_problem_type || inference.confidence < 0.5) {
-      console.log(`[INFER-PROBLEM] Low confidence: ${inference.confidence}`);
+    if (!inference.problem_type || inference.confidence < 0.65) {
+      console.log(`[INFER-PROBLEM] Low confidence: ${inference.confidence}. Requesting manual selection.`);
       return NextResponse.json(
-        { error: "Could not confidently infer problem. Please select a category manually." },
-        { status: 400 }
+        {
+          success: false,
+          problem_type: null,
+          confidence: inference.confidence,
+          message: "Could not confidently infer. Please select from the list."
+        },
+        { status: 200 }
       );
     }
 
-    const problemType = inference.inferred_problem_type;
+    const problemType = inference.problem_type;
     const problem = getProblemType(problemType);
 
     if (!problem) {

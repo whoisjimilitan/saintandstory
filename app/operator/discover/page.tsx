@@ -184,38 +184,42 @@ export default function DiscoverPage() {
           })
         });
 
-        if (!res.ok) {
-          const error = await res.json();
-          console.log("[DISCOVER] Inference failed, showing fallback");
-          setInferenceAttempted(true);
-          setInferenceFailed(true);
-          alert(error.error);
+        const inference = await res.json();
+        console.log("[DISCOVER] Inference response:", inference);
+
+        // If inference was successful, create the prospect
+        if (inference.success) {
+          const newProspect: Prospect = {
+            id: `manual-${Date.now()}`,
+            businessName: manualForm.businessName,
+            contactName: manualForm.contactName,
+            email: manualForm.email,
+            phone: manualForm.phone,
+            city: manualForm.city,
+            postcode: manualForm.postcode,
+            tier: getConsequenceTier(manualForm.businessName),
+            category: inference.category,
+            source: "manual",
+            extractedNeed: inference.problem_type
+          };
+
+          setProspects([newProspect, ...prospects]);
+          setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
+          setInferenceAttempted(false);
+          setInferenceFailed(false);
+          console.log("[DISCOVER] ✓ Inferred successfully");
           setInferringProblem(false);
           return;
         }
 
-        const inference = await res.json();
-        console.log("[DISCOVER] Inferred:", inference);
-
-        const newProspect: Prospect = {
-          id: `manual-${Date.now()}`,
-          businessName: manualForm.businessName,
-          contactName: manualForm.contactName,
-          email: manualForm.email,
-          phone: manualForm.phone,
-          city: manualForm.city,
-          postcode: manualForm.postcode,
-          tier: getConsequenceTier(manualForm.businessName),
-          category: inference.category,
-          source: "manual",
-          extractedNeed: inference.problem_type
-        };
-
-        setProspects([newProspect, ...prospects]);
-        setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
-        setInferenceAttempted(false);
-        setInferenceFailed(false);
-        alert(`✓ Added ${manualForm.businessName} (${inference.category})`);
+        // If inference failed, show dropdown for manual selection
+        if (!inference.success) {
+          console.log("[DISCOVER] Inference inconclusive, showing category dropdown");
+          setInferenceAttempted(true);
+          setInferenceFailed(true);
+          setInferringProblem(false);
+          return;
+        }
       } catch (error) {
         console.error("[DISCOVER] Error inferring problem:", error);
         alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
@@ -470,7 +474,7 @@ export default function DiscoverPage() {
                   rows={3}
                 />
                 {inferenceFailed ? (
-                  <p className="text-xs text-[#0D0D0D] mt-1">System couldn't confidently infer. Please select a category below.</p>
+                  <p className="text-xs text-[#666666] mt-1">Select the category that best fits their business.</p>
                 ) : (
                   <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
                 )}
@@ -479,7 +483,7 @@ export default function DiscoverPage() {
               {inferenceFailed && (
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                    Category (Manual Selection) *
+                    Category *
                   </label>
                   <select
                     value={manualForm.category}
