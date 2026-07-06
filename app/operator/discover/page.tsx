@@ -534,18 +534,19 @@ export default function DiscoverPage() {
           </div>
         )}
 
-        {/* === AUTOMATIC CONFESSIONS STATUS === */}
+        {/* === FROM SOCIALS === */}
         <div className="pt-12 border-t border-[#E8E8E8]">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-            Automatic Discovery
+            From Socials
           </p>
-          <div className="bg-[#F9F9F9] p-6 rounded-lg border border-[#E8E8E8]">
-            <p className="text-sm text-[#666666] mb-3">
-              Confessions harvested automatically from Reddit, Twitter, LinkedIn, and other sources go directly to approval queue in Settings.
+          <div className="bg-[#F9F9F9] p-6 rounded-lg border border-[#E8E8E8] flex items-center justify-between">
+            <p className="text-sm text-[#666666]">
+              Automatic discovery from social sources goes to Settings queue
             </p>
-            <p className="text-xs text-[#AAAAAA]">
-              Last harvest: checking... • Status: operational
-            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-[#22C55E] rounded-full"></div>
+              <p className="text-xs text-[#888888]">Operational</p>
+            </div>
           </div>
         </div>
 

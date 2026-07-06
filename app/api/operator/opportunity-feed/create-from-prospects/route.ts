@@ -176,11 +176,21 @@ export async function POST(request: NextRequest) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         const errorStack = error instanceof Error ? error.stack : "";
         console.error(`[OPPORTUNITY-FEED-CREATE] ✗ Error processing ${prospect.businessName}: ${errorMsg}`);
+        console.error(`[OPPORTUNITY-FEED-CREATE] Full error:`, error);
         console.error(`[OPPORTUNITY-FEED-CREATE] Stack: ${errorStack}`);
+
+        // Extract just the error message, not the full Prisma output
+        let shortError = errorMsg;
+        if (errorMsg.includes("Invalid")) {
+          // Extract the core error from Prisma verbose output
+          const match = errorMsg.match(/Invalid `[^`]+`[^:]*:\s*(.+?)(?:\n|$)/);
+          if (match) shortError = match[1];
+        }
+
         errors.push({
           businessName: prospect.businessName,
-          error: errorMsg,
-          stack: errorStack
+          error: shortError,
+          fullError: errorMsg
         });
       }
     }
