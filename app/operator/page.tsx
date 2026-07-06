@@ -112,7 +112,7 @@ export default function TodayPage() {
 
         {/* HEADER */}
         <div className="mb-12">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">Your Outreach</h1>
+          <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">Monitoring</h1>
           <p className="text-sm font-semibold text-[#666666] uppercase tracking-widest">{dayName} • {dateStr}</p>
         </div>
 

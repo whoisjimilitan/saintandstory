@@ -55,6 +55,9 @@ export default function ReachPage() {
 
   useEffect(() => {
     fetchData();
+    // Auto-refresh every 5 seconds for live updates
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchData = async () => {
