@@ -208,19 +208,20 @@ function generateBriefHTML(input: {
 }
 
 /**
- * Generate PROPHETIC email body using the complete psychological structure.
+ * Generate PROPHETIC email body - THE BREAKTHROUGH.
  *
- * PROPHECY STRUCTURE (6 lines, psychologically complete):
- * 1. Apology/Disarming (permission to listen)
- * 2. Teaching moment (humble authority)
- * 3. The gap insight (revelation)
- * 4. Personalization (specific to THEM)
- * 5. Engagement question (soft CTA)
- * 6. Signature
+ * PERFECT STRUCTURE (psychologically complete + discovery-first):
+ * 1. Greeting
+ * 2. Apologies (permission to listen)
+ * 3. Discovery ("A little birdie told me...")
+ * 4. Teaching moment (humble authority + the real insight)
+ * 5. Personalization (specific to THEM)
+ * 6. Credibility/Proof (why we built this)
+ * 7. Engagement question (soft CTA)
+ * 8. Signature
+ * 9. Reply button (in HTML)
  *
- * + Reply button (in HTML, not in text)
- *
- * This is the COMPLETE engine.
+ * Psychology: Permission → Recognition → Authority → Insight → Personalization → Proof → Engagement
  */
 export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
   const name = input?.contact_name || "there";
@@ -232,35 +233,154 @@ export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): st
     return "Brief generation failed.";
   }
 
-  // ============ BUILD THE PROPHETIC EMAIL ============
+  // ============ BUILD THE BREAKTHROUGH EMAIL ============
 
-  // Line 1: APOLOGY/DISARMING
-  const line1 = `Hi ${name},\n\nApologies for reaching out of the blue. I have a specific reason.`;
+  // Line 1: GREETING
+  const line1 = `Hi ${name},`;
 
-  // Line 2: TEACHING MOMENT (Humble Authority)
-  // Extract industry from problem type: "court_deadline_delivery" → "Working with legal firms"
+  // Line 2: APOLOGIES (Permission to listen)
+  const line2 = `\nApologies. I know it's unusual emailing you out of the blue.`;
+
+  // Line 3: DISCOVERY ("A little birdie told me...")
+  // What we discovered specifically about them
+  const discoveryPhrase = getDiscoveryPhrase(problemType, company);
+  const line3 = `\n${discoveryPhrase}`;
+
+  // Line 4: TEACHING MOMENT (Humble Authority + Real Insight)
+  // "Working with [INDUSTRY] has taught me one thing. [The real gap]"
   const industryPhrase = getIndustryPhrase(problemType);
-  const line2 = `\n\n${industryPhrase} has taught me one thing.`;
+  const realInsight = getTeachingMoment(problemType);
+  const line4 = `\n${industryPhrase} has taught me one thing. ${realInsight}`;
 
-  // Line 3: THE GAP INSIGHT (Revelation)
-  // This is the real insight that reveals what they're dealing with
-  const gapInsight = problem.loss_aversion_daily;
-  const line3 = `\n\n${gapInsight.charAt(0).toUpperCase() + gapInsight.slice(1)}`;
+  // Line 5: PERSONALIZATION (Specific to their situation)
+  const personalizationLine = getPersonalizationLine(problemType, company);
+  const line5 = `\n${personalizationLine}`;
 
-  // Line 4: PERSONALIZATION (Specific to them)
-  // Bridge to their specific situation
-  const personalization = `For ${company}, that's a real problem.`;
-  const line4 = `\n\n${personalization}`;
+  // Line 6: CREDIBILITY/PROOF (Why we built this)
+  const credibilityLine = getCredibilityStatement(problemType);
+  const line6 = `\n${credibilityLine}`;
 
-  // Line 5: ENGAGEMENT QUESTION (Soft CTA)
-  // Problem-specific question
+  // Line 7: ENGAGEMENT QUESTION (Soft CTA)
   const engagementQuestion = getEngagementQuestion(problemType);
-  const line5 = `\n\n${engagementQuestion}`;
+  const line7 = `\n${engagementQuestion}`;
 
-  // Line 6: SIGNATURE
-  const line6 = `\n\nJames\nSaint & Story`;
+  // Line 8: SIGNATURE
+  const line8 = `\nJames\nCo-Founder at Saint & Story`;
 
-  return line1 + line2 + line3 + line4 + line5 + line6;
+  return line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8;
+}
+
+/**
+ * Discovery phrase: "A little birdie told me about..."
+ * What we discovered about THEM specifically
+ */
+function getDiscoveryPhrase(problemType: string, company: string): string {
+  const discoveries: Record<string, string> = {
+    court_deadline_delivery: `A little birdie told me that ${company} handles critical court deadlines.`,
+    legal_document_delivery: `A little birdie told me that ${company} needs documents at court on time.`,
+    hospital_supply_delivery: `A little birdie told me that ${company} manages urgent patient care supply chains.`,
+    pharmacy_prescription_delivery: `A little birdie told me that ${company} delivers prescriptions daily.`,
+    construction_material_delivery: `A little birdie told me that ${company} coordinates site material deliveries.`,
+    estate_agent_document_delivery: `A little birdie told me that ${company} closes property deals daily.`,
+    restaurant_supply_delivery: `A little birdie told me that ${company} depends on reliable supplier collections.`,
+    accounting_file_delivery: `A little birdie told me that ${company} manages tax deadline documents.`,
+    architecture_drawing_delivery: `A little birdie told me that ${company} sends plans to construction sites.`,
+    veterinary_supply_delivery: `A little birdie told me that ${company} coordinates urgent medication deliveries.`,
+    dental_supply_delivery: `A little birdie told me that ${company} relies on lab and supply timing.`,
+    retail_stock_delivery: `A little birdie told me that ${company} needs early morning stock delivery.`,
+    beauty_supply_delivery: `A little birdie told me that ${company} depends on product availability.`,
+    art_gallery_artwork_delivery: `A little birdie told me that ${company} coordinates exhibition openings.`,
+    catering_supply_delivery: `A little birdie told me that ${company} sources supplies for events.`,
+    manufacturing_part_delivery: `A little birdie told me that ${company} coordinates parts delivery for production.`,
+    film_production_equipment: `A little birdie told me that ${company} needs equipment on location fast.`,
+    office_supply_delivery: `A little birdie told me that ${company} needs supplies to stay productive.`
+  };
+
+  return discoveries[problemType] || `A little birdie told me about ${company}.`;
+}
+
+/**
+ * Teaching moment: "Working with [INDUSTRY] has taught me one thing. [The real gap]"
+ */
+function getTeachingMoment(problemType: string): string {
+  const teachings: Record<string, string> = {
+    court_deadline_delivery: "Filing deadlines are rarely missed because of the legal work itself. They're usually missed when one small dependency becomes the biggest risk.",
+    legal_document_delivery: "Legal deadlines fail not because of the law, but because of logistics.",
+    hospital_supply_delivery: "Care delays aren't caused by medical complexity. They're caused by supply chain failures.",
+    pharmacy_prescription_delivery: "Patient trust isn't lost over medication. It's lost over late delivery.",
+    construction_material_delivery: "Projects slip not because of planning. They slip because materials arrive late.",
+    estate_agent_document_delivery: "Deals close not because of negotiation. They close because documents arrive on time.",
+    restaurant_supply_delivery: "Revenue loss isn't caused by cooking. It's caused by missing ingredients.",
+    accounting_file_delivery: "Tax compliance isn't about calculations. It's about delivering documents on deadline.",
+    architecture_drawing_delivery: "Building delays aren't about design. They're about getting plans to site on time.",
+    veterinary_supply_delivery: "Animal care doesn't fail from medical decisions. It fails from supply delays.",
+    dental_supply_delivery: "Dental delays don't come from treatment. They come from missing lab work.",
+    retail_stock_delivery: "Store success isn't about products. It's about stock arriving before opening.",
+    beauty_supply_delivery: "Client satisfaction doesn't depend on the service. It depends on having the products.",
+    art_gallery_artwork_delivery: "Exhibitions succeed or fail based on one thing: whether artwork arrives on time.",
+    catering_supply_delivery: "Event success isn't about food quality. It's about ingredients arriving when you need them.",
+    manufacturing_part_delivery: "Production targets miss not because of skill. They miss because parts arrive late.",
+    film_production_equipment: "Films get made or delayed based on one thing: whether equipment is where it needs to be.",
+    office_supply_delivery: "Productivity doesn't fail from work ethic. It fails from running out of essentials."
+  };
+
+  return teachings[problemType] || "One thing determines success: reliability.";
+}
+
+/**
+ * Personalization: "For many firms, that dependency is..."
+ */
+function getPersonalizationLine(problemType: string, company: string): string {
+  const personalizations: Record<string, string> = {
+    court_deadline_delivery: `For ${company}, that dependency is the delivery.`,
+    legal_document_delivery: `For ${company}, that's document courier reliability.`,
+    hospital_supply_delivery: `For ${company}, that's urgent supply delivery.`,
+    pharmacy_prescription_delivery: `For ${company}, that's reliable prescription logistics.`,
+    construction_material_delivery: `For ${company}, that's on-time material delivery.`,
+    estate_agent_document_delivery: `For ${company}, that's completion day document delivery.`,
+    restaurant_supply_delivery: `For ${company}, that's same-day supplier collections.`,
+    accounting_file_delivery: `For ${company}, that's deadline-day document delivery.`,
+    architecture_drawing_delivery: `For ${company}, that's plan delivery to site.`,
+    veterinary_supply_delivery: `For ${company}, that's urgent medication delivery.`,
+    dental_supply_delivery: `For ${company}, that's lab work and supply timing.`,
+    retail_stock_delivery: `For ${company}, that's early morning stock arrival.`,
+    beauty_supply_delivery: `For ${company}, that's product availability.`,
+    art_gallery_artwork_delivery: `For ${company}, that's secure artwork delivery.`,
+    catering_supply_delivery: `For ${company}, that's ingredient sourcing on time.`,
+    manufacturing_part_delivery: `For ${company}, that's parts delivery to production.`,
+    film_production_equipment: `For ${company}, that's equipment on location fast.`,
+    office_supply_delivery: `For ${company}, that's supply delivery when needed.`
+  };
+
+  return personalizations[problemType] || `For ${company}, that's reliable delivery.`;
+}
+
+/**
+ * Credibility statement: "That's why we built Saint & Story..."
+ */
+function getCredibilityStatement(problemType: string): string {
+  const statements: Record<string, string> = {
+    court_deadline_delivery: "That's why we built Saint & Story the way we did. If a delivery ever fails with us, we'll take responsibility and cover the re-delivery at no cost to you.",
+    legal_document_delivery: "That's why we built Saint & Story around court deadline reliability. Every delivery is backed by our commitment to get it right.",
+    hospital_supply_delivery: "That's why we built Saint & Story with medical delivery as the core. We understand that patient care depends on us.",
+    pharmacy_prescription_delivery: "That's why we built Saint & Story around prescription reliability. Patient health depends on timing.",
+    construction_material_delivery: "That's why we built Saint & Story around construction timelines. We don't just move materials. We move projects forward.",
+    estate_agent_document_delivery: "That's why we built Saint & Story around completion day reliability. We know deals close when documents arrive on time.",
+    restaurant_supply_delivery: "That's why we built Saint & Story around supply reliability. Your menu depends on us.",
+    accounting_file_delivery: "That's why we built Saint & Story around tax deadline certainty. Compliance isn't optional.",
+    architecture_drawing_delivery: "That's why we built Saint & Story around construction timelines. Your plans matter.",
+    veterinary_supply_delivery: "That's why we built Saint & Story around animal care. Supply reliability means patient care happens on schedule.",
+    dental_supply_delivery: "That's why we built Saint & Story around appointment scheduling. Your patients depend on us.",
+    retail_stock_delivery: "That's why we built Saint & Story around store readiness. First customers deserve full shelves.",
+    beauty_supply_delivery: "That's why we built Saint & Story around client bookings. Product availability keeps revenue flowing.",
+    art_gallery_artwork_delivery: "That's why we built Saint & Story around exhibition timing. Openings don't get rescheduled.",
+    catering_supply_delivery: "That's why we built Saint & Story around event success. Your reputation depends on us.",
+    manufacturing_part_delivery: "That's why we built Saint & Story around production schedules. Quotas depend on us.",
+    film_production_equipment: "That's why we built Saint & Story around production timelines. Shoots don't wait.",
+    office_supply_delivery: "That's why we built Saint & Story around operational continuity. Your team's productivity matters."
+  };
+
+  return statements[problemType] || "That's why we built Saint & Story. Reliability is everything.";
 }
 
 /**
