@@ -1,37 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import {
-  addMessage,
-  markMessageDelivered,
-  getConversation,
-} from "@/lib/whatsapp-conversation";
-import { generateOutreachMessage } from "@/lib/outreach-message-generator";
+import { prisma } from "@/lib/prisma";
+
+const META_API_VERSION = "v18.0";
+const META_GRAPH_URL = "https://graph.instagram.com";
 
 /**
  * POST /api/whatsapp/send
  *
- * Send WhatsApp message with psychology-locked framework
+ * Send WhatsApp message via Meta Cloud API (REAL - not mocked)
  *
  * REQUEST BODY:
  * {
- *   "conversationId": string
- *   "phoneNumber": string
- *   "message": string (optional - if not provided, will be generated)
- *   "businessName": string
- *   "firstName": string (optional - for message generation)
- *   "description": string (optional - for message generation)
- *   "groupName": string (optional - for message generation)
+ *   "phoneNumber": string (e.g., "1234567890")
+ *   "message": string
+ *   "businessName": string (optional - for logging)
+ *   "leadId": string (optional - link to database)
  * }
  *
  * RESPONSE:
  * {
  *   "success": boolean
- *   "messageId": string
- *   "message": string (the message that was sent)
- *   "strategy": string (which strategy was used)
- *   "status": "sent" | "delivered" | "error"
+ *   "messageId": string (Meta message ID)
+ *   "status": "sent" | "error"
  *   "timestamp": ISO timestamp
- *   "psychologyValidation": { noAsk: boolean, introPresent: boolean, charLimit: boolean }
  * }
  */
 
@@ -42,10 +34,8 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk",
 ];
 
-// Mock WhatsApp API send (replace with real API when credentials available)
-
 export async function POST(request: NextRequest) {
-  console.log("[WHATSAPP SEND] Starting message send");
+  console.log("[WHATSAPP SEND] Starting real WhatsApp send via Meta API");
 
   const { userId } = await auth();
   const user = await currentUser();
@@ -65,126 +55,156 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const {
-      conversationId,
-      phoneNumber,
-      message,
-      businessName,
-      firstName,
-      description,
-      groupName,
-    } = body;
+    const { phoneNumber, message, businessName, leadId } = body;
 
-    if (!conversationId || !phoneNumber) {
+    if (!phoneNumber || !message) {
       return NextResponse.json(
-        { error: "conversationId and phoneNumber are required" },
+        { error: "phoneNumber and message are required" },
         { status: 400 }
       );
     }
 
-    // Get conversation
-    const conversation = getConversation(conversationId);
-    if (!conversation) {
+    if (message.length > 4096) {
       return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 }
+        { error: "Message exceeds 4096 character limit" },
+        { status: 400 }
       );
     }
 
-    // Generate message if not provided
-    let finalMessage = message;
-    let strategy = "custom";
-
-    if (!message) {
-      console.log("[WHATSAPP SEND] Generating message using psychology framework");
-      const generated = generateOutreachMessage({
-        firstName: firstName || "there",
-        company: businessName,
-        description,
-        groupName,
-        linkedinProfile: undefined,
-        email: undefined,
-      });
-
-      finalMessage = generated.message;
-      strategy = generated.strategy;
-
-      // Validate psychology framework
-      if (!generated.psychologyValidation.noAsk) {
-        console.warn("[WHATSAPP SEND] ⚠️ Message contains 'Worth a chat?' - fixing");
-        finalMessage = finalMessage.replace(/Worth a chat\?/g, "").trim();
-      }
-
-      console.log(
-        `[WHATSAPP SEND] Generated message via ${strategy}: "${finalMessage.substring(0, 50)}..."`
+    // Normalize phone number
+    const normalizedPhone = phoneNumber.replace(/[\D]/g, "");
+    if (normalizedPhone.length < 10) {
+      return NextResponse.json(
+        { error: "Invalid phone number" },
+        { status: 400 }
       );
     }
 
-    // Add message to conversation
-    const addedMessage = addMessage(conversationId, finalMessage, "user", "sent");
-    if (!addedMessage) {
+    // Get credentials from env
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+
+    if (!phoneNumberId || !accessToken) {
+      console.error("[WHATSAPP SEND] ✗ Missing credentials in env");
       return NextResponse.json(
-        { error: "Failed to add message" },
+        { error: "WhatsApp not configured" },
         { status: 500 }
       );
     }
 
-    console.log(`[WHATSAPP SEND] Message created: ${addedMessage.id}`);
+    // Call Meta WhatsApp API
+    const metaUrl = `${META_GRAPH_URL}/${META_API_VERSION}/${phoneNumberId}/messages`;
+    console.log(`[WHATSAPP SEND] Calling Meta API: ${metaUrl}`);
 
-    // Mock WhatsApp API send (replace with real API when credentials available)
-    const whatsappMessageId = `wamid_${Date.now()}`;
+    const metaResponse = await fetch(metaUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: normalizedPhone,
+        type: "text",
+        text: {
+          body: message,
+        },
+      }),
+    });
 
-    // Mark as delivered
-    markMessageDelivered(conversationId, addedMessage.id, whatsappMessageId);
+    const metaData = await metaResponse.json();
 
-    console.log(
-      `[WHATSAPP SEND] ✓ Message sent to ${phoneNumber} via ${strategy}`
-    );
+    if (!metaResponse.ok) {
+      console.error(
+        `[WHATSAPP SEND] ✗ Meta API error: ${metaResponse.status}`,
+        metaData
+      );
 
-    // Audit logging
-    try {
-      await fetch("/api/audit/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "whatsapp_message_sent",
-          details: {
-            conversationId,
-            phoneNumber,
-            messageId: addedMessage.id,
-            whatsappMessageId,
-            businessName,
-            strategy,
-            message: finalMessage,
+      // Store failed send attempt if leadId provided
+      if (leadId) {
+        await prisma.b2bConversationEvent.create({
+          data: {
+            leadId,
+            type: "whatsapp",
+            direction: "outbound",
+            subject: "Message send failed",
+            body: message,
+            metadata: {
+              error: metaData.error?.message || "Unknown error",
+              phoneNumber,
+              businessName,
+            },
           },
-        }),
-      }).catch(() => {
-        // Silently fail
+        });
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          status: "error",
+          error: metaData.error?.message || "Failed to send message",
+        },
+        { status: 400 }
+      );
+    }
+
+    const messageId = metaData.messages?.[0]?.id;
+    if (!messageId) {
+      console.error("[WHATSAPP SEND] ✗ No message ID in Meta response");
+      return NextResponse.json(
+        { error: "No message ID returned from Meta" },
+        { status: 500 }
+      );
+    }
+
+    console.log(`[WHATSAPP SEND] ✓ Message sent: ${messageId} to ${normalizedPhone}`);
+
+    // Store message in database if leadId provided
+    if (leadId) {
+      const conversationEvent = await prisma.b2bConversationEvent.create({
+        data: {
+          leadId,
+          type: "whatsapp",
+          direction: "outbound",
+          subject: "WhatsApp Message Sent",
+          body: message,
+          metadata: {
+            messageId,
+            phoneNumber,
+            businessName,
+            status: "sent",
+          },
+        },
       });
-    } catch (auditError) {
-      // Continue
+
+      // Update lead engagement
+      await prisma.b2bLead.update({
+        where: { id: leadId },
+        data: {
+          last_engagement_at: new Date(),
+          last_engagement_type: "whatsapp",
+          engaged_today: true,
+        },
+      });
+
+      console.log(
+        `[WHATSAPP SEND] ✓ Stored in DB: ${conversationEvent.id}`
+      );
     }
 
     return NextResponse.json({
       success: true,
-      messageId: addedMessage.id,
-      message: finalMessage,
-      strategy,
-      whatsappMessageId,
-      status: "delivered",
+      messageId,
+      status: "sent",
       timestamp: new Date().toISOString(),
-      psychologyValidation: {
-        noAsk: !finalMessage.includes("Worth a chat?"),
-        introPresent: finalMessage.includes("I") || finalMessage.includes("we"),
-        charLimit: finalMessage.length <= 180,
-      },
+      businessName,
     });
   } catch (error) {
     console.error("[WHATSAPP SEND] ✗ Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to send message",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
