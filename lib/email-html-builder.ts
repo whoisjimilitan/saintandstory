@@ -1,6 +1,6 @@
 /**
- * Build premium HTML email with Saint & Story branding
- * Includes Reply button with pre-populated response for maximum conversion
+ * Build PREMIUM HTML email - Apple-level design
+ * Sleek, clean, minimal, elegant. Brand colors and typography.
  */
 export function buildEmailHtml(
   email: {
@@ -11,30 +11,34 @@ export function buildEmailHtml(
   },
   sender: { name: string; email: string; role?: string }
 ): string {
-  // Use phone based on email domain
-  const senderPhone = sender.email.includes("james@") ? "+44 20 3318 1234" : "+44 20 3318 5678";
-  const senderAddress = "Saint & Story, London, UK";
   const websiteUrl = "https://saintandstoryltd.co.uk";
   const logoUrl = "https://saintandstoryltd.co.uk/logo-mark.svg";
 
-  // Parse body to separate main content from signature
-  const lines = email.body.split("\n");
+  // Parse body: split into paragraphs
+  const paragraphs = email.body
+    .split("\n\n")
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
 
-  // Get non-empty lines from the end
-  const nonEmptyLines = lines.filter(l => l.trim());
-  const companyNameFromBody = nonEmptyLines[nonEmptyLines.length - 1] || "Saint & Story";
-  const senderNameFromBody = nonEmptyLines[nonEmptyLines.length - 2] || "James";
+  // Extract name and role from last lines
+  const lastTwoParagraphs = paragraphs.slice(-2);
+  const senderNameFromBody = lastTwoParagraphs[0] || "James";
+  const senderRoleFromBody = lastTwoParagraphs[1] || "";
 
-  // Main content is everything except the last 2 non-empty lines
-  const mainContent = lines.slice(0, -3).join("\n").trim();
+  // Main content: everything except last 2 paragraphs
+  const contentParagraphs = paragraphs.slice(0, -2);
 
-  // Build pre-populated reply email
+  // Build pre-populated reply
   const replyText = email.prePopulatedReply || "Let's talk about this.";
   const replyEmailBody = `Hi ${senderNameFromBody},%0D%0A%0D%0A${encodeURIComponent(replyText)}%0D%0A%0D%0AThanks,%0D%0A[Your Name]`;
   const replyLink = `mailto:${sender.email}?subject=Re:%20${encodeURIComponent(email.prospectName)}&body=${replyEmailBody}`;
 
-  return `
-<!DOCTYPE html>
+  // Format content paragraphs with proper HTML
+  const contentHtml = contentParagraphs
+    .map(p => `<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${p}</p>`)
+    .join("");
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -43,152 +47,82 @@ export function buildEmailHtml(
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-      color: #0D0D0D;
-      line-height: 1.65;
-      background: #FFFFFF;
+      background: #ffffff;
+      color: #1d1d1d;
     }
-    .wrapper { background: #FFFFFF; }
     .container {
-      max-width: 580px;
+      max-width: 560px;
       margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #E8E8E8;
-    }
-    .logo {
-      display: inline-block;
-      width: 48px;
-      height: 48px;
-      margin-bottom: 12px;
+      padding: 40px 24px;
+      background: #ffffff;
     }
     .content {
-      margin-bottom: 32px;
+      margin-bottom: 40px;
     }
-    .greeting {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 20px;
-      color: #0D0D0D;
+    .signature-section {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e8e8e8;
     }
-    .body-text {
+    .sender-name {
       font-size: 15px;
-      line-height: 1.7;
-      color: #333333;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      margin-bottom: 0;
+      font-weight: 500;
+      color: #0d0d0d;
+      margin-bottom: 4px;
     }
-    .divider {
-      margin: 32px 0;
-      height: 1px;
-      background: #E8E8E8;
-    }
-    .tagline-section {
+    .sender-role {
       font-size: 13px;
       color: #666666;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      line-height: 1.5;
-    }
-    .cta-section {
-      margin: 32px 0 12px 0;
+      margin-bottom: 24px;
     }
     .cta-button {
       display: inline-block;
-      padding: 12px 28px;
-      background: #0D0D0D;
-      color: white;
+      padding: 12px 32px;
+      background: #0d0d0d;
+      color: #ffffff;
       text-decoration: none;
       border-radius: 6px;
-      font-weight: 600;
       font-size: 14px;
+      font-weight: 500;
       transition: background 0.2s;
+      margin-right: 12px;
     }
     .cta-button:hover {
-      background: #333333;
+      background: #2d2d2d;
     }
-    .signature-section {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #E8E8E8;
-    }
-    .signature-sender {
-      font-weight: 600;
-      font-size: 16px;
-      color: #0D0D0D;
-      margin-bottom: 2px;
-    }
-    .signature-role {
-      font-size: 13px;
-      color: #888888;
-      margin-bottom: 5px;
-    }
-    .signature-details {
-      font-size: 13px;
-      color: #666666;
-      line-height: 1.6;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    .signature-details a {
-      color: #0D0D0D;
+    .website-link {
+      display: inline-block;
+      padding: 8px 0;
+      color: #0d0d0d;
       text-decoration: none;
-      font-weight: 500;
-    }
-    .signature-details a:hover {
-      text-decoration: underline;
-    }
-    .website-link-subtle {
       font-size: 13px;
-      color: rgba(0, 0, 0, 0.4);
-      text-decoration: none;
+      border-bottom: 1px solid #0d0d0d;
+      transition: opacity 0.2s;
     }
-    .website-link-subtle:hover {
-      color: #333333;
-      text-decoration: underline;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 30px 16px; }
-      .header { margin-bottom: 30px; }
-      .content { margin-bottom: 24px; }
-      .greeting { font-size: 15px; }
-      .body-text { font-size: 14px; }
-      .cta-button { padding: 11px 24px; font-size: 13px; }
+    .website-link:hover {
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="container">
-      <!-- Header with Logo -->
-      <div class="header">
-        <img src="${logoUrl}" alt="Saint & Story" class="logo" width="48" height="48">
-      </div>
+  <div class="container">
+    <div class="content">
+      ${contentHtml}
+    </div>
 
-      <!-- Main Content -->
-      <div class="content">
-        <div class="body-text">${mainContent}</div>
-      </div>
+    <div class="signature-section">
+      <div class="sender-name">${senderNameFromBody}</div>
+      ${senderRoleFromBody ? `<div class="sender-role">${senderRoleFromBody}</div>` : ''}
 
-      <!-- Divider -->
-      <div class="divider"></div>
-
-      <!-- Sender Identity + Reply Action (grouped together) -->
-      <div style="margin-bottom: 32px;">
-        <div style="font-size: 15px; color: #0D0D0D; font-weight: 500; margin-bottom: 16px;">${senderNameFromBody}</div>
-        ${sender.role ? `<div style="font-size: 14px; color: #666666; margin-bottom: 20px;">${sender.role} at Saint & Story</div>` : ''}
+      <div style="margin-top: 24px;">
         <a href="${replyLink}" class="cta-button">Reply</a>
-        <div style="margin-top: 20px;">
-          <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
-        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <a href="${websiteUrl}" class="website-link">Check out our website</a>
       </div>
     </div>
   </div>
 </body>
-</html>
-  `.trim();
+</html>`;
 }
