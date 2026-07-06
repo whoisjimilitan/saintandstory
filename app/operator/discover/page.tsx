@@ -55,7 +55,10 @@ export default function DiscoverPage() {
     city: "",
     postcode: "",
     category: "",
+    problemDescription: "",
   });
+
+  const [inferringProblem, setInferringProblem] = useState(false);
 
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -149,31 +152,61 @@ export default function DiscoverPage() {
     }
   };
 
-  const handleManualAdd = () => {
+  const handleManualAdd = async () => {
     if (!manualForm.businessName.trim()) {
       alert("Business name is required");
       return;
     }
-    if (!manualForm.category.trim()) {
-      alert("Please select a category");
+    if (!manualForm.problemDescription.trim()) {
+      alert("Please describe their problem");
       return;
     }
 
-    const newProspect: Prospect = {
-      id: `manual-${Date.now()}`,
-      businessName: manualForm.businessName,
-      contactName: manualForm.contactName,
-      email: manualForm.email,
-      phone: manualForm.phone,
-      city: manualForm.city,
-      postcode: manualForm.postcode,
-      tier: getConsequenceTier(manualForm.businessName),
-      category: manualForm.category, // Use selected category instead of auto-detect
-      source: "manual"
-    };
+    setInferringProblem(true);
+    try {
+      // Intelligently infer problem from description
+      const res = await fetch("/api/operator/infer-problem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problem_description: manualForm.problemDescription,
+          business_name: manualForm.businessName
+        })
+      });
 
-    setProspects([newProspect, ...prospects]);
-    setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "" });
+      if (!res.ok) {
+        const error = await res.json();
+        alert(`Could not infer problem: ${error.error}`);
+        setInferringProblem(false);
+        return;
+      }
+
+      const inference = await res.json();
+      console.log("[DISCOVER] Inferred:", inference);
+
+      const newProspect: Prospect = {
+        id: `manual-${Date.now()}`,
+        businessName: manualForm.businessName,
+        contactName: manualForm.contactName,
+        email: manualForm.email,
+        phone: manualForm.phone,
+        city: manualForm.city,
+        postcode: manualForm.postcode,
+        tier: getConsequenceTier(manualForm.businessName),
+        category: inference.category,
+        source: "manual",
+        extractedNeed: inference.problem_type
+      };
+
+      setProspects([newProspect, ...prospects]);
+      setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
+      alert(`✓ Added ${manualForm.businessName} (${inference.category})`);
+    } catch (error) {
+      console.error("[DISCOVER] Error inferring problem:", error);
+      alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setInferringProblem(false);
+    }
   };
 
   const toggleLead = (prospectId: string) => {
@@ -388,6 +421,20 @@ export default function DiscoverPage() {
                 </div>
               </div>
 
+              <div>
+                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  What's their problem? *
+                </label>
+                <textarea
+                  value={manualForm.problemDescription}
+                  onChange={(e) => setManualForm({ ...manualForm, problemDescription: e.target.value })}
+                  placeholder="e.g., Struggling with urgent medication delivery to rural clinics"
+                  className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none resize-none"
+                  rows={3}
+                />
+                <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
@@ -403,25 +450,15 @@ export default function DiscoverPage() {
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                    Category *
+                    City
                   </label>
-                  <select
-                    value={manualForm.category}
-                    onChange={(e) => setManualForm({ ...manualForm, category: e.target.value })}
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
-                  >
-                    <option value="">Select a category</option>
-                    <option value="Solicitor">Solicitors</option>
-                    <option value="Estate Agent">Estate Agents</option>
-                    <option value="Accountant">Accountants</option>
-                    <option value="Pharmacy">Pharmacy</option>
-                    <option value="Hospital">Hospital</option>
-                    <option value="Restaurant">Restaurant</option>
-                    <option value="Constructor">Construction</option>
-                    <option value="Architect">Architect</option>
-                    <option value="Veterinary">Veterinary</option>
-                    <option value="Business">Other Business</option>
-                  </select>
+                  <input
+                    type="text"
+                    value={manualForm.city}
+                    onChange={(e) => setManualForm({ ...manualForm, city: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
                 </div>
               </div>
 
@@ -454,9 +491,10 @@ export default function DiscoverPage() {
 
               <button
                 onClick={handleManualAdd}
-                className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                disabled={inferringProblem}
+                className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
               >
-                Add Prospect
+                {inferringProblem ? "Analyzing problem..." : "Add Prospect"}
               </button>
             </div>
           </div>
