@@ -64,6 +64,7 @@ export default function DiscoverPage() {
 
     setSearchLoading(true);
     try {
+      // Build search params - increase limit to 1000
       const params = new URLSearchParams();
       if (isPostcodeSearch) {
         params.append("postcode", searchTerm);
@@ -71,6 +72,7 @@ export default function DiscoverPage() {
       } else {
         params.append("keyword", searchTerm);
       }
+      params.append("limit", "1000"); // Increased from default
 
       const url = `/api/b2b/discover?${params}`;
       console.log("[DISCOVER] Searching:", url);
@@ -87,7 +89,8 @@ export default function DiscoverPage() {
         return;
       }
 
-      const results = (data.results || []).map((r: any) => ({
+      // Map results and sort alphabetically by city + business name
+      let results = (data.results || []).map((r: any) => ({
         id: r.id,
         businessName: r.businessName || r.name,
         contactName: r.contactName,
@@ -100,10 +103,39 @@ export default function DiscoverPage() {
         source: "search" as const
       }));
 
+      // Deduplication: fetch already-targeted companies from OpportunityFeed
+      const alreadyTargetedRes = await fetch("/api/operator/opportunity-feed/targeted-companies");
+      const alreadyTargeted = alreadyTargetedRes.ok
+        ? await alreadyTargetedRes.json().then((d: any) => new Set(d.companies || []))
+        : new Set();
+
+      // Filter out already-targeted prospects
+      const originalCount = results.length;
+      results = results.filter(r => !alreadyTargeted.has((r.businessName || "").toLowerCase()));
+
+      const dedupedCount = originalCount - results.length;
+      if (dedupedCount > 0) {
+        console.log(`[DISCOVER] Filtered out ${dedupedCount} already-targeted prospects`);
+      }
+
+      // Sort: by city first (A-Z), then by business name (A-Z)
+      results = results.sort((a, b) => {
+        const cityA = (a.city || "").toLowerCase();
+        const cityB = (b.city || "").toLowerCase();
+        if (cityA !== cityB) {
+          return cityA.localeCompare(cityB);
+        }
+        const nameA = (a.businessName || "").toLowerCase();
+        const nameB = (b.businessName || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
       console.log("[DISCOVER] Mapped results:", results.length, results);
 
       if (results.length === 0) {
         alert("No prospects found matching your search");
+      } else {
+        alert(`Found ${results.length} prospects (sorted by city and name)`);
       }
 
       setProspects(results);
