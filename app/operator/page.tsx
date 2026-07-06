@@ -198,7 +198,7 @@ export default function TodayPage() {
                   <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.opportunitiesQueued} opportunities ready</h2>
                   <p className="text-sm text-[#666666] mb-6">Your CSV upload is processed. Send these emails now.</p>
                   <Link
-                    href="/operator/discover"
+                    href="/operator/enrich?source=queue"
                     className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
                   >
                     Send Opportunities →

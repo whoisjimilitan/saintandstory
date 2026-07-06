@@ -91,6 +91,13 @@ export default function EnrichPage() {
       return;
     }
 
+    // Queue mode: load from approval queue
+    const source = searchParams.get("source");
+    if (source === "queue") {
+      loadQueueProspects();
+      return;
+    }
+
     // Traditional mode: load from sessionStorage
     const prospectData = sessionStorage.getItem("enrich_prospects");
     if (!prospectData) {
@@ -145,6 +152,40 @@ export default function EnrichPage() {
     } catch (error) {
       console.error("Error loading batch:", error);
       router.push("/operator/queue");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadQueueProspects = async () => {
+    try {
+      const res = await fetch("/api/operator/opportunity-feed/queue?approvalStatus=pending");
+      if (!res.ok) throw new Error("Failed to load queue");
+
+      const data = await res.json();
+      const opportunities = data.all_opportunities || [];
+
+      // Convert opportunities to prospect format
+      const prospects: Prospect[] = opportunities.map((opp: any) => ({
+        id: opp.id,
+        businessName: opp.companyName,
+        contactName: opp.contactName,
+        email: opp.contactEmail,
+        phone: opp.contactPhone,
+        city: opp.location,
+        businessCategory: opp.problemType
+      }));
+
+      if (prospects.length === 0) {
+        router.push("/operator/discover");
+        return;
+      }
+
+      setProspects(prospects);
+      generateEmails(prospects);
+    } catch (error) {
+      console.error("Error loading queue:", error);
+      router.push("/operator/discover");
     } finally {
       setLoading(false);
     }
