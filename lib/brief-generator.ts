@@ -359,24 +359,24 @@ function getPersonalizationLine(problemType: string, company: string): string {
  */
 function getCredibilityStatement(problemType: string): string {
   const statements: Record<string, string> = {
-    court_deadline_delivery: "Delivery won't fail with us. That's why we built Saint & Story. If a delivery fails, we take responsibility and cover the re-delivery at no cost.",
-    legal_document_delivery: "Delivery won't fail with us. That's why we built Saint & Story around court deadline reliability. Every delivery is backed by our commitment to get it right.",
-    hospital_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story with medical delivery as the core. We understand that patient care depends on us.",
-    pharmacy_prescription_delivery: "Delivery won't fail with us. That's why we built Saint & Story around prescription reliability. Patient health depends on timing.",
-    construction_material_delivery: "Delivery won't fail with us. That's why we built Saint & Story around construction timelines. We don't just move materials. We move projects forward.",
-    estate_agent_document_delivery: "Delivery won't fail with us. That's why we built Saint & Story around completion day reliability. We know deals close when documents arrive on time.",
-    restaurant_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around supply reliability. Your menu depends on us.",
-    accounting_file_delivery: "Delivery won't fail with us. That's why we built Saint & Story around tax deadline certainty. Compliance isn't optional.",
-    architecture_drawing_delivery: "Delivery won't fail with us. That's why we built Saint & Story around construction timelines. Your plans matter.",
-    veterinary_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around animal care. Supply reliability means patient care happens on schedule.",
-    dental_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around appointment scheduling. Your patients depend on us.",
-    retail_stock_delivery: "Delivery won't fail with us. That's why we built Saint & Story around store readiness. First customers deserve full shelves.",
-    beauty_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around client bookings. Product availability keeps revenue flowing.",
-    art_gallery_artwork_delivery: "Delivery won't fail with us. That's why we built Saint & Story around exhibition timing. Openings don't get rescheduled.",
-    catering_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around event success. Your reputation depends on us.",
-    manufacturing_part_delivery: "Delivery won't fail with us. That's why we built Saint & Story around production schedules. Quotas depend on us.",
-    film_production_equipment: "Delivery won't fail with us. That's why we built Saint & Story around production timelines. Shoots don't wait.",
-    office_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story around operational continuity. Your team's productivity matters."
+    court_deadline_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery fails, we take responsibility and cover the re-delivery at no cost.",
+    legal_document_delivery: "That's why we built Saint & Story around court deadline reliability. Delivery won't fail with us. Every delivery is backed by our commitment to get it right.",
+    hospital_supply_delivery: "That's why we built Saint & Story with medical delivery as the core. Delivery won't fail with us. We understand that patient care depends on us.",
+    pharmacy_prescription_delivery: "That's why we built Saint & Story around prescription reliability. Delivery won't fail with us. Patient health depends on timing.",
+    construction_material_delivery: "That's why we built Saint & Story around construction timelines. Delivery won't fail with us. We don't just move materials. We move projects forward.",
+    estate_agent_document_delivery: "That's why we built Saint & Story around completion day reliability. Delivery won't fail with us. We know deals close when documents arrive on time.",
+    restaurant_supply_delivery: "That's why we built Saint & Story around supply reliability. Delivery won't fail with us. Your menu depends on us.",
+    accounting_file_delivery: "That's why we built Saint & Story around tax deadline certainty. Delivery won't fail with us. Compliance isn't optional.",
+    architecture_drawing_delivery: "That's why we built Saint & Story around construction timelines. Delivery won't fail with us. Your plans matter.",
+    veterinary_supply_delivery: "That's why we built Saint & Story around animal care. Delivery won't fail with us. Supply reliability means patient care happens on schedule.",
+    dental_supply_delivery: "That's why we built Saint & Story around appointment scheduling. Delivery won't fail with us. Your patients depend on us.",
+    retail_stock_delivery: "That's why we built Saint & Story around store readiness. Delivery won't fail with us. First customers deserve full shelves.",
+    beauty_supply_delivery: "That's why we built Saint & Story around client bookings. Delivery won't fail with us. Product availability keeps revenue flowing.",
+    art_gallery_artwork_delivery: "That's why we built Saint & Story around exhibition timing. Delivery won't fail with us. Openings don't get rescheduled.",
+    catering_supply_delivery: "That's why we built Saint & Story around event success. Delivery won't fail with us. Your reputation depends on us.",
+    manufacturing_part_delivery: "That's why we built Saint & Story around production schedules. Delivery won't fail with us. Quotas depend on us.",
+    film_production_equipment: "That's why we built Saint & Story around production timelines. Delivery won't fail with us. Shoots don't wait.",
+    office_supply_delivery: "That's why we built Saint & Story around operational continuity. Delivery won't fail with us. Your team's productivity matters."
   };
 
   return statements[problemType] || "That's why we built Saint & Story. Reliability is everything.";
