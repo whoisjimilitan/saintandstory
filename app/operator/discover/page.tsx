@@ -146,15 +146,46 @@ export default function DiscoverPage() {
     setSelectedLeads(newSelected);
   };
 
-  const handleReviewAndSend = () => {
+  const handleReviewAndSend = async () => {
     if (selectedLeads.size === 0) {
       alert("Please select at least one prospect");
       return;
     }
 
     const selectedProspects = prospects.filter(p => selectedLeads.has(p.id));
-    sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
-    router.push("/operator/enrich");
+
+    try {
+      // Create OpportunityFeed records (unified persistence)
+      const res = await fetch("/api/operator/opportunity-feed/create-from-prospects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospects: selectedProspects })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to create opportunity records");
+      }
+
+      const data = await res.json();
+      console.log("[DISCOVER] Created opportunities:", data);
+
+      // Extract IDs of created records
+      const opportunityIds = data.opportunities
+        .filter((opp: any) => opp.status === "created" || opp.status === "already_exists")
+        .map((opp: any) => opp.opportunityId);
+
+      if (opportunityIds.length === 0) {
+        alert("No prospects were processed successfully");
+        return;
+      }
+
+      // Navigate to Enrich with opportunity IDs
+      router.push(`/operator/enrich?opportunities=${opportunityIds.join(",")}`);
+    } catch (error) {
+      console.error("[DISCOVER] Error creating opportunities:", error);
+      alert(`Failed to prepare prospects: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
   };
 
   const tier1Count = prospects.filter(p => p.tier === 1 && selectedLeads.has(p.id)).length;

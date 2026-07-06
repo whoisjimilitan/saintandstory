@@ -48,6 +48,7 @@ export default function EnrichPage() {
   const mode = searchParams.get("mode") || "draft";
   const count = parseInt(searchParams.get("count") || "0");
   const batchId = searchParams.get("batch_id");
+  const opportunitiesParam = searchParams.get("opportunities");
 
   const [activeTab, setActiveTab] = useState<TabType>("draft");
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -85,6 +86,12 @@ export default function EnrichPage() {
   }, [generatedEmails.length, activeTab]);
 
   useEffect(() => {
+    // OpportunityFeed mode: load from discovered/selected prospects
+    if (opportunitiesParam) {
+      loadOpportunitiesFromFeed(opportunitiesParam);
+      return;
+    }
+
     // Batch mode: load from autonomous queue
     if (batchId) {
       loadBatchProspects(batchId);
@@ -98,7 +105,7 @@ export default function EnrichPage() {
       return;
     }
 
-    // Traditional mode: load from sessionStorage
+    // Traditional mode: load from sessionStorage (fallback)
     const prospectData = sessionStorage.getItem("enrich_prospects");
     if (!prospectData) {
       router.push("/operator/discover");
@@ -185,6 +192,61 @@ export default function EnrichPage() {
       generateEmails(prospects);
     } catch (error) {
       console.error("Error loading queue:", error);
+      router.push("/operator/discover");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadOpportunitiesFromFeed = async (opportunitiesParam: string) => {
+    try {
+      const ids = opportunitiesParam.split(",");
+      const res = await fetch(`/api/operator/opportunity-feed/list?ids=${ids.join(",")}`);
+      if (!res.ok) throw new Error("Failed to load opportunities");
+
+      const data = await res.json();
+      const opportunities = data.opportunities || [];
+
+      if (opportunities.length === 0) {
+        router.push("/operator/discover");
+        return;
+      }
+
+      // Convert OpportunityFeed records to prospect format
+      // These already have briefs generated, so we'll show those briefs as emails
+      const prospects: Prospect[] = opportunities.map((opp: any) => ({
+        id: opp.id,
+        businessName: opp.companyName,
+        contactName: opp.contactName,
+        email: opp.contactEmail,
+        phone: opp.contactPhone,
+        city: opp.location,
+        businessCategory: opp.problemType,
+        extractedNeed: opp.extractedNeed,
+        briefHtml: opp.briefHtml,
+        emailBody: opp.emailBody
+      }));
+
+      setProspects(prospects);
+
+      // Load pre-generated briefs from OpportunityFeed (no need to regenerate)
+      const enrichedEmails = opportunities.map((opp: any) => ({
+        prospectId: opp.id,
+        prospectName: opp.contactName || opp.companyName,
+        businessName: opp.companyName,
+        city: opp.location || "",
+        email: opp.contactEmail || "",
+        subject: opp.emailSubject,
+        body: opp.emailBody,
+        htmlBody: opp.briefHtml,
+        wordCount: (opp.emailBody || "").split(" ").length,
+        senderName: user?.firstName || "James"
+      }));
+
+      setGeneratedEmails(enrichedEmails);
+      setLoading(false);
+    } catch (error) {
+      console.error("[ENRICH] Error loading opportunities:", error);
       router.push("/operator/discover");
     } finally {
       setLoading(false);
