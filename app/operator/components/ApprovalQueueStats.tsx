@@ -22,10 +22,22 @@ export default function ApprovalQueueStats() {
     const fetchStats = async () => {
       try {
         const res = await fetch("/api/operator/opportunity-feed/queue?approvalStatus=pending");
+        if (!res.ok) {
+          console.error("[QUEUE STATS] Error response:", res.status);
+          setLoading(false);
+          return;
+        }
         const data = await res.json();
-        setStats(data);
+
+        if (data.success && data.grouped_by_problem) {
+          setStats(data);
+        } else {
+          console.error("[QUEUE STATS] Invalid response format:", data);
+          setLoading(false);
+        }
       } catch (error) {
-        console.error("Error fetching queue stats:", error);
+        console.error("[QUEUE STATS] Fetch error:", error);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
