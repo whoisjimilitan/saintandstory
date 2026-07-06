@@ -1425,44 +1425,62 @@ enum ObservationSource {
 model OpportunityFeed {
   id                    String   @id @default(cuid())
 
-  // CSV Input
+  // Discovery Input
   companyName           String
   website               String?
   contactName           String?
   contactEmail          String?
-  sourcePlatform        String
-  sourceUrl             String?
-  postedDate            DateTime
-  originalWording       String   @db.Text
-  confidence            Int
+  contactPhone          String?   @map("contact_phone")
+  contactLinkedin       String?   @map("contact_linkedin")
+  sourcePlatform        String    @map("source_platform")
+  sourceUrl             String?   @map("source_url")
+  postedDate            DateTime  @map("posted_date")
+  originalWording       String    @db.Text @map("original_wording")
+  location              String?
 
-  // Extracted
-  extractedNeed         String?  @db.Text
-  extractedUrgency      String?
-  extractedContext      String?  @db.Text
-  extractedQuote        String?  @db.Text
+  // Extraction (confession parsing)
+  extractedNeed         String?   @db.Text @map("extracted_need")
+  extractedUrgency      String?   @map("extracted_urgency")
+  extractedContext      String?   @db.Text @map("extracted_context")
+  extractedQuote        String?   @db.Text @map("extracted_quote")
 
-  // Generated
-  briefHtml             String?  @db.Text
-  emailSubject          String?
-  emailBody             String?  @db.Text
+  // Problem Classification (NEW)
+  problemType           String?   @map("problem_type")
+  psychologyAnalysis    Json?     @map("psychology_analysis")
+  prePopulatedReply     String?   @db.Text @map("pre_populated_reply")
+
+  // Generated Brief
+  briefHtml             String?   @db.Text @map("brief_html")
+  emailSubject          String?   @map("email_subject")
+  emailBody             String?   @db.Text @map("email_body")
+
+  // Routing (NEW)
+  routingTier           Int?      @map("routing_tier")
+  confidenceScore       Decimal?  @map("confidence_score") @db.Decimal(3, 2)
+  approvalStatus        String    @default("pending") @map("approval_status")
+  jamesStatus           String?   @map("james_status")
 
   // Status
-  status                String   @default("imported")
+  status                String    @default("discovered")
+  rejectionReason       String?   @map("rejection_reason")
 
   // Tracking
-  sentAt                DateTime?
-  resendId              String?   @unique
-  openedAt              DateTime?
-  clickedAt             DateTime?
-  repliedAt             DateTime?
-  replyContent          String?  @db.Text
+  sentAt                DateTime? @map("sent_at")
+  resendId              String?   @unique @map("resend_id")
+  openedAt              DateTime? @map("opened_at")
+  clickedAt             DateTime? @map("clicked_at")
+  repliedAt             DateTime? @map("replied_at")
+  replyContent          String?   @db.Text @map("reply_content")
 
   // Timestamps
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
 
   @@index([status])
+  @@index([problemType])
+  @@index([routingTier])
+  @@index([approvalStatus])
+  @@index([jamesStatus])
   @@index([createdAt(sort: Desc)])
   @@map("opportunity_feed")
 }

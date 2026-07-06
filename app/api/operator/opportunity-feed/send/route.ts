@@ -4,6 +4,8 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   console.log("[OPPORTUNITY FEED] Send started");
 
@@ -18,19 +20,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("[OPPORTUNITY FEED] Sending", opportunityIds.length, "emails");
+    console.log(`[OPPORTUNITY FEED] Sending ${opportunityIds.length} emails`);
 
-    // Fetch queued opportunities
+    // Fetch approved opportunities
     const opportunities = await prisma.opportunityFeed.findMany({
       where: {
         id: { in: opportunityIds },
-        status: "queued",
+        approvalStatus: "approved",
+        sentAt: null // Not already sent
       },
     });
 
     if (opportunities.length === 0) {
       return NextResponse.json(
-        { error: "No queued opportunities found with given IDs" },
+        { error: "No approved opportunities found with given IDs" },
         { status: 404 }
       );
     }
@@ -44,14 +47,29 @@ export async function POST(request: NextRequest) {
           throw new Error("Missing email data or contact email");
         }
 
-        console.log("[OPPORTUNITY FEED] Sending to:", opp.companyName, opp.contactEmail);
+        console.log(`[OPPORTUNITY FEED] Sending to: ${opp.companyName} (${opp.contactEmail})`);
 
-        // Send via Resend
+        // Send via Resend with pre-populated reply in HTML template
+        const emailBody = `
+${opp.emailBody}
+
+---
+
+Ready to reply? Use this:
+
+${opp.prePopulatedReply}
+
+James
+`;
+
         const response = await resend.emails.send({
           from: "james@saintandstory.co.uk",
           to: opp.contactEmail,
-          subject: opp.emailSubject,
-          text: opp.emailBody,
+          subject: opp.emailSubject || `${opp.companyName} – Opportunity`,
+          text: emailBody,
+          html: opp.briefHtml
+            ? `${opp.briefHtml}<hr><p><strong>Reply with this:</strong></p><p>${opp.prePopulatedReply}</p>`
+            : undefined
         });
 
         if (!response.id) {
@@ -64,7 +82,8 @@ export async function POST(request: NextRequest) {
           data: {
             status: "sent",
             sentAt: new Date(),
-            resendId: response.id, // Store for webhook matching
+            resendId: response.id,
+            jamesStatus: "pending" // Waiting for reply
           },
         });
 
@@ -75,11 +94,12 @@ export async function POST(request: NextRequest) {
           resendId: response.id,
         });
 
-        console.log("[OPPORTUNITY FEED] Sent successfully to", opp.companyName, "resend id:", response.id);
+        console.log(`[OPPORTUNITY FEED] Sent to ${opp.companyName}, Resend ID: ${response.id}`);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        console.log("[OPPORTUNITY FEED] Send failed for", opp.companyName, ":", errorMsg);
+        console.error(`[OPPORTUNITY FEED] Send failed for ${opp.companyName}: ${errorMsg}`);
         failed.push({
+          id: opp.id,
           company: opp.companyName,
           email: opp.contactEmail,
           error: errorMsg,
@@ -87,7 +107,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log("[OPPORTUNITY FEED] Send complete. Sent:", results.length, "Failed:", failed.length);
+    console.log(
+      `[OPPORTUNITY FEED] Send complete. Sent: ${results.length}, Failed: ${failed.length}`
+    );
 
     return NextResponse.json({
       success: true,
@@ -99,7 +121,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("[OPPORTUNITY FEED] Send error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: String(error) },
       { status: 500 }
     );
   }
