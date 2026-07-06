@@ -302,55 +302,35 @@ function getDiscoveryPhrase(problemType: string): string {
  */
 function getTeachingMoment(problemType: string): string {
   const teachings: Record<string, string> = {
-    court_deadline_delivery: "Filing deadlines aren't missed because of the law. They're missed when one small dependency becomes the biggest risk.",
-    legal_document_delivery: "Legal deadlines fail not because of the law, but because of logistics.",
-    hospital_supply_delivery: "Care delays aren't caused by medical complexity. They're caused by supply chain failures.",
-    pharmacy_prescription_delivery: "Patient trust isn't lost over medication. It's lost over late delivery.",
-    construction_material_delivery: "Projects slip not because of planning. They slip because materials arrive late.",
-    estate_agent_document_delivery: "Deals close not because of negotiation. They close because documents arrive on time.",
-    restaurant_supply_delivery: "Revenue loss isn't caused by cooking. It's caused by missing ingredients.",
-    accounting_file_delivery: "Tax compliance isn't about calculations. It's about delivering documents on deadline.",
-    architecture_drawing_delivery: "Building delays aren't about design. They're about getting plans to site on time.",
-    veterinary_supply_delivery: "Animal care doesn't fail from medical decisions. It fails from supply delays.",
-    dental_supply_delivery: "Dental delays don't come from treatment. They come from missing lab work.",
-    retail_stock_delivery: "Store success isn't about products. It's about stock arriving before opening.",
-    beauty_supply_delivery: "Client satisfaction doesn't depend on the service. It depends on having the products.",
-    art_gallery_artwork_delivery: "Exhibitions succeed or fail based on one thing: whether artwork arrives on time.",
-    catering_supply_delivery: "Event success isn't about food quality. It's about ingredients arriving when you need them.",
-    manufacturing_part_delivery: "Production targets miss not because of skill. They miss because parts arrive late.",
-    film_production_equipment: "Films get made or delayed based on one thing: whether equipment is where it needs to be.",
-    office_supply_delivery: "Productivity doesn't fail from work ethic. It fails from running out of essentials."
+    court_deadline_delivery: "Filing deadlines aren't missed because of the law. They're missed because of dependencies that are out of your control.",
+    legal_document_delivery: "Legal deadlines fail not because of the law, but because of dependencies that are out of your control.",
+    hospital_supply_delivery: "Care delays aren't caused by medical skill. They're caused by dependencies that are out of your control.",
+    pharmacy_prescription_delivery: "Patient delays aren't caused by the medication. They're caused by dependencies that are out of your control.",
+    construction_material_delivery: "Project delays aren't caused by planning. They're caused by dependencies that are out of your control.",
+    estate_agent_document_delivery: "Deals don't fail because of negotiation. They fail because of dependencies that are out of your control.",
+    restaurant_supply_delivery: "Revenue loss isn't caused by your cooking. It's caused by dependencies that are out of your control.",
+    accounting_file_delivery: "Tax compliance isn't about calculations. It's about dependencies that are out of your control.",
+    architecture_drawing_delivery: "Building delays aren't about design. They're caused by dependencies that are out of your control.",
+    veterinary_supply_delivery: "Animal care doesn't fail from medical skill. It fails because of dependencies that are out of your control.",
+    dental_supply_delivery: "Dental delays don't come from treatment. They come from dependencies that are out of your control.",
+    retail_stock_delivery: "Store success isn't about your products. It's about dependencies that are out of your control.",
+    beauty_supply_delivery: "Client satisfaction doesn't depend on your service. It depends on dependencies that are out of your control.",
+    art_gallery_artwork_delivery: "Exhibition success isn't about the art. It's about dependencies that are out of your control.",
+    catering_supply_delivery: "Event success isn't about food quality. It's about dependencies that are out of your control.",
+    manufacturing_part_delivery: "Production targets miss not because of skill. They miss because of dependencies that are out of your control.",
+    film_production_equipment: "Films get made or delayed not because of talent. They depend on things out of your control.",
+    office_supply_delivery: "Productivity doesn't fail from work ethic. It fails because of dependencies that are out of your control."
   };
 
-  return teachings[problemType] || "One thing determines success: reliability.";
+  return teachings[problemType] || "Success always depends on one thing: dependencies you can't control.";
 }
 
 /**
- * Personalization: "For many firms, that dependency is..."
+ * Personalization: ALWAYS "For [COMPANY], that dependency is delivery."
+ * This reveals the core insight: their dependency is always delivery.
  */
 function getPersonalizationLine(problemType: string, company: string): string {
-  const personalizations: Record<string, string> = {
-    court_deadline_delivery: `For ${company}, that dependency is the delivery.`,
-    legal_document_delivery: `For ${company}, that's document courier reliability.`,
-    hospital_supply_delivery: `For ${company}, that's urgent supply delivery.`,
-    pharmacy_prescription_delivery: `For ${company}, that's reliable prescription logistics.`,
-    construction_material_delivery: `For ${company}, that's on-time material delivery.`,
-    estate_agent_document_delivery: `For ${company}, that's completion day document delivery.`,
-    restaurant_supply_delivery: `For ${company}, that's same-day supplier collections.`,
-    accounting_file_delivery: `For ${company}, that's deadline-day document delivery.`,
-    architecture_drawing_delivery: `For ${company}, that's plan delivery to site.`,
-    veterinary_supply_delivery: `For ${company}, that's urgent medication delivery.`,
-    dental_supply_delivery: `For ${company}, that's lab work and supply timing.`,
-    retail_stock_delivery: `For ${company}, that's early morning stock arrival.`,
-    beauty_supply_delivery: `For ${company}, that's product availability.`,
-    art_gallery_artwork_delivery: `For ${company}, that's secure artwork delivery.`,
-    catering_supply_delivery: `For ${company}, that's ingredient sourcing on time.`,
-    manufacturing_part_delivery: `For ${company}, that's parts delivery to production.`,
-    film_production_equipment: `For ${company}, that's equipment on location fast.`,
-    office_supply_delivery: `For ${company}, that's supply delivery when needed.`
-  };
-
-  return personalizations[problemType] || `For ${company}, that's reliable delivery.`;
+  return `For ${company}, that dependency is delivery.`;
 }
 
 /**
