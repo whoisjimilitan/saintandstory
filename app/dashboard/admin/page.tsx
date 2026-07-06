@@ -7,6 +7,7 @@ import IndexNowButton from "@/components/IndexNowButton";
 import AdminAutoRefresh from "@/components/AdminAutoRefresh";
 import AdminPushSubscribe from "@/components/AdminPushSubscribe";
 import AdminLocationUpdater from "@/components/AdminLocationUpdater";
+import AdminClock from "./components/AdminClock";
 
 const ADMIN_EMAILS = [
   "whoisjimi.today@gmail.com",
@@ -15,6 +16,13 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk"
 ];
 const ADMIN_USER_IDS = ["user_3EVExeiSBmgdhAWGzMEb8GMVc62"];
+
+function getTimeOfDay(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "morning";
+  if (hour < 18) return "afternoon";
+  return "evening";
+}
 
 async function getPendingJobs() {
   if (!process.env.DATABASE_URL) return [];
@@ -213,19 +221,33 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* Date Header - Subtle Context */}
-        <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.05em] mb-6">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
+        {/* Date & Time Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <p className="text-xs font-semibold text-[#888888] uppercase tracking-[0.05em]">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+          <span className="text-xs text-[#CCCCCC]">•</span>
+          <AdminClock />
+        </div>
 
         {/* Hero Section - Premium Bold Aesthetic */}
-        <div className="mb-12">
+        <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
-            Fleet dashboard.
+            Good {getTimeOfDay()}, {user?.firstName || "there"}
           </h1>
           <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
             Live job dispatch and driver status.
           </p>
+        </div>
+
+        {/* Operator Link */}
+        <div className="mb-12">
+          <Link
+            href="/operator"
+            className="inline-flex items-center px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+          >
+            Enter Operator Dashboard →
+          </Link>
         </div>
       </div>
 
