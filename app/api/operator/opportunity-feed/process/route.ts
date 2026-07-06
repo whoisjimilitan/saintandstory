@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { extractProblemTypeFromConfession, getProblemType } from "@/lib/problems-map";
+import { inferProblemFromConfession } from "@/lib/confession-inferencer";
 import { analyzePsychology, calculateConfidence, determineRoute } from "@/lib/psychology-analyzer";
 import { generateBrief, generateEmailBody } from "@/lib/brief-generator";
 import { extractContactInfo, getContactCompleteness, filterLegitimateConfession } from "@/lib/confession-scraper";
@@ -52,14 +53,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // STEP 2: Extract problem type
-    const problemType = extractProblemTypeFromConfession(body.confession_text);
+    // STEP 2: Extract problem type (keyword matching)
+    let problemType = extractProblemTypeFromConfession(body.confession_text);
+    let inferenceUsed = false;
+
+    // If keyword matching fails, use intelligent inference
     if (!problemType) {
-      console.log("[OPERATOR] Could not extract problem type");
-      return NextResponse.json(
-        { error: "Could not identify problem type from confession" },
-        { status: 400 }
-      );
+      console.log("[OPERATOR] Keyword matching failed, attempting intelligent inference...");
+      const inference = await inferProblemFromConfession(body.confession_text);
+
+      if (inference.inferred_problem_type && inference.confidence >= 0.6) {
+        problemType = inference.inferred_problem_type;
+        inferenceUsed = true;
+        console.log(`[OPERATOR] Inference successful: ${problemType} (confidence: ${inference.confidence})`);
+      } else {
+        console.log("[OPERATOR] Could not infer problem type with confidence");
+        return NextResponse.json(
+          { error: "Could not identify problem type (inference confidence too low)",
+            inference: inference },
+          { status: 400 }
+        );
+      }
     }
 
     const problem = getProblemType(problemType);
@@ -188,6 +202,7 @@ export async function POST(request: NextRequest) {
       success: true,
       opportunity_id: opportunity.id,
       problem_type: problemType,
+      inference_used: inferenceUsed,
       confidence: confidence,
       route,
       status: opportunity.status,
