@@ -274,7 +274,7 @@ export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): st
  */
 function getDiscoveryPhrase(problemType: string): string {
   const discoveries: Record<string, string> = {
-    court_deadline_delivery: `a little birdie told me that you handle quite a number of critical court deadlines.`,
+    court_deadline_delivery: `a little birdie told me that you handle critical court deadlines.`,
     legal_document_delivery: `a little birdie told me that you need documents at court on time.`,
     hospital_supply_delivery: `a little birdie told me that you manage urgent patient care supply chains.`,
     pharmacy_prescription_delivery: `a little birdie told me that you deliver prescriptions daily.`,
@@ -302,7 +302,7 @@ function getDiscoveryPhrase(problemType: string): string {
  */
 function getTeachingMoment(problemType: string): string {
   const teachings: Record<string, string> = {
-    court_deadline_delivery: "Filing deadlines are rarely missed because of the legal work itself. They're usually missed when one small dependency becomes the biggest risk.",
+    court_deadline_delivery: "Filing deadlines aren't missed because of the law. They're missed when one small dependency becomes the biggest risk.",
     legal_document_delivery: "Legal deadlines fail not because of the law, but because of logistics.",
     hospital_supply_delivery: "Care delays aren't caused by medical complexity. They're caused by supply chain failures.",
     pharmacy_prescription_delivery: "Patient trust isn't lost over medication. It's lost over late delivery.",
@@ -359,7 +359,7 @@ function getPersonalizationLine(problemType: string, company: string): string {
  */
 function getCredibilityStatement(problemType: string): string {
   const statements: Record<string, string> = {
-    court_deadline_delivery: "Delivery won't fail with us. That's why we built Saint & Story the way we did. If a delivery ever fails with us, we'll take responsibility and cover the re-delivery at no cost to you.",
+    court_deadline_delivery: "Delivery won't fail with us. That's why we built Saint & Story. If a delivery fails, we take responsibility and cover the re-delivery at no cost.",
     legal_document_delivery: "Delivery won't fail with us. That's why we built Saint & Story around court deadline reliability. Every delivery is backed by our commitment to get it right.",
     hospital_supply_delivery: "Delivery won't fail with us. That's why we built Saint & Story with medical delivery as the core. We understand that patient care depends on us.",
     pharmacy_prescription_delivery: "Delivery won't fail with us. That's why we built Saint & Story around prescription reliability. Patient health depends on timing.",
