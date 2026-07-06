@@ -63,6 +63,8 @@ export default function DiscoverPage() {
   const [inferenceAttempted, setInferenceAttempted] = useState(false);
   const [inferenceFailed, setInferenceFailed] = useState(false);
 
+  const [channel, setChannel] = useState<"email" | "whatsapp">("email");
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -270,6 +272,7 @@ export default function DiscoverPage() {
 
     // Store in sessionStorage (temporary, per-session)
     sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
+    sessionStorage.setItem("enrich_channel", channel);
 
     // Navigate to Enrich
     router.push("/operator/enrich");
@@ -592,12 +595,42 @@ export default function DiscoverPage() {
             </div>
 
             {selectedLeads.size > 0 && (
-              <button
-                onClick={handleReviewAndSend}
-                className="w-full mt-8 px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
-              >
-                Review & Proceed to Enrich →
-              </button>
+              <div className="mt-8 space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-[#888888] uppercase tracking-widest mb-3">
+                    Campaign Channel
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setChannel("email")}
+                      className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all text-sm font-semibold ${
+                        channel === "email"
+                          ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
+                          : "bg-white text-[#0D0D0D] border-[#E8E8E8]"
+                      }`}
+                    >
+                      Email
+                    </button>
+                    <button
+                      onClick={() => setChannel("whatsapp")}
+                      className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all text-sm font-semibold ${
+                        channel === "whatsapp"
+                          ? "bg-[#0D0D0D] text-white border-[#0D0D0D]"
+                          : "bg-white text-[#0D0D0D] border-[#E8E8E8]"
+                      }`}
+                    >
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleReviewAndSend}
+                  className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                >
+                  Review & Proceed to Enrich →
+                </button>
+              </div>
             )}
           </div>
         )}
