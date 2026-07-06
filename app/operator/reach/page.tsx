@@ -52,6 +52,19 @@ export default function ReachPage() {
   const [sendingReply, setSendingReply] = useState(false);
   const [newChatPhone, setNewChatPhone] = useState("");
   const [newChatName, setNewChatName] = useState("");
+  const [showEmailHistory, setShowEmailHistory] = useState(false);
+  const [showWhatsappHistory, setShowWhatsappHistory] = useState(false);
+
+  // Filter campaigns by 24-hour window
+  const filterCampaignsByWindow = (campaigns: any[], now = new Date()) => {
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const today = campaigns.filter((c) => new Date(c.sentAt) >= oneDayAgo);
+    const history = campaigns.filter((c) => new Date(c.sentAt) < oneDayAgo);
+    return { today, history };
+  };
+
+  const emailByWindow = filterCampaignsByWindow(emailCampaigns);
+  const whatsappByWindow = filterCampaignsByWindow(whatsappCampaigns);
 
   useEffect(() => {
     fetchData();
@@ -158,7 +171,7 @@ export default function ReachPage() {
     }
   };
 
-  const emailStats = emailCampaigns.reduce(
+  const emailStats = emailByWindow.today.reduce(
     (acc, c) => ({
       total: acc.total + (c.sent || 0),
       opened: acc.opened + (c.opened || 0),
@@ -167,7 +180,7 @@ export default function ReachPage() {
     { total: 0, opened: 0, replied: 0 }
   );
 
-  const whatsappStats = whatsappCampaigns.reduce(
+  const whatsappStats = whatsappByWindow.today.reduce(
     (acc, c) => ({
       total: acc.total + (c.sent || 0),
       delivered: acc.delivered + (c.delivered || 0),
@@ -248,16 +261,16 @@ export default function ReachPage() {
               </div>
             </div>
 
-            {/* Campaigns List */}
-            <div>
+            {/* Today's Campaigns */}
+            <div className="mb-8">
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-                Campaigns
+                Today
               </p>
-              {emailCampaigns.length === 0 ? (
-                <p className="text-sm text-[#666666]">No email campaigns yet</p>
+              {emailByWindow.today.length === 0 ? (
+                <p className="text-sm text-[#666666]">No campaigns sent today</p>
               ) : (
                 <div className="space-y-3">
-                  {emailCampaigns.map((campaign) => (
+                  {emailByWindow.today.map((campaign) => (
                     <div
                       key={campaign.id}
                       className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors"
@@ -298,6 +311,61 @@ export default function ReachPage() {
                 </div>
               )}
             </div>
+
+            {/* History Section */}
+            {emailByWindow.history.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setShowEmailHistory(!showEmailHistory)}
+                  className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6 hover:text-[#666666] transition-colors flex items-center gap-2"
+                >
+                  {showEmailHistory ? "▼" : "▶"} History ({emailByWindow.history.length})
+                </button>
+
+                {showEmailHistory && (
+                  <div className="space-y-3">
+                    {emailByWindow.history.map((campaign) => (
+                      <div
+                        key={campaign.id}
+                        className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors opacity-75"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-[#0D0D0D]">
+                              {campaign.campaignName}
+                            </p>
+                            <p className="text-xs text-[#888888] mt-1">
+                              {campaign.totalLeads} leads •{" "}
+                              {new Date(campaign.sentAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-6 text-right">
+                            <div>
+                              <p className="text-xs text-[#888888]">Sent</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.sent}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#888888]">Opened</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.opened}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#888888]">Replied</p>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.replied}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -333,14 +401,14 @@ export default function ReachPage() {
                 </div>
               </div>
 
-              {/* Campaigns */}
-              {whatsappCampaigns.length > 0 && (
-                <div>
+              {/* Today's Bulk Campaigns */}
+              {whatsappByWindow.today.length > 0 && (
+                <div className="mb-8">
                   <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-                    Bulk Campaigns
+                    Today
                   </p>
                   <div className="space-y-3">
-                    {whatsappCampaigns.map((campaign) => (
+                    {whatsappByWindow.today.map((campaign) => (
                       <div
                         key={campaign.id}
                         className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors"
@@ -379,6 +447,61 @@ export default function ReachPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* WhatsApp History Section */}
+              {whatsappByWindow.history.length > 0 && (
+                <div className="mb-8">
+                  <button
+                    onClick={() => setShowWhatsappHistory(!showWhatsappHistory)}
+                    className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6 hover:text-[#666666] transition-colors flex items-center gap-2"
+                  >
+                    {showWhatsappHistory ? "▼" : "▶"} History ({whatsappByWindow.history.length})
+                  </button>
+
+                  {showWhatsappHistory && (
+                    <div className="space-y-3">
+                      {whatsappByWindow.history.map((campaign) => (
+                        <div
+                          key={campaign.id}
+                          className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors opacity-75"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-[#0D0D0D]">
+                                {campaign.campaignName}
+                              </p>
+                              <p className="text-xs text-[#888888] mt-1">
+                                {campaign.totalLeads} leads •{" "}
+                                {new Date(campaign.sentAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex gap-6 text-right">
+                              <div>
+                                <p className="text-xs text-[#888888]">Sent</p>
+                                <p className="text-sm font-semibold text-[#0D0D0D]">
+                                  {campaign.sent}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-[#888888]">Delivered</p>
+                                <p className="text-sm font-semibold text-[#0D0D0D]">
+                                  {campaign.delivered}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-[#888888]">Replied</p>
+                                <p className="text-sm font-semibold text-[#0D0D0D]">
+                                  {campaign.replied}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
