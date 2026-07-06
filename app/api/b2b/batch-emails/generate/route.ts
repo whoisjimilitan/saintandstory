@@ -208,7 +208,8 @@ export async function POST(request: Request) {
           status: "success",
           problemType: problemType,
           psychologyAnalysis: psychology,
-          briefOpening: brief.opening
+          briefOpening: brief.opening,
+          prePopulatedReply: brief.pre_populated_reply
         });
 
         console.log(`[PROPHECY-PIPELINE] ✓ Complete: ${prospect.businessName}`);

@@ -336,6 +336,7 @@ export default function EnrichPage() {
           phoneNumber: (prospect as any)?.phone,
           subject: email.subject,
           body: email.body,
+          prePopulatedReply: (email as any).prePopulatedReply,
           tier: (email as any).characterMeta?.tier || 1,
           category: (email as any).characterMeta?.category || "Business",
         };

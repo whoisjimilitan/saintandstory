@@ -1,11 +1,13 @@
 /**
  * Build premium HTML email with Saint & Story branding
+ * Includes Reply button with pre-populated response for maximum conversion
  */
 export function buildEmailHtml(
   email: {
     prospectName: string;
     body: string;
     subject?: string;
+    prePopulatedReply?: string;
   },
   sender: { name: string; email: string; role?: string }
 ): string {
@@ -25,6 +27,11 @@ export function buildEmailHtml(
 
   // Main content is everything except the last 2 non-empty lines
   const mainContent = lines.slice(0, -3).join("\n").trim();
+
+  // Build pre-populated reply email
+  const replyText = email.prePopulatedReply || "Let's talk about this.";
+  const replyEmailBody = `Hi ${senderNameFromBody},%0D%0A%0D%0A${encodeURIComponent(replyText)}%0D%0A%0D%0AThanks,%0D%0A[Your Name]`;
+  const replyLink = `mailto:${sender.email}?subject=Re:%20${encodeURIComponent(email.prospectName)}&body=${replyEmailBody}`;
 
   return `
 <!DOCTYPE html>
@@ -174,7 +181,7 @@ export function buildEmailHtml(
       <div style="margin-bottom: 32px;">
         <div style="font-size: 15px; color: #0D0D0D; font-weight: 500; margin-bottom: 16px;">${senderNameFromBody}</div>
         ${sender.role ? `<div style="font-size: 14px; color: #666666; margin-bottom: 20px;">${sender.role} at Saint & Story</div>` : ''}
-        <a href="mailto:${sender.email}?subject=Re:%20Message%20from%20${email.prospectName}&body=Hi%20${senderNameFromBody},%0D%0A%0D%0AYes,%20occasionally%20we%20do.%0D%0A%0D%0AThanks,%0D%0A%5BYour%20Name%5D" class="cta-button">Reply</a>
+        <a href="${replyLink}" class="cta-button">Reply</a>
         <div style="margin-top: 20px;">
           <a href="${websiteUrl}" class="website-link-subtle" style="padding: 8px 12px; border: 1px solid #E8E8E8; border-radius: 4px; display: inline-block;">Check out our website</a>
         </div>

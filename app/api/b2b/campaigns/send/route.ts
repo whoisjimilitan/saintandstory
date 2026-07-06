@@ -35,6 +35,7 @@ interface EmailPayload {
   category?: string;
   subject?: string;
   body: string;
+  prePopulatedReply?: string;
 }
 
 async function getSenderInfo(category?: string): Promise<SenderInfo> {

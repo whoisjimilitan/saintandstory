@@ -208,46 +208,113 @@ function generateBriefHTML(input: {
 }
 
 /**
- * Generate SIMPLE email body using template format.
+ * Generate PROPHETIC email body using the complete psychological structure.
  *
- * PROPHECY STRUCTURE (5 lines, perfectly simple):
- * 1. Greeting (recognition)
- * 2. Discovery (what we learned about them)
- * 3. Action (brief prepared)
- * 4. Transformation (what becomes possible)
- * 5. CTA (low friction ask)
+ * PROPHECY STRUCTURE (6 lines, psychologically complete):
+ * 1. Apology/Disarming (permission to listen)
+ * 2. Teaching moment (humble authority)
+ * 3. The gap insight (revelation)
+ * 4. Personalization (specific to THEM)
+ * 5. Engagement question (soft CTA)
  * 6. Signature
  *
- * Psychology is in the STRUCTURE, not forced into words.
+ * + Reply button (in HTML, not in text)
+ *
+ * This is the COMPLETE engine.
  */
 export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
   const name = input?.contact_name || "there";
+  const company = input?.company_name || "your company";
   const problemType = input?.problem_type || "";
   const problem = getProblemType(problemType);
 
-  // Transform problem statement into discovery language
-  // "Your court deadlines shouldn't create anxiety" → "court deadlines challenges"
-  let discoveryPhrase = "delivery challenges";
-
-  if (problem && problem.brief_opening) {
-    discoveryPhrase = problem.brief_opening
-      .toLowerCase()
-      .replace(/^your /, "")
-      .replace(/shouldn't|don't|doesn't/, "")
-      .replace(/\.$/, "")
-      .trim();
+  if (!problem) {
+    return "Brief generation failed.";
   }
 
-  // Extract ONE punchy line from the possibility section (first sentence)
-  const punchyLine = brief.possibility_section.split(".")[0] + ".";
+  // ============ BUILD THE PROPHETIC EMAIL ============
 
-  // Perfect email format: each line separated by double newline for clarity
-  return [
-    `Hi ${name},`,
-    `A little birdie told me about ${discoveryPhrase}.`,
-    `I went ahead and prepared a Brief based on what you described.`,
-    `${punchyLine} Hopefully it saves you some thinking whether you use us or not.`,
-    `If you'd like us to turn it into a working setup, just reply.`,
-    `James`
-  ].join("\n\n");
+  // Line 1: APOLOGY/DISARMING
+  const line1 = `Hi ${name},\n\nApologies for reaching out of the blue. I have a specific reason.`;
+
+  // Line 2: TEACHING MOMENT (Humble Authority)
+  // Extract industry from problem type: "court_deadline_delivery" → "Working with legal firms"
+  const industryPhrase = getIndustryPhrase(problemType);
+  const line2 = `\n\n${industryPhrase} has taught me one thing.`;
+
+  // Line 3: THE GAP INSIGHT (Revelation)
+  // This is the real insight that reveals what they're dealing with
+  const gapInsight = problem.loss_aversion_daily;
+  const line3 = `\n\n${gapInsight.charAt(0).toUpperCase() + gapInsight.slice(1)}`;
+
+  // Line 4: PERSONALIZATION (Specific to them)
+  // Bridge to their specific situation
+  const personalization = `For ${company}, that's a real problem.`;
+  const line4 = `\n\n${personalization}`;
+
+  // Line 5: ENGAGEMENT QUESTION (Soft CTA)
+  // Problem-specific question
+  const engagementQuestion = getEngagementQuestion(problemType);
+  const line5 = `\n\n${engagementQuestion}`;
+
+  // Line 6: SIGNATURE
+  const line6 = `\n\nJames\nSaint & Story`;
+
+  return line1 + line2 + line3 + line4 + line5 + line6;
+}
+
+/**
+ * Extract industry phrase from problem type for "teaching moment" line
+ */
+function getIndustryPhrase(problemType: string): string {
+  const phrases: Record<string, string> = {
+    court_deadline_delivery: "Working with solicitors",
+    legal_document_delivery: "Working with legal firms",
+    hospital_supply_delivery: "Working with hospitals",
+    pharmacy_prescription_delivery: "Working with pharmacies",
+    construction_material_delivery: "Working with construction firms",
+    estate_agent_document_delivery: "Working with estate agents",
+    restaurant_supply_delivery: "Working with restaurants",
+    accounting_file_delivery: "Working with accountants",
+    architecture_drawing_delivery: "Working with architects",
+    veterinary_supply_delivery: "Working with veterinary clinics",
+    dental_supply_delivery: "Working with dental practices",
+    retail_stock_delivery: "Working with retail businesses",
+    beauty_supply_delivery: "Working with salons",
+    art_gallery_artwork_delivery: "Working with galleries",
+    catering_supply_delivery: "Working with caterers",
+    manufacturing_part_delivery: "Working with manufacturers",
+    film_production_equipment: "Working with film production",
+    office_supply_delivery: "Working with offices"
+  };
+
+  return phrases[problemType] || "Working with businesses";
+}
+
+/**
+ * Generate engagement question from problem type
+ */
+function getEngagementQuestion(problemType: string): string {
+  const questions: Record<string, string> = {
+    court_deadline_delivery: "When deadlines get tight, does your team ever need a same-day backup courier?",
+    legal_document_delivery: "When documents are critical, does reliable delivery become essential?",
+    hospital_supply_delivery: "When urgent supplies are needed, do you currently have a reliable option?",
+    pharmacy_prescription_delivery: "Does your team ever struggle with urgent prescription deliveries?",
+    construction_material_delivery: "When materials don't arrive on time, how does that affect your schedule?",
+    estate_agent_document_delivery: "On completion day, do documents always reach solicitors on time?",
+    restaurant_supply_delivery: "Does your team ever need urgent supplier collections during service?",
+    accounting_file_delivery: "During tax season, do document deadlines ever create stress?",
+    architecture_drawing_delivery: "When amendments come through, can builders wait for plans?",
+    veterinary_supply_delivery: "Does urgent medication delivery ever impact your schedule?",
+    dental_supply_delivery: "Do supply delays ever affect your appointment schedule?",
+    retail_stock_delivery: "Does early morning stock delivery affect your store readiness?",
+    beauty_supply_delivery: "Does product availability ever affect your client bookings?",
+    art_gallery_artwork_delivery: "When exhibitions need to open on time, is reliable transport critical?",
+    catering_supply_delivery: "Do event deadlines ever create supply chain stress?",
+    manufacturing_part_delivery: "When parts don't arrive on schedule, how does that impact production?",
+    film_production_equipment: "When equipment is needed on location, do delays halt production?",
+    office_supply_delivery: "Does running out of essentials ever create workflow disruption?"
+  };
+
+  return questions[problemType] || "Can we help with your delivery challenges?";
 }
