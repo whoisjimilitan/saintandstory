@@ -2,9 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
-import WhatsAppCsvUpload from "@/components/WhatsAppCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 
 interface Prospect {
@@ -17,42 +15,36 @@ interface Prospect {
   phone?: string;
   tier?: 1 | 2 | 3;
   category?: string;
-  source?: "email" | "whatsapp" | "feed";
-  opportunityId?: string;
+  source: "search" | "upload" | "manual";
   extractedNeed?: string;
-  briefHtml?: string;
-  emailBody?: string;
 }
 
-type Channel = "email" | "whatsapp" | "feed";
-type ActionMode = "upload" | "search" | "manual" | null;
-
+type DiscoveryMode = "search" | "upload" | "manual" | null;
 
 function detectCategory(businessName: string): string {
   const name = businessName.toLowerCase();
   if (name.includes("solicitor") || name.includes("lawyer")) return "Solicitor";
   if (name.includes("estate agent") || name.includes("realtor")) return "Estate Agent";
   if (name.includes("accountant")) return "Accountant";
-  if (name.includes("plumber")) return "Plumber";
-  if (name.includes("electrician")) return "Electrician";
-  if (name.includes("builder") || name.includes("construction")) return "Builder";
   if (name.includes("pharmacy") || name.includes("chemist")) return "Pharmacy";
   if (name.includes("hospital") || name.includes("clinic")) return "Hospital";
   if (name.includes("restaurant") || name.includes("cafe")) return "Restaurant";
+  if (name.includes("builder") || name.includes("construction")) return "Constructor";
+  if (name.includes("architect")) return "Architect";
+  if (name.includes("vet")) return "Veterinary";
   return "Business";
 }
 
 export default function DiscoverPage() {
   const router = useRouter();
 
-  const [selectedChannel, setSelectedChannel] = useState<Channel>("feed");
-  const [actionMode, setActionMode] = useState<ActionMode>(null);
-
+  const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
-  const [searchResults, setSearchResults] = useState<Prospect[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  const [prospects, setProspects] = useState<Prospect[]>([]);
+  const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
 
   const [manualForm, setManualForm] = useState({
     businessName: "",
@@ -63,15 +55,7 @@ export default function DiscoverPage() {
     postcode: "",
   });
 
-  const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
   const resultsRef = useRef<HTMLDivElement>(null);
-
-  const enrichResults = (prospects: Prospect[]): Prospect[] =>
-    prospects.map(p => ({
-      ...p,
-      tier: getConsequenceTier(p.businessName),
-      category: detectCategory(p.businessName),
-    }));
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,18 +66,28 @@ export default function DiscoverPage() {
       const params = new URLSearchParams();
       if (isPostcodeSearch) {
         params.append("postcode", searchTerm);
-        params.append("radius", searchRadius.toString());
       } else {
         params.append("keyword", searchTerm);
       }
 
-      const res = await fetch(`/api/b2b/discover?${params}`, { method: "GET" });
+      const res = await fetch(`/api/b2b/discover/search?${params}`, { method: "GET" });
       if (!res.ok) throw new Error("Search failed");
 
       const data = await res.json();
-      const results = enrichResults(data.results || []);
-      setSearchResults(results);
+      const results = (data.results || []).map((r: any) => ({
+        id: r.id,
+        businessName: r.businessName,
+        contactName: r.contactName,
+        city: r.city,
+        postcode: r.postcode,
+        email: r.email,
+        phone: r.phone,
+        tier: getConsequenceTier(r.businessName),
+        category: detectCategory(r.businessName),
+        source: "search" as const
+      }));
 
+      setProspects(results);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch (error) {
       console.error("Search error:", error);
@@ -102,18 +96,23 @@ export default function DiscoverPage() {
     }
   };
 
-
   const handleManualAdd = () => {
     if (!manualForm.businessName.trim()) return;
 
     const newProspect: Prospect = {
       id: `manual-${Date.now()}`,
-      ...manualForm,
-      businessCategory: "Manual Entry",
+      businessName: manualForm.businessName,
+      contactName: manualForm.contactName,
+      email: manualForm.email,
+      phone: manualForm.phone,
+      city: manualForm.city,
+      postcode: manualForm.postcode,
+      tier: getConsequenceTier(manualForm.businessName),
+      category: detectCategory(manualForm.businessName),
+      source: "manual"
     };
 
-    const enriched = enrichResults([newProspect]);
-    setSearchResults([enriched[0], ...searchResults]);
+    setProspects([newProspect, ...prospects]);
     setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
   };
 
@@ -129,22 +128,18 @@ export default function DiscoverPage() {
 
   const handleReviewAndSend = () => {
     if (selectedLeads.size === 0) {
-      alert("Please select at least one lead");
+      alert("Please select at least one prospect");
       return;
     }
 
-    const selectedProspects = searchResults.filter(p => selectedLeads.has(p.id));
-
-    // All channels (email, whatsapp, feed) flow through enrich
-    sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
-    sessionStorage.setItem("enrich_channel", selectedChannel);
+    const selectedProspects = prospects.filter(p => selectedLeads.has(p.id));
+    sessionStorage.setItem("discover_prospects", JSON.stringify(selectedProspects));
     router.push("/operator/enrich");
   };
 
-  const tier1Count = searchResults.filter(p => p.tier === 1 && selectedLeads.has(p.id)).length;
-  const tier2Count = searchResults.filter(p => p.tier === 2 && selectedLeads.has(p.id)).length;
-  const tier3Count = searchResults.filter(p => p.tier === 3 && selectedLeads.has(p.id)).length;
-  const categories = [...new Set(searchResults.filter(p => selectedLeads.has(p.id)).map(p => p.category))];
+  const tier1Count = prospects.filter(p => p.tier === 1 && selectedLeads.has(p.id)).length;
+  const tier2Count = prospects.filter(p => p.tier === 2 && selectedLeads.has(p.id)).length;
+  const tier3Count = prospects.filter(p => p.tier === 3 && selectedLeads.has(p.id)).length;
 
   return (
     <div className="min-h-screen bg-white pt-16 pb-16">
@@ -156,340 +151,278 @@ export default function DiscoverPage() {
             Discover
           </h1>
           <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-            Build your prospect list. Search, upload, or add leads. System infers problems and generates problem-specific briefs automatically.
+            Find prospects. System automatically infers problems and generates personalized briefs.
           </p>
         </div>
 
-        {/* === STEP 1: CHANNEL SELECTION === */}
+        {/* === HOW TO FIND PROSPECTS === */}
         <div className="mb-16">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-            Step 1: Choose Channel
+            How to Find Prospects
           </p>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search */}
             <button
-              onClick={() => setSelectedChannel("email")}
-              className={`p-6 rounded-lg border-2 transition-all ${
-                selectedChannel === "email"
+              onClick={() => setDiscoveryMode(discoveryMode === "search" ? null : "search")}
+              className={`p-6 rounded-lg border-2 transition-all text-left ${
+                discoveryMode === "search"
                   ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
                   : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-bold text-base mb-1">Email Campaign</p>
-              <p className="text-xs opacity-70">Professional outreach</p>
+              <p className="font-bold text-base mb-1">Search</p>
+              <p className="text-xs opacity-70">By postcode or keyword</p>
             </button>
 
+            {/* Upload */}
             <button
-              onClick={() => setSelectedChannel("whatsapp")}
-              className={`p-6 rounded-lg border-2 transition-all ${
-                selectedChannel === "whatsapp"
+              onClick={() => setDiscoveryMode(discoveryMode === "upload" ? null : "upload")}
+              className={`p-6 rounded-lg border-2 transition-all text-left ${
+                discoveryMode === "upload"
                   ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
                   : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-bold text-base mb-1">WhatsApp Campaign</p>
-              <p className="text-xs opacity-70">Real-time messaging</p>
+              <p className="font-bold text-base mb-1">Upload CSV</p>
+              <p className="text-xs opacity-70">Bulk import prospects</p>
             </button>
 
+            {/* Manual */}
             <button
-              onClick={() => setSelectedChannel("feed")}
-              className={`p-6 rounded-lg border-2 transition-all ${
-                selectedChannel === "feed"
+              onClick={() => setDiscoveryMode(discoveryMode === "manual" ? null : "manual")}
+              className={`p-6 rounded-lg border-2 transition-all text-left ${
+                discoveryMode === "manual"
                   ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
                   : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
               }`}
             >
-              <p className="font-bold text-base mb-1">Opportunity Feed</p>
-              <p className="text-xs opacity-70">GPT-5 discovered</p>
+              <p className="font-bold text-base mb-1">Add Manually</p>
+              <p className="text-xs opacity-70">Spot a business yourself</p>
             </button>
           </div>
         </div>
 
-        {/* === STEP 2: ADD LEADS === */}
-        <div className="mb-16">
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-            {selectedChannel === "feed" ? "Upload Opportunities" : "Step 2: Add Leads"}
-          </p>
-
-          {/* Feed Channel - CSV Upload Only */}
-          {selectedChannel === "feed" && (
-            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
-              <OpportunityCsvUpload
-                onUploadComplete={(opportunities) => {
-                  const converted: Prospect[] = opportunities.map((opp) => ({
-                    id: opp.id,
-                    businessName: opp.companyName,
-                    source: "feed",
-                    opportunityId: opp.id,
-                    extractedNeed: opp.extractedNeed,
-                    briefHtml: opp.briefHtml,
-                    emailBody: opp.emailBody,
-                    tier: getConsequenceTier(opp.companyName),
-                    category: "Opportunity Feed",
-                  }));
-                  setSearchResults([...converted, ...searchResults]);
-                }}
-              />
-            </div>
-          )}
-
-          {/* Email/WhatsApp Channels - Multiple Options */}
-          {selectedChannel !== "feed" && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <button
-                onClick={() => setActionMode(actionMode === "upload" ? null : "upload")}
-                className={`p-4 rounded-lg border transition-all ${
-                  actionMode === "upload"
-                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-                }`}
-              >
-                <p className="font-semibold text-sm text-[#0D0D0D]">Upload CSV</p>
-              </button>
-
-              <button
-                onClick={() => setActionMode(actionMode === "search" ? null : "search")}
-                className={`p-4 rounded-lg border transition-all ${
-                  actionMode === "search"
-                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-                }`}
-              >
-                <p className="font-semibold text-sm text-[#0D0D0D]">Search</p>
-              </button>
-
-              <button
-                onClick={() => setActionMode(actionMode === "manual" ? null : "manual")}
-                className={`p-4 rounded-lg border transition-all ${
-                  actionMode === "manual"
-                    ? "border-[#0D0D0D] bg-[#F9F9F9]"
-                    : "border-[#E8E8E8] bg-white hover:border-[#0D0D0D]"
-                }`}
-              >
-                <p className="font-semibold text-sm text-[#0D0D0D]">Add Manually</p>
-              </button>
-            </div>
-          )}
-
-          {/* UPLOAD MODE - Email/WhatsApp Only */}
-          {actionMode === "upload" && selectedChannel !== "feed" && (
-            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
-              {selectedChannel === "email" && (
-                <WhatsAppBatchCampaign channel="email" />
-              )}
-              {selectedChannel === "whatsapp" && (
-                <WhatsAppCsvUpload
-                  onUploadComplete={(leads) => {
-                    const converted: Prospect[] = leads.map((lead) => ({
-                      id: lead.id,
-                      businessName: lead.businessName,
-                      phone: lead.phone,
-                      contactName: lead.contactName,
-                      city: lead.city,
-                      source: "whatsapp",
-                      tier: getConsequenceTier(lead.businessName),
-                      category: detectCategory(lead.businessName),
-                    }));
-                    setSearchResults([...converted, ...searchResults]);
-                    setActionMode(null);
-                  }}
-                />
-              )}
-            </div>
-          )}
-
-          {/* SEARCH MODE - Email/WhatsApp Only */}
-          {actionMode === "search" && selectedChannel !== "feed" && (
-            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
-              <div className="mb-6 flex gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    checked={!isPostcodeSearch}
-                    onChange={() => setIsPostcodeSearch(false)}
-                    className="w-4 h-4 accent-[#0D0D0D]"
-                  />
-                  <span className="text-sm text-[#0D0D0D]">Keyword</span>
+        {/* === SEARCH MODE === */}
+        {discoveryMode === "search" && (
+          <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  Search Term
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    checked={isPostcodeSearch}
-                    onChange={() => setIsPostcodeSearch(true)}
-                    className="w-4 h-4 accent-[#0D0D0D]"
-                  />
-                  <span className="text-sm text-[#0D0D0D]">Postcode</span>
-                </label>
-              </div>
-
-              {isPostcodeSearch && (
-                <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#0D0D0D] block mb-3">
-                    Radius: {searchRadius}km
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="25"
-                    value={searchRadius}
-                    onChange={(e) => setSearchRadius(parseInt(e.target.value))}
-                    className="w-full accent-[#0D0D0D]"
-                  />
-                </div>
-              )}
-
-              <form onSubmit={handleSearch} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder={isPostcodeSearch ? "Enter postcode..." : "Search by business name..."}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder={isPostcodeSearch ? "e.g., SW1A1AA" : "e.g., Solicitors, Restaurants"}
+                  className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
                 />
-                <button
-                  type="submit"
-                  disabled={searchLoading}
-                  className="px-6 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded hover:bg-[#333333] disabled:opacity-50"
-                >
-                  Search
-                </button>
-              </form>
-            </div>
-          )}
+              </div>
 
-          {/* MANUAL ADD MODE - Email/WhatsApp Only */}
-          {actionMode === "manual" && selectedChannel !== "feed" && (
-            <div className="rounded-lg p-6 mb-8 bg-[#F9F9F9]">
-              <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="postcodeSearch"
+                  checked={isPostcodeSearch}
+                  onChange={(e) => setIsPostcodeSearch(e.target.checked)}
+                  className="w-4 h-4 border border-[#E8E8E8] rounded"
+                />
+                <label htmlFor="postcodeSearch" className="text-xs text-[#888888]">
+                  Search by postcode instead
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={searchLoading}
+                className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+              >
+                {searchLoading ? "Searching..." : "Search"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* === UPLOAD MODE === */}
+        {discoveryMode === "upload" && (
+          <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+            <OpportunityCsvUpload
+              onUploadComplete={(opportunities) => {
+                const converted: Prospect[] = opportunities.map((opp) => ({
+                  id: opp.id,
+                  businessName: opp.companyName,
+                  email: opp.contactEmail,
+                  tier: getConsequenceTier(opp.companyName),
+                  category: detectCategory(opp.companyName),
+                  source: "upload",
+                  extractedNeed: opp.extractedNeed
+                }));
+                setProspects([...converted, ...prospects]);
+              }}
+            />
+          </div>
+        )}
+
+        {/* === MANUAL MODE === */}
+        {discoveryMode === "manual" && (
+          <div className="mb-16 pb-12 border-b border-[#E8E8E8] bg-[#F9F9F9] p-8 rounded-lg">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  Business Name *
+                </label>
                 <input
                   type="text"
-                  placeholder="Business name *"
                   value={manualForm.businessName}
                   onChange={(e) => setManualForm({ ...manualForm, businessName: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
+                  placeholder="Company name"
+                  className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
                 />
-                <input
-                  type="text"
-                  placeholder="Contact name"
-                  value={manualForm.contactName}
-                  onChange={(e) => setManualForm({ ...manualForm, contactName: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={manualForm.email}
-                  onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone"
-                  value={manualForm.phone}
-                  onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                />
-                <input
-                  type="text"
-                  placeholder="City"
-                  value={manualForm.city}
-                  onChange={(e) => setManualForm({ ...manualForm, city: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#E8E8E8] rounded text-sm focus:outline-none focus:border-[#0D0D0D]"
-                />
-                <button
-                  onClick={handleManualAdd}
-                  className="w-full px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded hover:bg-[#333333]"
-                >
-                  Add Lead
-                </button>
               </div>
-            </div>
-          )}
 
-        </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Contact Name
+                  </label>
+                  <input
+                    type="text"
+                    value={manualForm.contactName}
+                    onChange={(e) => setManualForm({ ...manualForm, contactName: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={manualForm.email}
+                    onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={manualForm.city}
+                    onChange={(e) => setManualForm({ ...manualForm, city: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Postcode
+                  </label>
+                  <input
+                    type="text"
+                    value={manualForm.postcode}
+                    onChange={(e) => setManualForm({ ...manualForm, postcode: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleManualAdd}
+                className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+              >
+                Add Prospect
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* === RESULTS === */}
-        {searchResults.length > 0 && (
-          <>
-            <div className="mb-16">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
-                Step 3: Select Leads ({selectedLeads.size}/{searchResults.length})
-              </p>
-
-              <div className="space-y-3 mb-12">
-                {searchResults.map((prospect) => (
-                  <div
-                    key={prospect.id}
-                    className="rounded-lg p-4 bg-white border border-[#E8E8E8] hover:bg-[#F9F9F9] flex items-center gap-4 cursor-pointer"
-                    onClick={() => toggleLead(prospect.id)}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedLeads.has(prospect.id)}
-                      onChange={() => {}}
-                      className="w-4 h-4 cursor-pointer accent-[#0D0D0D]"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#0D0D0D]">{prospect.businessName}</p>
-                      <p className="text-xs text-[#888888] mt-1">
-                        {prospect.category} • {prospect.city || "Unknown"}
-                      </p>
-                    </div>
-                    {prospect.tier && (
-                      <span
-                        className={`text-xs font-semibold px-2 py-1 rounded ${
-                          prospect.tier === 1
-                            ? "bg-[#0D0D0D] text-white"
-                            : prospect.tier === 2
-                            ? "bg-[#333333] text-white"
-                            : "bg-[#E8E8E8] text-[#0D0D0D]"
-                        }`}
-                      >
-                        Tier {prospect.tier}
-                      </span>
-                    )}
-                  </div>
-                ))}
+        {prospects.length > 0 && (
+          <div className="mb-16" ref={resultsRef}>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                  {prospects.length} Prospects Found
+                </p>
+                <p className="text-sm text-[#888888]">
+                  {selectedLeads.size} selected
+                </p>
               </div>
-
-              {/* SUMMARY */}
               {selectedLeads.size > 0 && (
-                <div className="rounded-lg p-8 bg-[#F9F9F9]">
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-6">Ready to send?</p>
-                  <div className="grid grid-cols-4 gap-8 mb-8">
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Total</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{selectedLeads.size}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 1</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{tier1Count}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 2</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{tier2Count}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Tier 3</p>
-                      <p className="text-3xl font-black text-[#0D0D0D]">{tier3Count}</p>
-                    </div>
-                  </div>
-                  {categories.length > 0 && (
-                    <div className="mb-8">
-                      <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Categories</p>
-                      <p className="text-sm text-[#0D0D0D]">{categories.join(" • ")}</p>
-                    </div>
-                  )}
-                  <button
-                    onClick={handleReviewAndSend}
-                    className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold rounded-lg hover:bg-[#333333]"
-                  >
-                    Review & Send
-                  </button>
+                <div className="flex items-center gap-3 text-xs text-[#666666]">
+                  <span>Tier 1: {tier1Count}</span>
+                  <span>•</span>
+                  <span>Tier 2: {tier2Count}</span>
+                  <span>•</span>
+                  <span>Tier 3: {tier3Count}</span>
                 </div>
               )}
             </div>
-          </>
+
+            <div className="space-y-3">
+              {prospects.map((prospect) => (
+                <button
+                  key={prospect.id}
+                  onClick={() => toggleLead(prospect.id)}
+                  className={`w-full p-4 rounded-lg border transition-all text-left ${
+                    selectedLeads.has(prospect.id)
+                      ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
+                      : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-semibold text-sm">{prospect.businessName}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {prospect.category} {prospect.city && `• ${prospect.city}`}
+                      </p>
+                      {prospect.email && (
+                        <p className="text-xs opacity-60 mt-1">{prospect.email}</p>
+                      )}
+                    </div>
+                    <div className="text-xs font-semibold opacity-70">
+                      T{prospect.tier}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {selectedLeads.size > 0 && (
+              <button
+                onClick={handleReviewAndSend}
+                className="w-full mt-8 px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+              >
+                Review & Proceed to Enrich →
+              </button>
+            )}
+          </div>
         )}
+
+        {/* === AUTOMATIC CONFESSIONS STATUS === */}
+        <div className="pt-12 border-t border-[#E8E8E8]">
+          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+            Automatic Discovery
+          </p>
+          <div className="bg-[#F9F9F9] p-6 rounded-lg border border-[#E8E8E8]">
+            <p className="text-sm text-[#666666] mb-3">
+              Confessions harvested automatically from Reddit, Twitter, LinkedIn, and other sources go directly to approval queue in Settings.
+            </p>
+            <p className="text-xs text-[#AAAAAA]">
+              Last harvest: checking... • Status: operational
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   );
