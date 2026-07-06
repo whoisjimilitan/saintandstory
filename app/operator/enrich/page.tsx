@@ -331,6 +331,7 @@ export default function EnrichPage() {
       const payloadData = generatedEmails.map(email => {
         const prospect = prospects.find(p => p.id === email.prospectId);
         return {
+          prospectId: email.prospectId,
           prospectName: prospect?.contactName || email.prospectName || "[Name]",
           prospectEmail: email.email,
           phoneNumber: (prospect as any)?.phone,
