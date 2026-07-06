@@ -61,7 +61,7 @@ export default function ApprovalQueueStats() {
     return (
       <div className="text-center py-8">
         <p className="text-sm text-[#888888]">No pending opportunities.</p>
-        <p className="text-xs text-[#AAAAAA] mt-1">Use Test Confession Processor or upload CSV to get started.</p>
+        <p className="text-xs text-[#AAAAAA] mt-1">Use Discover → Search by postcode/keyword or Add Manually to find prospects</p>
       </div>
     );
   }

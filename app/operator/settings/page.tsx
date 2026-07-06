@@ -222,8 +222,8 @@ export default function ApprovalQueuePage() {
 
         {opportunities.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-sm text-[#666666]">No opportunities waiting to send.</p>
-            <p className="text-xs text-[#AAAAAA] mt-2">Upload a CSV in the Discover stage to get started.</p>
+            <p className="text-sm text-[#666666]">No pending opportunities.</p>
+            <p className="text-xs text-[#AAAAAA] mt-2">Go to Discover → Search (by postcode or keyword), Add Manually, or Upload CSV → Select prospects → Review & Proceed to Enrich</p>
           </div>
         ) : (
           <>
