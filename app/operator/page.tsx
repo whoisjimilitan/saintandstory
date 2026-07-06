@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 
 interface OperationStatus {
   whatsapp: {
@@ -33,7 +32,6 @@ interface TodayData {
 
 export default function TodayPage() {
   const router = useRouter();
-  const { user } = useUser();
   const [data, setData] = useState<TodayData>({
     operation: {
       whatsapp: { active: 0, replied: 0 },
@@ -107,7 +105,6 @@ export default function TodayPage() {
   const monthShort = today.toLocaleDateString("en-UK", { month: "short" });
   const year = today.getFullYear();
   const dateStr = `${String(dateNum).padStart(2, "0")}.${monthShort.toUpperCase()}.${year}`;
-  const greeting = user?.firstName ? `Good morning, ${user.firstName}` : "Good morning";
 
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
@@ -115,7 +112,7 @@ export default function TodayPage() {
 
         {/* HEADER */}
         <div className="mb-12">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">{greeting}</h1>
+          <h1 className="text-5xl font-black text-[#0D0D0D] mb-3 tracking-tight">Your Outreach</h1>
           <p className="text-sm font-semibold text-[#666666] uppercase tracking-widest">{dayName} • {dateStr}</p>
         </div>
 
