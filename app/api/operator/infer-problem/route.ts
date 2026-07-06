@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { inferProblemFromConfession } from "@/lib/confession-inferencer";
 import { getProblemType } from "@/lib/problems-map";
+import { getProblemCategory } from "@/lib/category-map";
 
 export const dynamic = "force-dynamic";
 
@@ -53,20 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Map problem type to category name for display
-    const categoryMap: Record<string, string> = {
-      court_deadline_delivery: "Solicitor",
-      estate_agent_document: "Estate Agent",
-      accounting_file: "Accountant",
-      pharmacy_prescription: "Pharmacy",
-      hospital_supply_delivery: "Hospital",
-      restaurant_supply_delivery: "Restaurant",
-      construction_material: "Constructor",
-      architecture_drawing: "Architect",
-      veterinary_supply_delivery: "Veterinary",
-      default: "Business"
-    };
-
-    const category = categoryMap[problemType] || "Business";
+    const category = getProblemCategory(problemType);
 
     console.log(`[INFER-PROBLEM] ✓ Inferred: ${problemType} (${category}) with ${Math.round(inference.confidence * 100)}% confidence`);
 

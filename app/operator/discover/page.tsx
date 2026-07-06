@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
+import { getAllCategories } from "@/lib/category-map";
 
 interface Prospect {
   id: string;
@@ -469,7 +470,7 @@ export default function DiscoverPage() {
                   rows={3}
                 />
                 {inferenceFailed ? (
-                  <p className="text-xs text-[#DD5533] mt-1">System couldn't confidently infer. Please select a category below.</p>
+                  <p className="text-xs text-[#0D0D0D] mt-1">System couldn't confidently infer. Please select a category below.</p>
                 ) : (
                   <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
                 )}
@@ -486,16 +487,11 @@ export default function DiscoverPage() {
                     className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
                   >
                     <option value="">Select a category</option>
-                    <option value="Solicitor">Solicitors</option>
-                    <option value="Estate Agent">Estate Agents</option>
-                    <option value="Accountant">Accountants</option>
-                    <option value="Pharmacy">Pharmacy</option>
-                    <option value="Hospital">Hospital</option>
-                    <option value="Restaurant">Restaurant</option>
-                    <option value="Constructor">Construction</option>
-                    <option value="Architect">Architect</option>
-                    <option value="Veterinary">Veterinary</option>
-                    <option value="Business">Other Business</option>
+                    {getAllCategories().map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
                   </select>
                 </div>
               )}
