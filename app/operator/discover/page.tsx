@@ -150,7 +150,14 @@ export default function DiscoverPage() {
   };
 
   const handleManualAdd = () => {
-    if (!manualForm.businessName.trim()) return;
+    if (!manualForm.businessName.trim()) {
+      alert("Business name is required");
+      return;
+    }
+    if (!manualForm.category.trim()) {
+      alert("Please select a category");
+      return;
+    }
 
     const newProspect: Prospect = {
       id: `manual-${Date.now()}`,
@@ -161,7 +168,7 @@ export default function DiscoverPage() {
       city: manualForm.city,
       postcode: manualForm.postcode,
       tier: getConsequenceTier(manualForm.businessName),
-      category: detectCategory(manualForm.businessName),
+      category: manualForm.category, // Use selected category instead of auto-detect
       source: "manual"
     };
 
@@ -396,15 +403,25 @@ export default function DiscoverPage() {
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                    Category
+                    Category *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={manualForm.category}
                     onChange={(e) => setManualForm({ ...manualForm, category: e.target.value })}
-                    placeholder="e.g., Solicitors, Restaurant"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
-                  />
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
+                  >
+                    <option value="">Select a category</option>
+                    <option value="Solicitor">Solicitors</option>
+                    <option value="Estate Agent">Estate Agents</option>
+                    <option value="Accountant">Accountants</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Hospital">Hospital</option>
+                    <option value="Restaurant">Restaurant</option>
+                    <option value="Constructor">Construction</option>
+                    <option value="Architect">Architect</option>
+                    <option value="Veterinary">Veterinary</option>
+                    <option value="Business">Other Business</option>
+                  </select>
                 </div>
               </div>
 
