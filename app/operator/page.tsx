@@ -43,16 +43,23 @@ export default function TodayPage() {
     pendingReplies: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [activeModal, setActiveModal] = useState<"drivers" | null>(null);
+
+  // Modal states for clickable cards
+  const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "phone" | "drivers" | null>(null);
+  const [driverPoolExpanded, setDriverPoolExpanded] = useState(false);
   const [assignForm, setAssignForm] = useState({
     driver_id: "",
     prospect_name: "",
     postcode_from: "",
+    postcode_to: "",
+    price: "100",
   });
+  const [searchProspect, setSearchProspect] = useState("");
 
   useEffect(() => {
     const loadTodayData = async () => {
       try {
+        // Fetch all operation status and pipeline data
         const [campaignRes, opportunitiesRes, driverRes, phoneRes, whatsappRes, repliesRes] = await Promise.all([
           fetch("/api/operator/today-campaign-stats"),
           fetch("/api/operator/opportunities-waiting"),
@@ -87,6 +94,7 @@ export default function TodayPage() {
     };
 
     loadTodayData();
+    // Refresh every 60 seconds for live updates
     const interval = setInterval(loadTodayData, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -98,15 +106,12 @@ export default function TodayPage() {
   const year = today.getFullYear();
   const dateStr = `${String(dateNum).padStart(2, "0")}.${monthShort.toUpperCase()}.${year}`;
 
-  const openRate = data.operation.email.sent > 0 ? Math.round((data.operation.email.opened / data.operation.email.sent) * 100) : 0;
-  const clickRate = data.operation.email.sent > 0 ? Math.round((data.operation.email.clicked / data.operation.email.sent) * 100) : 0;
-
   return (
-    <div className="min-h-screen bg-white pt-32 pb-20">
+    <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
 
         {/* HEADER */}
-        <div className="mb-16">
+        <div className="mb-12">
           <h1 className="text-5xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
           <p className="text-sm text-[#999999]">{dayName} • {dateStr}</p>
         </div>
@@ -118,238 +123,323 @@ export default function TodayPage() {
           </div>
         ) : (
           <>
-            {/* PRIMARY ACTION - Hero Section */}
-            <div className="mb-20">
-              <div>
-                {data.pendingReplies > 0 ? (
-                  <div className="border-2 border-[#0D0D0D] rounded-lg p-10 bg-[#F9F9F9] hover:bg-white transition-colors">
-                    <h2 className="text-4xl font-black text-[#0D0D0D] mb-3">{data.pendingReplies} replies waiting</h2>
-                    <p className="text-sm text-[#666666] mb-8 max-w-2xl">Prospects have replied to your emails. These are hot leads ready for qualification.</p>
-                    <Link
-                      href="/operator/responses"
-                      className="inline-block px-8 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#2d2d2d] active:bg-[#0D0D0D] transition-all duration-150"
-                    >
-                      Review Replies →
-                    </Link>
+            {/* SECTION 1: OPERATION STATUS - What's happening right now */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Operation Status</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* WhatsApp - Clickable */}
+                <button
+                  onClick={() => setActiveModal("whatsapp")}
+                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
+                >
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">WhatsApp</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.whatsapp.active}</p>
+                  <p className="text-xs text-[#666666]">active conversations</p>
+                  <p className="text-xs text-[#666666] mt-2">{data.operation.whatsapp.replied} replied today</p>
+                </button>
+
+                {/* Email - Clickable */}
+                <button
+                  onClick={() => setActiveModal("email")}
+                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
+                >
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Email</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.email.sent}</p>
+                  <p className="text-xs text-[#666666]">sent today</p>
+                  <div className="flex gap-2 mt-2">
+                    <span className="text-xs text-[#666666]">{data.operation.email.opened} opened</span>
+                    <span className="text-xs text-[#CCCCCC]">•</span>
+                    <span className="text-xs text-[#666666]">{data.operation.email.clicked} clicked</span>
                   </div>
-                ) : data.opportunitiesQueued > 0 ? (
-                  <div className="border-2 border-[#0D0D0D] rounded-lg p-10 bg-[#F9F9F9] hover:bg-white transition-colors">
-                    <h2 className="text-4xl font-black text-[#0D0D0D] mb-3">{data.opportunitiesQueued} prospects ready</h2>
-                    <p className="text-sm text-[#666666] mb-8 max-w-2xl">Your CSV is processed. Send personalized emails now.</p>
-                    <Link
-                      href="/operator/enrich?source=queue"
-                      className="inline-block px-8 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#2d2d2d] active:bg-[#0D0D0D] transition-all duration-150"
-                    >
-                      Send Opportunities →
-                    </Link>
-                  </div>
-                ) : data.operation.email.sent > 0 ? (
-                  <div className="border-2 border-[#0D0D0D] rounded-lg p-10 bg-[#F9F9F9] hover:bg-white transition-colors">
-                    <h2 className="text-4xl font-black text-[#0D0D0D] mb-3">Campaign running</h2>
-                    <p className="text-sm text-[#666666] mb-8 max-w-2xl">{data.operation.email.sent} emails sent • {openRate}% opened • {clickRate}% clicked</p>
-                    <Link
-                      href="/operator/reach"
-                      className="inline-block px-8 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#2d2d2d] active:bg-[#0D0D0D] transition-all duration-150"
-                    >
-                      Monitor Progress →
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="border-2 border-[#E8E8E8] rounded-lg p-10 bg-[#F9F9F9]">
-                    <h2 className="text-4xl font-black text-[#0D0D0D] mb-3">Ready to send</h2>
-                    <p className="text-sm text-[#666666] mb-8 max-w-2xl">Upload a CSV to begin discovering prospects and sending campaigns.</p>
-                    <Link
-                      href="/operator/discover"
-                      className="inline-block px-8 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#2d2d2d] active:bg-[#0D0D0D] transition-all duration-150"
-                    >
-                      Go to Discover →
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+                </button>
 
-            {/* CAMPAIGN HEALTH */}
-            <div className="mb-20">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-8">Campaign performance</p>
+                {/* Phone - Clickable */}
+                <button
+                  onClick={() => setActiveModal("phone")}
+                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
+                >
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
+                  <p className="text-xs text-[#666666]">no emails</p>
+                  <p className="text-xs text-[#666666] mt-2">Call to qualify</p>
+                </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Emails sent</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{data.operation.email.sent}</p>
-                  <p className="text-sm text-[#666666]">today</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Open rate</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{openRate}%</p>
-                  <p className="text-sm text-[#666666]">{data.operation.email.opened} emails opened</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Click rate</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{clickRate}%</p>
-                  <p className="text-sm text-[#666666]">{data.operation.email.clicked} emails clicked</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Replies</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{data.operation.email.replied}</p>
-                  <p className="text-sm text-[#666666]">responses received</p>
-                </div>
-              </div>
-            </div>
-
-            {/* DRIVER MANAGEMENT */}
-            <div className="mb-20">
-              <div className="flex items-center justify-between mb-8">
-                <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">Drivers</p>
+                {/* Drivers - Clickable */}
                 <button
                   onClick={() => setActiveModal("drivers")}
-                  className="text-xs font-semibold text-[#0D0D0D] hover:text-[#666666] transition-colors"
+                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
                 >
-                  + Assign job
+                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Drivers</p>
+                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.drivers.available}</p>
+                  <p className="text-xs text-[#666666]">available now</p>
+                  <p className="text-xs text-[#666666] mt-2">{data.operation.drivers.revenue} earned today</p>
                 </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Available</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{data.operation.drivers.available}</p>
-                  <p className="text-sm text-[#666666]">drivers on duty</p>
-                </div>
-
-                <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:border-[#0D0D0D] transition-colors">
-                  <p className="text-xs text-[#999999] uppercase tracking-widest mb-4">Revenue</p>
-                  <p className="text-4xl font-black text-[#0D0D0D] mb-2">{data.operation.drivers.revenue}</p>
-                  <p className="text-sm text-[#666666]">earned today</p>
-                </div>
               </div>
             </div>
 
-            {/* SECONDARY CHANNELS - Subtle */}
-            {(data.operation.whatsapp.active > 0 || data.operation.phone.readyToCall > 0) && (
-              <div className="pt-16 border-t border-[#E8E8E8]">
-                <p className="text-xs font-semibold text-[#999999] uppercase tracking-widest mb-8">Other channels</p>
+            {/* SECTION 2: PRIMARY ACTION - What you should do RIGHT NOW */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Primary Action</p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {data.operation.whatsapp.active > 0 && (
-                    <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
-                      <p className="text-xs text-[#999999] uppercase tracking-widest mb-3">WhatsApp</p>
-                      <p className="text-2xl font-black text-[#0D0D0D] mb-1">{data.operation.whatsapp.active}</p>
-                      <p className="text-xs text-[#999999]">active conversations</p>
-                      <p className="text-xs text-[#999999] mt-2">{data.operation.whatsapp.replied} replied</p>
-                    </div>
-                  )}
-
-                  {data.operation.phone.readyToCall > 0 && (
-                    <div className="border border-[#E8E8E8] rounded-lg p-6 bg-[#F9F9F9]">
-                      <p className="text-xs text-[#999999] uppercase tracking-widest mb-3">Phone</p>
-                      <p className="text-2xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
-                      <p className="text-xs text-[#999999]">prospects to call</p>
-                    </div>
-                  )}
+              {data.pendingReplies > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.pendingReplies} replies waiting</h2>
+                  <p className="text-sm text-[#666666] mb-6">Prospects have replied to your emails. Respond now.</p>
+                  <Link
+                    href="/operator/responses"
+                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                  >
+                    Review Replies →
+                  </Link>
                 </div>
-              </div>
-            )}
+              ) : data.opportunitiesQueued > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">{data.opportunitiesQueued} opportunities ready</h2>
+                  <p className="text-sm text-[#666666] mb-6">Your CSV upload is processed. Send these emails now.</p>
+                  <Link
+                    href="/operator/enrich?source=queue"
+                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                  >
+                    Send Opportunities →
+                  </Link>
+                </div>
+              ) : data.operation.email.sent > 0 ? (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">Campaign running</h2>
+                  <p className="text-sm text-[#666666] mb-6">{data.operation.email.sent} emails sent. {data.operation.email.sent > 0 ? Math.round((data.operation.email.opened / data.operation.email.sent) * 100) : 0}% opened. Keep monitoring.</p>
+                  <Link
+                    href="/operator/reach"
+                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                  >
+                    View Campaign →
+                  </Link>
+                </div>
+              ) : (
+                <div className="border-2 border-[#0D0D0D] rounded-lg p-8 bg-[#F9F9F9]">
+                  <h2 className="text-3xl font-black text-[#0D0D0D] mb-2">Upload CSV to start</h2>
+                  <p className="text-sm text-[#666666] mb-6">No opportunities queued. Go to Discover and upload your first CSV file.</p>
+                  <Link
+                    href="/operator/discover"
+                    className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+                  >
+                    Go to Discover →
+                  </Link>
+                </div>
+              )}
+            </div>
 
-            {/* NAVIGATION - Bottom */}
-            <div className="mt-24 pt-16 border-t border-[#E8E8E8]">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-8">Next step</p>
+            {/* FIND PROSPECT - Quick search to CRM */}
+            <div className="mb-16">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">Search</p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchProspect.length >= 2) {
+                    router.push(`/dashboard/crm?search=${encodeURIComponent(searchProspect)}`);
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  placeholder="Search by name, email, phone, or city..."
+                  value={searchProspect}
+                  onChange={(e) => setSearchProspect(e.target.value)}
+                  className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none transition-colors placeholder-[#CCCCCC]"
+                />
+                <button
+                  type="submit"
+                  disabled={searchProspect.length < 2}
+                  className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+
+            {/* QUICK NAVIGATION - All channels + Database */}
+            <div>
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Next Step</p>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Link
                   href="/operator/discover"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center group"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1 group-hover:text-[#0D0D0D]">Discover</p>
-                  <p className="text-xs text-[#999999]">Find prospects</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Discover</p>
+                  <p className="text-xs text-[#888888]">Find prospects</p>
                 </Link>
 
                 <Link
                   href="/operator/enrich"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center group"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1 group-hover:text-[#0D0D0D]">Enrich</p>
-                  <p className="text-xs text-[#999999]">Generate & send</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Enrich</p>
+                  <p className="text-xs text-[#888888]">Generate & send</p>
                 </Link>
 
                 <Link
                   href="/operator/reach"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center group"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1 group-hover:text-[#0D0D0D]">Monitor</p>
-                  <p className="text-xs text-[#999999]">Track campaigns</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Monitor</p>
+                  <p className="text-xs text-[#888888]">Track campaigns</p>
                 </Link>
 
                 <Link
                   href="/operator/responses"
-                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center group"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
                 >
-                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1 group-hover:text-[#0D0D0D]">Responses</p>
-                  <p className="text-xs text-[#999999]">Manage replies</p>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
+                  <p className="text-xs text-[#888888]">Manage replies</p>
                 </Link>
               </div>
             </div>
+
           </>
         )}
       </div>
 
-      {/* DRIVER ASSIGNMENT MODAL - Streamlined */}
-      {activeModal === "drivers" && (
+      {/* MODAL OVERLAYS */}
+      {activeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 max-w-xl w-full">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold text-[#0D0D0D]">Assign job</h2>
+          <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#0D0D0D]">
+                {activeModal === "whatsapp" && "WhatsApp Activity"}
+                {activeModal === "email" && "Email Campaign"}
+                {activeModal === "phone" && "Phone Outreach Queue"}
+                {activeModal === "drivers" && "Driver Management"}
+              </h2>
               <button
                 onClick={() => setActiveModal(null)}
-                className="text-[#999999] hover:text-[#0D0D0D] text-2xl leading-none transition-colors"
+                className="text-[#888888] hover:text-[#0D0D0D] text-2xl leading-none"
               >
                 ×
               </button>
             </div>
 
-            <form className="space-y-6">
-              <div>
-                <label className="text-xs font-semibold text-[#0D0D0D] block mb-3">Driver</label>
-                <select
-                  value={assignForm.driver_id}
-                  onChange={(e) => setAssignForm({ ...assignForm, driver_id: e.target.value })}
-                  className="w-full text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none bg-white"
-                >
-                  <option value="">Select a driver</option>
-                </select>
+            {/* WhatsApp Modal */}
+            {activeModal === "whatsapp" && (
+              <div className="space-y-4">
+                <div className="border-b border-[#E8E8E8] pb-4">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Active Conversations</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.whatsapp.active}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Replied Today</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.whatsapp.replied}</p>
+                </div>
+                <p className="text-xs text-[#666666] mt-6">Detailed conversation list and engagement metrics would appear here.</p>
               </div>
+            )}
 
-              <div>
-                <label className="text-xs font-semibold text-[#0D0D0D] block mb-3">Prospect or company name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Smith & Co"
-                  value={assignForm.prospect_name}
-                  onChange={(e) => setAssignForm({ ...assignForm, prospect_name: e.target.value })}
-                  className="w-full text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
-                />
+            {/* Email Modal */}
+            {activeModal === "email" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="border-b border-[#E8E8E8] pb-4">
+                    <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Sent</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.email.sent}</p>
+                  </div>
+                  <div className="border-b border-[#E8E8E8] pb-4">
+                    <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Opened</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">
+                      {data.operation.email.sent > 0
+                        ? Math.round((data.operation.email.opened / data.operation.email.sent) * 100)
+                        : 0}%
+                    </p>
+                  </div>
+                  <div className="border-b border-[#E8E8E8] pb-4">
+                    <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Clicked</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">
+                      {data.operation.email.sent > 0
+                        ? Math.round((data.operation.email.clicked / data.operation.email.sent) * 100)
+                        : 0}%
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-[#666666]">Campaign details and recipient list would appear here.</p>
               </div>
+            )}
 
-              <div>
-                <label className="text-xs font-semibold text-[#0D0D0D] block mb-3">Collection postcode</label>
-                <input
-                  type="text"
-                  placeholder="e.g. SW1A 1AA"
-                  value={assignForm.postcode_from}
-                  onChange={(e) => setAssignForm({ ...assignForm, postcode_from: e.target.value })}
-                  className="w-full text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
-                />
+            {/* Phone Modal */}
+            {activeModal === "phone" && (
+              <div className="space-y-4">
+                <div className="border-b border-[#E8E8E8] pb-4">
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-2">No Email</p>
+                  <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.phone.readyToCall}</p>
+                </div>
+                <p className="text-xs text-[#666666]">These prospects need to be contacted via phone. List of prospects and their details would appear here.</p>
               </div>
+            )}
 
-              <button
-                type="submit"
-                className="w-full bg-[#0D0D0D] text-white text-sm font-semibold px-6 py-4 rounded-lg hover:bg-[#2d2d2d] active:bg-[#0D0D0D] transition-all duration-150 mt-8"
-              >
-                Assign job
-              </button>
-            </form>
+            {/* Drivers Modal */}
+            {activeModal === "drivers" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4 border-b border-[#E8E8E8] pb-6">
+                  <div>
+                    <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Available</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.drivers.available}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Revenue Today</p>
+                    <p className="text-3xl font-black text-[#0D0D0D]">{data.operation.drivers.revenue}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Quick Assign Job</h3>
+                  <form className="space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">Driver</label>
+                      <select
+                        value={assignForm.driver_id}
+                        onChange={(e) => setAssignForm({ ...assignForm, driver_id: e.target.value })}
+                        className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded"
+                      >
+                        <option value="">Select driver</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-[#0D0D0D] block mb-1">Prospect</label>
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        value={assignForm.prospect_name}
+                        onChange={(e) => setAssignForm({ ...assignForm, prospect_name: e.target.value })}
+                        className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="From"
+                        value={assignForm.postcode_from}
+                        onChange={(e) => setAssignForm({ ...assignForm, postcode_from: e.target.value })}
+                        className="text-xs px-3 py-2 border border-[#E8E8E8] rounded"
+                      />
+                      <input
+                        type="text"
+                        placeholder="To"
+                        value={assignForm.postcode_to}
+                        onChange={(e) => setAssignForm({ ...assignForm, postcode_to: e.target.value })}
+                        className="text-xs px-3 py-2 border border-[#E8E8E8] rounded"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-[#0D0D0D] text-white text-xs font-semibold px-3 py-2 rounded hover:bg-[#333333]"
+                    >
+                      Assign
+                    </button>
+                  </form>
+                </div>
+
+                <p className="text-xs text-[#666666]">Full driver list, current jobs, and performance metrics would appear here.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
