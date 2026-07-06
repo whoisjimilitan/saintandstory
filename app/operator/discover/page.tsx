@@ -67,13 +67,24 @@ export default function DiscoverPage() {
       if (isPostcodeSearch) {
         params.append("postcode", searchTerm);
       } else {
-        params.append("keyword", searchTerm);
+        params.append("query", searchTerm);
       }
 
-      const res = await fetch(`/api/b2b/discover/search?${params}`, { method: "GET" });
-      if (!res.ok) throw new Error("Search failed");
+      const url = `/api/b2b/discover/search?${params}`;
+      console.log("[DISCOVER] Searching:", url);
 
+      const res = await fetch(url, { method: "GET" });
       const data = await res.json();
+
+      console.log("[DISCOVER] Search response:", data);
+
+      if (!res.ok) {
+        console.error("[DISCOVER] Search failed:", data.error);
+        alert(`Search failed: ${data.error || "Unknown error"}`);
+        setProspects([]);
+        return;
+      }
+
       const results = (data.results || []).map((r: any) => ({
         id: r.id,
         businessName: r.businessName,
@@ -87,10 +98,17 @@ export default function DiscoverPage() {
         source: "search" as const
       }));
 
+      console.log("[DISCOVER] Mapped results:", results.length, results);
+
+      if (results.length === 0) {
+        alert("No prospects found matching your search");
+      }
+
       setProspects(results);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch (error) {
-      console.error("Search error:", error);
+      console.error("[DISCOVER] Search error:", error);
+      alert(`Search error: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setSearchLoading(false);
     }
@@ -226,9 +244,9 @@ export default function DiscoverPage() {
                   id="postcodeSearch"
                   checked={isPostcodeSearch}
                   onChange={(e) => setIsPostcodeSearch(e.target.checked)}
-                  className="w-4 h-4 border border-[#E8E8E8] rounded"
+                  className="w-4 h-4 rounded appearance-none border border-[#0D0D0D] bg-white checked:bg-[#0D0D0D] checked:border-[#0D0D0D] cursor-pointer"
                 />
-                <label htmlFor="postcodeSearch" className="text-xs text-[#888888]">
+                <label htmlFor="postcodeSearch" className="text-xs text-[#888888] cursor-pointer">
                   Search by postcode instead
                 </label>
               </div>
