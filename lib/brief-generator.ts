@@ -302,24 +302,24 @@ function getDiscoveryPhrase(problemType: string): string {
  */
 function getTeachingMoment(problemType: string): string {
   const teachings: Record<string, string> = {
-    court_deadline_delivery: "Delivering court documents isn't only about legal expertise. It's about relying on dependencies that are out of your control.",
-    legal_document_delivery: "Delivering legal documents on time isn't only about the law. It's about relying on dependencies that are out of your control.",
-    hospital_supply_delivery: "Delivering patient care isn't only about medical skill. It's about relying on dependencies that are out of your control.",
-    pharmacy_prescription_delivery: "Delivering prescriptions on time isn't only about the medication. It's about relying on dependencies that are out of your control.",
-    construction_material_delivery: "Delivering projects on schedule isn't only about planning. It's about relying on dependencies that are out of your control.",
-    estate_agent_document_delivery: "Delivering completions on time isn't only about negotiation. It's about relying on dependencies that are out of your control.",
-    restaurant_supply_delivery: "Delivering consistent service isn't only about your cooking. It's about relying on dependencies that are out of your control.",
-    accounting_file_delivery: "Delivering tax compliance isn't only about calculations. It's about relying on dependencies that are out of your control.",
-    architecture_drawing_delivery: "Delivering projects on schedule isn't only about design. It's about relying on dependencies that are out of your control.",
-    veterinary_supply_delivery: "Delivering animal care on time isn't only about medical skill. It's about relying on dependencies that are out of your control.",
-    dental_supply_delivery: "Delivering appointments on schedule isn't only about treatment skill. It's about relying on dependencies that are out of your control.",
-    retail_stock_delivery: "Delivering store readiness isn't only about your products. It's about relying on dependencies that are out of your control.",
-    beauty_supply_delivery: "Delivering client satisfaction isn't only about your service. It's about relying on dependencies that are out of your control.",
-    art_gallery_artwork_delivery: "Delivering exhibitions on time isn't only about the art. It's about relying on dependencies that are out of your control.",
-    catering_supply_delivery: "Delivering successful events isn't only about food quality. It's about relying on dependencies that are out of your control.",
-    manufacturing_part_delivery: "Delivering production quotas isn't only about skill. It's about relying on dependencies that are out of your control.",
-    film_production_equipment: "Delivering films on schedule isn't only about talent. It's about relying on dependencies that are out of your control.",
-    office_supply_delivery: "Delivering productivity isn't only about work ethic. It's about relying on dependencies that are out of your control."
+    court_deadline_delivery: "Delivering court documents isn't only about legal expertise. It's also about relying on dependencies that are out of your control.",
+    legal_document_delivery: "Delivering legal documents on time isn't only about the law. It's also about relying on dependencies that are out of your control.",
+    hospital_supply_delivery: "Delivering patient care isn't only about medical skill. It's also about relying on dependencies that are out of your control.",
+    pharmacy_prescription_delivery: "Delivering prescriptions on time isn't only about the medication. It's also about relying on dependencies that are out of your control.",
+    construction_material_delivery: "Delivering projects on schedule isn't only about planning. It's also about relying on dependencies that are out of your control.",
+    estate_agent_document_delivery: "Delivering completions on time isn't only about negotiation. It's also about relying on dependencies that are out of your control.",
+    restaurant_supply_delivery: "Delivering consistent service isn't only about your cooking. It's also about relying on dependencies that are out of your control.",
+    accounting_file_delivery: "Delivering tax compliance isn't only about calculations. It's also about relying on dependencies that are out of your control.",
+    architecture_drawing_delivery: "Delivering projects on schedule isn't only about design. It's also about relying on dependencies that are out of your control.",
+    veterinary_supply_delivery: "Delivering animal care on time isn't only about medical skill. It's also about relying on dependencies that are out of your control.",
+    dental_supply_delivery: "Delivering appointments on schedule isn't only about treatment skill. It's also about relying on dependencies that are out of your control.",
+    retail_stock_delivery: "Delivering store readiness isn't only about your products. It's also about relying on dependencies that are out of your control.",
+    beauty_supply_delivery: "Delivering client satisfaction isn't only about your service. It's also about relying on dependencies that are out of your control.",
+    art_gallery_artwork_delivery: "Delivering exhibitions on time isn't only about the art. It's also about relying on dependencies that are out of your control.",
+    catering_supply_delivery: "Delivering successful events isn't only about food quality. It's also about relying on dependencies that are out of your control.",
+    manufacturing_part_delivery: "Delivering production quotas isn't only about skill. It's also about relying on dependencies that are out of your control.",
+    film_production_equipment: "Delivering films on schedule isn't only about talent. It's also about relying on dependencies that are out of your control.",
+    office_supply_delivery: "Delivering productivity isn't only about work ethic. It's also about relying on dependencies that are out of your control."
   };
 
   return teachings[problemType] || "Success always depends on one thing: relying on dependencies you can't control.";
