@@ -59,22 +59,6 @@ export function buildEmailHtml(
     .content {
       margin-bottom: 40px;
     }
-    .signature-section {
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid #e8e8e8;
-    }
-    .sender-name {
-      font-size: 15px;
-      font-weight: 500;
-      color: #0d0d0d;
-      margin-bottom: 4px;
-    }
-    .sender-role {
-      font-size: 13px;
-      color: #666666;
-      margin-bottom: 24px;
-    }
     .cta-button {
       display: inline-block;
       padding: 12px 32px;
@@ -110,9 +94,9 @@ export function buildEmailHtml(
       ${contentHtml}
     </div>
 
-    <div class="signature-section">
-      <div class="sender-name">${senderNameFromBody}</div>
-      ${senderRoleFromBody ? `<div class="sender-role">${senderRoleFromBody}</div>` : ''}
+    <div style="margin-top: 24px; padding-top: 0;">
+      <p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
+      ${senderRoleFromBody ? `<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.65; color: #666666; font-weight: 400;">${senderRoleFromBody}</p>` : '<p style="margin: 0 0 24px 0;"></p>'}
 
       <div style="margin-top: 24px;">
         <a href="${replyLink}" class="cta-button">Reply</a>

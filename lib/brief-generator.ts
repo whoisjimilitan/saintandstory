@@ -424,25 +424,25 @@ function getIndustryPhrase(problemType: string): string {
  */
 function getEngagementQuestion(problemType: string): string {
   const questions: Record<string, string> = {
-    court_deadline_delivery: "Do court deadlines ever get tight? And does your team ever need same-day backup for court document delivery?",
-    legal_document_delivery: "Do legal document deadlines ever feel urgent? And does your team ever need same-day backup for legal document delivery?",
-    hospital_supply_delivery: "Do urgent supplies ever go missing? And does your team ever need same-day backup for medical supply delivery?",
-    pharmacy_prescription_delivery: "Do prescription deadlines ever feel tight? And does your team ever need same-day backup for prescription delivery?",
-    construction_material_delivery: "Do material delays ever slow your site? And does your team ever need same-day backup for material delivery?",
-    estate_agent_document_delivery: "Do completion day documents ever come down to the wire? And does your team ever need same-day backup for solicitor document delivery?",
-    restaurant_supply_delivery: "Do supply delays ever affect service? And does your team ever need same-day backup for ingredient or supplier collections?",
-    accounting_file_delivery: "Do tax deadlines ever create panic? And does your team ever need same-day backup for tax document delivery?",
-    architecture_drawing_delivery: "Do plan amendments ever halt construction? And does your team ever need same-day backup for blueprint delivery?",
-    veterinary_supply_delivery: "Do urgent medication supplies ever go missing? And does your team ever need same-day backup for medication delivery?",
-    dental_supply_delivery: "Do supply delays ever affect your appointments? And does your team ever need same-day backup for dental lab or supply delivery?",
-    retail_stock_delivery: "Do morning stock deadlines ever feel tight? And does your team ever need same-day backup for early morning retail stock delivery?",
-    beauty_supply_delivery: "Do product delays ever affect client bookings? And does your team ever need same-day backup for product delivery?",
-    art_gallery_artwork_delivery: "Do exhibition deadlines ever create logistics stress? And does your team ever need same-day backup for artwork delivery?",
-    catering_supply_delivery: "Do event deadlines ever create supply chain stress? And does your team ever need same-day backup for ingredient delivery?",
-    manufacturing_part_delivery: "Do part delays ever slow production? And does your team ever need same-day backup for parts delivery?",
-    film_production_equipment: "Do equipment deadlines ever halt production? And does your team ever need same-day backup for equipment delivery?",
-    office_supply_delivery: "Do supply delays ever affect productivity? And does your team ever need same-day backup for office supply delivery?"
+    court_deadline_delivery: "Out of curiosity, when court deadlines get tight, does your team ever need same-day backup for court document delivery?",
+    legal_document_delivery: "Out of curiosity, when legal document deadlines feel urgent, does your team ever need same-day backup for legal document delivery?",
+    hospital_supply_delivery: "Out of curiosity, when urgent supplies are needed, does your team ever need same-day backup for medical supply delivery?",
+    pharmacy_prescription_delivery: "Out of curiosity, when prescriptions need to arrive fast, does your team ever need same-day backup for prescription delivery?",
+    construction_material_delivery: "Out of curiosity, when material delays slow your site, does your team ever need same-day backup for material delivery?",
+    estate_agent_document_delivery: "Out of curiosity, on completion day, does your team ever need same-day backup for solicitor document delivery?",
+    restaurant_supply_delivery: "Out of curiosity, when supply delays affect service, does your team ever need same-day backup for ingredient or supplier collections?",
+    accounting_file_delivery: "Out of curiosity, when tax deadlines create pressure, does your team ever need same-day backup for tax document delivery?",
+    architecture_drawing_delivery: "Out of curiosity, when plan amendments need to reach builders, does your team ever need same-day backup for blueprint delivery?",
+    veterinary_supply_delivery: "Out of curiosity, when urgent medication supplies are needed, does your team ever need same-day backup for medication delivery?",
+    dental_supply_delivery: "Out of curiosity, when supply timing affects appointments, does your team ever need same-day backup for dental lab or supply delivery?",
+    retail_stock_delivery: "Out of curiosity, when morning stock deadlines matter, does your team ever need same-day backup for retail stock delivery?",
+    beauty_supply_delivery: "Out of curiosity, when product delays affect bookings, does your team ever need same-day backup for product delivery?",
+    art_gallery_artwork_delivery: "Out of curiosity, when exhibition deadlines create stress, does your team ever need same-day backup for artwork delivery?",
+    catering_supply_delivery: "Out of curiosity, when event deadlines matter, does your team ever need same-day backup for ingredient delivery?",
+    manufacturing_part_delivery: "Out of curiosity, when part delays slow production, does your team ever need same-day backup for parts delivery?",
+    film_production_equipment: "Out of curiosity, when equipment timing matters, does your team ever need same-day backup for equipment delivery?",
+    office_supply_delivery: "Out of curiosity, when supply delays affect productivity, does your team ever need same-day backup for office supply delivery?"
   };
 
-  return questions[problemType] || "Can we help with your delivery challenges?";
+  return questions[problemType] || "Out of curiosity, does your team ever need same-day backup for delivery?";
 }
