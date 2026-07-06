@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import WhatsAppBatchCampaign from "@/components/WhatsAppBatchCampaign";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import WhatsAppCsvUpload from "@/components/WhatsAppCsvUpload";
-import ConfessionTestForm from "@/app/operator/components/ConfessionTestForm";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 
 interface Prospect {
@@ -157,23 +156,8 @@ export default function DiscoverPage() {
             Discover
           </h1>
           <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
-            Build your prospect list and prepare for outreach.
+            Build your prospect list. Search, upload, or add leads. System infers problems and generates problem-specific briefs automatically.
           </p>
-        </div>
-
-        {/* === TEST CONFESSION PROCESSOR === */}
-        <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
-              Test New Problem-Centric System
-            </p>
-            <p className="text-xs text-[#888888]">
-              Paste a confession. Watch it process through problem extraction → psychology → brief generation → routing.
-            </p>
-          </div>
-          <div className="bg-[#F9F9F9] p-8 rounded-lg border border-[#E8E8E8]">
-            <ConfessionTestForm />
-          </div>
         </div>
 
         {/* === STEP 1: CHANNEL SELECTION === */}
