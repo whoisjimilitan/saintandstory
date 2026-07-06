@@ -302,24 +302,24 @@ function getDiscoveryPhrase(problemType: string): string {
  */
 function getTeachingMoment(problemType: string): string {
   const teachings: Record<string, string> = {
-    court_deadline_delivery: "Court deadlines aren't only about legal expertise. It depends on one dependency: documents reaching court on time.",
-    legal_document_delivery: "Legal document deadlines aren't only about the law. It depends on one dependency: documents reaching where they need to be on time.",
-    hospital_supply_delivery: "Patient care on schedule isn't only about medical skill. It depends on one dependency: supplies reaching you on time.",
-    pharmacy_prescription_delivery: "Prescription deliveries on time aren't only about medication accuracy. It depends on one dependency: getting them to patients reliably.",
-    construction_material_delivery: "Projects on schedule aren't only about planning. It depends on one dependency: materials reaching your site on time.",
-    estate_agent_document_delivery: "Completions on time aren't only about negotiation. It depends on one dependency: documents reaching solicitors on time.",
-    restaurant_supply_delivery: "Consistent service isn't only about your cooking. It depends on one dependency: ingredients reaching your kitchen on time.",
-    accounting_file_delivery: "Tax compliance by deadline isn't only about calculations. It depends on one dependency: documents reaching the tax authority on time.",
-    architecture_drawing_delivery: "Projects on schedule aren't only about design. It depends on one dependency: plans reaching builders on time..",
-    veterinary_supply_delivery: "Animal care on time isn't only about medical skill. It depends on one dependency: medications reaching you on time.",
-    dental_supply_delivery: "Appointments on schedule aren't only about treatment skill. It depends on one dependency: supplies reaching you on time..",
-    retail_stock_delivery: "Store readiness isn't only about your products. It depends on one dependency: stock reaching shelves early enough.",
-    beauty_supply_delivery: "Client satisfaction isn't only about your service. It depends on one dependency: products reaching you so appointments stay booked.",
-    art_gallery_artwork_delivery: "Exhibitions on time aren't only about the art. It depends on one dependency: artwork reaching the gallery on schedule..",
-    catering_supply_delivery: "Successful events aren't only about food quality. It depends on one dependency: ingredients reaching you fresh and on time.",
-    manufacturing_part_delivery: "Production quotas aren't only about skill. It depends on one dependency: parts reaching you on schedule.",
-    film_production_equipment: "Films on schedule aren't only about talent. It depends on one dependency: equipment reaching location on time..",
-    office_supply_delivery: "Productivity isn't only about work ethic. It depends on one dependency: supplies reaching your team when they're needed."
+    court_deadline_delivery: "Court deadlines aren't only about legal expertise. It depends on one thing: documents reaching court on time.",
+    legal_document_delivery: "Legal document deadlines aren't only about the law. It depends on one thing: documents reaching where they need to be on time.",
+    hospital_supply_delivery: "Patient care on schedule isn't only about medical skill. It depends on one thing: supplies reaching you on time.",
+    pharmacy_prescription_delivery: "Prescription deliveries on time aren't only about medication accuracy. It depends on one thing: getting them to patients reliably.",
+    construction_material_delivery: "Projects on schedule aren't only about planning. It depends on one thing: materials reaching your site on time.",
+    estate_agent_document_delivery: "Completions on time aren't only about negotiation. It depends on one thing: documents reaching solicitors on time.",
+    restaurant_supply_delivery: "Consistent service isn't only about your cooking. It depends on one thing: ingredients reaching your kitchen on time.",
+    accounting_file_delivery: "Tax compliance by deadline isn't only about calculations. It depends on one thing: documents reaching the tax authority on time.",
+    architecture_drawing_delivery: "Projects on schedule aren't only about design. It depends on one thing: plans reaching builders on time..",
+    veterinary_supply_delivery: "Animal care on time isn't only about medical skill. It depends on one thing: medications reaching you on time.",
+    dental_supply_delivery: "Appointments on schedule aren't only about treatment skill. It depends on one thing: supplies reaching you on time..",
+    retail_stock_delivery: "Store readiness isn't only about your products. It depends on one thing: stock reaching shelves early enough.",
+    beauty_supply_delivery: "Client satisfaction isn't only about your service. It depends on one thing: products reaching you so appointments stay booked.",
+    art_gallery_artwork_delivery: "Exhibitions on time aren't only about the art. It depends on one thing: artwork reaching the gallery on schedule..",
+    catering_supply_delivery: "Successful events aren't only about food quality. It depends on one thing: ingredients reaching you fresh and on time.",
+    manufacturing_part_delivery: "Production quotas aren't only about skill. It depends on one thing: parts reaching you on schedule.",
+    film_production_equipment: "Films on schedule aren't only about talent. It depends on one thing: equipment reaching location on time..",
+    office_supply_delivery: "Productivity isn't only about work ethic. It depends on one thing: supplies reaching your team when they're needed."
   };
 
   return teachings[problemType] || "Success always depends on one thing: reliable delivery can't control.";
