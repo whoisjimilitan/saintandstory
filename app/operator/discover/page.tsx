@@ -54,6 +54,7 @@ export default function DiscoverPage() {
     phone: "",
     city: "",
     postcode: "",
+    category: "",
   });
 
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -165,7 +166,7 @@ export default function DiscoverPage() {
     };
 
     setProspects([newProspect, ...prospects]);
-    setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "" });
+    setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "" });
   };
 
   const toggleLead = (prospectId: string) => {
@@ -202,13 +203,23 @@ export default function DiscoverPage() {
       const data = await res.json();
       console.log("[DISCOVER] Created opportunities:", data);
 
+      // Show detailed error if all failed
+      if (data.created === 0 && data.errors > 0) {
+        const errorDetails = data.errorDetails
+          ? data.errorDetails.map((e: any) => `${e.businessName}: ${e.error}`).join("\n")
+          : "Unknown error";
+        console.error("[DISCOVER] Creation errors:", data.errorDetails);
+        alert(`Failed to create opportunities:\n\n${errorDetails}\n\nCheck browser console and Vercel logs.`);
+        return;
+      }
+
       // Extract IDs of created records
       const opportunityIds = data.opportunities
         .filter((opp: any) => opp.status === "created" || opp.status === "already_exists")
         .map((opp: any) => opp.opportunityId);
 
       if (opportunityIds.length === 0) {
-        alert("No prospects were processed successfully");
+        alert(`No prospects were processed successfully.\n\nMessage: ${data.message}`);
         return;
       }
 
@@ -410,6 +421,33 @@ export default function DiscoverPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={manualForm.phone}
+                    onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    value={manualForm.category}
+                    onChange={(e) => setManualForm({ ...manualForm, category: e.target.value })}
+                    placeholder="e.g., Solicitors, Restaurant"
+                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
                     City
                   </label>
                   <input
@@ -447,24 +485,13 @@ export default function DiscoverPage() {
         {/* === RESULTS === */}
         {prospects.length > 0 && (
           <div className="mb-16" ref={resultsRef}>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
-                  {prospects.length} Prospects Found
-                </p>
-                <p className="text-sm text-[#888888]">
-                  {selectedLeads.size} selected
-                </p>
-              </div>
-              {selectedLeads.size > 0 && (
-                <div className="flex items-center gap-3 text-xs text-[#666666]">
-                  <span>Tier 1: {tier1Count}</span>
-                  <span>•</span>
-                  <span>Tier 2: {tier2Count}</span>
-                  <span>•</span>
-                  <span>Tier 3: {tier3Count}</span>
-                </div>
-              )}
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-1">
+                {prospects.length} Prospects Found
+              </p>
+              <p className="text-sm text-[#888888]">
+                {selectedLeads.size} selected
+              </p>
             </div>
 
             <div className="space-y-3">

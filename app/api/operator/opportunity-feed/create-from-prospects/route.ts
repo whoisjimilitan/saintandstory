@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
 
     for (const prospect of prospects) {
       try {
+        console.log(`[OPPORTUNITY-FEED-CREATE] Processing: ${prospect.businessName}`);
+
         // Step 1: Check if already exists in OpportunityFeed (deduplication)
         const existing = await prisma.opportunityFeed.findFirst({
           where: {
@@ -74,6 +76,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Step 2: Infer problem type from business category
+        console.log(`[OPPORTUNITY-FEED-CREATE] Inferring problem from category: ${prospect.category || "Business"}`);
         const categoryInference = inferProblemFromCategory(prospect.category || "");
         const problemType = categoryInference.primary_problem || "court_deadline_delivery";
         const problem = getProblemType(problemType);
@@ -81,9 +84,11 @@ export async function POST(request: NextRequest) {
         if (!problem) {
           throw new Error(`Invalid problem type: ${problemType}`);
         }
+        console.log(`[OPPORTUNITY-FEED-CREATE] Inferred problem: ${problemType}`);
 
         // Step 3: Analyze psychology
         const confession = `${prospect.businessName} in ${prospect.city || "UK"} (${prospect.category || "Business"})`;
+        console.log(`[OPPORTUNITY-FEED-CREATE] Analyzing psychology...`);
         const psychology = analyzePsychology({
           confession_text: confession,
           problem_type: problemType,
@@ -94,6 +99,7 @@ export async function POST(request: NextRequest) {
         if (!psychology) {
           throw new Error("Failed to analyze psychology");
         }
+        console.log(`[OPPORTUNITY-FEED-CREATE] Psychology analyzed. Urgency: ${psychology.urgency_level}`);
 
         // Step 4: Calculate confidence
         const contactCompleteness = prospect.email ? 0.8 : prospect.phone ? 0.6 : 0.3;
@@ -102,8 +108,10 @@ export async function POST(request: NextRequest) {
           contact_info_completeness: contactCompleteness,
           keyword_match_strength: 0.75
         });
+        console.log(`[OPPORTUNITY-FEED-CREATE] Confidence: ${Math.round(confidence * 100)}%`);
 
         // Step 5: Generate brief
+        console.log(`[OPPORTUNITY-FEED-CREATE] Generating brief...`);
         const brief = generateBrief({
           confession_text: confession,
           problem_type: problemType,
@@ -116,8 +124,10 @@ export async function POST(request: NextRequest) {
         if (!brief) {
           throw new Error("Failed to generate brief");
         }
+        console.log(`[OPPORTUNITY-FEED-CREATE] Brief generated. Subject: ${brief.subject.substring(0, 50)}...`);
 
         // Step 6: Create OpportunityFeed record
+        console.log(`[OPPORTUNITY-FEED-CREATE] Creating database record...`);
         const opportunity = await prisma.opportunityFeed.create({
           data: {
             companyName: prospect.businessName,
@@ -125,7 +135,7 @@ export async function POST(request: NextRequest) {
             contactPhone: prospect.phone,
             location: prospect.city,
             postcode: prospect.postcode,
-            sourcePlatform: "operator_search", // Mark as from operator discovery
+            sourcePlatform: "operator_search",
             postedDate: new Date(),
             originalWording: confession,
             extractedNeed: problemType,
@@ -154,13 +164,16 @@ export async function POST(request: NextRequest) {
           opportunityId: opportunity.id
         });
 
-        console.log(`[OPPORTUNITY-FEED-CREATE] Created opportunity: ${prospect.businessName} (${problemType})`);
+        console.log(`[OPPORTUNITY-FEED-CREATE] ✓ Created opportunity: ${prospect.businessName} (ID: ${opportunity.id})`);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        console.error(`[OPPORTUNITY-FEED-CREATE] Error processing ${prospect.businessName}: ${errorMsg}`);
+        const errorStack = error instanceof Error ? error.stack : "";
+        console.error(`[OPPORTUNITY-FEED-CREATE] ✗ Error processing ${prospect.businessName}: ${errorMsg}`);
+        console.error(`[OPPORTUNITY-FEED-CREATE] Stack: ${errorStack}`);
         errors.push({
           businessName: prospect.businessName,
-          error: errorMsg
+          error: errorMsg,
+          stack: errorStack
         });
       }
     }
@@ -170,13 +183,20 @@ export async function POST(request: NextRequest) {
 
     console.log(`[OPPORTUNITY-FEED-CREATE] Complete. Created: ${successCount}, Already existed: ${existingCount}, Errors: ${errors.length}`);
 
+    console.log(`[OPPORTUNITY-FEED-CREATE] Final result: ${successCount} created, ${existingCount} already exist, ${errors.length} errors`);
+
     return NextResponse.json({
       success: true,
       created: successCount,
       alreadyExists: existingCount,
       errors: errors.length,
       opportunities: created,
-      errorDetails: errors.length > 0 ? errors : undefined
+      errorDetails: errors.length > 0 ? errors : undefined,
+      message: successCount === 0 && errors.length > 0
+        ? `All prospects failed processing. Check Vercel logs for details.`
+        : successCount > 0
+        ? `Successfully created ${successCount} opportunities`
+        : "No new opportunities created"
     });
   } catch (error) {
     console.error("[OPPORTUNITY-FEED-CREATE] Server error:", error);
