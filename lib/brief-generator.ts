@@ -210,20 +210,40 @@ function generateBriefHTML(input: {
 /**
  * Generate SIMPLE email body using template format.
  *
- * Less is more: one sentence opening, brief reference, punchy line, simple CTA.
- * The detailed brief is in briefHTML for reference.
+ * PROPHECY STRUCTURE:
+ * Line 1: Greeting (recognition)
+ * Line 2: Discovery (what we learned about them)
+ * Line 3: Action (brief prepared)
+ * Line 4: Transformation (what becomes possible)
+ * Line 5: CTA (low friction ask)
+ * Line 6: Signature
+ *
+ * Psychology is in the STRUCTURE, not the words.
  */
 export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
   const name = input?.contact_name || "there";
   const company = input?.company_name || "your company";
-  const problemPhrase = getProblemType(input?.problem_type || "")?.brief_opening || "this";
+  const problemType = input?.problem_type || "";
+  const problem = getProblemType(problemType);
+
+  // Transform problem statement into discovery language
+  // "Your court deadlines shouldn't create anxiety" → "court deadlines creating stress"
+  const discoveryPhrase = problem
+    ? problem.brief_opening
+        .replace(/^Your /, "")
+        .replace(/^(\w+) /, (match, word) => word.toLowerCase())
+        .replace(/ shouldn't.*$/, " challenges")
+        .replace(/ don't.*$/, " issues")
+        .replace(/ affect.*$/, " affecting you")
+        .replace(/\.$/, "")
+    : "delivery challenges";
 
   // Extract ONE punchy line from the possibility section (first sentence)
   const punchyLine = brief.possibility_section.split(".")[0] + ".";
 
   return `Hi ${name},
 
-A little birdie told me about ${problemPhrase}
+A little birdie told me about ${discoveryPhrase}.
 
 I went ahead and prepared a Brief based on what you described.
 

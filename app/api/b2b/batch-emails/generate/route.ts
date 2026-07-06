@@ -1,12 +1,13 @@
 /**
  * BATCH EMAIL GENERATION ENDPOINT
  *
- * Uses Problem-Centric Brief Generator
- * Generates ONE personalized brief per prospect following:
- * - Problem type inference from business category
- * - Psychology analysis (inverse incentives, loss aversion)
- * - Problem-specific language with embedded psychology
- * - Professional, human tone
+ * THE PROPHECY PIPELINE:
+ * 1. Identify the REAL problem (from category or inference)
+ * 2. Generate detailed brief HTML (shows deep understanding)
+ * 3. Fill template with specific problem + punchy line (feels prophetic)
+ * 4. Return both brief (for preview) and email (for sending)
+ *
+ * Goal: Every prospect feels like someone read their mind.
  */
 
 import { NextResponse } from "next/server";
@@ -20,7 +21,6 @@ const ADMIN_EMAILS = [
   "oye@saintandstoryltd.co.uk",
 ];
 
-// Admin name mapping
 const ADMIN_NAME_MAP: Record<string, string> = {
   "jimi": "James",
   "Jimi": "James",
@@ -43,8 +43,7 @@ export async function POST(request: Request) {
 
     const user = await currentUser();
     let senderName = user?.firstName || user?.fullName || "Team Member";
-    
-    // Map admin names for consistency
+
     const firstNameLower = (user?.firstName || "").toLowerCase();
     if (firstNameLower in ADMIN_NAME_MAP) {
       senderName = ADMIN_NAME_MAP[firstNameLower];
@@ -65,6 +64,7 @@ export async function POST(request: Request) {
           businessCategory: true,
           city: true,
           email: true,
+          contactName: true,
           website: true,
           painPoint: true,
           engagement_score: true,
@@ -100,17 +100,16 @@ export async function POST(request: Request) {
 
     for (const prospect of prospects) {
       try {
-        // Extract first name from contact name for mail merge
-        const firstName = prospect.contactName
-          ? prospect.contactName.split(" ")[0]
-          : undefined;
+        console.log(`[PROPHECY-PIPELINE] Starting: ${prospect.businessName}`);
 
-        // Generate email using problem-centric brief generator
-        // First, infer problem type from business category
+        // Import all generators once per prospect (not per loop)
         const { inferProblemFromCategory } = await import("@/lib/confession-inferencer");
         const { getProblemType } = await import("@/lib/problems-map");
         const { analyzePsychology } = await import("@/lib/psychology-analyzer");
         const { generateBrief, generateEmailBody } = await import("@/lib/brief-generator");
+
+        // ============ STEP 1: Identify Real Problem ============
+        console.log(`[PROPHECY-PIPELINE] Step 1: Identifying problem...`);
 
         const categoryInference = inferProblemFromCategory(prospect.businessCategory || "");
         const problemType = categoryInference.primary_problem || "court_deadline_delivery";
@@ -120,8 +119,16 @@ export async function POST(request: Request) {
           throw new Error(`Invalid problem type: ${problemType}`);
         }
 
-        // Analyze psychology
-        const confession = `${prospect.businessName} in ${prospect.city || "UK"} (${prospect.businessCategory || "Business"})`;
+        console.log(`[PROPHECY-PIPELINE] Problem identified: ${problemType}`);
+
+        // ============ STEP 2: Analyze Psychology ============
+        console.log(`[PROPHECY-PIPELINE] Step 2: Analyzing psychology...`);
+
+        // Create confession: Use pain point if available, otherwise generic
+        const confession = prospect.painPoint
+          ? `${prospect.businessName} said: "${prospect.painPoint}"`
+          : `${prospect.businessName} in ${prospect.city || "UK"} (${prospect.businessCategory || "Business"})`;
+
         const psychology = analyzePsychology({
           confession_text: confession,
           problem_type: problemType,
@@ -133,7 +140,15 @@ export async function POST(request: Request) {
           throw new Error("Failed to analyze psychology");
         }
 
-        // Generate brief using problem-centric system
+        console.log(`[PROPHECY-PIPELINE] Psychology analyzed. Urgency: ${psychology.urgency_level}`);
+
+        // ============ STEP 3: Generate Detailed Brief ============
+        console.log(`[PROPHECY-PIPELINE] Step 3: Generating brief...`);
+
+        const firstName = prospect.contactName
+          ? prospect.contactName.split(" ")[0]
+          : undefined;
+
         const brief = generateBrief({
           confession_text: confession,
           problem_type: problemType,
@@ -147,43 +162,43 @@ export async function POST(request: Request) {
           throw new Error("Failed to generate brief");
         }
 
-        const emailV4 = {
-          subjectLine: problemType, // Simple subject: just the problem type
-          bodyText: generateEmailBody(brief, {
-            confession_text: confession,
-            problem_type: problemType,
-            contact_name: firstName,
-            company_name: prospect.businessName,
-            location: prospect.city,
-            psychology
-          }),
-          specificPain: psychology.inverse_incentive,
-          specificPromise: psychology.loss_aversion_frame,
-          consequenceTier: 1,
-          senderVoice: "Professional"
-        };
+        console.log(`[PROPHECY-PIPELINE] Brief generated: ${brief.opening.substring(0, 50)}...`);
 
+        // ============ STEP 4: Generate Simple Email (Template + Specificity) ============
+        console.log(`[PROPHECY-PIPELINE] Step 4: Generating email from template...`);
+
+        const emailBody = generateEmailBody(brief, {
+          confession_text: confession,
+          problem_type: problemType,
+          contact_name: firstName,
+          company_name: prospect.businessName,
+          location: prospect.city,
+          psychology
+        });
+
+        console.log(`[PROPHECY-PIPELINE] Email generated. Length: ${emailBody.split("\n").length} lines`);
+
+        // ============ STEP 5: Package Result ============
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
-          subject: emailV4.subjectLine,
-          body: emailV4.bodyText,
-          htmlBody: brief.html, // Use problem-centric brief HTML
-          wordCount: emailV4.bodyText.split(/\s+/).length,
+          subject: `Brief: ${prospect.businessName}`,
+          body: emailBody,
+          htmlBody: brief.html,
+          wordCount: emailBody.split(/\s+/).length,
           senderName: senderName,
           relationshipStage: 1,
           status: "success",
-          pain: emailV4.specificPain,
-          promise: emailV4.specificPromise,
-          consequenceTier: emailV4.consequenceTier,
-          senderVoice: emailV4.senderVoice,
           problemType: problemType,
-          psychologyAnalysis: psychology
+          psychologyAnalysis: psychology,
+          briefOpening: brief.opening
         });
+
+        console.log(`[PROPHECY-PIPELINE] ✓ Complete: ${prospect.businessName}`);
       } catch (prospectError) {
         console.error(
-          `[BATCH-EMAILS] Error processing prospect ${prospect.id}:`,
+          `[PROPHECY-PIPELINE] ✗ Error processing ${prospect.businessName}:`,
           prospectError
         );
         results.push({
@@ -200,6 +215,7 @@ export async function POST(request: Request) {
     }
 
     const successfulResults = results.filter((r) => r.status === "success");
+    console.log(`[PROPHECY-PIPELINE] Results: ${successfulResults.length} success, ${results.length - successfulResults.length} failed`);
 
     return NextResponse.json({
       success: true,
@@ -209,11 +225,11 @@ export async function POST(request: Request) {
       results: results,
     });
   } catch (error) {
-    console.error("[BATCH-EMAILS-GENERATE] Error:", error);
+    console.error("[PROPHECY-PIPELINE] Server error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       {
-        error: "Failed to generate batch emails",
+        error: "Failed to generate emails",
         details: errorMessage,
         success: false,
       },
