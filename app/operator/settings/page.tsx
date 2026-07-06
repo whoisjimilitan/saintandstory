@@ -2,22 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/app/providers/ToastProvider";
+import ApprovalQueueStats from "@/app/operator/components/ApprovalQueueStats";
 
 interface Opportunity {
   id: string;
   companyName: string;
-  website: string;
-  contactName: string;
-  contactEmail: string;
+  website?: string;
+  contactName?: string;
+  contactEmail?: string;
   originalWording: string;
-  extractedNeed: string;
-  extractedUrgency: string;
-  extractedContext: string;
-  extractedQuote: string;
-  emailSubject: string;
-  emailBody: string;
-  briefHtml: string;
+  extractedNeed?: string;
+  extractedUrgency?: string;
+  extractedContext?: string;
+  extractedQuote?: string;
+  emailSubject?: string;
+  emailBody?: string;
+  briefHtml?: string;
+  prePopulatedReply?: string;
+  problemType?: string;
+  routingTier?: number;
+  confidenceScore?: number;
   status: string;
+  approvalStatus?: string;
   createdAt: string;
 }
 
@@ -45,10 +51,12 @@ export default function ApprovalQueuePage() {
   const fetchQueue = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/operator/opportunity-feed/queue?status=queued");
+      const res = await fetch("/api/operator/opportunity-feed/queue?approvalStatus=pending");
       const data = await res.json();
-      setOpportunities(data.opportunities || []);
-      console.log("[APPROVAL QUEUE] Loaded", data.count, "opportunities");
+      // Use new grouped structure
+      const allOpps: Opportunity[] = data.all_opportunities || [];
+      setOpportunities(allOpps);
+      console.log("[APPROVAL QUEUE] Loaded", data.count, "opportunities organized by problem type");
     } catch (error) {
       console.error("[APPROVAL QUEUE] Error fetching queue:", error);
       showToast("Failed to load queue", "error");
@@ -207,6 +215,11 @@ export default function ApprovalQueuePage() {
           </p>
         </div>
 
+        {/* Queue Stats */}
+        <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
+          <ApprovalQueueStats />
+        </div>
+
         {opportunities.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-sm text-[#666666]">No opportunities waiting to send.</p>
@@ -303,21 +316,25 @@ export default function ApprovalQueuePage() {
                       {/* Extracted Data */}
                       <div>
                         <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
-                          Extracted Data
+                          Problem Analysis
                         </p>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4 mb-4">
                           <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-2">Need</p>
-                            <p className="text-sm text-[#0D0D0D]">{opp.extractedNeed}</p>
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Problem Type</p>
+                            <p className="text-sm text-[#0D0D0D] font-mono bg-[#F9F9F9] px-2 py-1 rounded">{opp.problemType || "—"}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-[#888888] font-semibold mb-2">Urgency</p>
-                            <p className="text-sm text-[#0D0D0D]">{opp.extractedUrgency}</p>
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Tier</p>
+                            <p className="text-sm text-[#0D0D0D] font-mono bg-[#F9F9F9] px-2 py-1 rounded">{opp.routingTier ? `Tier ${opp.routingTier}` : "—"}</p>
                           </div>
-                          <div className="col-span-2">
-                            <p className="text-xs text-[#888888] font-semibold mb-2">Context</p>
-                            <p className="text-sm text-[#0D0D0D]">{opp.extractedContext}</p>
+                          <div>
+                            <p className="text-xs text-[#888888] font-semibold mb-2">Confidence</p>
+                            <p className="text-sm text-[#0D0D0D] font-mono bg-[#F9F9F9] px-2 py-1 rounded">{opp.confidenceScore ? (opp.confidenceScore * 100).toFixed(0) + "%" : "—"}</p>
                           </div>
+                        </div>
+                        <div>
+                          <p className="text-xs text-[#888888] font-semibold mb-2">Pre-Populated Reply</p>
+                          <p className="text-sm text-[#0D0D0D] italic bg-[#F9F9F9] px-3 py-2 rounded border border-[#E8E8E8]">"{opp.prePopulatedReply || "Let's talk about this."}"</p>
                         </div>
                       </div>
 
