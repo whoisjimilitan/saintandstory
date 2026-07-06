@@ -424,24 +424,24 @@ function getIndustryPhrase(problemType: string): string {
  */
 function getEngagementQuestion(problemType: string): string {
   const questions: Record<string, string> = {
-    court_deadline_delivery: "Do court deadlines ever get tight? And does your team ever need same-day court document delivery?",
-    legal_document_delivery: "Do legal document deadlines ever feel urgent? And does your team ever need same-day legal courier coverage?",
-    hospital_supply_delivery: "Do urgent supplies ever go missing? And does your team ever need same-day medical supply delivery?",
-    pharmacy_prescription_delivery: "Do prescription deadlines ever feel tight? And does your team ever need same-day prescription delivery?",
-    construction_material_delivery: "Do material delays ever slow your site? And does your team ever need same-day material delivery or long-term arrangements?",
-    estate_agent_document_delivery: "Do completion day documents ever come down to the wire? And does your team ever need same-day solicitor document delivery?",
-    restaurant_supply_delivery: "Do supply delays ever affect service? And does your team ever need same-day ingredient or supplier collections?",
-    accounting_file_delivery: "Do tax deadlines ever create panic? And does your team ever need same-day tax document delivery?",
-    architecture_drawing_delivery: "Do plan amendments ever halt construction? And does your team ever need same-day blueprint delivery?",
-    veterinary_supply_delivery: "Do urgent medication supplies ever go missing? And does your team ever need same-day veterinary supply delivery?",
-    dental_supply_delivery: "Do supply delays ever affect your appointments? And does your team ever need same-day dental lab or supply delivery?",
-    retail_stock_delivery: "Do morning stock deadlines ever feel tight? And does your team ever need early morning retail stock delivery?",
-    beauty_supply_delivery: "Do product delays ever affect client bookings? And does your team ever need same-day product delivery?",
-    art_gallery_artwork_delivery: "Do exhibition deadlines ever create logistics stress? And does your team ever need same-day artwork delivery?",
-    catering_supply_delivery: "Do event deadlines ever create supply chain stress? And do you or your team ever need a same-day courier or ongoing delivery arrangements?",
-    manufacturing_part_delivery: "Do part delays ever slow production? And does your team ever need same-day parts delivery or long-term arrangements?",
-    film_production_equipment: "Do equipment deadlines ever halt production? And does your team ever need same-day equipment delivery to location?",
-    office_supply_delivery: "Do supply delays ever affect productivity? And does your team ever need same-day office supply delivery?"
+    court_deadline_delivery: "Do court deadlines ever get tight? And does your team ever need same-day backup for court document delivery?",
+    legal_document_delivery: "Do legal document deadlines ever feel urgent? And does your team ever need same-day backup for legal document delivery?",
+    hospital_supply_delivery: "Do urgent supplies ever go missing? And does your team ever need same-day backup for medical supply delivery?",
+    pharmacy_prescription_delivery: "Do prescription deadlines ever feel tight? And does your team ever need same-day backup for prescription delivery?",
+    construction_material_delivery: "Do material delays ever slow your site? And does your team ever need same-day backup for material delivery?",
+    estate_agent_document_delivery: "Do completion day documents ever come down to the wire? And does your team ever need same-day backup for solicitor document delivery?",
+    restaurant_supply_delivery: "Do supply delays ever affect service? And does your team ever need same-day backup for ingredient or supplier collections?",
+    accounting_file_delivery: "Do tax deadlines ever create panic? And does your team ever need same-day backup for tax document delivery?",
+    architecture_drawing_delivery: "Do plan amendments ever halt construction? And does your team ever need same-day backup for blueprint delivery?",
+    veterinary_supply_delivery: "Do urgent medication supplies ever go missing? And does your team ever need same-day backup for medication delivery?",
+    dental_supply_delivery: "Do supply delays ever affect your appointments? And does your team ever need same-day backup for dental lab or supply delivery?",
+    retail_stock_delivery: "Do morning stock deadlines ever feel tight? And does your team ever need same-day backup for early morning retail stock delivery?",
+    beauty_supply_delivery: "Do product delays ever affect client bookings? And does your team ever need same-day backup for product delivery?",
+    art_gallery_artwork_delivery: "Do exhibition deadlines ever create logistics stress? And does your team ever need same-day backup for artwork delivery?",
+    catering_supply_delivery: "Do event deadlines ever create supply chain stress? And does your team ever need same-day backup for ingredient delivery?",
+    manufacturing_part_delivery: "Do part delays ever slow production? And does your team ever need same-day backup for parts delivery?",
+    film_production_equipment: "Do equipment deadlines ever halt production? And does your team ever need same-day backup for equipment delivery?",
+    office_supply_delivery: "Do supply delays ever affect productivity? And does your team ever need same-day backup for office supply delivery?"
   };
 
   return questions[problemType] || "Can we help with your delivery challenges?";
