@@ -583,20 +583,28 @@ export default function EnrichPage() {
                   <p className="text-sm font-semibold text-[#0D0D0D]">{currentEmail.subject}</p>
                 </div>
 
-                {/* BODY - HTML PREVIEW */}
+                {/* BODY - PROPHETIC EMAIL PREVIEW */}
+                <div className="mb-6">
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Email Message</p>
+                  <div className="bg-white border border-[#E8E8E8] rounded p-6 font-normal text-sm text-[#333333] whitespace-pre-wrap leading-relaxed">
+                    {currentEmail.body}
+                  </div>
+                </div>
+
+                {/* DETAILED BRIEF - EXPANDABLE */}
                 <div>
-                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Message Preview (Premium Design)</p>
+                  <p className="text-xs text-[#888888] uppercase font-semibold mb-2">Detailed Brief (For Reference)</p>
                   {currentEmail.htmlBody ? (
                     <iframe
                       srcDoc={currentEmail.htmlBody}
-                      title="Email Preview"
+                      title="Detailed Brief"
                       className="w-full border border-[#E8E8E8] rounded bg-white"
-                      style={{ minHeight: "600px" }}
+                      style={{ minHeight: "500px" }}
                       sandbox={{ allow: ['same-origin'] }}
                     />
                   ) : (
-                    <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 font-mono text-xs text-[#0D0D0D] whitespace-pre-wrap leading-relaxed">
-                      {currentEmail.body}
+                    <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded p-4 text-xs text-[#888888]">
+                      No detailed brief available
                     </div>
                   )}
                 </div>
