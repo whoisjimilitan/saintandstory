@@ -359,7 +359,7 @@ function getPersonalizationLine(problemType: string, company: string): string {
  */
 function getCredibilityStatement(problemType: string): string {
   const statements: Record<string, string> = {
-    court_deadline_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery fails, we take responsibility and cover the re-delivery at no cost.",
+    court_deadline_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we take responsibility and cover the re-delivery at no cost.",
     legal_document_delivery: "That's why we built Saint & Story around court deadline reliability. Delivery won't fail with us. Every delivery is backed by our commitment to get it right.",
     hospital_supply_delivery: "That's why we built Saint & Story with medical delivery as the core. Delivery won't fail with us. We understand that patient care depends on us.",
     pharmacy_prescription_delivery: "That's why we built Saint & Story around prescription reliability. Delivery won't fail with us. Patient health depends on timing.",
