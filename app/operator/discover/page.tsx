@@ -151,7 +151,7 @@ export default function DiscoverPage() {
     }
 
     const selectedProspects = prospects.filter(p => selectedLeads.has(p.id));
-    sessionStorage.setItem("discover_prospects", JSON.stringify(selectedProspects));
+    sessionStorage.setItem("enrich_prospects", JSON.stringify(selectedProspects));
     router.push("/operator/enrich");
   };
 
