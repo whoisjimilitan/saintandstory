@@ -148,8 +148,15 @@ export async function POST(request: Request) {
         }
 
         const emailV4 = {
-          subjectLine: brief.subject,
-          bodyText: generateEmailBody(brief),
+          subjectLine: problemType, // Simple subject: just the problem type
+          bodyText: generateEmailBody(brief, {
+            confession_text: confession,
+            problem_type: problemType,
+            contact_name: firstName,
+            company_name: prospect.businessName,
+            location: prospect.city,
+            psychology
+          }),
           specificPain: psychology.inverse_incentive,
           specificPromise: psychology.loss_aversion_frame,
           consequenceTier: 1,

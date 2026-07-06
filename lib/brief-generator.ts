@@ -208,20 +208,28 @@ function generateBriefHTML(input: {
 }
 
 /**
- * Generate brief for the email template.
+ * Generate SIMPLE email body using template format.
  *
- * Returns the complete email body ready to send.
+ * Less is more: one sentence opening, brief reference, punchy line, simple CTA.
+ * The detailed brief is in briefHTML for reference.
  */
-export function generateEmailBody(brief: GeneratedBrief): string {
-  return `${brief.opening}
+export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): string {
+  const name = input?.contact_name || "there";
+  const company = input?.company_name || "your company";
+  const problemPhrase = getProblemType(input?.problem_type || "")?.brief_opening || "this";
 
-${brief.gap_section}
+  // Extract ONE punchy line from the possibility section (first sentence)
+  const punchyLine = brief.possibility_section.split(".")[0] + ".";
 
-${brief.possibility_section}
+  return `Hi ${name},
 
-${brief.proof_section}
+A little birdie told me about ${problemPhrase}
 
-${brief.cta}
+I went ahead and prepared a Brief based on what you described.
+
+${punchyLine} Hopefully it saves you some thinking whether you use us or not.
+
+If you'd like us to turn it into a working setup, just reply.
 
 James`;
 }
