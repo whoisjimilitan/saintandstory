@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         const { inferProblemFromCategory } = await import("@/lib/confession-inferencer");
         const { getProblemType } = await import("@/lib/problems-map");
         const { analyzePsychology } = await import("@/lib/psychology-analyzer");
-        const { generateBrief, generateEmailBody } = await import("@/lib/brief-generator");
+        const { generateBrief, generateEmailBody, getSubjectLine } = await import("@/lib/brief-generator");
 
         // ============ STEP 1: Identify Real Problem ============
         console.log(`[PROPHECY-PIPELINE] Step 1: Identifying problem...`);
@@ -195,11 +195,13 @@ export async function POST(request: Request) {
         console.log(`[PROPHECY-PIPELINE] Email generated. Length: ${emailBody.split("\n").length} lines`);
 
         // ============ STEP 5: Package Result ============
+        const subjectLine = getSubjectLine(problemType);
+
         results.push({
           prospectId: prospect.id,
           businessName: prospect.businessName,
           email: prospect.email,
-          subject: `Brief: ${prospect.businessName}`,
+          subject: subjectLine,
           body: emailBody,
           htmlBody: brief.html,
           wordCount: emailBody.split(/\s+/).length,

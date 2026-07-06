@@ -363,6 +363,35 @@ function getCredibilityStatement(problemType: string): string {
 }
 
 /**
+ * Generate subject line: "About your [X]"
+ * Sets up the topic so "Apologies" flows naturally
+ */
+export function getSubjectLine(problemType: string): string {
+  const subjects: Record<string, string> = {
+    court_deadline_delivery: "About your court documents",
+    legal_document_delivery: "About your legal documents",
+    hospital_supply_delivery: "About your hospital supplies",
+    pharmacy_prescription_delivery: "About your prescription deliveries",
+    construction_material_delivery: "About your material deliveries",
+    estate_agent_document_delivery: "About your completion documents",
+    restaurant_supply_delivery: "About your ingredient deliveries",
+    accounting_file_delivery: "About your tax documents",
+    architecture_drawing_delivery: "About your blueprint deliveries",
+    veterinary_supply_delivery: "About your medication deliveries",
+    dental_supply_delivery: "About your supply deliveries",
+    retail_stock_delivery: "About your stock deliveries",
+    beauty_supply_delivery: "About your product deliveries",
+    art_gallery_artwork_delivery: "About your artwork deliveries",
+    catering_supply_delivery: "About your ingredient deliveries",
+    manufacturing_part_delivery: "About your parts deliveries",
+    film_production_equipment: "About your equipment deliveries",
+    office_supply_delivery: "About your supply deliveries"
+  };
+
+  return subjects[problemType] || "About your deliveries";
+}
+
+/**
  * Extract industry phrase from problem type for "teaching moment" line
  */
 function getIndustryPhrase(problemType: string): string {
