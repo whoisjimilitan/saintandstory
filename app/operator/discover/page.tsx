@@ -40,6 +40,7 @@ export default function DiscoverPage() {
 
   const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchRadius, setSearchRadius] = useState(10);
   const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
@@ -66,11 +67,12 @@ export default function DiscoverPage() {
       const params = new URLSearchParams();
       if (isPostcodeSearch) {
         params.append("postcode", searchTerm);
+        params.append("radius", searchRadius.toString());
       } else {
-        params.append("query", searchTerm);
+        params.append("keyword", searchTerm);
       }
 
-      const url = `/api/b2b/discover/search?${params}`;
+      const url = `/api/b2b/discover?${params}`;
       console.log("[DISCOVER] Searching:", url);
 
       const res = await fetch(url, { method: "GET" });
@@ -87,14 +89,14 @@ export default function DiscoverPage() {
 
       const results = (data.results || []).map((r: any) => ({
         id: r.id,
-        businessName: r.businessName,
+        businessName: r.businessName || r.name,
         contactName: r.contactName,
         city: r.city,
         postcode: r.postcode,
         email: r.email,
         phone: r.phone,
-        tier: getConsequenceTier(r.businessName),
-        category: detectCategory(r.businessName),
+        tier: getConsequenceTier(r.businessName || r.name),
+        category: detectCategory(r.businessName || r.name),
         source: "search" as const
       }));
 
@@ -250,6 +252,22 @@ export default function DiscoverPage() {
                   Search by postcode instead
                 </label>
               </div>
+
+              {isPostcodeSearch && (
+                <div>
+                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                    Search Radius: {searchRadius} km
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={searchRadius}
+                    onChange={(e) => setSearchRadius(parseInt(e.target.value))}
+                    className="w-full h-2 bg-[#E8E8E8] rounded appearance-none cursor-pointer accent-[#0D0D0D]"
+                  />
+                </div>
+              )}
 
               <button
                 type="submit"
