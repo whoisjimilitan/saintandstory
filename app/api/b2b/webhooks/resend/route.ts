@@ -149,12 +149,56 @@ export async function POST(request: NextRequest) {
         const updated = await prisma.b2bCampaignEmail.update({
           where: { id: campaignEmail.id },
           data: updateData,
-          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
+          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true, prospectId: true },
         });
 
         console.log(`[WEBHOOK] ✓✓ Updated b2bCampaignEmail ${campaignEmail.id}:`, {
           newStatus: updated.status,
         });
+
+        // Update lead engagement status if prospectId exists
+        if (updated.prospectId && (mappedEventType === "opened" || mappedEventType === "clicked" || mappedEventType === "replied")) {
+          try {
+            const leadUpdateData: any = {
+              last_engagement_at: timestamp,
+              last_engagement_type: `email_${mappedEventType}`,
+            };
+
+            if (mappedEventType === "replied") {
+              leadUpdateData.engaged_today = true;
+            }
+
+            await prisma.b2bLead.update({
+              where: { id: updated.prospectId },
+              data: leadUpdateData,
+            });
+
+            console.log(`[WEBHOOK] ✓ Updated lead engagement for ${updated.prospectId}: ${mappedEventType}`);
+
+            // Log the engagement event
+            await prisma.b2bConversationEvent.create({
+              data: {
+                leadId: updated.prospectId,
+                type: "email",
+                direction: "inbound",
+                subject: `Email ${mappedEventType}`,
+                body: `Prospect ${mappedEventType} the email sent via campaign ${campaignEmail.id}`,
+                metadata: {
+                  messageId: data.id,
+                  campaignId: campaignEmail.id,
+                  eventType: mappedEventType,
+                  timestamp: timestamp.toISOString(),
+                },
+              },
+            });
+
+            console.log(`[WEBHOOK] ✓ Logged engagement event for lead ${updated.prospectId}`);
+          } catch (leadUpdateError) {
+            console.warn(`[WEBHOOK] ⚠ Could not update lead engagement for ${updated.prospectId}:`,
+              leadUpdateError instanceof Error ? leadUpdateError.message : String(leadUpdateError)
+            );
+          }
+        }
 
         return NextResponse.json({
           received: true,
@@ -167,12 +211,56 @@ export async function POST(request: NextRequest) {
         const updated = await prisma.opportunityFeed.update({
           where: { id: opportunityFeed.id },
           data: updateData,
-          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true },
+          select: { id: true, status: true, openedAt: true, clickedAt: true, repliedAt: true, leadId: true },
         });
 
         console.log(`[WEBHOOK] ✓✓ Updated opportunityFeed ${opportunityFeed.id}:`, {
           newStatus: updated.status,
         });
+
+        // Update lead engagement status if leadId exists
+        if (updated.leadId && (mappedEventType === "opened" || mappedEventType === "clicked" || mappedEventType === "replied")) {
+          try {
+            const leadUpdateData: any = {
+              last_engagement_at: timestamp,
+              last_engagement_type: `email_${mappedEventType}`,
+            };
+
+            if (mappedEventType === "replied") {
+              leadUpdateData.engaged_today = true;
+            }
+
+            await prisma.b2bLead.update({
+              where: { id: updated.leadId },
+              data: leadUpdateData,
+            });
+
+            console.log(`[WEBHOOK] ✓ Updated lead engagement for ${updated.leadId}: ${mappedEventType}`);
+
+            // Log the engagement event
+            await prisma.b2bConversationEvent.create({
+              data: {
+                leadId: updated.leadId,
+                type: "email",
+                direction: "inbound",
+                subject: `Email ${mappedEventType}`,
+                body: `Prospect ${mappedEventType} the email sent via opportunity feed ${opportunityFeed.id}`,
+                metadata: {
+                  messageId: data.id,
+                  opportunityFeedId: opportunityFeed.id,
+                  eventType: mappedEventType,
+                  timestamp: timestamp.toISOString(),
+                },
+              },
+            });
+
+            console.log(`[WEBHOOK] ✓ Logged engagement event for lead ${updated.leadId}`);
+          } catch (leadUpdateError) {
+            console.warn(`[WEBHOOK] ⚠ Could not update lead engagement for ${updated.leadId}:`,
+              leadUpdateError instanceof Error ? leadUpdateError.message : String(leadUpdateError)
+            );
+          }
+        }
 
         return NextResponse.json({
           received: true,
