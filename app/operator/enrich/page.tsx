@@ -27,6 +27,7 @@ interface EnrichedEmail {
   senderName?: string;
   relationshipStage?: number;
   reasoning?: any;
+  prePopulatedReply?: string;
 }
 
 interface SentEmail {
@@ -736,6 +737,7 @@ export default function EnrichPage() {
                           prospectName: currentEmail.prospectName,
                           body: editBody,
                           subject: editSubject,
+                          prePopulatedReply: currentEmail.prePopulatedReply,
                         },
                         {
                           name: currentEmail.senderName || "James",
@@ -769,6 +771,7 @@ export default function EnrichPage() {
                           prospectName: currentEmail.prospectName,
                           body: editBody,
                           subject: editSubject,
+                          prePopulatedReply: currentEmail.prePopulatedReply,
                         },
                         {
                           name: currentEmail.senderName || "James",
