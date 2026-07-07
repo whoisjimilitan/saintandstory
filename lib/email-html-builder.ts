@@ -20,13 +20,41 @@ export function buildEmailHtml(
     .map(p => p.trim())
     .filter(p => p.length > 0);
 
-  // Extract name and role from last lines
-  const lastTwoParagraphs = paragraphs.slice(-2);
-  const senderNameFromBody = lastTwoParagraphs[0] || "James";
-  const senderRoleFromBody = lastTwoParagraphs[1] || "";
+  // Extract name and role — handle both formats:
+  // 1. Single paragraph with newline: "James\nCo-Founder at Saint & Story"
+  // 2. Two separate paragraphs: ["James", "Co-Founder at Saint & Story"]
+  let senderNameFromBody = "James";
+  let senderRoleFromBody = "";
+  let contentParagraphs = paragraphs;
 
-  // Main content: everything except last 2 paragraphs
-  const contentParagraphs = paragraphs.slice(0, -2);
+  if (paragraphs.length > 0) {
+    const lastPara = paragraphs[paragraphs.length - 1];
+
+    // Check if last paragraph contains newline (name and role together)
+    if (lastPara.includes("\n")) {
+      const lines = lastPara.split("\n").map(l => l.trim()).filter(l => l);
+      if (lines.length >= 2) {
+        senderNameFromBody = lines[0];
+        senderRoleFromBody = lines[1];
+        contentParagraphs = paragraphs.slice(0, -1);
+      }
+    }
+    // Otherwise check last 2 paragraphs (only if they look like name + role, not full sentences)
+    else if (paragraphs.length > 2) {
+      const lastTwo = paragraphs.slice(-2);
+      const isNameRole =
+        lastTwo[0].length < 100 &&
+        !lastTwo[0].includes("?") &&
+        !lastTwo[0].includes(".") &&
+        !lastTwo[0].startsWith("Out of");
+
+      if (isNameRole) {
+        senderNameFromBody = lastTwo[0];
+        senderRoleFromBody = lastTwo[1];
+        contentParagraphs = paragraphs.slice(0, -2);
+      }
+    }
+  }
 
   // Build pre-populated reply - matches the voice they received
   const defaultReply = "Thanks James, we do need courier services on backup or regular basis and would like to understand how you can help.";
@@ -100,7 +128,7 @@ export function buildEmailHtml(
     </div>
 
     <div style="margin-top: 48px; padding-top: 0; border-top: 1px solid #e8e8e8; padding-top: 24px;">
-      <p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
+      <p style="margin: 0 0 8px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
       ${senderRoleFromBody ? `<p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.65; color: #888888; font-weight: 400;">${senderRoleFromBody}</p>` : ''}
 
       <div style="margin-top: 24px;">
