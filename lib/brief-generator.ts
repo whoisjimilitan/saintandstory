@@ -66,8 +66,8 @@ A little birdie told me about ${problem.brief_opening.replace(/\.$/, "")}`;
   // Assemble subject
   const subject = `${company} – ${input.problem_type.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}`;
 
-  // Assemble pre-populated reply
-  const pre_populated_reply = problem.pre_populated_reply;
+  // Assemble pre-populated reply - smart one-liner for immediate engagement
+  const pre_populated_reply = getPrePopulatedReply(input.problem_type);
 
   // Generate HTML
   const html = generateBriefHTML({
@@ -417,6 +417,35 @@ function getIndustryPhrase(problemType: string): string {
   };
 
   return phrases[problemType] || "Working with businesses";
+}
+
+/**
+ * Generate pre-populated reply - one sentence showing interest
+ * User just adds their name, no friction
+ */
+export function getPrePopulatedReply(problemType: string): string {
+  const replies: Record<string, string> = {
+    court_deadline_delivery: "Thanks James, we do occasionally need same-day backup for court documents and would like to understand how your service works.",
+    legal_document_delivery: "Thanks James, we do occasionally need urgent legal document delivery and would like to explore how you could help.",
+    hospital_supply_delivery: "Thanks James, we do occasionally need urgent supply delivery and would like to discuss how your service could support us.",
+    pharmacy_prescription_delivery: "Thanks James, we do occasionally need same-day prescription delivery and would like to learn more about your service.",
+    construction_material_delivery: "Thanks James, we do occasionally need urgent material delivery to avoid site delays and would like to speak with you.",
+    estate_agent_document_delivery: "Thanks James, we do occasionally need same-day document delivery on completion days and would like to know more.",
+    restaurant_supply_delivery: "Thanks James, we do occasionally need urgent supplier collections and would like to discuss how you could help.",
+    accounting_file_delivery: "Thanks James, we do occasionally need same-day document delivery before tax deadlines and would like to explore options.",
+    architecture_drawing_delivery: "Thanks James, we do occasionally need urgent blueprint delivery and would like to discuss your service.",
+    veterinary_supply_delivery: "Thanks James, we do occasionally need same-day medication delivery and would like to learn more.",
+    dental_supply_delivery: "Thanks James, we do occasionally need urgent dental supply delivery and would like to speak about this.",
+    retail_stock_delivery: "Thanks James, we do occasionally need same-day stock delivery and would like to discuss how you could help.",
+    beauty_supply_delivery: "Thanks James, we do occasionally need urgent product delivery and would like to explore working together.",
+    art_gallery_artwork_delivery: "Thanks James, we do occasionally need same-day artwork delivery for exhibitions and would like to know more.",
+    catering_supply_delivery: "Thanks James, we do occasionally need urgent ingredient delivery for events and would like to discuss options.",
+    manufacturing_part_delivery: "Thanks James, we do occasionally need same-day parts delivery to avoid production delays and would like to speak.",
+    film_production_equipment: "Thanks James, we do occasionally need urgent equipment delivery and would like to discuss how you could support us.",
+    office_supply_delivery: "Thanks James, we do occasionally need same-day supply delivery and would like to learn more about your service."
+  };
+
+  return replies[problemType] || "Thanks James, we do occasionally need urgent delivery and would like to discuss how you could help.";
 }
 
 /**
