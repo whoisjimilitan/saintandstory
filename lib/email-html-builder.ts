@@ -28,8 +28,9 @@ export function buildEmailHtml(
   // Main content: everything except last 2 paragraphs
   const contentParagraphs = paragraphs.slice(0, -2);
 
-  // Build pre-populated reply
-  const replyText = email.prePopulatedReply || "Let's talk about this.";
+  // Build pre-populated reply - smart default if not provided
+  const defaultReply = "Thanks James, we do occasionally need your services and would like to understand how you could help us improve our operations.";
+  const replyText = email.prePopulatedReply || defaultReply;
   const replyEmailBody = `Hi ${senderNameFromBody},%0D%0A%0D%0A${encodeURIComponent(replyText)}%0D%0A%0D%0AThanks,%0D%0A[Your Name]`;
   const replyLink = `mailto:${sender.email}?subject=Re:%20${encodeURIComponent(email.prospectName)}&body=${replyEmailBody}`;
 
