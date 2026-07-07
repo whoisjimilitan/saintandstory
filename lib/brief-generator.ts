@@ -261,8 +261,11 @@ export function generateEmailBody(brief: GeneratedBrief, input?: BriefInput): st
   const engagementQuestion = getEngagementQuestion(problemType);
   const section6 = engagementQuestion;
 
-  // ASSEMBLE: Return as HTML with proper formatting
-  return generateEmailBodyHTML(section1, section2, section3, section4, section5, section6);
+  // SECTION 7: SIGNATURE
+  const section7 = `James\nCo-Founder at Saint & Story`;
+
+  // ASSEMBLE: Merge sections with blank lines for readability
+  return [section1, section2, section3, section4, section5, section6, section7].join("\n\n");
 }
 
 /**
@@ -442,37 +445,4 @@ function getEngagementQuestion(problemType: string): string {
   };
 
   return questions[problemType] || "Out of curiosity, does your team ever need same-day backup for delivery?";
-}
-
-/**
- * Generate email body as clean HTML with proper spacing and formatting.
- * All paragraphs have consistent spacing.
- * Signature has proper space before it, name and title on separate lines.
- */
-function generateEmailBodyHTML(
-  greeting: string,
-  apology: string,
-  teaching: string,
-  personalization: string,
-  credibility: string,
-  engagement: string
-): string {
-  return `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #1a1a1a; max-width: 600px;">
-  <p style="margin: 0 0 16px 0;">${greeting}</p>
-
-  <p style="margin: 0 0 16px 0;">${apology}</p>
-
-  <p style="margin: 0 0 16px 0;">${teaching}</p>
-
-  <p style="margin: 0 0 16px 0;">${personalization}</p>
-
-  <p style="margin: 0 0 16px 0;">${credibility}</p>
-
-  <p style="margin: 0 0 32px 0;">${engagement}</p>
-
-  <p style="margin: 0 0 4px 0;">James</p>
-  <p style="margin: 0;">Co-Founder at Saint & Story</p>
-</div>
-  `.trim();
 }

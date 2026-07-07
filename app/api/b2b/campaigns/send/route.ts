@@ -234,49 +234,6 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          // Update lead engagement status if prospectId exists
-          if (email.prospectId) {
-            try {
-              await prisma.b2bLead.update({
-                where: { id: email.prospectId },
-                data: {
-                  last_engagement_at: new Date(),
-                  last_engagement_type: "email",
-                  engaged_today: true,
-                },
-              });
-              console.log(`[CAMPAIGN SEND] ✓ Updated lead engagement: ${email.prospectId}`);
-            } catch (updateError) {
-              console.warn(`[CAMPAIGN SEND] ⚠ Could not update lead ${email.prospectId}:`,
-                updateError instanceof Error ? updateError.message : String(updateError)
-              );
-            }
-
-            // Create conversation event for audit trail
-            try {
-              await prisma.b2bConversationEvent.create({
-                data: {
-                  leadId: email.prospectId,
-                  type: "email",
-                  direction: "outbound",
-                  subject: email.subject || "Email Sent",
-                  body: email.body,
-                  metadata: {
-                    messageId,
-                    campaignId: campaign.id,
-                    sentBy: operatorEmail,
-                    sentAt: new Date().toISOString(),
-                  },
-                },
-              });
-              console.log(`[CAMPAIGN SEND] ✓ Logged conversation event: ${email.prospectId}`);
-            } catch (eventError) {
-              console.warn(`[CAMPAIGN SEND] ⚠ Could not log event for ${email.prospectId}:`,
-                eventError instanceof Error ? eventError.message : String(eventError)
-              );
-            }
-          }
-
           sentCount++;
           console.log(`[CAMPAIGN SEND] ✓ Email sent to ${email.prospectEmail}`);
         } else if (channel === "whatsapp") {
