@@ -54,6 +54,7 @@ export default function ReachPage() {
   const [newChatName, setNewChatName] = useState("");
   const [showEmailHistory, setShowEmailHistory] = useState(false);
   const [showWhatsappHistory, setShowWhatsappHistory] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Filter campaigns by 24-hour window
   const filterCampaignsByWindow = (campaigns: any[], now = new Date()) => {
@@ -67,15 +68,17 @@ export default function ReachPage() {
   const whatsappByWindow = filterCampaignsByWindow(whatsappCampaigns);
 
   useEffect(() => {
-    fetchData();
-    // Auto-refresh every 30 seconds for live updates (reduced from 5s to prevent flashing)
-    const interval = setInterval(fetchData, 30000);
+    fetchData(true); // Initial load with loading state
+    // Auto-refresh every 30 seconds silently (no loading indicator)
+    const interval = setInterval(() => fetchData(false), 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (showLoadingState: boolean = false) => {
     try {
-      setLoading(true);
+      if (showLoadingState) {
+        setLoading(true);
+      }
       const [emailRes, whatsappRes, convoRes] = await Promise.all([
         fetch("/api/b2b/campaigns/list"),
         fetch("/api/operator/whatsapp-campaigns"),
@@ -98,10 +101,16 @@ export default function ReachPage() {
         const data = await convoRes.json();
         setConversations(data.conversations || []);
       }
+
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
     } catch (error) {
       console.error("[REACH] Error fetching data:", error);
     } finally {
-      setLoading(false);
+      if (showLoadingState) {
+        setLoading(false);
+      }
     }
   };
 
