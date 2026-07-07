@@ -33,9 +33,13 @@ export function buildEmailHtml(
   const replyEmailBody = `Hi ${senderNameFromBody},%0D%0A%0D%0A${encodeURIComponent(replyText)}%0D%0A%0D%0AThanks,%0D%0A[Your Name]`;
   const replyLink = `mailto:${sender.email}?subject=Re:%20${encodeURIComponent(email.prospectName)}&body=${replyEmailBody}`;
 
-  // Format content paragraphs with proper HTML
+  // Format content paragraphs with proper HTML - last paragraph has no bottom margin
   const contentHtml = contentParagraphs
-    .map(p => `<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${p}</p>`)
+    .map((p, idx) => {
+      const isLast = idx === contentParagraphs.length - 1;
+      const margin = isLast ? "margin: 0;" : "margin: 0 0 24px 0;";
+      return `<p style="${margin} font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${p}</p>`;
+    })
     .join("");
 
   return `<!DOCTYPE html>
@@ -94,9 +98,9 @@ export function buildEmailHtml(
       ${contentHtml}
     </div>
 
-    <div style="margin-top: 48px; padding-top: 0;">
-      <p style="margin: 0 0 2px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
-      ${senderRoleFromBody ? `<p style="margin: 0; font-size: 15px; line-height: 1.65; color: #666666; font-weight: 400;">${senderRoleFromBody}</p>` : ''}
+    <div style="margin-top: 48px; padding-top: 0; border-top: 1px solid #e8e8e8; padding-top: 24px;">
+      <p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.65; color: #1d1d1d; font-weight: 400;">${senderNameFromBody}</p>
+      ${senderRoleFromBody ? `<p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.65; color: #888888; font-weight: 400;">${senderRoleFromBody}</p>` : ''}
 
       <div style="margin-top: 24px;">
         <a href="${replyLink}" class="cta-button">Reply</a>
