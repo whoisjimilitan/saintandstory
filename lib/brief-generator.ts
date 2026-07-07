@@ -334,29 +334,29 @@ function getPersonalizationLine(problemType: string, company: string): string {
 }
 
 /**
- * Credibility statement: Bold promise + assurance
- * "Delivery won't fail with us. If a delivery ever fails with us, we'll take responsibility..."
+ * Credibility statement: Investment proof + bold promise
+ * Shows we've invested in automation, not just making promises
  */
 function getCredibilityStatement(problemType: string): string {
   const statements: Record<string, string> = {
-    court_deadline_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    legal_document_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    hospital_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    pharmacy_prescription_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    construction_material_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    estate_agent_document_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    restaurant_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    accounting_file_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    architecture_drawing_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    veterinary_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    dental_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    retail_stock_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    beauty_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    art_gallery_artwork_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    catering_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    manufacturing_part_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    film_production_equipment: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
-    office_supply_delivery: "That's why we built Saint & Story. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost."
+    court_deadline_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    legal_document_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    hospital_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    pharmacy_prescription_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    construction_material_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    estate_agent_document_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    restaurant_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    accounting_file_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    architecture_drawing_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    veterinary_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    dental_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    retail_stock_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    beauty_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    art_gallery_artwork_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    catering_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    manufacturing_part_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    film_production_equipment: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost.",
+    office_supply_delivery: "That's why we built Saint & Story and invested significantly in automating our delivery systems. Delivery won't fail with us. If a delivery ever fails, we'll cover the re-delivery at no cost."
   };
 
   return statements[problemType] || "That's why we built Saint & Story. Reliability is everything.";
@@ -421,28 +421,29 @@ function getIndustryPhrase(problemType: string): string {
 
 /**
  * Generate engagement question from problem type
+ * Adds specificity with "courier" or category-specific service descriptor
  */
 function getEngagementQuestion(problemType: string): string {
   const questions: Record<string, string> = {
-    court_deadline_delivery: "Out of curiosity, when court deadlines get tight, does your team ever need same-day backup for court document delivery?",
-    legal_document_delivery: "Out of curiosity, when legal document deadlines feel urgent, does your team ever need same-day backup for legal document delivery?",
-    hospital_supply_delivery: "Out of curiosity, when urgent supplies are needed, does your team ever need same-day backup for medical supply delivery?",
-    pharmacy_prescription_delivery: "Out of curiosity, when prescriptions need to arrive fast, does your team ever need same-day backup for prescription delivery?",
-    construction_material_delivery: "Out of curiosity, when material delays slow your site, does your team ever need same-day backup for material delivery?",
-    estate_agent_document_delivery: "Out of curiosity, on completion day, does your team ever need same-day backup for solicitor document delivery?",
-    restaurant_supply_delivery: "Out of curiosity, when supply delays affect service, does your team ever need same-day backup for ingredient or supplier collections?",
-    accounting_file_delivery: "Out of curiosity, when tax deadlines create pressure, does your team ever need same-day backup for tax document delivery?",
-    architecture_drawing_delivery: "Out of curiosity, when plan amendments need to reach builders, does your team ever need same-day backup for blueprint delivery?",
-    veterinary_supply_delivery: "Out of curiosity, when urgent medication supplies are needed, does your team ever need same-day backup for medication delivery?",
-    dental_supply_delivery: "Out of curiosity, when supply timing affects appointments, does your team ever need same-day backup for dental lab or supply delivery?",
-    retail_stock_delivery: "Out of curiosity, when morning stock deadlines matter, does your team ever need same-day backup for retail stock delivery?",
-    beauty_supply_delivery: "Out of curiosity, when product delays affect bookings, does your team ever need same-day backup for product delivery?",
-    art_gallery_artwork_delivery: "Out of curiosity, when exhibition deadlines create stress, does your team ever need same-day backup for artwork delivery?",
-    catering_supply_delivery: "Out of curiosity, when event deadlines matter, does your team ever need same-day backup for ingredient delivery?",
-    manufacturing_part_delivery: "Out of curiosity, when part delays slow production, does your team ever need same-day backup for parts delivery?",
-    film_production_equipment: "Out of curiosity, when equipment timing matters, does your team ever need same-day backup for equipment delivery?",
-    office_supply_delivery: "Out of curiosity, when supply delays affect productivity, does your team ever need same-day backup for office supply delivery?"
+    court_deadline_delivery: "Out of curiosity, when court deadlines get tight, does your team ever need same-day backup courier for court document delivery?",
+    legal_document_delivery: "Out of curiosity, when legal document deadlines feel urgent, does your team ever need same-day backup courier for legal document delivery?",
+    hospital_supply_delivery: "Out of curiosity, when urgent supplies are needed, does your team ever need same-day backup courier for medical supply delivery?",
+    pharmacy_prescription_delivery: "Out of curiosity, when prescriptions need to arrive fast, does your team ever need same-day backup courier for prescription delivery?",
+    construction_material_delivery: "Out of curiosity, when material delays slow your site, does your team ever need same-day backup courier for material delivery?",
+    estate_agent_document_delivery: "Out of curiosity, on completion day, does your team ever need same-day backup courier for solicitor document delivery?",
+    restaurant_supply_delivery: "Out of curiosity, when supply delays affect service, does your team ever need same-day backup courier for ingredient or supplier collections?",
+    accounting_file_delivery: "Out of curiosity, when tax deadlines create pressure, does your team ever need same-day backup courier for tax document delivery?",
+    architecture_drawing_delivery: "Out of curiosity, when plan amendments need to reach builders, does your team ever need same-day backup courier for blueprint delivery?",
+    veterinary_supply_delivery: "Out of curiosity, when urgent medication supplies are needed, does your team ever need same-day backup courier for medication delivery?",
+    dental_supply_delivery: "Out of curiosity, when supply timing affects appointments, does your team ever need same-day backup courier for dental lab or supply delivery?",
+    retail_stock_delivery: "Out of curiosity, when morning stock deadlines matter, does your team ever need same-day backup courier for retail stock delivery?",
+    beauty_supply_delivery: "Out of curiosity, when product delays affect bookings, does your team ever need same-day backup courier for product delivery?",
+    art_gallery_artwork_delivery: "Out of curiosity, when exhibition deadlines create stress, does your team ever need same-day backup courier for artwork delivery?",
+    catering_supply_delivery: "Out of curiosity, when event deadlines matter, does your team ever need same-day backup courier for ingredient delivery?",
+    manufacturing_part_delivery: "Out of curiosity, when part delays slow production, does your team ever need same-day backup courier for parts delivery?",
+    film_production_equipment: "Out of curiosity, when equipment timing matters, does your team ever need same-day backup courier for equipment delivery?",
+    office_supply_delivery: "Out of curiosity, when supply delays affect productivity, does your team ever need same-day backup courier for office supply delivery?"
   };
 
-  return questions[problemType] || "Out of curiosity, does your team ever need same-day backup for delivery?";
+  return questions[problemType] || "Out of curiosity, does your team ever need same-day backup courier for delivery?";
 }
