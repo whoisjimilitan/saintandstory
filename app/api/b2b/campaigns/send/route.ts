@@ -234,6 +234,37 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
+          // Update lead engagement tracking if prospectId exists
+          if (email.prospectId) {
+            try {
+              await prisma.b2bLead.update({
+                where: { id: email.prospectId },
+                data: {
+                  last_engagement_at: new Date(),
+                  last_engagement_type: "email",
+                  engaged_today: true,
+                },
+              });
+
+              await prisma.b2bConversationEvent.create({
+                data: {
+                  leadId: email.prospectId,
+                  type: "email",
+                  direction: "outbound",
+                  subject: email.subject || "Email Sent",
+                  body: email.body,
+                  metadata: {
+                    messageId,
+                    campaignId: campaign.id,
+                    sentAt: new Date().toISOString(),
+                  },
+                },
+              });
+            } catch (trackingError) {
+              console.warn(`[CAMPAIGN SEND] ⚠ Could not update lead tracking for ${email.prospectId}`);
+            }
+          }
+
           sentCount++;
           console.log(`[CAMPAIGN SEND] ✓ Email sent to ${email.prospectEmail}`);
         } else if (channel === "whatsapp") {

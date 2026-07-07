@@ -156,6 +156,37 @@ export async function POST(request: NextRequest) {
           newStatus: updated.status,
         });
 
+        // Update lead engagement if prospectId exists
+        if (campaignEmail.prospectId && (mappedEventType === "opened" || mappedEventType === "clicked")) {
+          try {
+            await prisma.b2bLead.update({
+              where: { id: campaignEmail.prospectId },
+              data: {
+                last_engagement_at: timestamp,
+                last_engagement_type: `email_${mappedEventType}`,
+              },
+            });
+
+            await prisma.b2bConversationEvent.create({
+              data: {
+                leadId: campaignEmail.prospectId,
+                type: "email",
+                direction: "inbound",
+                subject: `Email ${mappedEventType}`,
+                body: `Prospect ${mappedEventType} the email`,
+                metadata: {
+                  messageId: data.id,
+                  campaignId: campaignEmail.id,
+                  eventType: mappedEventType,
+                  timestamp: timestamp.toISOString(),
+                },
+              },
+            });
+          } catch (trackingError) {
+            console.warn(`[WEBHOOK] ⚠ Could not track lead engagement`);
+          }
+        }
+
         return NextResponse.json({
           received: true,
           matched: true,
