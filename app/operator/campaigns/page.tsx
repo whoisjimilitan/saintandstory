@@ -124,6 +124,7 @@ export default function CampaignsPage() {
   // Modal state
   const [selectedBusiness, setSelectedBusiness] = useState<ValidatedBusiness | null>(null);
   const [sending, setSending] = useState(false);
+  const [batchSending, setBatchSending] = useState(false);
 
   const handleCsvUpload = async () => {
     if (!csvFile) {
@@ -362,7 +363,7 @@ James`;
       // Mark as sent in UI
       setBusinesses(
         businesses.map((b) =>
-          b.email === selectedBusiness.email ? { ...b, leadId } : b
+          b.email === selectedBusiness.email ? { ...b, leadId: "sent" } : b
         )
       );
 
@@ -371,6 +372,40 @@ James`;
       setError(err instanceof Error ? err.message : "Send failed");
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleBatchSend = async () => {
+    setBatchSending(true);
+    setError("");
+
+    try {
+      const validBusinesses = businesses.filter((b) => b.validationStatus === "valid" && !b.leadId);
+
+      const res = await fetch("/api/operator/campaigns/batch-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businesses: validBusinesses }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Batch send failed");
+      }
+
+      const data = await res.json();
+
+      // Mark all as sent
+      setBusinesses(
+        businesses.map((b) =>
+          b.validationStatus === "valid" && !b.leadId ? { ...b, leadId: "sent" } : b
+        )
+      );
+
+      setError(`✓ Sent ${data.sent} emails (${data.failed} failed)`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Batch send failed");
+    } finally {
+      setBatchSending(false);
     }
   };
 
@@ -614,6 +649,16 @@ James`;
             })}
           </div>
 
+          {error && (
+            <div className={`text-sm p-4 rounded ${
+              error.startsWith("✓")
+                ? "bg-[#F5F5F5] border border-[#E8E8E8] text-[#0D0D0D]"
+                : "bg-red-50 border border-red-200 text-red-700"
+            }`}>
+              {error}
+            </div>
+          )}
+
           <div className="flex gap-3">
             <button
               onClick={() => {
@@ -621,16 +666,18 @@ James`;
                 setBusinesses([]);
                 setCsvFile(null);
               }}
-              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D]"
+              disabled={batchSending}
+              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D] disabled:opacity-50"
             >
               New Campaign
             </button>
-            <Link
-              href="/operator"
-              className="flex-1 text-center bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded transition-colors"
+            <button
+              onClick={handleBatchSend}
+              disabled={batchSending || businesses.filter((b) => b.validationStatus === "valid" && !b.leadId).length === 0}
+              className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded transition-colors disabled:opacity-50"
             >
-              Done
-            </Link>
+              {batchSending ? "Sending..." : `Send All (${businesses.filter((b) => b.validationStatus === "valid" && !b.leadId).length})`}
+            </button>
           </div>
         </div>
       )}
