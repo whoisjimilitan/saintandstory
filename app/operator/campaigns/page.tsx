@@ -247,87 +247,40 @@ export default function CampaignsPage() {
 
     try {
       const validated: ValidatedBusiness[] = [];
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       for (let i = 0; i < businesses.length; i++) {
         const biz = businesses[i];
+        const email = biz.email?.trim() || "";
 
-        try {
-          // Escape CSV values properly
-          const escape = (val: string | undefined) => {
-            if (!val) return '""';
-            const str = String(val).replace(/"/g, '""');
-            return `"${str}"`;
-          };
-
-          const csv = `name,email,description,website,contact_name\n${escape(biz.name)},${escape(biz.email)},${escape(biz.description)},${escape(biz.website)},${escape(biz.contactName)}`;
-
-          // Send to verifier
-          const formData = new FormData();
-          const blob = new Blob([csv], { type: "text/csv" });
-          formData.append("file", blob, `row-${i}.csv`);
-
-          const res = await fetch("http://localhost:5050/verify", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!res.ok) {
-            validated.push({ ...biz, validationStatus: "risky", validationReason: "Verifier offline" });
-            setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
-            continue;
-          }
-
-          const data = await res.json();
-          const jobId = data.job_id;
-
-          // Poll until complete (max 15 seconds per email)
-          let percent = 0;
-          let attempts = 0;
-          while (percent < 100 && attempts < 50) {
-            await new Promise((r) => setTimeout(r, 300));
-            attempts++;
-
-            const progressRes = await fetch(`http://localhost:5050/progress?job_id=${jobId}`);
-            const progressData = await progressRes.json();
-            percent = progressData.percent;
-
-            if (percent >= 100) {
-              // Get results
-              const downloadRes = await fetch(`http://localhost:5050/download?job_id=${jobId}&type=all`);
-              const csvResult = await downloadRes.text();
-              const lines = csvResult.split("\n").filter((l) => l.trim());
-
-              if (lines.length > 1) {
-                const resultLine = lines[1];
-                // Parse CSV line carefully
-                const match = resultLine.match(/^"?([^"]*)"?,.*,.*,.*,.*,"([^"]*)",(.*)$/);
-                if (match) {
-                  const status = match[2]?.trim() || "risky";
-                  const reason = match[3]?.trim() || "Unknown";
-                  validated.push({
-                    ...biz,
-                    validationStatus: (status as "valid" | "risky" | "invalid") || "risky",
-                    validationReason: reason,
-                  });
-                } else {
-                  validated.push({ ...biz, validationStatus: "risky", validationReason: "Parse error" });
-                }
-              } else {
-                validated.push({ ...biz, validationStatus: "risky", validationReason: "No result" });
-              }
-              break;
-            }
-          }
-
-          if (percent < 100) {
-            validated.push({ ...biz, validationStatus: "risky", validationReason: "Timeout" });
-          }
-
+        // Quick syntax check
+        if (!emailRegex.test(email)) {
+          validated.push({ ...biz, validationStatus: "invalid", validationReason: "Invalid syntax" });
           setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
-        } catch (err) {
-          validated.push({ ...biz, validationStatus: "risky", validationReason: "Error" });
-          setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
+          continue;
         }
+
+        // Extract domain
+        const domain = email.split("@")[1];
+
+        // Quick MX check via API (lightweight)
+        try {
+          const mxRes = await fetch(`/api/operator/campaigns/check-mx?domain=${encodeURIComponent(domain)}`);
+          if (mxRes.ok) {
+            const mxData = await mxRes.json();
+            if (mxData.hasMX) {
+              validated.push({ ...biz, validationStatus: "valid", validationReason: "MX verified" });
+            } else {
+              validated.push({ ...biz, validationStatus: "invalid", validationReason: "No MX record" });
+            }
+          } else {
+            validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
+          }
+        } catch {
+          validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
+        }
+
+        setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
       }
 
       setBusinesses(validated);
