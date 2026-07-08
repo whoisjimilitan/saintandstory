@@ -158,6 +158,7 @@ export async function POST(request: NextRequest) {
         console.log(`[BATCH-SEND] [${i + 1}] ⧖ Queued for ${scheduledFor.toISOString()}`);
       } else {
         // Send now
+        console.log(`[BATCH-SEND] [${i + 1}] Sending via Resend to ${biz.email}`);
         const emailResponse = await resend.emails.send({
           from: "James <james@saintandstoryltd.co.uk>",
           to: biz.email,
@@ -166,8 +167,14 @@ export async function POST(request: NextRequest) {
           replyTo: "hello@saintandstoryltd.co.uk",
         });
 
+        console.log(`[BATCH-SEND] [${i + 1}] Resend response:`, {
+          hasError: !!emailResponse.error,
+          error: emailResponse.error,
+          messageId: emailResponse.data?.id,
+        });
+
         if (emailResponse.error || !emailResponse.data?.id) {
-          throw new Error(`Resend failed: ${emailResponse.error || "No message ID"}`);
+          throw new Error(`Resend failed: ${JSON.stringify(emailResponse.error) || "No message ID"}`);
         }
 
         messageId = emailResponse.data.id;
