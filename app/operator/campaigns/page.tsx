@@ -7,6 +7,7 @@ import { SimpleEmailModal } from "./simple-email-modal";
 interface ParsedBusiness {
   name: string;
   email: string;
+  emailCandidates?: string[];
   description?: string;
   website?: string;
   category?: string;
@@ -112,7 +113,7 @@ interface ValidatedBusiness extends ParsedBusiness {
 }
 
 export default function CampaignsPage() {
-  const [step, setStep] = useState<"upload" | "infer" | "validate" | "campaign">("upload");
+  const [step, setStep] = useState<"upload" | "generate" | "infer" | "validate" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [businesses, setBusinesses] = useState<ValidatedBusiness[]>([]);
@@ -151,35 +152,59 @@ export default function CampaignsPage() {
       const contactIdx = headers.indexOf("contact_name");
       const sourceIdx = headers.indexOf("source");
 
-      if (nameIdx === -1 || emailIdx === -1) {
-        throw new Error("CSV must have 'name' and 'email' columns");
+      if (nameIdx === -1) {
+        throw new Error("CSV must have 'name' column");
       }
+
+      const generateEmailCandidates = (businessName: string, domain: string): string[] => {
+        const parts = businessName.toLowerCase().split(/\s+/).filter(p => p.length > 0);
+        const candidates: string[] = [];
+
+        if (parts.length >= 2) {
+          // firstname.lastname@domain
+          candidates.push(`${parts[0]}.${parts[parts.length - 1]}@${domain}`);
+          // first.initial.lastname@domain
+          candidates.push(`${parts[0]}.${parts[1].charAt(0)}.${parts[parts.length - 1]}@${domain}`);
+        }
+
+        // firstname@domain
+        candidates.push(`${parts[0]}@${domain}`);
+
+        return candidates;
+      };
 
       const parsed: ParsedBusiness[] = [];
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(",").map((v) => v.trim());
-        if (values[nameIdx] && values[emailIdx]) {
-          // Extract email or generate from name + domain
-          let email = values[emailIdx];
-          const website = webIdx >= 0 ? values[webIdx] : undefined;
+        const name = values[nameIdx];
+        const providedEmail = emailIdx >= 0 ? values[emailIdx] : undefined;
+        const website = webIdx >= 0 ? values[webIdx] : undefined;
 
-          // If email is missing but we have website, try to generate it
-          if (!email && website) {
-            try {
-              const url = new URL(website);
-              const domain = url.hostname;
-              const firstName = values[nameIdx]?.split(" ")[0]?.toLowerCase() || "";
-              const lastName = values[nameIdx]?.split(" ")[1]?.toLowerCase() || "";
-              // Try firstname.lastname@domain first, then firstname@domain
-              email = lastName ? `${firstName}.${lastName}@${domain}` : `${firstName}@${domain}`;
-            } catch (e) {
-              email = values[emailIdx];
-            }
+        if (!name) continue;
+
+        let email = providedEmail;
+        let candidates: string[] = [];
+
+        // If no email provided but we have website, generate candidates
+        if (!email && website) {
+          try {
+            const url = new URL(website.startsWith("http") ? website : `https://${website}`);
+            const domain = url.hostname;
+            candidates = generateEmailCandidates(name, domain);
+            email = candidates[0]; // Use first candidate as primary
+          } catch (e) {
+            // Invalid website, skip this row
+            continue;
           }
+        } else if (email) {
+          candidates = [email];
+        }
 
+        if (email) {
           parsed.push({
-            name: values[nameIdx],
-            email: email || values[emailIdx],
+            name: name,
+            email: email,
+            emailCandidates: candidates,
             description: descIdx >= 0 ? values[descIdx] : undefined,
             website: website,
             contactName: contactIdx >= 0 ? values[contactIdx] : undefined,
@@ -189,17 +214,23 @@ export default function CampaignsPage() {
       }
 
       if (parsed.length === 0) {
-        throw new Error("No valid rows found");
+        throw new Error("No valid rows found (need 'name' and 'website' columns)");
       }
 
       setBusinesses(parsed);
-      setStep("infer");
+      setStep("generate");
       setCsvFile(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Parse failed");
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleGenerateEmails = () => {
+    setError("");
+    // User reviews generated emails and proceeds to category inference
+    setStep("infer");
   };
 
   const handleInferCategories = async () => {
@@ -424,7 +455,7 @@ James`;
           Simple Email Campaigns
         </h1>
         <p className="text-sm text-[#888888]">
-          Upload businesses, infer categories, preview emails, send.
+          Upload CSV with name + website → generate emails → infer categories → validate → send.
         </p>
       </div>
 
@@ -436,8 +467,8 @@ James`;
               Upload CSV
             </label>
             <p className="text-xs text-[#888888] mb-4">
-              Format: name, email, description (optional), website (optional), contact_name (optional), source (optional)<br/>
-              <span className="text-[#AAAAAA]">Source examples: LinkedIn, Solicitors Advice UK, Google Maps, Industry Directory</span>
+              Format: name, website, description (optional), email (optional), contact_name (optional), source (optional)<br/>
+              <span className="text-[#AAAAAA]">If email missing, we'll generate candidates from name + domain. Source examples: LinkedIn, Solicitors Advice UK, Google Maps, Industry Directory</span>
             </p>
             <input
               type="file"
@@ -463,7 +494,57 @@ James`;
         </div>
       )}
 
-      {/* Step 2: Infer Categories */}
+      {/* Step 2: Generate & Review Emails */}
+      {step === "generate" && (
+        <div className="border border-[#E8E8E8] rounded-lg p-8 space-y-6">
+          <div>
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
+              {businesses.length} businesses — review generated emails
+            </p>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {businesses.map((b) => (
+                <div
+                  key={b.email}
+                  className="text-xs p-3 bg-[#F5F5F5] rounded border border-[#E8E8E8]"
+                >
+                  <p className="font-semibold text-[#0D0D0D] mb-1">{b.name}</p>
+                  <p className="text-[#0D0D0D] mb-2"><strong>Email:</strong> {b.email}</p>
+                  {b.emailCandidates && b.emailCandidates.length > 1 && (
+                    <p className="text-[#888888]">Candidates: {b.emailCandidates.join(", ")}</p>
+                  )}
+                  {b.website && <p className="text-[#888888]">Domain: {b.website}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setStep("upload");
+                setBusinesses([]);
+              }}
+              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D]"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleGenerateEmails}
+              className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded"
+            >
+              Continue to Categories
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Infer Categories */}
       {step === "infer" && (
         <div className="border border-[#E8E8E8] rounded-lg p-8 space-y-6">
           <div>
