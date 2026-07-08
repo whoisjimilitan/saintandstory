@@ -101,16 +101,28 @@ const SOURCE_OPENING_TEMPLATE: Record<string, string> = {
   Other: "I came across your business in {source} and thought it worth reaching out",
 };
 
+interface ValidationResult {
+  status: "valid" | "risky" | "invalid";
+  reason: string;
+}
+
+interface ValidatedBusiness extends ParsedBusiness {
+  validationStatus?: "valid" | "risky" | "invalid";
+  validationReason?: string;
+}
+
 export default function CampaignsPage() {
-  const [step, setStep] = useState<"upload" | "infer" | "campaign">("upload");
+  const [step, setStep] = useState<"upload" | "infer" | "validate" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [businesses, setBusinesses] = useState<ParsedBusiness[]>([]);
+  const [businesses, setBusinesses] = useState<ValidatedBusiness[]>([]);
   const [inferring, setInferring] = useState(false);
+  const [validating, setValidating] = useState(false);
+  const [validationProgress, setValidationProgress] = useState(0);
   const [error, setError] = useState("");
 
   // Modal state
-  const [selectedBusiness, setSelectedBusiness] = useState<ParsedBusiness | null>(null);
+  const [selectedBusiness, setSelectedBusiness] = useState<ValidatedBusiness | null>(null);
   const [sending, setSending] = useState(false);
 
   const handleCsvUpload = async () => {
@@ -220,11 +232,89 @@ export default function CampaignsPage() {
       }
 
       setBusinesses(updated);
-      setStep("campaign");
+      setStep("validate");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Inference failed");
     } finally {
       setInferring(false);
+    }
+  };
+
+  const handleValidateEmails = async () => {
+    setValidating(true);
+    setError("");
+    setValidationProgress(0);
+
+    try {
+      const validated: ValidatedBusiness[] = [];
+
+      for (let i = 0; i < businesses.length; i++) {
+        const biz = businesses[i];
+
+        try {
+          // Build CSV with single row for validation
+          const csv = `name,email,description,website,contact_name\n"${biz.name}","${biz.email}","${biz.description || ""}","${biz.website || ""}","${biz.contactName || ""}"`;
+
+          // Send to verifier
+          const formData = new FormData();
+          const blob = new Blob([csv], { type: "text/csv" });
+          formData.append("file", blob, `${biz.name}.csv`);
+
+          const res = await fetch("http://localhost:5050/verify", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            validated.push({ ...biz, validationStatus: "risky", validationReason: "Verifier unreachable" });
+            setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
+            continue;
+          }
+
+          const data = await res.json();
+          const jobId = data.job_id;
+
+          // Poll until complete
+          let percent = 0;
+          let result: any = null;
+          while (percent < 100) {
+            await new Promise((r) => setTimeout(r, 300));
+            const progressRes = await fetch(`http://localhost:5050/progress?job_id=${jobId}`);
+            const progressData = await progressRes.json();
+            percent = progressData.percent;
+
+            if (percent >= 100) {
+              // Get results
+              const downloadRes = await fetch(`http://localhost:5050/download?job_id=${jobId}&type=all`);
+              const csvResult = await downloadRes.text();
+              const lines = csvResult.split("\n");
+              if (lines.length > 1) {
+                const resultLine = lines[1];
+                const resultValues = resultLine.split(",");
+                const status = resultValues[resultValues.length - 2];
+                const reason = resultValues[resultValues.length - 1];
+                validated.push({
+                  ...biz,
+                  validationStatus: status as "valid" | "risky" | "invalid",
+                  validationReason: reason?.replace(/"/g, ""),
+                });
+              }
+            }
+          }
+
+          setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
+        } catch (err) {
+          validated.push({ ...biz, validationStatus: "risky", validationReason: "Validation error" });
+          setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
+        }
+      }
+
+      setBusinesses(validated);
+      setStep("campaign");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Validation failed");
+    } finally {
+      setValidating(false);
     }
   };
 
@@ -404,22 +494,96 @@ James`;
         </div>
       )}
 
-      {/* Step 3: Campaign - Preview & Send */}
+      {/* Step 3: Validate Emails */}
+      {step === "validate" && (
+        <div className="border border-[#E8E8E8] rounded-lg p-8 space-y-6">
+          <div>
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
+              Validating {businesses.length} email addresses...
+            </p>
+            <div className="w-full bg-[#E8E8E8] rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-[#0D0D0D] h-full transition-all duration-300"
+                style={{ width: `${validationProgress}%` }}
+              />
+            </div>
+            <p className="text-xs text-[#888888] mt-2">{validationProgress}%</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setStep("upload");
+                setBusinesses([]);
+              }}
+              disabled={validating}
+              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D] disabled:opacity-50"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleValidateEmails}
+              disabled={validating}
+              className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded disabled:opacity-50"
+            >
+              {validating ? "Validating..." : "Start Validation"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 4: Campaign - Preview & Send */}
       {step === "campaign" && (
         <div className="space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-2xl font-black text-green-600">
+                {businesses.filter((b) => b.validationStatus === "valid").length}
+              </p>
+              <p className="text-xs text-green-700 mt-1">Valid emails</p>
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-2xl font-black text-yellow-600">
+                {businesses.filter((b) => b.validationStatus === "risky").length}
+              </p>
+              <p className="text-xs text-yellow-700 mt-1">Risky emails</p>
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-2xl font-black text-red-600">
+                {businesses.filter((b) => b.validationStatus === "invalid").length}
+              </p>
+              <p className="text-xs text-red-700 mt-1">Invalid emails</p>
+            </div>
+          </div>
+
           <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm p-4 rounded">
-            {businesses.filter((b) => b.leadId).length}/{businesses.length} emails sent
+            {businesses.filter((b) => b.leadId).length}/{businesses.filter((b) => b.validationStatus === "valid").length} valid emails sent
           </div>
 
           <div className="grid gap-4">
             {businesses.map((biz) => {
               const email = generateEmail(biz);
               const isSent = !!biz.leadId;
+              const statusColor = {
+                valid: "green",
+                risky: "yellow",
+                invalid: "red",
+              }[biz.validationStatus || "risky"];
 
               return (
                 <div
                   key={biz.email}
-                  className="border border-[#E8E8E8] rounded-lg p-4"
+                  className={`border rounded-lg p-4 ${
+                    biz.validationStatus === "invalid"
+                      ? "border-red-200 bg-red-50/30 opacity-60"
+                      : "border-[#E8E8E8]"
+                  }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -427,22 +591,48 @@ James`;
                         {biz.name}
                       </p>
                       <p className="text-xs text-[#888888]">{biz.email}</p>
-                      <p className="text-xs text-[#888888] mt-1">
-                        {biz.category || "Unknown"}
-                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <span className="text-xs text-[#888888] bg-[#F5F5F5] px-2 py-1 rounded">
+                          {biz.category || "Unknown"}
+                        </span>
+                        <span
+                          className={`text-xs font-semibold px-2 py-1 rounded ${
+                            statusColor === "green"
+                              ? "bg-green-100 text-green-700"
+                              : statusColor === "yellow"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {biz.validationStatus === "valid"
+                            ? "✓ Valid"
+                            : biz.validationStatus === "risky"
+                            ? "⚠ Risky"
+                            : "✗ Invalid"}
+                        </span>
+                        {biz.validationReason && (
+                          <span className="text-xs text-[#888888]">
+                            {biz.validationReason}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {isSent ? (
                       <div className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded">
                         ✓ Sent
                       </div>
-                    ) : (
+                    ) : biz.validationStatus === "valid" ? (
                       <button
                         onClick={() => setSelectedBusiness(biz)}
                         className="text-sm font-semibold text-white bg-[#0D0D0D] hover:bg-[#333333] px-4 py-2 rounded transition-colors"
                       >
                         Preview & Send
                       </button>
+                    ) : (
+                      <div className="text-xs font-semibold text-[#888888] px-3 py-1 rounded border border-[#E8E8E8]">
+                        Cannot send
+                      </div>
                     )}
                   </div>
                 </div>

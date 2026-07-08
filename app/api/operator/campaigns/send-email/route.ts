@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Send via Resend
     const emailResponse = await resend.emails.send({
-      from: "Saint & Story <noreply@saintandstory.co.uk>",
+      from: "James <james@saintandstoryltd.co.uk>",
       to: lead.email,
       subject: subject,
       html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0D0D0D; line-height: 1.6;">
