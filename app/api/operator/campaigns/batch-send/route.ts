@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        // Record outreach
+        // Record in B2bOutreach for outreach history
         await prisma.b2bOutreach.create({
           data: {
             leadId: lead.id,
@@ -192,6 +192,27 @@ export async function POST(request: NextRequest) {
           },
         });
 
+        // Record in B2bCampaignEmail for dashboard stats (same structure as batch-emails)
+        // This is required for the dashboard to show sent email counts
+        try {
+          await prisma.b2bCampaignEmail.create({
+            data: {
+              prospectEmail: biz.email,
+              prospectName: biz.name,
+              category: biz.category,
+              subject,
+              body,
+              emailSentAt: now,
+              resendMessageId: emailResponse.data.id,
+              status: "sent",
+            },
+          });
+          console.log(`[BATCH-SEND] [${i + 1}] Recorded in B2bCampaignEmail for dashboard`);
+        } catch (campaignEmailError) {
+          console.warn(`[BATCH-SEND] [${i + 1}] Could not record in B2bCampaignEmail:`, campaignEmailError);
+          // Don't fail the send if we can't record to campaign email table
+        }
+
         results.sent++;
         results.details.push({
           email: biz.email,
@@ -199,7 +220,7 @@ export async function POST(request: NextRequest) {
           messageId: emailResponse.data.id,
         });
 
-        console.log(`[BATCH-SEND] [${i + 1}] ✓ Email sent successfully`);
+        console.log(`[BATCH-SEND] [${i + 1}] ✓ Email sent and recorded for dashboard`);
       } catch (err) {
         console.error(`[BATCH-SEND] [${i}] Error:`, err);
         results.failed++;
