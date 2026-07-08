@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { businesses } = await request.json();
+  const { businesses, mode = "now" } = await request.json();
+  // mode: "now" = send all immediately, "warmup" = queue with staggered times (20/hour)
   if (!Array.isArray(businesses) || businesses.length === 0) {
     return NextResponse.json({ error: "Invalid businesses array" }, { status: 400 });
   }
@@ -134,48 +135,71 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 2. Send email via Resend
-      const emailResponse = await resend.emails.send({
-        from: "James <james@saintandstoryltd.co.uk>",
-        to: biz.email,
-        subject,
-        html: body,
-        replyTo: "hello@saintandstoryltd.co.uk",
-      });
+      let messageId: string | null = null;
 
-      if (emailResponse.error || !emailResponse.data?.id) {
-        throw new Error(`Resend failed: ${emailResponse.error || "No message ID"}`);
-      }
+      if (mode === "warmup") {
+        // Queue email with staggered schedule (20 per hour = 3 min apart)
+        const scheduledFor = new Date(now.getTime() + (i * 3 * 60 * 1000));
 
-      const messageId = emailResponse.data.id;
+        await prisma.b2bCampaignEmail.create({
+          data: {
+            campaignId: campaign.id,
+            leadId: lead.id,
+            prospectEmail: biz.email,
+            prospectName: biz.name,
+            category: biz.category || "Other",
+            subject,
+            body,
+            status: "pending",
+            scheduledFor,
+          },
+        });
 
-      // 3. Record in B2bCampaignEmail — THIS IS THE SOURCE OF TRUTH
-      await prisma.b2bCampaignEmail.create({
-        data: {
-          campaignId: campaign.id,
-          leadId: lead.id,
-          prospectEmail: biz.email,
-          prospectName: biz.name,
-          category: biz.category || "Other",
+        console.log(`[BATCH-SEND] [${i + 1}] ⧖ Queued for ${scheduledFor.toISOString()}`);
+      } else {
+        // Send now
+        const emailResponse = await resend.emails.send({
+          from: "James <james@saintandstoryltd.co.uk>",
+          to: biz.email,
           subject,
-          body,
-          emailSentAt: now,
-          resendMessageId: messageId,
-          status: "sent",
-        },
-      });
+          html: body,
+          replyTo: "hello@saintandstoryltd.co.uk",
+        });
 
-      // 4. Update B2bLead engagement summary
-      await prisma.b2bLead.update({
-        where: { id: lead.id },
-        data: {
-          pipeline_stage: "propose",
-          leadState: "emailed",
-          last_engagement_at: now,
-          email_sent_at: now,
-          last_engagement_type: "email",
-        },
-      });
+        if (emailResponse.error || !emailResponse.data?.id) {
+          throw new Error(`Resend failed: ${emailResponse.error || "No message ID"}`);
+        }
+
+        messageId = emailResponse.data.id;
+
+        // Record in B2bCampaignEmail — THIS IS THE SOURCE OF TRUTH
+        await prisma.b2bCampaignEmail.create({
+          data: {
+            campaignId: campaign.id,
+            leadId: lead.id,
+            prospectEmail: biz.email,
+            prospectName: biz.name,
+            category: biz.category || "Other",
+            subject,
+            body,
+            emailSentAt: now,
+            resendMessageId: messageId,
+            status: "sent",
+          },
+        });
+
+        // Update B2bLead engagement summary
+        await prisma.b2bLead.update({
+          where: { id: lead.id },
+          data: {
+            pipeline_stage: "propose",
+            leadState: "emailed",
+            last_engagement_at: now,
+            email_sent_at: now,
+            last_engagement_type: "email",
+          },
+        });
+      }
 
       sent.push(biz.email);
       console.log(`[BATCH-SEND] [${i + 1}] ✓ ${biz.email}`);

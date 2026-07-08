@@ -1354,6 +1354,7 @@ model B2bCampaignEmail {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   campaignId      String    @map("campaign_id") @db.Uuid
   prospectId      String?   @map("prospect_id") @db.Uuid
+  leadId          String?   @map("lead_id") @db.Uuid
   prospectEmail   String    @map("prospect_email")
   prospectName    String    @map("prospect_name")
   tier            Int?      @map("tier") // 1, 2, or 3
@@ -1365,12 +1366,14 @@ model B2bCampaignEmail {
   openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
   clickedAt       DateTime? @map("clicked_at") @db.Timestamptz(6)
   repliedAt       DateTime? @map("replied_at") @db.Timestamptz(6)
-  status          String    @default("pending") @map("status") // pending | sent | opened | clicked | replied
+  status          String    @default("pending") @map("status") // pending | sent | opened | clicked | replied | bounced | complained
+  scheduledFor    DateTime? @map("scheduled_for") @db.Timestamptz(6)
   campaign        B2bCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@index([campaignId], map: "idx_b2b_campaign_email_campaign")
   @@index([status], map: "idx_b2b_campaign_email_status")
   @@index([emailSentAt(sort: Desc)], map: "idx_b2b_campaign_email_sent")
+  @@index([scheduledFor], map: "idx_b2b_campaign_email_scheduled")
   @@map("b2b_campaign_emails")
 }
 
