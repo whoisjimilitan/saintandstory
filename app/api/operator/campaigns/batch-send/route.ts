@@ -66,7 +66,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[BATCH-SEND] Starting batch send for ${businesses.length} leads`);
+    console.log(`[BATCH-SEND] ✓ Batch send handler invoked`);
+    console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
+    console.log(`[BATCH-SEND] RESEND_API_KEY present: ${!!process.env.RESEND_API_KEY}`);
 
     const results = {
       sent: 0,
