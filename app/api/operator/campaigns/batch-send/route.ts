@@ -76,25 +76,36 @@ export async function POST(request: NextRequest) {
 
     for (const biz of businesses) {
       try {
-        // Upsert lead
-        const lead = await prisma.b2bLead.upsert({
+        // Find or create lead using findFirst + update/create pattern
+        let lead = await prisma.b2bLead.findFirst({
           where: { email: biz.email },
-          update: {
-            businessCategory: biz.category,
-            contactName: biz.contactName,
-            website: biz.website,
-            source: biz.source || "campaign",
-          },
-          create: {
-            businessName: biz.name,
-            email: biz.email,
-            businessCategory: biz.category,
-            contactName: biz.contactName,
-            website: biz.website,
-            status: "new",
-            source: biz.source || "campaign",
-          },
         });
+
+        if (lead) {
+          // Update existing
+          lead = await prisma.b2bLead.update({
+            where: { id: lead.id },
+            data: {
+              businessCategory: biz.category || lead.businessCategory,
+              contactName: biz.contactName || lead.contactName,
+              website: biz.website || lead.website,
+              source: biz.source || lead.source || "campaign",
+            },
+          });
+        } else {
+          // Create new
+          lead = await prisma.b2bLead.create({
+            data: {
+              businessName: biz.name,
+              email: biz.email,
+              businessCategory: biz.category,
+              contactName: biz.contactName,
+              website: biz.website,
+              status: "new",
+              source: biz.source || "campaign",
+            },
+          });
+        }
 
         // Generate email
         const { subject, body } = generateEmail(biz);
