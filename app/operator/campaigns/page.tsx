@@ -536,7 +536,7 @@ James`;
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm p-4 rounded">
+          <div className="bg-[#F5F5F5] border border-[#E8E8E8] text-[#666666] text-sm p-4 rounded">
             {businesses.filter((b) => b.leadId).length}/{businesses.filter((b) => b.validationStatus === "valid").length} valid emails sent
           </div>
 
