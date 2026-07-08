@@ -15,24 +15,24 @@ interface ParsedBusiness {
 }
 
 const CATEGORY_OPENING: Record<string, string> = {
-  Legal: "I was looking at firms handling litigation deadlines and noticed your practice",
-  Healthcare: "I noticed your practice while researching urgent care delivery solutions",
-  "Estate Agents": "I was researching conveyancing firms managing completion deadlines",
-  Accounting: "I noticed your firm while looking into tax deadline management",
-  Construction: "I was researching construction firms managing site material urgency",
-  Hospitality: "I noticed your business while researching food service supply chains",
-  Retail: "I was looking at retail operations managing stock urgency",
-  Beauty: "I noticed your salon while researching product supply chains",
-  Veterinary: "I was researching emergency supply management for veterinary clinics",
-  Dental: "I noticed your practice while researching lab work turnaround",
-  Manufacturing: "I was looking at manufacturers managing parts delivery urgency",
-  "Film/Production": "I noticed your company while researching production logistics",
-  "Office Supplies": "I was researching office operations managing supply urgency",
-  Architecture: "I noticed your firm while looking into plan delivery management",
-  Catering: "I was researching event catering managing delivery deadlines",
-  "Property/Lettings": "I noticed your firm while researching lettings administration",
-  "Art/Auction": "I was researching art handlers managing time-critical collections",
-  Other: "I noticed your business while researching your industry",
+  Legal: "I was researching medium-sized legal practices handling court deadlines",
+  Healthcare: "I was researching healthcare practices managing urgent deliveries",
+  "Estate Agents": "I was researching estate agents handling property completions",
+  Accounting: "I was researching accounting firms managing tax deadlines",
+  Construction: "I was researching construction companies managing site deadlines",
+  Hospitality: "I was researching hospitality businesses managing supplier deliveries",
+  Retail: "I was researching retail businesses managing stock deliveries",
+  Beauty: "I was researching beauty businesses managing product deliveries",
+  Veterinary: "I was researching veterinary practices managing urgent supplies",
+  Dental: "I was researching dental practices managing lab work and supplies",
+  Manufacturing: "I was researching manufacturing businesses managing parts delivery",
+  "Film/Production": "I was researching production companies managing equipment delivery",
+  "Office Supplies": "I was researching businesses managing urgent office supply needs",
+  Architecture: "I was researching architecture firms managing plan delivery",
+  Catering: "I was researching catering businesses managing event deliveries",
+  "Property/Lettings": "I was researching property firms managing key and document delivery",
+  "Art/Auction": "I was researching art galleries managing artwork delivery",
+  Other: "I was researching businesses in your industry",
 };
 
 const CATEGORY_CONTEXT: Record<string, string> = {
@@ -172,7 +172,7 @@ export default function CampaignsPage() {
     const subject = "Hoping you could help";
     const body = `Hi ${firstName},
 
-${opening}.
+${opening} and came across your practice.
 
 Quick question: for ${context}, does your firm stick with one local courier or have alternatives lined up?
 
