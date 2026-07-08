@@ -47,7 +47,10 @@ ${consequence}
 
 Quick question: does your firm stick with one local courier or have alternatives lined up?
 
-James`;
+---
+James
+Co-Founder, Saint & Story
+https://saintandstoryltd.co.uk`;
 
   return {
     subject: "Hoping you could help",
@@ -57,6 +60,16 @@ James`;
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("[BATCH-SEND] ✓ Handler invoked");
+
+    if (!process.env.RESEND_API_KEY) {
+      console.error("[BATCH-SEND] ✗ CRITICAL: RESEND_API_KEY not configured");
+      return NextResponse.json(
+        { error: "Email service not configured - RESEND_API_KEY missing" },
+        { status: 500 }
+      );
+    }
+
     const { businesses } = await request.json();
 
     if (!Array.isArray(businesses) || businesses.length === 0) {
@@ -66,9 +79,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[BATCH-SEND] ✓ Batch send handler invoked`);
     console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
-    console.log(`[BATCH-SEND] RESEND_API_KEY present: ${!!process.env.RESEND_API_KEY}`);
 
     const results = {
       sent: 0,
@@ -76,15 +87,18 @@ export async function POST(request: NextRequest) {
       details: [] as any[],
     };
 
-    for (const biz of businesses) {
+    for (let i = 0; i < businesses.length; i++) {
+      const biz = businesses[i];
+
       try {
-        // Find or create lead using findFirst + update/create pattern
+        console.log(`[BATCH-SEND] [${i + 1}/${businesses.length}] Processing ${biz.email}`);
+
+        // Find or create lead
         let lead = await prisma.b2bLead.findFirst({
           where: { email: biz.email },
         });
 
         if (lead) {
-          // Update existing
           lead = await prisma.b2bLead.update({
             where: { id: lead.id },
             data: {
@@ -94,8 +108,8 @@ export async function POST(request: NextRequest) {
               source: biz.source || lead.source || "campaign",
             },
           });
+          console.log(`[BATCH-SEND] [${i + 1}] Updated existing lead: ${lead.id}`);
         } else {
-          // Create new
           lead = await prisma.b2bLead.create({
             data: {
               businessName: biz.name,
@@ -107,50 +121,46 @@ export async function POST(request: NextRequest) {
               source: biz.source || "campaign",
             },
           });
+          console.log(`[BATCH-SEND] [${i + 1}] Created new lead: ${lead.id}`);
         }
 
         // Generate email
         const { subject, body } = generateEmail(biz);
 
-        // Send email with proper error handling
-        console.log(`[BATCH-SEND] Sending email ${i + 1}/${businesses.length} to ${biz.email}`);
-
-        // Build simple HTML without embedded logo to avoid encoding issues
-        const htmlBody = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0D0D0D; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-  <div style="margin-bottom: 30px; white-space: pre-line;">${body.replace(/\n/g, "<br />")}</div>
-  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E8E8E8; font-size: 13px; color: #666666;">
-    <strong>James</strong><br>
-    Co-Founder, Saint & Story<br>
-    <a href="https://saintandstoryltd.co.uk" style="color: #0D0D0D; text-decoration: none;">Check out our website</a>
-  </div>
-</div>`;
-
+        // Send via Resend
+        console.log(`[BATCH-SEND] [${i + 1}] Calling Resend...`);
         const emailResponse = await resend.emails.send({
-          from: "james@saintandstoryltd.co.uk",
+          from: "James <james@saintandstoryltd.co.uk>",
           to: biz.email,
           subject,
-          html: htmlBody,
+          html: body,
+          replyTo: "hello@saintandstoryltd.co.uk",
+        });
+
+        console.log(`[BATCH-SEND] [${i + 1}] Resend response:`, {
+          hasError: !!emailResponse.error,
+          messageId: emailResponse.data?.id,
         });
 
         if (emailResponse.error) {
+          console.error(`[BATCH-SEND] [${i + 1}] Resend error:`, emailResponse.error);
           results.failed++;
           results.details.push({
             email: biz.email,
             status: "failed",
             error: String(emailResponse.error),
           });
-          console.error(`[BATCH-SEND] Failed to send to ${biz.email}:`, emailResponse.error);
           continue;
         }
 
         if (!emailResponse.data?.id) {
+          console.error(`[BATCH-SEND] [${i + 1}] No message ID returned`);
           results.failed++;
           results.details.push({
             email: biz.email,
             status: "failed",
-            error: "No message ID returned",
+            error: "No message ID",
           });
-          console.error(`[BATCH-SEND] No message ID for ${biz.email}. Full response:`, emailResponse);
           continue;
         }
 
@@ -161,7 +171,7 @@ export async function POST(request: NextRequest) {
             subject,
             body,
             sentAt: new Date(),
-            resendMessageId: emailResponse.data?.id || null,
+            resendMessageId: emailResponse.data.id,
             emailType: "initial",
             sent_by: "operator",
           },
@@ -171,34 +181,32 @@ export async function POST(request: NextRequest) {
         results.details.push({
           email: biz.email,
           status: "sent",
-          messageId: emailResponse.data?.id,
+          messageId: emailResponse.data.id,
         });
 
-        console.log(`[BATCH-SEND] Sent to ${biz.email}`);
+        console.log(`[BATCH-SEND] [${i + 1}] ✓ Email sent successfully`);
       } catch (err) {
+        console.error(`[BATCH-SEND] [${i}] Error:`, err);
         results.failed++;
         results.details.push({
           email: biz.email,
           status: "error",
           error: String(err),
         });
-        console.error(`[BATCH-SEND] Error for ${biz.email}:`, err);
       }
     }
 
-    console.log(
-      `[BATCH-SEND] Complete: ${results.sent} sent, ${results.failed} failed`
-    );
+    console.log(`[BATCH-SEND] ✓ Complete: ${results.sent} sent, ${results.failed} failed`);
 
     return NextResponse.json({
       success: true,
       sent: results.sent,
       failed: results.failed,
       total: businesses.length,
-      details: results.details.slice(0, 10), // Return first 10 for preview
+      details: results.details.slice(0, 10),
     });
   } catch (error) {
-    console.error("[BATCH-SEND] Error:", error);
+    console.error("[BATCH-SEND] Fatal error:", error);
     return NextResponse.json(
       { error: "Server error", details: String(error) },
       { status: 500 }
