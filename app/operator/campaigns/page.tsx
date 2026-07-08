@@ -57,6 +57,28 @@ const CATEGORY_CONTEXT: Record<string, string> = {
   Other: "urgent deliveries",
 };
 
+// Consequence statements by category (what fails when delivery is late)
+const CONSEQUENCE_MAP: Record<string, string> = {
+  Legal: "One late delivery on a critical filing.\nYour case is dismissed.",
+  Healthcare: "One late delivery on urgent supplies.\nPatient care is delayed.",
+  "Estate Agents": "One late delivery on completion day.\nThe deal falls through.",
+  Accounting: "One late delivery on tax documents.\nDeadline is missed.",
+  Construction: "One late delivery on site materials.\nConstruction stops.",
+  Hospitality: "One late delivery on supplier goods.\nService is affected.",
+  Retail: "One late delivery on stock.\nSales are lost.",
+  Beauty: "One late delivery on products.\nAppointments are cancelled.",
+  Veterinary: "One late delivery on emergency supplies.\nTreatment is delayed.",
+  Dental: "One late delivery on lab work.\nPatient appointments slip.",
+  Manufacturing: "One late delivery on parts.\nProduction halts.",
+  "Film/Production": "One late delivery on equipment.\nShooting is delayed.",
+  "Office Supplies": "One late delivery on urgent supplies.\nOperations stall.",
+  Architecture: "One late delivery on plans.\nDeadline is missed.",
+  Catering: "One late delivery on event supplies.\nEvent is compromised.",
+  "Property/Lettings": "One late delivery on documents.\nTransaction delays.",
+  "Art/Auction": "One late delivery on artwork.\nAuction is affected.",
+  Other: "One late delivery on critical items.\nOperations are impacted.",
+};
+
 // Source-based openings (when source/location is provided)
 const SOURCE_OPENING_TEMPLATE: Record<string, string> = {
   Legal: "I noticed your practice in {source} and thought your insight might help",
@@ -124,11 +146,29 @@ export default function CampaignsPage() {
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(",").map((v) => v.trim());
         if (values[nameIdx] && values[emailIdx]) {
+          // Extract email or generate from name + domain
+          let email = values[emailIdx];
+          const website = webIdx >= 0 ? values[webIdx] : undefined;
+
+          // If email is missing but we have website, try to generate it
+          if (!email && website) {
+            try {
+              const url = new URL(website);
+              const domain = url.hostname;
+              const firstName = values[nameIdx]?.split(" ")[0]?.toLowerCase() || "";
+              const lastName = values[nameIdx]?.split(" ")[1]?.toLowerCase() || "";
+              // Try firstname.lastname@domain first, then firstname@domain
+              email = lastName ? `${firstName}.${lastName}@${domain}` : `${firstName}@${domain}`;
+            } catch (e) {
+              email = values[emailIdx];
+            }
+          }
+
           parsed.push({
             name: values[nameIdx],
-            email: values[emailIdx],
+            email: email || values[emailIdx],
             description: descIdx >= 0 ? values[descIdx] : undefined,
-            website: webIdx >= 0 ? values[webIdx] : undefined,
+            website: website,
             contactName: contactIdx >= 0 ? values[contactIdx] : undefined,
             source: sourceIdx >= 0 ? values[sourceIdx] : undefined,
           });
@@ -190,24 +230,18 @@ export default function CampaignsPage() {
 
   const generateEmail = (biz: ParsedBusiness) => {
     const cat = biz.category || "Other";
-    const context = CATEGORY_CONTEXT[cat];
+    const consequence = CONSEQUENCE_MAP[cat];
     const firstName = biz.contactName?.split(" ")[0] || "there";
 
-    // Use source-based opening if available, otherwise fall back to generic
-    let opening = CATEGORY_OPENING[cat];
-    if (biz.source) {
-      const sourceTemplate = SOURCE_OPENING_TEMPLATE[cat];
-      opening = sourceTemplate.replace("{source}", biz.source);
-    }
-
     const subject = "Hoping you could help";
-    const body = `Hi ${firstName},
+    const body = `Apologies. I know it's a little unusual emailing out of the blue.
 
-${opening}.
+I was researching medium-sized ${cat.toLowerCase()} practices handling time-sensitive documents because we built Saint & Story specifically for firms like yours who are vulnerable to one single point of failure: delivery.
 
-Quick question: for ${context}, does your firm stick with one local courier or have alternatives lined up?
+${consequence}
 
-Thanks,
+Quick question: does your firm stick with one local courier or have alternatives lined up?
+
 James`;
 
     return { subject, body };
