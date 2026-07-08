@@ -20,37 +20,48 @@ export async function GET(request: NextRequest) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // CAMPAIGNS - Email campaigns
-    const campaigns = await prisma.b2bCampaign.findMany({
-      include: { emails: true, whatsapp: true },
-      orderBy: { sentAt: "desc" },
-    });
+    console.log("[DASHBOARD-STATS] Querying B2bCampaignEmail for stats");
 
-    // EMAIL STATS - From new B2bCampaignEmail
+    // EMAIL STATS - B2bCampaignEmail is the source of truth
     const emailStats = {
-      totalSent: await prisma.b2bCampaignEmail.count({
-        where: { status: "sent" },
+      todaySent: await prisma.b2bCampaignEmail.count({
+        where: {
+          status: "sent",
+          emailSentAt: { gte: today },
+        },
       }),
-      totalOpened: await prisma.b2bCampaignEmail.count({
-        where: { status: "opened" },
-      }),
-      totalClicked: await prisma.b2bCampaignEmail.count({
-        where: { status: "clicked" },
-      }),
-      totalReplied: await prisma.b2bCampaignEmail.count({
-        where: { status: "replied" },
+      todayOpened: await prisma.b2bCampaignEmail.count({
+        where: {
+          openedAt: { gte: today },
+        },
       }),
       todayReplied: await prisma.b2bCampaignEmail.count({
         where: {
           status: "replied",
-          repliedAt: {
-            gte: today,
-          },
+          repliedAt: { gte: today },
         },
+      }),
+      totalSent: await prisma.b2bCampaignEmail.count({
+        where: { status: "sent" },
+      }),
+      totalOpened: await prisma.b2bCampaignEmail.count({
+        where: { openedAt: { not: null } },
+      }),
+      totalReplied: await prisma.b2bCampaignEmail.count({
+        where: { status: "replied" },
       }),
     };
 
-    // WHATSAPP STATS - From new B2bCampaignWhatsApp
+    // CAMPAIGNS
+    const campaigns = await prisma.b2bCampaign.findMany({
+      orderBy: { sentAt: "desc" },
+      take: 50,
+    });
+
+    console.log("[DASHBOARD-STATS] Email stats:", emailStats);
+    console.log("[DASHBOARD-STATS] Campaigns found:", campaigns.length);
+
+    // WHATSAPP STATS
     const whatsappStats = {
       totalSent: await prisma.b2bCampaignWhatsApp.count({
         where: { status: "sent" },
@@ -63,7 +74,7 @@ export async function GET(request: NextRequest) {
       }),
     };
 
-    // CONTRACT STATS - From B2bStandingOrder
+    // CONTRACT STATS
     const contracts = await prisma.b2bStandingOrder.findMany();
     const contractStats = {
       total: contracts.length,
@@ -72,65 +83,31 @@ export async function GET(request: NextRequest) {
       totalValue: contracts.reduce((sum, c) => sum + (c.price?.toNumber() || 0), 0),
     };
 
-    // RECENT REPLIES - Last 5 replied emails
-    const recentReplies = await prisma.b2bCampaignEmail.findMany({
-      where: { status: "replied" },
-      orderBy: { repliedAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        prospectName: true,
-        prospectEmail: true,
-        category: true,
-        repliedAt: true,
-        campaign: { select: { campaignName: true } },
-      },
-    });
-
-    // ACTIVE CAMPAIGNS - In progress
-    const activeCampaigns = campaigns.filter(c => c.status === "sent").length;
-
-    // TODAY'S ACTIVITY
-    const todayEmailsReplied = await prisma.b2bCampaignEmail.count({
-      where: {
-        status: "replied",
-        repliedAt: { gte: today },
-      },
-    });
-
     console.log("[DASHBOARD STATS] ✓ Loaded live stats");
 
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
+      email: {
+        todaySent: emailStats.todaySent,
+        todayOpened: emailStats.todayOpened,
+        todayReplied: emailStats.todayReplied,
+        totalSent: emailStats.totalSent,
+        totalOpened: emailStats.totalOpened,
+        totalReplied: emailStats.totalReplied,
+      },
+      whatsapp: whatsappStats,
       campaigns: {
         total: campaigns.length,
-        active: activeCampaigns,
-        byChannel: {
-          email: campaigns.filter(c => c.channel === "email").length,
-          whatsapp: campaigns.filter(c => c.channel === "whatsapp").length,
-          phone: campaigns.filter(c => c.channel === "phone").length,
-        },
+        recent: campaigns.map(c => ({
+          id: c.id,
+          name: c.campaignName,
+          sentAt: c.sentAt,
+          totalLeads: c.totalLeads,
+          status: c.status,
+        })),
       },
-      email: emailStats,
-      whatsapp: whatsappStats,
       contracts: contractStats,
-      activity: {
-        repliedToday: todayEmailsReplied,
-        recentReplies: recentReplies,
-      },
-      command_center: {
-        actionItems: {
-          reviewReplies: emailStats.totalReplied,
-          pendingContracts: contractStats.active,
-          sendCampaigns: activeCampaigns,
-        },
-        priority: {
-          hot: emailStats.totalReplied,
-          needsAction: contractStats.total - contractStats.active,
-          inProgress: activeCampaigns,
-        },
-      },
     });
   } catch (error) {
     console.error("[DASHBOARD STATS] Error:", error);

@@ -15,9 +15,6 @@ interface OperationStatus {
     clicked: number;
     replied: number;
   };
-  phone: {
-    readyToCall: number;
-  };
   drivers: {
     available: number;
     revenue: string;
@@ -36,7 +33,6 @@ export default function TodayPage() {
     operation: {
       whatsapp: { active: 0, replied: 0 },
       email: { sent: 0, opened: 0, clicked: 0, replied: 0 },
-      phone: { readyToCall: 0 },
       drivers: { available: 0, revenue: "£0" },
     },
     opportunitiesQueued: 0,
@@ -45,7 +41,7 @@ export default function TodayPage() {
   const [loading, setLoading] = useState(true);
 
   // Modal states for clickable cards
-  const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "phone" | "drivers" | null>(null);
+  const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "drivers" | null>(null);
   const [driverPoolExpanded, setDriverPoolExpanded] = useState(false);
   const [assignForm, setAssignForm] = useState({
     driver_id: "",
@@ -60,11 +56,10 @@ export default function TodayPage() {
     const loadTodayData = async () => {
       try {
         // Fetch all operation status and pipeline data
-        const [campaignRes, opportunitiesRes, driverRes, phoneRes, whatsappRes, repliesRes] = await Promise.all([
+        const [campaignRes, opportunitiesRes, driverRes, whatsappRes, repliesRes] = await Promise.all([
           fetch("/api/operator/today-campaign-stats"),
           fetch("/api/operator/opportunities-waiting"),
           fetch("/api/operator/today-driver-stats"),
-          fetch("/api/operator/today-phone-stats"),
           fetch("/api/operator/today-whatsapp-stats"),
           fetch("/api/operator/today-pending-replies"),
         ]);
@@ -72,7 +67,6 @@ export default function TodayPage() {
         const campaign = campaignRes.ok ? await campaignRes.json() : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
         const opportunities = opportunitiesRes.ok ? await opportunitiesRes.json() : { count: 0 };
         const driverData = driverRes.ok ? await driverRes.json() : { available: 0, revenue: "£0" };
-        const phoneData = phoneRes.ok ? await phoneRes.json() : { count: 0 };
         const whatsappData = whatsappRes.ok ? await whatsappRes.json() : { active: 0, replied: 0 };
         const repliesData = repliesRes.ok ? await repliesRes.json() : { count: 0 };
 
@@ -80,7 +74,6 @@ export default function TodayPage() {
           operation: {
             whatsapp: { active: whatsappData.active || 0, replied: whatsappData.replied || 0 },
             email: campaign.stats || { sent: 0, opened: 0, clicked: 0, replied: 0 },
-            phone: { readyToCall: phoneData.count || 0 },
             drivers: { available: driverData.available || 0, revenue: driverData.revenue || "£0" },
           },
           opportunitiesQueued: opportunities.count || 0,
@@ -127,7 +120,7 @@ export default function TodayPage() {
             <div className="mb-16">
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Operation Status</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* WhatsApp - Clickable */}
                 <button
                   onClick={() => setActiveModal("whatsapp")}
@@ -152,17 +145,6 @@ export default function TodayPage() {
                     <span className="text-xs text-[#CCCCCC]">•</span>
                     <span className="text-xs text-[#666666]">{data.operation.email.clicked} clicked</span>
                   </div>
-                </button>
-
-                {/* Phone - Clickable */}
-                <button
-                  onClick={() => setActiveModal("phone")}
-                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
-                >
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
-                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
-                  <p className="text-xs text-[#666666]">no emails</p>
-                  <p className="text-xs text-[#666666] mt-2">Call to qualify</p>
                 </button>
 
                 {/* Drivers - Clickable */}

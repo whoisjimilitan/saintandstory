@@ -59,195 +59,143 @@ https://saintandstoryltd.co.uk`;
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    console.log("[BATCH-SEND] ✓ Handler invoked");
+  console.log("[BATCH-SEND] ✓ Handler invoked");
 
-    if (!process.env.RESEND_API_KEY) {
-      console.error("[BATCH-SEND] ✗ CRITICAL: RESEND_API_KEY not configured");
-      return NextResponse.json(
-        { error: "Email service not configured - RESEND_API_KEY missing" },
-        { status: 500 }
-      );
-    }
-
-    const { businesses } = await request.json();
-
-    if (!Array.isArray(businesses) || businesses.length === 0) {
-      return NextResponse.json(
-        { error: "Businesses array required" },
-        { status: 400 }
-      );
-    }
-
-    console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
-
-    const results = {
-      sent: 0,
-      failed: 0,
-      details: [] as any[],
-    };
-
-    for (let i = 0; i < businesses.length; i++) {
-      const biz = businesses[i];
-
-      try {
-        console.log(`[BATCH-SEND] [${i + 1}/${businesses.length}] Processing ${biz.email}`);
-
-        // Find or create lead
-        let lead = await prisma.b2bLead.findFirst({
-          where: { email: biz.email },
-        });
-
-        if (lead) {
-          lead = await prisma.b2bLead.update({
-            where: { id: lead.id },
-            data: {
-              businessCategory: biz.category || lead.businessCategory,
-              contactName: biz.contactName || lead.contactName,
-              website: biz.website || lead.website,
-              source: biz.source || lead.source || "campaign",
-            },
-          });
-          console.log(`[BATCH-SEND] [${i + 1}] Updated existing lead: ${lead.id}`);
-        } else {
-          lead = await prisma.b2bLead.create({
-            data: {
-              businessName: biz.name,
-              email: biz.email,
-              businessCategory: biz.category,
-              contactName: biz.contactName,
-              website: biz.website,
-              status: "new",
-              source: biz.source || "campaign",
-            },
-          });
-          console.log(`[BATCH-SEND] [${i + 1}] Created new lead: ${lead.id}`);
-        }
-
-        // Generate email
-        const { subject, body } = generateEmail(biz);
-
-        // Send via Resend
-        console.log(`[BATCH-SEND] [${i + 1}] Calling Resend...`);
-        const emailResponse = await resend.emails.send({
-          from: "James <james@saintandstoryltd.co.uk>",
-          to: biz.email,
-          subject,
-          html: body,
-          replyTo: "hello@saintandstoryltd.co.uk",
-        });
-
-        console.log(`[BATCH-SEND] [${i + 1}] Resend response:`, {
-          hasError: !!emailResponse.error,
-          messageId: emailResponse.data?.id,
-        });
-
-        if (emailResponse.error) {
-          console.error(`[BATCH-SEND] [${i + 1}] Resend error:`, emailResponse.error);
-          results.failed++;
-          results.details.push({
-            email: biz.email,
-            status: "failed",
-            error: String(emailResponse.error),
-          });
-          continue;
-        }
-
-        if (!emailResponse.data?.id) {
-          console.error(`[BATCH-SEND] [${i + 1}] No message ID returned`);
-          results.failed++;
-          results.details.push({
-            email: biz.email,
-            status: "failed",
-            error: "No message ID",
-          });
-          continue;
-        }
-
-        // Update lead engagement tracking
-        const now = new Date();
-        await prisma.b2bLead.update({
-          where: { id: lead.id },
-          data: {
-            pipeline_stage: "propose",
-            leadState: "emailed",
-            last_engagement_at: now,
-            email_sent_at: now,
-            engaged_today: true,
-            last_engagement_type: "email",
-            notes: `Email sent via campaign: "${subject}"`,
-          },
-        });
-
-        // Record in B2bOutreach for outreach history
-        await prisma.b2bOutreach.create({
-          data: {
-            leadId: lead.id,
-            subject,
-            body,
-            sentAt: now,
-            resendMessageId: emailResponse.data.id,
-            emailType: "initial",
-            sent_by: "operator",
-          },
-        });
-
-        // Record in B2bCampaignEmail for dashboard stats (same structure as batch-emails)
-        // This is required for the dashboard to show sent email counts
-        try {
-          await prisma.b2bCampaignEmail.create({
-            data: {
-              prospectEmail: biz.email,
-              prospectName: biz.name,
-              category: biz.category,
-              subject,
-              body,
-              emailSentAt: now,
-              resendMessageId: emailResponse.data.id,
-              status: "sent",
-            },
-          });
-          console.log(`[BATCH-SEND] [${i + 1}] Recorded in B2bCampaignEmail for dashboard`);
-        } catch (campaignEmailError) {
-          console.warn(`[BATCH-SEND] [${i + 1}] Could not record in B2bCampaignEmail:`, campaignEmailError);
-          // Don't fail the send if we can't record to campaign email table
-        }
-
-        results.sent++;
-        results.details.push({
-          email: biz.email,
-          status: "sent",
-          messageId: emailResponse.data.id,
-        });
-
-        console.log(`[BATCH-SEND] [${i + 1}] ✓ Email sent and recorded for dashboard`);
-      } catch (err) {
-        console.error(`[BATCH-SEND] [${i}] Error:`, err);
-        results.failed++;
-        results.details.push({
-          email: biz.email,
-          status: "error",
-          error: String(err),
-        });
-      }
-    }
-
-    console.log(`[BATCH-SEND] ✓ Complete: ${results.sent} sent, ${results.failed} failed`);
-
-    return NextResponse.json({
-      success: true,
-      sent: results.sent,
-      failed: results.failed,
-      total: businesses.length,
-      details: results.details.slice(0, 10),
-    });
-  } catch (error) {
-    console.error("[BATCH-SEND] Fatal error:", error);
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[BATCH-SEND] ✗ CRITICAL: RESEND_API_KEY not configured");
     return NextResponse.json(
-      { error: "Server error", details: String(error) },
+      { error: "Email service not configured" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
+
+  const { businesses } = await request.json();
+  if (!Array.isArray(businesses) || businesses.length === 0) {
+    return NextResponse.json({ error: "Invalid businesses array" }, { status: 400 });
+  }
+
+  console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
+
+  const now = new Date();
+  let campaign;
+  let campaignError = null;
+
+  try {
+    campaign = await prisma.b2bCampaign.create({
+      data: {
+        channel: "email",
+        campaignName: `Campaign ${now.toISOString().split('T')[0]}`,
+        totalLeads: businesses.length,
+        status: "sent",
+        sentAt: now,
+      },
+    });
+    console.log(`[BATCH-SEND] ✓ Campaign created: ${campaign.id}`);
+  } catch (err) {
+    campaignError = err;
+    console.error("[BATCH-SEND] ✗ Campaign creation failed:", err);
+    return NextResponse.json({ error: "Campaign creation failed" }, { status: 500 });
+  }
+
+  const sent: string[] = [];
+  const failed: Array<{ email: string; error: string }> = [];
+
+  for (let i = 0; i < businesses.length; i++) {
+    const biz = businesses[i];
+    const { subject, body } = generateEmail(biz);
+
+    try {
+      console.log(`[BATCH-SEND] [${i + 1}/${businesses.length}] ${biz.email}`);
+
+      // 1. Find or create lead
+      let lead = await prisma.b2bLead.findFirst({ where: { email: biz.email } });
+
+      if (lead) {
+        lead = await prisma.b2bLead.update({
+          where: { id: lead.id },
+          data: {
+            businessCategory: biz.category || lead.businessCategory,
+            contactName: biz.contactName || lead.contactName,
+            website: biz.website || lead.website,
+            source: biz.source || lead.source || "campaign",
+          },
+        });
+      } else {
+        lead = await prisma.b2bLead.create({
+          data: {
+            businessName: biz.name,
+            email: biz.email,
+            businessCategory: biz.category,
+            contactName: biz.contactName,
+            website: biz.website,
+            status: "new",
+            source: biz.source || "campaign",
+          },
+        });
+      }
+
+      // 2. Send email via Resend
+      const emailResponse = await resend.emails.send({
+        from: "James <james@saintandstoryltd.co.uk>",
+        to: biz.email,
+        subject,
+        html: body,
+        replyTo: "hello@saintandstoryltd.co.uk",
+      });
+
+      if (emailResponse.error || !emailResponse.data?.id) {
+        throw new Error(`Resend failed: ${emailResponse.error || "No message ID"}`);
+      }
+
+      const messageId = emailResponse.data.id;
+
+      // 3. Record in B2bCampaignEmail — THIS IS THE SOURCE OF TRUTH
+      await prisma.b2bCampaignEmail.create({
+        data: {
+          campaignId: campaign.id,
+          leadId: lead.id,
+          prospectEmail: biz.email,
+          prospectName: biz.name,
+          category: biz.category || "Other",
+          subject,
+          body,
+          emailSentAt: now,
+          resendMessageId: messageId,
+          status: "sent",
+        },
+      });
+
+      // 4. Update B2bLead engagement summary
+      await prisma.b2bLead.update({
+        where: { id: lead.id },
+        data: {
+          pipeline_stage: "propose",
+          leadState: "emailed",
+          last_engagement_at: now,
+          email_sent_at: now,
+          last_engagement_type: "email",
+        },
+      });
+
+      sent.push(biz.email);
+      console.log(`[BATCH-SEND] [${i + 1}] ✓ ${biz.email}`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      failed.push({ email: biz.email, error: errorMsg });
+      console.error(`[BATCH-SEND] [${i + 1}] ✗ ${biz.email}: ${errorMsg}`);
+    }
+  }
+
+  console.log(`[BATCH-SEND] ✓ Complete: ${sent.length} sent, ${failed.length} failed`);
+
+  await prisma.$disconnect();
+
+  return NextResponse.json({
+    success: true,
+    campaignId: campaign.id,
+    sent: sent.length,
+    failed: failed.length,
+    total: businesses.length,
+    failedEmails: failed.slice(0, 10),
+  });
 }
