@@ -11,6 +11,7 @@ interface ParsedBusiness {
   website?: string;
   category?: string;
   contactName?: string;
+  source?: string;
   leadId?: string;
 }
 
@@ -56,6 +57,28 @@ const CATEGORY_CONTEXT: Record<string, string> = {
   Other: "urgent deliveries",
 };
 
+// Source-based openings (when source/location is provided)
+const SOURCE_OPENING_TEMPLATE: Record<string, string> = {
+  Legal: "I noticed your practice in {source} and thought your insight might help",
+  Healthcare: "I came across your clinic in {source} while researching urgent care solutions",
+  "Estate Agents": "I noticed your agency in {source} while looking into completion management",
+  Accounting: "I came across your firm in {source} while researching tax deadline solutions",
+  Construction: "I noticed your company in {source} while looking into site logistics",
+  Hospitality: "I came across your business in {source} while researching supply chain solutions",
+  Retail: "I noticed your business in {source} while looking into stock management",
+  Beauty: "I came across your salon in {source} while researching supply chains",
+  Veterinary: "I noticed your practice in {source} while researching emergency supplies",
+  Dental: "I came across your practice in {source} while looking into lab turnaround",
+  Manufacturing: "I noticed your company in {source} while researching parts delivery",
+  "Film/Production": "I came across your company in {source} while researching production logistics",
+  "Office Supplies": "I noticed your business in {source} while looking into supply urgency",
+  Architecture: "I came across your firm in {source} while researching plan delivery",
+  Catering: "I noticed your business in {source} while researching event logistics",
+  "Property/Lettings": "I came across your firm in {source} while looking into administration",
+  "Art/Auction": "I noticed your gallery in {source} while researching art logistics",
+  Other: "I came across your business in {source} and thought it worth reaching out",
+};
+
 export default function CampaignsPage() {
   const [step, setStep] = useState<"upload" | "infer" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -91,6 +114,7 @@ export default function CampaignsPage() {
       const descIdx = headers.indexOf("description");
       const webIdx = headers.indexOf("website");
       const contactIdx = headers.indexOf("contact_name");
+      const sourceIdx = headers.indexOf("source");
 
       if (nameIdx === -1 || emailIdx === -1) {
         throw new Error("CSV must have 'name' and 'email' columns");
@@ -106,6 +130,7 @@ export default function CampaignsPage() {
             description: descIdx >= 0 ? values[descIdx] : undefined,
             website: webIdx >= 0 ? values[webIdx] : undefined,
             contactName: contactIdx >= 0 ? values[contactIdx] : undefined,
+            source: sourceIdx >= 0 ? values[sourceIdx] : undefined,
           });
         }
       }
@@ -165,14 +190,20 @@ export default function CampaignsPage() {
 
   const generateEmail = (biz: ParsedBusiness) => {
     const cat = biz.category || "Other";
-    const opening = CATEGORY_OPENING[cat];
     const context = CATEGORY_CONTEXT[cat];
     const firstName = biz.contactName?.split(" ")[0] || "there";
+
+    // Use source-based opening if available, otherwise fall back to generic
+    let opening = CATEGORY_OPENING[cat];
+    if (biz.source) {
+      const sourceTemplate = SOURCE_OPENING_TEMPLATE[cat];
+      opening = sourceTemplate.replace("{source}", biz.source);
+    }
 
     const subject = "Hoping you could help";
     const body = `Hi ${firstName},
 
-${opening} and came across your practice.
+${opening}.
 
 Quick question: for ${context}, does your firm stick with one local courier or have alternatives lined up?
 
@@ -189,7 +220,7 @@ James`;
     setError("");
 
     try {
-      // First, save/update lead in database with category
+      // First, save/update lead in database with category and source
       const leadResponse = await fetch("/api/b2b/leads/upsert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -199,6 +230,7 @@ James`;
           businessCategory: selectedBusiness.category,
           contactName: selectedBusiness.contactName,
           website: selectedBusiness.website,
+          source: selectedBusiness.source,
         }),
       });
 
@@ -263,7 +295,8 @@ James`;
               Upload CSV
             </label>
             <p className="text-xs text-[#888888] mb-4">
-              Format: name, email, description (optional), website (optional), contact_name (optional)
+              Format: name, email, description (optional), website (optional), contact_name (optional), source (optional)<br/>
+              <span className="text-[#AAAAAA]">Source examples: LinkedIn, Solicitors Advice UK, Google Maps, Industry Directory</span>
             </p>
             <input
               type="file"

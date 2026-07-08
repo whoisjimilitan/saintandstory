@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
       businessCategory,
       contactName,
       website,
+      source,
     } = await request.json();
 
     if (!businessName || !email) {
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
           businessCategory: businessCategory || existing.businessCategory,
           contactName: contactName || existing.contactName,
           website: website || existing.website,
+          source: source || existing.source,
         },
       });
 
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
           contactName,
           website,
           status: "new",
-          source: "campaign",
+          source: source || "campaign",
         },
       });
 
