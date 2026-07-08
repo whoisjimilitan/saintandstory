@@ -99,9 +99,11 @@ export async function POST(request: NextRequest) {
         // Generate email
         const { subject, body } = generateEmail(biz);
 
-        // Send email
+        // Send email with proper error handling
+        console.log(`[BATCH-SEND] Sending email ${i + 1}/${businesses.length} to ${biz.email}`);
+
         const emailResponse = await resend.emails.send({
-          from: "James <james@saintandstoryltd.co.uk>",
+          from: "Saint & Story <james@saintandstoryltd.co.uk>",
           to: biz.email,
           subject,
           html: `<!DOCTYPE html>
@@ -137,9 +139,20 @@ export async function POST(request: NextRequest) {
           results.details.push({
             email: biz.email,
             status: "failed",
-            error: emailResponse.error,
+            error: String(emailResponse.error),
           });
-          console.error(`[BATCH-SEND] Failed to send to ${biz.email}`, emailResponse.error);
+          console.error(`[BATCH-SEND] Failed to send to ${biz.email}:`, emailResponse.error);
+          continue;
+        }
+
+        if (!emailResponse.data?.id) {
+          results.failed++;
+          results.details.push({
+            email: biz.email,
+            status: "failed",
+            error: "No message ID returned",
+          });
+          console.error(`[BATCH-SEND] No message ID for ${biz.email}. Full response:`, emailResponse);
           continue;
         }
 
