@@ -214,12 +214,18 @@ export async function POST(request: NextRequest) {
 
   await prisma.$disconnect();
 
+  // Combine sent and failed for details array
+  const details = [
+    ...sent.map(email => ({ email, status: "sent" })),
+    ...failed.slice(0, 10).map(f => ({ email: f.email, status: "failed", error: f.error })),
+  ];
+
   return NextResponse.json({
     success: true,
     campaignId: campaign.id,
     sent: sent.length,
     failed: failed.length,
     total: businesses.length,
-    failedEmails: failed.slice(0, 10),
+    details,
   });
 }
