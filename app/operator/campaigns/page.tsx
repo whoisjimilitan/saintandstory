@@ -394,14 +394,22 @@ James`;
 
       const data = await res.json();
 
-      // Mark all as sent
+      // Only mark successfully sent emails as sent
+      const sentEmails = new Set(
+        data.details.filter((d: any) => d.status === "sent").map((d: any) => d.email)
+      );
+
       setBusinesses(
         businesses.map((b) =>
-          b.validationStatus === "valid" && !b.leadId ? { ...b, leadId: "sent" } : b
+          sentEmails.has(b.email) ? { ...b, leadId: "sent" } : b
         )
       );
 
-      setError(`✓ Sent ${data.sent} emails (${data.failed} failed)`);
+      if (data.sent > 0) {
+        setError(`Sent ${data.sent} emails (${data.failed} failed)`);
+      } else {
+        setError(`Failed to send emails. Check Resend API key.`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Batch send failed");
     } finally {
@@ -605,19 +613,19 @@ James`;
                           {biz.category || "Unknown"}
                         </span>
                         <span
-                          className={`text-xs font-semibold px-2 py-1 rounded ${
+                          className={`text-xs font-medium px-2 py-1 rounded border ${
                             statusColor === "green"
-                              ? "bg-[#F5F5F5] text-[#0D0D0D]"
+                              ? "bg-[#F5F5F5] text-[#0D0D0D] border-[#E8E8E8]"
                               : statusColor === "yellow"
-                              ? "bg-[#FAFAFA] text-[#666666]"
-                              : "bg-[#F5F5F5] text-[#AAAAAA]"
+                              ? "bg-[#FAFAFA] text-[#666666] border-[#E8E8E8]"
+                              : "bg-[#F5F5F5] text-[#AAAAAA] border-[#E8E8E8]"
                           }`}
                         >
                           {biz.validationStatus === "valid"
-                            ? "✓ Valid"
+                            ? "Valid"
                             : biz.validationStatus === "risky"
-                            ? "⚠ Risky"
-                            : "✗ Invalid"}
+                            ? "Risky"
+                            : "Invalid"}
                         </span>
                         {biz.validationReason && (
                           <span className="text-xs text-[#888888]">
@@ -628,8 +636,8 @@ James`;
                     </div>
 
                     {isSent ? (
-                      <div className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded">
-                        ✓ Sent
+                      <div className="text-xs font-medium text-[#666666] bg-[#F5F5F5] px-3 py-1 rounded border border-[#E8E8E8]">
+                        Sent
                       </div>
                     ) : biz.validationStatus === "valid" ? (
                       <button
@@ -639,7 +647,7 @@ James`;
                         Preview & Send
                       </button>
                     ) : (
-                      <div className="text-xs font-semibold text-[#888888] px-3 py-1 rounded border border-[#E8E8E8]">
+                      <div className="text-xs font-medium text-[#AAAAAA] px-3 py-1 rounded border border-[#E8E8E8]">
                         Cannot send
                       </div>
                     )}
@@ -650,12 +658,12 @@ James`;
           </div>
 
           {error && (
-            <div className={`text-sm p-4 rounded ${
+            <div className={`text-sm p-4 rounded border ${
               error.startsWith("✓")
-                ? "bg-[#F5F5F5] border border-[#E8E8E8] text-[#0D0D0D]"
-                : "bg-red-50 border border-red-200 text-red-700"
+                ? "bg-[#F5F5F5] border-[#E8E8E8] text-[#0D0D0D]"
+                : "bg-[#FAFAFA] border-[#E8E8E8] text-[#666666]"
             }`}>
-              {error}
+              {error.replace("✓ ", "")}
             </div>
           )}
 
