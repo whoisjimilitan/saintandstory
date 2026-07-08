@@ -1,0 +1,127 @@
+SAINT & STORY - DORK SEARCH STRINGS (NO QUOTES - COPY & PASTE)
+==============================================================
+
+LEGAL SERVICES
+site:linkedin.com legal services we handle time-sensitive location:UK
+site:linkedin.com solicitor we handle urgent deadlines location:UK
+site:linkedin.com law firm we handle time-critical location:UK
+site:linkedin.com practice manager we handle court deadlines location:UK
+site:linkedin.com barrister we need document delivery location:UK
+
+HEALTHCARE / PHARMACY
+site:linkedin.com pharmacy we handle urgent deliveries location:UK
+site:linkedin.com hospital we need same-day supplies location:UK
+site:linkedin.com healthcare we handle time-critical location:UK
+site:linkedin.com pharmacy we handle prescription delivery location:UK
+site:linkedin.com clinic we need urgent supplies location:UK
+
+ESTATE AGENTS
+site:linkedin.com estate agent we handle completion deadlines location:UK
+site:linkedin.com estate agents we need same-day delivery location:UK
+site:linkedin.com lettings we handle document delivery location:UK
+site:linkedin.com property we handle time-sensitive location:UK
+site:linkedin.com realtor we need urgent delivery location:UK
+
+ACCOUNTING / TAX
+site:linkedin.com accounting we handle tax deadlines location:UK
+site:linkedin.com accountant we handle compliance deadlines location:UK
+site:linkedin.com accounting we need same-day filing location:UK
+site:linkedin.com tax we handle time-sensitive location:UK
+site:linkedin.com practice manager accounting we handle deadlines location:UK
+
+CONSTRUCTION / TRADES
+site:linkedin.com construction we handle site delivery location:UK
+site:linkedin.com builder we need material delivery location:UK
+site:linkedin.com construction we handle urgent supplies location:UK
+site:linkedin.com contractor we need same-day delivery location:UK
+site:linkedin.com project manager construction we handle location:UK
+
+HOSPITALITY / RESTAURANT
+site:linkedin.com restaurant we handle supplier delivery location:UK
+site:linkedin.com hospitality we need same-day supplies location:UK
+site:linkedin.com general manager restaurant we handle location:UK
+site:linkedin.com cafe we handle urgent delivery location:UK
+site:linkedin.com restaurant we need food delivery location:UK
+
+RETAIL / ECOMMERCE
+site:linkedin.com retail we handle stock delivery location:UK
+site:linkedin.com ecommerce we need same-day delivery location:UK
+site:linkedin.com retail we handle urgent restocking location:UK
+site:linkedin.com online retail we need courier location:UK
+site:linkedin.com retail chain we handle delivery location:UK
+
+BEAUTY / SALON
+site:linkedin.com salon we handle product delivery location:UK
+site:linkedin.com beauty we need same-day supplies location:UK
+site:linkedin.com salon we handle urgent delivery location:UK
+site:linkedin.com salon chain we need delivery location:UK
+site:linkedin.com beauty we handle supplier delivery location:UK
+
+VETERINARY
+site:linkedin.com veterinary we handle urgent medication location:UK
+site:linkedin.com vet clinic we need same-day delivery location:UK
+site:linkedin.com veterinary we handle supply delivery location:UK
+site:linkedin.com veterinary we need time-critical location:UK
+site:linkedin.com animal hospital we handle delivery location:UK
+
+DENTAL
+site:linkedin.com dental we handle lab delivery location:UK
+site:linkedin.com dentist we need same-day courier location:UK
+site:linkedin.com dental practice we handle urgent location:UK
+site:linkedin.com dental we need supply delivery location:UK
+site:linkedin.com orthodontist we handle delivery location:UK
+
+MANUFACTURING
+site:linkedin.com manufacturing we handle parts delivery location:UK
+site:linkedin.com factory we need supply chain location:UK
+site:linkedin.com manufacturing we handle urgent materials location:UK
+site:linkedin.com operations manager manufacturing we handle location:UK
+site:linkedin.com production we need same-day delivery location:UK
+
+FILM / PRODUCTION
+site:linkedin.com film production we need equipment delivery location:UK
+site:linkedin.com production we handle urgent delivery location:UK
+site:linkedin.com tv production we need same-day location:UK
+site:linkedin.com film we need logistics location:UK
+site:linkedin.com production we handle location delivery location:UK
+
+OFFICE SUPPLIES
+site:linkedin.com office supplies we handle same-day location:UK
+site:linkedin.com office we need urgent delivery location:UK
+site:linkedin.com office supplies we handle delivery location:UK
+site:linkedin.com operations manager office we handle location:UK
+site:linkedin.com office we need restocking location:UK
+
+ARCHITECTURE / ENGINEERING
+site:linkedin.com architect we handle plans delivery location:UK
+site:linkedin.com architecture we need site delivery location:UK
+site:linkedin.com engineering we handle document delivery location:UK
+site:linkedin.com architect we need urgent delivery location:UK
+site:linkedin.com project manager architecture we handle location:UK
+
+CATERING / EVENTS
+site:linkedin.com catering we handle same-day delivery location:UK
+site:linkedin.com events we need urgent supplies location:UK
+site:linkedin.com event planning we handle delivery location:UK
+site:linkedin.com catering we need last-minute delivery location:UK
+site:linkedin.com operations manager catering we handle location:UK
+
+PROPERTY / LETTINGS
+site:linkedin.com lettings we handle key delivery location:UK
+site:linkedin.com property management we need courier location:UK
+site:linkedin.com lettings we need same-day delivery location:UK
+site:linkedin.com property we handle document delivery location:UK
+site:linkedin.com property agent we need delivery location:UK
+
+ART GALLERY / AUCTION
+site:linkedin.com art gallery we need delivery location:UK
+site:linkedin.com auction we handle artwork delivery location:UK
+site:linkedin.com gallery we need courier location:UK
+site:linkedin.com auction house we handle delivery location:UK
+site:linkedin.com art we need same-day delivery location:UK
+
+==============================================================
+PATTERN: site:linkedin.com [INDUSTRY] we [PAIN PHRASE] location:UK
+NO QUOTES - Direct paste into Google
+RETURNS: Job postings with confessions of delivery pain
+==============================================================

@@ -252,13 +252,19 @@ export default function CampaignsPage() {
         const biz = businesses[i];
 
         try {
-          // Build CSV with single row for validation
-          const csv = `name,email,description,website,contact_name\n"${biz.name}","${biz.email}","${biz.description || ""}","${biz.website || ""}","${biz.contactName || ""}"`;
+          // Escape CSV values properly
+          const escape = (val: string | undefined) => {
+            if (!val) return '""';
+            const str = String(val).replace(/"/g, '""');
+            return `"${str}"`;
+          };
+
+          const csv = `name,email,description,website,contact_name\n${escape(biz.name)},${escape(biz.email)},${escape(biz.description)},${escape(biz.website)},${escape(biz.contactName)}`;
 
           // Send to verifier
           const formData = new FormData();
           const blob = new Blob([csv], { type: "text/csv" });
-          formData.append("file", blob, `${biz.name}.csv`);
+          formData.append("file", blob, `row-${i}.csv`);
 
           const res = await fetch("http://localhost:5050/verify", {
             method: "POST",
@@ -266,7 +272,7 @@ export default function CampaignsPage() {
           });
 
           if (!res.ok) {
-            validated.push({ ...biz, validationStatus: "risky", validationReason: "Verifier unreachable" });
+            validated.push({ ...biz, validationStatus: "risky", validationReason: "Verifier offline" });
             setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
             continue;
           }
@@ -274,11 +280,13 @@ export default function CampaignsPage() {
           const data = await res.json();
           const jobId = data.job_id;
 
-          // Poll until complete
+          // Poll until complete (max 15 seconds per email)
           let percent = 0;
-          let result: any = null;
-          while (percent < 100) {
+          let attempts = 0;
+          while (percent < 100 && attempts < 50) {
             await new Promise((r) => setTimeout(r, 300));
+            attempts++;
+
             const progressRes = await fetch(`http://localhost:5050/progress?job_id=${jobId}`);
             const progressData = await progressRes.json();
             percent = progressData.percent;
@@ -287,24 +295,37 @@ export default function CampaignsPage() {
               // Get results
               const downloadRes = await fetch(`http://localhost:5050/download?job_id=${jobId}&type=all`);
               const csvResult = await downloadRes.text();
-              const lines = csvResult.split("\n");
+              const lines = csvResult.split("\n").filter((l) => l.trim());
+
               if (lines.length > 1) {
                 const resultLine = lines[1];
-                const resultValues = resultLine.split(",");
-                const status = resultValues[resultValues.length - 2];
-                const reason = resultValues[resultValues.length - 1];
-                validated.push({
-                  ...biz,
-                  validationStatus: status as "valid" | "risky" | "invalid",
-                  validationReason: reason?.replace(/"/g, ""),
-                });
+                // Parse CSV line carefully
+                const match = resultLine.match(/^"?([^"]*)"?,.*,.*,.*,.*,"([^"]*)",(.*)$/);
+                if (match) {
+                  const status = match[2]?.trim() || "risky";
+                  const reason = match[3]?.trim() || "Unknown";
+                  validated.push({
+                    ...biz,
+                    validationStatus: (status as "valid" | "risky" | "invalid") || "risky",
+                    validationReason: reason,
+                  });
+                } else {
+                  validated.push({ ...biz, validationStatus: "risky", validationReason: "Parse error" });
+                }
+              } else {
+                validated.push({ ...biz, validationStatus: "risky", validationReason: "No result" });
               }
+              break;
             }
+          }
+
+          if (percent < 100) {
+            validated.push({ ...biz, validationStatus: "risky", validationReason: "Timeout" });
           }
 
           setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
         } catch (err) {
-          validated.push({ ...biz, validationStatus: "risky", validationReason: "Validation error" });
+          validated.push({ ...biz, validationStatus: "risky", validationReason: "Error" });
           setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
         }
       }
@@ -542,23 +563,23 @@ James`;
       {step === "campaign" && (
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-2xl font-black text-green-600">
+            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-4">
+              <p className="text-2xl font-black text-[#0D0D0D]">
                 {businesses.filter((b) => b.validationStatus === "valid").length}
               </p>
-              <p className="text-xs text-green-700 mt-1">Valid emails</p>
+              <p className="text-xs text-[#888888] mt-1">Valid emails</p>
             </div>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-2xl font-black text-yellow-600">
+            <div className="bg-[#FAFAFA] border border-[#E8E8E8] rounded-lg p-4">
+              <p className="text-2xl font-black text-[#666666]">
                 {businesses.filter((b) => b.validationStatus === "risky").length}
               </p>
-              <p className="text-xs text-yellow-700 mt-1">Risky emails</p>
+              <p className="text-xs text-[#888888] mt-1">Risky emails</p>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-2xl font-black text-red-600">
+            <div className="bg-[#F5F5F5] border border-[#E8E8E8] rounded-lg p-4">
+              <p className="text-2xl font-black text-[#AAAAAA]">
                 {businesses.filter((b) => b.validationStatus === "invalid").length}
               </p>
-              <p className="text-xs text-red-700 mt-1">Invalid emails</p>
+              <p className="text-xs text-[#888888] mt-1">Invalid emails</p>
             </div>
           </div>
 
@@ -581,7 +602,7 @@ James`;
                   key={biz.email}
                   className={`border rounded-lg p-4 ${
                     biz.validationStatus === "invalid"
-                      ? "border-red-200 bg-red-50/30 opacity-60"
+                      ? "border-[#E8E8E8] bg-[#FAFAFA] opacity-50"
                       : "border-[#E8E8E8]"
                   }`}
                 >
@@ -598,10 +619,10 @@ James`;
                         <span
                           className={`text-xs font-semibold px-2 py-1 rounded ${
                             statusColor === "green"
-                              ? "bg-green-100 text-green-700"
+                              ? "bg-[#F5F5F5] text-[#0D0D0D]"
                               : statusColor === "yellow"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-[#FAFAFA] text-[#666666]"
+                              : "bg-[#F5F5F5] text-[#AAAAAA]"
                           }`}
                         >
                           {biz.validationStatus === "valid"
