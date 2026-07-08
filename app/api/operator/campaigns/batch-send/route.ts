@@ -102,36 +102,21 @@ export async function POST(request: NextRequest) {
         // Send email with proper error handling
         console.log(`[BATCH-SEND] Sending email ${i + 1}/${businesses.length} to ${biz.email}`);
 
+        // Build simple HTML without embedded logo to avoid encoding issues
+        const htmlBody = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0D0D0D; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+  <div style="margin-bottom: 30px; white-space: pre-line;">${body.replace(/\n/g, "<br />")}</div>
+  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E8E8E8; font-size: 13px; color: #666666;">
+    <strong>James</strong><br>
+    Co-Founder, Saint & Story<br>
+    <a href="https://saintandstoryltd.co.uk" style="color: #0D0D0D; text-decoration: none;">Check out our website</a>
+  </div>
+</div>`;
+
         const emailResponse = await resend.emails.send({
-          from: "Saint & Story <james@saintandstoryltd.co.uk>",
+          from: "james@saintandstoryltd.co.uk",
           to: biz.email,
           subject,
-          html: `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #0D0D0D; }
-    .content { line-height: 1.6; font-size: 14px; margin-bottom: 30px; white-space: pre-line; }
-    .signature { margin-top: 40px; padding-top: 20px; border-top: 1px solid #E8E8E8; font-size: 13px; color: #666666; }
-    .cta { margin-top: 20px; padding: 12px 20px; background-color: #0D0D0D; color: white; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 13px; font-weight: 500; }
-    .logo { max-width: 32px; height: auto; margin-bottom: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <img src="https://saintandstoryltd.co.uk/logo-mark.svg" alt="Saint & Story" class="logo">
-    <div class="content">${body.replace(/\n/g, "<br />")}</div>
-    <div class="signature">
-      <strong>James</strong><br>
-      Co-Founder, Saint & Story<br>
-      <a href="https://saintandstoryltd.co.uk" style="color: #0D0D0D; text-decoration: none;">Check out our website</a>
-    </div>
-  </div>
-</body>
-</html>`,
+          html: htmlBody,
         });
 
         if (emailResponse.error) {
