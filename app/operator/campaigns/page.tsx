@@ -81,6 +81,7 @@ const SOURCE_OPENING_TEMPLATE: Record<string, string> = {
 
 export default function CampaignsPage() {
   const [step, setStep] = useState<"upload" | "infer" | "campaign">("upload");
+  const [channel, setChannel] = useState<"email" | "whatsapp" | "messenger" | "instagram" | "linkedin">("email");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [businesses, setBusinesses] = useState<ParsedBusiness[]>([]);
@@ -188,7 +189,7 @@ export default function CampaignsPage() {
     }
   };
 
-  const generateEmail = (biz: ParsedBusiness) => {
+  const generateMessage = (biz: ParsedBusiness, chan: typeof channel) => {
     const cat = biz.category || "Other";
     const context = CATEGORY_CONTEXT[cat];
     const firstName = biz.contactName?.split(" ")[0] || "there";
@@ -200,8 +201,9 @@ export default function CampaignsPage() {
       opening = sourceTemplate.replace("{source}", biz.source);
     }
 
-    const subject = "Hoping you could help";
-    const body = `Hi ${firstName},
+    if (chan === "email") {
+      const subject = "Hoping you could help";
+      const body = `Hi ${firstName},
 
 ${opening}.
 
@@ -209,8 +211,47 @@ Quick question: for ${context}, does your firm stick with one local courier or h
 
 Thanks,
 James`;
+      return { subject, body };
+    } else if (chan === "whatsapp") {
+      const body = `Hi ${firstName} 👋
 
-    return { subject, body };
+${opening}.
+
+Quick question: for ${context}, do you stick with one local courier or have alternatives?
+
+Cheers,
+James`;
+      return { subject: "", body };
+    } else if (chan === "messenger") {
+      const body = `Hey ${firstName}!
+
+${opening}.
+
+Quick q - for ${context}, do you stick with one local courier or have other options?
+
+Cheers`;
+      return { subject: "", body };
+    } else if (chan === "instagram") {
+      const body = `Hey ${firstName}! 👋
+
+Noticed you while looking into ${context} management. Do you work with one courier or keep options open?
+
+Curious!`;
+      return { subject: "", body };
+    } else if (chan === "linkedin") {
+      const body = `Hi ${firstName},
+
+${opening}.
+
+I'm curious — for ${context}, does your firm typically stick with one courier or do you have alternatives lined up?
+
+Would be great to connect.
+
+James`;
+      return { subject: "", body };
+    }
+
+    return { subject: "", body: "" };
   };
 
   const handleSendEmail = async (subject: string, body: string) => {
@@ -374,12 +415,34 @@ James`;
       {step === "campaign" && (
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm p-4 rounded">
-            {businesses.filter((b) => b.leadId).length}/{businesses.length} emails sent
+            {businesses.filter((b) => b.leadId).length}/{businesses.length} messages sent
+          </div>
+
+          {/* Channel selector */}
+          <div>
+            <label className="text-sm font-semibold text-[#0D0D0D] block mb-3">
+              Send via
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {(["email", "whatsapp", "messenger", "instagram", "linkedin"] as const).map((ch) => (
+                <button
+                  key={ch}
+                  onClick={() => setChannel(ch)}
+                  className={`px-4 py-2 rounded text-xs font-semibold uppercase transition-colors ${
+                    channel === ch
+                      ? "bg-[#0D0D0D] text-white"
+                      : "border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
+                  }`}
+                >
+                  {ch}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-4">
             {businesses.map((biz) => {
-              const email = generateEmail(biz);
+              const email = generateMessage(biz, channel);
               const isSent = !!biz.leadId;
 
               return (
@@ -442,8 +505,9 @@ James`;
         <SimpleEmailModal
           isOpen={!!selectedBusiness}
           business={selectedBusiness}
-          initialSubject={generateEmail(selectedBusiness).subject}
-          initialBody={generateEmail(selectedBusiness).body}
+          channel={channel}
+          initialSubject={selectedBusiness ? generateMessage(selectedBusiness, channel).subject : ""}
+          initialBody={selectedBusiness ? generateMessage(selectedBusiness, channel).body : ""}
           onClose={() => setSelectedBusiness(null)}
           onSend={handleSendEmail}
           sending={sending}
