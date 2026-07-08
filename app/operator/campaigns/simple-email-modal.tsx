@@ -10,7 +10,6 @@ interface SimpleEmailModalProps {
     category: string;
     contactName?: string;
   };
-  channel?: "email" | "whatsapp" | "messenger" | "instagram" | "linkedin";
   initialSubject: string;
   initialBody: string;
   onClose: () => void;
@@ -21,7 +20,6 @@ interface SimpleEmailModalProps {
 export function SimpleEmailModal({
   isOpen,
   business,
-  channel = "email",
   initialSubject,
   initialBody,
   onClose,
@@ -55,7 +53,7 @@ export function SimpleEmailModal({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-[0.15em] mb-1">
-                {channel === "email" ? "Email Campaign" : `${channel} Message`}
+                Simple Email Campaign
               </p>
               <p className="text-sm text-[#888888]">{business.name}</p>
             </div>
@@ -88,25 +86,23 @@ export function SimpleEmailModal({
             </div>
           </div>
 
-          {/* Subject - only for email */}
-          {channel === "email" && (
-            <div>
-              <label className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] block mb-2">
-                Subject
-              </label>
-              <input
-                type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                className="w-full border border-[#E8E8E8] rounded p-3 text-sm focus:outline-none focus:border-[#0D0D0D]"
-              />
-            </div>
-          )}
-
-          {/* Body / Message */}
+          {/* Subject */}
           <div>
             <label className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] block mb-2">
-              {channel === "email" ? "Body" : "Message"}
+              Subject
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="w-full border border-[#E8E8E8] rounded p-3 text-sm focus:outline-none focus:border-[#0D0D0D]"
+            />
+          </div>
+
+          {/* Body */}
+          <div>
+            <label className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] block mb-2">
+              Body
             </label>
             <textarea
               value={body}
@@ -122,19 +118,17 @@ export function SimpleEmailModal({
               Preview
             </p>
             <div className="bg-white border border-[#E8E8E8] rounded p-4 space-y-3">
-              {channel === "email" && (
-                <div>
-                  <p className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] mb-1">
-                    Subject
-                  </p>
-                  <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {subject || "(empty)"}
-                  </p>
-                </div>
-              )}
-              <div className={channel === "email" ? "border-t border-[#E8E8E8] pt-3" : ""}>
+              <div>
                 <p className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] mb-1">
-                  {channel === "email" ? "Body" : "Message"}
+                  Subject
+                </p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">
+                  {subject || "(empty)"}
+                </p>
+              </div>
+              <div className="border-t border-[#E8E8E8] pt-3">
+                <p className="text-[9px] text-[#888888] uppercase font-semibold tracking-[0.1em] mb-1">
+                  Body
                 </p>
                 <p className="text-sm text-[#0D0D0D] whitespace-pre-wrap font-mono text-xs">
                   {body || "(empty)"}
@@ -163,7 +157,7 @@ export function SimpleEmailModal({
               disabled={sending}
               className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded transition-colors disabled:opacity-50"
             >
-              {sending ? "Sending..." : channel === "email" ? "Send Email" : `Copy ${channel.charAt(0).toUpperCase() + channel.slice(1)}`}
+              {sending ? "Sending..." : "Send Email"}
             </button>
           </div>
         </div>
