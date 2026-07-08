@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
@@ -302,7 +303,7 @@ export default function DiscoverPage() {
             How to Find Prospects
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
             <button
               onClick={() => setDiscoveryMode(discoveryMode === "search" ? null : "search")}
@@ -328,6 +329,15 @@ export default function DiscoverPage() {
               <p className="font-bold text-base mb-1">Upload CSV</p>
               <p className="text-xs opacity-70">Bulk import prospects</p>
             </button>
+
+            {/* Quick Campaign */}
+            <Link
+              href="/operator/campaigns"
+              className="p-6 rounded-lg border-2 border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D] transition-all text-left"
+            >
+              <p className="font-bold text-base mb-1">Quick Campaign</p>
+              <p className="text-xs opacity-70">CSV → Send immediately</p>
+            </Link>
 
             {/* Manual */}
             <button
