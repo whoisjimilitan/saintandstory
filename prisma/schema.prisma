@@ -256,6 +256,7 @@ model B2bLead {
   pipeline_stage              String?                      @default("NEW") @map("pipeline_stage")
   channel                     String?                      @default("whatsapp") @map("channel")
   company_size                String?                      @map("company_size")
+  do_not_contact              Boolean?                     @default(false) @map("do_not_contact")
   b2b_email_events            b2b_email_events[]
   b2b_email_link_clicks       b2b_email_link_clicks[]
   b2b_heat_score_history      b2b_heat_score_history[]
