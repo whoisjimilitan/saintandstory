@@ -164,13 +164,28 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
+        // Update lead engagement tracking
+        const now = new Date();
+        await prisma.b2bLead.update({
+          where: { id: lead.id },
+          data: {
+            pipeline_stage: "propose",
+            leadState: "emailed",
+            last_engagement_at: now,
+            email_sent_at: now,
+            engaged_today: true,
+            last_engagement_type: "email",
+            notes: `Email sent via campaign: "${subject}"`,
+          },
+        });
+
         // Record outreach
         await prisma.b2bOutreach.create({
           data: {
             leadId: lead.id,
             subject,
             body,
-            sentAt: new Date(),
+            sentAt: now,
             resendMessageId: emailResponse.data.id,
             emailType: "initial",
             sent_by: "operator",
