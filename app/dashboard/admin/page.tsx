@@ -197,7 +197,7 @@ export default async function AdminPage() {
       <AdminLocationUpdater />
 
       {/* Premium Header Section */}
-      <div className="px-4 md:px-8 lg:px-12 pt-16 pb-16">
+      <div className="px-4 md:px-8 pt-32 pb-16">
         <div className="flex items-start justify-between mb-12">
           <div></div>
 
@@ -249,7 +249,7 @@ export default async function AdminPage() {
       </div>
 
       {/* Content Section */}
-      <div className="px-4 md:px-8 lg:px-12 pb-12">
+      <div className="px-4 md:px-8 pb-16">
 
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">

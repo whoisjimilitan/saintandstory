@@ -70,7 +70,7 @@ export default function ReachPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-16 pb-16">
+    <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-12">
