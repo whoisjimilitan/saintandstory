@@ -105,8 +105,8 @@ export default function TodayPage() {
 
         {/* HEADER */}
         <div className="mb-12">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
-          <p className="text-sm text-[#999999]">{dayName} • {dateStr}</p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
+          <p className="text-xs text-[#999999]">{dayName} • {dateStr}</p>
         </div>
 
         {loading ? (

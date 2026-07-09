@@ -152,8 +152,8 @@ export default function ResponsesPage() {
       {/* HEADER */}
       <div className="pt-32 pb-6 px-8 border-b border-[#E8E8E8]">
         <div className="max-w-7xl">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-2 tracking-tight">Responses</h1>
-          <p className="text-sm text-[#666666]">Manage all prospect conversations and replies</p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Responses</h1>
+          <p className="text-xs text-[#999999]">Manage all prospect conversations and replies</p>
         </div>
       </div>
 
