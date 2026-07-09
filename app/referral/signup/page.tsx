@@ -48,6 +48,7 @@ export default function ReferrerSignup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<SignupResponse | null>(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -138,7 +139,7 @@ export default function ReferrerSignup() {
                 <li className="flex gap-3">
                   <span className="font-bold">3.</span>
                   <span>
-                    They book with us and mention your code → You earn £15 per referral
+                    They book with us and mention your code → You earn £20 per referral
                   </span>
                 </li>
                 <li className="flex gap-3">
@@ -196,11 +197,11 @@ export default function ReferrerSignup() {
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-3">
-              Join the Referral Network
+            <h1 className="text-4xl font-black text-slate-900 mb-3">
+              R<span className="italic font-display">e</span>fer Customers.
             </h1>
             <p className="text-lg text-slate-600">
-              Earn £15 per referral. No signup fee. Get paid monthly.
+              Earn £20 per referral. For receptionists and office managers. Paid monthly.
             </p>
           </div>
 
@@ -208,7 +209,7 @@ export default function ReferrerSignup() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-slate-50 p-4 rounded-lg">
               <div className="text-2xl mb-2">💰</div>
-              <div className="font-bold text-slate-900 mb-1">£15 Per Referral</div>
+              <div className="font-bold text-slate-900 mb-1">£20 Per Referral</div>
               <p className="text-sm text-slate-600">Every client who books earns you money</p>
             </div>
             <div className="bg-slate-50 p-4 rounded-lg">
@@ -336,27 +337,29 @@ export default function ReferrerSignup() {
         {/* FAQ */}
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">FAQ</h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">How much do I earn?</h3>
-              <p className="text-slate-600">£15 per referral. When your client books with us and mentions your code, you get paid.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">When do I get paid?</h3>
-              <p className="text-slate-600">Monthly. On the 1st of each month, we process payouts from the previous month directly to your bank.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">Do I need to do anything?</h3>
-              <p className="text-slate-600">No. Just tell your clients to mention your code when they book. We handle everything else.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">Is there a minimum?</h3>
-              <p className="text-slate-600">No minimum referrals. Earn as much or as little as you want. Zero obligations.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">What if I have questions?</h3>
-              <p className="text-slate-600">Call us on 0203 051 9243 or reply to your WhatsApp messages. We're here to help.</p>
-            </div>
+          <div className="space-y-3">
+            {[
+              { q: "How much do I earn?", a: "£20 per referral. When your client books with us and mentions your code, you get paid." },
+              { q: "When do I get paid?", a: "Monthly. On the 1st of each month, we process payouts from the previous month directly to your bank." },
+              { q: "Do I need to do anything?", a: "No. Just tell your clients to mention your code when they book. We handle everything else." },
+              { q: "Is there a minimum?", a: "No minimum referrals. Earn as much or as little as you want. Zero obligations." },
+              { q: "What if I have questions?", a: "Call us on 0203 051 9243 or reply to your WhatsApp messages. We're here to help." },
+            ].map((item, idx) => (
+              <div key={idx} className="border border-slate-200 rounded-lg">
+                <button
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full text-left p-4 font-bold text-slate-900 hover:bg-slate-50 transition flex justify-between items-center"
+                >
+                  {item.q}
+                  <span className={`text-xl transition-transform ${openFaq === idx ? 'rotate-180' : ''}`}>▼</span>
+                </button>
+                {openFaq === idx && (
+                  <div className="px-4 pb-4 text-slate-600">
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
