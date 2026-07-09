@@ -735,6 +735,100 @@ model ObservationEvent {
   createdAt  DateTime          @default(now())
 }
 
+model Referrer {
+  id                 String              @id @default(cuid())
+  phone              String              @unique
+  officeManagerName   String?             @map("office_manager_name")
+  officeName         String?             @map("office_name")
+  city               String
+  referralCode       String              @unique @map("referral_code")
+  category           String?             // e.g., "solicitor", "accountant", "estate_agent"
+  totalEarnings      Decimal             @default(0) @map("total_earnings") @db.Decimal(10, 2)
+  monthlyEarnings    Decimal             @default(0) @map("monthly_earnings") @db.Decimal(10, 2)
+  totalReferrals     Int                 @default(0) @map("total_referrals")
+  activeReferrals    Int                 @default(0) @map("active_referrals")
+  status             String              @default("active") // active, inactive, paused
+  whatsappStatus     String              @default("pending") @map("whatsapp_status") // pending, joined, active
+  whatsappJoinedAt   DateTime?           @map("whatsapp_joined_at")
+  lastActiveAt       DateTime?           @map("last_active_at")
+  commission         Decimal             @default(15) @db.Decimal(5, 2) // £15 default per referral
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  earnings           ReferrerEarning[]
+  jobs               ReferralJob[]
+
+  @@index([phone])
+  @@index([referralCode])
+  @@index([city])
+  @@index([status])
+  @@index([whatsappStatus])
+  @@index([createdAt])
+  @@map("referrers")
+}
+
+model ReferrerEarning {
+  id                 String    @id @default(cuid())
+  referrerId         String    @map("referrer_id")
+  jobId              String?   @map("job_id")
+  amount             Decimal   @db.Decimal(10, 2)
+  status             String    @default("pending") // pending, confirmed, paid
+  referralMonth      DateTime  @map("referral_month") @db.Date // Used for monthly payouts
+  paidAt             DateTime? @map("paid_at")
+  notes              String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  referrer           Referrer  @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([referralMonth])
+  @@index([status])
+  @@index([jobId])
+  @@map("referrer_earnings")
+}
+
+model ReferralJob {
+  id                 String    @id @default(cuid())
+  jobId              String    @map("job_id")
+  referrerId         String    @map("referrer_id")
+  customerName       String?   @map("customer_name")
+  customerPhone      String?   @map("customer_phone")
+  customerEmail      String?   @map("customer_email")
+  jobValue           Decimal   @map("job_value") @db.Decimal(10, 2)
+  commission         Decimal   @db.Decimal(10, 2) // Amount paid to referrer
+  status             String    @default("new") // new, confirmed, completed, disputed
+  confirmedAt        DateTime? @map("confirmed_at")
+  completedAt        DateTime? @map("completed_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  referrer           Referrer  @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([jobId])
+  @@index([status])
+  @@map("referral_jobs")
+}
+
+model ReferrerMonthlyPayout {
+  id                 String    @id @default(cuid())
+  referrerId         String    @map("referrer_id")
+  month              DateTime  @db.Date // Start of month
+  totalEarnings      Decimal   @map("total_earnings") @db.Decimal(10, 2)
+  referralCount      Int       @map("referral_count")
+  status             String    @default("pending") // pending, processed, paid
+  paidAt             DateTime? @map("paid_at")
+  bankTransferId     String?   @map("bank_transfer_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  @@unique([referrerId, month], map: "uq_referrer_monthly_payout")
+  @@index([referrerId])
+  @@index([month])
+  @@index([status])
+  @@map("referrer_monthly_payouts")
+}
+
 model ProspectFeedback {
   id           String   @id @default(cuid())
   slug         String
