@@ -91,80 +91,70 @@ export default function ReferrerSignup() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 border-l-4 border-green-600">
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-4">✅</div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                Welcome to the Referral Network!
-              </h1>
-              <p className="text-lg text-slate-600">
-                Your referral code has been generated
-              </p>
-            </div>
+      <div className="min-h-screen bg-white pt-32 pb-16">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
+              Welcome
+            </h1>
+            <p className="text-xs text-[#999999]">Your referral code is ready</p>
+          </div>
 
-            {/* Referral Code Display */}
-            <div className="bg-slate-100 rounded-lg p-6 mb-6 text-center border-2 border-slate-300">
-              <div className="text-sm text-slate-600 mb-2">Your Referral Code</div>
-              <div className="text-4xl font-mono font-bold text-slate-900 mb-4">
+          <div className="max-w-2xl">
+            {/* Code Card */}
+            <div className="mb-12 p-8 border border-[#E8E8E8] rounded-lg">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+                Your Referral Code
+              </p>
+              <p className="text-5xl font-black text-[#0D0D0D] font-mono mb-6">
                 {success.referralCode}
-              </div>
+              </p>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(success.referralCode);
-                  alert("Code copied to clipboard!");
+                  alert("Code copied!");
                 }}
-                className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition font-medium"
+                className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
               >
                 Copy Code
               </button>
             </div>
 
-            {/* Next Steps */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <h2 className="font-bold text-blue-900 mb-4">What Happens Next</h2>
-              <ol className="space-y-3 text-blue-900">
-                <li className="flex gap-3">
-                  <span className="font-bold">1.</span>
-                  <span>
-                    We've sent you a WhatsApp message with your code and instructions
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">2.</span>
-                  <span>When clients ask about removals, give them your code</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">3.</span>
-                  <span>
-                    They book with us and mention your code → You earn £15 per referral
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold">4.</span>
-                  <span>Track earnings on your dashboard, paid monthly</span>
-                </li>
-              </ol>
+            {/* How It Works */}
+            <div className="mb-12 pb-12 border-b border-[#E8E8E8]">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">
+                How It Works
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">1. Share Your Code</p>
+                  <p className="text-xs text-[#666666]">
+                    When clients ask about removals, give them your referral code
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">2. They Book With Us</p>
+                  <p className="text-xs text-[#666666]">They mention your code when booking</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">3. You Earn £15</p>
+                  <p className="text-xs text-[#666666]">
+                    Per referral, paid monthly to your bank account
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* Dashboard Link */}
-            <div className="mb-6">
-              <Link
-                href={success.dashboard}
-                className="block w-full bg-slate-900 text-white text-center py-3 rounded-lg hover:bg-slate-800 transition font-bold text-lg"
-              >
-                Go to Dashboard
-              </Link>
-            </div>
-
-            {/* Share Message */}
-            <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-              <h2 className="font-bold text-slate-900 mb-3">Message to Share</h2>
-              <div className="bg-white p-4 rounded border border-slate-300 mb-3 font-mono text-sm">
-                <p className="text-slate-700">
+            {/* Message Template */}
+            <div className="mb-12">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+                Share This Message
+              </p>
+              <div className="p-6 border border-[#E8E8E8] rounded-lg bg-[#F9F9F9] mb-4">
+                <p className="text-sm text-[#0D0D0D]">
                   Hi, for removals I recommend Saint & Story. Tell them code{" "}
-                  <span className="font-bold">{success.referralCode}</span> for priority service.
+                  <span className="font-mono font-semibold">{success.referralCode}</span> for
+                  priority service.
                 </p>
               </div>
               <button
@@ -173,17 +163,19 @@ export default function ReferrerSignup() {
                   navigator.clipboard.writeText(text);
                   alert("Message copied!");
                 }}
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium"
+                className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
               >
-                Copy Message for Clients
+                Copy Message
               </button>
             </div>
 
-            {/* Support */}
-            <div className="text-center mt-8 text-sm text-slate-600">
-              <p>Questions?</p>
-              <p className="font-mono font-bold">0203 051 9243</p>
-            </div>
+            {/* Dashboard Link */}
+            <Link
+              href={success.dashboard}
+              className="block w-full px-6 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors text-center"
+            >
+              Go to Your Dashboard
+            </Link>
           </div>
         </div>
       </div>
@@ -191,81 +183,61 @@ export default function ReferrerSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+    <div className="min-h-screen bg-white pt-32 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="max-w-2xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-3">
-              Join the Referral Network
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
+              Join Our Network
             </h1>
-            <p className="text-lg text-slate-600">
-              Earn £15 per referral. No signup fee. Get paid monthly.
-            </p>
-          </div>
-
-          {/* Benefits */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="text-2xl mb-2">💰</div>
-              <div className="font-bold text-slate-900 mb-1">£15 Per Referral</div>
-              <p className="text-sm text-slate-600">Every client who books earns you money</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="text-2xl mb-2">📱</div>
-              <div className="font-bold text-slate-900 mb-1">Real-Time Dashboard</div>
-              <p className="text-sm text-slate-600">
-                Track earnings, see payouts coming
-              </p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="text-2xl mb-2">🚚</div>
-              <div className="font-bold text-slate-900 mb-1">Done For You</div>
-              <p className="text-sm text-slate-600">We handle everything end-to-end</p>
-            </div>
+            <p className="text-xs text-[#999999]">Earn £15 per referral. No fees. Paid monthly.</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6 mb-12">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6">
-                {error}
+              <div className="p-4 bg-[#FFF5F5] border border-[#FFE0E0] rounded-lg">
+                <p className="text-sm text-[#CC0000]">{error}</p>
               </div>
             )}
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                Your Name *
+            {/* Name */}
+            <div>
+              <label className="block text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                Your Name
               </label>
               <input
                 type="text"
                 name="officeManagerName"
                 value={formData.officeManagerName}
                 onChange={handleChange}
-                placeholder="e.g., Sarah Jones"
+                placeholder="Sarah Jones"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                Office/Business Name *
+            {/* Office Name */}
+            <div>
+              <label className="block text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                Office/Business Name
               </label>
               <input
                 type="text"
                 name="officeName"
                 value={formData.officeName}
                 onChange={handleChange}
-                placeholder="e.g., Smith & Associates Solicitors"
+                placeholder="Smith & Associates"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                WhatsApp Number *
+            {/* WhatsApp Phone */}
+            <div>
+              <label className="block text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                WhatsApp Number
               </label>
               <input
                 type="tel"
@@ -274,23 +246,26 @@ export default function ReferrerSignup() {
                 onChange={handleChange}
                 placeholder="+441234567890 or 01234567890"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
-              <p className="text-xs text-slate-500 mt-2">UK format: Include country code +44 or just start with 0. We'll use this to send you referral updates.</p>
+              <p className="text-xs text-[#666666] mt-2">
+                UK format: Include country code +44 or start with 0
+              </p>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                City *
+            {/* City */}
+            <div>
+              <label className="block text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                City
               </label>
               <select
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
               >
-                <option value="">Select a city...</option>
+                <option value="">Select a city</option>
                 {UK_CITIES.map((city) => (
                   <option key={city} value={city}>
                     {city}
@@ -299,15 +274,16 @@ export default function ReferrerSignup() {
               </select>
             </div>
 
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-slate-900 mb-2">
-                Business Type (Optional)
+            {/* Category */}
+            <div>
+              <label className="block text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-2">
+                Business Type
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -317,45 +293,60 @@ export default function ReferrerSignup() {
               </select>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-900 text-white py-3 rounded-lg hover:bg-slate-800 transition font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
             >
-              {loading ? "Creating Your Code..." : "Get Your Referral Code"}
+              {loading ? "Creating Code..." : "Get Your Referral Code"}
             </button>
           </form>
 
           {/* Terms */}
-          <p className="text-xs text-slate-500 text-center mt-6">
-            By signing up, you agree to receive WhatsApp messages from Saint & Story about your
-            referral activity and payouts.
+          <p className="text-xs text-[#999999] text-center mb-12">
+            By signing up, you agree to receive WhatsApp messages about your referral activity and
+            payouts.
           </p>
-        </div>
 
-        {/* FAQ */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">FAQ</h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">How much do I earn?</h3>
-              <p className="text-slate-600">£15 per referral. When your client books with us and mentions your code, you get paid.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">When do I get paid?</h3>
-              <p className="text-slate-600">Monthly. On the 1st of each month, we process payouts from the previous month directly to your bank.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">Do I need to do anything?</h3>
-              <p className="text-slate-600">No. Just tell your clients to mention your code when they book. We handle everything else.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">Is there a minimum?</h3>
-              <p className="text-slate-600">No minimum referrals. Earn as much or as little as you want. Zero obligations.</p>
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-2">What if I have questions?</h3>
-              <p className="text-slate-600">Call us on 0203 051 9243 or reply to your WhatsApp messages. We're here to help.</p>
+          {/* FAQ */}
+          <div className="pt-12 border-t border-[#E8E8E8]">
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-8">
+              Questions
+            </p>
+            <div className="space-y-8">
+              <div>
+                <p className="text-sm font-semibold text-[#0D0D0D] mb-2">How much do I earn?</p>
+                <p className="text-xs text-[#666666]">
+                  £15 per referral. When your client books and mentions your code, you get paid.
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0D0D0D] mb-2">When do I get paid?</p>
+                <p className="text-xs text-[#666666]">
+                  Monthly. On the 1st of each month, we process payouts from the previous month
+                  directly to your bank.
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0D0D0D] mb-2">What do I need to do?</p>
+                <p className="text-xs text-[#666666]">
+                  Just tell your clients to mention your code when they book. We handle everything
+                  else.
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Is there a minimum?</p>
+                <p className="text-xs text-[#666666]">
+                  No minimum referrals. Zero obligations.
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0D0D0D] mb-2">Questions?</p>
+                <p className="text-xs text-[#666666]">
+                  Call us on 0203 051 9243 or reply to your WhatsApp messages.
+                </p>
+              </div>
             </div>
           </div>
         </div>
