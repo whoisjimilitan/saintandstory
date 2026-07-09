@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         city,
         category: category || "business",
         referralCode,
-        commission: 15, // £15 per referral default
+        commission: 20, // £20 per referral
       },
     });
 

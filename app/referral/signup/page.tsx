@@ -14,6 +14,7 @@ interface SignupResponse {
 export default function ReferrerSignup() {
   const [formData, setFormData] = useState({
     officeManagerName: "",
+    officeName: "",
     phone: "",
     city: "",
   });
@@ -21,7 +22,7 @@ export default function ReferrerSignup() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<SignupResponse | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -38,13 +39,7 @@ export default function ReferrerSignup() {
       const response = await fetch("/api/referral/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          officeManagerName: formData.officeManagerName,
-          officeName: formData.city,
-          phone: formData.phone,
-          city: formData.city,
-          category: "business"
-        }),
+        body: JSON.stringify({ ...formData, category: "business" }),
       });
 
       const data = await response.json();
@@ -62,6 +57,7 @@ export default function ReferrerSignup() {
     return (
       <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
         <div className="max-w-2xl w-full">
+          {/* Success Hero */}
           <div className="text-center mb-12">
             <div className="mb-6 text-4xl">✓</div>
             <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
@@ -70,6 +66,7 @@ export default function ReferrerSignup() {
             <p className="text-xs text-[#999999]">Your referral code is active</p>
           </div>
 
+          {/* Code Section */}
           <div className="mb-12 p-8 border border-[#E8E8E8] rounded-lg text-center">
             <p className="text-xs text-[#888888] mb-4 uppercase tracking-widest font-semibold">
               Your Code
@@ -88,6 +85,7 @@ export default function ReferrerSignup() {
             </button>
           </div>
 
+          {/* Next Steps */}
           <div className="space-y-4 mb-12">
             <div className="p-6 border border-[#E8E8E8] rounded-lg">
               <p className="text-sm font-semibold text-[#0D0D0D] mb-2">1. Share Your Code</p>
@@ -103,6 +101,7 @@ export default function ReferrerSignup() {
             </div>
           </div>
 
+          {/* Message Template */}
           <div className="mb-8">
             <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
               Share This
@@ -125,6 +124,7 @@ export default function ReferrerSignup() {
             </button>
           </div>
 
+          {/* Dashboard Link */}
           <Link
             href={success.dashboard}
             className="block w-full px-6 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors text-center"
@@ -139,24 +139,29 @@ export default function ReferrerSignup() {
   return (
     <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
+        {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
             Earn Money Referring
           </h1>
-          <p className="text-xs text-[#999999] mb-4">A side gig for receptionists and office managers</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <span className="px-3 py-1.5 border border-[#E8E8E8] rounded-full text-xs text-[#0D0D0D] font-semibold bg-white">
-              £20 per referral
-            </span>
-            <span className="px-3 py-1.5 border border-[#E8E8E8] rounded-full text-xs text-[#0D0D0D] font-semibold bg-white">
-              Paid monthly
-            </span>
-            <span className="px-3 py-1.5 border border-[#E8E8E8] rounded-full text-xs text-[#0D0D0D] font-semibold bg-white">
-              60 seconds
-            </span>
+          <p className="text-xs text-[#999999] mb-2">A side gig for receptionists and office managers</p>
+          <p className="text-xs text-[#999999]">Get paid £20 per referral. Takes 1 minute.</p>
+        </div>
+
+        {/* Value Props - Pills */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]"><span className="font-semibold">£20</span> per referral</p>
+          </div>
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]">Paid <span className="font-semibold">monthly</span></p>
+          </div>
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]"><span className="font-semibold">Zero</span> obligations</p>
           </div>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
           {error && (
             <div className="p-4 bg-[#FFF5F5] border border-[#FFE0E0] rounded-lg">
@@ -164,6 +169,7 @@ export default function ReferrerSignup() {
             </div>
           )}
 
+          {/* Name */}
           <input
             type="text"
             name="officeManagerName"
@@ -171,9 +177,10 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="Your name"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
+          {/* Phone */}
           <input
             type="tel"
             name="phone"
@@ -181,9 +188,10 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="WhatsApp: +441234567890 or 01234567890"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
+          {/* City */}
           <input
             type="text"
             name="city"
@@ -191,9 +199,10 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="Your city or town"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -203,6 +212,7 @@ export default function ReferrerSignup() {
           </button>
         </form>
 
+        {/* Terms */}
         <p className="text-xs text-[#999999] text-center">
           By signing up, you agree to receive WhatsApp updates about your referrals and payouts.
         </p>
