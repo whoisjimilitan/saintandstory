@@ -60,66 +60,32 @@ export default function ReferrerSignup() {
     return (
       <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
         <div className="max-w-2xl w-full">
-          {/* Success Hero */}
           <div className="text-center mb-12">
-            <div className="mb-6 text-4xl">✓</div>
-            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
-              Ready to earn
-            </h1>
-            <p className="text-xs text-[#999999]">Your referral code is active</p>
-          </div>
-
-          {/* Code Section */}
-          <div className="mb-12 p-8 border border-[#E8E8E8] rounded-lg text-center">
-            <p className="text-xs text-[#888888] mb-4 uppercase tracking-widest font-semibold">
-              Your Code
-            </p>
-            <p className="text-6xl font-black text-[#0D0D0D] font-mono mb-6">
+            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-4">Your Code</p>
+            <p className="text-7xl font-black text-[#0D0D0D] font-mono mb-8">
               {success.referralCode}
             </p>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(success.referralCode);
-                alert("Copied!");
+                alert("Copied to clipboard!");
               }}
-              className="inline-block px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
             >
               Copy Code
             </button>
           </div>
 
-          {/* Next Steps */}
-          <div className="space-y-4 mb-12">
-            <div className="p-6 border border-[#E8E8E8] rounded-lg">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">1. Share Your Code</p>
-              <p className="text-xs text-[#666666]">When clients ask about removals, give them your code</p>
-            </div>
-            <div className="p-6 border border-[#E8E8E8] rounded-lg">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">2. They Book With Us</p>
-              <p className="text-xs text-[#666666]">They mention your code when booking</p>
-            </div>
-            <div className="p-6 border border-[#E8E8E8] rounded-lg">
-              <p className="text-sm font-semibold text-[#0D0D0D] mb-2">3. You Earn £20</p>
-              <p className="text-xs text-[#666666]">Paid monthly to your bank account</p>
-            </div>
-          </div>
-
-          {/* Message Template */}
-          <div className="mb-8">
-            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
-              Share This
+          <div className="mb-12 p-6 border border-[#E8E8E8] rounded-lg">
+            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-3">Share this message</p>
+            <p className="text-sm text-[#0D0D0D] mb-4">
+              "Hi, for removals I recommend Saint & Story. Use code <span className="font-mono font-semibold">{success.referralCode}</span>"
             </p>
-            <div className="p-4 bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg mb-3">
-              <p className="text-sm text-[#0D0D0D]">
-                Hi, for removals I recommend Saint & Story. Tell them code{" "}
-                <span className="font-mono font-semibold">{success.referralCode}</span>
-              </p>
-            </div>
             <button
               onClick={() => {
-                const text = `Hi, for removals I recommend Saint & Story. Tell them code ${success.referralCode}`;
+                const text = `Hi, for removals I recommend Saint & Story. Use code ${success.referralCode}`;
                 navigator.clipboard.writeText(text);
-                alert("Copied!");
+                alert("Message copied!");
               }}
               className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
             >
@@ -127,12 +93,11 @@ export default function ReferrerSignup() {
             </button>
           </div>
 
-          {/* Dashboard Link */}
           <Link
             href={success.dashboard}
-            className="block w-full px-6 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors text-center"
+            className="block w-full px-6 py-4 border border-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors text-center"
           >
-            Go to Dashboard
+            View Dashboard
           </Link>
         </div>
       </div>
@@ -142,19 +107,14 @@ export default function ReferrerSignup() {
   return (
     <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
-        {/* Badge */}
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#888888] mb-6 text-center">
-          For receptionists and office managers
-        </p>
-
-        {/* Headline - Mixed typography */}
-        <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-4 text-center">
-          Earn money<br />
-          r<span className="font-display italic font-normal">e</span>ferring.
+        {/* Headline - Direct and clear */}
+        <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-2 text-center">
+          R<span className="font-display italic font-normal">e</span>fer Clients.<br />
+          Earn £20.
         </h1>
 
-        {/* Subheading */}
-        <p className="text-base text-[#888888] text-center mb-12">Refer a customer. Get paid each month. No strings.</p>
+        {/* Subheading - Simple context */}
+        <p className="text-base text-[#888888] text-center mb-12">For receptionists and office managers. Monthly payouts. No strings.</p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
@@ -181,7 +141,9 @@ export default function ReferrerSignup() {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            placeholder="WhatsApp: +441234567890 or 01234567890"
+            placeholder="+44 followed by your number (e.g. +441234567890)"
+            pattern="^\+44\d{10}$"
+            title="Please enter in format: +44 followed by 10 digits"
             required
             className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
