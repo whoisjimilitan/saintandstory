@@ -180,32 +180,44 @@ export async function POST(request: NextRequest) {
         messageId = emailResponse.data.id;
 
         // Record in B2bCampaignEmail — THIS IS THE SOURCE OF TRUTH
-        await prisma.b2bCampaignEmail.create({
-          data: {
-            campaignId: campaign.id,
-            leadId: lead.id,
-            prospectEmail: biz.email,
-            prospectName: biz.name,
-            category: biz.category || "Other",
-            subject,
-            body,
-            emailSentAt: now,
-            resendMessageId: messageId,
-            status: "sent",
-          },
-        });
+        try {
+          const emailRecord = await prisma.b2bCampaignEmail.create({
+            data: {
+              campaignId: campaign.id,
+              leadId: lead.id,
+              prospectEmail: biz.email,
+              prospectName: biz.name,
+              category: biz.category || "Other",
+              subject,
+              body,
+              emailSentAt: now,
+              resendMessageId: messageId,
+              status: "sent",
+            },
+          });
+          console.log(`[BATCH-SEND] [${i + 1}] ✓ Created b2bCampaignEmail: ${emailRecord.id}`);
+        } catch (createErr) {
+          console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to create b2bCampaignEmail:`, createErr);
+          throw createErr;
+        }
 
         // Update B2bLead engagement summary
-        await prisma.b2bLead.update({
-          where: { id: lead.id },
-          data: {
-            pipeline_stage: "propose",
-            leadState: "emailed",
-            last_engagement_at: now,
-            email_sent_at: now,
-            last_engagement_type: "email",
-          },
-        });
+        try {
+          await prisma.b2bLead.update({
+            where: { id: lead.id },
+            data: {
+              pipeline_stage: "propose",
+              leadState: "emailed",
+              last_engagement_at: now,
+              email_sent_at: now,
+              last_engagement_type: "email",
+            },
+          });
+          console.log(`[BATCH-SEND] [${i + 1}] ✓ Updated B2bLead engagement`);
+        } catch (updateErr) {
+          console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to update B2bLead:`, updateErr);
+          throw updateErr;
+        }
       }
 
       sent.push(biz.email);
