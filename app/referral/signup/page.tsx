@@ -14,7 +14,6 @@ interface SignupResponse {
 export default function ReferrerSignup() {
   const [formData, setFormData] = useState({
     officeManagerName: "",
-    officeName: "",
     phone: "",
     city: "",
   });
@@ -39,7 +38,11 @@ export default function ReferrerSignup() {
       const response = await fetch("/api/referral/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, category: "business" }),
+        body: JSON.stringify({
+          ...formData,
+          officeName: formData.city,
+          category: "business",
+        }),
       });
 
       const data = await response.json();
