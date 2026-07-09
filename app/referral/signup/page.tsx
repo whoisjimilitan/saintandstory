@@ -146,8 +146,8 @@ export default function ReferrerSignup() {
 
         {/* Headline - Mixed typography */}
         <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-4 text-center">
-          Share clients.<br />
-          E<span className="font-display italic font-normal">a</span>rn £20.
+          Earn money<br />
+          r<span className="font-display italic font-normal">e</span>ferring.
         </h1>
 
         {/* Subheading */}
