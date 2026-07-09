@@ -21,7 +21,7 @@ export default function ReferrerSignup() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<SignupResponse | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -39,8 +39,10 @@ export default function ReferrerSignup() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          officeManagerName: formData.officeManagerName,
           officeName: formData.city,
+          phone: formData.phone,
+          city: formData.city,
           category: "business",
         }),
       });
@@ -107,13 +109,13 @@ export default function ReferrerSignup() {
   return (
     <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
-        {/* Headline - Direct and clear */}
+        {/* Headline */}
         <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-4 text-center">
           R<span className="font-display italic font-normal">e</span>fer Customers.<br />
           Earn £20<span className="text-4xl md:text-5xl">/referral</span>.
         </h1>
 
-        {/* Subheading - Context for who and how */}
+        {/* Subheading */}
         <p className="text-base text-[#888888] text-center mb-12">For receptionists and office managers. Paid monthly to your account.</p>
 
         {/* Form */}
@@ -124,7 +126,6 @@ export default function ReferrerSignup() {
             </div>
           )}
 
-          {/* Name */}
           <input
             type="text"
             name="officeManagerName"
@@ -135,7 +136,6 @@ export default function ReferrerSignup() {
             className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
-          {/* Phone */}
           <input
             type="tel"
             name="phone"
@@ -148,7 +148,6 @@ export default function ReferrerSignup() {
             className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
-          {/* City */}
           <input
             type="text"
             name="city"
@@ -159,7 +158,6 @@ export default function ReferrerSignup() {
             className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
           />
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -169,7 +167,6 @@ export default function ReferrerSignup() {
           </button>
         </form>
 
-        {/* Terms */}
         <p className="text-xs text-[#999999] text-center">
           By signing up, you agree to receive WhatsApp updates about your referrals and payouts.
         </p>
