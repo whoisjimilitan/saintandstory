@@ -282,10 +282,10 @@ export default function ReachPage() {
                   {emailByWindow.today.map((campaign) => (
                     <div
                       key={campaign.id}
-                      className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors"
+                      className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors group"
                     >
                       <div className="flex items-center justify-between">
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm font-semibold text-[#0D0D0D]">
                             {campaign.campaignName}
                           </p>
@@ -294,7 +294,7 @@ export default function ReachPage() {
                             {new Date(campaign.sentAt).toLocaleDateString()}
                           </p>
                         </div>
-                        <div className="flex gap-6 text-right">
+                        <div className="flex gap-6 text-right items-center">
                           <div>
                             <p className="text-xs text-[#888888]">Sent</p>
                             <p className="text-sm font-semibold text-[#0D0D0D]">
@@ -313,6 +313,25 @@ export default function ReachPage() {
                               {(campaign as any).emailStats?.replied || 0}
                             </p>
                           </div>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Delete campaign "${campaign.campaignName}"? This cannot be undone.`)) {
+                                fetch("/api/operator/campaigns/delete", {
+                                  method: "DELETE",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ campaignId: campaign.id }),
+                                }).then((res) => {
+                                  if (res.ok) {
+                                    window.location.reload();
+                                  }
+                                });
+                              }
+                            }}
+                            className="ml-4 text-[#999999] hover:text-[#FF6B6B] transition-colors opacity-0 group-hover:opacity-100"
+                            title="Delete campaign"
+                          >
+                            ✕
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -336,10 +355,10 @@ export default function ReachPage() {
                     {emailByWindow.history.map((campaign) => (
                       <div
                         key={campaign.id}
-                        className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors opacity-75"
+                        className="border border-[#E8E8E8] rounded-lg p-4 hover:bg-[#F9F9F9] transition-colors opacity-75 group"
                       >
                         <div className="flex items-center justify-between">
-                          <div>
+                          <div className="flex-1">
                             <p className="text-sm font-semibold text-[#0D0D0D]">
                               {campaign.campaignName}
                             </p>
@@ -348,7 +367,7 @@ export default function ReachPage() {
                               {new Date(campaign.sentAt).toLocaleDateString()}
                             </p>
                           </div>
-                          <div className="flex gap-6 text-right">
+                          <div className="flex gap-6 text-right items-center">
                             <div>
                               <p className="text-xs text-[#888888]">Sent</p>
                               <p className="text-sm font-semibold text-[#0D0D0D]">
@@ -367,6 +386,25 @@ export default function ReachPage() {
                                 {campaign.replied}
                               </p>
                             </div>
+                            <button
+                              onClick={() => {
+                                if (confirm(`Delete campaign "${campaign.campaignName}"? This cannot be undone.`)) {
+                                  fetch("/api/operator/campaigns/delete", {
+                                    method: "DELETE",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ campaignId: campaign.id }),
+                                  }).then((res) => {
+                                    if (res.ok) {
+                                      window.location.reload();
+                                    }
+                                  });
+                                }
+                              }}
+                              className="ml-4 text-[#999999] hover:text-[#FF6B6B] transition-colors opacity-0 group-hover:opacity-100"
+                              title="Delete campaign"
+                            >
+                              ✕
+                            </button>
                           </div>
                         </div>
                       </div>
