@@ -265,18 +265,18 @@ export default function ReferrerSignup() {
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-900 mb-2">
-                Phone Number *
+                WhatsApp Number *
               </label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="e.g., 0203 123 4567"
+                placeholder="+441234567890 or 01234567890"
                 required
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
               />
-              <p className="text-sm text-slate-500 mt-1">We'll send you WhatsApp updates here</p>
+              <p className="text-xs text-slate-500 mt-2">UK format: Include country code +44 or just start with 0. We'll use this to send you referral updates.</p>
             </div>
 
             <div className="mb-6">
