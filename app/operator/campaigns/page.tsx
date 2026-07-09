@@ -789,15 +789,11 @@ James`;
 
           {/* Daily Limit Warning */}
           {dailyLimit && (
-            <div className={`p-4 rounded mb-4 ${dailyLimit.remaining === 0 ? 'bg-[#FFE5E5] border border-[#FF6B6B]' : dailyLimit.remaining < 20 ? 'bg-[#FFF8E5] border border-[#FFB84D]' : 'bg-[#E5F5FF] border border-[#4DBBFF]'}`}>
+            <div className={`p-4 rounded mb-4 ${dailyLimit.remaining === 0 ? 'bg-[#F5F5F5] border border-[#0D0D0D]' : 'bg-[#F9F9F9] border border-[#E8E8E8]'}`}>
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm font-semibold text-[#0D0D0D]">
-                    {dailyLimit.remaining === 0
-                      ? '⚠️ Daily limit reached'
-                      : dailyLimit.remaining < 20
-                      ? '⚠️ Approaching daily limit'
-                      : '📊 Daily email limit'}
+                    Daily email limit
                   </p>
                   <p className="text-xs text-[#666666] mt-1">
                     {dailyLimit.sentToday} sent + {dailyLimit.queuedToday} queued = {dailyLimit.totalUsed}/{dailyLimit.limit} ({dailyLimit.percentUsed}%)
