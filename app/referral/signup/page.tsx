@@ -108,13 +108,13 @@ export default function ReferrerSignup() {
     <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
         {/* Headline - Direct and clear */}
-        <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-2 text-center">
-          R<span className="font-display italic font-normal">e</span>fer Clients.<br />
-          Earn £20.
+        <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-4 text-center">
+          R<span className="font-display italic font-normal">e</span>fer Customers.<br />
+          Earn £20<span className="text-4xl md:text-5xl">/referral</span>.
         </h1>
 
-        {/* Subheading - Simple context */}
-        <p className="text-base text-[#888888] text-center mb-12">For receptionists and office managers. Monthly payouts. No strings.</p>
+        {/* Subheading - Context for who and how */}
+        <p className="text-base text-[#888888] text-center mb-12">For receptionists and office managers. Paid monthly to your account.</p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
