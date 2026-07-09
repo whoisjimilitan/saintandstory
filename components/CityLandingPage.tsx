@@ -4,6 +4,7 @@ import ModalCTA from "@/components/ModalCTA";
 import SiteFooter from "@/components/SiteFooter";
 import ModalProvider from "@/components/ModalProvider";
 import AutoOpenModal from "@/components/AutoOpenModal";
+import { generateLocalBusinessSchema, generateOrganizationSchema, generateServiceSchema } from "@/lib/schema-generator";
 
 /**
  * SAINT & STORY — CITY PAGE DATA TEMPLATE (CONSTRAINT-LOCKED)
@@ -240,12 +241,32 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
     })),
   };
 
+  // Generate schema markup for LSA eligibility
+  const localBusinessSchema = generateLocalBusinessSchema({
+    city: data.city,
+    postcodeCoverage: data.stats[3]?.stat || "UK",
+    rating: 4.9,
+    ratingCount: 120,
+  });
+
+  const organizationSchema = generateOrganizationSchema();
+
+  const serviceSchema = generateServiceSchema({
+    city: data.city,
+    postcodeCoverage: data.stats[3]?.stat || "UK",
+    rating: 4.9,
+    ratingCount: 120,
+  });
+
   return (
     <>
       <ModalProvider />
       <AutoOpenModal delayMs={800} />
       <main className="pb-20 md:pb-0">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
         <Nav />
 
       {/* Hero */}
