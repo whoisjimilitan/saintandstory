@@ -97,8 +97,7 @@ export default function OperatorReferralDashboard() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000);
-    return () => clearInterval(interval);
+    // Only fetch once on load. User can navigate back to /operator/referral-network to refresh if needed.
   }, [filter]);
 
   const fetchData = async () => {
