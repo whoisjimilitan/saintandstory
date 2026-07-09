@@ -244,7 +244,7 @@ export default function TodayPage() {
             <div>
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Next Step</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <Link
                   href="/operator/discover"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
@@ -275,6 +275,14 @@ export default function TodayPage() {
                 >
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
                   <p className="text-xs text-[#888888]">Email & WhatsApp</p>
+                </Link>
+
+                <Link
+                  href="/operator/referral-network"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
+                >
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Referrals</p>
+                  <p className="text-xs text-[#888888]">Manage partners</p>
                 </Link>
               </div>
             </div>
