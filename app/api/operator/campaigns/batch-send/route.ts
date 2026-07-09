@@ -77,6 +77,50 @@ export async function POST(request: NextRequest) {
 
   console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
 
+  // GUARDRAIL: Check Resend daily limit (100 per day)
+  const RESEND_DAILY_LIMIT = 100;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  try {
+    const emailsSentToday = await prisma.b2bCampaignEmail.count({
+      where: {
+        status: "sent",
+        emailSentAt: { gte: today },
+      },
+    });
+
+    const emailsInQueue = await prisma.b2bCampaignEmail.count({
+      where: {
+        status: "pending",
+        scheduledFor: { not: null },
+      },
+    });
+
+    const totalCommitted = emailsSentToday + emailsInQueue + businesses.length;
+
+    if (totalCommitted > RESEND_DAILY_LIMIT) {
+      const remaining = Math.max(0, RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue);
+      console.error(`[BATCH-SEND] ✗ DAILY LIMIT EXCEEDED: ${emailsSentToday} sent + ${emailsInQueue} queued + ${businesses.length} requested = ${totalCommitted} > ${RESEND_DAILY_LIMIT}`);
+      return NextResponse.json(
+        {
+          error: `Daily email limit exceeded`,
+          details: `You've sent ${emailsSentToday} emails today and have ${emailsInQueue} queued. Resend allows 100/day. You can send ${remaining} more today.`,
+          limit: RESEND_DAILY_LIMIT,
+          sentToday: emailsSentToday,
+          queuedToday: emailsInQueue,
+          remaining: remaining,
+        },
+        { status: 429 }
+      );
+    }
+
+    console.log(`[BATCH-SEND] Daily limit check: ${emailsSentToday} sent, ${emailsInQueue} queued, ${remaining = RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue} remaining`);
+  } catch (err) {
+    console.error("[BATCH-SEND] Error checking daily limit:", err);
+    // Don't fail the whole request if limit check fails, but log it
+  }
+
   const now = new Date();
   let campaign;
   let campaignError = null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SimpleEmailModal } from "./simple-email-modal";
 
@@ -112,6 +112,16 @@ interface ValidatedBusiness extends ParsedBusiness {
   validationReason?: string;
 }
 
+interface DailyLimit {
+  limit: number;
+  sentToday: number;
+  queuedToday: number;
+  totalUsed: number;
+  remaining: number;
+  percentUsed: number;
+  canSend: boolean;
+}
+
 export default function CampaignsPage() {
   const [step, setStep] = useState<"upload" | "generate" | "infer" | "validate" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -121,11 +131,31 @@ export default function CampaignsPage() {
   const [validating, setValidating] = useState(false);
   const [validationProgress, setValidationProgress] = useState(0);
   const [error, setError] = useState("");
+  const [dailyLimit, setDailyLimit] = useState<DailyLimit | null>(null);
 
   // Modal state
   const [selectedBusiness, setSelectedBusiness] = useState<ValidatedBusiness | null>(null);
   const [sending, setSending] = useState(false);
   const [batchSending, setBatchSending] = useState(false);
+
+  // Fetch daily limit on mount and periodically
+  const fetchDailyLimit = async () => {
+    try {
+      const res = await fetch("/api/operator/campaigns/daily-limit");
+      if (res.ok) {
+        const data = await res.json();
+        setDailyLimit(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch daily limit:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDailyLimit();
+    const interval = setInterval(fetchDailyLimit, 10000); // Refresh every 10s
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCsvUpload = async () => {
     if (!csvFile) {
@@ -420,10 +450,19 @@ James`;
       });
 
       if (!res.ok) {
-        throw new Error("Batch send failed");
+        const errorData = await res.json();
+        if (res.status === 429) {
+          // Daily limit exceeded
+          setError(`❌ Daily limit reached: ${errorData.details}`);
+          await fetchDailyLimit(); // Refresh limit status
+        } else {
+          setError(errorData.error || "Batch send failed");
+        }
+        return;
       }
 
       const data = await res.json();
+      await fetchDailyLimit(); // Refresh limit after successful send
 
       // Only mark successfully sent emails as sent
       const sentEmails = new Set(
@@ -748,6 +787,33 @@ James`;
             </div>
           )}
 
+          {/* Daily Limit Warning */}
+          {dailyLimit && (
+            <div className={`p-4 rounded mb-4 ${dailyLimit.remaining === 0 ? 'bg-[#FFE5E5] border border-[#FF6B6B]' : dailyLimit.remaining < 20 ? 'bg-[#FFF8E5] border border-[#FFB84D]' : 'bg-[#E5F5FF] border border-[#4DBBFF]'}`}>
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-semibold text-[#0D0D0D]">
+                    {dailyLimit.remaining === 0
+                      ? '⚠️ Daily limit reached'
+                      : dailyLimit.remaining < 20
+                      ? '⚠️ Approaching daily limit'
+                      : '📊 Daily email limit'}
+                  </p>
+                  <p className="text-xs text-[#666666] mt-1">
+                    {dailyLimit.sentToday} sent + {dailyLimit.queuedToday} queued = {dailyLimit.totalUsed}/{dailyLimit.limit} ({dailyLimit.percentUsed}%)
+                  </p>
+                  <p className="text-xs text-[#0D0D0D] font-semibold mt-1">
+                    {dailyLimit.remaining > 0 ? `${dailyLimit.remaining} emails remaining today` : 'No emails can be sent today'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-[#0D0D0D]">{dailyLimit.remaining}</p>
+                  <p className="text-xs text-[#666666]">remaining</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-3">
             <button
               onClick={() => {
@@ -762,8 +828,9 @@ James`;
             </button>
             <button
               onClick={handleBatchSend}
-              disabled={batchSending || businesses.filter((b) => b.validationStatus === "valid" && !b.leadId).length === 0}
+              disabled={batchSending || businesses.filter((b) => b.validationStatus === "valid" && !b.leadId).length === 0 || (dailyLimit && dailyLimit.remaining <= 0)}
               className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded transition-colors disabled:opacity-50"
+              title={dailyLimit && dailyLimit.remaining <= 0 ? "Daily email limit reached. Resend allows 100 emails per day." : ""}
             >
               {batchSending ? "Sending..." : `Send All (${businesses.filter((b) => b.validationStatus === "valid" && !b.leadId).length})`}
             </button>
