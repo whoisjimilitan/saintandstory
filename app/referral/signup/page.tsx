@@ -228,10 +228,9 @@ export default function ReferrerSignup() {
               <div key={idx} className="border border-[#E8E8E8] rounded-lg">
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left p-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition flex justify-between items-center"
+                  className="w-full text-left p-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition"
                 >
                   {item.q}
-                  <span className={`text-lg transition-transform ${openFaq === idx ? 'rotate-180' : ''}`}>▼</span>
                 </button>
                 {openFaq === idx && (
                   <div className="px-4 pb-4 text-sm text-[#888888] border-t border-[#E8E8E8]">
