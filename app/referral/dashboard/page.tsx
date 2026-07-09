@@ -76,12 +76,10 @@ function DashboardContent() {
 
   if (!code) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-          <h1 className="text-2xl font-semibold mb-4">Referral Dashboard</h1>
-          <p className="text-slate-600 mb-6">
-            No referral code found. Please check your referral link.
-          </p>
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
+        <div className="max-w-2xl w-full text-center">
+          <h1 className="text-2xl font-black text-[#0D0D0D] mb-2">Referral Dashboard</h1>
+          <p className="text-sm text-[#888888]">No referral code found. Please check your referral link.</p>
         </div>
       </div>
     );
@@ -89,10 +87,10 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#E8E8E8] border-t-[#0D0D0D] mx-auto mb-4"></div>
+          <p className="text-sm text-[#888888]">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -100,13 +98,13 @@ function DashboardContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full border-2 border-red-200">
-          <h1 className="text-2xl font-semibold mb-4 text-red-600">Error</h1>
-          <p className="text-slate-600 mb-6">{error}</p>
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
+        <div className="max-w-2xl w-full border border-[#FFE0E0] rounded-lg p-8 text-center">
+          <h1 className="text-2xl font-black text-[#CC0000] mb-2">Error</h1>
+          <p className="text-sm text-[#888888] mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-slate-900 text-white py-2 rounded-lg hover:bg-slate-800 transition"
+            className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition"
           >
             Try Again
           </button>
@@ -117,9 +115,9 @@ function DashboardContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-          <p className="text-slate-600">No data available</p>
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
+        <div className="max-w-2xl w-full text-center">
+          <p className="text-sm text-[#888888]">No data available</p>
         </div>
       </div>
     );
@@ -130,111 +128,87 @@ function DashboardContent() {
   const referrals = data.referrals;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white pt-32 pb-16">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6 border-l-4 border-slate-900">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                {referrer.name}
-              </h1>
-              <p className="text-slate-600 mt-1">{referrer.office} • {referrer.city}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-sm font-mono text-slate-500 mb-2">Code</div>
-              <div className="text-2xl font-bold font-mono text-slate-900 bg-slate-100 px-4 py-2 rounded">
-                {referrer.code}
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-              {referrer.status === "active" ? "✓ Active" : "Inactive"}
-            </div>
-            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-              WhatsApp: {referrer.whatsappStatus}
-            </div>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
+            {referrer.name}
+          </h1>
+          <p className="text-xs text-[#999999]">{referrer.office} • {referrer.city} • Code: <span className="font-mono font-semibold">{referrer.code}</span></p>
         </div>
 
         {/* Earnings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 border-t-4 border-slate-900">
-            <div className="text-sm text-slate-600 font-medium mb-2">Total Earnings</div>
-            <div className="text-3xl font-bold text-slate-900">
-              £{earnings.total.toFixed(2)}
-            </div>
-            <div className="text-xs text-slate-500 mt-2">All time</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total Earnings</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.total.toFixed(2)}</p>
+            <p className="text-xs text-[#666666]">All time</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border-t-4 border-green-600">
-            <div className="text-sm text-slate-600 font-medium mb-2">This Month</div>
-            <div className="text-3xl font-bold text-green-600">
-              £{earnings.thisMonth.toFixed(2)}
-            </div>
-            <div className="text-xs text-slate-500 mt-2">{referrals.thisMonth} referrals</div>
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">This Month</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.thisMonth.toFixed(2)}</p>
+            <p className="text-xs text-[#666666]">{referrals.thisMonth} referrals</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border-t-4 border-amber-600">
-            <div className="text-sm text-slate-600 font-medium mb-2">Pending</div>
-            <div className="text-3xl font-bold text-amber-600">
-              £{earnings.pending.toFixed(2)}
-            </div>
-            <div className="text-xs text-slate-500 mt-2">{referrals.pending} pending</div>
+          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Pending</p>
+            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.pending.toFixed(2)}</p>
+            <p className="text-xs text-[#666666]">{referrals.pending} pending</p>
           </div>
         </div>
 
         {/* Referrals Summary */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">Referral Activity</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="border border-[#E8E8E8] rounded-lg p-6 mb-12 bg-white">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Referral Activity</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <div className="text-sm text-slate-600 mb-2">Total Referrals</div>
-              <div className="text-2xl font-bold text-slate-900">{referrals.total}</div>
+              <p className="text-xs text-[#666666] mb-2">Total Referrals</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{referrals.total}</p>
             </div>
             <div>
-              <div className="text-sm text-slate-600 mb-2">Active</div>
-              <div className="text-2xl font-bold text-slate-900">{referrals.active}</div>
+              <p className="text-xs text-[#666666] mb-2">Active</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">{referrals.active}</p>
             </div>
             <div>
-              <div className="text-sm text-slate-600 mb-2">Commission Rate</div>
-              <div className="text-2xl font-bold text-slate-900">£{data.commission}</div>
+              <p className="text-xs text-[#666666] mb-2">Commission Rate</p>
+              <p className="text-2xl font-black text-[#0D0D0D]">£{data.commission}</p>
             </div>
             <div>
-              <div className="text-sm text-slate-600 mb-2">Next Payout</div>
-              <div className="text-lg font-bold text-slate-900">
+              <p className="text-xs text-[#666666] mb-2">Next Payout</p>
+              <p className="text-lg font-bold text-[#0D0D0D]">
                 {new Date(data.nextPayoutDate).toLocaleDateString()}
-              </div>
+              </p>
             </div>
           </div>
         </div>
 
         {/* Recent Referrals */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Referrals</h2>
+        <div className="border border-[#E8E8E8] rounded-lg p-6 mb-12 bg-white">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Recent Referrals</p>
           {data.recentJobs.length === 0 ? (
-            <p className="text-slate-600 py-6">No recent referrals yet.</p>
+            <p className="text-sm text-[#888888] py-6">No recent referrals yet.</p>
           ) : (
             <div className="space-y-3">
               {data.recentJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="flex justify-between items-center p-4 bg-slate-50 rounded-lg border border-slate-200"
+                  className="flex justify-between items-center p-4 bg-[#F9F9F9] rounded-lg border border-[#E8E8E8]"
                 >
                   <div>
-                    <div className="font-medium text-slate-900">{job.customer}</div>
-                    <div className="text-sm text-slate-600">
+                    <p className="font-semibold text-[#0D0D0D]">{job.customer}</p>
+                    <p className="text-xs text-[#666666] mt-1">
                       Job: £{job.value.toFixed(2)} • {job.status}
-                    </div>
+                    </p>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-slate-900">
+                    <p className="font-black text-[#0D0D0D]">
                       £{job.commission.toFixed(2)}
-                    </div>
-                    <div className="text-xs text-slate-500">
+                    </p>
+                    <p className="text-xs text-[#999999] mt-1">
                       {new Date(job.createdAt).toLocaleDateString()}
-                    </div>
+                    </p>
                   </div>
                 </div>
               ))}
@@ -243,35 +217,33 @@ function DashboardContent() {
         </div>
 
         {/* How to Share */}
-        <div className="bg-slate-900 text-white rounded-lg shadow-sm p-6 mt-6">
-          <h2 className="text-xl font-semibold mb-4">How to Earn More</h2>
-          <p className="mb-4 text-slate-300">
-            When your clients ask about removals, give them this message:
+        <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">How to Earn More</p>
+          <p className="text-sm text-[#666666] mb-4">
+            When your clients ask about removals, share this message:
           </p>
-          <div className="bg-slate-800 p-4 rounded font-mono text-sm mb-4">
-            <p className="text-slate-300">Hi, for removals I recommend Saint & Story.</p>
-            <p className="text-slate-300">
-              Tell them code <span className="text-green-400 font-bold">{referrer.code}</span> for
-              priority service.
+          <div className="bg-[#F9F9F9] p-4 rounded-lg border border-[#E8E8E8] font-mono text-sm mb-4">
+            <p className="text-[#0D0D0D]">Hi, for removals I recommend Saint & Story.</p>
+            <p className="text-[#0D0D0D] mt-1">
+              Tell them code <span className="font-semibold">{referrer.code}</span>
             </p>
           </div>
           <button
             onClick={() => {
-              const text = `Hi, for removals I recommend Saint & Story. Tell them code ${referrer.code} for priority service.`;
+              const text = `Hi, for removals I recommend Saint & Story. Tell them code ${referrer.code}`;
               navigator.clipboard.writeText(text);
               alert("Copied to clipboard!");
             }}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition"
+            className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold text-sm rounded-lg hover:bg-[#333333] transition-colors"
           >
             Copy Message
           </button>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-sm text-slate-600">
+        <div className="text-center mt-8 text-xs text-[#999999]">
           <p>
-            Questions? Call{" "}
-            <span className="font-mono font-bold">0203 051 9243</span>
+            Questions? Call <span className="font-mono font-semibold text-[#0D0D0D]">0203 051 9243</span>
           </p>
           <p className="mt-2">Last updated: {new Date(earnings.lastUpdated).toLocaleTimeString()}</p>
         </div>
