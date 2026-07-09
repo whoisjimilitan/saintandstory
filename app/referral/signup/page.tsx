@@ -144,7 +144,7 @@ export default function ReferrerSignup() {
         {/* Headline - Premium typography matching homepage */}
         <div className="max-w-2xl mx-auto mb-16 text-center">
           <h1 className="font-sans font-black text-5xl md:text-6xl leading-[1.0] tracking-tight text-[#0D0D0D] mb-4">
-            R<span className="font-display italic font-normal">e</span>fer Customers.<br />
+            R<span className="font-display italic font-normal">e</span>fer Clients.<br />
             Earn £20<span className="text-4xl md:text-5xl">/referral</span>.
           </h1>
           <p className="text-base text-[#888888]">For receptionists and office managers. Paid monthly to your account.</p>
@@ -196,11 +196,11 @@ export default function ReferrerSignup() {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none appearance-none bg-white cursor-pointer hover:border-[#0D0D0D] transition-colors"
               >
-                <option value="">Select your city</option>
+                <option value="" className="text-[#CCCCCC]">Select your city</option>
                 {UK_CITIES.map((city) => (
-                  <option key={city} value={city}>
+                  <option key={city} value={city} className="text-[#0D0D0D]">
                     {city}
                   </option>
                 ))}
@@ -217,7 +217,7 @@ export default function ReferrerSignup() {
           </div>
 
           {/* FAQ */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[
               { q: "How much do I earn?", a: "£20 per referral. When your client books and mentions your code, you get paid." },
               { q: "When do I get paid?", a: "Monthly. Payouts processed on the 1st of each month to your bank." },
@@ -225,15 +225,15 @@ export default function ReferrerSignup() {
               { q: "Is there a minimum?", a: "No minimum. Earn as much or as little as you want." },
               { q: "Questions?", a: "Call 0203 051 9243 or reply to WhatsApp. We're here to help." },
             ].map((item, idx) => (
-              <div key={idx} className="border border-[#E8E8E8] rounded-lg bg-white">
+              <div key={idx} className="border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] transition-colors">
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left p-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition"
+                  className="w-full text-left p-5 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition text-sm"
                 >
                   {item.q}
                 </button>
                 {openFaq === idx && (
-                  <div className="px-4 pb-4 text-sm text-[#888888] border-t border-[#E8E8E8]">
+                  <div className="px-5 pb-5 text-sm text-[#666666] border-t border-[#E8E8E8] pt-4 leading-relaxed">
                     {item.a}
                   </div>
                 )}
