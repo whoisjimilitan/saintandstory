@@ -166,19 +166,16 @@ export default function ReferrerSignup() {
           <p className="text-xs text-[#999999]">Get paid £15 per referral. Takes 1 minute.</p>
         </div>
 
-        {/* Value Props */}
-        <div className="grid grid-cols-3 gap-3 mb-12">
-          <div className="text-center">
-            <p className="text-2xl font-black text-[#0D0D0D] mb-1">£15</p>
-            <p className="text-xs text-[#666666]">Per referral</p>
+        {/* Value Props - Pills */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]"><span className="font-semibold">£15</span> per referral</p>
           </div>
-          <div className="text-center">
-            <p className="text-2xl font-black text-[#0D0D0D] mb-1">Monthly</p>
-            <p className="text-xs text-[#666666]">Payment cycle</p>
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]">Paid <span className="font-semibold">monthly</span></p>
           </div>
-          <div className="text-center">
-            <p className="text-2xl font-black text-[#0D0D0D] mb-1">Zero</p>
-            <p className="text-xs text-[#666666]">Obligations</p>
+          <div className="px-4 py-2 border border-[#E8E8E8] rounded-full bg-[#F9F9F9] hover:bg-white hover:border-[#0D0D0D] transition-all">
+            <p className="text-xs text-[#0D0D0D]"><span className="font-semibold">Zero</span> obligations</p>
           </div>
         </div>
 
@@ -198,7 +195,7 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="Your name"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none focus:shadow-[0_0_0_2px_rgba(13,13,13,0.05)] transition-all duration-200"
           />
 
           {/* Office */}
@@ -209,7 +206,7 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="Your office or business"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none focus:shadow-[0_0_0_2px_rgba(13,13,13,0.05)] transition-all duration-200"
           />
 
           {/* Phone */}
@@ -220,7 +217,7 @@ export default function ReferrerSignup() {
             onChange={handleChange}
             placeholder="WhatsApp: +441234567890 or 01234567890"
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none focus:shadow-[0_0_0_2px_rgba(13,13,13,0.05)] transition-all duration-200"
           />
 
           {/* City */}
@@ -229,7 +226,7 @@ export default function ReferrerSignup() {
             value={formData.city}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+            className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none focus:shadow-[0_0_0_2px_rgba(13,13,13,0.05)] transition-all duration-200"
           >
             <option value="">Select your city</option>
             {UK_CITIES.map((city) => (
