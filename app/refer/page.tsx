@@ -44,6 +44,7 @@ export default function ReferrerSignup() {
     phone: "",
     city: "",
     category: "business",
+    hasWhatsapp: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,10 +52,10 @@ export default function ReferrerSignup() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target as HTMLInputElement;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -186,10 +187,21 @@ export default function ReferrerSignup() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="Your WhatsApp number"
+                placeholder="Your contact number"
                 required
                 className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="hasWhatsapp"
+                  checked={formData.hasWhatsapp}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded border border-[#E8E8E8]"
+                />
+                <span className="text-sm text-[#0D0D0D]">Available on WhatsApp</span>
+              </label>
 
               <select
                 name="city"
