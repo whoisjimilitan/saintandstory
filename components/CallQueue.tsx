@@ -26,8 +26,8 @@ export default function CallQueue() {
   const [activeTab, setActiveTab] = useState<"queue" | "history">("queue");
   const [queue, setQueue] = useState<Contact[]>([]);
   const [recentCalls, setRecentCalls] = useState<CallLogEntry[]>([]);
-  const [postcodeSearch, setPostcodeSearch] = useState("");
-  const [keywordSearch, setKeywordSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isPostcodeSearch, setIsPostcodeSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -84,21 +84,41 @@ export default function CallQueue() {
     }
   };
 
-  const handleSearch = async (query: string, type: "keyword" | "postcode") => {
-    if (!query || query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch(
-        `/api/contacts/search?q=${encodeURIComponent(query)}&type=${type}`
-      );
-      const data = await response.json();
+      const params = new URLSearchParams();
+      if (isPostcodeSearch) {
+        params.append("postcode", searchTerm);
+      } else {
+        params.append("businessName", searchTerm);
+      }
+
+      const url = `/api/contacts/search?${params}`;
+      console.log("[CONTACTS] Searching:", url);
+
+      const res = await fetch(url, { method: "GET" });
+      const data = await res.json();
+
+      console.log("[CONTACTS] Search response:", data);
+
+      if (!res.ok) {
+        console.error("[CONTACTS] Search failed:", data.error);
+        alert(`Search failed: ${data.error || "Unknown error"}`);
+        setSearchResults([]);
+        return;
+      }
+
       setSearchResults(data.results || []);
+      if (data.results?.length === 0) {
+        alert("No contacts found");
+      }
     } catch (error) {
-      console.error("Error searching:", error);
+      console.error("[CONTACTS] Search error:", error);
+      alert(`Search error: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setLoading(false);
     }
@@ -155,38 +175,42 @@ export default function CallQueue() {
       </div>
 
       {/* Search Section */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Search by business name..."
-          value={keywordSearch}
-          onChange={(e) => setKeywordSearch(e.target.value)}
-          className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-        />
-        <button
-          onClick={() => handleSearch(keywordSearch, "keyword")}
-          disabled={loading || keywordSearch.length < 2}
-          className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
-        >
-          Search
-        </button>
-      </div>
+      <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
+        <form onSubmit={handleSearch} className="space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+              Search Term
+            </label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={isPostcodeSearch ? "e.g., SW1A1AA" : "e.g., Business Name"}
+              className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+            />
+          </div>
 
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Search by postcode..."
-          value={postcodeSearch}
-          onChange={(e) => setPostcodeSearch(e.target.value)}
-          className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-        />
-        <button
-          onClick={() => handleSearch(postcodeSearch, "postcode")}
-          disabled={loading || postcodeSearch.length < 2}
-          className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
-        >
-          Search
-        </button>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="postcodeSearch"
+              checked={isPostcodeSearch}
+              onChange={(e) => setIsPostcodeSearch(e.target.checked)}
+              className="w-4 h-4 rounded appearance-none border border-[#0D0D0D] bg-white checked:bg-[#0D0D0D] checked:border-[#0D0D0D] cursor-pointer"
+            />
+            <label htmlFor="postcodeSearch" className="text-xs text-[#888888] cursor-pointer">
+              Search by postcode instead
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Searching..." : "Search"}
+          </button>
+        </form>
       </div>
 
       {/* Main Content */}

@@ -24,8 +24,10 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = new URL(request.url).searchParams;
-    const query = searchParams.get("q") || "";
-    const type = searchParams.get("type") || "keyword"; // "keyword" or "postcode"
+    const businessName = searchParams.get("businessName") || "";
+    const postcode = searchParams.get("postcode") || "";
+
+    const query = businessName || postcode;
 
     if (!query || query.length < 2) {
       return NextResponse.json(
@@ -34,24 +36,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`[CONTACTS SEARCH] Searching for: ${query} (type: ${type})`);
+    console.log(`[CONTACTS SEARCH] Searching for: ${query}`);
 
-    // Search by type
     let whereClause: any;
 
-    if (type === "postcode") {
+    if (postcode) {
       // Search only postcode
       whereClause = {
-        postcode: { contains: query, mode: "insensitive" },
+        postcode: { contains: postcode, mode: "insensitive" },
       };
     } else {
-      // Search keyword (business name, contact name, industry)
+      // Search business name
       whereClause = {
-        OR: [
-          { businessName: { contains: query, mode: "insensitive" } },
-          { contactName: { contains: query, mode: "insensitive" } },
-          { industry: { contains: query, mode: "insensitive" } },
-        ],
+        businessName: { contains: businessName, mode: "insensitive" },
       };
     }
 
