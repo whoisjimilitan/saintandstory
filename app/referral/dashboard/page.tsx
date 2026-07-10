@@ -144,46 +144,39 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Earnings - Minimal Layout */}
+        {/* Earnings - Premium Card */}
         <div className="mb-16">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Earnings</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-            <div>
-              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.total.toFixed(2)}</p>
-              <p className="text-sm text-[#999999]">Total earned</p>
-            </div>
-            <div>
-              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.thisMonth.toFixed(2)}</p>
-              <p className="text-sm text-[#999999]">This month • {referrals.thisMonth} referrals</p>
-            </div>
-            <div>
-              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.pending.toFixed(2)}</p>
-              <p className="text-sm text-[#999999]">Pending • {referrals.pending} referrals</p>
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Balance</p>
+          <div className="border border-[#E8E8E8] rounded-lg p-10 md:p-12 bg-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+              <div>
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4">This Month</p>
+                <p className="text-7xl font-black text-[#0D0D0D]">£{earnings.thisMonth.toFixed(2)}</p>
+                <p className="text-sm text-[#999999] mt-4">{referrals.thisMonth} referrals</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4">Pending</p>
+                <p className="text-7xl font-black text-[#0D0D0D]">{referrals.pending}</p>
+                <p className="text-sm text-[#999999] mt-4">referrals awaiting confirmation</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Activity Summary - Minimal */}
+        {/* Summary Info - Minimal */}
         <div className="mb-16 pb-8 border-b border-[#E8E8E8]">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Activity</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
-              <p className="text-4xl font-black text-[#0D0D0D] mb-1">{referrals.total}</p>
-              <p className="text-xs text-[#999999]">Total referrals</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Referrals</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
             </div>
             <div>
-              <p className="text-4xl font-black text-[#0D0D0D] mb-1">{referrals.active}</p>
-              <p className="text-xs text-[#999999]">Active</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Earn</p>
+              <p className="text-3xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-lg font-normal text-[#999999]">per referral</span></p>
             </div>
             <div>
-              <p className="text-4xl font-black text-[#0D0D0D] mb-1">£{data.commission}</p>
-              <p className="text-xs text-[#999999]">Per referral</p>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-[#0D0D0D] mb-1">
-                {new Date(data.nextPayoutDate).toLocaleDateString()}
-              </p>
-              <p className="text-xs text-[#999999]">Next payout</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Next Payout</p>
+              <p className="text-lg font-bold text-[#0D0D0D]">{new Date(data.nextPayoutDate).toLocaleDateString()}</p>
             </div>
           </div>
         </div>
