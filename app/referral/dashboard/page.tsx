@@ -129,110 +129,75 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
+      <div className="max-w-4xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">
+        <div className="mb-16 pb-8 border-b border-[#E8E8E8]">
+          <h1 className="text-5xl md:text-6xl font-black text-[#0D0D0D] mb-4 tracking-tight">
             {referrer.name}
           </h1>
-          <p className="text-xs text-[#999999]">{referrer.office} • {referrer.city} • Code: <span className="font-mono font-semibold">{referrer.code}</span></p>
-        </div>
-
-        {/* Earnings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:bg-[#F9F9F9] transition-colors">
-            <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">Total Earnings</p>
-            <p className="text-5xl font-black text-[#0D0D0D] mb-4">£{earnings.total.toFixed(2)}</p>
-            <div className="h-1 bg-[#E8E8E8] rounded-full mb-4"></div>
-            <p className="text-sm text-[#666666]">All time earnings</p>
-          </div>
-
-          <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] transition-colors">
-            <p className="text-xs text-[#cccccc] uppercase tracking-widest mb-4 font-semibold">This Month</p>
-            <p className="text-5xl font-black text-white mb-4">£{earnings.thisMonth.toFixed(2)}</p>
-            <div className="h-1 bg-white/20 rounded-full mb-4"></div>
-            <p className="text-sm text-[#cccccc]">{referrals.thisMonth} referrals this month</p>
-          </div>
-
-          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:bg-[#F9F9F9] transition-colors">
-            <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">Pending</p>
-            <p className="text-5xl font-black text-[#0D0D0D] mb-4">£{earnings.pending.toFixed(2)}</p>
-            <div className="h-1 bg-[#E8E8E8] rounded-full mb-4"></div>
-            <p className="text-sm text-[#666666]">{referrals.pending} pending referrals</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <p className="text-base text-[#666666]">{referrer.office} • {referrer.city}</p>
+            <div className="bg-[#F9F9F9] px-5 py-3 rounded-lg">
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-1">Your code</p>
+              <p className="font-mono font-black text-xl text-[#0D0D0D]">{referrer.code}</p>
+            </div>
           </div>
         </div>
 
-        {/* Referrals Summary */}
-        <div className="border border-[#E8E8E8] rounded-lg p-6 mb-12 bg-white">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Referral Activity</p>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Earnings - Minimal Layout */}
+        <div className="mb-16">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Earnings</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
             <div>
-              <p className="text-xs text-[#666666] mb-2">Total Referrals</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{referrals.total}</p>
+              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.total.toFixed(2)}</p>
+              <p className="text-sm text-[#999999]">Total earned</p>
             </div>
             <div>
-              <p className="text-xs text-[#666666] mb-2">Active</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">{referrals.active}</p>
+              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.thisMonth.toFixed(2)}</p>
+              <p className="text-sm text-[#999999]">This month • {referrals.thisMonth} referrals</p>
             </div>
             <div>
-              <p className="text-xs text-[#666666] mb-2">Commission Rate</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">£{data.commission}</p>
+              <p className="text-6xl font-black text-[#0D0D0D] mb-2">£{earnings.pending.toFixed(2)}</p>
+              <p className="text-sm text-[#999999]">Pending • {referrals.pending} referrals</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Activity Summary - Minimal */}
+        <div className="mb-16 pb-8 border-b border-[#E8E8E8]">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Activity</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            <div>
+              <p className="text-4xl font-black text-[#0D0D0D] mb-1">{referrals.total}</p>
+              <p className="text-xs text-[#999999]">Total referrals</p>
             </div>
             <div>
-              <p className="text-xs text-[#666666] mb-2">Next Payout</p>
-              <p className="text-lg font-bold text-[#0D0D0D]">
+              <p className="text-4xl font-black text-[#0D0D0D] mb-1">{referrals.active}</p>
+              <p className="text-xs text-[#999999]">Active</p>
+            </div>
+            <div>
+              <p className="text-4xl font-black text-[#0D0D0D] mb-1">£{data.commission}</p>
+              <p className="text-xs text-[#999999]">Per referral</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[#0D0D0D] mb-1">
                 {new Date(data.nextPayoutDate).toLocaleDateString()}
               </p>
+              <p className="text-xs text-[#999999]">Next payout</p>
             </div>
           </div>
         </div>
 
-        {/* Recent Referrals */}
-        <div className="border border-[#E8E8E8] rounded-lg p-6 mb-12 bg-white">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Recent Referrals</p>
-          {data.recentJobs.length === 0 ? (
-            <p className="text-sm text-[#888888] py-6">No recent referrals yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {data.recentJobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="flex justify-between items-center p-4 bg-[#F9F9F9] rounded-lg border border-[#E8E8E8]"
-                >
-                  <div>
-                    <p className="font-semibold text-[#0D0D0D]">{job.customer}</p>
-                    <p className="text-xs text-[#666666] mt-1">
-                      Job: £{job.value.toFixed(2)} • {job.status}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-[#0D0D0D]">
-                      £{job.commission.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-[#999999] mt-1">
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Share Message Hero */}
-        <div className="border border-[#E8E8E8] rounded-lg p-10 md:p-12 bg-white mb-12">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Start Earning</p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-3 tracking-tight">
-            Share this message
-          </h2>
-          <p className="text-base text-[#666666] mb-8">
-            When your clients need removals, copy and share. They mention your code and you earn £20.
+        {/* Share Message - Clean CTA */}
+        <div className="mb-12">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Share & Earn</p>
+          <p className="text-lg text-[#0D0D0D] mb-6 leading-relaxed">
+            When your clients ask about removals, share this message and earn £20 when they book.
           </p>
 
-          <div className="bg-[#F9F9F9] p-6 rounded-lg border-2 border-[#E8E8E8] mb-8">
-            <p className="font-mono text-base leading-relaxed text-[#0D0D0D]">
-              <span className="block mb-3">Hi, for removals I recommend Saint & Story.</span>
-              <span className="block font-black text-lg">Tell them code <span className="text-[#0D0D0D]">{referrer.code}</span></span>
+          <div className="bg-[#F9F9F9] p-6 rounded-lg mb-6">
+            <p className="text-base text-[#0D0D0D] leading-relaxed">
+              Hi, for removals I recommend Saint & Story. Tell them code <span className="font-mono font-black">{referrer.code}</span>
             </p>
           </div>
 
@@ -240,24 +205,17 @@ function DashboardContent() {
             onClick={() => {
               const text = `Hi, for removals I recommend Saint & Story. Tell them code ${referrer.code}`;
               navigator.clipboard.writeText(text);
-              alert("Message copied to clipboard!");
+              alert("Copied to clipboard");
             }}
-            className="w-full px-6 py-4 bg-[#0D0D0D] text-white font-black text-base rounded-lg hover:bg-[#1a1a1a] transition-colors mb-4"
+            className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold text-sm rounded-lg hover:bg-[#333333] transition-colors"
           >
             Copy Message
           </button>
-
-          <p className="text-xs text-[#999999] text-center">
-            Works in WhatsApp, email, phone calls—anywhere.
-          </p>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-xs text-[#999999]">
-          <p>
-            Questions? Call <span className="font-mono font-semibold text-[#0D0D0D]">0203 051 9243</span>
-          </p>
-          <p className="mt-2">Last updated: {new Date(earnings.lastUpdated).toLocaleTimeString()}</p>
+        <div className="text-center pt-8 border-t border-[#E8E8E8] text-xs text-[#999999]">
+          <p>Questions? Call <span className="font-mono font-semibold text-[#0D0D0D]">0203 051 9243</span></p>
         </div>
       </div>
     </div>
