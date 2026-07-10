@@ -62,6 +62,16 @@ export async function GET(
 
     console.log("[REFERRAL REFERRER DETAIL] ✓ Data retrieved successfully");
 
+    // Calculate pending earnings
+    const pendingEarnings = referrer.earnings
+      .filter((e) => e.status === "pending")
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    // Calculate pending jobs
+    const pendingJobs = referrer.jobs.filter(
+      (j) => j.status === "new" || j.status === "confirmed"
+    ).length;
+
     return NextResponse.json({
       success: true,
       referrer: {
@@ -79,35 +89,30 @@ export async function GET(
         updatedAt: referrer.updatedAt,
         whatsappJoinedAt: referrer.whatsappJoinedAt,
         lastActiveAt: referrer.lastActiveAt,
+        earnings: {
+          total: Number(referrer.totalEarnings),
+          thisMonth: Number(referrer.monthlyEarnings),
+          pending: pendingEarnings,
+          recentEarnings: referrer.earnings.slice(0, 3).map((e) => ({
+            id: e.id,
+            amount: Number(e.amount),
+            status: e.status,
+            date: e.createdAt,
+          })),
+        },
+        referrals: {
+          total: referrer.totalReferrals,
+          active: referrer.activeReferrals,
+          pending: pendingJobs,
+          recentJobs: referrer.jobs.slice(0, 3).map((j) => ({
+            id: j.id,
+            jobId: j.jobId,
+            commission: Number(j.commission),
+            status: j.status,
+            date: j.createdAt,
+          })),
+        },
       },
-      summary: {
-        totalEarnings: Number(referrer.totalEarnings),
-        monthlyEarnings: Number(referrer.monthlyEarnings),
-        totalReferrals: referrer.totalReferrals,
-        activeReferrals: referrer.activeReferrals,
-      },
-      earnings: referrer.earnings.map((e) => ({
-        id: e.id,
-        amount: Number(e.amount),
-        status: e.status,
-        jobId: e.jobId,
-        month: e.referralMonth,
-        createdAt: e.createdAt,
-        paidAt: e.paidAt,
-      })),
-      jobs: referrer.jobs.map((j) => ({
-        id: j.id,
-        jobId: j.jobId,
-        customerName: j.customerName,
-        customerPhone: j.customerPhone,
-        customerEmail: j.customerEmail,
-        jobValue: Number(j.jobValue),
-        commission: Number(j.commission),
-        status: j.status,
-        confirmedAt: j.confirmedAt,
-        completedAt: j.completedAt,
-        createdAt: j.createdAt,
-      })),
       monthlyBreakdown,
       lastUpdated: new Date().toISOString(),
     });
