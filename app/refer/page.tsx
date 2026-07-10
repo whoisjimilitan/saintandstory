@@ -186,7 +186,7 @@ export default function ReferrerSignup() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+44 followed by your number"
+                placeholder="Your WhatsApp number"
                 required
                 className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
