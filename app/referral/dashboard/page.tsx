@@ -131,66 +131,66 @@ function DashboardContent() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="mb-16 pb-8 border-b border-[#E8E8E8]">
-          <h1 className="text-5xl md:text-6xl font-black text-[#0D0D0D] mb-4 tracking-tight">
+        <div className="mb-12 pb-6 border-b border-[#E8E8E8]">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-3 tracking-tight">
             {referrer.name}
           </h1>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <p className="text-base text-[#666666]">{referrer.office} • {referrer.city}</p>
-            <div className="bg-[#F9F9F9] px-5 py-3 rounded-lg">
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-1">Your code</p>
-              <p className="font-mono font-black text-xl text-[#0D0D0D]">{referrer.code}</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <p className="text-sm text-[#666666]">{referrer.office} • {referrer.city}</p>
+            <div className="bg-[#F9F9F9] px-4 py-2 rounded-lg">
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-0.5">Your code</p>
+              <p className="font-mono font-black text-base text-[#0D0D0D]">{referrer.code}</p>
             </div>
           </div>
         </div>
 
         {/* Earnings - Premium Card */}
-        <div className="mb-16">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Balance</p>
-          <div className="border border-[#E8E8E8] rounded-lg p-10 md:p-12 bg-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+        <div className="mb-12">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Balance</p>
+          <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4">This Month</p>
-                <p className="text-7xl font-black text-[#0D0D0D]">£{earnings.thisMonth.toFixed(2)}</p>
-                <p className="text-sm text-[#999999] mt-4">{referrals.thisMonth} referrals</p>
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">This Month</p>
+                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D]">£{earnings.thisMonth.toFixed(2)}</p>
+                <p className="text-xs text-[#999999] mt-3">{referrals.thisMonth} referrals</p>
               </div>
               <div>
-                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4">Pending</p>
-                <p className="text-7xl font-black text-[#0D0D0D]">{referrals.pending}</p>
-                <p className="text-sm text-[#999999] mt-4">referrals awaiting confirmation</p>
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Pending</p>
+                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D]">{referrals.pending}</p>
+                <p className="text-xs text-[#999999] mt-3">referrals awaiting confirmation</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Summary Info - Minimal */}
-        <div className="mb-16 pb-8 border-b border-[#E8E8E8]">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+        <div className="mb-12 pb-6 border-b border-[#E8E8E8]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Referrals</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Referrals</p>
+              <p className="text-2xl md:text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
             </div>
             <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Earn</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-lg font-normal text-[#999999]">per referral</span></p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Earn</p>
+              <p className="text-lg md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-sm font-normal text-[#999999]">per</span></p>
             </div>
             <div>
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Next Payout</p>
-              <p className="text-lg font-bold text-[#0D0D0D]">{new Date(data.nextPayoutDate).toLocaleDateString()}</p>
+              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Next Payout</p>
+              <p className="text-base font-bold text-[#0D0D0D]">{new Date(data.nextPayoutDate).toLocaleDateString()}</p>
             </div>
           </div>
         </div>
 
         {/* Share Message - Clean CTA */}
         <div className="mb-12">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-8 font-semibold">Share & Earn</p>
-          <p className="text-lg text-[#0D0D0D] mb-6 leading-relaxed">
-            When your clients ask about removals, share this message and earn £20 when they book.
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-5 font-semibold">Share & Earn</p>
+          <p className="text-sm md:text-base text-[#0D0D0D] mb-5">
+            Share with clients and earn £20 when they book.
           </p>
 
-          <div className="bg-[#F9F9F9] p-6 rounded-lg mb-6">
-            <p className="text-base text-[#0D0D0D] leading-relaxed">
-              Hi, for removals I recommend Saint & Story. Tell them code <span className="font-mono font-black">{referrer.code}</span>
+          <div className="bg-[#F9F9F9] p-4 md:p-5 rounded-lg mb-5">
+            <p className="text-sm text-[#0D0D0D] leading-relaxed">
+              Hi, for removals I recommend Saint & Story. Tell them code <span className="font-mono font-black text-base">{referrer.code}</span>
             </p>
           </div>
 
