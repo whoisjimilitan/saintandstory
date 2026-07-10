@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import CallQueue from "@/components/CallQueue";
 
 interface OperationStatus {
   whatsapp: {
@@ -39,6 +40,7 @@ export default function TodayPage() {
     pendingReplies: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"today" | "contacts">("today");
 
   // Modal states for clickable cards
   const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "drivers" | null>(null);
@@ -103,18 +105,51 @@ export default function TodayPage() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
 
-        {/* HEADER */}
-        <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
-          <p className="text-xs text-[#999999]">{dayName} • {dateStr}</p>
+        {/* TABS */}
+        <div className="mb-12 border-b border-[#E8E8E8] flex gap-8">
+          <button
+            onClick={() => setActiveTab("today")}
+            className={`pb-4 font-semibold text-sm transition-colors ${
+              activeTab === "today"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#CCCCCC] hover:text-[#888888]"
+            }`}
+          >
+            Today
+          </button>
+          <button
+            onClick={() => setActiveTab("contacts")}
+            className={`pb-4 font-semibold text-sm transition-colors ${
+              activeTab === "contacts"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#CCCCCC] hover:text-[#888888]"
+            }`}
+          >
+            Contacts
+          </button>
         </div>
 
-        {loading ? (
+        {/* HEADER */}
+        {activeTab === "today" && (
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
+            <p className="text-xs text-[#999999]">{dayName} • {dateStr}</p>
+          </div>
+        )}
+
+        {activeTab === "contacts" && (
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Warm Outreach Pipeline</h1>
+            <p className="text-xs text-[#999999]">Upload contacts, call, qualify, then campaign</p>
+          </div>
+        )}
+
+        {activeTab === "today" && loading ? (
           <div className="text-center py-12">
             <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-sm text-[#666666]">Loading your day...</p>
           </div>
-        ) : (
+        ) : activeTab === "today" ? (
           <>
             {/* SECTION 1: OPERATION STATUS - What's happening right now */}
             <div className="mb-16">
@@ -288,7 +323,9 @@ export default function TodayPage() {
             </div>
 
           </>
-        )}
+        ) : activeTab === "contacts" ? (
+          <CallQueue />
+        ) : null}
       </div>
 
       {/* MODAL OVERLAYS */}
