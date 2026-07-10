@@ -17,7 +17,7 @@ export default function ReferralNetworkPage() {
         {/* HEADER */}
         <div className="mb-12 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Referral Network</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Receptionists and Office Managers</h1>
             <p className="text-xs text-[#999999]">Manage partners and track earnings</p>
           </div>
           <Link

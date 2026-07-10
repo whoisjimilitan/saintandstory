@@ -272,13 +272,6 @@ export default function OperatorReferralDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Referral Network</h1>
-          <p className="text-sm text-slate-600 mt-1">Receptionists and Office Managers</p>
-        </div>
-      </div>
-
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard label="Total Referrers" value={stats.referrers.total} trend={`${stats.referrers.active} active`} />
