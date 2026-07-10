@@ -275,7 +275,7 @@ export default function OperatorReferralDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Referral Network</h1>
-          <p className="text-sm text-slate-600 mt-1">All referrers and earnings</p>
+          <p className="text-sm text-slate-600 mt-1">Receptionists and Office Managers</p>
         </div>
       </div>
 
