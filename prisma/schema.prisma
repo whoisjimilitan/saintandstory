@@ -1690,3 +1690,44 @@ model ApprovalQueue {
   @@index([createdAt(sort: Desc)])
   @@map("approval_queue")
 }
+
+model Contact {
+  id                String    @id @default(cuid())
+  businessName      String
+  contactName       String
+  phone             String
+  postcode          String
+  industry          String?
+  email             String?
+  userId            String    // who uploaded this contact
+  status            String    @default("not_called") // not_called, called, interested, not_interested, no_answer
+  lastCalledAt      DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  callLogs          CallLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([postcode])
+  @@index([createdAt])
+  @@map("contacts")
+}
+
+model CallLog {
+  id                String    @id @default(cuid())
+  contactId         String
+  userId            String    // who made the call
+  status            String    // "called", "interested", "not_interested", "no_answer", "wrong_number"
+  notes             String?   @db.Text
+  calledAt          DateTime
+  createdAt         DateTime  @default(now())
+
+  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([userId])
+  @@index([status])
+  @@index([calledAt])
+  @@map("call_logs")
+}
