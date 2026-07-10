@@ -124,6 +124,24 @@ export default function OperatorReferralDashboard() {
     }
   };
 
+  const deleteReferrer = async (referrerId: string) => {
+    if (!window.confirm("Delete this referrer? This cannot be undone.")) return;
+
+    try {
+      const response = await fetch("/api/operator/referral-network/referrers", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ referrerId }),
+      });
+      if (!response.ok) throw new Error("Failed to delete referrer");
+      // Refresh data after delete
+      fetchData();
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert(err instanceof Error ? err.message : "Failed to delete referrer");
+    }
+  };
+
   const fetchReferrerDetail = async (referrerId: string) => {
     try {
       const response = await fetch(`/api/operator/referral-network/referrers/${referrerId}`);
@@ -376,12 +394,20 @@ export default function OperatorReferralDashboard() {
                     <StatusBadge status={referrer.status} />
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <button
-                      onClick={() => fetchReferrerDetail(referrer.id)}
-                      className="text-xs font-medium text-slate-600 hover:text-slate-900 transition"
-                    >
-                      View
-                    </button>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => fetchReferrerDetail(referrer.id)}
+                        className="text-xs font-medium text-slate-600 hover:text-slate-900 transition"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => deleteReferrer(referrer.id)}
+                        className="text-xs font-medium text-red-600 hover:text-red-900 transition"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -401,7 +427,7 @@ export default function OperatorReferralDashboard() {
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-600 mb-1">WhatsApp Connected</p>
+              <p className="text-xs text-slate-600 mb-1">WhatsApp Sent</p>
               <p className="text-lg font-semibold text-slate-900">
                 {stats.whatsapp.active}/{stats.referrers.total}
               </p>

@@ -172,3 +172,45 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
+/**
+ * DELETE /api/operator/referral-network/referrers
+ * Delete a referrer
+ * Body: { referrerId }
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    console.log("[REFERRAL REFERRERS DELETE] Deleting referrer");
+
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { referrerId } = await request.json();
+
+    if (!referrerId) {
+      return NextResponse.json(
+        { error: "referrerId required" },
+        { status: 400 }
+      );
+    }
+
+    await prisma.referrer.delete({
+      where: { id: referrerId },
+    });
+
+    console.log(`[REFERRAL REFERRERS DELETE] ✓ Referrer ${referrerId} deleted`);
+
+    return NextResponse.json({
+      success: true,
+      message: "Referrer deleted",
+    });
+  } catch (error) {
+    console.error("[REFERRAL REFERRERS DELETE] Error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to delete referrer" },
+      { status: 500 }
+    );
+  }
+}
