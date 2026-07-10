@@ -147,16 +147,16 @@ function DashboardContent() {
         {/* Earnings - Premium Card */}
         <div className="mb-12">
           <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Balance</p>
-          <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-white">
+          <div className="border border-[#E8E8E8] rounded-lg p-6 md:p-8 bg-[#FAFAFA]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">This Month</p>
-                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D]">£{earnings.thisMonth.toFixed(2)}</p>
+                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D] pb-3 border-b border-[#E8E8E8]">£{earnings.thisMonth.toFixed(2)}</p>
                 <p className="text-xs text-[#999999] mt-3">{referrals.thisMonth} referrals</p>
               </div>
               <div>
                 <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Pending</p>
-                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D]">{referrals.pending}</p>
+                <p className="text-5xl md:text-6xl font-black text-[#0D0D0D] pb-3 border-b border-[#E8E8E8]">{referrals.pending}</p>
                 <p className="text-xs text-[#999999] mt-3">referrals awaiting confirmation</p>
               </div>
             </div>
@@ -170,7 +170,7 @@ function DashboardContent() {
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Referrals</p>
               <p className="text-2xl md:text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
             </div>
-            <div>
+            <div className="md:border-l md:border-r md:border-[#E8E8E8] md:px-8">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Earn</p>
               <p className="text-lg md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-sm font-normal text-[#999999]">per</span></p>
             </div>
@@ -188,7 +188,7 @@ function DashboardContent() {
             Share with clients and earn £20 when they book.
           </p>
 
-          <div className="bg-[#F9F9F9] p-4 md:p-5 rounded-lg mb-5">
+          <div className="bg-[#F9F9F9] p-4 md:p-5 rounded-lg mb-5 border-l-4 border-[#0D0D0D]">
             <p className="text-sm text-[#0D0D0D] leading-relaxed">
               Hi, for removals I recommend Saint & Story. Tell them code <span className="font-mono font-black text-base">{referrer.code}</span>
             </p>
