@@ -139,23 +139,26 @@ function DashboardContent() {
         </div>
 
         {/* Earnings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
-            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Total Earnings</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.total.toFixed(2)}</p>
-            <p className="text-xs text-[#666666]">All time</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:bg-[#F9F9F9] transition-colors">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">Total Earnings</p>
+            <p className="text-5xl font-black text-[#0D0D0D] mb-4">£{earnings.total.toFixed(2)}</p>
+            <div className="h-1 bg-[#E8E8E8] rounded-full mb-4"></div>
+            <p className="text-sm text-[#666666]">All time earnings</p>
           </div>
 
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
-            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">This Month</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.thisMonth.toFixed(2)}</p>
-            <p className="text-xs text-[#666666]">{referrals.thisMonth} referrals</p>
+          <div className="border border-[#0D0D0D] rounded-lg p-8 bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] transition-colors">
+            <p className="text-xs text-[#cccccc] uppercase tracking-widest mb-4 font-semibold">This Month</p>
+            <p className="text-5xl font-black text-white mb-4">£{earnings.thisMonth.toFixed(2)}</p>
+            <div className="h-1 bg-white/20 rounded-full mb-4"></div>
+            <p className="text-sm text-[#cccccc]">{referrals.thisMonth} referrals this month</p>
           </div>
 
-          <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
-            <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Pending</p>
-            <p className="text-3xl font-black text-[#0D0D0D] mb-1">£{earnings.pending.toFixed(2)}</p>
-            <p className="text-xs text-[#666666]">{referrals.pending} pending</p>
+          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white hover:bg-[#F9F9F9] transition-colors">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">Pending</p>
+            <p className="text-5xl font-black text-[#0D0D0D] mb-4">£{earnings.pending.toFixed(2)}</p>
+            <div className="h-1 bg-[#E8E8E8] rounded-full mb-4"></div>
+            <p className="text-sm text-[#666666]">{referrals.pending} pending referrals</p>
           </div>
         </div>
 
@@ -216,28 +219,37 @@ function DashboardContent() {
           )}
         </div>
 
-        {/* How to Share */}
-        <div className="border border-[#E8E8E8] rounded-lg p-6 bg-white">
-          <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">How to Earn More</p>
-          <p className="text-sm text-[#666666] mb-4">
-            When your clients ask about removals, share this message:
+        {/* Share Message Hero */}
+        <div className="border border-[#E8E8E8] rounded-lg p-10 md:p-12 bg-white mb-12">
+          <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Start Earning</p>
+          <h2 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-3 tracking-tight">
+            Share this message
+          </h2>
+          <p className="text-base text-[#666666] mb-8">
+            When your clients need removals, copy and share. They mention your code and you earn £20.
           </p>
-          <div className="bg-[#F9F9F9] p-4 rounded-lg border border-[#E8E8E8] font-mono text-sm mb-4">
-            <p className="text-[#0D0D0D]">Hi, for removals I recommend Saint & Story.</p>
-            <p className="text-[#0D0D0D] mt-1">
-              Tell them code <span className="font-semibold">{referrer.code}</span>
+
+          <div className="bg-[#F9F9F9] p-6 rounded-lg border-2 border-[#E8E8E8] mb-8">
+            <p className="font-mono text-base leading-relaxed text-[#0D0D0D]">
+              <span className="block mb-3">Hi, for removals I recommend Saint & Story.</span>
+              <span className="block font-black text-lg">Tell them code <span className="text-[#0D0D0D]">{referrer.code}</span></span>
             </p>
           </div>
+
           <button
             onClick={() => {
               const text = `Hi, for removals I recommend Saint & Story. Tell them code ${referrer.code}`;
               navigator.clipboard.writeText(text);
-              alert("Copied to clipboard!");
+              alert("Message copied to clipboard!");
             }}
-            className="w-full px-6 py-3 bg-[#0D0D0D] text-white font-semibold text-sm rounded-lg hover:bg-[#333333] transition-colors"
+            className="w-full px-6 py-4 bg-[#0D0D0D] text-white font-black text-base rounded-lg hover:bg-[#1a1a1a] transition-colors mb-4"
           >
             Copy Message
           </button>
+
+          <p className="text-xs text-[#999999] text-center">
+            Works in WhatsApp, email, phone calls—anywhere.
+          </p>
         </div>
 
         {/* Footer */}
