@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
 
     const searchParams = new URL(request.url).searchParams;
     const query = searchParams.get("q") || "";
+    const type = searchParams.get("type") || "keyword"; // "keyword" or "postcode"
 
     if (!query || query.length < 2) {
       return NextResponse.json(
@@ -33,18 +34,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`[CONTACTS SEARCH] Searching for: ${query}`);
+    console.log(`[CONTACTS SEARCH] Searching for: ${query} (type: ${type})`);
 
-    // Search by keyword (business name, contact name, industry) or postcode
-    const results = await prisma.contact.findMany({
-      where: {
+    // Search by type
+    let whereClause: any;
+
+    if (type === "postcode") {
+      // Search only postcode
+      whereClause = {
+        postcode: { contains: query, mode: "insensitive" },
+      };
+    } else {
+      // Search keyword (business name, contact name, industry)
+      whereClause = {
         OR: [
           { businessName: { contains: query, mode: "insensitive" } },
           { contactName: { contains: query, mode: "insensitive" } },
-          { postcode: { contains: query, mode: "insensitive" } },
           { industry: { contains: query, mode: "insensitive" } },
         ],
-      },
+      };
+    }
+
+    const results = await prisma.contact.findMany({
+      where: whereClause,
       orderBy: { status: "asc" }, // not_called first
       take: 50,
     });

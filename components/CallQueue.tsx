@@ -84,7 +84,7 @@ export default function CallQueue() {
     }
   };
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, type: "keyword" | "postcode") => {
     if (!query || query.length < 2) {
       setSearchResults([]);
       return;
@@ -93,7 +93,7 @@ export default function CallQueue() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/contacts/search?q=${encodeURIComponent(query)}`
+        `/api/contacts/search?q=${encodeURIComponent(query)}&type=${type}`
       );
       const data = await response.json();
       setSearchResults(data.results || []);
@@ -155,31 +155,38 @@ export default function CallQueue() {
       </div>
 
       {/* Search Section */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search by business name..."
-            value={keywordSearch}
-            onChange={(e) => {
-              setKeywordSearch(e.target.value);
-              if (e.target.value.length >= 2) handleSearch(e.target.value);
-            }}
-            className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-          />
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search by postcode..."
-            value={postcodeSearch}
-            onChange={(e) => {
-              setPostcodeSearch(e.target.value);
-              if (e.target.value.length >= 2) handleSearch(e.target.value);
-            }}
-            className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-          />
-        </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Search by business name..."
+          value={keywordSearch}
+          onChange={(e) => setKeywordSearch(e.target.value)}
+          className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
+        />
+        <button
+          onClick={() => handleSearch(keywordSearch, "keyword")}
+          disabled={loading || keywordSearch.length < 2}
+          className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+        >
+          Search
+        </button>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Search by postcode..."
+          value={postcodeSearch}
+          onChange={(e) => setPostcodeSearch(e.target.value)}
+          className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
+        />
+        <button
+          onClick={() => handleSearch(postcodeSearch, "postcode")}
+          disabled={loading || postcodeSearch.length < 2}
+          className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+        >
+          Search
+        </button>
       </div>
 
       {/* Main Content */}
