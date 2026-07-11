@@ -52,11 +52,12 @@ export default function CallQueue() {
       } else {
         params.append("keyword", query);
       }
+      params.append("limit", "1000");
 
       const url = `/api/b2b/discover?${params}`;
       console.log("[CALL QUEUE SEARCH] Querying:", url);
 
-      const response = await fetch(url);
+      const response = await fetch(url, { method: "GET" });
       const data = await response.json();
 
       console.log("[CALL QUEUE SEARCH] Results:", data);
