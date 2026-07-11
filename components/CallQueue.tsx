@@ -118,6 +118,17 @@ export default function CallQueue() {
     setTimeout(() => setMessage(""), 1500);
   };
 
+  const handleWhatsApp = (business: Business) => {
+    const phone = business.phone || business.formatted_phone_number || business.telephone;
+    if (!phone) {
+      setMessage("No phone available");
+      return;
+    }
+    // Format phone for WhatsApp (remove spaces, dashes)
+    const formattedPhone = phone.replace(/\s|-/g, "");
+    window.open(`https://wa.me/${formattedPhone}`, "_blank");
+  };
+
   const calledCount = queuedBusinesses.filter((q) => q.called).length;
   const notCalledCount = queuedBusinesses.filter((q) => !q.called).length;
 
@@ -167,14 +178,22 @@ export default function CallQueue() {
                     <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
                   </div>
 
-                  {/* Phone */}
-                  {(business.phone || business.formatted_phone_number) && (
-                    <button
-                      onClick={() => handleCall(business)}
-                      className="text-xs text-[#0D0D0D] font-mono hover:underline"
-                    >
-                      {business.phone || business.formatted_phone_number}
-                    </button>
+                  {/* Phone & Actions */}
+                  {(business.phone || business.formatted_phone_number || business.telephone) && (
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => handleCall(business)}
+                        className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                      >
+                        {business.phone || business.formatted_phone_number || business.telephone}
+                      </button>
+                      <button
+                        onClick={() => handleWhatsApp(business)}
+                        className="text-xs px-3 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold whitespace-nowrap"
+                      >
+                        WhatsApp
+                      </button>
+                    </div>
                   )}
 
                   {/* Notes Field */}
@@ -287,12 +306,20 @@ export default function CallQueue() {
                       </p>
                     )}
                     {(business.phone || business.formatted_phone_number || business.telephone) && (
-                      <button
-                        onClick={() => handleCall(business)}
-                        className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
-                      >
-                        {business.phone || business.formatted_phone_number || business.telephone}
-                      </button>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={() => handleCall(business)}
+                          className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                        >
+                          {business.phone || business.formatted_phone_number || business.telephone}
+                        </button>
+                        <button
+                          onClick={() => handleWhatsApp(business)}
+                          className="text-xs px-2 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold whitespace-nowrap"
+                        >
+                          WhatsApp
+                        </button>
+                      </div>
                     )}
                   </div>
 
