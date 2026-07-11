@@ -22,6 +22,23 @@ interface QueuedBusiness extends Business {
   called: boolean;
 }
 
+// Detect if UK phone number is mobile or landline
+function detectPhoneType(phoneNumber: string): "mobile" | "landline" | "unknown" {
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  // UK mobile: starts with 07 (11 digits total)
+  if (cleaned.match(/^447\d{9}$/) || cleaned.match(/^07\d{9}$/)) {
+    return "mobile";
+  }
+
+  // UK landline: starts with 01, 02, or 03 (10-11 digits)
+  if (cleaned.match(/^44[0-3]\d{8,10}$/) || cleaned.match(/^0[1-3]\d{8,10}$/)) {
+    return "landline";
+  }
+
+  return "unknown";
+}
+
 export default function CallQueue() {
   const [keywordSearch, setKeywordSearch] = useState("");
   const [postcodeSearch, setPostcodeSearch] = useState("");
@@ -288,19 +305,42 @@ export default function CallQueue() {
                         >
                           {business.phone || business.formatted_phone_number || business.telephone}
                         </button>
-                        <button
-                          onClick={() => handleCallVoIP(business)}
-                          className="text-xs px-2 py-1 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
-                        >
-                          Call
-                        </button>
+                        {(() => {
+                          const phoneType = detectPhoneType(
+                            business.phone || business.formatted_phone_number || business.telephone || ""
+                          );
+                          return phoneType === "mobile" ? (
+                            <span className="text-xs px-1.5 py-0.5 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
+                              Mobile
+                            </span>
+                          ) : (
+                            <span className="text-xs px-1.5 py-0.5 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
+                              Landline
+                            </span>
+                          );
+                        })()}
                       </div>
-                      <button
-                        onClick={() => handleWhatsApp(business)}
-                        className="w-full text-xs px-3 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
-                      >
-                        WhatsApp
-                      </button>
+
+                      {(() => {
+                        const phoneType = detectPhoneType(
+                          business.phone || business.formatted_phone_number || business.telephone || ""
+                        );
+                        return phoneType === "mobile" ? (
+                          <button
+                            onClick={() => handleWhatsApp(business)}
+                            className="w-full text-xs px-3 py-2 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
+                          >
+                            WhatsApp Message
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleCallVoIP(business)}
+                            className="w-full text-xs px-3 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold"
+                          >
+                            Call via VoIP
+                          </button>
+                        );
+                      })()}
                     </div>
                   ) : (
                     <button
@@ -421,19 +461,51 @@ export default function CallQueue() {
                       </p>
                     )}
                     {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                      <div className="flex items-center gap-2 mt-2">
-                        <button
-                          onClick={() => handleCall(business)}
-                          className="text-xs text-[#0D0D0D] font-mono hover:underline"
-                        >
-                          {business.phone || business.formatted_phone_number || business.telephone}
-                        </button>
-                        <button
-                          onClick={() => handleWhatsApp(business)}
-                          className="text-xs px-2 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold whitespace-nowrap"
-                        >
-                          WhatsApp
-                        </button>
+                      <div className="mt-2 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleCall(business)}
+                            className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                          >
+                            {business.phone || business.formatted_phone_number || business.telephone}
+                          </button>
+                          {(() => {
+                            const phoneType = detectPhoneType(
+                              business.phone || business.formatted_phone_number || business.telephone || ""
+                            );
+                            return phoneType === "mobile" ? (
+                              <span className="text-xs px-1.5 py-0.5 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
+                                Mobile
+                              </span>
+                            ) : (
+                              <span className="text-xs px-1.5 py-0.5 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
+                                Landline
+                              </span>
+                            );
+                          })()}
+                        </div>
+                        <div>
+                          {(() => {
+                            const phoneType = detectPhoneType(
+                              business.phone || business.formatted_phone_number || business.telephone || ""
+                            );
+                            return phoneType === "mobile" ? (
+                              <button
+                                onClick={() => handleWhatsApp(business)}
+                                className="w-full text-xs px-2 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
+                              >
+                                WhatsApp
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleCallVoIP(business)}
+                                className="w-full text-xs px-2 py-1 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold"
+                              >
+                                Call (VoIP)
+                              </button>
+                            );
+                          })()}
+                        </div>
                       </div>
                     ) : (
                       <button
