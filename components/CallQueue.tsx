@@ -132,19 +132,20 @@ export default function CallQueue() {
       return;
     }
 
-    // WhatsApp (wa.me) requires international format: +44XXXXXXXXX
+    // WA Chat Manager requires international format: +44XXXXXXXXX
     const internationalPhone = normalizePhoneToInternational(phone);
+    const cleanPhone = internationalPhone.replace("+", "");
 
     // Saint & Story sales message
     const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // Use wa.me - works across all platforms
+    // FORCE WA Chat Manager - no fallback to web version
     const encodedMessage = encodeURIComponent(message);
-    const waWebUrl = `https://wa.me/${internationalPhone.replace("+", "")}?text=${encodedMessage}`;
+    const waChatManagerUrl = `wachatmanager://send?phone=${cleanPhone}&text=${encodedMessage}`;
 
-    console.log(`[WHATSAPP] Opening: ${waWebUrl}`);
-    window.open(waWebUrl, "_blank");
-    setMessage(`Opened WhatsApp: ${formatPhoneForDisplay(phone)}`);
+    console.log(`[WHATSAPP] Force opening WA Chat Manager: ${waChatManagerUrl}`);
+    window.location.href = waChatManagerUrl;
+    setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
   };
 
   const handleCallVoIP = async (business: Business) => {
@@ -155,36 +156,16 @@ export default function CallQueue() {
     }
 
     try {
-      setMessage("Opening MobileVOIP...");
-
-      // MobileVOIP prefers 00 format (0044XXXXXXXXX)
+      // MobileVOIP requires 00 format (0044XXXXXXXXX)
       const voipPhone = normalizePhoneTo00(phone);
-      const displayPhone = formatPhoneForDisplay(phone);
 
-      console.log(`[VOIP] Phone input: "${phone}"`);
-      console.log(`[VOIP] Normalized to: "${voipPhone}"`);
-      console.log(`[VOIP] Display as: "${displayPhone}"`);
+      console.log(`[VOIP] Input: "${phone}" → Normalized: "${voipPhone}"`);
 
-      // Call backend to force-open MobileVOIP with AppleScript
-      const response = await fetch("/api/voip/call", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: voipPhone })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Fallback: try URL scheme directly
-        const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
-        console.log(`[VOIP] Backend failed, trying URL scheme: ${urlScheme}`);
-        window.location.href = urlScheme;
-        setMessage(`Opening MobileVOIP: ${displayPhone}`);
-        return;
-      }
-
-      console.log(`[VOIP] ✓ Opened via backend: ${voipPhone}`);
-      setMessage(`MobileVOIP opening: ${displayPhone}`);
+      // FORCE MobileVOIP app via URL scheme - no fallback
+      const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
+      console.log(`[VOIP] Opening URL scheme: ${urlScheme}`);
+      window.location.href = urlScheme;
+      setMessage(`Opening MobileVOIP: ${voipPhone}`);
     } catch (error) {
       console.error("[VOIP] Error:", error);
       setMessage("Failed to open MobileVOIP - check if app is installed");

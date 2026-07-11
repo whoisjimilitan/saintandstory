@@ -131,10 +131,10 @@ export default function WhatsAppWidget({
       console.error("[WIDGET] Failed to log message:", error);
     }
 
-    // Use wa.me for reliable cross-platform support
-    const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    console.log(`[WIDGET] Opening WhatsApp: ${waWebUrl}`);
-    window.open(waWebUrl, "_blank");
+    // FORCE WA Chat Manager app - no web fallback
+    const waChatManagerUrl = `wachatmanager://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+    console.log(`[WIDGET] Force opening WA Chat Manager: ${waChatManagerUrl}`);
+    window.location.href = waChatManagerUrl;
   };
 
   const positionClass =
