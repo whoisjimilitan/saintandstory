@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import {
-  normalizePhoneToInternational,
-  normalizePhoneToLocal,
-  normalizePhoneTo00,
+  getPhonePlusFormat,
+  getPhone00Format,
+  getPhoneLocalFormat,
   detectPhoneType,
   formatPhoneForDisplay,
 } from "@/lib/phone-utils";
@@ -132,18 +132,18 @@ export default function CallQueue() {
       return;
     }
 
-    // WA Chat Manager requires international format: +44XXXXXXXXX
-    const internationalPhone = normalizePhoneToInternational(phone);
-    const cleanPhone = internationalPhone.replace("+", "");
+    // WA Chat Manager requires +44 format (no leading 0)
+    const wachatPhone = getPhonePlusFormat(phone);
+    const cleanPhone = wachatPhone.replace("+", ""); // 447711007373
 
     // Saint & Story sales message
     const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // FORCE WA Chat Manager - no fallback to web version
+    // FORCE WA Chat Manager with correct format
     const encodedMessage = encodeURIComponent(message);
-    const waChatManagerUrl = `wachatmanager://send?phone=${cleanPhone}&text=${encodedMessage}`;
+    const waChatManagerUrl = `wachatmanager://send?phone=+${cleanPhone}&text=${encodedMessage}`;
 
-    console.log(`[WHATSAPP] Force opening WA Chat Manager: ${waChatManagerUrl}`);
+    console.log(`[WHATSAPP] Phone: "${phone}" → Plus format: "${wachatPhone}" → URL: ${waChatManagerUrl}`);
     window.location.href = waChatManagerUrl;
     setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
   };
@@ -156,14 +156,14 @@ export default function CallQueue() {
     }
 
     try {
-      // MobileVOIP requires 00 format (0044XXXXXXXXX)
-      const voipPhone = normalizePhoneTo00(phone);
+      // MobileVOIP requires 00 format (00447711007373)
+      const voipPhone = getPhone00Format(phone);
 
-      console.log(`[VOIP] Input: "${phone}" → Normalized: "${voipPhone}"`);
+      console.log(`[VOIP] Input: "${phone}" → 00 format: "${voipPhone}"`);
 
-      // FORCE MobileVOIP app via URL scheme - no fallback
+      // FORCE MobileVOIP app via URL scheme
       const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
-      console.log(`[VOIP] Opening URL scheme: ${urlScheme}`);
+      console.log(`[VOIP] Opening: ${urlScheme}`);
       window.location.href = urlScheme;
       setMessage(`Opening MobileVOIP: ${voipPhone}`);
     } catch (error) {
@@ -328,7 +328,7 @@ export default function CallQueue() {
                           return phoneType === "mobile" ? (
                             <button
                               onClick={() => handleWhatsApp(business)}
-                              className="flex-1 text-xs px-4 py-2.5 bg-[#25D366] text-white rounded-full font-semibold hover:bg-[#1FAE56] transition-all hover:shadow-md active:scale-95"
+                              className="flex-1 text-xs px-4 py-2.5 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded-full font-semibold hover:bg-[#F9F9F9] transition-all hover:shadow-sm active:scale-95"
                             >
                               WhatsApp
                             </button>
@@ -489,7 +489,7 @@ export default function CallQueue() {
                             return phoneType === "mobile" ? (
                               <button
                                 onClick={() => handleWhatsApp(business)}
-                                className="flex-1 text-xs px-3 py-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#1FAE56] font-semibold transition-all hover:shadow-md active:scale-95"
+                                className="flex-1 text-xs px-3 py-1.5 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded-full font-semibold transition-all hover:bg-[#F9F9F9] hover:shadow-sm active:scale-95"
                               >
                                 WhatsApp
                               </button>

@@ -1,147 +1,113 @@
 /**
- * Phone Number Utilities
- * Handles UK phone number normalization for WhatsApp, VoIP, and logging
+ * Phone Number Utilities - HOLISTIC
+ * Robust UK phone handling with validation, corruption detection, and multiple output formats
  */
 
 /**
- * Normalize UK phone number to international format (+44XXXXXXXXX or 0044XXXXXXXXX)
- * Accepts multiple input formats and converts to consistent format
- * Handles corrupted input and validates length
+ * Extract core UK number from any format
+ * Handles: 07711007373, 07711 007373, +447711007373, 00447711007373, 447711007373
+ * Returns: 07711007373 (clean local format, 11 digits starting with 0)
+ * REJECTS corrupted data like 04771100737 or 0477110737
  */
-export function normalizePhoneToInternational(phone: string, format: "+" | "00" = "+"): string {
+function extractCoreNumber(phone: string): string {
   if (!phone) return "";
 
-  // Remove all whitespace, dashes, parentheses
-  let cleaned = phone.replace(/[\s\-()]/g, "");
+  // Remove all spaces, dashes, parentheses, dots
+  let cleaned = phone.replace(/[\s\-()\.]/g, "");
 
-  // Handle leading country codes
+  // Strip country codes to get to core number
   if (cleaned.startsWith("+44")) {
-    cleaned = "44" + cleaned.substring(3); // Remove + if present
+    cleaned = cleaned.substring(3); // +447711007373 → 7711007373
   } else if (cleaned.startsWith("0044")) {
-    cleaned = cleaned.substring(2); // Remove first 00, keep 44
-  } else if (cleaned.startsWith("+")) {
-    cleaned = cleaned.substring(1); // Remove other country codes
+    cleaned = cleaned.substring(4); // 00447711007373 → 7711007373
+  } else if (cleaned.startsWith("44")) {
+    cleaned = cleaned.substring(2); // 447711007373 → 7711007373
+  } else if (cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1); // 07711007373 → 7711007373
   }
 
-  // Convert UK local format (starting with 0) to international
-  // But first check if it's actually a valid 11-digit UK number
-  if (cleaned.startsWith("0")) {
-    // Common corruption: spacing issues like "0477 110 07373"
-    // Try to detect and fix if it's a malformed mobile number
-    const digits = cleaned.substring(1); // Remove leading 0
-
-    // If we have a digit that looks like a duplicate, it might be corrupted
-    // E.g., "477 110 07373" = malformed "7711 007373"
-    // Check if removing the first digit fixes it
-    if (digits.length === 10 && digits.startsWith("4")) {
-      // Might be "0477..." which is actually "07..." with a doubled 4
-      const possibleFix = "07" + digits.substring(1);
-      if (possibleFix.match(/^07\d{9}$/)) {
-        cleaned = "44" + possibleFix.substring(1);
-        console.log(`[PHONE] Auto-corrected possible corruption: 0${digits} → ${possibleFix} → 44${possibleFix.substring(1)}`);
-      } else {
-        cleaned = "44" + digits;
-      }
-    } else {
-      cleaned = "44" + digits;
-    }
+  // At this point we have just the digits (e.g., 7711007373)
+  // Validate it's 10 digits (UK number without leading 0)
+  if (!/^\d{10}$/.test(cleaned)) {
+    console.warn(`[PHONE] Rejected corrupted UK number: "${phone}" (got "${cleaned}", need exactly 10 digits)`);
+    return ""; // Return empty to signal invalid
   }
 
-  // Validate: should be 12 digits (44 + 10-digit UK number)
-  if (!/^44\d{10,11}$/.test(cleaned)) {
-    console.warn(`[PHONE] Invalid format after normalization: ${cleaned} (input was: ${phone})`);
+  // Validate it starts with valid UK prefixes (7 for mobile, 1-3 for landline)
+  const firstDigit = cleaned.charAt(0);
+  if (!["1", "2", "3", "7"].includes(firstDigit)) {
+    console.warn(`[PHONE] Rejected invalid UK prefix: "${phone}" (first digit after country code: ${firstDigit})`);
+    return ""; // Not a valid UK number
   }
 
-  // Add prefix
-  return format === "+" ? "+" + cleaned : "00" + cleaned;
+  // Return with leading 0 (local format)
+  return "0" + cleaned;
 }
 
 /**
- * Normalize UK phone number to local format (07xxxxxxxxx or 01xxxxxxxxx)
- * Used for display and some VoIP systems
+ * Get phone in +44 format (for WhatsApp URL schemes)
  */
-export function normalizePhoneToLocal(phone: string): string {
-  if (!phone) return "";
-
-  // Get international format first
-  const intl = normalizePhoneToInternational(phone);
-
-  // Convert +447 → 07
-  if (intl.startsWith("+447")) {
-    return "0" + intl.substring(2);
-  }
-
-  // Convert +441 → 01
-  if (intl.startsWith("+441")) {
-    return "0" + intl.substring(2);
-  }
-
-  // Already in local format or unknown
-  return intl.replace("+44", "0");
+export function getPhonePlusFormat(phone: string): string {
+  const core = extractCoreNumber(phone);
+  if (!core) return "";
+  // 07711007373 → +447711007373
+  return "+" + "44" + core.substring(1);
 }
 
 /**
- * Detect if UK phone is mobile (07xxx) or landline (01/02/03xxx)
- * Direct detection - don't rely on normalization chain
+ * Get phone in 00 format (for VoIP/MobileVOIP)
+ */
+export function getPhone00Format(phone: string): string {
+  const core = extractCoreNumber(phone);
+  if (!core) return "";
+  // 07711007373 → 00447711007373
+  return "00" + "44" + core.substring(1);
+}
+
+/**
+ * Get phone in local format (for display: 07711 007373)
+ */
+export function getPhoneLocalFormat(phone: string): string {
+  const core = extractCoreNumber(phone);
+  if (!core) return "";
+  // 07711007373 → 07711 007373 (for mobile: 5+6 digits after 0)
+  // 01234567890 → 01234 567890 (for landline: 4+3+4 digits)
+  if (core.startsWith("07")) {
+    return core.replace(/^(\d{5})(\d{6})$/, "$1 $2");
+  }
+  if (core.startsWith("0")) {
+    return core.replace(/^(\d{5})(\d{6})$/, "$1 $2");
+  }
+  return core;
+}
+
+/**
+ * Detect phone type: mobile (07xxx) or landline (01/02/03xxx)
  */
 export function detectPhoneType(phone: string): "mobile" | "landline" | "unknown" {
-  if (!phone) return "unknown";
+  const core = extractCoreNumber(phone);
+  if (!core) return "unknown";
 
-  // Clean the phone - just remove spaces and special chars
-  const cleaned = phone.replace(/[\s\-()]/g, "");
-
-  // Remove any + or 00 prefix to get to the core number
-  let core = cleaned;
-  if (core.startsWith("+44")) {
-    core = "0" + core.substring(3); // +447711007373 → 07711007373
-  } else if (core.startsWith("0044")) {
-    core = "0" + core.substring(4); // 00447711007373 → 07711007373
-  } else if (core.startsWith("44")) {
-    core = "0" + core.substring(2); // 447711007373 → 07711007373
-  }
-
-  console.log(`[DETECT] Input: "${phone}" → Cleaned: "${cleaned}" → Core: "${core}"`);
-
-  // Mobile: 07xxx (11 digits total: 0 + 7 + 9 more)
-  if (core.match(/^07\d{9}$/)) {
-    console.log(`[DETECT] ✓ MOBILE detected`);
-    return "mobile";
-  }
-
-  // Landline: 01/02/03xxx (10-11 digits: 0 + [1-3] + 8-10 more)
-  if (core.match(/^0[1-3]\d{8,10}$/)) {
-    console.log(`[DETECT] ✓ LANDLINE detected`);
-    return "landline";
-  }
-
-  console.log(`[DETECT] ✗ UNKNOWN format`);
+  if (core.startsWith("07")) return "mobile";
+  if (core.match(/^0[1-3]/)) return "landline";
   return "unknown";
 }
 
 /**
- * Normalize to 00 prefix format (0044XXXXXXXXX)
- * Used for some VoIP systems that prefer 00 over +
+ * Legacy functions for backwards compatibility
  */
-export function normalizePhoneTo00(phone: string): string {
-  return normalizePhoneToInternational(phone, "00").replace(/^00/, "00");
+export function normalizePhoneToInternational(phone: string, format: "+" | "00" = "+"): string {
+  return format === "+" ? getPhonePlusFormat(phone) : getPhone00Format(phone);
 }
 
-/**
- * Format phone for display (human-readable)
- * Example: 07711 007373
- */
+export function normalizePhoneToLocal(phone: string): string {
+  return getPhoneLocalFormat(phone);
+}
+
+export function normalizePhoneTo00(phone: string): string {
+  return getPhone00Format(phone);
+}
+
 export function formatPhoneForDisplay(phone: string): string {
-  const normalized = normalizePhoneToLocal(phone);
-
-  if (normalized.match(/^07\d{9}$/)) {
-    // Mobile: 07711 007373
-    return normalized.replace(/(\d{4})(\d{6})/, "$1 $2");
-  }
-
-  if (normalized.match(/^0\d{4}\d{6,7}$/)) {
-    // Landline: 0123 456 7890
-    return normalized.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3");
-  }
-
-  return normalized;
+  return getPhoneLocalFormat(phone);
 }

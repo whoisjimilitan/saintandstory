@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { normalizePhoneToInternational } from "@/lib/phone-utils";
+import { getPhonePlusFormat } from "@/lib/phone-utils";
 
 interface WidgetProps {
   position?: "bottom-right" | "bottom-left";
@@ -110,7 +110,7 @@ export default function WhatsAppWidget({
     const encodedMessage = encodeURIComponent(message);
 
     // Business WhatsApp number: +442030519243
-    const whatsappNumber = normalizePhoneToInternational("+442030519243").replace("+", "");
+    const whatsappNumber = getPhonePlusFormat("+442030519243").replace("+", "");
 
     // Log message to backend so it appears in /operator dashboard
     try {
