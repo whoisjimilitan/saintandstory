@@ -179,7 +179,7 @@ export default function CallQueue() {
                   </div>
 
                   {/* Phone & Actions */}
-                  {(business.phone || business.formatted_phone_number || business.telephone) && (
+                  {(business.phone || business.formatted_phone_number || business.telephone) ? (
                     <div className="flex items-center justify-between gap-2">
                       <button
                         onClick={() => handleCall(business)}
@@ -194,6 +194,8 @@ export default function CallQueue() {
                         WhatsApp
                       </button>
                     </div>
+                  ) : (
+                    <div className="text-xs text-[#CCCCCC]">Phone not loaded</div>
                   )}
 
                   {/* Notes Field */}
@@ -305,7 +307,7 @@ export default function CallQueue() {
                         {business.formatted_address || business.address}
                       </p>
                     )}
-                    {(business.phone || business.formatted_phone_number || business.telephone) && (
+                    {(business.phone || business.formatted_phone_number || business.telephone) ? (
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => handleCall(business)}
@@ -320,6 +322,8 @@ export default function CallQueue() {
                           WhatsApp
                         </button>
                       </div>
+                    ) : (
+                      <div className="text-xs text-[#CCCCCC] mt-2">Phone not available</div>
                     )}
                   </div>
 
