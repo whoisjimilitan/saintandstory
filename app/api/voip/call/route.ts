@@ -38,29 +38,43 @@ export async function POST(request: NextRequest) {
 
     console.log(`[VOIP CALL] Attempting to open MobileVOIP with: ${phone}`);
 
-    // Phone should already be in 00 format from frontend (e.g., 00447711007373)
-    const mobileVoipUrl = `mobilevoip://dial?number=${phone}`;
+    // Clean up phone number for use in URL scheme
+    const cleanPhone = phone.replace(/[\s\-()]/g, "");
+
+    // AppleScript to force-open MobileVOIP and dial number
+    // MobileVOIP URL scheme format: mobilevoip://dial?number=PHONENUMBER
+    const script = `
+tell application "MobileVOIP"
+  activate
+  -- Give app time to come to foreground
+  delay 0.5
+end tell
+
+-- Alternative: use open command with URL scheme
+open location "mobilevoip://dial?number=${cleanPhone}"
+`;
 
     try {
-      // Use open -a to force-open MobileVOIP with URL scheme
-      await execFileAsync("open", ["-a", "MobileVOIP", "--url", mobileVoipUrl]);
+      // Execute AppleScript
+      await execFileAsync("osascript", ["-e", script]);
 
-      console.log(`[VOIP CALL] ✓ MobileVOIP opened successfully with number: ${phone}`);
+      console.log(`[VOIP CALL] ✓ MobileVOIP opened successfully with number: ${cleanPhone}`);
 
       return NextResponse.json({
         success: true,
         message: "MobileVOIP opened",
-        phone,
+        phone: cleanPhone,
       });
-    } catch (execError) {
-      console.error(`[VOIP CALL] Failed to open app:`, execError);
+    } catch (osascriptError) {
+      console.error(`[VOIP CALL] AppleScript error:`, osascriptError);
 
-      // If backend fails, return error (don't provide fallback)
+      // If AppleScript fails, return URL scheme for frontend fallback
       return NextResponse.json({
         success: false,
-        message: "Failed to open MobileVOIP",
-        phone,
-      }, { status: 500 });
+        message: "AppleScript unavailable, use URL scheme",
+        urlScheme: `mobilevoip://dial?number=${cleanPhone}`,
+        phone: cleanPhone,
+      }, { status: 202 });
     }
   } catch (error) {
     console.error("[VOIP CALL] Error:", error);

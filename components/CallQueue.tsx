@@ -125,47 +125,27 @@ export default function CallQueue() {
     setTimeout(() => setMessage(""), 1500);
   };
 
-  const handleWhatsApp = async (business: Business) => {
+  const handleWhatsApp = (business: Business) => {
     const phone = business.phone || business.formatted_phone_number || business.telephone;
     if (!phone) {
       setMessage("No phone available");
       return;
     }
 
-    try {
-      // WA Chat Manager requires +44 format (e.g., +447711007373)
-      const wachatPhone = getPhonePlusFormat(phone);
-      if (!wachatPhone) {
-        setMessage("Invalid phone number");
-        return;
-      }
+    // WA Chat Manager requires +44 format (no leading 0)
+    const wachatPhone = getPhonePlusFormat(phone);
+    const cleanPhone = wachatPhone.replace("+", ""); // 447711007373
 
-      // Saint & Story sales message
-      const messageText = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
+    // Saint & Story sales message
+    const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-      console.log(`[WHATSAPP] Opening WA Chat Manager for: ${formatPhoneForDisplay(phone)}`);
+    // FORCE WA Chat Manager with correct format
+    const encodedMessage = encodeURIComponent(message);
+    const waChatManagerUrl = `wachatmanager://send?phone=+${cleanPhone}&text=${encodedMessage}`;
 
-      // Call backend to open WA Chat Manager (uses open -a command)
-      const response = await fetch("/api/whatsapp/open", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: wachatPhone,
-          message: messageText,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
-        setTimeout(() => setMessage(""), 2000);
-      } else {
-        setMessage("Failed to open WA Chat Manager");
-      }
-    } catch (error) {
-      console.error("[WHATSAPP] Error:", error);
-      setMessage("Failed to open WA Chat Manager");
-    }
+    console.log(`[WHATSAPP] Phone: "${phone}" → Plus format: "${wachatPhone}" → URL: ${waChatManagerUrl}`);
+    window.location.href = waChatManagerUrl;
+    setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
   };
 
   const handleCallVoIP = async (business: Business) => {
@@ -176,32 +156,43 @@ export default function CallQueue() {
     }
 
     try {
-      // MobileVOIP requires 00 format (e.g., 00447711007373)
+      // MobileVOIP requires 00 format (00447711007373)
       const voipPhone = getPhone00Format(phone);
-      if (!voipPhone) {
-        setMessage("Invalid phone number");
-        return;
+
+      console.log(`[VOIP] Input: "${phone}" → 00 format: "${voipPhone}"`);
+
+      // Try backend first (AppleScript on Mac)
+      try {
+        const response = await fetch("/api/voip/call", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: voipPhone }),
+        });
+
+        const data = await response.json();
+
+        // If backend succeeded or returned a fallback URL scheme
+        if (response.ok || response.status === 202) {
+          if (data.urlScheme) {
+            // Use fallback URL scheme from backend
+            console.log(`[VOIP] Using fallback URL scheme: ${data.urlScheme}`);
+            window.location.href = data.urlScheme;
+          }
+          setMessage(`Opening MobileVOIP: ${formatPhoneForDisplay(phone)}`);
+          return;
+        }
+      } catch (backendError) {
+        console.log(`[VOIP] Backend call failed, using direct URL scheme`, backendError);
       }
 
-      console.log(`[VOIP] Opening MobileVOIP for: ${formatPhoneForDisplay(phone)}`);
-
-      // Call backend to open MobileVOIP (uses open -a command)
-      const response = await fetch("/api/voip/call", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: voipPhone }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setMessage(`Opening MobileVOIP: ${formatPhoneForDisplay(phone)}`);
-        setTimeout(() => setMessage(""), 2000);
-      } else {
-        setMessage("Failed to open MobileVOIP");
-      }
+      // Fallback: Direct URL scheme if backend unavailable
+      const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
+      console.log(`[VOIP] Opening: ${urlScheme}`);
+      window.location.href = urlScheme;
+      setMessage(`Opening MobileVOIP: ${voipPhone}`);
     } catch (error) {
       console.error("[VOIP] Error:", error);
-      setMessage("Failed to open MobileVOIP");
+      setMessage("Failed to open MobileVOIP - check if app is installed");
     }
   };
 
