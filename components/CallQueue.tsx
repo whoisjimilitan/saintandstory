@@ -265,57 +265,58 @@ export default function CallQueue() {
 
   return (
     <div className="space-y-6">
-      {/* Daily Summary */}
+      {/* Daily Summary - Premium Cards */}
       {queuedBusinesses.length > 0 && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
-            <p className="text-2xl font-black text-[#0D0D0D]">{notCalledCount}</p>
-            <p className="text-xs text-[#888888]">to call</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="border border-[#E8E8E8] rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-3xl font-black text-[#0D0D0D] mb-1">{notCalledCount}</p>
+            <p className="text-xs font-medium text-[#888888] tracking-wide uppercase">to call</p>
           </div>
-          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
-            <p className="text-2xl font-black text-[#0D0D0D]">{calledCount}</p>
-            <p className="text-xs text-[#888888]">called today</p>
+          <div className="border border-[#E8E8E8] rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-3xl font-black text-[#0D0D0D] mb-1">{calledCount}</p>
+            <p className="text-xs font-medium text-[#888888] tracking-wide uppercase">called today</p>
           </div>
         </div>
       )}
 
-      {/* Today's Queue */}
+      {/* Today's Queue - Premium Design */}
       {queuedBusinesses.length > 0 && (
-        <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
+        <div className="border border-[#E8E8E8] rounded-xl bg-white overflow-hidden shadow-sm">
+          <div className="px-6 py-5 border-b border-[#E8E8E8] bg-gradient-to-r from-white to-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">Today's Queue</p>
-            <p className="text-xs text-[#888888]">{queuedBusinesses.length} in queue</p>
+            <p className="text-xs text-[#888888] mt-1">{queuedBusinesses.length} contact{queuedBusinesses.length !== 1 ? "s" : ""}</p>
           </div>
 
           <div className="divide-y divide-[#E8E8E8]">
             {queuedBusinesses.map((business) => (
               <div
                 key={business.id}
-                className={`p-6 ${business.called ? "bg-[#F9F9F9]" : "hover:bg-[#F9F9F9]"} transition`}
+                className={`p-6 transition-all ${business.called ? "bg-[#F9F9F9]" : "hover:bg-[#FAFAFA]"}`}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Business Info */}
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <p className={`font-semibold text-sm ${business.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-semibold text-sm leading-tight ${business.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
                         {business.name || business.businessName}
                       </p>
                       {(business.formatted_address || business.address) && (
-                        <p className="text-xs text-[#888888] mt-1">
+                        <p className="text-xs text-[#888888] mt-2 line-clamp-2">
                           {business.formatted_address || business.address}
                         </p>
                       )}
                     </div>
-                    <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
+                    <div className="text-xs text-[#CCCCCC] whitespace-nowrap ml-2">{business.queuedAt}</div>
                   </div>
 
                   {/* Phone & Actions */}
                   {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-3">
+                      {/* Phone with subtle indicator dot */}
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleCall(business)}
-                          className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                          className="text-xs text-[#0D0D0D] font-mono hover:text-[#0D0D0D] hover:underline transition-colors"
                         >
                           {business.phone || business.formatted_phone_number || business.telephone}
                         </button>
@@ -324,74 +325,73 @@ export default function CallQueue() {
                             business.phone || business.formatted_phone_number || business.telephone || ""
                           );
                           return phoneType === "mobile" ? (
-                            <span className="text-xs px-1.5 py-0.5 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
-                              Mobile
-                            </span>
+                            <div className="w-2 h-2 bg-[#10B981] rounded-full" title="Mobile"></div>
                           ) : (
-                            <span className="text-xs px-1.5 py-0.5 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
-                              Landline
-                            </span>
+                            <div className="w-2 h-2 bg-[#3B82F6] rounded-full" title="Landline"></div>
                           );
                         })()}
                       </div>
 
-                      {(() => {
-                        const phoneType = detectPhoneType(
-                          business.phone || business.formatted_phone_number || business.telephone || ""
-                        );
-                        return phoneType === "mobile" ? (
-                          <button
-                            onClick={() => handleWhatsApp(business)}
-                            className="w-full text-xs px-3 py-2 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
-                          >
-                            WhatsApp Message
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleCallVoIP(business)}
-                            className="w-full text-xs px-3 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold"
-                          >
-                            Call via VoIP
-                          </button>
-                        );
-                      })()}
+                      {/* Premium Pill Buttons */}
+                      <div className="flex gap-2">
+                        {(() => {
+                          const phoneType = detectPhoneType(
+                            business.phone || business.formatted_phone_number || business.telephone || ""
+                          );
+                          return phoneType === "mobile" ? (
+                            <button
+                              onClick={() => handleWhatsApp(business)}
+                              className="flex-1 text-xs px-4 py-2.5 bg-[#25D366] text-white rounded-full font-semibold hover:bg-[#1FAE56] transition-all hover:shadow-md active:scale-95"
+                            >
+                              WhatsApp
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleCallVoIP(business)}
+                              className="flex-1 text-xs px-4 py-2.5 bg-[#0D0D0D] text-white rounded-full font-semibold hover:bg-[#333333] transition-all hover:shadow-md active:scale-95"
+                            >
+                              Call
+                            </button>
+                          );
+                        })()}
+                      </div>
                     </div>
                   ) : (
                     <button
                       onClick={() => handleLoadPhone(business)}
-                      className="text-xs px-3 py-1 border border-[#CCCCCC] text-[#CCCCCC] rounded hover:border-[#0D0D0D] hover:text-[#0D0D0D] font-semibold"
+                      className="text-xs px-4 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded-full hover:border-[#0D0D0D] font-semibold transition-all hover:shadow-sm"
                     >
                       Find Phone
                     </button>
                   )}
 
-                  {/* Notes Field */}
+                  {/* Notes Field - Premium */}
                   <div>
                     <textarea
                       value={business.notes}
                       onChange={(e) => handleUpdateNotes(business.id, e.target.value)}
-                      placeholder="Notes"
-                      className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none resize-none"
+                      placeholder="Add notes..."
+                      className="w-full text-xs px-4 py-2.5 border border-[#E8E8E8] rounded-lg bg-[#FAFAFA] text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 resize-none transition-colors"
                       rows={2}
                     />
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2">
+                  {/* Actions - Premium Pills */}
+                  <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleMarkCalled(business.id)}
                       disabled={business.called}
-                      className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
+                      className={`flex-1 text-xs px-4 py-2.5 rounded-full font-semibold transition-all ${
                         business.called
                           ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
-                          : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
+                          : "bg-[#0D0D0D] text-white hover:bg-[#333333] hover:shadow-md active:scale-95"
                       }`}
                     >
-                      {business.called ? "Called" : "Mark Called"}
+                      {business.called ? "✓ Called" : "Mark Called"}
                     </button>
                     <button
                       onClick={() => handleRemoveFromQueue(business.id)}
-                      className="flex-1 text-xs px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold hover:border-[#0D0D0D] transition"
+                      className="flex-1 text-xs px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] rounded-full font-semibold hover:border-[#0D0D0D] hover:shadow-sm transition-all active:scale-95"
                     >
                       Remove
                     </button>
@@ -403,9 +403,9 @@ export default function CallQueue() {
         </div>
       )}
 
-      {/* Search Section */}
-      <div className="border border-[#E8E8E8] rounded-lg bg-white p-6">
-        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
+      {/* Search Section - Premium */}
+      <div className="border border-[#E8E8E8] rounded-xl bg-white p-6 shadow-sm">
+        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-5">
           Find Businesses
         </p>
 
@@ -416,12 +416,12 @@ export default function CallQueue() {
               placeholder="Search by business name..."
               value={keywordSearch}
               onChange={(e) => setKeywordSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
+              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 transition-all"
             />
             <button
               onClick={() => handleSearch(keywordSearch, "keyword")}
               disabled={loading || keywordSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-all hover:shadow-md active:scale-95"
             >
               {loading ? "..." : "Search"}
             </button>
@@ -433,12 +433,12 @@ export default function CallQueue() {
               placeholder="Search by postcode..."
               value={postcodeSearch}
               onChange={(e) => setPostcodeSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
+              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 transition-all"
             />
             <button
               onClick={() => handleSearch(postcodeSearch, "postcode")}
               disabled={loading || postcodeSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-all hover:shadow-md active:scale-95"
             >
               {loading ? "..." : "Search"}
             </button>
@@ -447,15 +447,15 @@ export default function CallQueue() {
       </div>
 
       {message && (
-        <div className="px-4 py-3 rounded-lg bg-[#F9F9F9] border border-[#E8E8E8]">
+        <div className="px-4 py-3 rounded-lg bg-[#F9F9F9] border border-[#E8E8E8] shadow-sm animate-in fade-in-50 duration-200">
           <p className="text-xs font-semibold text-[#0D0D0D]">{message}</p>
         </div>
       )}
 
-      {/* Search Results */}
+      {/* Search Results - Premium */}
       {searchResults.length > 0 && (
-        <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
+        <div className="border border-[#E8E8E8] rounded-xl bg-white overflow-hidden shadow-sm">
+          <div className="px-6 py-5 border-b border-[#E8E8E8] bg-gradient-to-r from-white to-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">
               {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
             </p>
@@ -463,23 +463,23 @@ export default function CallQueue() {
 
           <div className="divide-y divide-[#E8E8E8]">
             {searchResults.map((business) => (
-              <div key={business.id} className="p-6 hover:bg-[#F9F9F9] transition">
+              <div key={business.id} className="p-6 hover:bg-[#FAFAFA] transition-colors">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <p className="font-semibold text-[#0D0D0D] text-sm">
                       {business.name || business.businessName}
                     </p>
                     {(business.formatted_address || business.address) && (
-                      <p className="text-xs text-[#888888] mt-1">
+                      <p className="text-xs text-[#888888] mt-2 line-clamp-2">
                         {business.formatted_address || business.address}
                       </p>
                     )}
                     {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                      <div className="mt-2 space-y-2">
-                        <div className="flex items-center gap-2">
+                      <div className="mt-3 space-y-3">
+                        <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleCall(business)}
-                            className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                            className="text-xs text-[#0D0D0D] font-mono hover:underline transition-colors"
                           >
                             {business.phone || business.formatted_phone_number || business.telephone}
                           </button>
@@ -488,17 +488,13 @@ export default function CallQueue() {
                               business.phone || business.formatted_phone_number || business.telephone || ""
                             );
                             return phoneType === "mobile" ? (
-                              <span className="text-xs px-1.5 py-0.5 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
-                                Mobile
-                              </span>
+                              <div className="w-2 h-2 bg-[#10B981] rounded-full" title="Mobile"></div>
                             ) : (
-                              <span className="text-xs px-1.5 py-0.5 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
-                                Landline
-                              </span>
+                              <div className="w-2 h-2 bg-[#3B82F6] rounded-full" title="Landline"></div>
                             );
                           })()}
                         </div>
-                        <div>
+                        <div className="flex gap-2">
                           {(() => {
                             const phoneType = detectPhoneType(
                               business.phone || business.formatted_phone_number || business.telephone || ""
@@ -506,16 +502,16 @@ export default function CallQueue() {
                             return phoneType === "mobile" ? (
                               <button
                                 onClick={() => handleWhatsApp(business)}
-                                className="w-full text-xs px-2 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
+                                className="flex-1 text-xs px-3 py-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#1FAE56] font-semibold transition-all hover:shadow-md active:scale-95"
                               >
                                 WhatsApp
                               </button>
                             ) : (
                               <button
                                 onClick={() => handleCallVoIP(business)}
-                                className="w-full text-xs px-2 py-1 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold"
+                                className="flex-1 text-xs px-3 py-1.5 bg-[#0D0D0D] text-white rounded-full hover:bg-[#333333] font-semibold transition-all hover:shadow-md active:scale-95"
                               >
-                                Call (VoIP)
+                                Call
                               </button>
                             );
                           })()}
@@ -524,7 +520,7 @@ export default function CallQueue() {
                     ) : (
                       <button
                         onClick={() => handleLoadPhone(business)}
-                        className="text-xs px-2 py-1 border border-[#CCCCCC] text-[#CCCCCC] rounded hover:border-[#0D0D0D] hover:text-[#0D0D0D] font-semibold mt-2"
+                        className="text-xs px-3 py-1.5 border border-[#E8E8E8] text-[#0D0D0D] rounded-full hover:border-[#0D0D0D] font-semibold mt-3 transition-all hover:shadow-sm"
                       >
                         Find Phone
                       </button>
@@ -533,9 +529,9 @@ export default function CallQueue() {
 
                   <button
                     onClick={() => handleAddToQueue(business)}
-                    className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
+                    className="text-xs px-4 py-2.5 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#333333] font-semibold whitespace-nowrap transition-all hover:shadow-md active:scale-95"
                   >
-                    Add to Queue
+                    Add
                   </button>
                 </div>
               </div>
@@ -545,8 +541,8 @@ export default function CallQueue() {
       )}
 
       {!loading && (keywordSearch.length >= 2 || postcodeSearch.length >= 2) && searchResults.length === 0 && (
-        <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
-          <p className="text-sm text-[#888888]">No results</p>
+        <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-xl bg-[#F9F9F9]">
+          <p className="text-sm text-[#888888]">No results found. Try a different search.</p>
         </div>
       )}
     </div>
