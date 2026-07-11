@@ -129,6 +129,47 @@ export default function CallQueue() {
     window.open(`https://wa.me/${formattedPhone}`, "_blank");
   };
 
+  const handleLoadPhone = async (business: Business) => {
+    try {
+      setMessage("Finding phone...");
+
+      const response = await fetch("/api/b2b/dork-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `${business.name || business.businessName} phone contact`
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.leads || data.leads.length === 0) {
+        setMessage("Phone not found");
+        return;
+      }
+
+      // Get phone from first result
+      const foundPhone = data.leads[0]?.phone;
+      if (!foundPhone) {
+        setMessage("Phone not found");
+        return;
+      }
+
+      // Update business in queue with phone
+      setQueuedBusinesses(
+        queuedBusinesses.map((q) =>
+          q.id === business.id ? { ...q, telephone: foundPhone } : q
+        )
+      );
+
+      setMessage(`Found: ${foundPhone}`);
+      setTimeout(() => setMessage(""), 2000);
+    } catch (error) {
+      setMessage("Failed to find phone");
+      console.error("Error loading phone:", error);
+    }
+  };
+
   const calledCount = queuedBusinesses.filter((q) => q.called).length;
   const notCalledCount = queuedBusinesses.filter((q) => !q.called).length;
 
@@ -195,7 +236,12 @@ export default function CallQueue() {
                       </button>
                     </div>
                   ) : (
-                    <div className="text-xs text-[#CCCCCC]">Phone not loaded</div>
+                    <button
+                      onClick={() => handleLoadPhone(business)}
+                      className="text-xs px-3 py-1 border border-[#CCCCCC] text-[#CCCCCC] rounded hover:border-[#0D0D0D] hover:text-[#0D0D0D] font-semibold"
+                    >
+                      Find Phone
+                    </button>
                   )}
 
                   {/* Notes Field */}
@@ -323,7 +369,12 @@ export default function CallQueue() {
                         </button>
                       </div>
                     ) : (
-                      <div className="text-xs text-[#CCCCCC] mt-2">Phone not available</div>
+                      <button
+                        onClick={() => handleLoadPhone(business)}
+                        className="text-xs px-2 py-1 border border-[#CCCCCC] text-[#CCCCCC] rounded hover:border-[#0D0D0D] hover:text-[#0D0D0D] font-semibold mt-2"
+                      >
+                        Find Phone
+                      </button>
                     )}
                   </div>
 
