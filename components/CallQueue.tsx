@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   normalizePhoneToInternational,
   normalizePhoneToLocal,
+  normalizePhoneTo00,
   detectPhoneType,
   formatPhoneForDisplay,
 } from "@/lib/phone-utils";
@@ -156,32 +157,37 @@ export default function CallQueue() {
     try {
       setMessage("Opening MobileVOIP...");
 
-      // MobileVOIP can accept both local (07xxx) and international (+447xxx) formats
-      const localPhone = normalizePhoneToLocal(phone);
-      const internationalPhone = normalizePhoneToInternational(phone);
+      // MobileVOIP prefers 00 format (0044XXXXXXXXX)
+      const voipPhone = normalizePhoneTo00(phone);
+      const displayPhone = formatPhoneForDisplay(phone);
+
+      console.log(`[VOIP] Phone input: "${phone}"`);
+      console.log(`[VOIP] Normalized to: "${voipPhone}"`);
+      console.log(`[VOIP] Display as: "${displayPhone}"`);
 
       // Call backend to force-open MobileVOIP with AppleScript
       const response = await fetch("/api/voip/call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: internationalPhone })
+        body: JSON.stringify({ phone: voipPhone })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Fallback: try custom URL scheme with international format
-        window.location.href = `mobilevoip://dial?number=${internationalPhone}`;
-        console.log(`[VOIP] Fallback to URL scheme: ${internationalPhone}`);
-        setMessage(`Calling via MobileVOIP: ${formatPhoneForDisplay(phone)}`);
+        // Fallback: try URL scheme directly
+        const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
+        console.log(`[VOIP] Backend failed, trying URL scheme: ${urlScheme}`);
+        window.location.href = urlScheme;
+        setMessage(`Opening MobileVOIP: ${displayPhone}`);
         return;
       }
 
-      console.log(`[VOIP] Opened via backend: ${internationalPhone}`);
-      setMessage(`MobileVOIP opened: ${formatPhoneForDisplay(phone)}`);
+      console.log(`[VOIP] ✓ Opened via backend: ${voipPhone}`);
+      setMessage(`MobileVOIP opening: ${displayPhone}`);
     } catch (error) {
       console.error("[VOIP] Error:", error);
-      setMessage("Failed to open MobileVOIP");
+      setMessage("Failed to open MobileVOIP - check if app is installed");
     }
   };
 

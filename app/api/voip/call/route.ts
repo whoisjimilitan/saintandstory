@@ -38,25 +38,32 @@ export async function POST(request: NextRequest) {
 
     console.log(`[VOIP CALL] Attempting to open MobileVOIP with: ${phone}`);
 
+    // Clean up phone number for use in URL scheme
+    const cleanPhone = phone.replace(/[\s\-()]/g, "");
+
     // AppleScript to force-open MobileVOIP and dial number
+    // MobileVOIP URL scheme format: mobilevoip://dial?number=PHONENUMBER
     const script = `
 tell application "MobileVOIP"
   activate
   -- Give app time to come to foreground
   delay 0.5
 end tell
+
+-- Alternative: use open command with URL scheme
+open location "mobilevoip://dial?number=${cleanPhone}"
 `;
 
     try {
       // Execute AppleScript
       await execFileAsync("osascript", ["-e", script]);
 
-      console.log(`[VOIP CALL] ✓ MobileVOIP opened successfully`);
+      console.log(`[VOIP CALL] ✓ MobileVOIP opened successfully with number: ${cleanPhone}`);
 
       return NextResponse.json({
         success: true,
         message: "MobileVOIP opened",
-        phone,
+        phone: cleanPhone,
       });
     } catch (osascriptError) {
       console.error(`[VOIP CALL] AppleScript error:`, osascriptError);
@@ -65,8 +72,8 @@ end tell
       return NextResponse.json({
         success: false,
         message: "AppleScript unavailable, use URL scheme",
-        urlScheme: `mobilevoip://dial?number=${phone.replace(/\s/g, "")}`,
-        phone,
+        urlScheme: `mobilevoip://dial?number=${cleanPhone}`,
+        phone: cleanPhone,
       }, { status: 202 });
     }
   } catch (error) {
