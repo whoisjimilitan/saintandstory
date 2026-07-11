@@ -167,17 +167,29 @@ export default function CallQueue() {
     try {
       setMessage("Finding phone...");
 
+      // Build smart query: business name + address/postcode for specificity
+      const businessName = business.name || business.businessName || "business";
+      const address = business.formatted_address || business.address || "";
+      const postcode = business.postcode || "";
+
+      // Query: "Business Name" "postcode" phone UK
+      // This helps Google find the specific business with phone in results
+      const query = postcode
+        ? `"${businessName}" ${postcode} phone UK`
+        : `${businessName} phone contact UK`;
+
+      console.log(`[PHONE LOOKUP] Query: ${query}`);
+
       const response = await fetch("/api/b2b/dork-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query: `${business.name || business.businessName} phone contact`
-        })
+        body: JSON.stringify({ query })
       });
 
       const data = await response.json();
 
       if (!response.ok || !data.leads || data.leads.length === 0) {
+        console.log(`[PHONE LOOKUP] No leads found in response`);
         setMessage("Phone not found");
         return;
       }
@@ -185,9 +197,12 @@ export default function CallQueue() {
       // Get phone from first result
       const foundPhone = data.leads[0]?.phone;
       if (!foundPhone) {
+        console.log(`[PHONE LOOKUP] Leads found but no phone extracted`);
         setMessage("Phone not found");
         return;
       }
+
+      console.log(`[PHONE LOOKUP] ✓ Found phone: ${foundPhone}`);
 
       // Update business in queue with phone
       setQueuedBusinesses(
