@@ -36,17 +36,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`[CONTACTS SEARCH] Searching for: ${query}`);
+    console.log(`[CONTACTS SEARCH] ════════════════════════════`);
+    console.log(`[CONTACTS SEARCH] Searching database for: ${query}`);
+    console.log(`[CONTACTS SEARCH] Search type: ${postcode ? 'postcode' : 'businessName'}`);
 
     let whereClause: any;
 
     if (postcode) {
       // Search only postcode
+      console.log(`[CONTACTS SEARCH] Querying postcode field`);
       whereClause = {
         postcode: { contains: postcode, mode: "insensitive" },
       };
     } else {
       // Search business name
+      console.log(`[CONTACTS SEARCH] Querying businessName field`);
       whereClause = {
         businessName: { contains: businessName, mode: "insensitive" },
       };
@@ -54,13 +58,18 @@ export async function GET(request: NextRequest) {
 
     const results = await prisma.contact.findMany({
       where: whereClause,
-      orderBy: { status: "asc" }, // not_called first
+      orderBy: { createdAt: "desc" },
       take: 50,
     });
 
-    console.log(
-      `[CONTACTS SEARCH] ✓ Found ${results.length} matching contacts`
-    );
+    console.log(`[CONTACTS SEARCH] ✓ Query completed`);
+    console.log(`[CONTACTS SEARCH] Results found: ${results.length}`);
+
+    if (results.length === 0) {
+      console.log(`[CONTACTS SEARCH] ℹ️  No contacts matched query`);
+    } else {
+      console.log(`[CONTACTS SEARCH] First result: ${results[0]?.businessName}`);
+    }
 
     return NextResponse.json({
       success: true,
@@ -69,9 +78,10 @@ export async function GET(request: NextRequest) {
       count: results.length,
     });
   } catch (error) {
-    console.error("[CONTACTS SEARCH] Error:", error);
+    console.error("[CONTACTS SEARCH] ✗ Error:", error);
     return NextResponse.json(
       {
+        success: false,
         error: error instanceof Error ? error.message : "Failed to search",
       },
       { status: 500 }

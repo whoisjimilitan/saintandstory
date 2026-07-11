@@ -198,7 +198,7 @@ export default function ReferrerSignup() {
                   name="hasWhatsapp"
                   checked={formData.hasWhatsapp}
                   onChange={handleChange}
-                  className="w-4 h-4 rounded border border-[#E8E8E8]"
+                  className="w-4 h-4 rounded border border-[#0D0D0D] bg-white appearance-none checked:bg-[#0D0D0D] checked:border-[#0D0D0D] cursor-pointer"
                 />
                 <span className="text-sm text-[#0D0D0D]">Available on WhatsApp</span>
               </label>
