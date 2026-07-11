@@ -1,10 +1,12 @@
 /**
  * Google Places Provider
  * Discovers businesses using Google Places API
+ * Tries multiple keyword variations to maximize results
  */
 
 import { Business, SearchQuery, ProviderSource } from "../types";
 import { BusinessProvider, ProviderResult } from "../provider";
+import { getKeywordVariations } from "../keyword-normalizer";
 
 interface GooglePlacesResult {
   results: GooglePlace[];
@@ -58,35 +60,66 @@ export class GooglePlacesProvider extends BusinessProvider {
 
       this.log("Starting Google Places search");
 
-      // Build search query
-      let searchQuery = query.keyword || "";
-      if (query.postcode) {
-        searchQuery = searchQuery
-          ? `${searchQuery} ${query.postcode}`
-          : query.postcode;
-      } else if (query.city) {
-        searchQuery = searchQuery ? `${searchQuery} ${query.city}` : query.city;
+      // Get keyword variations for flexible searching
+      const keywordVariations = query.keyword ? getKeywordVariations(query.keyword) : [];
+      let results: GooglePlace[] = [];
+
+      // Try each keyword variation until we get results
+      for (const keyword of keywordVariations) {
+        if (results.length > 0) {
+          this.log(`Got ${results.length} results with "${keyword}", skipping remaining variations`);
+          break;
+        }
+
+        // Build search query with this keyword variation
+        let searchQuery = keyword || "";
+        if (query.postcode) {
+          searchQuery = searchQuery
+            ? `${searchQuery} ${query.postcode}`
+            : query.postcode;
+        } else if (query.city) {
+          searchQuery = searchQuery ? `${searchQuery} ${query.city}` : query.city;
+        }
+
+        // Google Places requires a business type for textSearch
+        // If only location provided (no keyword), add default business type
+        if (!keyword && (query.postcode || query.city)) {
+          searchQuery = `business ${searchQuery}`;
+        }
+
+        if (!searchQuery.trim()) {
+          searchQuery = query.city || "business";
+        }
+
+        this.log(`Trying keyword variation: "${keyword}" → full query: "${searchQuery}"`);
+
+        // Call Google Places API with this variation
+        const variationResults = await this.callGooglePlacesAPI(
+          searchQuery,
+          query.postcode,
+          query.radius,
+          query.limit
+        );
+
+        results = variationResults;
+        this.log(`  → Got ${results.length} results`);
       }
 
-      // Google Places requires a business type for textSearch
-      // If only location provided (no keyword), add default business type
-      if (!query.keyword && (query.postcode || query.city)) {
-        searchQuery = `business ${searchQuery}`;
+      // If no keyword was provided, do a single search with location-only query
+      if (keywordVariations.length === 0 && (query.postcode || query.city)) {
+        let searchQuery = query.postcode || query.city || "business";
+        if (query.postcode && query.city) {
+          searchQuery = `${query.city} ${query.postcode}`;
+        }
+
+        this.log(`Location-only search: "${searchQuery}"`);
+        results = await this.callGooglePlacesAPI(
+          searchQuery,
+          query.postcode,
+          query.radius,
+          query.limit
+        );
       }
-
-      if (!searchQuery.trim()) {
-        searchQuery = query.city || "business";
-      }
-
-      this.log(`Searching: "${searchQuery}"`);
-
-      // Call Google Places API
-      const results = await this.callGooglePlacesAPI(
-        searchQuery,
-        query.postcode,
-        query.radius,
-        query.limit
-      );
 
       // Process results: filter THEN slice
       // Fetch extra results so after filtering we still have enough
