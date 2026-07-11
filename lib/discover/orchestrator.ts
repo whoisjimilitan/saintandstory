@@ -67,10 +67,28 @@ export class DiscoverOrchestrator {
 
         // Add businesses from this provider
         providerResult.businesses.forEach((business) => {
-          // Use business ID as key to deduplicate later
-          if (!allBusinesses.has(business.id)) {
+          const existingBusiness = allBusinesses.get(business.id);
+
+          // If not exists, add it
+          if (!existingBusiness) {
             allBusinesses.set(business.id, business);
             providerCounts[providerName as keyof typeof providerCounts]++;
+            return;
+          }
+
+          // If exists, check if new provider has better data
+          // Prioritize Companies House (has phone numbers, company data)
+          const newFromCompaniesHouse = business.sources?.[0]?.provider === "companies_house";
+          const existingFromCompaniesHouse = existingBusiness.sources?.[0]?.provider === "companies_house";
+          const newHasPhone = !!business.telephone;
+          const existingHasPhone = !!existingBusiness.telephone;
+
+          // Replace if: new is from Companies House and existing isn't, OR new has phone and existing doesn't
+          if ((newFromCompaniesHouse && !existingFromCompaniesHouse) || (newHasPhone && !existingHasPhone)) {
+            allBusinesses.set(business.id, business);
+            console.log(
+              `[ORCHESTRATOR] Merged: ${providerName} data preferred for ${business.businessName} (has phone: ${newHasPhone})`
+            );
           }
         });
 
