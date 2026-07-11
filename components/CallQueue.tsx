@@ -1,12 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import {
-  normalizePhoneToInternational,
-  normalizePhoneToLocal,
-  detectPhoneType,
-  formatPhoneForDisplay,
-} from "@/lib/phone-utils";
 
 interface Business {
   id: string;
@@ -14,7 +8,6 @@ interface Business {
   businessName?: string;
   phone?: string;
   formatted_phone_number?: string;
-  telephone?: string;
   formatted_address?: string;
   address?: string;
   city?: string;
@@ -78,7 +71,7 @@ export default function CallQueue() {
   const handleAddToQueue = (business: Business) => {
     const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
-      setMessage("Already queued");
+      setMessage(`Already queued: ${business.name || business.businessName}`);
       return;
     }
 
@@ -93,7 +86,7 @@ export default function CallQueue() {
     };
 
     setQueuedBusinesses([queued, ...queuedBusinesses]);
-    setMessage(`Added: ${business.name || business.businessName}`);
+    setMessage(`✓ Queued: ${business.name || business.businessName}`);
     setTimeout(() => setMessage(""), 2000);
   };
 
@@ -114,150 +107,14 @@ export default function CallQueue() {
   };
 
   const handleCall = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number || business.telephone;
+    const phone = business.phone || business.formatted_phone_number;
     if (!phone) {
-      setMessage("No phone available");
+      setMessage("✗ No phone number available");
       return;
     }
     navigator.clipboard.writeText(phone);
-    setMessage(`Copied: ${phone}`);
+    setMessage(`✓ Copied: ${phone}`);
     setTimeout(() => setMessage(""), 1500);
-  };
-
-  const handleWhatsApp = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number || business.telephone;
-    if (!phone) {
-      setMessage("No phone available");
-      return;
-    }
-
-    // WhatsApp (wa.me) requires international format: +44XXXXXXXXX
-    const internationalPhone = normalizePhoneToInternational(phone);
-
-    // Saint & Story sales message
-    const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
-
-    // Use wa.me - works across all platforms
-    const encodedMessage = encodeURIComponent(message);
-    const waWebUrl = `https://wa.me/${internationalPhone.replace("+", "")}?text=${encodedMessage}`;
-
-    console.log(`[WHATSAPP] Opening: ${waWebUrl}`);
-    window.open(waWebUrl, "_blank");
-    setMessage(`Opened WhatsApp: ${formatPhoneForDisplay(phone)}`);
-  };
-
-  const handleCallVoIP = async (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number || business.telephone;
-    if (!phone) {
-      setMessage("No phone available");
-      return;
-    }
-
-    try {
-      setMessage("Opening MobileVOIP...");
-
-      // MobileVOIP can accept both local (07xxx) and international (+447xxx) formats
-      const localPhone = normalizePhoneToLocal(phone);
-      const internationalPhone = normalizePhoneToInternational(phone);
-
-      // Call backend to force-open MobileVOIP with AppleScript
-      const response = await fetch("/api/voip/call", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: internationalPhone })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Fallback: try custom URL scheme with international format
-        window.location.href = `mobilevoip://dial?number=${internationalPhone}`;
-        console.log(`[VOIP] Fallback to URL scheme: ${internationalPhone}`);
-        setMessage(`Calling via MobileVOIP: ${formatPhoneForDisplay(phone)}`);
-        return;
-      }
-
-      console.log(`[VOIP] Opened via backend: ${internationalPhone}`);
-      setMessage(`MobileVOIP opened: ${formatPhoneForDisplay(phone)}`);
-    } catch (error) {
-      console.error("[VOIP] Error:", error);
-      setMessage("Failed to open MobileVOIP");
-    }
-  };
-
-  const handleLoadPhone = async (business: Business) => {
-    try {
-      setMessage("Finding phone...");
-
-      const businessName = business.name || business.businessName || "";
-      const postcode = business.postcode || "";
-      const city = business.city || "";
-
-      if (!businessName) {
-        setMessage("Need business name to find phone");
-        return;
-      }
-
-      // Try multiple search strategies with increasing specificity
-      const strategies = [
-        // Strategy 1: Specific (business name + postcode)
-        postcode ? `"${businessName}" ${postcode} phone` : null,
-        // Strategy 2: Medium (business name + city)
-        city ? `"${businessName}" ${city} phone` : null,
-        // Strategy 3: Broad (just business name)
-        `${businessName} phone contact number`,
-        // Strategy 4: Very broad
-        `${businessName} contact phone`,
-      ].filter(Boolean);
-
-      let foundPhone: string | null = null;
-
-      for (const query of strategies) {
-        if (!query) continue;
-
-        console.log(`[PHONE LOOKUP] Trying: ${query}`);
-
-        try {
-          const response = await fetch("/api/b2b/dork-search", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query })
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.leads && data.leads.length > 0) {
-            const phone = data.leads[0]?.phone;
-            if (phone) {
-              foundPhone = phone;
-              console.log(`[PHONE LOOKUP] ✓ Found: ${phone}`);
-              break;
-            }
-          }
-        } catch (error) {
-          console.log(`[PHONE LOOKUP] Strategy failed, trying next...`);
-        }
-      }
-
-      if (!foundPhone) {
-        console.log(`[PHONE LOOKUP] All strategies exhausted`);
-        setMessage("Phone not found - try searching Google manually or checking Companies House");
-        return;
-      }
-
-      // Update business in queue with phone
-      setQueuedBusinesses(
-        queuedBusinesses.map((q) =>
-          q.id === business.id ? { ...q, telephone: foundPhone } : q
-        )
-      );
-
-      setMessage(`Found: ${foundPhone}`);
-      setTimeout(() => setMessage(""), 2000);
-    } catch (error) {
-      setMessage("Failed to find phone");
-      console.error("Error loading phone:", error);
-    }
   };
 
   const calledCount = queuedBusinesses.filter((q) => q.called).length;
@@ -265,133 +122,87 @@ export default function CallQueue() {
 
   return (
     <div className="space-y-6">
-      {/* Daily Summary - Premium Cards */}
+      {/* Daily Summary */}
       {queuedBusinesses.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="border border-[#E8E8E8] rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-3xl font-black text-[#0D0D0D] mb-1">{notCalledCount}</p>
-            <p className="text-xs font-medium text-[#888888] tracking-wide uppercase">to call</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
+            <p className="text-2xl font-black text-[#0D0D0D]">{notCalledCount}</p>
+            <p className="text-xs text-[#888888]">to call</p>
           </div>
-          <div className="border border-[#E8E8E8] rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-3xl font-black text-[#0D0D0D] mb-1">{calledCount}</p>
-            <p className="text-xs font-medium text-[#888888] tracking-wide uppercase">called today</p>
+          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
+            <p className="text-2xl font-black text-[#0D0D0D]">{calledCount}</p>
+            <p className="text-xs text-[#888888]">called today</p>
           </div>
         </div>
       )}
 
-      {/* Today's Queue - Premium Design */}
+      {/* Today's Queue */}
       {queuedBusinesses.length > 0 && (
-        <div className="border border-[#E8E8E8] rounded-xl bg-white overflow-hidden shadow-sm">
-          <div className="px-6 py-5 border-b border-[#E8E8E8] bg-gradient-to-r from-white to-[#FAFAFA]">
+        <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">Today's Queue</p>
-            <p className="text-xs text-[#888888] mt-1">{queuedBusinesses.length} contact{queuedBusinesses.length !== 1 ? "s" : ""}</p>
+            <p className="text-xs text-[#888888]">{queuedBusinesses.length} in queue</p>
           </div>
 
           <div className="divide-y divide-[#E8E8E8]">
             {queuedBusinesses.map((business) => (
               <div
                 key={business.id}
-                className={`p-6 transition-all ${business.called ? "bg-[#F9F9F9]" : "hover:bg-[#FAFAFA]"}`}
+                className={`p-6 ${business.called ? "bg-[#F9F9F9]" : "hover:bg-[#F9F9F9]"} transition`}
               >
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Business Info */}
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-semibold text-sm leading-tight ${business.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
+                    <div className="flex-1">
+                      <p className={`font-semibold text-sm ${business.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
                         {business.name || business.businessName}
                       </p>
                       {(business.formatted_address || business.address) && (
-                        <p className="text-xs text-[#888888] mt-2 line-clamp-2">
+                        <p className="text-xs text-[#888888] mt-1">
                           {business.formatted_address || business.address}
                         </p>
                       )}
                     </div>
-                    <div className="text-xs text-[#CCCCCC] whitespace-nowrap ml-2">{business.queuedAt}</div>
+                    <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
                   </div>
 
-                  {/* Phone & Actions */}
-                  {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                    <div className="space-y-3">
-                      {/* Phone with subtle indicator dot */}
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => handleCall(business)}
-                          className="text-xs text-[#0D0D0D] font-mono hover:text-[#0D0D0D] hover:underline transition-colors"
-                        >
-                          {business.phone || business.formatted_phone_number || business.telephone}
-                        </button>
-                        {(() => {
-                          const phoneType = detectPhoneType(
-                            business.phone || business.formatted_phone_number || business.telephone || ""
-                          );
-                          return phoneType === "mobile" ? (
-                            <div className="w-2 h-2 bg-[#10B981] rounded-full" title="Mobile"></div>
-                          ) : (
-                            <div className="w-2 h-2 bg-[#3B82F6] rounded-full" title="Landline"></div>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Premium Pill Buttons */}
-                      <div className="flex gap-2">
-                        {(() => {
-                          const phoneType = detectPhoneType(
-                            business.phone || business.formatted_phone_number || business.telephone || ""
-                          );
-                          return phoneType === "mobile" ? (
-                            <button
-                              onClick={() => handleWhatsApp(business)}
-                              className="flex-1 text-xs px-4 py-2.5 bg-[#25D366] text-white rounded-full font-semibold hover:bg-[#1FAE56] transition-all hover:shadow-md active:scale-95"
-                            >
-                              WhatsApp
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleCallVoIP(business)}
-                              className="flex-1 text-xs px-4 py-2.5 bg-[#0D0D0D] text-white rounded-full font-semibold hover:bg-[#333333] transition-all hover:shadow-md active:scale-95"
-                            >
-                              Call
-                            </button>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  ) : (
+                  {/* Phone */}
+                  {(business.phone || business.formatted_phone_number) && (
                     <button
-                      onClick={() => handleLoadPhone(business)}
-                      className="text-xs px-4 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded-full hover:border-[#0D0D0D] font-semibold transition-all hover:shadow-sm"
+                      onClick={() => handleCall(business)}
+                      className="text-xs text-[#0D0D0D] font-mono hover:underline"
                     >
-                      Find Phone
+                      {business.phone || business.formatted_phone_number}
                     </button>
                   )}
 
-                  {/* Notes Field - Premium */}
+                  {/* Notes Field */}
                   <div>
                     <textarea
                       value={business.notes}
                       onChange={(e) => handleUpdateNotes(business.id, e.target.value)}
-                      placeholder="Add notes..."
-                      className="w-full text-xs px-4 py-2.5 border border-[#E8E8E8] rounded-lg bg-[#FAFAFA] text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 resize-none transition-colors"
+                      placeholder="Add notes here (interested, call back, etc.)"
+                      className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none resize-none"
                       rows={2}
                     />
                   </div>
 
-                  {/* Actions - Premium Pills */}
-                  <div className="flex gap-2 pt-1">
+                  {/* Actions */}
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleMarkCalled(business.id)}
                       disabled={business.called}
-                      className={`flex-1 text-xs px-4 py-2.5 rounded-full font-semibold transition-all ${
+                      className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
                         business.called
                           ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
-                          : "bg-[#0D0D0D] text-white hover:bg-[#333333] hover:shadow-md active:scale-95"
+                          : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
                       }`}
                     >
                       {business.called ? "✓ Called" : "Mark Called"}
                     </button>
                     <button
                       onClick={() => handleRemoveFromQueue(business.id)}
-                      className="flex-1 text-xs px-4 py-2.5 border border-[#E8E8E8] text-[#0D0D0D] rounded-full font-semibold hover:border-[#0D0D0D] hover:shadow-sm transition-all active:scale-95"
+                      className="flex-1 text-xs px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold hover:border-[#0D0D0D] transition"
                     >
                       Remove
                     </button>
@@ -403,9 +214,9 @@ export default function CallQueue() {
         </div>
       )}
 
-      {/* Search Section - Premium */}
-      <div className="border border-[#E8E8E8] rounded-xl bg-white p-6 shadow-sm">
-        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-5">
+      {/* Search Section */}
+      <div className="border border-[#E8E8E8] rounded-lg bg-white p-6">
+        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
           Find Businesses
         </p>
 
@@ -416,12 +227,12 @@ export default function CallQueue() {
               placeholder="Search by business name..."
               value={keywordSearch}
               onChange={(e) => setKeywordSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 transition-all"
+              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
             />
             <button
               onClick={() => handleSearch(keywordSearch, "keyword")}
               disabled={loading || keywordSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-all hover:shadow-md active:scale-95"
+              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
             >
               {loading ? "..." : "Search"}
             </button>
@@ -433,12 +244,12 @@ export default function CallQueue() {
               placeholder="Search by postcode..."
               value={postcodeSearch}
               onChange={(e) => setPostcodeSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none focus:ring-1 focus:ring-[#0D0D0D]/5 transition-all"
+              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
             />
             <button
               onClick={() => handleSearch(postcodeSearch, "postcode")}
               disabled={loading || postcodeSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-all hover:shadow-md active:scale-95"
+              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
             >
               {loading ? "..." : "Search"}
             </button>
@@ -447,91 +258,48 @@ export default function CallQueue() {
       </div>
 
       {message && (
-        <div className="px-4 py-3 rounded-lg bg-[#F9F9F9] border border-[#E8E8E8] shadow-sm animate-in fade-in-50 duration-200">
+        <div className="px-4 py-3 rounded-lg bg-[#F9F9F9] border border-[#E8E8E8]">
           <p className="text-xs font-semibold text-[#0D0D0D]">{message}</p>
         </div>
       )}
 
-      {/* Search Results - Premium */}
+      {/* Search Results */}
       {searchResults.length > 0 && (
-        <div className="border border-[#E8E8E8] rounded-xl bg-white overflow-hidden shadow-sm">
-          <div className="px-6 py-5 border-b border-[#E8E8E8] bg-gradient-to-r from-white to-[#FAFAFA]">
+        <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">
-              {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
+              {searchResults.length} Business{searchResults.length !== 1 ? "es" : ""} Found
             </p>
           </div>
 
           <div className="divide-y divide-[#E8E8E8]">
             {searchResults.map((business) => (
-              <div key={business.id} className="p-6 hover:bg-[#FAFAFA] transition-colors">
+              <div key={business.id} className="p-6 hover:bg-[#F9F9F9] transition">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <p className="font-semibold text-[#0D0D0D] text-sm">
                       {business.name || business.businessName}
                     </p>
                     {(business.formatted_address || business.address) && (
-                      <p className="text-xs text-[#888888] mt-2 line-clamp-2">
+                      <p className="text-xs text-[#888888] mt-1">
                         {business.formatted_address || business.address}
                       </p>
                     )}
-                    {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                      <div className="mt-3 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => handleCall(business)}
-                            className="text-xs text-[#0D0D0D] font-mono hover:underline transition-colors"
-                          >
-                            {business.phone || business.formatted_phone_number || business.telephone}
-                          </button>
-                          {(() => {
-                            const phoneType = detectPhoneType(
-                              business.phone || business.formatted_phone_number || business.telephone || ""
-                            );
-                            return phoneType === "mobile" ? (
-                              <div className="w-2 h-2 bg-[#10B981] rounded-full" title="Mobile"></div>
-                            ) : (
-                              <div className="w-2 h-2 bg-[#3B82F6] rounded-full" title="Landline"></div>
-                            );
-                          })()}
-                        </div>
-                        <div className="flex gap-2">
-                          {(() => {
-                            const phoneType = detectPhoneType(
-                              business.phone || business.formatted_phone_number || business.telephone || ""
-                            );
-                            return phoneType === "mobile" ? (
-                              <button
-                                onClick={() => handleWhatsApp(business)}
-                                className="flex-1 text-xs px-3 py-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#1FAE56] font-semibold transition-all hover:shadow-md active:scale-95"
-                              >
-                                WhatsApp
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleCallVoIP(business)}
-                                className="flex-1 text-xs px-3 py-1.5 bg-[#0D0D0D] text-white rounded-full hover:bg-[#333333] font-semibold transition-all hover:shadow-md active:scale-95"
-                              >
-                                Call
-                              </button>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    ) : (
+                    {(business.phone || business.formatted_phone_number) && (
                       <button
-                        onClick={() => handleLoadPhone(business)}
-                        className="text-xs px-3 py-1.5 border border-[#E8E8E8] text-[#0D0D0D] rounded-full hover:border-[#0D0D0D] font-semibold mt-3 transition-all hover:shadow-sm"
+                        onClick={() => handleCall(business)}
+                        className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
                       >
-                        Find Phone
+                        {business.phone || business.formatted_phone_number}
                       </button>
                     )}
                   </div>
 
                   <button
                     onClick={() => handleAddToQueue(business)}
-                    className="text-xs px-4 py-2.5 bg-[#0D0D0D] text-white rounded-lg hover:bg-[#333333] font-semibold whitespace-nowrap transition-all hover:shadow-md active:scale-95"
+                    className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
                   >
-                    Add
+                    Add to Queue
                   </button>
                 </div>
               </div>
@@ -541,8 +309,8 @@ export default function CallQueue() {
       )}
 
       {!loading && (keywordSearch.length >= 2 || postcodeSearch.length >= 2) && searchResults.length === 0 && (
-        <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-xl bg-[#F9F9F9]">
-          <p className="text-sm text-[#888888]">No results found. Try a different search.</p>
+        <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
+          <p className="text-sm text-[#888888]">No businesses found. Try a different search.</p>
         </div>
       )}
     </div>
