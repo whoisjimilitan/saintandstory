@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import {
+  normalizePhoneToInternational,
+  normalizePhoneToLocal,
+  detectPhoneType,
+  formatPhoneForDisplay,
+} from "@/lib/phone-utils";
 
 interface Business {
   id: string;
@@ -20,23 +26,6 @@ interface QueuedBusiness extends Business {
   queuedAt: string;
   notes: string;
   called: boolean;
-}
-
-// Detect if UK phone number is mobile or landline
-function detectPhoneType(phoneNumber: string): "mobile" | "landline" | "unknown" {
-  const cleaned = phoneNumber.replace(/\D/g, "");
-
-  // UK mobile: starts with 07 (11 digits total)
-  if (cleaned.match(/^447\d{9}$/) || cleaned.match(/^07\d{9}$/)) {
-    return "mobile";
-  }
-
-  // UK landline: starts with 01, 02, or 03 (10-11 digits)
-  if (cleaned.match(/^44[0-3]\d{8,10}$/) || cleaned.match(/^0[1-3]\d{8,10}$/)) {
-    return "landline";
-  }
-
-  return "unknown";
 }
 
 export default function CallQueue() {
@@ -142,41 +131,19 @@ export default function CallQueue() {
       return;
     }
 
-    // Format phone for WhatsApp (remove spaces, keep + and dashes)
-    const formattedPhone = phone.replace(/\s/g, "");
+    // WhatsApp (wa.me) requires international format: +44XXXXXXXXX
+    const internationalPhone = normalizePhoneToInternational(phone);
 
     // Saint & Story sales message
     const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // Try WA Chat Manager first (macOS), fallback to wa.me
+    // Use wa.me - works across all platforms
     const encodedMessage = encodeURIComponent(message);
-    const waChatManagerUrl = `wachatmanager://send?phone=${formattedPhone}&text=${encodedMessage}`;
-    const waWebUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+    const waWebUrl = `https://wa.me/${internationalPhone.replace("+", "")}?text=${encodedMessage}`;
 
-    // Attempt WA Chat Manager (will fail silently if app not available)
-    try {
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = waChatManagerUrl;
-      document.body.appendChild(iframe);
-
-      // After a short delay, if still on the page, fall back to web version
-      setTimeout(() => {
-        iframe.remove();
-        // Check if still focused on this page (WA Chat Manager would steal focus)
-        if (document.hasFocus()) {
-          console.log("[QUEUE] WA Chat Manager not available, using wa.me");
-          window.open(waWebUrl, "_blank");
-          setMessage(`Opened WhatsApp: ${phone}`);
-        } else {
-          setMessage(`Opened WA Chat Manager: ${phone}`);
-        }
-      }, 1500);
-    } catch (error) {
-      console.error("[QUEUE] Error with WA Chat Manager, falling back to wa.me:", error);
-      window.open(waWebUrl, "_blank");
-      setMessage(`Opened WhatsApp: ${phone}`);
-    }
+    console.log(`[WHATSAPP] Opening: ${waWebUrl}`);
+    window.open(waWebUrl, "_blank");
+    setMessage(`Opened WhatsApp: ${formatPhoneForDisplay(phone)}`);
   };
 
   const handleCallVoIP = async (business: Business) => {
@@ -189,26 +156,31 @@ export default function CallQueue() {
     try {
       setMessage("Opening MobileVOIP...");
 
+      // MobileVOIP can accept both local (07xxx) and international (+447xxx) formats
+      const localPhone = normalizePhoneToLocal(phone);
+      const internationalPhone = normalizePhoneToInternational(phone);
+
       // Call backend to force-open MobileVOIP with AppleScript
       const response = await fetch("/api/voip/call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify({ phone: internationalPhone })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Fallback: try custom URL scheme
-        const formattedPhone = phone.replace(/\s/g, "");
-        window.location.href = `mobilevoip://dial?number=${formattedPhone}`;
-        setMessage(`Calling via MobileVOIP: ${phone}`);
+        // Fallback: try custom URL scheme with international format
+        window.location.href = `mobilevoip://dial?number=${internationalPhone}`;
+        console.log(`[VOIP] Fallback to URL scheme: ${internationalPhone}`);
+        setMessage(`Calling via MobileVOIP: ${formatPhoneForDisplay(phone)}`);
         return;
       }
 
-      setMessage(`MobileVOIP opened: ${phone}`);
+      console.log(`[VOIP] Opened via backend: ${internationalPhone}`);
+      setMessage(`MobileVOIP opened: ${formatPhoneForDisplay(phone)}`);
     } catch (error) {
-      console.error("VoIP call error:", error);
+      console.error("[VOIP] Error:", error);
       setMessage("Failed to open MobileVOIP");
     }
   };

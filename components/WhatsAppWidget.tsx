@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { normalizePhoneToInternational } from "@/lib/phone-utils";
 
 interface WidgetProps {
   position?: "bottom-right" | "bottom-left";
@@ -107,7 +108,9 @@ export default function WhatsAppWidget({
     const userCity = availability.city;
     const message = `Hi, we're in ${userCity} and need urgent same-day delivery. Are you available today?`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappNumber = "442030519243";
+
+    // Business WhatsApp number: +442030519243
+    const whatsappNumber = normalizePhoneToInternational("+442030519243").replace("+", "");
 
     // Log message to backend so it appears in /operator dashboard
     try {
@@ -128,31 +131,10 @@ export default function WhatsAppWidget({
       console.error("[WIDGET] Failed to log message:", error);
     }
 
-    // Try WA Chat Manager first (macOS), fallback to wa.me
-    const waChatManagerUrl = `wachatmanager://send?phone=+${whatsappNumber}&text=${encodedMessage}`;
+    // Use wa.me for reliable cross-platform support
     const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-    // Attempt WA Chat Manager (will fail silently if app not available)
-    try {
-      // Try to open the custom URL scheme
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = waChatManagerUrl;
-      document.body.appendChild(iframe);
-
-      // After a short delay, if still on the page, fall back to web version
-      setTimeout(() => {
-        iframe.remove();
-        // Check if still focused on this page (WA Chat Manager would steal focus)
-        if (document.hasFocus()) {
-          console.log("[WIDGET] WA Chat Manager not available, using wa.me");
-          window.open(waWebUrl, "_blank");
-        }
-      }, 1500);
-    } catch (error) {
-      console.error("[WIDGET] Error with WA Chat Manager, falling back to wa.me:", error);
-      window.open(waWebUrl, "_blank");
-    }
+    console.log(`[WIDGET] Opening WhatsApp: ${waWebUrl}`);
+    window.open(waWebUrl, "_blank");
   };
 
   const positionClass =
