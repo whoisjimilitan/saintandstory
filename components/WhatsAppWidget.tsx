@@ -103,15 +103,34 @@ export default function WhatsAppWidget({
     return () => clearInterval(interval);
   }, []);
 
-  const handleOpenWhatsApp = () => {
+  const handleOpenWhatsApp = async () => {
     const userCity = availability.city;
-    // Psychology-locked message: Acknowledge + Problem (no ask, no sales language)
-    // Operator will respond with: Acknowledge → Problem → Intro (I head logistics...)
     const message = `Hi, we're in ${userCity} and need urgent same-day delivery. Are you available today?`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappNumber = "442030519243";
-    const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    window.open(url, "_blank");
+
+    // Log message to backend so it appears in /operator dashboard
+    try {
+      await fetch("/api/widget-messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          city: userCity,
+          timestamp: new Date().toISOString(),
+          source: "website_widget",
+          userAgent: navigator.userAgent,
+          referrer: document.referrer,
+        }),
+      });
+      console.log("[WIDGET] Message logged to backend");
+    } catch (error) {
+      console.error("[WIDGET] Failed to log message:", error);
+    }
+
+    // Force WA Chat Manager to open (macOS only)
+    const waChatManagerUrl = `wachatmanager://send?phone=+${whatsappNumber}&text=${encodedMessage}`;
+    window.location.href = waChatManagerUrl;
   };
 
   const positionClass =

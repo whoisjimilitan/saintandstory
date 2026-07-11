@@ -1731,3 +1731,20 @@ model CallLog {
   @@index([calledAt])
   @@map("call_logs")
 }
+
+model WidgetMessage {
+  id                String    @id @default(cuid())
+  message           String    @db.Text
+  city              String
+  userAgent         String?   @map("user_agent")
+  referrer          String?
+  source            String    @default("website_widget")
+  timestamp         DateTime  @map("timestamp")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([city])
+  @@index([source])
+  @@index([timestamp])
+  @@index([createdAt])
+  @@map("widget_messages")
+}
