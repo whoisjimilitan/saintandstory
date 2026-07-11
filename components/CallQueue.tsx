@@ -71,7 +71,7 @@ export default function CallQueue() {
   const handleAddToQueue = (business: Business) => {
     const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
-      setMessage(`Already queued: ${business.name || business.businessName}`);
+      setMessage("Already queued");
       return;
     }
 
@@ -86,7 +86,7 @@ export default function CallQueue() {
     };
 
     setQueuedBusinesses([queued, ...queuedBusinesses]);
-    setMessage(`✓ Queued: ${business.name || business.businessName}`);
+    setMessage(`Added: ${business.name || business.businessName}`);
     setTimeout(() => setMessage(""), 2000);
   };
 
@@ -109,11 +109,11 @@ export default function CallQueue() {
   const handleCall = (business: Business) => {
     const phone = business.phone || business.formatted_phone_number;
     if (!phone) {
-      setMessage("✗ No phone number available");
+      setMessage("No phone available");
       return;
     }
     navigator.clipboard.writeText(phone);
-    setMessage(`✓ Copied: ${phone}`);
+    setMessage(`Copied: ${phone}`);
     setTimeout(() => setMessage(""), 1500);
   };
 
@@ -181,7 +181,7 @@ export default function CallQueue() {
                     <textarea
                       value={business.notes}
                       onChange={(e) => handleUpdateNotes(business.id, e.target.value)}
-                      placeholder="Add notes here (interested, call back, etc.)"
+                      placeholder="Notes"
                       className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none resize-none"
                       rows={2}
                     />
@@ -198,7 +198,7 @@ export default function CallQueue() {
                           : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
                       }`}
                     >
-                      {business.called ? "✓ Called" : "Mark Called"}
+                      {business.called ? "Called" : "Mark Called"}
                     </button>
                     <button
                       onClick={() => handleRemoveFromQueue(business.id)}
@@ -268,7 +268,7 @@ export default function CallQueue() {
         <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">
-              {searchResults.length} Business{searchResults.length !== 1 ? "es" : ""} Found
+              {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
             </p>
           </div>
 
@@ -310,7 +310,7 @@ export default function CallQueue() {
 
       {!loading && (keywordSearch.length >= 2 || postcodeSearch.length >= 2) && searchResults.length === 0 && (
         <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
-          <p className="text-sm text-[#888888]">No businesses found. Try a different search.</p>
+          <p className="text-sm text-[#888888]">No results</p>
         </div>
       )}
     </div>
