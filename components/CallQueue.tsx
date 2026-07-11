@@ -161,31 +161,7 @@ export default function CallQueue() {
 
       console.log(`[VOIP] Input: "${phone}" → 00 format: "${voipPhone}"`);
 
-      // Try backend first (AppleScript on Mac)
-      try {
-        const response = await fetch("/api/voip/call", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: voipPhone }),
-        });
-
-        const data = await response.json();
-
-        // If backend succeeded or returned a fallback URL scheme
-        if (response.ok || response.status === 202) {
-          if (data.urlScheme) {
-            // Use fallback URL scheme from backend
-            console.log(`[VOIP] Using fallback URL scheme: ${data.urlScheme}`);
-            window.location.href = data.urlScheme;
-          }
-          setMessage(`Opening MobileVOIP: ${formatPhoneForDisplay(phone)}`);
-          return;
-        }
-      } catch (backendError) {
-        console.log(`[VOIP] Backend call failed, using direct URL scheme`, backendError);
-      }
-
-      // Fallback: Direct URL scheme if backend unavailable
+      // FORCE MobileVOIP app via URL scheme
       const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
       console.log(`[VOIP] Opening: ${urlScheme}`);
       window.location.href = urlScheme;
