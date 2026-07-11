@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import {
-  getPhonePlusFormat,
-  getPhone00Format,
-  getPhoneLocalFormat,
+  normalizePhoneToInternational,
+  normalizePhoneToLocal,
   detectPhoneType,
   formatPhoneForDisplay,
 } from "@/lib/phone-utils";
@@ -52,12 +51,11 @@ export default function CallQueue() {
       } else {
         params.append("keyword", query);
       }
-      params.append("limit", "1000");
 
       const url = `/api/b2b/discover?${params}`;
       console.log("[CALL QUEUE SEARCH] Querying:", url);
 
-      const response = await fetch(url, { method: "GET" });
+      const response = await fetch(url);
       const data = await response.json();
 
       console.log("[CALL QUEUE SEARCH] Results:", data);
@@ -133,20 +131,19 @@ export default function CallQueue() {
       return;
     }
 
-    // WA Chat Manager requires +44 format (no leading 0)
-    const wachatPhone = getPhonePlusFormat(phone);
-    const cleanPhone = wachatPhone.replace("+", ""); // 447711007373
+    // WhatsApp (wa.me) requires international format: +44XXXXXXXXX
+    const internationalPhone = normalizePhoneToInternational(phone);
 
     // Saint & Story sales message
     const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // FORCE WA Chat Manager with correct format
+    // Use wa.me - works across all platforms
     const encodedMessage = encodeURIComponent(message);
-    const waChatManagerUrl = `wachatmanager://send?phone=+${cleanPhone}&text=${encodedMessage}`;
+    const waWebUrl = `https://wa.me/${internationalPhone.replace("+", "")}?text=${encodedMessage}`;
 
-    console.log(`[WHATSAPP] Phone: "${phone}" → Plus format: "${wachatPhone}" → URL: ${waChatManagerUrl}`);
-    window.location.href = waChatManagerUrl;
-    setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
+    console.log(`[WHATSAPP] Opening: ${waWebUrl}`);
+    window.open(waWebUrl, "_blank");
+    setMessage(`Opened WhatsApp: ${formatPhoneForDisplay(phone)}`);
   };
 
   const handleCallVoIP = async (business: Business) => {
@@ -157,19 +154,34 @@ export default function CallQueue() {
     }
 
     try {
-      // MobileVOIP requires 00 format (00447711007373)
-      const voipPhone = getPhone00Format(phone);
+      setMessage("Opening MobileVOIP...");
 
-      console.log(`[VOIP] Input: "${phone}" → 00 format: "${voipPhone}"`);
+      // MobileVOIP can accept both local (07xxx) and international (+447xxx) formats
+      const localPhone = normalizePhoneToLocal(phone);
+      const internationalPhone = normalizePhoneToInternational(phone);
 
-      // FORCE MobileVOIP app via URL scheme
-      const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
-      console.log(`[VOIP] Opening: ${urlScheme}`);
-      window.location.href = urlScheme;
-      setMessage(`Opening MobileVOIP: ${voipPhone}`);
+      // Call backend to force-open MobileVOIP with AppleScript
+      const response = await fetch("/api/voip/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: internationalPhone })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Fallback: try custom URL scheme with international format
+        window.location.href = `mobilevoip://dial?number=${internationalPhone}`;
+        console.log(`[VOIP] Fallback to URL scheme: ${internationalPhone}`);
+        setMessage(`Calling via MobileVOIP: ${formatPhoneForDisplay(phone)}`);
+        return;
+      }
+
+      console.log(`[VOIP] Opened via backend: ${internationalPhone}`);
+      setMessage(`MobileVOIP opened: ${formatPhoneForDisplay(phone)}`);
     } catch (error) {
       console.error("[VOIP] Error:", error);
-      setMessage("Failed to open MobileVOIP - check if app is installed");
+      setMessage("Failed to open MobileVOIP");
     }
   };
 
@@ -329,7 +341,7 @@ export default function CallQueue() {
                           return phoneType === "mobile" ? (
                             <button
                               onClick={() => handleWhatsApp(business)}
-                              className="flex-1 text-xs px-4 py-2.5 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded-full font-semibold hover:bg-[#F9F9F9] transition-all hover:shadow-sm active:scale-95"
+                              className="flex-1 text-xs px-4 py-2.5 bg-[#25D366] text-white rounded-full font-semibold hover:bg-[#1FAE56] transition-all hover:shadow-md active:scale-95"
                             >
                               WhatsApp
                             </button>
@@ -490,7 +502,7 @@ export default function CallQueue() {
                             return phoneType === "mobile" ? (
                               <button
                                 onClick={() => handleWhatsApp(business)}
-                                className="flex-1 text-xs px-3 py-1.5 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded-full font-semibold transition-all hover:bg-[#F9F9F9] hover:shadow-sm active:scale-95"
+                                className="flex-1 text-xs px-3 py-1.5 bg-[#25D366] text-white rounded-full hover:bg-[#1FAE56] font-semibold transition-all hover:shadow-md active:scale-95"
                               >
                                 WhatsApp
                               </button>
