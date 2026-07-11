@@ -217,42 +217,61 @@ export default function CallQueue() {
     try {
       setMessage("Finding phone...");
 
-      // Build smart query: business name + address/postcode for specificity
-      const businessName = business.name || business.businessName || "business";
-      const address = business.formatted_address || business.address || "";
+      const businessName = business.name || business.businessName || "";
       const postcode = business.postcode || "";
+      const city = business.city || "";
 
-      // Query: "Business Name" "postcode" phone UK
-      // This helps Google find the specific business with phone in results
-      const query = postcode
-        ? `"${businessName}" ${postcode} phone UK`
-        : `${businessName} phone contact UK`;
-
-      console.log(`[PHONE LOOKUP] Query: ${query}`);
-
-      const response = await fetch("/api/b2b/dork-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.leads || data.leads.length === 0) {
-        console.log(`[PHONE LOOKUP] No leads found in response`);
-        setMessage("Phone not found");
+      if (!businessName) {
+        setMessage("Need business name to find phone");
         return;
       }
 
-      // Get phone from first result
-      const foundPhone = data.leads[0]?.phone;
+      // Try multiple search strategies with increasing specificity
+      const strategies = [
+        // Strategy 1: Specific (business name + postcode)
+        postcode ? `"${businessName}" ${postcode} phone` : null,
+        // Strategy 2: Medium (business name + city)
+        city ? `"${businessName}" ${city} phone` : null,
+        // Strategy 3: Broad (just business name)
+        `${businessName} phone contact number`,
+        // Strategy 4: Very broad
+        `${businessName} contact phone`,
+      ].filter(Boolean);
+
+      let foundPhone: string | null = null;
+
+      for (const query of strategies) {
+        if (!query) continue;
+
+        console.log(`[PHONE LOOKUP] Trying: ${query}`);
+
+        try {
+          const response = await fetch("/api/b2b/dork-search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query })
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.leads && data.leads.length > 0) {
+            const phone = data.leads[0]?.phone;
+            if (phone) {
+              foundPhone = phone;
+              console.log(`[PHONE LOOKUP] ✓ Found: ${phone}`);
+              break;
+            }
+          }
+        } catch (error) {
+          console.log(`[PHONE LOOKUP] Strategy failed, trying next...`);
+        }
+      }
+
       if (!foundPhone) {
-        console.log(`[PHONE LOOKUP] Leads found but no phone extracted`);
-        setMessage("Phone not found");
+        console.log(`[PHONE LOOKUP] All strategies exhausted`);
+        setMessage("Phone not found - try searching Google manually or checking Companies House");
         return;
       }
-
-      console.log(`[PHONE LOOKUP] ✓ Found phone: ${foundPhone}`);
 
       // Update business in queue with phone
       setQueuedBusinesses(
