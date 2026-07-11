@@ -129,6 +129,40 @@ export default function CallQueue() {
     window.open(`https://wa.me/${formattedPhone}`, "_blank");
   };
 
+  const handleCallVoIP = async (business: Business) => {
+    const phone = business.phone || business.formatted_phone_number || business.telephone;
+    if (!phone) {
+      setMessage("No phone available");
+      return;
+    }
+
+    try {
+      setMessage("Opening MobileVOIP...");
+
+      // Call backend to force-open MobileVOIP with AppleScript
+      const response = await fetch("/api/voip/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Fallback: try custom URL scheme
+        const formattedPhone = phone.replace(/\s/g, "");
+        window.location.href = `mobilevoip://dial?number=${formattedPhone}`;
+        setMessage(`Calling via MobileVOIP: ${phone}`);
+        return;
+      }
+
+      setMessage(`MobileVOIP opened: ${phone}`);
+    } catch (error) {
+      console.error("VoIP call error:", error);
+      setMessage("Failed to open MobileVOIP");
+    }
+  };
+
   const handleLoadPhone = async (business: Business) => {
     try {
       setMessage("Finding phone...");
@@ -221,16 +255,24 @@ export default function CallQueue() {
 
                   {/* Phone & Actions */}
                   {(business.phone || business.formatted_phone_number || business.telephone) ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => handleCall(business)}
-                        className="text-xs text-[#0D0D0D] font-mono hover:underline"
-                      >
-                        {business.phone || business.formatted_phone_number || business.telephone}
-                      </button>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleCall(business)}
+                          className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                        >
+                          {business.phone || business.formatted_phone_number || business.telephone}
+                        </button>
+                        <button
+                          onClick={() => handleCallVoIP(business)}
+                          className="text-xs px-2 py-1 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
+                        >
+                          Call
+                        </button>
+                      </div>
                       <button
                         onClick={() => handleWhatsApp(business)}
-                        className="text-xs px-3 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold whitespace-nowrap"
+                        className="w-full text-xs px-3 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
                       >
                         WhatsApp
                       </button>
