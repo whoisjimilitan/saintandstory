@@ -148,12 +148,35 @@ export default function CallQueue() {
     // Saint & Story sales message
     const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // Force WA Chat Manager (uses business account +442030519243)
+    // Try WA Chat Manager first (macOS), fallback to wa.me
     const encodedMessage = encodeURIComponent(message);
     const waChatManagerUrl = `wachatmanager://send?phone=${formattedPhone}&text=${encodedMessage}`;
+    const waWebUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
 
-    window.location.href = waChatManagerUrl;
-    setMessage(`Opening WA Chat Manager: ${phone}`);
+    // Attempt WA Chat Manager (will fail silently if app not available)
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = waChatManagerUrl;
+      document.body.appendChild(iframe);
+
+      // After a short delay, if still on the page, fall back to web version
+      setTimeout(() => {
+        iframe.remove();
+        // Check if still focused on this page (WA Chat Manager would steal focus)
+        if (document.hasFocus()) {
+          console.log("[QUEUE] WA Chat Manager not available, using wa.me");
+          window.open(waWebUrl, "_blank");
+          setMessage(`Opened WhatsApp: ${phone}`);
+        } else {
+          setMessage(`Opened WA Chat Manager: ${phone}`);
+        }
+      }, 1500);
+    } catch (error) {
+      console.error("[QUEUE] Error with WA Chat Manager, falling back to wa.me:", error);
+      window.open(waWebUrl, "_blank");
+      setMessage(`Opened WhatsApp: ${phone}`);
+    }
   };
 
   const handleCallVoIP = async (business: Business) => {

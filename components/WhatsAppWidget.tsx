@@ -128,9 +128,31 @@ export default function WhatsAppWidget({
       console.error("[WIDGET] Failed to log message:", error);
     }
 
-    // Force WA Chat Manager to open (macOS only)
+    // Try WA Chat Manager first (macOS), fallback to wa.me
     const waChatManagerUrl = `wachatmanager://send?phone=+${whatsappNumber}&text=${encodedMessage}`;
-    window.location.href = waChatManagerUrl;
+    const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    // Attempt WA Chat Manager (will fail silently if app not available)
+    try {
+      // Try to open the custom URL scheme
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = waChatManagerUrl;
+      document.body.appendChild(iframe);
+
+      // After a short delay, if still on the page, fall back to web version
+      setTimeout(() => {
+        iframe.remove();
+        // Check if still focused on this page (WA Chat Manager would steal focus)
+        if (document.hasFocus()) {
+          console.log("[WIDGET] WA Chat Manager not available, using wa.me");
+          window.open(waWebUrl, "_blank");
+        }
+      }, 1500);
+    } catch (error) {
+      console.error("[WIDGET] Error with WA Chat Manager, falling back to wa.me:", error);
+      window.open(waWebUrl, "_blank");
+    }
   };
 
   const positionClass =
