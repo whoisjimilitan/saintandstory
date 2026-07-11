@@ -124,9 +124,19 @@ export default function CallQueue() {
       setMessage("No phone available");
       return;
     }
-    // Format phone for WhatsApp (remove spaces, dashes)
-    const formattedPhone = phone.replace(/\s|-/g, "");
-    window.open(`https://wa.me/${formattedPhone}`, "_blank");
+
+    // Format phone for WhatsApp (remove spaces, keep + and dashes)
+    const formattedPhone = phone.replace(/\s/g, "");
+
+    // Saint & Story sales message
+    const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
+
+    // Force WA Chat Manager (uses business account +442030519243)
+    const encodedMessage = encodeURIComponent(message);
+    const waChatManagerUrl = `wachatmanager://send?phone=${formattedPhone}&text=${encodedMessage}`;
+
+    window.location.href = waChatManagerUrl;
+    setMessage(`Opening WA Chat Manager: ${phone}`);
   };
 
   const handleCallVoIP = async (business: Business) => {
