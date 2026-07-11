@@ -82,20 +82,39 @@ export function normalizePhoneToLocal(phone: string): string {
 
 /**
  * Detect if UK phone is mobile (07xxx) or landline (01/02/03xxx)
+ * Direct detection - don't rely on normalization chain
  */
 export function detectPhoneType(phone: string): "mobile" | "landline" | "unknown" {
-  const normalized = normalizePhoneToLocal(phone);
+  if (!phone) return "unknown";
 
-  // Mobile: 07xxx
-  if (normalized.match(/^07\d{9}$/)) {
+  // Clean the phone - just remove spaces and special chars
+  const cleaned = phone.replace(/[\s\-()]/g, "");
+
+  // Remove any + or 00 prefix to get to the core number
+  let core = cleaned;
+  if (core.startsWith("+44")) {
+    core = "0" + core.substring(3); // +447711007373 → 07711007373
+  } else if (core.startsWith("0044")) {
+    core = "0" + core.substring(4); // 00447711007373 → 07711007373
+  } else if (core.startsWith("44")) {
+    core = "0" + core.substring(2); // 447711007373 → 07711007373
+  }
+
+  console.log(`[DETECT] Input: "${phone}" → Cleaned: "${cleaned}" → Core: "${core}"`);
+
+  // Mobile: 07xxx (11 digits total: 0 + 7 + 9 more)
+  if (core.match(/^07\d{9}$/)) {
+    console.log(`[DETECT] ✓ MOBILE detected`);
     return "mobile";
   }
 
-  // Landline: 01/02/03xxx
-  if (normalized.match(/^0[1-3]\d{8,10}$/)) {
+  // Landline: 01/02/03xxx (10-11 digits: 0 + [1-3] + 8-10 more)
+  if (core.match(/^0[1-3]\d{8,10}$/)) {
+    console.log(`[DETECT] ✓ LANDLINE detected`);
     return "landline";
   }
 
+  console.log(`[DETECT] ✗ UNKNOWN format`);
   return "unknown";
 }
 
