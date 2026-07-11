@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { phone } = body;
+    const { phone, message } = body;
 
     if (!phone) {
       return NextResponse.json(
@@ -36,37 +36,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[VOIP CALL] Attempting to open MobileVOIP with: ${phone}`);
+    const encodedMessage = encodeURIComponent(message || "");
+    const waChatManagerUrl = `wachatmanager://send?phone=${phone}&text=${encodedMessage}`;
 
-    // Phone should already be in 00 format from frontend (e.g., 00447711007373)
-    const mobileVoipUrl = `mobilevoip://dial?number=${phone}`;
+    console.log(`[WHATSAPP] Attempting to open WA Chat Manager: ${waChatManagerUrl}`);
 
+    // Use open -a to force-open WA Chat Manager app
     try {
-      // Use open -a to force-open MobileVOIP with URL scheme
-      await execFileAsync("open", ["-a", "MobileVOIP", "--url", mobileVoipUrl]);
+      await execFileAsync("open", ["-a", "WA Chat Manager", "--url", waChatManagerUrl]);
 
-      console.log(`[VOIP CALL] ✓ MobileVOIP opened successfully with number: ${phone}`);
+      console.log(`[WHATSAPP] ✓ WA Chat Manager opened successfully`);
 
       return NextResponse.json({
         success: true,
-        message: "MobileVOIP opened",
+        message: "WA Chat Manager opened",
         phone,
       });
-    } catch (execError) {
-      console.error(`[VOIP CALL] Failed to open app:`, execError);
+    } catch (osascriptError) {
+      console.error(`[WHATSAPP] Failed to open app:`, osascriptError);
 
       // If backend fails, return error (don't provide fallback)
       return NextResponse.json({
         success: false,
-        message: "Failed to open MobileVOIP",
+        message: "Failed to open WA Chat Manager",
         phone,
       }, { status: 500 });
     }
   } catch (error) {
-    console.error("[VOIP CALL] Error:", error);
+    console.error("[WHATSAPP] Error:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to initiate call",
+        error: error instanceof Error ? error.message : "Failed to open WhatsApp",
       },
       { status: 500 }
     );

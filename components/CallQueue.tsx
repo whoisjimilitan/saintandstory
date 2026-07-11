@@ -125,27 +125,47 @@ export default function CallQueue() {
     setTimeout(() => setMessage(""), 1500);
   };
 
-  const handleWhatsApp = (business: Business) => {
+  const handleWhatsApp = async (business: Business) => {
     const phone = business.phone || business.formatted_phone_number || business.telephone;
     if (!phone) {
       setMessage("No phone available");
       return;
     }
 
-    // WA Chat Manager requires +44 format (no leading 0)
-    const wachatPhone = getPhonePlusFormat(phone);
-    const cleanPhone = wachatPhone.replace("+", ""); // 447711007373
+    try {
+      // WA Chat Manager requires +44 format (e.g., +447711007373)
+      const wachatPhone = getPhonePlusFormat(phone);
+      if (!wachatPhone) {
+        setMessage("Invalid phone number");
+        return;
+      }
 
-    // Saint & Story sales message
-    const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
+      // Saint & Story sales message
+      const messageText = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
 
-    // FORCE WA Chat Manager with correct format
-    const encodedMessage = encodeURIComponent(message);
-    const waChatManagerUrl = `wachatmanager://send?phone=+${cleanPhone}&text=${encodedMessage}`;
+      console.log(`[WHATSAPP] Opening WA Chat Manager for: ${formatPhoneForDisplay(phone)}`);
 
-    console.log(`[WHATSAPP] Phone: "${phone}" → Plus format: "${wachatPhone}" → URL: ${waChatManagerUrl}`);
-    window.location.href = waChatManagerUrl;
-    setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
+      // Call backend to open WA Chat Manager (uses open -a command)
+      const response = await fetch("/api/whatsapp/open", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: wachatPhone,
+          message: messageText,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(`Sending via WA Chat Manager: ${formatPhoneForDisplay(phone)}`);
+        setTimeout(() => setMessage(""), 2000);
+      } else {
+        setMessage("Failed to open WA Chat Manager");
+      }
+    } catch (error) {
+      console.error("[WHATSAPP] Error:", error);
+      setMessage("Failed to open WA Chat Manager");
+    }
   };
 
   const handleCallVoIP = async (business: Business) => {
@@ -156,19 +176,32 @@ export default function CallQueue() {
     }
 
     try {
-      // MobileVOIP requires 00 format (00447711007373)
+      // MobileVOIP requires 00 format (e.g., 00447711007373)
       const voipPhone = getPhone00Format(phone);
+      if (!voipPhone) {
+        setMessage("Invalid phone number");
+        return;
+      }
 
-      console.log(`[VOIP] Input: "${phone}" → 00 format: "${voipPhone}"`);
+      console.log(`[VOIP] Opening MobileVOIP for: ${formatPhoneForDisplay(phone)}`);
 
-      // FORCE MobileVOIP app via URL scheme
-      const urlScheme = `mobilevoip://dial?number=${voipPhone}`;
-      console.log(`[VOIP] Opening: ${urlScheme}`);
-      window.location.href = urlScheme;
-      setMessage(`Opening MobileVOIP: ${voipPhone}`);
+      // Call backend to open MobileVOIP (uses open -a command)
+      const response = await fetch("/api/voip/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: voipPhone }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(`Opening MobileVOIP: ${formatPhoneForDisplay(phone)}`);
+        setTimeout(() => setMessage(""), 2000);
+      } else {
+        setMessage("Failed to open MobileVOIP");
+      }
     } catch (error) {
       console.error("[VOIP] Error:", error);
-      setMessage("Failed to open MobileVOIP - check if app is installed");
+      setMessage("Failed to open MobileVOIP");
     }
   };
 
