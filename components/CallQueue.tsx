@@ -8,6 +8,7 @@ interface Business {
   businessName?: string;
   phone?: string;
   formatted_phone_number?: string;
+  telephone?: string;
   formatted_address?: string;
   address?: string;
   city?: string;
@@ -107,7 +108,7 @@ export default function CallQueue() {
   };
 
   const handleCall = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number;
+    const phone = business.phone || business.formatted_phone_number || business.telephone;
     if (!phone) {
       setMessage("No phone available");
       return;
@@ -285,12 +286,12 @@ export default function CallQueue() {
                         {business.formatted_address || business.address}
                       </p>
                     )}
-                    {(business.phone || business.formatted_phone_number) && (
+                    {(business.phone || business.formatted_phone_number || business.telephone) && (
                       <button
                         onClick={() => handleCall(business)}
                         className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
                       >
-                        {business.phone || business.formatted_phone_number}
+                        {business.phone || business.formatted_phone_number || business.telephone}
                       </button>
                     )}
                   </div>
