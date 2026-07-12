@@ -688,7 +688,7 @@ export default function DiscoverPage() {
                                 onClick={() => handleCall(prospect, phoneNumber)}
                                 className="text-xs text-[#0D0D0D] font-mono hover:underline"
                               >
-                                {phoneNumber}
+                                {getPhoneLocalFormat(phoneNumber)}
                               </button>
                               <span className="inline-flex items-center gap-1">
                                 <span className={`w-2 h-2 rounded-full ${isMobile ? "bg-[#2E7D32]" : "bg-[#1976D2]"}`}></span>
