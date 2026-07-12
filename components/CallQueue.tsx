@@ -223,15 +223,19 @@ export default function CallQueue() {
                     <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
                   </div>
 
-                  {/* Phone */}
-                  {(business.telephone || business.phone || business.formatted_phone_number) && (
-                    <button
-                      onClick={() => handleCall(business)}
-                      className="text-xs text-[#0D0D0D] font-mono hover:underline"
-                    >
-                      {business.telephone || business.phone || business.formatted_phone_number}
-                    </button>
-                  )}
+                  {/* Phone - Always show */}
+                  <div className="bg-[#F0F0F0] p-3 rounded border-l-2 border-[#0D0D0D]">
+                    {(business.telephone || business.phone || business.formatted_phone_number) ? (
+                      <button
+                        onClick={() => handleCall(business)}
+                        className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold"
+                      >
+                        📞 {business.telephone || business.phone || business.formatted_phone_number}
+                      </button>
+                    ) : (
+                      <p className="text-xs text-[#999999]">No phone number available</p>
+                    )}
+                  </div>
 
                   {/* Notes Field */}
                   <div>
@@ -265,23 +269,21 @@ export default function CallQueue() {
                     </button>
                   </div>
 
-                  {/* Contact Methods */}
-                  {(business.telephone || business.phone || business.formatted_phone_number) && (
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={() => handleWhatsApp(business)}
-                        className="flex-1 text-xs px-3 py-2 bg-[#25D366] text-white rounded font-semibold hover:bg-[#1fa855] transition"
-                      >
-                        WhatsApp
-                      </button>
-                      <button
-                        onClick={() => handleVoIPCall(business)}
-                        className="flex-1 text-xs px-3 py-2 bg-[#4B72D1] text-white rounded font-semibold hover:bg-[#3a5aa8] transition"
-                      >
-                        Call (VoIP)
-                      </button>
-                    </div>
-                  )}
+                  {/* Contact Methods - Always show both */}
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => handleWhatsApp(business)}
+                      className="flex-1 text-sm px-4 py-3 bg-[#25D366] text-white rounded font-bold hover:bg-[#1fa855] transition"
+                    >
+                      💬 WhatsApp
+                    </button>
+                    <button
+                      onClick={() => handleVoIPCall(business)}
+                      className="flex-1 text-sm px-4 py-3 bg-[#4B72D1] text-white rounded font-bold hover:bg-[#3a5aa8] transition"
+                    >
+                      ☎ Call (VoIP)
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
