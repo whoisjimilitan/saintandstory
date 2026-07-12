@@ -9,6 +9,7 @@ interface Business {
   businessName?: string;
   phone?: string;
   formatted_phone_number?: string;
+  telephone?: string;
   formatted_address?: string;
   address?: string;
   city?: string;
@@ -108,7 +109,7 @@ export default function CallQueue() {
   };
 
   const handleCall = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number;
+    const phone = business.telephone || business.phone || business.formatted_phone_number;
     if (!phone) {
       setMessage("✗ No phone number available");
       return;
@@ -119,7 +120,7 @@ export default function CallQueue() {
   };
 
   const handleWhatsApp = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number;
+    const phone = business.telephone || business.phone || business.formatted_phone_number;
     if (!phone) {
       setMessage("✗ No phone number available");
       return;
@@ -148,7 +149,7 @@ export default function CallQueue() {
   };
 
   const handleVoIPCall = (business: Business) => {
-    const phone = business.phone || business.formatted_phone_number;
+    const phone = business.telephone || business.phone || business.formatted_phone_number;
     if (!phone) {
       setMessage("✗ No phone number available");
       return;
@@ -223,12 +224,12 @@ export default function CallQueue() {
                   </div>
 
                   {/* Phone */}
-                  {(business.phone || business.formatted_phone_number) && (
+                  {(business.telephone || business.phone || business.formatted_phone_number) && (
                     <button
                       onClick={() => handleCall(business)}
                       className="text-xs text-[#0D0D0D] font-mono hover:underline"
                     >
-                      {business.phone || business.formatted_phone_number}
+                      {business.telephone || business.phone || business.formatted_phone_number}
                     </button>
                   )}
 
@@ -265,7 +266,7 @@ export default function CallQueue() {
                   </div>
 
                   {/* Contact Methods */}
-                  {(business.phone || business.formatted_phone_number) && (
+                  {(business.telephone || business.phone || business.formatted_phone_number) && (
                     <div className="flex gap-2 pt-2">
                       <button
                         onClick={() => handleWhatsApp(business)}
@@ -360,12 +361,12 @@ export default function CallQueue() {
                           {business.formatted_address || business.address}
                         </p>
                       )}
-                      {(business.phone || business.formatted_phone_number) && (
+                      {(business.telephone || business.phone || business.formatted_phone_number) && (
                         <button
                           onClick={() => handleCall(business)}
                           className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
                         >
-                          {business.phone || business.formatted_phone_number}
+                          {business.telephone || business.phone || business.formatted_phone_number}
                         </button>
                       )}
                     </div>
@@ -379,7 +380,7 @@ export default function CallQueue() {
                   </div>
 
                   {/* Quick Contact */}
-                  {(business.phone || business.formatted_phone_number) && (
+                  {(business.telephone || business.phone || business.formatted_phone_number) && (
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleWhatsApp(business)}
