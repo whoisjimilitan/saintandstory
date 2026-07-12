@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
 import { getAllCategories } from "@/lib/category-map";
+import { detectPhoneType, getPhonePlusFormat, getPhone00Format, getPhoneLocalFormat } from "@/lib/phone-utils";
 
 interface Prospect {
   id: string;
@@ -14,10 +15,13 @@ interface Prospect {
   postcode?: string;
   email?: string;
   phone?: string;
+  phone_mobile?: string[];
+  phone_landline?: string[];
   tier?: 1 | 2 | 3;
   category?: string;
   source: "search" | "upload" | "manual";
   extractedNeed?: string;
+  phoneLookupLoading?: boolean;
 }
 
 type DiscoveryMode = "search" | "upload" | "manual" | null;
@@ -260,6 +264,83 @@ export default function DiscoverPage() {
       newSelected.add(prospectId);
     }
     setSelectedLeads(newSelected);
+  };
+
+  const handleLoadPhone = async (prospect: Prospect) => {
+    console.log(`[PHONE LOOKUP] Finding phone for: ${prospect.businessName}`);
+
+    // Mark as loading
+    setProspects(
+      prospects.map(p =>
+        p.id === prospect.id ? { ...p, phoneLookupLoading: true } : p
+      )
+    );
+
+    try {
+      const response = await fetch("/api/b2b/lookup-phones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessName: prospect.businessName, postcode: prospect.postcode })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.phones) {
+        console.log(`[PHONE LOOKUP] No phones found`);
+        setProspects(
+          prospects.map(p =>
+            p.id === prospect.id ? { ...p, phoneLookupLoading: false } : p
+          )
+        );
+        return;
+      }
+
+      console.log(`[PHONE LOOKUP] ✓ Found ${data.phones.mobile?.length || 0} mobile, ${data.phones.landline?.length || 0} landline`);
+
+      // Update prospect with found phones
+      setProspects(
+        prospects.map(p =>
+          p.id === prospect.id
+            ? {
+                ...p,
+                phone_mobile: data.phones.mobile || [],
+                phone_landline: data.phones.landline || [],
+                phone: data.phones.all?.[0],
+                phoneLookupLoading: false
+              }
+            : p
+        )
+      );
+    } catch (error) {
+      console.error(`[PHONE LOOKUP] Error:`, error);
+      setProspects(
+        prospects.map(p =>
+          p.id === prospect.id ? { ...p, phoneLookupLoading: false } : p
+        )
+      );
+    }
+  };
+
+  const handleWhatsApp = (prospect: Prospect, phoneNumber: string) => {
+    if (!phoneNumber) return;
+
+    const formattedPhone = getPhonePlusFormat(phoneNumber);
+    const message = `Hello, I came across your business and thought Saint & Story could help improve your urgent deliveries and collections. We're a same-day courier service. Would you be open to a quick conversation?`;
+    const encodedMessage = encodeURIComponent(message);
+    const waChatManagerUrl = `wachatmanager://send?phone=${formattedPhone}&text=${encodedMessage}`;
+
+    console.log(`[WHATSAPP] Opening: ${formattedPhone}`);
+    window.location.href = waChatManagerUrl;
+  };
+
+  const handleVoIPCall = (prospect: Prospect, phoneNumber: string) => {
+    if (!phoneNumber) return;
+
+    const formattedPhone = getPhone00Format(phoneNumber);
+    console.log(`[VOIP] Calling: ${formattedPhone}`);
+
+    // Try custom URL scheme first
+    window.location.href = `mobilevoip://dial?number=${formattedPhone}`;
   };
 
   const handleReviewAndSend = () => {
@@ -566,32 +647,114 @@ export default function DiscoverPage() {
             </div>
 
             <div className="space-y-3">
-              {prospects.map((prospect) => (
-                <button
-                  key={prospect.id}
-                  onClick={() => toggleLead(prospect.id)}
-                  className={`w-full p-4 rounded-lg border transition-all text-left ${
-                    selectedLeads.has(prospect.id)
-                      ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
-                      : "border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-semibold text-sm">{prospect.businessName}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {prospect.category} {prospect.city && `• ${prospect.city}`}
-                      </p>
-                      {prospect.email && (
-                        <p className="text-xs opacity-60 mt-1">{prospect.email}</p>
+              {prospects.map((prospect) => {
+                const hasPhone = prospect.phone || prospect.phone_mobile?.length || prospect.phone_landline?.length;
+                const phoneNumber = prospect.phone || prospect.phone_mobile?.[0] || prospect.phone_landline?.[0];
+                const phoneType = phoneNumber ? detectPhoneType(phoneNumber) : null;
+                const isMobile = phoneType === "mobile";
+                const isLandline = phoneType === "landline";
+
+                return (
+                  <div
+                    key={prospect.id}
+                    className={`w-full p-4 rounded-lg border transition-all ${
+                      selectedLeads.has(prospect.id)
+                        ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
+                        : "border-[#E8E8E8] bg-white text-[#0D0D0D]"
+                    }`}
+                  >
+                    {/* Header: Name, Category, City, Tier */}
+                    <button
+                      onClick={() => toggleLead(prospect.id)}
+                      className="w-full text-left hover:opacity-80 transition-opacity"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold text-sm">{prospect.businessName}</p>
+                          <p className={`text-xs opacity-70 mt-1 ${selectedLeads.has(prospect.id) ? "opacity-50" : ""}`}>
+                            {prospect.category} {prospect.city && `• ${prospect.city}`}
+                          </p>
+                          {prospect.email && (
+                            <p className={`text-xs opacity-60 mt-1 ${selectedLeads.has(prospect.id) ? "opacity-40" : ""}`}>
+                              {prospect.email}
+                            </p>
+                          )}
+                        </div>
+                        <div className={`text-xs font-semibold ${selectedLeads.has(prospect.id) ? "opacity-50" : "opacity-70"}`}>
+                          T{prospect.tier}
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Phone Section */}
+                    <div className="mt-3 pt-3 border-t border-[#E8E8E8]/50">
+                      {phoneNumber ? (
+                        <div className="space-y-2">
+                          {/* Phone Number with Badge */}
+                          <div className="flex items-center justify-between">
+                            <p className={`text-sm font-mono font-semibold ${
+                              isMobile
+                                ? "text-[#2E7D32]"
+                                : isLandline
+                                ? "text-[#1976D2]"
+                                : ""
+                            }`}>
+                              {getPhoneLocalFormat(phoneNumber)}
+                            </p>
+                            {isMobile && (
+                              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
+                                Mobile
+                              </span>
+                            )}
+                            {isLandline && (
+                              <span className="text-xs px-2 py-1 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
+                                Landline
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2 mt-2">
+                            {isMobile && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWhatsApp(prospect, phoneNumber);
+                                }}
+                                className="flex-1 px-3 py-2 bg-[#25D366] text-white text-xs font-semibold rounded hover:bg-[#20BA5C] transition-colors"
+                              >
+                                WhatsApp
+                              </button>
+                            )}
+                            {isLandline && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleVoIPCall(prospect, phoneNumber);
+                                }}
+                                className="flex-1 px-3 py-2 bg-[#1976D2] text-white text-xs font-semibold rounded hover:bg-[#1565C0] transition-colors"
+                              >
+                                VoIP Call
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLoadPhone(prospect);
+                          }}
+                          disabled={prospect.phoneLookupLoading}
+                          className="w-full px-3 py-2 bg-[#F0F0F0] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#E8E8E8] disabled:opacity-50 transition-colors"
+                        >
+                          {prospect.phoneLookupLoading ? "Finding phone..." : "Find Phone"}
+                        </button>
                       )}
                     </div>
-                    <div className="text-xs font-semibold opacity-70">
-                      T{prospect.tier}
-                    </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
 
             {selectedLeads.size > 0 && (
