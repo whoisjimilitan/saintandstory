@@ -179,8 +179,19 @@ export class GooglePlacesProvider extends BusinessProvider {
     try {
       this.log(`Geocoding postcode: ${postcode}`);
 
+      // Extract outward code (first 1-2 chars before numbers) to find city
+      const outwardCode = postcode.split(/\d/)[0].toUpperCase();
+      const city = this.postcodeAreaToCity[outwardCode];
+
+      // Format address with city if available for better geocoding accuracy
+      let fullAddress = postcode;
+      if (city) {
+        fullAddress = `${postcode} ${city}`;
+        this.log(`  Postcode area ${outwardCode} → ${city}`);
+      }
+
       const params = new URLSearchParams({
-        address: postcode,
+        address: fullAddress,
         region: "gb",
         key: this.apiKey,
       });
@@ -196,7 +207,7 @@ export class GooglePlacesProvider extends BusinessProvider {
       const data = (await response.json()) as { results?: Array<{ geometry?: { location?: { lat: number; lng: number } } }>; status?: string };
 
       if (data.status !== "OK" || !data.results || data.results.length === 0) {
-        this.log(`Geocoding returned no results for: ${postcode}`);
+        this.log(`Geocoding returned no results for: ${fullAddress}`);
         return null;
       }
 
