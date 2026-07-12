@@ -17,19 +17,20 @@ interface GooglePlacesResult {
 interface GooglePlace {
   place_id: string;
   name: string;
-  formatted_address: string;
+  formatted_address?: string;
   geometry: {
     location: {
       lat: number;
       lng: number;
     };
   };
-  business_status: string;
+  business_status?: string;
   rating?: number;
   user_ratings_total?: number;
   types: string[];
   website?: string;
   formatted_phone_number?: string;
+  vicinity?: string;
 }
 
 export class GooglePlacesProvider extends BusinessProvider {
@@ -140,16 +141,28 @@ export class GooglePlacesProvider extends BusinessProvider {
       }
 
       // Process results: filter THEN slice
-      // Fetch extra results so after filtering we still have enough
+      // For postcode-only search (Nearby Search), skip business_status check
+      // For keyword search (Text Search), apply full filtering
       const targetLimit = query.limit || 1000;
 
-      const businesses: Business[] = results
-        .filter((place) => place.business_status === "OPERATIONAL")
-        .filter((place) => this.isUKLocation(place.formatted_address))
-        .slice(0, targetLimit)
-        .map((place) => this.normalizePlaceResult(place));
+      let filteredResults = results;
+      if (query.postcode && !query.keyword) {
+        // Nearby Search results - already UK-based by coordinates, don't filter by status
+        this.log(`Using Nearby Search results (no status filter)`);
+        filteredResults = results.slice(0, targetLimit);
+      } else {
+        // Text Search results - apply full filtering
+        filteredResults = results
+          .filter((place) => place.business_status === "OPERATIONAL")
+          .filter((place) => this.isUKLocation(place.formatted_address || ""))
+          .slice(0, targetLimit);
+      }
 
-      this.log(`Found ${businesses.length} UK businesses`);
+      const businesses: Business[] = filteredResults.map((place) =>
+        this.normalizePlaceResult(place)
+      );
+
+      this.log(`Found ${businesses.length} businesses`);
 
       return {
         businesses,
@@ -288,7 +301,24 @@ export class GooglePlacesProvider extends BusinessProvider {
       }
 
       this.log(`Total nearby results: ${allResults.length}`);
-      return allResults.slice(0, limit);
+
+      // Filter out generic places (localities, political boundaries) - keep only actual businesses
+      const businesses = allResults.filter((place) => {
+        // Exclude generic place types
+        const hasGenericType = place.types.some((t) =>
+          ["locality", "political", "administrative_area_level_1", "administrative_area_level_2", "country"].includes(t)
+        );
+
+        // Include if it has specific business types
+        const hasBusinessType = place.types.some((t) =>
+          !["locality", "political", "administrative_area_level_1", "administrative_area_level_2", "country", "point_of_interest"].includes(t)
+        );
+
+        return !hasGenericType && hasBusinessType;
+      });
+
+      this.log(`After filtering generic places: ${businesses.length}/${allResults.length}`);
+      return businesses.slice(0, limit);
     } catch (error) {
       this.log(`Nearby search error: ${error instanceof Error ? error.message : String(error)}`);
       return [];
@@ -383,13 +413,16 @@ export class GooglePlacesProvider extends BusinessProvider {
       ? place.formatted_phone_number.replace(/^\+44\s?/, "0")
       : undefined;
 
+    // Use formatted_address if available, otherwise use vicinity (from Nearby Search)
+    const address = place.formatted_address || place.vicinity || place.name;
+
     return {
       id: this.generateId(place.place_id),
       businessName: place.name,
       tradingName: place.name,
-      address: place.formatted_address,
-      postcode: this.extractPostcode(place.formatted_address),
-      city: this.extractCity(place.formatted_address),
+      address: address,
+      postcode: this.extractPostcode(address),
+      city: this.extractCity(address),
       coordinates: {
         lat: place.geometry.location.lat,
         lng: place.geometry.location.lng,
