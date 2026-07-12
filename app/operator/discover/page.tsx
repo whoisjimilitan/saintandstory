@@ -322,6 +322,12 @@ export default function DiscoverPage() {
     }
   };
 
+  const handleCall = (prospect: Prospect, phoneNumber: string) => {
+    if (!phoneNumber) return;
+    navigator.clipboard.writeText(phoneNumber);
+    alert(`Copied: ${phoneNumber}`);
+  };
+
   const handleWhatsApp = (prospect: Prospect, phoneNumber: string) => {
     if (!phoneNumber) return;
 
@@ -654,111 +660,86 @@ export default function DiscoverPage() {
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="divide-y divide-[#E8E8E8] border border-[#E8E8E8] rounded-lg bg-white">
               {prospects.map((prospect) => {
-                const hasPhone = prospect.phone || prospect.phone_mobile?.length || prospect.phone_landline?.length;
                 const phoneNumber = prospect.phone || prospect.phone_mobile?.[0] || prospect.phone_landline?.[0];
                 const phoneType = phoneNumber ? detectPhoneType(phoneNumber) : null;
                 const isMobile = phoneType === "mobile";
-                const isLandline = phoneType === "landline";
 
                 return (
-                  <div
-                    key={prospect.id}
-                    className={`w-full p-4 rounded-lg border transition-all ${
-                      selectedLeads.has(prospect.id)
-                        ? "border-[#0D0D0D] bg-[#0D0D0D] text-white"
-                        : "border-[#E8E8E8] bg-white text-[#0D0D0D]"
-                    }`}
-                  >
-                    {/* Header: Name, Category, City, Tier */}
-                    <button
-                      onClick={() => toggleLead(prospect.id)}
-                      className="w-full text-left hover:opacity-80 transition-opacity"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="font-semibold text-sm">{prospect.businessName}</p>
-                          <p className={`text-xs opacity-70 mt-1 ${selectedLeads.has(prospect.id) ? "opacity-50" : ""}`}>
-                            {prospect.category} {prospect.city && `• ${prospect.city}`}
+                  <div key={prospect.id} className="p-4 hover:bg-[#F9F9F9] transition">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <p className="font-semibold text-[#0D0D0D] text-sm">{prospect.businessName}</p>
+                        {prospect.city && (
+                          <p className="text-xs text-[#888888] mt-1">
+                            {prospect.city} {prospect.postcode && `• ${prospect.postcode}`}
                           </p>
-                          {prospect.email && (
-                            <p className={`text-xs opacity-60 mt-1 ${selectedLeads.has(prospect.id) ? "opacity-40" : ""}`}>
-                              {prospect.email}
-                            </p>
-                          )}
-                        </div>
-                        <div className={`text-xs font-semibold ${selectedLeads.has(prospect.id) ? "opacity-50" : "opacity-70"}`}>
-                          T{prospect.tier}
-                        </div>
-                      </div>
-                    </button>
+                        )}
+                        {prospect.email && (
+                          <p className="text-xs text-[#888888] mt-1">{prospect.email}</p>
+                        )}
 
-                    {/* Phone Section */}
-                    <div className="mt-3 pt-3 border-t border-[#E8E8E8]/50">
-                      {phoneNumber ? (
-                        <div className="space-y-2">
-                          {/* Phone Number with Badge */}
-                          <div className="flex items-center justify-between">
-                            <p className={`text-sm font-mono font-semibold ${
-                              isMobile
-                                ? "text-[#2E7D32]"
-                                : isLandline
-                                ? "text-[#1976D2]"
-                                : ""
-                            }`}>
-                              {getPhoneLocalFormat(phoneNumber)}
-                            </p>
-                            {isMobile && (
-                              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded font-semibold">
-                                Mobile
-                              </span>
-                            )}
-                            {isLandline && (
-                              <span className="text-xs px-2 py-1 bg-[#E3F2FD] text-[#1976D2] rounded font-semibold">
-                                Landline
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-2 mt-2">
-                            {isMobile && (
+                        {phoneNumber ? (
+                          <div className="mt-2 space-y-2">
+                            {/* Phone with inline badge */}
+                            <div className="flex items-center gap-2">
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleWhatsApp(prospect, phoneNumber);
-                                }}
-                                className="flex-1 px-3 py-2 bg-[#25D366] text-white text-xs font-semibold rounded hover:bg-[#20BA5C] transition-colors"
+                                onClick={() => handleCall(prospect, phoneNumber)}
+                                className="text-xs text-[#0D0D0D] font-mono hover:underline"
+                              >
+                                {phoneNumber}
+                              </button>
+                              <span className="inline-flex items-center gap-1">
+                                <span className={`w-2 h-2 rounded-full ${isMobile ? "bg-[#2E7D32]" : "bg-[#1976D2]"}`}></span>
+                                <span className={`text-xs px-1.5 py-0.5 ${
+                                  isMobile
+                                    ? "bg-[#E8F5E9] text-[#2E7D32]"
+                                    : "bg-[#E3F2FD] text-[#1976D2]"
+                                } rounded font-semibold`}>
+                                  {isMobile ? "Mobile" : "Landline"}
+                                </span>
+                              </span>
+                            </div>
+
+                            {/* Call button */}
+                            {isMobile ? (
+                              <button
+                                onClick={() => handleWhatsApp(prospect, phoneNumber)}
+                                className="w-full text-xs px-2 py-1 bg-[#25D366] text-white rounded hover:bg-[#1FAE56] font-semibold"
                               >
                                 WhatsApp
                               </button>
-                            )}
-                            {isLandline && (
+                            ) : (
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleVoIPCall(prospect, phoneNumber);
-                                }}
-                                className="flex-1 px-3 py-2 bg-[#1976D2] text-white text-xs font-semibold rounded hover:bg-[#1565C0] transition-colors"
+                                onClick={() => handleVoIPCall(prospect, phoneNumber)}
+                                className="w-full text-xs px-2 py-1 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold"
                               >
-                                VoIP Call
+                                Call (VoIP)
                               </button>
                             )}
                           </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLoadPhone(prospect);
-                          }}
-                          disabled={prospect.phoneLookupLoading}
-                          className="w-full px-3 py-2 bg-[#F0F0F0] text-[#0D0D0D] text-xs font-semibold rounded hover:bg-[#E8E8E8] disabled:opacity-50 transition-colors"
-                        >
-                          {prospect.phoneLookupLoading ? "Finding phone..." : "Find Phone"}
-                        </button>
-                      )}
+                        ) : (
+                          <button
+                            onClick={() => handleLoadPhone(prospect)}
+                            disabled={prospect.phoneLookupLoading}
+                            className="text-xs px-2 py-1 border border-[#CCCCCC] text-[#CCCCCC] rounded hover:border-[#0D0D0D] hover:text-[#0D0D0D] font-semibold mt-2 disabled:opacity-50"
+                          >
+                            {prospect.phoneLookupLoading ? "Finding phone..." : "Find Phone"}
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => toggleLead(prospect.id)}
+                        className={`text-xs px-4 py-2 rounded font-semibold whitespace-nowrap ${
+                          selectedLeads.has(prospect.id)
+                            ? "bg-[#0D0D0D] text-white"
+                            : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:bg-[#F9F9F9]"
+                        }`}
+                      >
+                        {selectedLeads.has(prospect.id) ? "Selected" : "Select"}
+                      </button>
                     </div>
                   </div>
                 );
