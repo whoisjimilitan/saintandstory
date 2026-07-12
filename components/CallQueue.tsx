@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getPhonePlusFormat, getPhone00Format, detectPhoneType } from "@/lib/phone-utils";
 
 interface Business {
@@ -21,6 +21,8 @@ interface QueuedBusiness extends Business {
   queuedAt: string;
   notes: string;
   called: boolean;
+  phone_mobile?: string[];
+  phone_landline?: string[];
 }
 
 export default function CallQueue() {
@@ -70,7 +72,7 @@ export default function CallQueue() {
     }
   };
 
-  const handleAddToQueue = (business: Business) => {
+  const handleAddToQueue = async (business: Business) => {
     const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
       setMessage(`Already queued: ${business.name || business.businessName}`);
@@ -85,10 +87,47 @@ export default function CallQueue() {
       }),
       notes: "",
       called: false,
+      phone_mobile: [],
+      phone_landline: [],
     };
 
     setQueuedBusinesses([queued, ...queuedBusinesses]);
     setMessage(`✓ Queued: ${business.name || business.businessName}`);
+
+    // Fetch phone numbers in background
+    try {
+      const res = await fetch("/api/b2b/lookup-phones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessName: business.businessName || business.name,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.phones) {
+          // Update the queued business with found phones
+          setQueuedBusinesses((current) =>
+            current.map((q) =>
+              q.id === business.id
+                ? {
+                    ...q,
+                    phone_mobile: data.phones.mobile || [],
+                    phone_landline: data.phones.landline || [],
+                  }
+                : q
+            )
+          );
+          console.log(
+            `[QUEUE] Found phones for ${business.businessName}: ${data.phones.mobile.length} mobile, ${data.phones.landline.length} landline`
+          );
+        }
+      }
+    } catch (error) {
+      console.error("[QUEUE] Phone lookup failed:", error);
+    }
+
     setTimeout(() => setMessage(""), 2000);
   };
 
@@ -223,17 +262,60 @@ export default function CallQueue() {
                     <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
                   </div>
 
-                  {/* Phone - Always show */}
-                  <div className="bg-[#F0F0F0] p-3 rounded border-l-2 border-[#0D0D0D]">
-                    {(business.telephone || business.phone || business.formatted_phone_number) ? (
+                  {/* Phone Numbers - Show Google Places + Dork Search results */}
+                  <div className="bg-[#F0F0F0] p-3 rounded border-l-2 border-[#0D0D0D] space-y-2">
+                    {/* Primary phone from Google Places */}
+                    {(business.telephone || business.phone || business.formatted_phone_number) && (
                       <button
                         onClick={() => handleCall(business)}
-                        className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold"
+                        className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold block w-full text-left"
                       >
-                        📞 {business.telephone || business.phone || business.formatted_phone_number}
+                        📍 {business.telephone || business.phone || business.formatted_phone_number}
                       </button>
-                    ) : (
-                      <p className="text-xs text-[#999999]">No phone number available</p>
+                    )}
+
+                    {/* Mobile numbers from dork search */}
+                    {(business as any).phone_mobile && (business as any).phone_mobile.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs text-[#666] font-semibold">Mobile:</p>
+                        {(business as any).phone_mobile.map((phone: string, idx: number) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              navigator.clipboard.writeText(phone);
+                              setMessage(`✓ Copied mobile: ${phone}`);
+                              setTimeout(() => setMessage(""), 1500);
+                            }}
+                            className="text-sm font-mono text-[#25D366] hover:underline block w-full text-left"
+                          >
+                            📱 {phone}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Landline numbers from dork search */}
+                    {(business as any).phone_landline && (business as any).phone_landline.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs text-[#666] font-semibold">Landline:</p>
+                        {(business as any).phone_landline.map((phone: string, idx: number) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              navigator.clipboard.writeText(phone);
+                              setMessage(`✓ Copied landline: ${phone}`);
+                              setTimeout(() => setMessage(""), 1500);
+                            }}
+                            className="text-sm font-mono text-[#4B72D1] hover:underline block w-full text-left"
+                          >
+                            ☎ {phone}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {!business.telephone && !business.phone && !business.formatted_phone_number && !(business as any).phone_mobile?.length && !(business as any).phone_landline?.length && (
+                      <p className="text-xs text-[#999999]">Searching for phone numbers...</p>
                     )}
                   </div>
 
