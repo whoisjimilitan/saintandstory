@@ -479,27 +479,59 @@ export default function CallQueue() {
                     </button>
                   </div>
 
-                  {/* Call Button - Routes to WhatsApp or VoIP based on type */}
-                  <button
-                    onClick={() => {
-                      const phone = business.phone || business.telephone || business.formatted_phone_number;
-                      if (!phone) {
-                        setMessage("✗ No phone number available");
-                        return;
-                      }
-                      const phoneType = detectPhoneType(phone);
-                      if (phoneType === "mobile") {
-                        handleWhatsApp(business);
-                      } else if (phoneType === "landline") {
-                        handleVoIPCall(business);
-                      } else {
-                        setMessage("✗ Unable to detect phone type");
-                      }
-                    }}
-                    className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-semibold hover:bg-[#333333] transition"
-                  >
-                    Call
-                  </button>
+                  {/* Call Button or Find Phone fallback */}
+                  {(() => {
+                    const phone = business.phone || business.telephone || business.formatted_phone_number;
+                    if (phone) {
+                      return (
+                        <button
+                          onClick={() => {
+                            const phoneType = detectPhoneType(phone);
+                            if (phoneType === "mobile") {
+                              handleWhatsApp(business);
+                            } else if (phoneType === "landline") {
+                              handleVoIPCall(business);
+                            } else {
+                              setMessage("✗ Unable to detect phone type");
+                            }
+                          }}
+                          className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-semibold hover:bg-[#333333] transition"
+                        >
+                          Call
+                        </button>
+                      );
+                    }
+                    return (
+                      <button
+                        onClick={() => {
+                          setMessage("⏳ Looking up phone number...");
+                          fetch("/api/b2b/lookup-phones", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ businessName: business.businessName || business.name }),
+                          })
+                            .then((res) => res.json())
+                            .then((data) => {
+                              if (data.phones?.all?.length > 0) {
+                                const phone = data.phones.all[0];
+                                setSearchResults(
+                                  searchResults.map((b) =>
+                                    b.id === business.id ? { ...b, phone } : b
+                                  )
+                                );
+                                setMessage(`✓ Found: ${phone}`);
+                              } else {
+                                setMessage("✗ No phone found");
+                              }
+                            })
+                            .catch((err) => setMessage("✗ Lookup failed"));
+                        }}
+                        className="w-full text-sm px-4 py-3 border-2 border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold hover:border-[#0D0D0D] transition"
+                      >
+                        Find Phone
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
