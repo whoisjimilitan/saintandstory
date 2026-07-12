@@ -1,300 +1,150 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getPhonePlusFormat, getPhone00Format, detectPhoneType } from "@/lib/phone-utils";
+import { useState } from "react";
+import { detectPhoneType, getPhonePlusFormat, getPhone00Format } from "@/lib/phone-utils";
 
-interface Business {
+interface Lead {
   id: string;
-  name: string;
-  businessName?: string;
-  phone?: string;
-  formatted_phone_number?: string;
-  telephone?: string;
-  formatted_address?: string;
-  address?: string;
-  city?: string;
-  postcode?: string;
+  businessName: string;
   email?: string;
+  phone?: string;
+  website?: string;
 }
 
-interface QueuedBusiness extends Business {
+interface QueuedLead extends Lead {
   queuedAt: string;
   notes: string;
   called: boolean;
-  phone_mobile?: string[];
-  phone_landline?: string[];
 }
 
 export default function CallQueue() {
-  const [keywordSearch, setKeywordSearch] = useState("");
+  const [businessSearch, setBusinessSearch] = useState("");
+  const [roleSearch, setRoleSearch] = useState("");
   const [postcodeSearch, setPostcodeSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<Business[]>([]);
-  const [queuedBusinesses, setQueuedBusinesses] = useState<QueuedBusiness[]>([]);
+  const [searchResults, setSearchResults] = useState<Lead[]>([]);
+  const [queuedLeads, setQueuedLeads] = useState<QueuedLead[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedResults, setSelectedResults] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<"business" | "role">("business");
 
-  const handleSearch = async (query: string, type: "keyword" | "postcode") => {
-    if (!query || query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
+  const handleBusinessSearch = async (query: string) => {
+    if (!query || query.length < 2) return;
 
+    setLoading(true);
     try {
-      setLoading(true);
+      const response = await fetch("/api/b2b/dork-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
 
-      const params = new URLSearchParams();
-      if (type === "postcode") {
-        params.append("postcode", query);
-      } else {
-        params.append("keyword", query);
-      }
-
-      const url = `/api/b2b/discover?${params}`;
-      console.log("[CALL QUEUE SEARCH] Querying:", url);
-
-      const response = await fetch(url);
       const data = await response.json();
-
-      console.log("[CALL QUEUE SEARCH] Results:", data);
-
-      if (!response.ok) {
-        console.error("[CALL QUEUE SEARCH] Error:", data.error);
+      if (data.success && data.leads) {
+        setSearchResults(data.leads);
+        setMessage(`✓ Found ${data.leads.length} businesses`);
+      } else {
+        setMessage("✗ No results found. Try a different search.");
         setSearchResults([]);
-        return;
       }
-
-      setSearchResults(data.results || []);
     } catch (error) {
-      console.error("Error searching:", error);
-      setSearchResults([]);
+      console.error("Search error:", error);
+      setMessage("✗ Search failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddToQueue = async (business: Business) => {
-    const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
-    if (alreadyQueued) {
-      setMessage(`Already queued: ${business.name || business.businessName}`);
+  const handleRoleSearch = async () => {
+    if (!roleSearch || !postcodeSearch || roleSearch.length < 2 || postcodeSearch.length < 2) {
+      setMessage("✗ Enter both role and postcode");
       return;
     }
 
-    const queued: QueuedBusiness = {
-      ...business,
-      queuedAt: new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      notes: "",
-      called: false,
-      phone_mobile: [],
-      phone_landline: [],
-    };
-
-    setQueuedBusinesses([queued, ...queuedBusinesses]);
-    setMessage(`✓ Queued: ${business.name || business.businessName}`);
-
-    // Fetch phone numbers in background
+    const query = `${roleSearch} ${postcodeSearch} site:linkedin`;
+    setLoading(true);
     try {
-      const res = await fetch("/api/b2b/lookup-phones", {
+      const response = await fetch("/api/b2b/dork-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessName: business.businessName || business.name,
-        }),
+        body: JSON.stringify({ query }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.phones) {
-          // Update the queued business with found phones
-          setQueuedBusinesses((current) =>
-            current.map((q) =>
-              q.id === business.id
-                ? {
-                    ...q,
-                    phone_mobile: data.phones.mobile || [],
-                    phone_landline: data.phones.landline || [],
-                  }
-                : q
-            )
-          );
-          console.log(
-            `[QUEUE] Found phones for ${business.businessName}: ${data.phones.mobile.length} mobile, ${data.phones.landline.length} landline`
-          );
-        }
+      const data = await response.json();
+      if (data.success && data.leads) {
+        setSearchResults(data.leads);
+        setMessage(`✓ Found ${data.leads.length} people in ${postcodeSearch}`);
+      } else {
+        setMessage("✗ No results found. Try a different role or postcode.");
+        setSearchResults([]);
       }
     } catch (error) {
-      console.error("[QUEUE] Phone lookup failed:", error);
+      console.error("Search error:", error);
+      setMessage("✗ Search failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToQueue = (lead: Lead) => {
+    const alreadyQueued = queuedLeads.some((q) => q.id === lead.id);
+    if (alreadyQueued) {
+      setMessage(`Already queued: ${lead.businessName}`);
+      return;
     }
 
+    const queued: QueuedLead = {
+      ...lead,
+      queuedAt: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+      notes: "",
+      called: false,
+    };
+
+    setQueuedLeads([queued, ...queuedLeads]);
+    setMessage(`✓ Queued: ${lead.businessName}`);
     setTimeout(() => setMessage(""), 2000);
   };
 
   const handleRemoveFromQueue = (id: string) => {
-    setQueuedBusinesses(queuedBusinesses.filter((q) => q.id !== id));
-  };
-
-  const handleUpdateNotes = (id: string, notes: string) => {
-    setQueuedBusinesses(
-      queuedBusinesses.map((q) => (q.id === id ? { ...q, notes } : q))
-    );
+    setQueuedLeads(queuedLeads.filter((q) => q.id !== id));
   };
 
   const handleMarkCalled = (id: string) => {
-    setQueuedBusinesses(
-      queuedBusinesses.map((q) => (q.id === id ? { ...q, called: true } : q))
+    setQueuedLeads(
+      queuedLeads.map((q) => (q.id === id ? { ...q, called: true } : q))
     );
   };
 
-  const handleCall = (business: Business) => {
-    const phone = business.telephone || business.phone || business.formatted_phone_number;
-    if (!phone) {
-      setMessage("✗ No phone number available");
-      return;
-    }
-    navigator.clipboard.writeText(phone);
-    setMessage(`✓ Copied: ${phone}`);
-    setTimeout(() => setMessage(""), 1500);
+  const handleUpdateNotes = (id: string, notes: string) => {
+    setQueuedLeads(
+      queuedLeads.map((q) => (q.id === id ? { ...q, notes } : q))
+    );
   };
 
-  const handleWhatsApp = (business: Business) => {
-    const phone = business.telephone || business.phone || business.formatted_phone_number;
-    if (!phone) {
-      setMessage("✗ No phone number available");
+  const handleCall = (lead: Lead) => {
+    if (!lead.phone) {
+      setMessage("✗ No phone number");
       return;
     }
 
-    const phoneType = detectPhoneType(phone);
-    if (phoneType !== "mobile") {
-      setMessage("✗ WhatsApp only works with mobile numbers (07xxx)");
-      return;
+    const phoneType = detectPhoneType(lead.phone);
+    if (phoneType === "mobile") {
+      const plusFormat = getPhonePlusFormat(lead.phone);
+      const message = `Hi ${lead.businessName}, Saint & Story here. We help with urgent deliveries and collections.`;
+      const encoded = encodeURIComponent(message);
+      window.location.href = `wachatmanager://send?phone=${plusFormat}&text=${encoded}`;
+    } else if (phoneType === "landline") {
+      const phone00 = getPhone00Format(lead.phone);
+      window.location.href = `mobilevoip://dial?number=${phone00}`;
     }
-
-    const plusFormat = getPhonePlusFormat(phone);
-    if (!plusFormat) {
-      setMessage("✗ Invalid phone number");
-      return;
-    }
-
-    // Use WA Chat Manager app scheme
-    const message = `Hi ${business.businessName}, Saint & Story here. We help with urgent deliveries and collections.`;
-    const encoded = encodeURIComponent(message);
-    const waUrl = `wachatmanager://send?phone=${plusFormat}&text=${encoded}`;
-
-    window.location.href = waUrl;
-    setMessage(`✓ Opening WhatsApp...`);
-    setTimeout(() => setMessage(""), 2000);
   };
 
-  const handleVoIPCall = (business: Business) => {
-    const phone = business.telephone || business.phone || business.formatted_phone_number;
-    if (!phone) {
-      setMessage("✗ No phone number available");
-      return;
-    }
-
-    const phoneType = detectPhoneType(phone);
-    if (phoneType !== "landline") {
-      setMessage("✗ VoIP only works with landlines (01/02/03xxx)");
-      return;
-    }
-
-    const phone00Format = getPhone00Format(phone);
-    if (!phone00Format) {
-      setMessage("✗ Invalid phone number");
-      return;
-    }
-
-    // Use MobileVOIP URL scheme
-    const voipUrl = `mobilevoip://dial?number=${phone00Format}`;
-    window.location.href = voipUrl;
-    setMessage(`✓ Opening MobileVOIP...`);
-    setTimeout(() => setMessage(""), 2000);
-  };
-
-  const toggleSelectResult = (id: string) => {
-    setSelectedResults((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const handleBulkAddToQueue = () => {
-    if (selectedResults.size === 0) return;
-
-    const toQueue = Array.from(selectedResults)
-      .map((id) => searchResults.find((b) => b.id === id))
-      .filter(Boolean) as Business[];
-
-    let addedCount = 0;
-    for (const business of toQueue) {
-      const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
-      if (!alreadyQueued) {
-        const queued: QueuedBusiness = {
-          ...business,
-          queuedAt: new Date().toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          notes: "",
-          called: false,
-          phone_mobile: [],
-          phone_landline: [],
-        };
-        setQueuedBusinesses((prev) => [queued, ...prev]);
-        addedCount++;
-
-        if (!business.phone && !business.telephone && !business.formatted_phone_number) {
-          try {
-            fetch("/api/b2b/lookup-phones", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                businessName: business.businessName || business.name,
-              }),
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                if (data.phones) {
-                  setQueuedBusinesses((current) =>
-                    current.map((q) =>
-                      q.id === business.id
-                        ? {
-                            ...q,
-                            phone_mobile: data.phones.mobile || [],
-                            phone_landline: data.phones.landline || [],
-                          }
-                        : q
-                    )
-                  );
-                }
-              });
-          } catch (error) {
-            console.error("[QUEUE] Phone lookup failed:", error);
-          }
-        }
-      }
-    }
-
-    setSelectedResults(new Set());
-    setMessage(`✓ Added ${addedCount} to queue`);
-    setTimeout(() => setMessage(""), 2000);
-  };
-
-  const calledCount = queuedBusinesses.filter((q) => q.called).length;
-  const notCalledCount = queuedBusinesses.filter((q) => !q.called).length;
+  const calledCount = queuedLeads.filter((q) => q.called).length;
+  const notCalledCount = queuedLeads.filter((q) => !q.called).length;
 
   return (
     <div className="space-y-6">
       {/* Daily Summary */}
-      {queuedBusinesses.length > 0 && (
+      {queuedLeads.length > 0 && (
         <div className="grid grid-cols-2 gap-3">
           <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
             <p className="text-2xl font-black text-[#0D0D0D]">{notCalledCount}</p>
@@ -302,145 +152,73 @@ export default function CallQueue() {
           </div>
           <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white">
             <p className="text-2xl font-black text-[#0D0D0D]">{calledCount}</p>
-            <p className="text-xs text-[#888888]">called today</p>
+            <p className="text-xs text-[#888888]">called</p>
           </div>
         </div>
       )}
 
       {/* Today's Queue */}
-      {queuedBusinesses.length > 0 && (
+      {queuedLeads.length > 0 && (
         <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
             <p className="text-sm font-semibold text-[#0D0D0D]">Today's Queue</p>
-            <p className="text-xs text-[#888888]">{queuedBusinesses.length} in queue</p>
           </div>
 
           <div className="divide-y divide-[#E8E8E8]">
-            {queuedBusinesses.map((business) => (
-              <div
-                key={business.id}
-                className={`p-6 ${business.called ? "bg-[#F9F9F9]" : "hover:bg-[#F9F9F9]"} transition`}
-              >
+            {queuedLeads.map((lead) => (
+              <div key={lead.id} className={`p-6 ${lead.called ? "bg-[#F9F9F9]" : ""}`}>
                 <div className="space-y-3">
-                  {/* Business Info */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <p className={`font-semibold text-sm ${business.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
-                        {business.name || business.businessName}
+                      <p className={`font-semibold text-sm ${lead.called ? "text-[#CCCCCC] line-through" : "text-[#0D0D0D]"}`}>
+                        {lead.businessName}
                       </p>
-                      {(business.formatted_address || business.address) && (
-                        <p className="text-xs text-[#888888] mt-1">
-                          {business.formatted_address || business.address}
-                        </p>
+                      {lead.phone && (
+                        <p className="text-xs text-[#888888] mt-1 font-mono">{lead.phone}</p>
+                      )}
+                      {lead.email && (
+                        <p className="text-xs text-[#888888] font-mono">{lead.email}</p>
                       )}
                     </div>
-                    <div className="text-xs text-[#CCCCCC]">{business.queuedAt}</div>
+                    <div className="text-xs text-[#CCCCCC]">{lead.queuedAt}</div>
                   </div>
 
-                  {/* Phone Numbers - Show Google Places + Dork Search results */}
-                  <div className="bg-[#F0F0F0] p-3 rounded border-l-2 border-[#0D0D0D] space-y-2">
-                    {/* Primary phone from Google Places */}
-                    {(business.telephone || business.phone || business.formatted_phone_number) && (
-                      <button
-                        onClick={() => handleCall(business)}
-                        className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold block w-full text-left"
-                      >
-                        📍 {business.telephone || business.phone || business.formatted_phone_number}
-                      </button>
-                    )}
+                  <textarea
+                    value={lead.notes}
+                    onChange={(e) => handleUpdateNotes(lead.id, e.target.value)}
+                    placeholder="Add notes..."
+                    className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white"
+                    rows={2}
+                  />
 
-                    {/* Mobile numbers from dork search */}
-                    {(business as any).phone_mobile && (business as any).phone_mobile.length > 0 && (
-                      <div className="space-y-1">
-                        <p className="text-xs text-[#666] font-semibold">Mobile:</p>
-                        {(business as any).phone_mobile.map((phone: string, idx: number) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              navigator.clipboard.writeText(phone);
-                              setMessage(`✓ Copied mobile: ${phone}`);
-                              setTimeout(() => setMessage(""), 1500);
-                            }}
-                            className="text-sm font-mono text-[#25D366] hover:underline block w-full text-left"
-                          >
-                            📱 {phone}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Landline numbers from dork search */}
-                    {(business as any).phone_landline && (business as any).phone_landline.length > 0 && (
-                      <div className="space-y-1">
-                        <p className="text-xs text-[#666] font-semibold">Landline:</p>
-                        {(business as any).phone_landline.map((phone: string, idx: number) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              navigator.clipboard.writeText(phone);
-                              setMessage(`✓ Copied landline: ${phone}`);
-                              setTimeout(() => setMessage(""), 1500);
-                            }}
-                            className="text-sm font-mono text-[#4B72D1] hover:underline block w-full text-left"
-                          >
-                            ☎ {phone}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {!business.telephone && !business.phone && !business.formatted_phone_number && !(business as any).phone_mobile?.length && !(business as any).phone_landline?.length && (
-                      <p className="text-xs text-[#999999]">Searching for phone numbers...</p>
-                    )}
-                  </div>
-
-                  {/* Notes Field */}
-                  <div>
-                    <textarea
-                      value={business.notes}
-                      onChange={(e) => handleUpdateNotes(business.id, e.target.value)}
-                      placeholder="Add notes here (interested, call back, etc.)"
-                      className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none resize-none"
-                      rows={2}
-                    />
-                  </div>
-
-                  {/* Actions */}
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleMarkCalled(business.id)}
-                      disabled={business.called}
-                      className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
-                        business.called
+                      onClick={() => handleMarkCalled(lead.id)}
+                      disabled={lead.called}
+                      className={`flex-1 text-xs px-3 py-2 rounded font-semibold ${
+                        lead.called
                           ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
                           : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
                       }`}
                     >
-                      {business.called ? "✓ Called" : "Mark Called"}
+                      {lead.called ? "✓ Called" : "Mark Called"}
                     </button>
                     <button
-                      onClick={() => handleRemoveFromQueue(business.id)}
-                      className="flex-1 text-xs px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold hover:border-[#0D0D0D] transition"
+                      onClick={() => handleRemoveFromQueue(lead.id)}
+                      className="flex-1 text-xs px-3 py-2 border border-[#E8E8E8] text-[#0D0D0D] rounded font-semibold hover:border-[#0D0D0D]"
                     >
                       Remove
                     </button>
                   </div>
 
-                  {/* Contact Methods - Always show both */}
-                  <div className="flex gap-2 pt-2">
+                  {lead.phone && (
                     <button
-                      onClick={() => handleWhatsApp(business)}
-                      className="flex-1 text-sm px-4 py-3 bg-[#25D366] text-white rounded font-bold hover:bg-[#1fa855] transition"
+                      onClick={() => handleCall(lead)}
+                      className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-bold hover:bg-[#333333]"
                     >
-                      💬 WhatsApp
+                      Call
                     </button>
-                    <button
-                      onClick={() => handleVoIPCall(business)}
-                      className="flex-1 text-sm px-4 py-3 bg-[#4B72D1] text-white rounded font-bold hover:bg-[#3a5aa8] transition"
-                    >
-                      ☎ Call (VoIP)
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -449,45 +227,81 @@ export default function CallQueue() {
       )}
 
       {/* Search Section */}
-      <div className="border border-[#E8E8E8] rounded-lg bg-white p-6">
-        <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-          Find Businesses
-        </p>
+      <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
+        <div className="flex border-b border-[#E8E8E8]">
+          <button
+            onClick={() => setActiveTab("business")}
+            className={`flex-1 px-6 py-4 text-sm font-semibold ${
+              activeTab === "business"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#888888]"
+            }`}
+          >
+            Search by Business
+          </button>
+          <button
+            onClick={() => setActiveTab("role")}
+            className={`flex-1 px-6 py-4 text-sm font-semibold ${
+              activeTab === "role"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#888888]"
+            }`}
+          >
+            Search by Role & Postcode
+          </button>
+        </div>
 
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search by business name..."
-              value={keywordSearch}
-              onChange={(e) => setKeywordSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-            />
-            <button
-              onClick={() => handleSearch(keywordSearch, "keyword")}
-              disabled={loading || keywordSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
-            >
-              {loading ? "..." : "Search"}
-            </button>
-          </div>
-
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search by postcode..."
-              value={postcodeSearch}
-              onChange={(e) => setPostcodeSearch(e.target.value)}
-              className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white focus:border-[#0D0D0D] focus:outline-none"
-            />
-            <button
-              onClick={() => handleSearch(postcodeSearch, "postcode")}
-              disabled={loading || postcodeSearch.length < 2}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
-            >
-              {loading ? "..." : "Search"}
-            </button>
-          </div>
+        <div className="p-6 space-y-4">
+          {activeTab === "business" ? (
+            <div className="space-y-3">
+              <p className="text-xs text-[#888888] uppercase tracking-widest">Find businesses by type</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g., solicitors, accountants, construction, dentists..."
+                  value={businessSearch}
+                  onChange={(e) => setBusinessSearch(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleBusinessSearch(businessSearch)}
+                  className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                />
+                <button
+                  onClick={() => handleBusinessSearch(businessSearch)}
+                  disabled={loading || businessSearch.length < 2}
+                  className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+                >
+                  {loading ? "..." : "Search"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-[#888888] uppercase tracking-widest">Find people in specific roles</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g., receptionist, office manager, director..."
+                  value={roleSearch}
+                  onChange={(e) => setRoleSearch(e.target.value)}
+                  className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Postcode (e.g., M1, SW1)"
+                  value={postcodeSearch}
+                  onChange={(e) => setPostcodeSearch(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleRoleSearch()}
+                  className="w-32 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg focus:border-[#0D0D0D] focus:outline-none"
+                />
+              </div>
+              <button
+                onClick={handleRoleSearch}
+                disabled={loading || roleSearch.length < 2 || postcodeSearch.length < 2}
+                className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+              >
+                {loading ? "..." : "Search"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -501,83 +315,41 @@ export default function CallQueue() {
       {searchResults.length > 0 && (
         <div className="border border-[#E8E8E8] rounded-lg bg-white overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E8E8E8] bg-[#FAFAFA]">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-[#0D0D0D]">
-                {searchResults.length} Business{searchResults.length !== 1 ? "es" : ""} Found
-              </p>
-              {selectedResults.size > 0 && (
-                <button
-                  onClick={handleBulkAddToQueue}
-                  className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded font-semibold hover:bg-[#333333]"
-                >
-                  Add {selectedResults.size} to Queue
-                </button>
-              )}
-            </div>
+            <p className="text-sm font-semibold text-[#0D0D0D]">
+              {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
+            </p>
           </div>
 
           <div className="divide-y divide-[#E8E8E8]">
-            {searchResults.map((business) => (
-              <div key={business.id} className="p-6 hover:bg-[#F9F9F9] transition">
+            {searchResults.map((lead) => (
+              <div key={lead.id} className="p-6 hover:bg-[#F9F9F9] transition">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedResults.has(business.id)}
-                      onChange={() => toggleSelectResult(business.id)}
-                      className="mt-1 w-4 h-4 rounded border-[#E8E8E8] cursor-pointer"
-                    />
                     <div className="flex-1">
-                      <p className="font-semibold text-[#0D0D0D] text-sm">
-                        {business.name || business.businessName}
-                      </p>
-                      {(business.formatted_address || business.address) && (
-                        <p className="text-xs text-[#888888] mt-1">
-                          {business.formatted_address || business.address}
-                        </p>
+                      <p className="font-semibold text-[#0D0D0D] text-sm">{lead.businessName}</p>
+                      {lead.phone && (
+                        <p className="text-xs text-[#0D0D0D] mt-2 font-mono font-semibold">{lead.phone}</p>
                       )}
-                      {(business.telephone || business.phone || business.formatted_phone_number) && (
-                        <div className="mt-3 flex items-center gap-2">
-                          <button
-                            onClick={() => handleCall(business)}
-                            className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold"
-                          >
-                            {business.telephone || business.phone || business.formatted_phone_number}
-                          </button>
-                          <span className="text-lg text-[#4B72D1]">•</span>
-                        </div>
+                      {lead.email && (
+                        <p className="text-xs text-[#0D0D0D] font-mono">{lead.email}</p>
                       )}
                     </div>
-
                     <button
-                      onClick={() => handleAddToQueue(business)}
+                      onClick={() => handleAddToQueue(lead)}
                       className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
                     >
                       Add to Queue
                     </button>
                   </div>
 
-                  {/* Call Button - Full width like in screenshot */}
-                  <button
-                    onClick={() => {
-                      const phone = business.telephone || business.phone || business.formatted_phone_number;
-                      if (!phone) {
-                        setMessage("✗ No phone number available");
-                        return;
-                      }
-                      const phoneType = detectPhoneType(phone);
-                      if (phoneType === "mobile") {
-                        handleWhatsApp(business);
-                      } else if (phoneType === "landline") {
-                        handleVoIPCall(business);
-                      } else {
-                        setMessage("✗ Unable to detect phone type");
-                      }
-                    }}
-                    className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-bold hover:bg-[#333333] transition"
-                  >
-                    Call
-                  </button>
+                  {lead.phone && (
+                    <button
+                      onClick={() => handleCall(lead)}
+                      className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-bold hover:bg-[#333333]"
+                    >
+                      Call Now
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -585,9 +357,9 @@ export default function CallQueue() {
         </div>
       )}
 
-      {!loading && (keywordSearch.length >= 2 || postcodeSearch.length >= 2) && searchResults.length === 0 && (
+      {!loading && searchResults.length === 0 && (businessSearch || roleSearch) && (
         <div className="px-6 py-12 text-center border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
-          <p className="text-sm text-[#888888]">No businesses found. Try a different search.</p>
+          <p className="text-sm text-[#888888]">No results found. Try a different search.</p>
         </div>
       )}
     </div>
