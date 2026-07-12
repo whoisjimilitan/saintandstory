@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getPhonePlusFormat, getPhone00Format, detectPhoneType } from "@/lib/phone-utils";
 
 interface Business {
   id: string;
@@ -117,6 +118,61 @@ export default function CallQueue() {
     setTimeout(() => setMessage(""), 1500);
   };
 
+  const handleWhatsApp = (business: Business) => {
+    const phone = business.phone || business.formatted_phone_number;
+    if (!phone) {
+      setMessage("✗ No phone number available");
+      return;
+    }
+
+    const phoneType = detectPhoneType(phone);
+    if (phoneType !== "mobile") {
+      setMessage("✗ WhatsApp only works with mobile numbers (07xxx)");
+      return;
+    }
+
+    const plusFormat = getPhonePlusFormat(phone);
+    if (!plusFormat) {
+      setMessage("✗ Invalid phone number");
+      return;
+    }
+
+    // Use WA Chat Manager app scheme
+    const message = `Hi ${business.businessName}, Saint & Story here. We help with urgent deliveries and collections.`;
+    const encoded = encodeURIComponent(message);
+    const waUrl = `wachatmanager://send?phone=${plusFormat}&text=${encoded}`;
+
+    window.location.href = waUrl;
+    setMessage(`✓ Opening WhatsApp...`);
+    setTimeout(() => setMessage(""), 2000);
+  };
+
+  const handleVoIPCall = (business: Business) => {
+    const phone = business.phone || business.formatted_phone_number;
+    if (!phone) {
+      setMessage("✗ No phone number available");
+      return;
+    }
+
+    const phoneType = detectPhoneType(phone);
+    if (phoneType !== "landline") {
+      setMessage("✗ VoIP only works with landlines (01/02/03xxx)");
+      return;
+    }
+
+    const phone00Format = getPhone00Format(phone);
+    if (!phone00Format) {
+      setMessage("✗ Invalid phone number");
+      return;
+    }
+
+    // Use MobileVOIP URL scheme
+    const voipUrl = `mobilevoip://dial?number=${phone00Format}`;
+    window.location.href = voipUrl;
+    setMessage(`✓ Opening MobileVOIP...`);
+    setTimeout(() => setMessage(""), 2000);
+  };
+
   const calledCount = queuedBusinesses.filter((q) => q.called).length;
   const notCalledCount = queuedBusinesses.filter((q) => !q.called).length;
 
@@ -207,6 +263,24 @@ export default function CallQueue() {
                       Remove
                     </button>
                   </div>
+
+                  {/* Contact Methods */}
+                  {(business.phone || business.formatted_phone_number) && (
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => handleWhatsApp(business)}
+                        className="flex-1 text-xs px-3 py-2 bg-[#25D366] text-white rounded font-semibold hover:bg-[#1fa855] transition"
+                      >
+                        WhatsApp
+                      </button>
+                      <button
+                        onClick={() => handleVoIPCall(business)}
+                        className="flex-1 text-xs px-3 py-2 bg-[#4B72D1] text-white rounded font-semibold hover:bg-[#3a5aa8] transition"
+                      >
+                        Call (VoIP)
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -275,32 +349,52 @@ export default function CallQueue() {
           <div className="divide-y divide-[#E8E8E8]">
             {searchResults.map((business) => (
               <div key={business.id} className="p-6 hover:bg-[#F9F9F9] transition">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="font-semibold text-[#0D0D0D] text-sm">
-                      {business.name || business.businessName}
-                    </p>
-                    {(business.formatted_address || business.address) && (
-                      <p className="text-xs text-[#888888] mt-1">
-                        {business.formatted_address || business.address}
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <p className="font-semibold text-[#0D0D0D] text-sm">
+                        {business.name || business.businessName}
                       </p>
-                    )}
-                    {(business.phone || business.formatted_phone_number) && (
-                      <button
-                        onClick={() => handleCall(business)}
-                        className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
-                      >
-                        {business.phone || business.formatted_phone_number}
-                      </button>
-                    )}
+                      {(business.formatted_address || business.address) && (
+                        <p className="text-xs text-[#888888] mt-1">
+                          {business.formatted_address || business.address}
+                        </p>
+                      )}
+                      {(business.phone || business.formatted_phone_number) && (
+                        <button
+                          onClick={() => handleCall(business)}
+                          className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
+                        >
+                          {business.phone || business.formatted_phone_number}
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => handleAddToQueue(business)}
+                      className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
+                    >
+                      Add to Queue
+                    </button>
                   </div>
 
-                  <button
-                    onClick={() => handleAddToQueue(business)}
-                    className="text-xs px-4 py-2 bg-[#0D0D0D] text-white rounded hover:bg-[#333333] font-semibold whitespace-nowrap"
-                  >
-                    Add to Queue
-                  </button>
+                  {/* Quick Contact */}
+                  {(business.phone || business.formatted_phone_number) && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleWhatsApp(business)}
+                        className="flex-1 text-xs px-3 py-2 bg-[#25D366] text-white rounded font-semibold hover:bg-[#1fa855] transition"
+                      >
+                        WhatsApp
+                      </button>
+                      <button
+                        onClick={() => handleVoIPCall(business)}
+                        className="flex-1 text-xs px-3 py-2 bg-[#4B72D1] text-white rounded font-semibold hover:bg-[#3a5aa8] transition"
+                      >
+                        Call
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
