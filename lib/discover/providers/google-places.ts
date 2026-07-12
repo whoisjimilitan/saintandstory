@@ -350,11 +350,10 @@ export class GooglePlacesProvider extends BusinessProvider {
           query,
           key: this.apiKey,
           language: "en",
+          region: "gb",
+          location: "53.4084,-2.9916", // UK center (Birmingham area)
+          radius: "200000", // 200km radius covers all UK
         });
-
-        if (postcode && radius) {
-          params.append("region", "gb");
-        }
 
         // Add next page token if available
         if (nextPageToken) {
