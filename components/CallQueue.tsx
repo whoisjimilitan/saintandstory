@@ -446,12 +446,15 @@ export default function CallQueue() {
                         </p>
                       )}
                       {(business.telephone || business.phone || business.formatted_phone_number) && (
-                        <button
-                          onClick={() => handleCall(business)}
-                          className="text-xs text-[#0D0D0D] font-mono hover:underline mt-2"
-                        >
-                          {business.telephone || business.phone || business.formatted_phone_number}
-                        </button>
+                        <div className="mt-3 flex items-center gap-2">
+                          <button
+                            onClick={() => handleCall(business)}
+                            className="text-sm font-mono text-[#0D0D0D] hover:underline font-semibold"
+                          >
+                            {business.telephone || business.phone || business.formatted_phone_number}
+                          </button>
+                          <span className="text-lg text-[#4B72D1]">•</span>
+                        </div>
                       )}
                     </div>
 
@@ -463,23 +466,27 @@ export default function CallQueue() {
                     </button>
                   </div>
 
-                  {/* Quick Contact */}
-                  {(business.telephone || business.phone || business.formatted_phone_number) && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleWhatsApp(business)}
-                        className="flex-1 text-xs px-3 py-2 bg-[#25D366] text-white rounded font-semibold hover:bg-[#1fa855] transition"
-                      >
-                        WhatsApp
-                      </button>
-                      <button
-                        onClick={() => handleVoIPCall(business)}
-                        className="flex-1 text-xs px-3 py-2 bg-[#4B72D1] text-white rounded font-semibold hover:bg-[#3a5aa8] transition"
-                      >
-                        Call
-                      </button>
-                    </div>
-                  )}
+                  {/* Call Button - Full width like in screenshot */}
+                  <button
+                    onClick={() => {
+                      const phone = business.telephone || business.phone || business.formatted_phone_number;
+                      if (!phone) {
+                        setMessage("✗ No phone number available");
+                        return;
+                      }
+                      const phoneType = detectPhoneType(phone);
+                      if (phoneType === "mobile") {
+                        handleWhatsApp(business);
+                      } else if (phoneType === "landline") {
+                        handleVoIPCall(business);
+                      } else {
+                        setMessage("✗ Unable to detect phone type");
+                      }
+                    }}
+                    className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-bold hover:bg-[#333333] transition"
+                  >
+                    Call
+                  </button>
                 </div>
               </div>
             ))}
