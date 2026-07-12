@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { label: "How it works", href: "/how-it-works" },
   { label: "For drivers", href: "/for-drivers" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Referrals", href: "/refer" },
   { label: "Contact", href: "/contact" },
 ];
 

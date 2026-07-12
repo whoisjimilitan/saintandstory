@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import CallQueue from "@/components/CallQueue";
 
 interface OperationStatus {
   whatsapp: {
@@ -14,9 +15,6 @@ interface OperationStatus {
     opened: number;
     clicked: number;
     replied: number;
-  };
-  phone: {
-    readyToCall: number;
   };
   drivers: {
     available: number;
@@ -36,16 +34,16 @@ export default function TodayPage() {
     operation: {
       whatsapp: { active: 0, replied: 0 },
       email: { sent: 0, opened: 0, clicked: 0, replied: 0 },
-      phone: { readyToCall: 0 },
       drivers: { available: 0, revenue: "£0" },
     },
     opportunitiesQueued: 0,
     pendingReplies: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"today" | "contacts">("today");
 
   // Modal states for clickable cards
-  const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "phone" | "drivers" | null>(null);
+  const [activeModal, setActiveModal] = useState<"whatsapp" | "email" | "drivers" | null>(null);
   const [driverPoolExpanded, setDriverPoolExpanded] = useState(false);
   const [assignForm, setAssignForm] = useState({
     driver_id: "",
@@ -60,11 +58,10 @@ export default function TodayPage() {
     const loadTodayData = async () => {
       try {
         // Fetch all operation status and pipeline data
-        const [campaignRes, opportunitiesRes, driverRes, phoneRes, whatsappRes, repliesRes] = await Promise.all([
+        const [campaignRes, opportunitiesRes, driverRes, whatsappRes, repliesRes] = await Promise.all([
           fetch("/api/operator/today-campaign-stats"),
           fetch("/api/operator/opportunities-waiting"),
           fetch("/api/operator/today-driver-stats"),
-          fetch("/api/operator/today-phone-stats"),
           fetch("/api/operator/today-whatsapp-stats"),
           fetch("/api/operator/today-pending-replies"),
         ]);
@@ -72,7 +69,6 @@ export default function TodayPage() {
         const campaign = campaignRes.ok ? await campaignRes.json() : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
         const opportunities = opportunitiesRes.ok ? await opportunitiesRes.json() : { count: 0 };
         const driverData = driverRes.ok ? await driverRes.json() : { available: 0, revenue: "£0" };
-        const phoneData = phoneRes.ok ? await phoneRes.json() : { count: 0 };
         const whatsappData = whatsappRes.ok ? await whatsappRes.json() : { active: 0, replied: 0 };
         const repliesData = repliesRes.ok ? await repliesRes.json() : { count: 0 };
 
@@ -80,7 +76,6 @@ export default function TodayPage() {
           operation: {
             whatsapp: { active: whatsappData.active || 0, replied: whatsappData.replied || 0 },
             email: campaign.stats || { sent: 0, opened: 0, clicked: 0, replied: 0 },
-            phone: { readyToCall: phoneData.count || 0 },
             drivers: { available: driverData.available || 0, revenue: driverData.revenue || "£0" },
           },
           opportunitiesQueued: opportunities.count || 0,
@@ -108,26 +103,59 @@ export default function TodayPage() {
 
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
-      <div className="max-w-5xl mx-auto px-4 md:px-8">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
 
-        {/* HEADER */}
-        <div className="mb-12">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
-          <p className="text-sm text-[#999999]">{dayName} • {dateStr}</p>
+        {/* TABS */}
+        <div className="mb-12 border-b border-[#E8E8E8] flex gap-8">
+          <button
+            onClick={() => setActiveTab("today")}
+            className={`pb-4 font-semibold text-sm transition-colors ${
+              activeTab === "today"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#CCCCCC] hover:text-[#888888]"
+            }`}
+          >
+            Today
+          </button>
+          <button
+            onClick={() => setActiveTab("contacts")}
+            className={`pb-4 font-semibold text-sm transition-colors ${
+              activeTab === "contacts"
+                ? "text-[#0D0D0D] border-b-2 border-[#0D0D0D]"
+                : "text-[#CCCCCC] hover:text-[#888888]"
+            }`}
+          >
+            Contacts
+          </button>
         </div>
 
-        {loading ? (
+        {/* HEADER */}
+        {activeTab === "today" && (
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Today</h1>
+            <p className="text-xs text-[#999999]">{dayName} • {dateStr}</p>
+          </div>
+        )}
+
+        {activeTab === "contacts" && (
+          <div className="mb-12">
+            <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Warm Outreach Pipeline</h1>
+            <p className="text-xs text-[#999999]">Upload contacts, call, qualify, then campaign</p>
+          </div>
+        )}
+
+        {activeTab === "today" && loading ? (
           <div className="text-center py-12">
             <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-sm text-[#666666]">Loading your day...</p>
           </div>
-        ) : (
+        ) : activeTab === "today" ? (
           <>
             {/* SECTION 1: OPERATION STATUS - What's happening right now */}
             <div className="mb-16">
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Operation Status</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* WhatsApp - Clickable */}
                 <button
                   onClick={() => setActiveModal("whatsapp")}
@@ -152,17 +180,6 @@ export default function TodayPage() {
                     <span className="text-xs text-[#CCCCCC]">•</span>
                     <span className="text-xs text-[#666666]">{data.operation.email.clicked} clicked</span>
                   </div>
-                </button>
-
-                {/* Phone - Clickable */}
-                <button
-                  onClick={() => setActiveModal("phone")}
-                  className="border border-[#E8E8E8] rounded-lg p-6 bg-white hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-left cursor-pointer"
-                >
-                  <p className="text-xs text-[#888888] uppercase tracking-widest mb-3">Phone</p>
-                  <p className="text-3xl font-black text-[#0D0D0D] mb-1">{data.operation.phone.readyToCall}</p>
-                  <p className="text-xs text-[#666666]">no emails</p>
-                  <p className="text-xs text-[#666666] mt-2">Call to qualify</p>
                 </button>
 
                 {/* Drivers - Clickable */}
@@ -262,7 +279,7 @@ export default function TodayPage() {
             <div>
               <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Next Step</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <Link
                   href="/operator/discover"
                   className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
@@ -294,11 +311,21 @@ export default function TodayPage() {
                   <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Responses</p>
                   <p className="text-xs text-[#888888]">Email & WhatsApp</p>
                 </Link>
+
+                <Link
+                  href="/operator/referral-network"
+                  className="border border-[#E8E8E8] rounded-lg p-6 hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-center"
+                >
+                  <p className="text-sm font-semibold text-[#0D0D0D] mb-1">Referrals</p>
+                  <p className="text-xs text-[#888888]">Manage partners</p>
+                </Link>
               </div>
             </div>
 
           </>
-        )}
+        ) : activeTab === "contacts" ? (
+          <CallQueue />
+        ) : null}
       </div>
 
       {/* MODAL OVERLAYS */}

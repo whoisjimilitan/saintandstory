@@ -150,16 +150,16 @@ export default function ResponsesPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* HEADER */}
-      <div className="pt-32 pb-6 px-8 border-b border-[#E8E8E8]">
-        <div className="max-w-7xl">
-          <h1 className="text-5xl font-black text-[#0D0D0D] mb-2 tracking-tight">Responses</h1>
-          <p className="text-sm text-[#666666]">Manage all prospect conversations and replies</p>
+      <div className="pt-32 pb-8 px-4 md:px-8 border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Responses</h1>
+          <p className="text-xs text-[#999999]">Manage all prospect conversations and replies</p>
         </div>
       </div>
 
       {/* STATS + FILTER */}
-      <div className="px-8 py-8 border-b border-[#E8E8E8]">
-        <div className="max-w-7xl">
+      <div className="px-4 md:px-8 py-8 border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-3 gap-12 mb-12">
             <div>
               <p className="text-xs text-[#999999] uppercase tracking-widest mb-2">Total</p>

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       select: { companyName: true },
       distinct: ["companyName"],
       where: {
-        companyName: { not: null }
+        companyName: { not: { equals: null } }
       }
     });
 

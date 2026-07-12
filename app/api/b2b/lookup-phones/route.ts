@@ -1,8 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { detectPhoneType } from "@/lib/phone-utils";
 
+const ADMIN_EMAILS = [
+  "whoisjimi.today@gmail.com",
+  "oyedeleoyepeju2014@gmail.com",
+  "james@saintandstoryltd.co.uk",
+  "oye@saintandstoryltd.co.uk"
+];
+
+/**
+ * Extract phone numbers from business website
+ * Performs dork search to find both mobile and landline numbers
+ */
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { businessName, website } = body;
 
@@ -31,7 +49,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Build search query: for website use site: operator, for business name use quoted search
+    // Build search query
     const query = website ? `site:${website} phone OR tel OR contact` : `"${businessName}" phone UK`;
 
     const url = new URL("https://www.googleapis.com/customsearch/v1");
@@ -63,17 +81,15 @@ export async function POST(request: NextRequest) {
     for (const result of results) {
       const text = (result.title || "") + " " + (result.snippet || "");
 
-      // Match UK phone numbers: various formats
-      const phoneMatches = text.match(
-        /(?:\+44|0044|0)?[0-9]{3,4}[\s\-]?[0-9]{3,4}[\s\-]?[0-9]{3,4}|(?:\+44|0044)[0-9]{10}|0[0-9]{10}/g
-      );
+      // Match UK phone numbers: +44, 0044, 0, or just digits
+      const phoneMatches = text.match(/(?:\+44|0044|0)?[0-9]{3,4}[\s\-]?[0-9]{3,4}[\s\-]?[0-9]{3,4}|(?:\+44|0044)[0-9]{10}|0[0-9]{10}/g);
 
       if (phoneMatches) {
         for (let phone of phoneMatches) {
           // Clean up
           phone = phone.replace(/[\s\-()]/g, "");
 
-          // Validate it's a real UK number (11+ digits)
+          // Validate it's a real UK number
           if (phone.length >= 11 && /^(?:\+44|0044|0)?[0-9]{10,11}$/.test(phone)) {
             extractedPhones.add(phone);
           }

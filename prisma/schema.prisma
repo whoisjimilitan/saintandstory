@@ -256,6 +256,7 @@ model B2bLead {
   pipeline_stage              String?                      @default("NEW") @map("pipeline_stage")
   channel                     String?                      @default("whatsapp") @map("channel")
   company_size                String?                      @map("company_size")
+  do_not_contact              Boolean?                     @default(false) @map("do_not_contact")
   b2b_email_events            b2b_email_events[]
   b2b_email_link_clicks       b2b_email_link_clicks[]
   b2b_heat_score_history      b2b_heat_score_history[]
@@ -732,6 +733,101 @@ model ObservationEvent {
   sourceId   String
   text       String
   createdAt  DateTime          @default(now())
+}
+
+model Referrer {
+  id                 String              @id @default(cuid())
+  phone              String              @unique
+  officeManagerName   String?             @map("office_manager_name")
+  officeName         String?             @map("office_name")
+  city               String
+  referralCode       String              @unique @map("referral_code")
+  category           String?             // e.g., "solicitor", "accountant", "estate_agent"
+  totalEarnings      Decimal             @default(0) @map("total_earnings") @db.Decimal(10, 2)
+  monthlyEarnings    Decimal             @default(0) @map("monthly_earnings") @db.Decimal(10, 2)
+  totalReferrals     Int                 @default(0) @map("total_referrals")
+  activeReferrals    Int                 @default(0) @map("active_referrals")
+  status             String              @default("active") // active, inactive, paused
+  whatsappStatus     String              @default("pending") @map("whatsapp_status") // pending, joined, active
+  whatsappJoinedAt   DateTime?           @map("whatsapp_joined_at")
+  sentAt             DateTime?           @map("sent_at") // When signup was marked as sent via WhatsApp
+  lastActiveAt       DateTime?           @map("last_active_at")
+  commission         Decimal             @default(15) @db.Decimal(5, 2) // £15 default per referral
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  earnings           ReferrerEarning[]
+  jobs               ReferralJob[]
+
+  @@index([phone])
+  @@index([referralCode])
+  @@index([city])
+  @@index([status])
+  @@index([whatsappStatus])
+  @@index([createdAt])
+  @@map("referrers")
+}
+
+model ReferrerEarning {
+  id                 String    @id @default(cuid())
+  referrerId         String    @map("referrer_id")
+  jobId              String?   @map("job_id")
+  amount             Decimal   @db.Decimal(10, 2)
+  status             String    @default("pending") // pending, confirmed, paid
+  referralMonth      DateTime  @map("referral_month") @db.Date // Used for monthly payouts
+  paidAt             DateTime? @map("paid_at")
+  notes              String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  referrer           Referrer  @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([referralMonth])
+  @@index([status])
+  @@index([jobId])
+  @@map("referrer_earnings")
+}
+
+model ReferralJob {
+  id                 String    @id @default(cuid())
+  jobId              String    @map("job_id")
+  referrerId         String    @map("referrer_id")
+  customerName       String?   @map("customer_name")
+  customerPhone      String?   @map("customer_phone")
+  customerEmail      String?   @map("customer_email")
+  jobValue           Decimal   @map("job_value") @db.Decimal(10, 2)
+  commission         Decimal   @db.Decimal(10, 2) // Amount paid to referrer
+  status             String    @default("new") // new, confirmed, completed, disputed
+  confirmedAt        DateTime? @map("confirmed_at")
+  completedAt        DateTime? @map("completed_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  referrer           Referrer  @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([jobId])
+  @@index([status])
+  @@map("referral_jobs")
+}
+
+model ReferrerMonthlyPayout {
+  id                 String    @id @default(cuid())
+  referrerId         String    @map("referrer_id")
+  month              DateTime  @db.Date // Start of month
+  totalEarnings      Decimal   @map("total_earnings") @db.Decimal(10, 2)
+  referralCount      Int       @map("referral_count")
+  status             String    @default("pending") // pending, processed, paid
+  paidAt             DateTime? @map("paid_at")
+  bankTransferId     String?   @map("bank_transfer_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  @@unique([referrerId, month], map: "uq_referrer_monthly_payout")
+  @@index([referrerId])
+  @@index([month])
+  @@index([status])
+  @@map("referrer_monthly_payouts")
 }
 
 model ProspectFeedback {
@@ -1353,6 +1449,7 @@ model B2bCampaignEmail {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   campaignId      String    @map("campaign_id") @db.Uuid
   prospectId      String?   @map("prospect_id") @db.Uuid
+  leadId          String?   @map("lead_id") @db.Uuid
   prospectEmail   String    @map("prospect_email")
   prospectName    String    @map("prospect_name")
   tier            Int?      @map("tier") // 1, 2, or 3
@@ -1364,12 +1461,14 @@ model B2bCampaignEmail {
   openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
   clickedAt       DateTime? @map("clicked_at") @db.Timestamptz(6)
   repliedAt       DateTime? @map("replied_at") @db.Timestamptz(6)
-  status          String    @default("pending") @map("status") // pending | sent | opened | clicked | replied
+  status          String    @default("pending") @map("status") // pending | sent | opened | clicked | replied | bounced | complained
+  scheduledFor    DateTime? @map("scheduled_for") @db.Timestamptz(6)
   campaign        B2bCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@index([campaignId], map: "idx_b2b_campaign_email_campaign")
   @@index([status], map: "idx_b2b_campaign_email_status")
   @@index([emailSentAt(sort: Desc)], map: "idx_b2b_campaign_email_sent")
+  @@index([scheduledFor], map: "idx_b2b_campaign_email_scheduled")
   @@map("b2b_campaign_emails")
 }
 
@@ -1483,4 +1582,169 @@ model OpportunityFeed {
   @@index([jamesStatus])
   @@index([createdAt(sort: Desc)])
   @@map("opportunity_feed")
+}
+
+model SearchResult {
+  id                String   @id @default(cuid())
+  businessName      String
+  website           String?
+  sourceUrl         String
+  sourcePlatform    String   // linkedin, twitter, reddit, blog, etc
+  originalStatement String   @db.Text
+  opportunityType   String   // "direct_need" or "business_trigger"
+  extractedNeed     String?
+  confidence        String   // "high", "medium", "low"
+  reason            String?  @db.Text
+  industry          String?
+  city              String?
+  country           String?
+  postedDate        DateTime?
+  processedAt       DateTime?
+  status            String   @default("raw") // raw, processing, processed, queued, sent
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([confidence])
+  @@index([createdAt(sort: Desc)])
+  @@map("search_results")
+}
+
+model ProcessedOpportunity {
+  id                String   @id @default(cuid())
+  searchResultId    String
+  businessName      String
+  website           String?
+  originalStatement String   @db.Text
+  opportunityType   String   // "direct_need" or "business_trigger"
+  confidence        String   // "high", "medium", "low"
+
+  // Intelligence reasoning
+  deducedNeed       String   @db.Text // What they actually need
+  recommendedBrief  String   // Type of brief
+  whyTheyNeedIt     String   @db.Text // Personalized reason
+
+  // Generated assets
+  emailSubject      String?
+  emailBody         String?  @db.Text
+  briefUrl          String?
+  briefTitle        String?
+
+  // Status
+  status            String   @default("processed") // processed, queued, approved, sent, response_received
+
+  // Tracking
+  sentAt            DateTime?
+  responseAt        DateTime?
+  responseBody      String?  @db.Text
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([opportunityType])
+  @@index([createdAt(sort: Desc)])
+  @@map("processed_opportunities")
+}
+
+model GeneratedBrief {
+  id                    String   @id @default(cuid())
+  processedOpportunityId String
+  briefType             String   // courier_readiness, medical_logistics, temperature_controlled, etc
+  businessName          String
+  specificNeed          String   @db.Text
+  htmlContent           String   @db.Text
+  publicUrl             String   // URL where brief is hosted
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([processedOpportunityId])
+  @@map("generated_briefs")
+}
+
+model ApprovalQueue {
+  id                        String   @id @default(cuid())
+  processedOpportunityId    String
+  businessName              String
+  originalStatement         String   @db.Text
+  deducedNeed               String   @db.Text
+  emailPreview              String   @db.Text
+  briefUrl                  String?
+  confidence                String
+
+  // Operator action
+  approvedBy                String?
+  approvedAt                DateTime?
+  rejectedAt                DateTime?
+  rejectionReason           String?
+
+  // Status
+  status                    String   @default("pending") // pending, approved, rejected, sent
+  sentAt                    DateTime?
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("approval_queue")
+}
+
+model Contact {
+  id                String    @id @default(cuid())
+  businessName      String
+  contactName       String
+  phone             String
+  postcode          String
+  industry          String?
+  email             String?
+  userId            String    // who uploaded this contact
+  status            String    @default("not_called") // not_called, called, interested, not_interested, no_answer
+  lastCalledAt      DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  callLogs          CallLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([postcode])
+  @@index([createdAt])
+  @@map("contacts")
+}
+
+model CallLog {
+  id                String    @id @default(cuid())
+  contactId         String
+  userId            String    // who made the call
+  status            String    // "called", "interested", "not_interested", "no_answer", "wrong_number"
+  notes             String?   @db.Text
+  calledAt          DateTime
+  createdAt         DateTime  @default(now())
+
+  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([userId])
+  @@index([status])
+  @@index([calledAt])
+  @@map("call_logs")
+}
+
+model WidgetMessage {
+  id                String    @id @default(cuid())
+  message           String    @db.Text
+  city              String
+  userAgent         String?   @map("user_agent")
+  referrer          String?
+  source            String    @default("website_widget")
+  timestamp         DateTime  @map("timestamp")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([city])
+  @@index([source])
+  @@index([timestamp])
+  @@index([createdAt])
+  @@map("widget_messages")
 }

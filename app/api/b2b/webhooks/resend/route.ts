@@ -138,6 +138,12 @@ export async function POST(request: NextRequest) {
       updateData.openedAt = timestamp;
     } else if (mappedEventType === "clicked") {
       updateData.clickedAt = timestamp;
+    } else if (mappedEventType === "bounced") {
+      updateData.status = "bounced";
+      // Track bounce time for hard bounce detection
+    } else if (mappedEventType === "complained") {
+      updateData.status = "complained";
+      // Mark as spam complaint
     } else if (mappedEventType === "replied") {
       updateData.repliedAt = timestamp;
       updateData.status = "replied";
@@ -156,20 +162,29 @@ export async function POST(request: NextRequest) {
           newStatus: updated.status,
         });
 
-        // Update lead engagement if prospectId exists
-        if (campaignEmail.prospectId && (mappedEventType === "opened" || mappedEventType === "clicked")) {
+        // Update lead engagement and handle bounces/complaints
+        if (campaignEmail.leadId) {
           try {
+            const leadUpdateData: any = {
+              last_engagement_at: timestamp,
+              last_engagement_type: `email_${mappedEventType}`,
+            };
+
+            // Mark as do_not_contact on bounce or complaint
+            if (mappedEventType === "bounced" || mappedEventType === "complained") {
+              leadUpdateData.do_not_contact = true;
+              console.log(`[WEBHOOK] ⚠ Marking lead ${campaignEmail.leadId} as do_not_contact (${mappedEventType})`);
+            }
+
             await prisma.b2bLead.update({
-              where: { id: campaignEmail.prospectId },
-              data: {
-                last_engagement_at: timestamp,
-                last_engagement_type: `email_${mappedEventType}`,
-              },
+              where: { id: campaignEmail.leadId },
+              data: leadUpdateData,
             });
 
+            // Log event
             await prisma.b2bConversationEvent.create({
               data: {
-                leadId: campaignEmail.prospectId,
+                leadId: campaignEmail.leadId,
                 type: "email",
                 direction: "inbound",
                 subject: `Email ${mappedEventType}`,
@@ -183,7 +198,7 @@ export async function POST(request: NextRequest) {
               },
             });
           } catch (trackingError) {
-            console.warn(`[WEBHOOK] ⚠ Could not track lead engagement`);
+            console.warn(`[WEBHOOK] ⚠ Could not track lead engagement:`, trackingError);
           }
         }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import OpportunityCsvUpload from "@/components/OpportunityCsvUpload";
 import { getConsequenceTier } from "@/lib/business-pain-promise-map";
@@ -364,15 +365,13 @@ export default function DiscoverPage() {
   const tier3Count = prospects.filter(p => p.tier === 3 && selectedLeads.has(p.id)).length;
 
   return (
-    <div className="min-h-screen bg-white pt-16 pb-16">
+    <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
 
         {/* === HEADER === */}
         <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
-            Discover
-          </h1>
-          <p className="text-sm text-[#666666] leading-relaxed max-w-2xl font-normal">
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Discover</h1>
+          <p className="text-xs text-[#999999]">
             Find prospects. System automatically infers problems and generates personalized briefs.
           </p>
         </div>
@@ -383,7 +382,7 @@ export default function DiscoverPage() {
             How to Find Prospects
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
             <button
               onClick={() => setDiscoveryMode(discoveryMode === "search" ? null : "search")}
@@ -409,6 +408,15 @@ export default function DiscoverPage() {
               <p className="font-bold text-base mb-1">Upload CSV</p>
               <p className="text-xs opacity-70">Bulk import prospects</p>
             </button>
+
+            {/* Quick Campaign */}
+            <Link
+              href="/operator/campaigns"
+              className="p-6 rounded-lg border-2 border-[#E8E8E8] bg-white text-[#0D0D0D] hover:border-[#0D0D0D] transition-all text-left"
+            >
+              <p className="font-bold text-base mb-1">Quick Campaign</p>
+              <p className="text-xs opacity-70">CSV → Send immediately</p>
+            </Link>
 
             {/* Manual */}
             <button

@@ -193,7 +193,7 @@ export default function ApprovalQueuePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-16 pb-16 flex items-center justify-center">
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-sm text-[#666666]">Loading queue...</p>
@@ -203,16 +203,12 @@ export default function ApprovalQueuePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-16 pb-16">
+    <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight leading-tight">
-            Approval Queue
-          </h1>
-          <p className="text-sm text-[#666666]">
-            Review briefs and emails. Five seconds per opportunity. Click send.
-          </p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-2 tracking-tight">Queue</h1>
+          <p className="text-xs text-[#999999]">Review and approve emails before sending to prospects</p>
         </div>
 
         {/* Queue Stats */}
@@ -221,45 +217,46 @@ export default function ApprovalQueuePage() {
         </div>
 
         {opportunities.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-sm text-[#666666]">No pending opportunities.</p>
-            <p className="text-xs text-[#AAAAAA] mt-2">Go to Discover → Search (by postcode or keyword), Add Manually, or Upload CSV → Select prospects → Review & Proceed to Enrich</p>
+          <div className="text-center py-16 border border-[#E8E8E8] rounded-lg bg-[#F9F9F9]">
+            <p className="text-sm font-semibold text-[#0D0D0D]">Queue is empty</p>
+            <p className="text-xs text-[#666666] mt-2">Go to Discover → find prospects → Enrich → generate emails → Queue</p>
+            <p className="text-xs text-[#999999] mt-4">Your email queue will appear here after you generate campaigns</p>
           </div>
         ) : (
           <>
-            {/* Stats */}
-            <div className="mb-8 pb-8 border-b border-[#E8E8E8]">
-              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-4">
-                Summary
-              </p>
-              <div className="flex items-center justify-between">
+            {/* Summary Section */}
+            <div className="mb-12 pb-8 border-b border-[#E8E8E8]">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Summary</p>
+              <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-3xl font-black text-[#0D0D0D]">{opportunities.length}</p>
-                  <p className="text-xs text-[#888888] mt-1">waiting to send</p>
+                  <p className="text-4xl font-black text-[#0D0D0D]">{opportunities.length}</p>
+                  <p className="text-xs text-[#888888] mt-2">emails ready to send</p>
                 </div>
                 <button
                   onClick={handleSendAll}
                   disabled={sendingAll}
                   className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
                 >
-                  {sendingAll ? "Sending..." : "Send All"}
+                  {sendingAll ? "Sending All..." : "Send All"}
                 </button>
               </div>
             </div>
 
-            {/* Opportunities - Modal-style preview */}
-            <div className="space-y-4">
+            {/* Opportunities List */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-6">Pending Emails</p>
+              <div className="space-y-4">
               {opportunities.map((opp) => (
                 <div
                   key={opp.id}
-                  className="border border-[#E8E8E8] rounded-lg overflow-hidden bg-white transition-all"
+                  className="border border-[#E8E8E8] rounded-lg overflow-hidden bg-white hover:border-[#0D0D0D] transition-all"
                 >
                   {/* Header Row - Collapsible */}
                   <button
                     onClick={() =>
                       setExpandedId(expandedId === opp.id ? null : opp.id)
                     }
-                    className="w-full p-4 hover:bg-[#F9F9F9] text-left transition-colors flex items-center justify-between"
+                    className="w-full p-6 hover:bg-[#F9F9F9] text-left transition-colors flex items-center justify-between group"
                   >
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-[#0D0D0D]">
@@ -283,7 +280,7 @@ export default function ApprovalQueuePage() {
                         {opp.extractedUrgency}
                       </span>
                       <svg
-                        className={`w-5 h-5 text-[#0D0D0D] transition-transform ${
+                        className={`w-5 h-5 text-[#888888] group-hover:text-[#0D0D0D] transition-all ${
                           expandedId === opp.id ? "rotate-180" : ""
                         }`}
                         fill="none"
@@ -300,9 +297,9 @@ export default function ApprovalQueuePage() {
                     </div>
                   </button>
 
-                  {/* Expanded Modal View */}
+                  {/* Expanded Detail View */}
                   {expandedId === opp.id && (
-                    <div className="border-t border-[#E8E8E8] bg-white p-6 space-y-6">
+                    <div className="border-t border-[#E8E8E8] bg-[#F9F9F9] p-8 space-y-8">
                       {/* Original Post - Show once, no repetition */}
                       <div>
                         <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest mb-3">
@@ -354,7 +351,7 @@ export default function ApprovalQueuePage() {
                           ) : null}
                         </div>
 
-                        <div className="bg-white border border-[#E8E8E8] rounded-lg p-4 space-y-3">
+                        <div className="bg-white border border-[#E8E8E8] rounded-lg p-6 space-y-4">
                           {/* To/Subject */}
                           <div>
                             <p className="text-xs text-[#888888] font-semibold mb-1">To</p>
@@ -405,17 +402,17 @@ export default function ApprovalQueuePage() {
 
                         {/* Edit/Save Actions */}
                         {editing[opp.id] && (
-                          <div className="flex gap-3 mt-4">
+                          <div className="flex gap-3 mt-6 pt-6 border-t border-[#E8E8E8]">
                             <button
                               onClick={() => saveEdits(opp.id)}
                               disabled={savingIds.has(opp.id)}
-                              className="flex-1 px-4 py-2 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                              className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
                             >
-                              {savingIds.has(opp.id) ? "Saving..." : "Save Changes"}
+                              {savingIds.has(opp.id) ? "Saving..." : "Save"}
                             </button>
                             <button
                               onClick={() => cancelEditing(opp.id)}
-                              className="px-4 py-2 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
+                              className="flex-1 px-4 py-3 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
                             >
                               Cancel
                             </button>
@@ -425,17 +422,17 @@ export default function ApprovalQueuePage() {
 
                       {/* Send Actions */}
                       {!editing[opp.id] && (
-                        <div className="flex gap-3 pt-4 border-t border-[#E8E8E8]">
+                        <div className="flex gap-3 pt-6 border-t border-[#E8E8E8]">
                           <button
                             onClick={() => handleSend(opp.id)}
                             disabled={sendingIds.has(opp.id)}
-                            className="flex-1 px-4 py-2.5 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                            className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
                           >
-                            {sendingIds.has(opp.id) ? "Sending..." : "Send"}
+                            {sendingIds.has(opp.id) ? "Sending..." : "Send Email"}
                           </button>
                           <button
                             onClick={() => setExpandedId(null)}
-                            className="px-4 py-2.5 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
+                            className="flex-1 px-4 py-3 bg-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:bg-[#CCCCCC] transition-colors"
                           >
                             Skip
                           </button>
@@ -445,6 +442,7 @@ export default function ApprovalQueuePage() {
                   )}
                 </div>
               ))}
+              </div>
             </div>
           </>
         )}
