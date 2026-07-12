@@ -111,7 +111,7 @@ export default function DiscoverPage() {
         city: r.city,
         postcode: r.postcode,
         email: r.email,
-        phone: r.phone,
+        phone: r.telephone || r.phone || r.formatted_phone_number,
         tier: getConsequenceTier(r.businessName || r.name),
         category: detectCategory(r.businessName || r.name),
         source: "search" as const
