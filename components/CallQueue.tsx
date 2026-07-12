@@ -63,7 +63,12 @@ export default function CallQueue() {
         return;
       }
 
-      setSearchResults(data.results || []);
+      // Map results and normalize phone field
+      const results = (data.results || []).map((r: any) => ({
+        ...r,
+        phone: r.telephone || r.phone || r.formatted_phone_number,
+      }));
+      setSearchResults(results);
     } catch (error) {
       console.error("Error searching:", error);
       setSearchResults([]);
@@ -466,27 +471,49 @@ export default function CallQueue() {
                     </button>
                   </div>
 
-                  {/* Call Button - Full width like in screenshot */}
-                  <button
-                    onClick={() => {
-                      const phone = business.telephone || business.phone || business.formatted_phone_number;
-                      if (!phone) {
-                        setMessage("✗ No phone number available");
-                        return;
-                      }
-                      const phoneType = detectPhoneType(phone);
-                      if (phoneType === "mobile") {
-                        handleWhatsApp(business);
-                      } else if (phoneType === "landline") {
-                        handleVoIPCall(business);
-                      } else {
-                        setMessage("✗ Unable to detect phone type");
-                      }
-                    }}
-                    className="w-full text-sm px-4 py-3 bg-[#0D0D0D] text-white rounded font-bold hover:bg-[#333333] transition"
-                  >
-                    Call
-                  </button>
+                  {/* Call Button - Shows WhatsApp for mobile, VoIP for landline */}
+                  {(() => {
+                    const phone = business.phone || business.telephone || business.formatted_phone_number;
+                    if (!phone) {
+                      return (
+                        <button
+                          disabled
+                          className="w-full text-sm px-4 py-3 bg-[#E8E8E8] text-[#CCCCCC] rounded font-bold cursor-not-allowed"
+                        >
+                          No Phone
+                        </button>
+                      );
+                    }
+                    const phoneType = detectPhoneType(phone);
+                    if (phoneType === "mobile") {
+                      return (
+                        <button
+                          onClick={() => handleWhatsApp(business)}
+                          className="w-full text-sm px-4 py-3 bg-[#25D366] text-white rounded font-bold hover:bg-[#20BA5C] transition"
+                        >
+                          WhatsApp
+                        </button>
+                      );
+                    } else if (phoneType === "landline") {
+                      return (
+                        <button
+                          onClick={() => handleVoIPCall(business)}
+                          className="w-full text-sm px-4 py-3 bg-[#4B72D1] text-white rounded font-bold hover:bg-[#3A5AA0] transition"
+                        >
+                          Call (VoIP)
+                        </button>
+                      );
+                    } else {
+                      return (
+                        <button
+                          disabled
+                          className="w-full text-sm px-4 py-3 bg-[#E8E8E8] text-[#CCCCCC] rounded font-bold cursor-not-allowed"
+                        >
+                          Unable to detect type
+                        </button>
+                      );
+                    }
+                  })()}
                 </div>
               </div>
             ))}
