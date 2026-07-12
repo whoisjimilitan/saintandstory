@@ -60,65 +60,83 @@ export class GooglePlacesProvider extends BusinessProvider {
 
       this.log("Starting Google Places search");
 
-      // Get keyword variations for flexible searching
-      const keywordVariations = query.keyword ? getKeywordVariations(query.keyword) : [];
       let results: GooglePlace[] = [];
 
-      // Try each keyword variation until we get results
-      for (const keyword of keywordVariations) {
-        if (results.length > 0) {
-          this.log(`Got ${results.length} results with "${keyword}", skipping remaining variations`);
-          break;
+      // POSTCODE-ONLY search: Use Nearby Search with geocoding
+      if (query.postcode && !query.keyword) {
+        this.log(`Postcode-only search: "${query.postcode}"`);
+        const coordinates = await this.geocodePostcode(query.postcode);
+
+        if (coordinates) {
+          this.log(`Postcode geocoded to: ${coordinates.lat}, ${coordinates.lng}`);
+          results = await this.nearbySearch(
+            coordinates.lat,
+            coordinates.lng,
+            query.radius || 5,
+            query.limit || 100
+          );
+          this.log(`Nearby search returned ${results.length} results`);
+        } else {
+          this.log(`Failed to geocode postcode: ${query.postcode}`);
+        }
+      } else {
+        // KEYWORD search: Use text search (original logic)
+        const keywordVariations = query.keyword ? getKeywordVariations(query.keyword) : [];
+
+        // Try each keyword variation until we get results
+        for (const keyword of keywordVariations) {
+          if (results.length > 0) {
+            this.log(`Got ${results.length} results with "${keyword}", skipping remaining variations`);
+            break;
+          }
+
+          // Build search query with this keyword variation
+          let searchQuery = keyword || "";
+          if (query.postcode) {
+            searchQuery = searchQuery
+              ? `${searchQuery} ${query.postcode}`
+              : query.postcode;
+          } else if (query.city) {
+            searchQuery = searchQuery ? `${searchQuery} ${query.city}` : query.city;
+          }
+
+          if (!keyword && (query.postcode || query.city)) {
+            searchQuery = `business ${searchQuery}`;
+          }
+
+          if (!searchQuery.trim()) {
+            searchQuery = query.city || "business";
+          }
+
+          this.log(`Trying keyword variation: "${keyword}" → full query: "${searchQuery}"`);
+
+          // Call Google Places API with this variation
+          const variationResults = await this.callGooglePlacesAPI(
+            searchQuery,
+            query.postcode,
+            query.radius,
+            query.limit
+          );
+
+          results = variationResults;
+          this.log(`  → Got ${results.length} results`);
         }
 
-        // Build search query with this keyword variation
-        let searchQuery = keyword || "";
-        if (query.postcode) {
-          searchQuery = searchQuery
-            ? `${searchQuery} ${query.postcode}`
-            : query.postcode;
-        } else if (query.city) {
-          searchQuery = searchQuery ? `${searchQuery} ${query.city}` : query.city;
+        // If no keyword was provided, do a single search with location-only query
+        if (keywordVariations.length === 0 && (query.postcode || query.city)) {
+          let searchQuery = query.postcode || query.city || "business";
+          if (query.postcode && query.city) {
+            searchQuery = `${query.city} ${query.postcode}`;
+          }
+
+          this.log(`Location-only search: "${searchQuery}"`);
+          results = await this.callGooglePlacesAPI(
+            searchQuery,
+            query.postcode,
+            query.radius,
+            query.limit
+          );
         }
-
-        // Google Places requires a business type for textSearch
-        // If only location provided (no keyword), add default business type
-        if (!keyword && (query.postcode || query.city)) {
-          searchQuery = `business ${searchQuery}`;
-        }
-
-        if (!searchQuery.trim()) {
-          searchQuery = query.city || "business";
-        }
-
-        this.log(`Trying keyword variation: "${keyword}" → full query: "${searchQuery}"`);
-
-        // Call Google Places API with this variation
-        const variationResults = await this.callGooglePlacesAPI(
-          searchQuery,
-          query.postcode,
-          query.radius,
-          query.limit
-        );
-
-        results = variationResults;
-        this.log(`  → Got ${results.length} results`);
-      }
-
-      // If no keyword was provided, do a single search with location-only query
-      if (keywordVariations.length === 0 && (query.postcode || query.city)) {
-        let searchQuery = query.postcode || query.city || "business";
-        if (query.postcode && query.city) {
-          searchQuery = `${query.city} ${query.postcode}`;
-        }
-
-        this.log(`Location-only search: "${searchQuery}"`);
-        results = await this.callGooglePlacesAPI(
-          searchQuery,
-          query.postcode,
-          query.radius,
-          query.limit
-        );
       }
 
       // Process results: filter THEN slice
@@ -152,6 +170,117 @@ export class GooglePlacesProvider extends BusinessProvider {
           recoverable: true,
         },
       };
+    }
+  }
+
+  private async geocodePostcode(postcode: string): Promise<{ lat: number; lng: number } | null> {
+    const endpoint = "https://maps.googleapis.com/maps/api/geocode/json";
+
+    try {
+      this.log(`Geocoding postcode: ${postcode}`);
+
+      const params = new URLSearchParams({
+        address: postcode,
+        region: "gb",
+        key: this.apiKey,
+      });
+
+      const url = `${endpoint}?${params.toString()}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        this.log(`Geocoding failed: ${response.status}`);
+        return null;
+      }
+
+      const data = (await response.json()) as { results?: Array<{ geometry?: { location?: { lat: number; lng: number } } }>; status?: string };
+
+      if (data.status !== "OK" || !data.results || data.results.length === 0) {
+        this.log(`Geocoding returned no results for: ${postcode}`);
+        return null;
+      }
+
+      const location = data.results[0].geometry?.location;
+      if (location) {
+        this.log(`✓ Geocoded ${postcode} to ${location.lat}, ${location.lng}`);
+        return location;
+      }
+
+      return null;
+    } catch (error) {
+      this.log(`Geocoding error: ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+
+  private async nearbySearch(
+    lat: number,
+    lng: number,
+    radiusKm: number,
+    limit: number
+  ): Promise<GooglePlace[]> {
+    const endpoint = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+    const radiusMeters = (radiusKm || 5) * 1000; // Convert km to meters
+    const allResults: GooglePlace[] = [];
+
+    try {
+      this.log(`Nearby search: lat=${lat}, lng=${lng}, radius=${radiusKm}km`);
+
+      let nextPageToken: string | undefined;
+      let pageCount = 0;
+
+      while (allResults.length < limit && pageCount < 3) {
+        pageCount++;
+        this.log(`Fetching nearby page ${pageCount}`);
+
+        const params = new URLSearchParams({
+          location: `${lat},${lng}`,
+          radius: radiusMeters.toString(),
+          key: this.apiKey,
+          language: "en",
+          type: "establishment",
+        });
+
+        if (nextPageToken) {
+          params.append("pagetoken", nextPageToken);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        const url = `${endpoint}?${params.toString()}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          this.log(`Nearby search failed: ${response.status}`);
+          break;
+        }
+
+        const data = (await response.json()) as { results?: GooglePlace[]; status?: string; next_page_token?: string };
+
+        if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
+          this.log(`Nearby search status: ${data.status}`);
+          break;
+        }
+
+        if (!data.results || data.results.length === 0) {
+          this.log(`Page ${pageCount}: no results`);
+          break;
+        }
+
+        allResults.push(...data.results);
+        this.log(`Page ${pageCount}: got ${data.results.length} results (total: ${allResults.length})`);
+
+        if (data.next_page_token) {
+          nextPageToken = data.next_page_token;
+        } else {
+          break;
+        }
+      }
+
+      this.log(`Total nearby results: ${allResults.length}`);
+      return allResults.slice(0, limit);
+    } catch (error) {
+      this.log(`Nearby search error: ${error instanceof Error ? error.message : String(error)}`);
+      return [];
     }
   }
 
