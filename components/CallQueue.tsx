@@ -32,6 +32,8 @@ export default function CallQueue() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [searchMode, setSearchMode] = useState<"keyword" | "postcode" | "dork">("keyword");
+  const [manualPhoneEntry, setManualPhoneEntry] = useState<{ [key: string]: string }>({});
+  const [manualPhoneMode, setManualPhoneMode] = useState<Set<string>>(new Set());
 
   const handleSearch = async (query: string, type: "keyword" | "postcode") => {
     if (!query || query.length < 2) {
@@ -136,17 +138,58 @@ export default function CallQueue() {
                 : q
             )
           );
+          setManualPhoneMode((prev) => {
+            const next = new Set(prev);
+            next.delete(business.id);
+            return next;
+          });
           setMessage(`Found phone: ${foundPhone}`);
         } else {
-          setMessage("No phone found");
+          // No phone found - show manual entry
+          setManualPhoneMode((prev) => new Set(prev).add(business.id));
+          setMessage("No phone found - enter manually:");
         }
       } else {
-        setMessage("No phone found");
+        // Dork search failed - show manual entry
+        setManualPhoneMode((prev) => new Set(prev).add(business.id));
+        setMessage("Phone lookup failed - enter manually:");
       }
     } catch (error) {
       console.error("Phone lookup error:", error);
-      setMessage("Phone lookup failed");
+      setManualPhoneMode((prev) => new Set(prev).add(business.id));
+      setMessage("Phone lookup failed - enter manually:");
     }
+  };
+
+  const handleManualPhoneSubmit = (businessId: string) => {
+    const phone = manualPhoneEntry[businessId];
+    if (!phone || phone.length < 5) {
+      setMessage("Enter a valid phone number");
+      return;
+    }
+
+    // Update the queued business with manual phone
+    setQueuedBusinesses((current) =>
+      current.map((q) =>
+        q.id === businessId
+          ? { ...q, phone, telephone: phone }
+          : q
+      )
+    );
+
+    // Clear manual entry mode
+    setManualPhoneMode((prev) => {
+      const next = new Set(prev);
+      next.delete(businessId);
+      return next;
+    });
+    setManualPhoneEntry((prev) => ({
+      ...prev,
+      [businessId]: "",
+    }));
+
+    setMessage(`Phone saved: ${phone}`);
+    setTimeout(() => setMessage(""), 2000);
   };
 
   const handleAddToQueue = async (business: Business) => {
@@ -301,35 +344,54 @@ export default function CallQueue() {
                   rows={2}
                 />
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleMarkCalled(business.id)}
-                    disabled={business.called}
-                    className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
-                      business.called
-                        ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
-                        : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
-                    }`}
-                  >
-                    {business.called ? "✓ Called" : "Mark Called"}
-                  </button>
-                  {(business.telephone || business.phone || business.formatted_phone_number) ? (
+                {manualPhoneMode.has(business.id) ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter phone (e.g., 0151 123 4567)"
+                      value={manualPhoneEntry[business.id] || ""}
+                      onChange={(e) => setManualPhoneEntry({ ...manualPhoneEntry, [business.id]: e.target.value })}
+                      onKeyPress={(e) => e.key === "Enter" && handleManualPhoneSubmit(business.id)}
+                      className="flex-1 text-xs px-3 py-2 border border-[#0D0D0D] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:outline-none"
+                    />
                     <button
-                      onClick={() => handleCall(business)}
-                      className="flex-1 text-xs px-3 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9]"
+                      onClick={() => handleManualPhoneSubmit(business.id)}
+                      className="px-4 py-2 bg-[#0D0D0D] text-white text-xs rounded font-semibold hover:bg-[#333333]"
                     >
-                      Call
+                      Save
                     </button>
-                  ) : (
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => handleFindPhoneForQueued(business)}
-                      disabled={loading}
-                      className="flex-1 text-xs px-3 py-2 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9] disabled:opacity-50"
+                      onClick={() => handleMarkCalled(business.id)}
+                      disabled={business.called}
+                      className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
+                        business.called
+                          ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
+                          : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
+                      }`}
                     >
-                      {loading ? "Finding..." : "Find Phone"}
+                      {business.called ? "✓ Called" : "Mark Called"}
                     </button>
-                  )}
-                </div>
+                    {(business.telephone || business.phone || business.formatted_phone_number) ? (
+                      <button
+                        onClick={() => handleCall(business)}
+                        className="flex-1 text-xs px-3 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9]"
+                      >
+                        Call
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleFindPhoneForQueued(business)}
+                        disabled={loading}
+                        className="flex-1 text-xs px-3 py-2 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9] disabled:opacity-50"
+                      >
+                        {loading ? "Finding..." : "Find Phone"}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
