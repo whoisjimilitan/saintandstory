@@ -58,10 +58,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[REFERRAL LIST] Error:", error);
+    const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error("[REFERRAL LIST] Full error message:", errorMsg);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to fetch referrals",
+        error: errorMsg,
+        details: error instanceof Error ? error.stack : "No stack trace",
       },
       { status: 500 }
     );
