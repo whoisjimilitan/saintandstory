@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
           from: "James <james@saintandstoryltd.co.uk>",
           to: biz.email,
           subject,
-          text: body,
+          html: body,
           replyTo: "hello@saintandstoryltd.co.uk",
         });
 
