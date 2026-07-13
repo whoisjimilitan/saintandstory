@@ -260,10 +260,10 @@ export default function CampaignsPage() {
 
   const handleGenerateEmails = () => {
     setError("");
-    // Skip inference step entirely - default all to "Other" category
-    const withCategory = businesses.map(b => ({ ...b, category: "Other" }));
+    // Add categories and jump straight to campaign (skip validation)
+    const withCategory = businesses.map(b => ({ ...b, category: "Other", validationStatus: "valid" as const }));
     setBusinesses(withCategory);
-    setStep("validate");
+    setStep("campaign");
   };
 
   const handleInferCategories = async () => {
@@ -318,31 +318,11 @@ export default function CampaignsPage() {
         const biz = businesses[i];
         const email = biz.email?.trim() || "";
 
-        // Quick syntax check
-        if (!emailRegex.test(email)) {
-          validated.push({ ...biz, validationStatus: "invalid", validationReason: "Invalid syntax" });
-          setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
-          continue;
-        }
-
-        // Extract domain
-        const domain = email.split("@")[1];
-
-        // Quick MX check via API (lightweight)
-        try {
-          const mxRes = await fetch(`/api/operator/campaigns/check-mx?domain=${encodeURIComponent(domain)}`);
-          if (mxRes.ok) {
-            const mxData = await mxRes.json();
-            if (mxData.hasMX) {
-              validated.push({ ...biz, validationStatus: "valid", validationReason: "MX verified" });
-            } else {
-              validated.push({ ...biz, validationStatus: "invalid", validationReason: "No MX record" });
-            }
-          } else {
-            validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
-          }
-        } catch {
+        // Quick syntax check only - skip slow MX lookups
+        if (emailRegex.test(email)) {
           validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
+        } else {
+          validated.push({ ...biz, validationStatus: "invalid", validationReason: "Invalid syntax" });
         }
 
         setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
