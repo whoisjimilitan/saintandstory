@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { generateReferralMessage } from "@/lib/referral-message";
 
 interface SignupResponse {
   success: boolean;
@@ -114,11 +115,11 @@ export default function ReferrerSignup() {
           <div className="mb-12 border border-[#E8E8E8] rounded-lg p-6 bg-white">
             <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-3">Share this message</p>
             <p className="text-sm text-[#0D0D0D] mb-4">
-              "Hi, for removals I recommend Saint & Story. Use code <span className="font-mono font-semibold">{success.referralCode}</span>"
+              "{generateReferralMessage(success.referralCode)}"
             </p>
             <button
               onClick={() => {
-                const text = `Hi, for removals I recommend Saint & Story. Use code ${success.referralCode}`;
+                const text = generateReferralMessage(success.referralCode);
                 navigator.clipboard.writeText(text);
                 alert("Message copied!");
               }}
