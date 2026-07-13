@@ -377,11 +377,11 @@ export default function CallQueue() {
 
         {searchMode === "dork" && (
           <>
-            <p className="text-xs text-[#888888]">Find people by role/location (e.g., "receptionist london", "office manager M1")</p>
+            <p className="text-xs text-[#888888]">Find phone numbers & contacts by company name, role, or location</p>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="e.g., receptionist london, office manager M1..."
+                placeholder="e.g., Smith & Sons Solicitors, receptionist london, office manager M1..."
                 value={dorkSearch}
                 onChange={(e) => setDorkSearch(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleDorkSearch(dorkSearch)}
@@ -418,8 +418,20 @@ export default function CallQueue() {
                     {(business.formatted_address || business.address) && (
                       <p className="text-xs text-[#888888]">{business.formatted_address || business.address}</p>
                     )}
+
+                    {/* Phone */}
                     {(business.telephone || business.phone || business.formatted_phone_number) && (
                       <p className="text-sm text-[#0D0D0D] mt-2 font-mono font-semibold">{business.telephone || business.phone || business.formatted_phone_number}</p>
+                    )}
+
+                    {/* Email */}
+                    {business.email && (
+                      <p className="text-xs text-[#0D0D0D] font-mono mt-1">{business.email}</p>
+                    )}
+
+                    {/* Website */}
+                    {business.website && (
+                      <p className="text-xs text-[#0D0D0D] break-all mt-1">{business.website}</p>
                     )}
                   </div>
                   <button
