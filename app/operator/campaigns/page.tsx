@@ -452,51 +452,81 @@ https://saintandstoryltd.co.uk`;
     try {
       const validBusinesses = businesses.filter((b) => b.validationStatus === "valid" && !b.leadId);
 
+      if (validBusinesses.length === 0) {
+        setError("❌ No valid emails to send. All have either invalid status or were already sent.");
+        setBatchSending(false);
+        return;
+      }
+
+      console.log(`[CAMPAIGNS] Sending to ${validBusinesses.length} businesses`);
+
       const res = await fetch("/api/operator/campaigns/batch-send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ businesses: validBusinesses, campaignType }),
       });
 
+      const data = await res.json();
+      console.log(`[CAMPAIGNS] Response:`, data);
+
       if (!res.ok) {
-        const errorData = await res.json();
         if (res.status === 429) {
-          // Daily limit exceeded
-          setError(`❌ Daily limit reached: ${errorData.details}`);
-          await fetchDailyLimit(); // Refresh limit status
+          setError(`❌ Daily limit reached: ${data.details}`);
         } else {
-          setError(errorData.error || "Batch send failed");
+          setError(`❌ Send failed: ${data.error || "Unknown error"}`);
         }
+        await fetchDailyLimit();
         return;
       }
 
-      const data = await res.json();
-      await fetchDailyLimit(); // Refresh limit after successful send
+      // Parse response - handle both legacy and new formats
+      const sentCount = data.sent || 0;
+      const failedCount = data.failed || 0;
+      const totalCount = data.total || validBusinesses.length;
 
-      // Only mark successfully sent emails as sent
-      const sentEmails = new Set(
-        data.details.filter((d: any) => d.status === "sent").map((d: any) => d.email)
-      );
+      console.log(`[CAMPAIGNS] Result: ${sentCount} sent, ${failedCount} failed out of ${totalCount}`);
 
-      setBusinesses(
-        businesses.map((b) =>
-          sentEmails.has(b.email) ? { ...b, leadId: "sent" } : b
-        )
-      );
+      // Mark sent emails in state
+      if (sentCount > 0 && data.details) {
+        const sentEmails = new Set(
+          data.details
+            .filter((d: any) => d.status === "sent")
+            .map((d: any) => d.email)
+        );
 
-      if (data.sent > 0) {
+        if (sentEmails.size > 0) {
+          setBusinesses(
+            businesses.map((b) =>
+              sentEmails.has(b.email) ? { ...b, leadId: "sent" } : b
+            )
+          );
+        }
+      }
+
+      // Show success message with clear numbers
+      if (sentCount > 0) {
         if (data.campaignType === "referral" && data.referralCodes?.length > 0) {
           const codesText = data.referralCodes.slice(0, 5).map((c: any) => `${c.email}: ${c.code}`).join(" | ");
           const moreText = data.referralCodes.length > 5 ? ` +${data.referralCodes.length - 5} more` : "";
-          setError(`✓ REFERRAL EMAILS SENT: ${data.sent}/${data.total} emails sent\n\nSample codes:\n${codesText}${moreText}\n\nCheck /reach page for full campaign stats`);
+          setError(`✓ SUCCESS: ${sentCount}/${totalCount} referral emails sent${failedCount > 0 ? ` (${failedCount} failed)` : ""}\n\nCodes:\n${codesText}${moreText}\n\nCheck /reach for live tracking`);
         } else {
-          setError(`✓ EMAILS SENT: ${data.sent} sent, ${data.failed} failed (${data.total} total)`);
+          setError(`✓ SUCCESS: ${sentCount}/${totalCount} emails sent${failedCount > 0 ? ` (${failedCount} failed)` : ""}`);
         }
       } else {
-        setError(`✗ NO EMAILS SENT - 0/${data.total} emails sent. Check Resend API key and daily limit (100/day).`);
+        setError(`❌ FAILED: 0/${totalCount} emails sent. Check API key, rate limits, or logs.`);
       }
+
+      // Refresh tracking
+      await fetchDailyLimit();
+
+      // Redirect to REACH page for live tracking
+      setTimeout(() => {
+        window.location.href = "/operator/reach";
+      }, 2000);
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Batch send failed");
+      console.error(`[CAMPAIGNS] Catch error:`, err);
+      setError(`❌ Error: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setBatchSending(false);
     }
