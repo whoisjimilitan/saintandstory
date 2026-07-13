@@ -59,22 +59,42 @@ export default function TodayPage() {
   useEffect(() => {
     const loadTodayData = async () => {
       try {
-        // Fetch all operation status and pipeline data
-        const [campaignRes, opportunitiesRes, driverRes, phoneRes, whatsappRes, repliesRes] = await Promise.all([
-          fetch("/api/operator/today-campaign-stats"),
-          fetch("/api/operator/opportunities-waiting"),
-          fetch("/api/operator/today-driver-stats"),
-          fetch("/api/operator/today-phone-stats"),
-          fetch("/api/operator/today-whatsapp-stats"),
-          fetch("/api/operator/today-pending-replies"),
+        // Fetch with timeout and error handling
+        const fetchWithTimeout = (url: string, timeout = 5000) =>
+          Promise.race([
+            fetch(url),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Timeout")), timeout)
+            ),
+          ]);
+
+        const results = await Promise.allSettled([
+          fetchWithTimeout("/api/operator/today-campaign-stats"),
+          fetchWithTimeout("/api/operator/opportunities-waiting"),
+          fetchWithTimeout("/api/operator/today-driver-stats"),
+          fetchWithTimeout("/api/operator/today-phone-stats"),
+          fetchWithTimeout("/api/operator/today-whatsapp-stats"),
+          fetchWithTimeout("/api/operator/today-pending-replies"),
         ]);
 
-        const campaign = campaignRes.ok ? await campaignRes.json() : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
-        const opportunities = opportunitiesRes.ok ? await opportunitiesRes.json() : { count: 0 };
-        const driverData = driverRes.ok ? await driverRes.json() : { available: 0, revenue: "£0" };
-        const phoneData = phoneRes.ok ? await phoneRes.json() : { count: 0 };
-        const whatsappData = whatsappRes.ok ? await whatsappRes.json() : { active: 0, replied: 0 };
-        const repliesData = repliesRes.ok ? await repliesRes.json() : { count: 0 };
+        const campaign = results[0].status === "fulfilled" && (results[0].value as any).ok
+          ? await (results[0].value as any).json()
+          : { stats: { sent: 0, opened: 0, clicked: 0, replied: 0 } };
+        const opportunities = results[1].status === "fulfilled" && (results[1].value as any).ok
+          ? await (results[1].value as any).json()
+          : { count: 0 };
+        const driverData = results[2].status === "fulfilled" && (results[2].value as any).ok
+          ? await (results[2].value as any).json()
+          : { available: 0, revenue: "£0" };
+        const phoneData = results[3].status === "fulfilled" && (results[3].value as any).ok
+          ? await (results[3].value as any).json()
+          : { count: 0 };
+        const whatsappData = results[4].status === "fulfilled" && (results[4].value as any).ok
+          ? await (results[4].value as any).json()
+          : { active: 0, replied: 0 };
+        const repliesData = results[5].status === "fulfilled" && (results[5].value as any).ok
+          ? await (results[5].value as any).json()
+          : { count: 0 };
 
         setData({
           operation: {
@@ -94,7 +114,6 @@ export default function TodayPage() {
     };
 
     loadTodayData();
-    // Refresh every 60 seconds for live updates
     const interval = setInterval(loadTodayData, 60000);
     return () => clearInterval(interval);
   }, []);
