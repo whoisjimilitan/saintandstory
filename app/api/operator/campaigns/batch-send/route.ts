@@ -68,27 +68,20 @@ function generateReferralCode(name: string): string {
 function generateReferralEmail(business: Business, referralCode: string) {
   const body = `Hi ${business.contactName || "there"},
 
-Working at ${business.name || business.email}, you probably see urgent delivery needs all the time.
+You deal with urgent deliveries and collections all the time at ${business.name || business.email}
 
 We're a same-day courier — and we pay referral bonuses when you mention us:
 
 • £20 per single job referral
-• £100 when a referred client does 5+ jobs with us
+• £100 when a referred client does 3 consecutive jobs with us
 
 That's it. No sales calls, no pressure. Just say "I know a reliable courier" when the moment comes up.
 
-Share your code: ${referralCode}
-Dashboard: https://saintandstoryltd.co.uk/referral/dashboard?code=${referralCode}
-
-Questions? Reply here or call 0203 051 9243.
-
----
 James
-Co-Founder, Saint & Story
-https://saintandstoryltd.co.uk`;
+0203 051 9243`;
 
   return {
-    subject: `£20-£100 referral bonus — share with your network`,
+    subject: `£20-£100 referral bonus`,
     body,
   };
 }
