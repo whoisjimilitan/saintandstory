@@ -32,14 +32,25 @@ export default function ReferralNetworkPage() {
   const fetchReferrals = async () => {
     try {
       const response = await fetch("/api/referral/list");
-      if (!response.ok) throw new Error("Failed to fetch referrals");
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error("[REFERRAL-NETWORK] API Error:", {
+          status: response.status,
+          error: data.error,
+          details: data.details,
+          fullResponse: data,
+        });
+        throw new Error(data.error || "Failed to fetch referrals");
+      }
+
+      console.log("[REFERRAL-NETWORK] ✓ Fetched referrals:", data);
       setReferrals({
         pending: data.pending || [],
         sent: data.sent || [],
       });
     } catch (error) {
-      console.error("Error fetching referrals:", error);
+      console.error("[REFERRAL-NETWORK] Error fetching referrals:", error);
     }
   };
 
