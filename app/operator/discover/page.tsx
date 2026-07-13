@@ -70,6 +70,9 @@ export default function DiscoverPage() {
 
   const [channel, setChannel] = useState<"email" | "whatsapp">("email");
 
+  const [sendingReferralEmail, setSendingReferralEmail] = useState(false);
+  const [referralEmailMessage, setReferralEmailMessage] = useState("");
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -254,6 +257,62 @@ export default function DiscoverPage() {
       setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
       setInferenceAttempted(false);
       setInferenceFailed(false);
+    }
+  };
+
+  const handleSendReferralEmail = async () => {
+    if (!manualForm.businessName.trim()) {
+      alert("Business name is required");
+      return;
+    }
+    if (!manualForm.email.trim()) {
+      alert("Email address is required");
+      return;
+    }
+
+    setSendingReferralEmail(true);
+    setReferralEmailMessage("");
+
+    try {
+      const response = await fetch("/api/operator/campaigns/batch-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businesses: [
+            {
+              name: manualForm.businessName,
+              email: manualForm.email,
+              contactName: manualForm.contactName || "there",
+              category: "Other"
+            }
+          ],
+          campaignType: "referral",
+          mode: "now"
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setReferralEmailMessage(`❌ Failed: ${data.error || "Unknown error"}`);
+        return;
+      }
+
+      if (data.success && data.sent > 0) {
+        setReferralEmailMessage(`✓ Referral email sent to ${manualForm.email}`);
+        if (data.referralCodes && data.referralCodes[0]) {
+          setReferralEmailMessage(`✓ Sent! Code: ${data.referralCodes[0].code}`);
+        }
+        setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
+        setTimeout(() => setReferralEmailMessage(""), 4000);
+      } else {
+        setReferralEmailMessage(`❌ Email failed to send`);
+      }
+    } catch (error) {
+      console.error("[REFERRAL] Send error:", error);
+      setReferralEmailMessage(`❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setSendingReferralEmail(false);
     }
   };
 
@@ -637,13 +696,27 @@ export default function DiscoverPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handleManualAdd}
-                disabled={inferringProblem}
-                className="w-full px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
-              >
-                {inferringProblem ? "Analyzing problem..." : "Add Prospect"}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleManualAdd}
+                  disabled={inferringProblem}
+                  className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                >
+                  {inferringProblem ? "Analyzing..." : "Add Prospect"}
+                </button>
+                <button
+                  onClick={handleSendReferralEmail}
+                  disabled={sendingReferralEmail || !manualForm.email.trim()}
+                  className="flex-1 px-4 py-3 bg-[#1a7f5f] text-white text-sm font-semibold rounded-lg hover:bg-[#15664f] disabled:opacity-50 transition-colors"
+                >
+                  {sendingReferralEmail ? "Sending..." : "Send Referral Email"}
+                </button>
+              </div>
+              {referralEmailMessage && (
+                <p className="text-xs text-center mt-2 text-[#666666]">
+                  {referralEmailMessage}
+                </p>
+              )}
             </div>
           </div>
         )}
