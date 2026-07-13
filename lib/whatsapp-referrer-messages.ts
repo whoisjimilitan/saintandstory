@@ -17,24 +17,23 @@ const META_GRAPH_URL = "https://graph.instagram.com";
 
 /**
  * Send welcome message when referrer joins network
- * Includes: Referral code, how it works, first steps
+ * Side-gig positioning: emphasize ease and earning potential
  */
 export async function sendWhatsAppReferrerWelcome(referrer: Referrer): Promise<void> {
-  const message = `👋 Welcome to Saint & Story Referrer Network!
+  const message = `🎉 You're In! Start Earning Today
 
-Your referral code: *${referrer.referralCode}*
+Your code: *${referrer.referralCode}*
 
-💰 How it works:
-• When your clients need removals, you recommend us
-• You give them your code: ${referrer.referralCode}
-• They book through us → mention your code
-• You earn £${referrer.commission} per referral
+💰 The Setup:
+Everyone knows someone needing urgent delivery. You get £${referrer.commission} every time they use your code.
 
-📱 Copy & share this message:
-"For removals in ${referrer.city}, I recommend Saint & Story. Ask for code ${referrer.referralCode} for priority service."
+📱 Copy & Share:
+"For urgent deliveries, I recommend Saint & Story. Use code ${referrer.referralCode}."
 
-📊 Dashboard: See your earnings in real-time
+💸 Watch Your Earnings:
 https://saintandstoryltd.co.uk/referral/dashboard?code=${referrer.referralCode}
+
+No limits. No catch. Refer as much as you want.
 
 ❓ Questions? Reply here or call 0203 051 9243`;
 
@@ -117,6 +116,7 @@ Thanks for referring! 🙌`;
 /**
  * Core WhatsApp message sender using Meta API
  * Uses: WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN
+ * Dev mode: WHATSAPP_DEV_MODE=true logs instead of sending
  */
 async function sendWhatsAppMessage(phoneNumber: string, message: string): Promise<void> {
   console.log(`[WHATSAPP REFERRER] Sending message to ${phoneNumber}`);
@@ -125,8 +125,19 @@ async function sendWhatsAppMessage(phoneNumber: string, message: string): Promis
     // Get credentials from env
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+    const isDev = process.env.WHATSAPP_DEV_MODE === "true";
 
     if (!phoneNumberId || !accessToken) {
+      if (isDev) {
+        // DEV MODE: Log message instead of sending
+        console.log("[WHATSAPP REFERRER] 📱 DEV MODE - Would send to:", phoneNumber);
+        console.log("[WHATSAPP REFERRER] Message preview:");
+        console.log("---");
+        console.log(message);
+        console.log("---");
+        return;
+      }
+
       console.warn(
         "[WHATSAPP REFERRER] ⚠ WhatsApp credentials not configured. Set WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN"
       );
