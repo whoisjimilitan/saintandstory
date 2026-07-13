@@ -294,7 +294,7 @@ export default function DiscoverPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setReferralEmailMessage(`❌ Failed: ${data.error || "Unknown error"}`);
+        setReferralEmailMessage(`❌ ${data.error || "Failed to send"}`);
         return;
       }
 
@@ -305,6 +305,16 @@ export default function DiscoverPage() {
         }
         setManualForm({ businessName: "", contactName: "", email: "", phone: "", city: "", postcode: "", category: "", problemDescription: "" });
         setTimeout(() => setReferralEmailMessage(""), 4000);
+      } else if (data.details && data.details[0]?.error) {
+        // Extract the actual error from Resend
+        const resendError = data.details[0].error;
+        if (resendError.includes("daily email sending quota")) {
+          setReferralEmailMessage(`❌ Daily email limit reached (100/day). Try again tomorrow.`);
+        } else if (resendError.includes("domain is not verified")) {
+          setReferralEmailMessage(`❌ Sender domain not verified with email provider`);
+        } else {
+          setReferralEmailMessage(`❌ ${resendError}`);
+        }
       } else {
         setReferralEmailMessage(`❌ Email failed to send`);
       }
