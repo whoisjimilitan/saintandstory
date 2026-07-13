@@ -26,12 +26,11 @@ interface QueuedBusiness extends Business {
 export default function CallQueue() {
   const [keywordSearch, setKeywordSearch] = useState("");
   const [postcodeSearch, setPostcodeSearch] = useState("");
-  const [dorkSearch, setDorkSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Business[]>([]);
   const [queuedBusinesses, setQueuedBusinesses] = useState<QueuedBusiness[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [searchMode, setSearchMode] = useState<"keyword" | "postcode" | "dork">("keyword");
+  const [searchMode, setSearchMode] = useState<"keyword" | "postcode">("keyword");
   const [manualPhoneEntry, setManualPhoneEntry] = useState<{ [key: string]: string }>({});
   const [manualPhoneMode, setManualPhoneMode] = useState<Set<string>>(new Set());
 
@@ -78,64 +77,6 @@ export default function CallQueue() {
     }
   };
 
-  const handleDorkSearch = async (query: string, location?: string) => {
-    if (!query || query.length < 2) return;
-
-    setLoading(true);
-    try {
-      // Build smart dork query for finding people by role
-      // Searches social media bios and profiles for emails/phones
-      const emailDomains = [
-        "@gmail.com", "@yahoo.com", "@hotmail.co.uk", "@outlook.com",
-        "@hotmail.com", "@yahoo.co.uk", "@live.com", "@aol.com"
-      ].map(d => `"${d}"`).join(" OR ");
-
-      const phonePatterns = [
-        '"+44"', '"07"', '"0151"', '"0161"', '"0121"', '"020"',
-        '"0131"', '"0141"', '"0117"', '"0113"'
-      ].join(" OR ");
-
-      let dorkQuery = `site:instagram.com OR site:linkedin.com OR site:twitter.com "${query}"`;
-
-      if (location) {
-        dorkQuery += ` "${location}"`;
-      }
-
-      dorkQuery += ` ((${emailDomains}) OR (${phonePatterns}))`;
-
-      console.log("[DORK SEARCH] Smart query:", dorkQuery);
-
-      const response = await fetch("/api/b2b/dork-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: dorkQuery }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.leads) {
-        const results = data.leads.map((lead: any) => ({
-          ...lead,
-          id: lead.id,
-          businessName: lead.businessName || "Profile",
-          phone: lead.phone,
-          email: lead.email,
-          website: lead.website,
-        }));
-
-        setSearchResults(results);
-        setMessage(`Found ${results.length} profiles with contact info`);
-      } else {
-        setSearchResults([]);
-        setMessage("No profiles found with contact info");
-      }
-    } catch (error) {
-      console.error("Dork search error:", error);
-      setSearchResults([]);
-      setMessage("Search failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleFindPhoneForQueued = async (business: QueuedBusiness) => {
     setMessage(`Finding phone for ${business.businessName}...`);
@@ -441,16 +382,6 @@ export default function CallQueue() {
         >
           By Postcode
         </button>
-        <button
-          onClick={() => setSearchMode("dork")}
-          className={`px-4 py-2 rounded-full font-semibold text-sm transition ${
-            searchMode === "dork"
-              ? "bg-[#0D0D0D] text-white"
-              : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
-          }`}
-        >
-          By Role
-        </button>
       </div>
 
       {/* Search Input */}
@@ -501,38 +432,6 @@ export default function CallQueue() {
           </>
         )}
 
-        {searchMode === "dork" && (
-          <>
-            <p className="text-xs text-[#888888]">Find people by role (searches social media bios for emails & phone numbers)</p>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Role (e.g., receptionist, office manager, director)"
-                  value={dorkSearch}
-                  onChange={(e) => setDorkSearch(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleDorkSearch(dorkSearch, postcodeSearch)}
-                  className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Location (optional, e.g., manchester, london)"
-                  value={postcodeSearch}
-                  onChange={(e) => setPostcodeSearch(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleDorkSearch(dorkSearch, postcodeSearch)}
-                  className="w-40 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-                />
-              </div>
-              <button
-                onClick={() => handleDorkSearch(dorkSearch, postcodeSearch)}
-                disabled={loading || dorkSearch.length < 2}
-                className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
-              >
-                {loading ? "Searching..." : "Search"}
-              </button>
-            </div>
-          </>
-        )}
       </div>
 
       {message && (
