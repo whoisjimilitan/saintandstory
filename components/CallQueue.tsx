@@ -114,6 +114,41 @@ export default function CallQueue() {
     }
   };
 
+  const handleFindPhoneForQueued = async (business: QueuedBusiness) => {
+    setMessage(`Finding phone for ${business.businessName}...`);
+
+    try {
+      const response = await fetch("/api/b2b/dork-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: business.businessName || business.name }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.leads && data.leads.length > 0) {
+        const foundPhone = data.leads[0].phone;
+        if (foundPhone) {
+          // Update the queued business with found phone
+          setQueuedBusinesses((current) =>
+            current.map((q) =>
+              q.id === business.id
+                ? { ...q, phone: foundPhone, telephone: foundPhone }
+                : q
+            )
+          );
+          setMessage(`Found phone: ${foundPhone}`);
+        } else {
+          setMessage("No phone found");
+        }
+      } else {
+        setMessage("No phone found");
+      }
+    } catch (error) {
+      console.error("Phone lookup error:", error);
+      setMessage("Phone lookup failed");
+    }
+  };
+
   const handleAddToQueue = async (business: Business) => {
     const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
@@ -278,12 +313,20 @@ export default function CallQueue() {
                   >
                     {business.called ? "✓ Called" : "Mark Called"}
                   </button>
-                  {(business.telephone || business.phone || business.formatted_phone_number) && (
+                  {(business.telephone || business.phone || business.formatted_phone_number) ? (
                     <button
                       onClick={() => handleCall(business)}
                       className="flex-1 text-xs px-3 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9]"
                     >
                       Call
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleFindPhoneForQueued(business)}
+                      disabled={loading}
+                      className="flex-1 text-xs px-3 py-2 border-2 border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9] disabled:opacity-50"
+                    >
+                      {loading ? "Finding..." : "Find Phone"}
                     </button>
                   )}
                 </div>
