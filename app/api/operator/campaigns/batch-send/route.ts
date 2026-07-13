@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
 
         // Add delay between sends to prevent Resend rate limiting
         if (i < businesses.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 50));
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
 
         messageId = emailResponse.data.id;
