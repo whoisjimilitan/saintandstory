@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWhatsAppReferrerWelcome } from "@/lib/whatsapp-referrer-messages";
+import { generateReferralMessage, getReferralLink } from "@/lib/referral-message";
 
 /**
  * Referral Signup API
@@ -99,11 +100,15 @@ export async function POST(request: NextRequest) {
 
     console.log("[REFERRAL SIGNUP] ✓ Signup complete");
 
+    // Generate the shareable referral message with link
+    const referralLink = getReferralLink(city);
+    const shareMessage = generateReferralMessage(referrer.referralCode, referralLink);
+
     return NextResponse.json({
       success: true,
       referrerId: referrer.id,
       referralCode: referrer.referralCode,
-      message: `Welcome! Your referral code: ${referrer.referralCode}. Check WhatsApp for next steps.`,
+      message: shareMessage,
       dashboard: `https://saintandstoryltd.co.uk/referral/dashboard?code=${referrer.referralCode}`,
     });
   } catch (error) {

@@ -44,7 +44,7 @@ export default function ReferrerSignup() {
     phone: "",
     city: "",
     category: "business",
-    hasWhatsapp: true,
+    hasWhatsapp: true, // Pre-checked for better UX
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,18 +111,17 @@ export default function ReferrerSignup() {
             </button>
           </div>
 
-          <div className="mb-12 border border-[#E8E8E8] rounded-lg p-6 bg-white">
+          <div className="mb-12 border border-[#E8E8E8] rounded-xl p-6 bg-white shadow-sm">
             <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-3">Share this message</p>
-            <p className="text-sm text-[#0D0D0D] mb-4">
-              "Hi, for removals I recommend Saint & Story. Use code <span className="font-mono font-semibold">{success.referralCode}</span>"
+            <p className="text-sm text-[#0D0D0D] mb-4 leading-relaxed">
+              "{success.message}"
             </p>
             <button
               onClick={() => {
-                const text = `Hi, for removals I recommend Saint & Story. Use code ${success.referralCode}`;
-                navigator.clipboard.writeText(text);
+                navigator.clipboard.writeText(success.message);
                 alert("Message copied!");
               }}
-              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Copy Message
             </button>
@@ -154,8 +153,8 @@ export default function ReferrerSignup() {
         {/* Form & FAQ in grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Form */}
-          <div className="border border-[#E8E8E8] rounded-lg p-8 bg-white">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="p-4 bg-[#FFF5F5] border border-[#FFE0E0] rounded-lg">
                   <p className="text-sm text-[#CC0000]">{error}</p>
@@ -169,7 +168,7 @@ export default function ReferrerSignup() {
                 onChange={handleChange}
                 placeholder="Your name"
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
               />
 
               <input
@@ -177,9 +176,9 @@ export default function ReferrerSignup() {
                 name="officeName"
                 value={formData.officeName}
                 onChange={handleChange}
-                placeholder="Your office or business"
+                placeholder="Your role or title"
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
               />
 
               <input
@@ -189,18 +188,30 @@ export default function ReferrerSignup() {
                 onChange={handleChange}
                 placeholder="Your contact number"
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
               />
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="hasWhatsapp"
-                  checked={formData.hasWhatsapp}
-                  onChange={handleChange}
-                  className="w-4 h-4 rounded border border-[#0D0D0D] bg-white appearance-none checked:bg-[#0D0D0D] checked:border-[#0D0D0D] cursor-pointer"
-                />
-                <span className="text-sm text-[#0D0D0D]">Available on WhatsApp</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative w-5 h-5 flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    name="hasWhatsapp"
+                    checked={formData.hasWhatsapp}
+                    onChange={handleChange}
+                    className="w-5 h-5 rounded border border-[#0D0D0D] bg-white appearance-none cursor-pointer checked:bg-[#0D0D0D] checked:border-[#0D0D0D] transition-colors"
+                  />
+                  {formData.hasWhatsapp && (
+                    <svg
+                      className="absolute inset-0 w-5 h-5 text-white pointer-events-none"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-sm text-[#0D0D0D] group-hover:text-[#333333] transition-colors">Available on WhatsApp</span>
               </label>
 
               <select
@@ -208,7 +219,7 @@ export default function ReferrerSignup() {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none appearance-none bg-white cursor-pointer hover:border-[#0D0D0D] transition-colors"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none appearance-none bg-white cursor-pointer hover:border-[#0D0D0D] transition-all"
               >
                 <option value="" className="text-[#CCCCCC]">Select your city</option>
                 {UK_CITIES.map((city) => (
@@ -221,7 +232,7 @@ export default function ReferrerSignup() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 {loading ? "Creating Code..." : "Get Your Code"}
               </button>
