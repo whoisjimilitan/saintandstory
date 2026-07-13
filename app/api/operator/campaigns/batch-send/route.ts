@@ -333,6 +333,11 @@ export async function POST(request: NextRequest) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       failed.push({ email: biz.email, error: errorMsg });
       console.error(`[BATCH-SEND] [${i + 1}] ✗ ${biz.email}: ${errorMsg}`);
+      console.error(`[BATCH-SEND] Full error:`, err);
+      // Log first error in detail so we can debug
+      if (i === 0) {
+        console.error(`[BATCH-SEND] FIRST EMAIL FAILED - Full stack:`, err);
+      }
     }
   }
 
