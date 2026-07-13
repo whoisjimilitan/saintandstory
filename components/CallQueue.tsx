@@ -3,30 +3,80 @@
 import { useState } from "react";
 import { detectPhoneType, getPhonePlusFormat, getPhone00Format } from "@/lib/phone-utils";
 
-interface Lead {
+interface Business {
   id: string;
-  businessName: string;
-  email?: string;
+  name: string;
+  businessName?: string;
   phone?: string;
-  website?: string;
+  formatted_phone_number?: string;
+  telephone?: string;
+  formatted_address?: string;
+  address?: string;
+  city?: string;
+  postcode?: string;
+  email?: string;
 }
 
-interface QueuedLead extends Lead {
+interface QueuedBusiness extends Business {
   queuedAt: string;
   notes: string;
   called: boolean;
 }
 
 export default function CallQueue() {
-  const [businessSearch, setBusinessSearch] = useState("");
+  const [keywordSearch, setKeywordSearch] = useState("");
   const [postcodeSearch, setPostcodeSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<Lead[]>([]);
-  const [queuedLeads, setQueuedLeads] = useState<QueuedLead[]>([]);
+  const [dorkSearch, setDorkSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<Business[]>([]);
+  const [queuedBusinesses, setQueuedBusinesses] = useState<QueuedBusiness[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [searchMode, setSearchMode] = useState<"business" | "postcode">("business");
+  const [searchMode, setSearchMode] = useState<"keyword" | "postcode" | "dork">("keyword");
 
-  const handleBusinessSearch = async (query: string) => {
+  const handleSearch = async (query: string, type: "keyword" | "postcode") => {
+    if (!query || query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (type === "postcode") {
+        params.append("postcode", query);
+      } else {
+        params.append("keyword", query);
+      }
+
+      const url = `/api/b2b/discover?${params}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("[CALL QUEUE SEARCH] Error:", data.error);
+        setSearchResults([]);
+        setMessage("No results found");
+        return;
+      }
+
+      // Map results and normalize phone field
+      const results = (data.results || []).map((r: any) => ({
+        ...r,
+        phone: r.telephone || r.phone || r.formatted_phone_number,
+      }));
+
+      setSearchResults(results);
+      setMessage(`Found ${results.length} businesses`);
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+      setMessage("Search failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDorkSearch = async (query: string) => {
     if (!query || query.length < 2) return;
 
     setLoading(true);
@@ -39,111 +89,92 @@ export default function CallQueue() {
 
       const data = await response.json();
       if (data.success && data.leads) {
-        setSearchResults(data.leads);
-        setMessage(`Found ${data.leads.length} businesses`);
+        // Map dork results to Business interface
+        const results = data.leads.map((lead: any) => ({
+          ...lead,
+          id: lead.id,
+          businessName: lead.businessName,
+          phone: lead.phone,
+          email: lead.email,
+          website: lead.website,
+        }));
+
+        setSearchResults(results);
+        setMessage(`Found ${results.length} results`);
       } else {
-        setMessage("No results found");
         setSearchResults([]);
+        setMessage("No results found");
       }
     } catch (error) {
-      console.error("Search error:", error);
+      console.error("Dork search error:", error);
+      setSearchResults([]);
       setMessage("Search failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePostcodeSearch = async () => {
-    if (!businessSearch || !postcodeSearch || businessSearch.length < 2 || postcodeSearch.length < 2) {
-      setMessage("Enter business type and postcode");
-      return;
-    }
-
-    const query = `${businessSearch} ${postcodeSearch}`;
-    setLoading(true);
-    try {
-      const response = await fetch("/api/b2b/dork-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.leads) {
-        setSearchResults(data.leads);
-        setMessage(`Found ${data.leads.length} businesses in ${postcodeSearch}`);
-      } else {
-        setMessage("No results found");
-        setSearchResults([]);
-      }
-    } catch (error) {
-      console.error("Search error:", error);
-      setMessage("Search failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddToQueue = (lead: Lead) => {
-    const alreadyQueued = queuedLeads.some((q) => q.id === lead.id);
+  const handleAddToQueue = (business: Business) => {
+    const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
-      setMessage(`Already queued: ${lead.businessName}`);
+      setMessage(`Already queued: ${business.name || business.businessName}`);
       return;
     }
 
-    const queued: QueuedLead = {
-      ...lead,
+    const queued: QueuedBusiness = {
+      ...business,
       queuedAt: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
       notes: "",
       called: false,
     };
 
-    setQueuedLeads([queued, ...queuedLeads]);
-    setMessage(`Queued: ${lead.businessName}`);
+    setQueuedBusinesses([queued, ...queuedBusinesses]);
+    setMessage(`Queued: ${business.name || business.businessName}`);
     setTimeout(() => setMessage(""), 1500);
   };
 
   const handleRemoveFromQueue = (id: string) => {
-    setQueuedLeads(queuedLeads.filter((q) => q.id !== id));
+    setQueuedBusinesses(queuedBusinesses.filter((q) => q.id !== id));
   };
 
   const handleMarkCalled = (id: string) => {
-    setQueuedLeads(
-      queuedLeads.map((q) => (q.id === id ? { ...q, called: true } : q))
+    setQueuedBusinesses(
+      queuedBusinesses.map((q) => (q.id === id ? { ...q, called: true } : q))
     );
   };
 
   const handleUpdateNotes = (id: string, notes: string) => {
-    setQueuedLeads(
-      queuedLeads.map((q) => (q.id === id ? { ...q, notes } : q))
+    setQueuedBusinesses(
+      queuedBusinesses.map((q) => (q.id === id ? { ...q, notes } : q))
     );
   };
 
-  const handleCall = (lead: Lead) => {
-    if (!lead.phone) {
+  const handleCall = (business: Business) => {
+    const phone = business.telephone || business.phone || business.formatted_phone_number;
+    if (!phone) {
       setMessage("No phone number");
       return;
     }
 
-    const phoneType = detectPhoneType(lead.phone);
+    const phoneType = detectPhoneType(phone);
     if (phoneType === "mobile") {
-      const plusFormat = getPhonePlusFormat(lead.phone);
-      const message = `Hi ${lead.businessName}, Saint & Story here. We help with urgent deliveries and collections.`;
-      const encoded = encodeURIComponent(message);
+      const plusFormat = getPhonePlusFormat(phone);
+      const msg = `Hi ${business.businessName || business.name}, Saint & Story here. We help with urgent deliveries and collections.`;
+      const encoded = encodeURIComponent(msg);
       window.location.href = `wachatmanager://send?phone=${plusFormat}&text=${encoded}`;
     } else if (phoneType === "landline") {
-      const phone00 = getPhone00Format(lead.phone);
+      const phone00 = getPhone00Format(phone);
       window.location.href = `mobilevoip://dial?number=${phone00}`;
     }
   };
 
-  const calledCount = queuedLeads.filter((q) => q.called).length;
-  const notCalledCount = queuedLeads.filter((q) => !q.called).length;
+  const calledCount = queuedBusinesses.filter((q) => q.called).length;
+  const notCalledCount = queuedBusinesses.filter((q) => !q.called).length;
 
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Stats Pills */}
-      {queuedLeads.length > 0 && (
+      {queuedBusinesses.length > 0 && (
         <div className="flex gap-2">
           <div className="px-4 py-2 rounded-full bg-white border border-[#E8E8E8]">
             <span className="text-xs text-[#888888]">To call</span>
@@ -157,28 +188,31 @@ export default function CallQueue() {
       )}
 
       {/* Queue */}
-      {queuedLeads.length > 0 && (
+      {queuedBusinesses.length > 0 && (
         <div className="space-y-3">
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">Today's Queue</p>
-          {queuedLeads.map((lead) => (
+          {queuedBusinesses.map((business) => (
             <div
-              key={lead.id}
+              key={business.id}
               className={`border border-[#E8E8E8] rounded-lg p-4 bg-white transition ${
-                lead.called ? "opacity-60 bg-[#F9F9F9]" : ""
+                business.called ? "opacity-60 bg-[#F9F9F9]" : ""
               }`}
             >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-semibold ${lead.called ? "line-through text-[#CCCCCC]" : "text-[#0D0D0D]"}`}>
-                      {lead.businessName}
+                    <p className={`text-sm font-semibold ${business.called ? "line-through text-[#CCCCCC]" : "text-[#0D0D0D]"}`}>
+                      {business.name || business.businessName}
                     </p>
-                    {lead.phone && (
-                      <p className="text-xs text-[#0D0D0D] mt-1 font-mono font-semibold">{lead.phone}</p>
+                    {(business.telephone || business.phone || business.formatted_phone_number) && (
+                      <p className="text-xs text-[#0D0D0D] mt-1 font-mono font-semibold">{business.telephone || business.phone || business.formatted_phone_number}</p>
+                    )}
+                    {(business.formatted_address || business.address) && (
+                      <p className="text-xs text-[#888888]">{business.formatted_address || business.address}</p>
                     )}
                   </div>
                   <button
-                    onClick={() => handleRemoveFromQueue(lead.id)}
+                    onClick={() => handleRemoveFromQueue(business.id)}
                     className="text-[#CCCCCC] hover:text-[#0D0D0D] text-sm font-semibold"
                   >
                     ×
@@ -186,8 +220,8 @@ export default function CallQueue() {
                 </div>
 
                 <textarea
-                  value={lead.notes}
-                  onChange={(e) => handleUpdateNotes(lead.id, e.target.value)}
+                  value={business.notes}
+                  onChange={(e) => handleUpdateNotes(business.id, e.target.value)}
                   placeholder="Add notes..."
                   className="w-full text-xs px-3 py-2 border border-[#E8E8E8] rounded bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:outline-none focus:border-[#0D0D0D] resize-none"
                   rows={2}
@@ -195,19 +229,19 @@ export default function CallQueue() {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleMarkCalled(lead.id)}
-                    disabled={lead.called}
+                    onClick={() => handleMarkCalled(business.id)}
+                    disabled={business.called}
                     className={`flex-1 text-xs px-3 py-2 rounded font-semibold transition ${
-                      lead.called
+                      business.called
                         ? "bg-[#E8E8E8] text-[#CCCCCC] cursor-not-allowed"
                         : "bg-[#0D0D0D] text-white hover:bg-[#333333]"
                     }`}
                   >
-                    {lead.called ? "✓ Called" : "Mark Called"}
+                    {business.called ? "✓ Called" : "Mark Called"}
                   </button>
-                  {lead.phone && (
+                  {(business.telephone || business.phone || business.formatted_phone_number) && (
                     <button
-                      onClick={() => handleCall(lead)}
+                      onClick={() => handleCall(business)}
                       className="flex-1 text-xs px-3 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold hover:bg-[#F9F9F9]"
                     >
                       Call
@@ -220,17 +254,17 @@ export default function CallQueue() {
         </div>
       )}
 
-      {/* Search Options Pills */}
-      <div className="flex gap-2">
+      {/* Search Mode Pills */}
+      <div className="flex gap-2 flex-wrap">
         <button
-          onClick={() => setSearchMode("business")}
+          onClick={() => setSearchMode("keyword")}
           className={`px-4 py-2 rounded-full font-semibold text-sm transition ${
-            searchMode === "business"
+            searchMode === "keyword"
               ? "bg-[#0D0D0D] text-white"
               : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
           }`}
         >
-          Search by Business
+          By Business Type
         </button>
         <button
           onClick={() => setSearchMode("postcode")}
@@ -240,61 +274,89 @@ export default function CallQueue() {
               : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
           }`}
         >
-          Search by Postcode
+          By Postcode
+        </button>
+        <button
+          onClick={() => setSearchMode("dork")}
+          className={`px-4 py-2 rounded-full font-semibold text-sm transition ${
+            searchMode === "dork"
+              ? "bg-[#0D0D0D] text-white"
+              : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
+          }`}
+        >
+          By Role/Phone
         </button>
       </div>
 
       {/* Search Input */}
-      <div className="space-y-3">
-        {searchMode === "business" ? (
-          <div className="space-y-2">
-            <p className="text-xs text-[#888888]">Business type (e.g., solicitors, accountants, construction)</p>
+      <div className="space-y-2">
+        {searchMode === "keyword" && (
+          <>
+            <p className="text-xs text-[#888888]">Search by business type (e.g., solicitors, accountants)</p>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Search..."
-                value={businessSearch}
-                onChange={(e) => setBusinessSearch(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleBusinessSearch(businessSearch)}
+                placeholder="e.g., solicitors, accountants, construction..."
+                value={keywordSearch}
+                onChange={(e) => setKeywordSearch(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSearch(keywordSearch, "keyword")}
                 className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
               <button
-                onClick={() => handleBusinessSearch(businessSearch)}
-                disabled={loading || businessSearch.length < 2}
+                onClick={() => handleSearch(keywordSearch, "keyword")}
+                disabled={loading || keywordSearch.length < 2}
                 className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
               >
                 {loading ? "..." : "Search"}
               </button>
             </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <p className="text-xs text-[#888888]">Business type and postcode</p>
+          </>
+        )}
+
+        {searchMode === "postcode" && (
+          <>
+            <p className="text-xs text-[#888888]">Search by postcode (e.g., M1, SW1, B1)</p>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Business type..."
-                value={businessSearch}
-                onChange={(e) => setBusinessSearch(e.target.value)}
-                className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
-              />
-              <input
-                type="text"
-                placeholder="Postcode..."
+                placeholder="e.g., M1, SW1, B1..."
                 value={postcodeSearch}
                 onChange={(e) => setPostcodeSearch(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handlePostcodeSearch()}
-                className="w-32 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+                onKeyPress={(e) => e.key === "Enter" && handleSearch(postcodeSearch, "postcode")}
+                className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
               />
               <button
-                onClick={handlePostcodeSearch}
-                disabled={loading || businessSearch.length < 2 || postcodeSearch.length < 2}
+                onClick={() => handleSearch(postcodeSearch, "postcode")}
+                disabled={loading || postcodeSearch.length < 2}
                 className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
               >
                 {loading ? "..." : "Search"}
               </button>
             </div>
-          </div>
+          </>
+        )}
+
+        {searchMode === "dork" && (
+          <>
+            <p className="text-xs text-[#888888]">Find people by role/location (e.g., "receptionist london", "office manager M1")</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g., receptionist london, office manager M1..."
+                value={dorkSearch}
+                onChange={(e) => setDorkSearch(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleDorkSearch(dorkSearch)}
+                className="flex-1 text-sm px-4 py-3 border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:outline-none"
+              />
+              <button
+                onClick={() => handleDorkSearch(dorkSearch)}
+                disabled={loading || dorkSearch.length < 2}
+                className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50"
+              >
+                {loading ? "..." : "Search"}
+              </button>
+            </div>
+          </>
         )}
       </div>
 
@@ -308,30 +370,30 @@ export default function CallQueue() {
           <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
             {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
           </p>
-          {searchResults.map((lead) => (
-            <div key={lead.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-white hover:border-[#0D0D0D] transition">
+          {searchResults.map((business) => (
+            <div key={business.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-white hover:border-[#0D0D0D] transition">
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#0D0D0D]">{lead.businessName}</p>
-                    {lead.phone && (
-                      <p className="text-sm text-[#0D0D0D] mt-1 font-mono font-semibold">{lead.phone}</p>
+                    <p className="text-sm font-semibold text-[#0D0D0D]">{business.name || business.businessName}</p>
+                    {(business.formatted_address || business.address) && (
+                      <p className="text-xs text-[#888888]">{business.formatted_address || business.address}</p>
                     )}
-                    {lead.email && (
-                      <p className="text-xs text-[#888888] font-mono">{lead.email}</p>
+                    {(business.telephone || business.phone || business.formatted_phone_number) && (
+                      <p className="text-sm text-[#0D0D0D] mt-2 font-mono font-semibold">{business.telephone || business.phone || business.formatted_phone_number}</p>
                     )}
                   </div>
                   <button
-                    onClick={() => handleAddToQueue(lead)}
+                    onClick={() => handleAddToQueue(business)}
                     className="px-4 py-2 bg-[#0D0D0D] text-white rounded font-semibold text-xs hover:bg-[#333333] whitespace-nowrap"
                   >
                     Queue
                   </button>
                 </div>
 
-                {lead.phone && (
+                {(business.telephone || business.phone || business.formatted_phone_number) && (
                   <button
-                    onClick={() => handleCall(lead)}
+                    onClick={() => handleCall(business)}
                     className="w-full px-4 py-2 border border-[#0D0D0D] text-[#0D0D0D] rounded font-semibold text-sm hover:bg-[#F9F9F9]"
                   >
                     Call
@@ -343,7 +405,7 @@ export default function CallQueue() {
         </div>
       )}
 
-      {!loading && searchResults.length === 0 && (businessSearch || postcodeSearch) && (
+      {!loading && searchResults.length === 0 && (keywordSearch || postcodeSearch || dorkSearch) && (
         <p className="text-xs text-[#888888] text-center py-8">No results found. Try a different search.</p>
       )}
     </div>
