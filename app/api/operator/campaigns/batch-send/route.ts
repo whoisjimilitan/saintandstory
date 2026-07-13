@@ -94,10 +94,12 @@ https://saintandstoryltd.co.uk`;
 }
 
 export async function POST(request: NextRequest) {
-  console.log("[BATCH-SEND] ✓ Handler invoked");
+  const timestamp = new Date().toISOString();
+  console.log(`\n${"=".repeat(80)}`);
+  console.log(`[BATCH-SEND] Handler invoked at ${timestamp}`);
 
   if (!process.env.RESEND_API_KEY) {
-    console.error("[BATCH-SEND] ✗ CRITICAL: RESEND_API_KEY not configured");
+    console.error("[BATCH-SEND] CRITICAL ERROR: RESEND_API_KEY not configured");
     return NextResponse.json(
       { error: "Email service not configured" },
       { status: 500 }
@@ -105,13 +107,14 @@ export async function POST(request: NextRequest) {
   }
 
   const { businesses, mode = "now", campaignType = "cold_outreach" } = await request.json();
-  // mode: "now" = send all immediately, "warmup" = queue with staggered times (20/hour)
-  // campaignType: "cold_outreach" = generic, "referral" = referral program
   if (!Array.isArray(businesses) || businesses.length === 0) {
+    console.error("[BATCH-SEND] ERROR: Invalid businesses array");
     return NextResponse.json({ error: "Invalid businesses array" }, { status: 400 });
   }
 
-  console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
+  console.log(`[BATCH-SEND] RECEIVED ${businesses.length} businesses`);
+  console.log(`[BATCH-SEND] Campaign type: ${campaignType}`);
+  console.log(`[BATCH-SEND] Mode: ${mode}`);
 
   // GUARDRAIL: Check Resend daily limit (100 per day)
   const RESEND_DAILY_LIMIT = 100;
@@ -249,7 +252,7 @@ export async function POST(request: NextRequest) {
 
         console.log(`[BATCH-SEND] [${i + 1}] ⧖ Queued for ${scheduledFor.toISOString()}`);
       } else {
-        // Send now
+        // Send now - with delay to prevent rate limiting
         console.log(`[BATCH-SEND] [${i + 1}] Sending via Resend to ${biz.email}`);
         const emailResponse = await resend.emails.send({
           from: "James <james@saintandstoryltd.co.uk>",
@@ -267,6 +270,11 @@ export async function POST(request: NextRequest) {
 
         if (emailResponse.error || !emailResponse.data?.id) {
           throw new Error(`Resend failed: ${JSON.stringify(emailResponse.error) || "No message ID"}`);
+        }
+
+        // Add delay between sends to prevent Resend rate limiting
+        if (i < businesses.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
 
         messageId = emailResponse.data.id;

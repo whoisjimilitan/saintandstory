@@ -1,23 +1,49 @@
-import { neon } from "@neondatabase/serverless";
+import { PrismaClient } from '@prisma/client';
 
-async function main() {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    console.log("DATABASE_URL not set");
-    process.exit(1);
-  }
+const prisma = new PrismaClient();
 
-  console.log("Database URL:", databaseUrl.substring(0, 50) + "...");
-
-  const sql = neon(databaseUrl);
-
+async function check() {
   try {
-    const result = await sql`SELECT COUNT(*) as count FROM b2b_leads`;
-    console.log("✓ B2B_LEADS table exists");
-    console.log("✓ Record count:", result[0].count);
-  } catch (error) {
-    console.error("✗ Error:", (error as any).message);
+    // Total records
+    const total = await prisma.b2bCampaignEmail.count();
+    console.log(`\n[DB] Total B2bCampaignEmail records: ${total}`);
+    
+    // Campaigns
+    const campaigns = await prisma.b2bCampaign.findMany({
+      include: { _count: { select: { emails: true } } },
+      orderBy: { sentAt: 'desc' }
+    });
+    
+    console.log(`\n[CAMPAIGNS] ${campaigns.length} campaigns:`);
+    for (const c of campaigns) {
+      console.log(`  Campaign ${c.id.slice(0, 8)}: totalLeads=${c.totalLeads}, actual=${c._count.emails}`);
+    }
+    
+    // Duplicates
+    const dups = await prisma.b2bCampaignEmail.groupBy({
+      by: ['prospectEmail'],
+      _count: true,
+      having: { prospectEmail: { _count: { gt: 1 } } }
+    });
+    
+    console.log(`\n[DUPLICATES] ${dups.length} emails sent multiple times:`);
+    for (const d of dups) {
+      console.log(`  ${d.prospectEmail}: ${d._count} times`);
+    }
+    
+    // Statuses
+    const statuses = await prisma.b2bCampaignEmail.groupBy({
+      by: ['status'],
+      _count: true
+    });
+    console.log(`\n[STATUS]`);
+    for (const s of statuses) {
+      console.log(`  ${s.status}: ${s._count}`);
+    }
+    
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-main();
+check();

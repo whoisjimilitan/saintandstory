@@ -509,7 +509,7 @@ https://saintandstoryltd.co.uk`;
           Simple Email Campaigns
         </h1>
         <p className="text-sm text-[#888888]">
-          Upload CSV with name + website → generate emails → infer categories → validate → send.
+          Upload CSV → Generate emails → Select campaign type → Send all
         </p>
       </div>
 
