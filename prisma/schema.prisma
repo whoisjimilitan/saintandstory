@@ -738,6 +738,7 @@ model ObservationEvent {
 model Referrer {
   id                 String              @id @default(cuid())
   phone              String              @unique
+  email              String?             @unique
   officeManagerName   String?             @map("office_manager_name")
   officeName         String?             @map("office_name")
   city               String
@@ -751,6 +752,9 @@ model Referrer {
   whatsappStatus     String              @default("pending") @map("whatsapp_status") // pending, joined, active
   whatsappJoinedAt   DateTime?           @map("whatsapp_joined_at")
   sentAt             DateTime?           @map("sent_at") // When signup was marked as sent via WhatsApp
+  campaignSource     String?             @map("campaign_source") // "self_signup", "batch_email", "manual"
+  campaignEmailId    String?             @map("campaign_email_id") // Link to B2bCampaignEmail for tracking
+  emailSentAt        DateTime?           @map("email_sent_at") // When referral email was sent
   lastActiveAt       DateTime?           @map("last_active_at")
   commission         Decimal             @default(15) @db.Decimal(5, 2) // £15 default per referral
   createdAt          DateTime            @default(now()) @map("created_at")
@@ -760,10 +764,12 @@ model Referrer {
   jobs               ReferralJob[]
 
   @@index([phone])
+  @@index([email])
   @@index([referralCode])
   @@index([city])
   @@index([status])
   @@index([whatsappStatus])
+  @@index([campaignSource])
   @@index([createdAt])
   @@map("referrers")
 }
