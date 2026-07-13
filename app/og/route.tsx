@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get("title") || "Same-Day Courier Service";
-  const sub = searchParams.get("sub") || "Urgent deliveries. Fixed price. Verified drivers.";
+  const sub = searchParams.get("sub") || "Same-day urgent deliveries. Reasonable pricing. Professional drivers.";
 
   return new ImageResponse(
     (
@@ -36,26 +36,27 @@ export async function GET(request: NextRequest) {
           }}
         />
 
-        {/* Logo & Brand */}
+        {/* Logo & Brand - Using actual brand logo */}
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-          <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-            <rect width="48" height="48" rx="10" fill="white" />
+          {/* Actual logo mark - black square with white route */}
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect width="48" height="48" rx="11" fill="#0D0D0D" />
             <path
               d="M 34 12 C 34 7 13 7 13 18 C 13 29 34 29 34 38"
-              stroke="#0D0D0D"
+              stroke="white"
               strokeWidth="3.5"
               strokeLinecap="round"
               fill="none"
             />
-            <circle cx="34" cy="12" r="3.5" fill="#0D0D0D" />
-            <circle cx="34" cy="38" r="3.5" fill="#0D0D0D" />
+            <circle cx="34" cy="12" r="3.5" fill="white" />
+            <circle cx="34" cy="38" r="3.5" fill="white" />
           </svg>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span style={{ color: "white", fontSize: "16px", fontWeight: 900, letterSpacing: "-0.02em" }}>
               Saint & Story
             </span>
             <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontWeight: 500, marginTop: "2px" }}>
-              Urgent Delivery Network
+              UK Courier Service
             </span>
           </div>
         </div>
@@ -76,9 +77,9 @@ export async function GET(request: NextRequest) {
           </div>
           <div
             style={{
-              color: "rgba(255,255,255,0.6)",
-              fontSize: "28px",
-              fontWeight: 500,
+              color: "rgba(255,255,255,0.65)",
+              fontSize: "32px",
+              fontWeight: 400,
               letterSpacing: "-0.01em",
               lineHeight: 1.3,
               maxWidth: "85%",
@@ -87,19 +88,19 @@ export async function GET(request: NextRequest) {
             {sub}
           </div>
 
-          {/* Value Props - Horizontal */}
-          <div style={{ display: "flex", gap: "40px", marginTop: "16px", fontSize: "16px", color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>✓ Same Day</span>
-              <span style={{ fontSize: "13px" }}>In most UK locations</span>
+          {/* Value Props - Three pillars */}
+          <div style={{ display: "flex", gap: "48px", marginTop: "24px", fontSize: "15px", color: "rgba(255,255,255,0.5)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={{ color: "white", fontWeight: 700, fontSize: "16px" }}>Fixed Price</span>
+              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>No surprises</span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>✓ Fixed Price</span>
-              <span style={{ fontSize: "13px" }}>No hidden fees</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={{ color: "white", fontWeight: 700, fontSize: "16px" }}>Verified Drivers</span>
+              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>Professional & insured</span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>✓ Verified</span>
-              <span style={{ fontSize: "13px" }}>Professional drivers</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={{ color: "white", fontWeight: 700, fontSize: "16px" }}>30+ UK Cities</span>
+              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>Fast coverage</span>
             </div>
           </div>
         </div>

@@ -21,12 +21,12 @@ const cormorant = Cormorant_Garamond({
 });
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const OG_IMAGE = `${BASE_URL}/og?title=Same-Day+Courier+Service&sub=Urgent+deliveries.+Fixed+price.+Verified+drivers.`;
+const OG_IMAGE = `${BASE_URL}/og?title=Same-Day+Courier+Service&sub=Same-day+urgent+deliveries.+Reasonable+pricing.+Professional+drivers.`;
 
 export const metadata: Metadata = {
   title: "Saint & Story — Same-Day Courier Service UK",
   description:
-    "Premium same-day courier service covering London, Manchester, Birmingham, Leeds and 30+ UK cities. Urgent deliveries with verified drivers and fixed pricing.",
+    "Same-day urgent deliveries. Reasonable pricing. Professional drivers across 30+ UK cities.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -44,14 +44,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Saint & Story",
     title: "Same-Day Courier Service — Saint & Story",
-    description: "Urgent deliveries. Fixed price. Verified drivers. Coverage across 30+ UK cities.",
+    description: "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     url: BASE_URL,
     images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Saint & Story Same-Day Courier Service" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Same-Day Courier Service — Saint & Story",
-    description: "Urgent deliveries. Fixed price. Verified drivers.",
+    description: "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     images: [OG_IMAGE],
   },
 };
