@@ -114,7 +114,7 @@ export default function CallQueue() {
     }
   };
 
-  const handleAddToQueue = (business: Business) => {
+  const handleAddToQueue = async (business: Business) => {
     const alreadyQueued = queuedBusinesses.some((q) => q.id === business.id);
     if (alreadyQueued) {
       setMessage(`Already queued: ${business.name || business.businessName}`);
@@ -130,7 +130,46 @@ export default function CallQueue() {
 
     setQueuedBusinesses([queued, ...queuedBusinesses]);
     setMessage(`Queued: ${business.name || business.businessName}`);
-    setTimeout(() => setMessage(""), 1500);
+
+    // If no phone, use dork search to find it
+    const hasPhone = business.telephone || business.phone || business.formatted_phone_number;
+    if (!hasPhone) {
+      setMessage(`Queued: ${business.name || business.businessName} (finding phone...)`);
+
+      try {
+        const companyName = business.name || business.businessName;
+        const response = await fetch("/api/b2b/dork-search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: companyName }),
+        });
+
+        const data = await response.json();
+        if (data.success && data.leads && data.leads.length > 0) {
+          const foundPhone = data.leads[0].phone;
+          if (foundPhone) {
+            // Update the queued business with the found phone
+            setQueuedBusinesses((current) =>
+              current.map((q) =>
+                q.id === business.id
+                  ? { ...q, phone: foundPhone, telephone: foundPhone }
+                  : q
+              )
+            );
+            setMessage(`Queued: ${business.name || business.businessName} (found phone: ${foundPhone})`);
+          } else {
+            setMessage(`Queued: ${business.name || business.businessName} (no phone found)`);
+          }
+        } else {
+          setMessage(`Queued: ${business.name || business.businessName} (no phone found)`);
+        }
+      } catch (error) {
+        console.error("Dork search error:", error);
+        setMessage(`Queued: ${business.name || business.businessName} (phone lookup failed)`);
+      }
+    }
+
+    setTimeout(() => setMessage(""), 3000);
   };
 
   const handleRemoveFromQueue = (id: string) => {
