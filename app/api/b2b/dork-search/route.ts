@@ -46,7 +46,7 @@ function parseConversationalQuery(input: string) {
 }
 
 // Google Custom Search API integration
-async function searchGoogle(params: any): Promise<any[]> {
+async function searchGoogle(rawQuery: string): Promise<any[]> {
   const apiKey = process.env.GOOGLE_CUSTOM_SEARCH_API_KEY;
   const searchEngineId = process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID;
 
@@ -56,11 +56,14 @@ async function searchGoogle(params: any): Promise<any[]> {
   }
 
   try {
-    // Company name only - search for phone and email
-    // Use exact match with quotes for reliability
-    const query = `"${params.keyword}" phone email contact`;
+    // If the query already contains dork patterns (site:, OR, etc), use it directly
+    // Otherwise wrap it in quotes and add context
+    let query = rawQuery;
+    if (!rawQuery.includes("site:") && !rawQuery.includes(" OR ")) {
+      query = `"${rawQuery}" phone email contact`;
+    }
 
-    console.log(`[DORK SEARCH] Query: "${query}"`);
+    console.log(`[DORK SEARCH] Searching with query: "${query}"`);
 
     // Call Google Custom Search API
     const url = new URL("https://www.googleapis.com/customsearch/v1");
@@ -215,12 +218,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse user input into search parameters
-    const params = parseConversationalQuery(query);
-
-    // Execute Google Custom Search
-    console.log(`[DORK SEARCH] Searching: "${query}"`);
-    const searchResults = await searchGoogle(params);
+    // Execute Google Custom Search with the raw query
+    // If it's a pre-built dork query (contains site: or OR), use it directly
+    // Otherwise parse it first
+    console.log(`[DORK SEARCH] Raw query received: "${query}"`);
+    const searchResults = await searchGoogle(query);
 
     if (searchResults.length === 0) {
       return NextResponse.json({
@@ -237,7 +239,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Clean and structure results
-    const cleanedResults = parseSearchResults(searchResults, params);
+    // For dork searches, we care about email/phone extraction, not business categorization
+    const cleanedResults = searchResults.map((result: any) => {
+      const businessName = result.title || "Unknown";
+      const website = result.link || "";
+      const snippet = result.snippet || "";
+
+      const email = extractEmailFromText(snippet);
+      const phone = extractPhoneFromText(snippet);
+
+      return {
+        businessName: businessName.replace(" - ", "").substring(0, 150),
+        email: email || undefined,
+        phone: phone || undefined,
+        website,
+        location: "UK",
+        source: "google_search",
+      };
+    }).filter((r: any) => r.email || r.phone); // Only keep results with contact info
 
     // Create leads in database
     const createdLeads = [];
@@ -255,8 +274,8 @@ export async function POST(request: NextRequest) {
             source: "dork_search",
             status: "new",
             leadState: "new",
-            businessCategory: params.keyword,
-            notes: `Dork search: "${query}" | Source: ${result.source} | Batch: ${batchId}`,
+            businessCategory: "people_search",
+            notes: `Dork search: "${query}" | Batch: ${batchId}`,
           },
         });
 
@@ -277,12 +296,7 @@ export async function POST(request: NextRequest) {
       query,
       leadsCreated: createdLeads.length,
       leads: createdLeads,
-      parsed: {
-        businessType: params.keyword,
-        source: params.source,
-        contactType: params.contactType,
-      },
-      message: `Created ${createdLeads.length} leads from search results.`,
+      message: `Found ${createdLeads.length} profiles with contact info.`,
     });
   } catch (error) {
     console.error("[DORK SEARCH] Error:", error);
