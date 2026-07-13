@@ -137,6 +137,7 @@ export default function CampaignsPage() {
   const [selectedBusiness, setSelectedBusiness] = useState<ValidatedBusiness | null>(null);
   const [sending, setSending] = useState(false);
   const [batchSending, setBatchSending] = useState(false);
+  const [campaignType, setCampaignType] = useState<"cold_outreach" | "referral">("cold_outreach");
 
   // Fetch daily limit on mount and periodically
   const fetchDailyLimit = async () => {
@@ -446,7 +447,7 @@ James`;
       const res = await fetch("/api/operator/campaigns/batch-send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businesses: validBusinesses }),
+        body: JSON.stringify({ businesses: validBusinesses, campaignType }),
       });
 
       if (!res.ok) {
@@ -476,7 +477,12 @@ James`;
       );
 
       if (data.sent > 0) {
-        setError(`Sent ${data.sent} emails (${data.failed} failed)`);
+        if (data.campaignType === "referral" && data.referralCodes?.length > 0) {
+          const codesText = data.referralCodes.map((c: any) => `${c.email}: ${c.code}`).join("\n");
+          setError(`✓ Referral campaign sent to ${data.sent} people\n\nCodes:\n${codesText}`);
+        } else {
+          setError(`Sent ${data.sent} emails (${data.failed} failed)`);
+        }
       } else {
         setError(`Failed to send emails. Check Resend API key.`);
       }
@@ -786,6 +792,37 @@ James`;
               {error.replace("✓ ", "")}
             </div>
           )}
+
+          {/* Campaign Type Selection */}
+          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white mb-4">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Campaign Type</p>
+            <div className="flex gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="campaignType"
+                  value="cold_outreach"
+                  checked={campaignType === "cold_outreach"}
+                  onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-[#0D0D0D]">Cold Outreach</span>
+                <span className="text-xs text-[#888888]">(General business inquiry)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="campaignType"
+                  value="referral"
+                  checked={campaignType === "referral"}
+                  onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-[#0D0D0D]">Referral Program</span>
+                <span className="text-xs text-[#888888]">(£20/£100 commission offer)</span>
+              </label>
+            </div>
+          </div>
 
           {/* Daily Limit Warning */}
           {dailyLimit && (
