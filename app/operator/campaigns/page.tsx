@@ -374,6 +374,32 @@ James`;
     return { subject, body };
   };
 
+  const generateReferralEmail = (biz: ParsedBusiness, referralCode: string) => {
+    const subject = "£20-£100 referral bonus — share with your network";
+    const body = `Hi ${biz.contactName || "there"},
+
+Working at ${biz.name || biz.email}, you probably see urgent delivery needs all the time.
+
+We're a same-day courier — and we pay referral bonuses when you mention us:
+
+• £20 per single job referral
+• £100 when a referred client does 5+ jobs with us
+
+That's it. No sales calls, no pressure. Just say "I know a reliable courier" when the moment comes up.
+
+Share your code: ${referralCode}
+Dashboard: https://saintandstoryltd.co.uk/referral/dashboard?code=${referralCode}
+
+Questions? Reply here or call 0203 051 9243.
+
+---
+James
+Co-Founder, Saint & Story
+https://saintandstoryltd.co.uk`;
+
+    return { subject, body };
+  };
+
   const handleSendEmail = async (subject: string, body: string) => {
     if (!selectedBusiness) return;
 
@@ -873,17 +899,25 @@ James`;
       )}
 
       {/* Email Edit Modal */}
-      {selectedBusiness && (
-        <SimpleEmailModal
-          isOpen={!!selectedBusiness}
-          business={selectedBusiness}
-          initialSubject={generateEmail(selectedBusiness).subject}
-          initialBody={generateEmail(selectedBusiness).body}
-          onClose={() => setSelectedBusiness(null)}
-          onSend={handleSendEmail}
-          sending={sending}
-        />
-      )}
+      {selectedBusiness && (() => {
+        const referralCode = campaignType === "referral"
+          ? `SH-${selectedBusiness.name.toUpperCase().slice(0, 4).padEnd(4, "H")}-${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`
+          : null;
+        const email = campaignType === "referral" && referralCode
+          ? generateReferralEmail(selectedBusiness, referralCode)
+          : generateEmail(selectedBusiness);
+        return (
+          <SimpleEmailModal
+            isOpen={!!selectedBusiness}
+            business={selectedBusiness}
+            initialSubject={email.subject}
+            initialBody={email.body}
+            onClose={() => setSelectedBusiness(null)}
+            onSend={handleSendEmail}
+            sending={sending}
+          />
+        );
+      })()}
     </div>
   );
 }
