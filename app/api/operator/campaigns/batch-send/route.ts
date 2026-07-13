@@ -58,6 +58,41 @@ https://saintandstoryltd.co.uk`;
   };
 }
 
+function generateReferralCode(name: string): string {
+  const initials = name.toUpperCase().slice(0, 2).padEnd(2, "S");
+  const middle = name.toUpperCase().slice(0, 4).padEnd(4, "H");
+  const suffix = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+  return `SH-${middle.slice(0, 4)}-${suffix}`;
+}
+
+function generateReferralEmail(business: Business, referralCode: string) {
+  const body = `Hi ${business.contactName || "there"},
+
+Working at ${business.name || business.email}, you probably see urgent delivery needs all the time.
+
+We're a same-day courier — and we pay referral bonuses when you mention us:
+
+• £20 per single job referral
+• £100 when a referred client does 5+ jobs with us
+
+That's it. No sales calls, no pressure. Just say "I know a reliable courier" when the moment comes up.
+
+Share your code: ${referralCode}
+Dashboard: https://saintandstoryltd.co.uk/referral/dashboard?code=${referralCode}
+
+Questions? Reply here or call 0203 051 9243.
+
+---
+James
+Co-Founder, Saint & Story
+https://saintandstoryltd.co.uk`;
+
+  return {
+    subject: `£20-£100 referral bonus — share with your network`,
+    body,
+  };
+}
+
 export async function POST(request: NextRequest) {
   console.log("[BATCH-SEND] ✓ Handler invoked");
 
@@ -69,8 +104,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { businesses, mode = "now" } = await request.json();
+  const { businesses, mode = "now", campaignType = "cold_outreach" } = await request.json();
   // mode: "now" = send all immediately, "warmup" = queue with staggered times (20/hour)
+  // campaignType: "cold_outreach" = generic, "referral" = referral program
   if (!Array.isArray(businesses) || businesses.length === 0) {
     return NextResponse.json({ error: "Invalid businesses array" }, { status: 400 });
   }
@@ -145,9 +181,20 @@ export async function POST(request: NextRequest) {
   const sent: string[] = [];
   const failed: Array<{ email: string; error: string }> = [];
 
+  const referralCodes: Array<{ email: string; code: string }> = [];
+
   for (let i = 0; i < businesses.length; i++) {
     const biz = businesses[i];
-    const { subject, body } = generateEmail(biz);
+
+    // Generate referral code if this is a referral campaign
+    let referralCode: string | null = null;
+    if (campaignType === "referral") {
+      referralCode = generateReferralCode(biz.contactName || biz.name);
+    }
+
+    const { subject, body } = campaignType === "referral" && referralCode
+      ? generateReferralEmail(biz, referralCode)
+      : generateEmail(biz);
 
     try {
       console.log(`[BATCH-SEND] [${i + 1}/${businesses.length}] ${biz.email}`);
@@ -262,6 +309,39 @@ export async function POST(request: NextRequest) {
           console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to update B2bLead:`, updateErr);
           throw updateErr;
         }
+
+        // Create Referrer record if this is a referral campaign
+        if (campaignType === "referral" && referralCode) {
+          try {
+            const existingReferrer = await prisma.referrer.findFirst({
+              where: { email: biz.email },
+            });
+
+            if (existingReferrer) {
+              console.log(`[BATCH-SEND] [${i + 1}] ⚠ Referrer already exists: ${biz.email}`);
+            } else {
+              const referrer = await prisma.referrer.create({
+                data: {
+                  email: biz.email,
+                  phone: "0", // Placeholder, will be updated when they sign up
+                  officeManagerName: biz.contactName,
+                  officeName: biz.name,
+                  city: "UK", // Default, will be updated when they sign up
+                  referralCode: referralCode,
+                  campaignSource: "batch_email",
+                  emailSentAt: mode === "now" ? now : undefined,
+                  commission: 20, // £20 per referral
+                },
+              });
+
+              referralCodes.push({ email: biz.email, code: referralCode });
+              console.log(`[BATCH-SEND] [${i + 1}] ✓ Created Referrer: ${referrer.id} (code: ${referralCode})`);
+            }
+          } catch (referrerErr) {
+            console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to create Referrer:`, referrerErr);
+            // Don't fail the whole batch if Referrer creation fails
+          }
+        }
       }
 
       sent.push(biz.email);
@@ -286,9 +366,11 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     success: true,
     campaignId: campaign.id,
+    campaignType,
     sent: sent.length,
     failed: failed.length,
     total: businesses.length,
     details,
+    ...(campaignType === "referral" && { referralCodes }),
   });
 }
