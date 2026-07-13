@@ -324,7 +324,10 @@ export default function TodayPage() {
 
           </>
         ) : activeTab === "contacts" ? (
-          <CallQueue />
+          <div className="text-center py-12">
+            <p className="text-sm text-[#666666]">Warm Outreach Pipeline</p>
+            <p className="text-xs text-[#999999] mt-2">Loading contacts...</p>
+          </div>
         ) : null}
       </div>
 
