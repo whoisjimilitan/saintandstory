@@ -123,7 +123,7 @@ interface DailyLimit {
 }
 
 export default function CampaignsPage() {
-  const [step, setStep] = useState<"upload" | "generate" | "infer" | "validate" | "campaign">("upload");
+  const [step, setStep] = useState<"upload" | "generate" | "validate" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [businesses, setBusinesses] = useState<ValidatedBusiness[]>([]);
@@ -260,8 +260,10 @@ export default function CampaignsPage() {
 
   const handleGenerateEmails = () => {
     setError("");
-    // User reviews generated emails and proceeds to category inference
-    setStep("infer");
+    // Skip inference step entirely - default all to "Other" category
+    const withCategory = businesses.map(b => ({ ...b, category: "Other" }));
+    setBusinesses(withCategory);
+    setStep("validate");
   };
 
   const handleInferCategories = async () => {
@@ -610,55 +612,7 @@ https://saintandstoryltd.co.uk`;
               onClick={handleGenerateEmails}
               className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded"
             >
-              Continue to Categories
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Infer Categories */}
-      {step === "infer" && (
-        <div className="border border-[#E8E8E8] rounded-lg p-8 space-y-6">
-          <div>
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
-              {businesses.length} businesses loaded
-            </p>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {businesses.map((b) => (
-                <div
-                  key={b.email}
-                  className="text-xs p-2 bg-[#F5F5F5] rounded border border-[#E8E8E8]"
-                >
-                  <p className="font-semibold text-[#0D0D0D]">{b.name}</p>
-                  <p className="text-[#888888]">{b.email}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setStep("upload");
-                setBusinesses([]);
-              }}
-              disabled={inferring}
-              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D] disabled:opacity-50"
-            >
-              Back
-            </button>
-            <button
-              onClick={handleInferCategories}
-              disabled={inferring}
-              className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded disabled:opacity-50"
-            >
-              {inferring ? "Inferring..." : "Infer Categories"}
+              Continue to Validation
             </button>
           </div>
         </div>
