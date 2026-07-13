@@ -486,7 +486,7 @@ export default function CallQueue() {
         </div>
       )}
 
-      {!loading && searchResults.length === 0 && (keywordSearch || postcodeSearch || dorkSearch) && (
+      {!loading && searchResults.length === 0 && (keywordSearch || postcodeSearch) && (
         <p className="text-xs text-[#888888] text-center py-8">No results found. Try a different search.</p>
       )}
     </div>
