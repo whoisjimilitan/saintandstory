@@ -738,7 +738,6 @@ model ObservationEvent {
 model Referrer {
   id                 String              @id @default(cuid())
   phone              String              @unique
-  email              String?             @unique
   officeManagerName   String?             @map("office_manager_name")
   officeName         String?             @map("office_name")
   city               String
@@ -764,7 +763,6 @@ model Referrer {
   jobs               ReferralJob[]
 
   @@index([phone])
-  @@index([email])
   @@index([referralCode])
   @@index([city])
   @@index([status])
