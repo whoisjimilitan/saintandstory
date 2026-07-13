@@ -428,7 +428,7 @@ export default function CallQueue() {
               : "bg-white border border-[#E8E8E8] text-[#0D0D0D] hover:border-[#0D0D0D]"
           }`}
         >
-          By Role/Phone
+          By Role
         </button>
       </div>
 
@@ -482,11 +482,11 @@ export default function CallQueue() {
 
         {searchMode === "dork" && (
           <>
-            <p className="text-xs text-[#888888]">Find phone numbers & contacts by company name, role, or location</p>
+            <p className="text-xs text-[#888888]">Find people by role (e.g., receptionist, office manager, director)</p>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="e.g., Smith & Sons Solicitors, receptionist london, office manager M1..."
+                placeholder="e.g., receptionist, office manager, director..."
                 value={dorkSearch}
                 onChange={(e) => setDorkSearch(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleDorkSearch(dorkSearch)}
