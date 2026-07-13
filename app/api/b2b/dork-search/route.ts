@@ -56,15 +56,18 @@ async function searchGoogle(params: any): Promise<any[]> {
   }
 
   try {
-    // Build search query
-    const query = `${params.keyword} ${params.source} ${params.location}`;
+    // Company name only - search for phone and email
+    // Use exact match with quotes for reliability
+    const query = `"${params.keyword}" phone email contact`;
+
+    console.log(`[DORK SEARCH] Query: "${query}"`);
 
     // Call Google Custom Search API
     const url = new URL("https://www.googleapis.com/customsearch/v1");
     url.searchParams.append("q", query);
     url.searchParams.append("key", apiKey);
     url.searchParams.append("cx", searchEngineId);
-    url.searchParams.append("num", "10"); // Get 10 results
+    url.searchParams.append("num", "15"); // Get more results for better coverage
 
     const response = await fetch(url.toString());
 

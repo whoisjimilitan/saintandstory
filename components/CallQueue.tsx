@@ -511,9 +511,23 @@ export default function CallQueue() {
       {/* Results */}
       {searchResults.length > 0 && (
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
-            {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest">
+              {searchResults.length} Result{searchResults.length !== 1 ? "s" : ""}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  searchResults.forEach(b => handleAddToQueue(b));
+                  setMessage(`Added ${searchResults.length} businesses to queue`);
+                  setTimeout(() => setMessage(""), 2000);
+                }}
+                className="text-xs px-3 py-1 bg-[#0D0D0D] text-white rounded font-semibold hover:bg-[#333333]"
+              >
+                Add All to Queue
+              </button>
+            </div>
+          </div>
           {searchResults.map((business) => (
             <div key={business.id} className="border border-[#E8E8E8] rounded-lg p-4 bg-white hover:border-[#0D0D0D] transition">
               <div className="space-y-2">
@@ -532,11 +546,6 @@ export default function CallQueue() {
                     {/* Email */}
                     {business.email && (
                       <p className="text-xs text-[#0D0D0D] font-mono mt-1">{business.email}</p>
-                    )}
-
-                    {/* Website */}
-                    {business.website && (
-                      <p className="text-xs text-[#0D0D0D] break-all mt-1">{business.website}</p>
                     )}
                   </div>
                   <button
