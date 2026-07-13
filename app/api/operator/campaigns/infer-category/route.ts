@@ -25,14 +25,28 @@ const CATEGORIES = [
 ];
 
 export async function POST(request: NextRequest) {
+  let businessName = "Unknown";
+
   try {
-    const { businessName, description, website } = await request.json();
+    const { businessName: bName, description, website } = await request.json();
+    businessName = bName;
 
     if (!businessName) {
       return NextResponse.json(
         { error: "businessName required" },
         { status: 400 }
       );
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.warn("[INFER-CATEGORY] ANTHROPIC_API_KEY not configured, defaulting to 'Other'");
+      return NextResponse.json({
+        businessName,
+        category: "Other",
+        inferred: false,
+        reason: "API not configured",
+        timestamp: new Date().toISOString(),
+      });
     }
 
     const contextParts = [businessName];
@@ -67,9 +81,12 @@ Respond with ONLY the category name, nothing else. Must be one of the valid cate
     });
   } catch (error) {
     console.error("[INFER-CATEGORY] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to infer category", details: String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      businessName,
+      category: "Other",
+      inferred: false,
+      reason: "Inference failed, using default",
+      timestamp: new Date().toISOString(),
+    });
   }
 }

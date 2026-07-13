@@ -151,7 +151,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[BATCH-SEND] Daily limit check: ${emailsSentToday} sent, ${emailsInQueue} queued, ${remaining = RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue} remaining`);
+    const remaining = RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue;
+    console.log(`[BATCH-SEND] Daily limit check: ${emailsSentToday} sent, ${emailsInQueue} queued, ${remaining} remaining`);
   } catch (err) {
     console.error("[BATCH-SEND] Error checking daily limit:", err);
     // Don't fail the whole request if limit check fails, but log it
