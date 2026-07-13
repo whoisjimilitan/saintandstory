@@ -310,37 +310,11 @@ export async function POST(request: NextRequest) {
           throw updateErr;
         }
 
-        // Create Referrer record if this is a referral campaign
+        // NOTE: Referrer record creation disabled for now - will be added back after schema migration
+        // Keep referral codes in response for operator visibility
         if (campaignType === "referral" && referralCode) {
-          try {
-            const existingReferrer = await prisma.referrer.findFirst({
-              where: { email: biz.email },
-            });
-
-            if (existingReferrer) {
-              console.log(`[BATCH-SEND] [${i + 1}] ⚠ Referrer already exists: ${biz.email}`);
-            } else {
-              const referrer = await prisma.referrer.create({
-                data: {
-                  email: biz.email,
-                  phone: "0", // Placeholder, will be updated when they sign up
-                  officeManagerName: biz.contactName,
-                  officeName: biz.name,
-                  city: "UK", // Default, will be updated when they sign up
-                  referralCode: referralCode,
-                  campaignSource: "batch_email",
-                  emailSentAt: mode === "now" ? now : undefined,
-                  commission: 20, // £20 per referral
-                },
-              });
-
-              referralCodes.push({ email: biz.email, code: referralCode });
-              console.log(`[BATCH-SEND] [${i + 1}] ✓ Created Referrer: ${referrer.id} (code: ${referralCode})`);
-            }
-          } catch (referrerErr) {
-            console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to create Referrer:`, referrerErr);
-            // Don't fail the whole batch if Referrer creation fails
-          }
+          referralCodes.push({ email: biz.email, code: referralCode });
+          console.log(`[BATCH-SEND] [${i + 1}] ℹ Referral code generated: ${referralCode}`);
         }
       }
 

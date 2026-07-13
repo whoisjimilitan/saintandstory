@@ -478,13 +478,14 @@ James`;
 
       if (data.sent > 0) {
         if (data.campaignType === "referral" && data.referralCodes?.length > 0) {
-          const codesText = data.referralCodes.map((c: any) => `${c.email}: ${c.code}`).join("\n");
-          setError(`✓ Referral campaign sent to ${data.sent} people\n\nCodes:\n${codesText}`);
+          const codesText = data.referralCodes.slice(0, 5).map((c: any) => `${c.email}: ${c.code}`).join(" | ");
+          const moreText = data.referralCodes.length > 5 ? ` +${data.referralCodes.length - 5} more` : "";
+          setError(`✓ REFERRAL EMAILS SENT: ${data.sent}/${data.total} emails sent\n\nSample codes:\n${codesText}${moreText}\n\nCheck /reach page for full campaign stats`);
         } else {
-          setError(`Sent ${data.sent} emails (${data.failed} failed)`);
+          setError(`✓ EMAILS SENT: ${data.sent} sent, ${data.failed} failed (${data.total} total)`);
         }
       } else {
-        setError(`Failed to send emails. Check Resend API key.`);
+        setError(`✗ NO EMAILS SENT - 0/${data.total} emails sent. Check Resend API key and daily limit (100/day).`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Batch send failed");
@@ -804,7 +805,7 @@ James`;
                   value="cold_outreach"
                   checked={campaignType === "cold_outreach"}
                   onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
-                  className="w-4 h-4"
+                  className="w-4 h-4 accent-[#0D0D0D]"
                 />
                 <span className="text-sm text-[#0D0D0D]">Cold Outreach</span>
                 <span className="text-xs text-[#888888]">(General business inquiry)</span>
@@ -816,7 +817,7 @@ James`;
                   value="referral"
                   checked={campaignType === "referral"}
                   onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
-                  className="w-4 h-4"
+                  className="w-4 h-4 accent-[#0D0D0D]"
                 />
                 <span className="text-sm text-[#0D0D0D]">Referral Program</span>
                 <span className="text-xs text-[#888888]">(£20/£100 commission offer)</span>
