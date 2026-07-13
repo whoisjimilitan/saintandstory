@@ -58,24 +58,56 @@ https://saintandstoryltd.co.uk`;
   };
 }
 
+function generateReferralCode(name: string): string {
+  const initials = name.toUpperCase().slice(0, 2).padEnd(2, "S");
+  const middle = name.toUpperCase().slice(0, 4).padEnd(4, "H");
+  const suffix = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+  return `SH-${middle.slice(0, 4)}-${suffix}`;
+}
+
+function generateReferralEmail(business: Business, referralCode: string) {
+  const body = `Hi ${business.contactName || "there"},
+
+You deal with urgent deliveries and collections all the time at ${business.name || business.email}
+
+We're a same-day courier — and we pay referral bonuses when you mention us:
+
+• £20 per single job referral
+• £100 when a referred client does 3 consecutive jobs with us
+
+That's it. No sales calls, no pressure. Just say "I know a reliable courier" when the moment comes up.
+
+James
+0203 051 9243`;
+
+  return {
+    subject: `£20-£100 referral bonus`,
+    body,
+  };
+}
+
 export async function POST(request: NextRequest) {
-  console.log("[BATCH-SEND] ✓ Handler invoked");
+  const timestamp = new Date().toISOString();
+  console.log(`\n${"=".repeat(80)}`);
+  console.log(`[BATCH-SEND] Handler invoked at ${timestamp}`);
 
   if (!process.env.RESEND_API_KEY) {
-    console.error("[BATCH-SEND] ✗ CRITICAL: RESEND_API_KEY not configured");
+    console.error("[BATCH-SEND] CRITICAL ERROR: RESEND_API_KEY not configured");
     return NextResponse.json(
       { error: "Email service not configured" },
       { status: 500 }
     );
   }
 
-  const { businesses, mode = "now" } = await request.json();
-  // mode: "now" = send all immediately, "warmup" = queue with staggered times (20/hour)
+  const { businesses, mode = "now", campaignType = "cold_outreach" } = await request.json();
   if (!Array.isArray(businesses) || businesses.length === 0) {
+    console.error("[BATCH-SEND] ERROR: Invalid businesses array");
     return NextResponse.json({ error: "Invalid businesses array" }, { status: 400 });
   }
 
-  console.log(`[BATCH-SEND] Processing ${businesses.length} leads`);
+  console.log(`[BATCH-SEND] RECEIVED ${businesses.length} businesses`);
+  console.log(`[BATCH-SEND] Campaign type: ${campaignType}`);
+  console.log(`[BATCH-SEND] Mode: ${mode}`);
 
   // GUARDRAIL: Check Resend daily limit (100 per day)
   const RESEND_DAILY_LIMIT = 100;
@@ -115,7 +147,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[BATCH-SEND] Daily limit check: ${emailsSentToday} sent, ${emailsInQueue} queued, ${remaining = RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue} remaining`);
+    const remaining = RESEND_DAILY_LIMIT - emailsSentToday - emailsInQueue;
+    console.log(`[BATCH-SEND] Daily limit check: ${emailsSentToday} sent, ${emailsInQueue} queued, ${remaining} remaining`);
   } catch (err) {
     console.error("[BATCH-SEND] Error checking daily limit:", err);
     // Don't fail the whole request if limit check fails, but log it
@@ -145,9 +178,20 @@ export async function POST(request: NextRequest) {
   const sent: string[] = [];
   const failed: Array<{ email: string; error: string }> = [];
 
+  const referralCodes: Array<{ email: string; code: string }> = [];
+
   for (let i = 0; i < businesses.length; i++) {
     const biz = businesses[i];
-    const { subject, body } = generateEmail(biz);
+
+    // Generate referral code if this is a referral campaign
+    let referralCode: string | null = null;
+    if (campaignType === "referral") {
+      referralCode = generateReferralCode(biz.contactName || biz.name);
+    }
+
+    const { subject, body } = campaignType === "referral" && referralCode
+      ? generateReferralEmail(biz, referralCode)
+      : generateEmail(biz);
 
     try {
       console.log(`[BATCH-SEND] [${i + 1}/${businesses.length}] ${biz.email}`);
@@ -201,7 +245,7 @@ export async function POST(request: NextRequest) {
 
         console.log(`[BATCH-SEND] [${i + 1}] ⧖ Queued for ${scheduledFor.toISOString()}`);
       } else {
-        // Send now
+        // Send now - with delay to prevent rate limiting
         console.log(`[BATCH-SEND] [${i + 1}] Sending via Resend to ${biz.email}`);
         const emailResponse = await resend.emails.send({
           from: "James <james@saintandstoryltd.co.uk>",
@@ -219,6 +263,11 @@ export async function POST(request: NextRequest) {
 
         if (emailResponse.error || !emailResponse.data?.id) {
           throw new Error(`Resend failed: ${JSON.stringify(emailResponse.error) || "No message ID"}`);
+        }
+
+        // Add delay between sends to prevent Resend rate limiting
+        if (i < businesses.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
 
         messageId = emailResponse.data.id;
@@ -262,6 +311,13 @@ export async function POST(request: NextRequest) {
           console.error(`[BATCH-SEND] [${i + 1}] ✗ Failed to update B2bLead:`, updateErr);
           throw updateErr;
         }
+
+        // NOTE: Referrer record creation disabled for now - will be added back after schema migration
+        // Keep referral codes in response for operator visibility
+        if (campaignType === "referral" && referralCode) {
+          referralCodes.push({ email: biz.email, code: referralCode });
+          console.log(`[BATCH-SEND] [${i + 1}] ℹ Referral code generated: ${referralCode}`);
+        }
       }
 
       sent.push(biz.email);
@@ -270,6 +326,11 @@ export async function POST(request: NextRequest) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       failed.push({ email: biz.email, error: errorMsg });
       console.error(`[BATCH-SEND] [${i + 1}] ✗ ${biz.email}: ${errorMsg}`);
+      console.error(`[BATCH-SEND] Full error:`, err);
+      // Log first error in detail so we can debug
+      if (i === 0) {
+        console.error(`[BATCH-SEND] FIRST EMAIL FAILED - Full stack:`, err);
+      }
     }
   }
 
@@ -286,9 +347,11 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     success: true,
     campaignId: campaign.id,
+    campaignType,
     sent: sent.length,
     failed: failed.length,
     total: businesses.length,
     details,
+    ...(campaignType === "referral" && { referralCodes }),
   });
 }

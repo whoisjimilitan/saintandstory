@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import OperatorReferralDashboard from "@/components/OperatorReferralDashboard";
+import { generateReferralMessage } from "@/lib/referral-message";
 
 interface ReferralSignup {
   id: string;
@@ -32,14 +33,25 @@ export default function ReferralNetworkPage() {
   const fetchReferrals = async () => {
     try {
       const response = await fetch("/api/referral/list");
-      if (!response.ok) throw new Error("Failed to fetch referrals");
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error("[REFERRAL-NETWORK] API Error:", {
+          status: response.status,
+          error: data.error,
+          details: data.details,
+          fullResponse: data,
+        });
+        throw new Error(data.error || "Failed to fetch referrals");
+      }
+
+      console.log("[REFERRAL-NETWORK] ✓ Fetched referrals:", data);
       setReferrals({
         pending: data.pending || [],
         sent: data.sent || [],
       });
     } catch (error) {
-      console.error("Error fetching referrals:", error);
+      console.error("[REFERRAL-NETWORK] Error fetching referrals:", error);
     }
   };
 
@@ -144,11 +156,11 @@ export default function ReferralNetworkPage() {
                     <div className="bg-[#F9F9F9] p-4 rounded-lg border-l-4 border-[#0D0D0D]">
                       <p className="text-xs text-[#888888] mb-2">Message Template</p>
                       <p className="text-sm text-[#0D0D0D] leading-relaxed mb-3">
-                        Hi, for removals I recommend Saint & Story. Use code <span className="font-mono font-semibold">{signup.code}</span>
+                        {generateReferralMessage(signup.code)}
                       </p>
                       <button
                         onClick={() => {
-                          const text = `Hi, for removals I recommend Saint & Story. Use code ${signup.code}`;
+                          const text = generateReferralMessage(signup.code);
                           navigator.clipboard.writeText(text);
                           alert("Message copied! Send via WhatsApp, then mark as sent.");
                         }}

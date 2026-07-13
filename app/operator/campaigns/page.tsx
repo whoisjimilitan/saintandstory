@@ -123,7 +123,7 @@ interface DailyLimit {
 }
 
 export default function CampaignsPage() {
-  const [step, setStep] = useState<"upload" | "generate" | "infer" | "validate" | "campaign">("upload");
+  const [step, setStep] = useState<"upload" | "generate" | "validate" | "campaign">("upload");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [businesses, setBusinesses] = useState<ValidatedBusiness[]>([]);
@@ -137,6 +137,7 @@ export default function CampaignsPage() {
   const [selectedBusiness, setSelectedBusiness] = useState<ValidatedBusiness | null>(null);
   const [sending, setSending] = useState(false);
   const [batchSending, setBatchSending] = useState(false);
+  const [campaignType, setCampaignType] = useState<"cold_outreach" | "referral">("cold_outreach");
 
   // Fetch daily limit on mount and periodically
   const fetchDailyLimit = async () => {
@@ -259,8 +260,10 @@ export default function CampaignsPage() {
 
   const handleGenerateEmails = () => {
     setError("");
-    // User reviews generated emails and proceeds to category inference
-    setStep("infer");
+    // Add categories and jump straight to campaign (skip validation)
+    const withCategory = businesses.map(b => ({ ...b, category: "Other", validationStatus: "valid" as const }));
+    setBusinesses(withCategory);
+    setStep("campaign");
   };
 
   const handleInferCategories = async () => {
@@ -315,31 +318,11 @@ export default function CampaignsPage() {
         const biz = businesses[i];
         const email = biz.email?.trim() || "";
 
-        // Quick syntax check
-        if (!emailRegex.test(email)) {
-          validated.push({ ...biz, validationStatus: "invalid", validationReason: "Invalid syntax" });
-          setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
-          continue;
-        }
-
-        // Extract domain
-        const domain = email.split("@")[1];
-
-        // Quick MX check via API (lightweight)
-        try {
-          const mxRes = await fetch(`/api/operator/campaigns/check-mx?domain=${encodeURIComponent(domain)}`);
-          if (mxRes.ok) {
-            const mxData = await mxRes.json();
-            if (mxData.hasMX) {
-              validated.push({ ...biz, validationStatus: "valid", validationReason: "MX verified" });
-            } else {
-              validated.push({ ...biz, validationStatus: "invalid", validationReason: "No MX record" });
-            }
-          } else {
-            validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
-          }
-        } catch {
+        // Quick syntax check only - skip slow MX lookups
+        if (emailRegex.test(email)) {
           validated.push({ ...biz, validationStatus: "valid", validationReason: "Syntax OK" });
+        } else {
+          validated.push({ ...biz, validationStatus: "invalid", validationReason: "Invalid syntax" });
         }
 
         setValidationProgress(Math.round(((i + 1) / businesses.length) * 100));
@@ -369,6 +352,32 @@ ${consequence}
 Quick question: does your firm stick with one local courier or have alternatives lined up?
 
 James`;
+
+    return { subject, body };
+  };
+
+  const generateReferralEmail = (biz: ParsedBusiness, referralCode: string) => {
+    const subject = "£20-£100 referral bonus — share with your network";
+    const body = `Hi ${biz.contactName || "there"},
+
+Working at ${biz.name || biz.email}, you probably see urgent delivery needs all the time.
+
+We're a same-day courier — and we pay referral bonuses when you mention us:
+
+• £20 per single job referral
+• £100 when a referred client does 5+ jobs with us
+
+That's it. No sales calls, no pressure. Just say "I know a reliable courier" when the moment comes up.
+
+Share your code: ${referralCode}
+Dashboard: https://saintandstoryltd.co.uk/referral/dashboard?code=${referralCode}
+
+Questions? Reply here or call 0203 051 9243.
+
+---
+James
+Co-Founder, Saint & Story
+https://saintandstoryltd.co.uk`;
 
     return { subject, body };
   };
@@ -446,42 +455,57 @@ James`;
       const res = await fetch("/api/operator/campaigns/batch-send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businesses: validBusinesses }),
+        body: JSON.stringify({ businesses: validBusinesses, campaignType }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
         if (res.status === 429) {
-          // Daily limit exceeded
           setError(`❌ Daily limit reached: ${errorData.details}`);
-          await fetchDailyLimit(); // Refresh limit status
         } else {
-          setError(errorData.error || "Batch send failed");
+          setError(`❌ ${errorData.error || "Send failed"}`);
         }
+        await fetchDailyLimit();
         return;
       }
 
       const data = await res.json();
-      await fetchDailyLimit(); // Refresh limit after successful send
+      const sentCount = data.sent || 0;
+      const failedCount = data.failed || 0;
+      const totalCount = data.total || 0;
 
-      // Only mark successfully sent emails as sent
-      const sentEmails = new Set(
-        data.details.filter((d: any) => d.status === "sent").map((d: any) => d.email)
-      );
+      // Mark sent emails in state
+      if (data.details && Array.isArray(data.details)) {
+        const sentEmails = new Set(
+          data.details
+            .filter((d: any) => d.status === "sent")
+            .map((d: any) => d.email)
+        );
 
-      setBusinesses(
-        businesses.map((b) =>
-          sentEmails.has(b.email) ? { ...b, leadId: "sent" } : b
-        )
-      );
-
-      if (data.sent > 0) {
-        setError(`Sent ${data.sent} emails (${data.failed} failed)`);
-      } else {
-        setError(`Failed to send emails. Check Resend API key.`);
+        setBusinesses(
+          businesses.map((b) =>
+            sentEmails.has(b.email) ? { ...b, leadId: "sent" } : b
+          )
+        );
       }
+
+      // Show result
+      if (sentCount > 0) {
+        if (data.campaignType === "referral" && data.referralCodes?.length > 0) {
+          const codesText = data.referralCodes.slice(0, 5).map((c: any) => `${c.email}: ${c.code}`).join(" | ");
+          const moreText = data.referralCodes.length > 5 ? ` +${data.referralCodes.length - 5} more` : "";
+          setError(`✓ ${sentCount}/${totalCount} emails sent\n\nCodes: ${codesText}${moreText}\n\nCheck /reach page`);
+        } else {
+          setError(`✓ ${sentCount}/${totalCount} emails sent`);
+        }
+      } else {
+        setError(`❌ 0/${totalCount} emails sent`);
+      }
+
+      await fetchDailyLimit();
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Batch send failed");
+      setError(`❌ ${err instanceof Error ? err.message : "Send failed"}`);
     } finally {
       setBatchSending(false);
     }
@@ -494,7 +518,7 @@ James`;
           Simple Email Campaigns
         </h1>
         <p className="text-sm text-[#888888]">
-          Upload CSV with name + website → generate emails → infer categories → validate → send.
+          Upload CSV → Generate emails → Select campaign type → Send all
         </p>
       </div>
 
@@ -577,55 +601,7 @@ James`;
               onClick={handleGenerateEmails}
               className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded"
             >
-              Continue to Categories
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Infer Categories */}
-      {step === "infer" && (
-        <div className="border border-[#E8E8E8] rounded-lg p-8 space-y-6">
-          <div>
-            <p className="text-sm font-semibold text-[#0D0D0D] mb-4">
-              {businesses.length} businesses loaded
-            </p>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {businesses.map((b) => (
-                <div
-                  key={b.email}
-                  className="text-xs p-2 bg-[#F5F5F5] rounded border border-[#E8E8E8]"
-                >
-                  <p className="font-semibold text-[#0D0D0D]">{b.name}</p>
-                  <p className="text-[#888888]">{b.email}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setStep("upload");
-                setBusinesses([]);
-              }}
-              disabled={inferring}
-              className="flex-1 border border-[#E8E8E8] text-[#0D0D0D] font-semibold py-3 rounded hover:border-[#0D0D0D] disabled:opacity-50"
-            >
-              Back
-            </button>
-            <button
-              onClick={handleInferCategories}
-              disabled={inferring}
-              className="flex-1 bg-[#0D0D0D] hover:bg-[#333333] text-white font-semibold py-3 rounded disabled:opacity-50"
-            >
-              {inferring ? "Inferring..." : "Infer Categories"}
+              Continue to Validation
             </button>
           </div>
         </div>
@@ -787,6 +763,37 @@ James`;
             </div>
           )}
 
+          {/* Campaign Type Selection */}
+          <div className="border border-[#E8E8E8] rounded-lg p-4 bg-white mb-4">
+            <p className="text-sm font-semibold text-[#0D0D0D] mb-3">Campaign Type</p>
+            <div className="flex gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="campaignType"
+                  value="cold_outreach"
+                  checked={campaignType === "cold_outreach"}
+                  onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
+                  className="w-4 h-4 accent-[#0D0D0D]"
+                />
+                <span className="text-sm text-[#0D0D0D]">Cold Outreach</span>
+                <span className="text-xs text-[#888888]">(General business inquiry)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="campaignType"
+                  value="referral"
+                  checked={campaignType === "referral"}
+                  onChange={(e) => setCampaignType(e.target.value as "cold_outreach" | "referral")}
+                  className="w-4 h-4 accent-[#0D0D0D]"
+                />
+                <span className="text-sm text-[#0D0D0D]">Referral Program</span>
+                <span className="text-xs text-[#888888]">(£20/£100 commission offer)</span>
+              </label>
+            </div>
+          </div>
+
           {/* Daily Limit Warning */}
           {dailyLimit && (
             <div className={`p-4 rounded mb-4 ${dailyLimit.remaining === 0 ? 'bg-[#F5F5F5] border border-[#0D0D0D]' : 'bg-[#F9F9F9] border border-[#E8E8E8]'}`}>
@@ -835,17 +842,25 @@ James`;
       )}
 
       {/* Email Edit Modal */}
-      {selectedBusiness && (
-        <SimpleEmailModal
-          isOpen={!!selectedBusiness}
-          business={selectedBusiness}
-          initialSubject={generateEmail(selectedBusiness).subject}
-          initialBody={generateEmail(selectedBusiness).body}
-          onClose={() => setSelectedBusiness(null)}
-          onSend={handleSendEmail}
-          sending={sending}
-        />
-      )}
+      {selectedBusiness && (() => {
+        const referralCode = campaignType === "referral"
+          ? `SH-${selectedBusiness.name.toUpperCase().slice(0, 4).padEnd(4, "H")}-${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`
+          : null;
+        const email = campaignType === "referral" && referralCode
+          ? generateReferralEmail(selectedBusiness, referralCode)
+          : generateEmail(selectedBusiness);
+        return (
+          <SimpleEmailModal
+            isOpen={!!selectedBusiness}
+            business={selectedBusiness}
+            initialSubject={email.subject}
+            initialBody={email.body}
+            onClose={() => setSelectedBusiness(null)}
+            onSend={handleSendEmail}
+            sending={sending}
+          />
+        );
+      })()}
     </div>
   );
 }

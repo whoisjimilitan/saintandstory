@@ -21,12 +21,12 @@ const cormorant = Cormorant_Garamond({
 });
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const OG_IMAGE = `${BASE_URL}/og?title=Saint+%26+Story&sub=Fixed+price.+Verified+driver.+Done+properly.`;
+const OG_IMAGE = `${BASE_URL}/og?title=Same-Day+Courier+Service&sub=Same-day+urgent+deliveries.+Reasonable+pricing.+Professional+drivers.`;
 
 export const metadata: Metadata = {
-  title: "Saint & Story — UK Removals & Logistics",
+  title: "Saint & Story — Same-Day Courier Service UK",
   description:
-    "Tell us what's moving. We call back with a fixed price and a verified local driver. No surprises. Covering London, Manchester, Birmingham, Leeds and 30+ UK cities.",
+    "Same-day urgent deliveries. Reasonable pricing. Professional drivers across 30+ UK cities.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -43,15 +43,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Saint & Story",
-    title: "Saint & Story — UK Removals & Logistics",
-    description: "Fixed price. Verified driver. Done properly. 30+ UK cities covered.",
+    title: "Same-Day Courier Service — Saint & Story",
+    description: "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     url: BASE_URL,
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Saint & Story Logistics" }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Saint & Story Same-Day Courier Service" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saint & Story — UK Removals & Logistics",
-    description: "Fixed price. Verified driver. Done properly.",
+    title: "Same-Day Courier Service — Saint & Story",
+    description: "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     images: [OG_IMAGE],
   },
 };

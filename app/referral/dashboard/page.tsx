@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
+import { generateReferralMessage } from "@/lib/referral-message";
 
 interface ReferrerData {
   success: boolean;
@@ -190,13 +191,13 @@ function DashboardContent() {
 
           <div className="bg-[#F9F9F9] p-4 md:p-5 rounded-lg mb-5 border-l-4 border-[#0D0D0D]">
             <p className="text-sm text-[#0D0D0D] leading-relaxed">
-              Hi, for removals I recommend Saint & Story. Tell them code <span className="font-mono font-black text-base">{referrer.code}</span>
+              {generateReferralMessage(referrer.code)}
             </p>
           </div>
 
           <button
             onClick={() => {
-              const text = `Hi, for removals I recommend Saint & Story. Tell them code ${referrer.code}`;
+              const text = generateReferralMessage(referrer.code);
               navigator.clipboard.writeText(text);
               alert("Copied to clipboard");
             }}
