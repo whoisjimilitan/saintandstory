@@ -80,6 +80,10 @@ async function searchGoogle(rawQuery: string): Promise<any[]> {
     }
 
     const data = await response.json();
+    console.log(`[DORK SEARCH] Google returned ${(data.items || []).length} items`);
+    if (data.error) {
+      console.error("[DORK SEARCH] Google API error:", data.error);
+    }
     return data.items || [];
   } catch (error) {
     console.error("[DORK SEARCH] Search error:", error);
@@ -229,11 +233,6 @@ export async function POST(request: NextRequest) {
         success: true,
         leadsCreated: 0,
         leads: [],
-        parsed: {
-          businessType: params.keyword,
-          source: params.source,
-          contactType: params.contactType,
-        },
         message: "No results found. Try a different search query.",
       });
     }

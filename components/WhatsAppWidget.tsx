@@ -131,10 +131,20 @@ export default function WhatsAppWidget({
       console.error("[WIDGET] Failed to log message:", error);
     }
 
-    // FORCE WA Chat Manager app - no web fallback
-    const waChatManagerUrl = `wachatmanager://send?phone=${whatsappNumber}&text=${encodedMessage}`;
-    console.log(`[WIDGET] Force opening WA Chat Manager: ${waChatManagerUrl}`);
-    window.location.href = waChatManagerUrl;
+    // Detect platform: mobile vs desktop
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // On mobile: FORCE WA Chat Manager app (no web fallback)
+      const waChatManagerUrl = `wachatmanager://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+      console.log(`[WIDGET] Mobile detected. Opening WA Chat Manager: ${waChatManagerUrl}`);
+      window.location.href = waChatManagerUrl;
+    } else {
+      // On desktop: use web WhatsApp (wa.me) for reliable cross-browser support
+      const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      console.log(`[WIDGET] Desktop detected. Opening web WhatsApp: ${waWebUrl}`);
+      window.open(waWebUrl, "_blank");
+    }
   };
 
   const positionClass =
