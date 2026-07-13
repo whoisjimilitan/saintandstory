@@ -254,18 +254,11 @@ export async function POST(request: NextRequest) {
       } else {
         // Send now - with delay to prevent rate limiting
         console.log(`[BATCH-SEND] [${i + 1}] Sending via Resend to ${biz.email}`);
-        const htmlBody = body
-          .split('\n')
-          .map(line => line.trim())
-          .filter(line => line.length > 0)
-          .map(line => `<p>${line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`)
-          .join('');
-
         const emailResponse = await resend.emails.send({
           from: "James <james@saintandstoryltd.co.uk>",
           to: biz.email,
           subject,
-          html: `<!DOCTYPE html><html><body>${htmlBody}</body></html>`,
+          text: body,
           replyTo: "hello@saintandstoryltd.co.uk",
         });
 
