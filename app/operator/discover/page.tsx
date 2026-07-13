@@ -587,24 +587,26 @@ export default function DiscoverPage() {
 
         {/* === MANUAL MODE === */}
         {discoveryMode === "manual" && (
-          <div className="mb-16 pb-12 border-b border-[#E8E8E8] bg-[#F9F9F9] p-8 rounded-lg">
-            <div className="space-y-4">
+          <div className="mb-16 pb-12 border-b border-[#E8E8E8]">
+            <div className="space-y-6 max-w-2xl">
+              {/* Business Name */}
               <div>
-                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                  Business Name *
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
+                  Business Name
                 </label>
                 <input
                   type="text"
                   value={manualForm.businessName}
                   onChange={(e) => setManualForm({ ...manualForm, businessName: e.target.value })}
-                  placeholder="Company name"
-                  className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  placeholder="Enter company name"
+                  className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                 />
               </div>
 
+              {/* Contact & Email */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
                     Contact Name
                   </label>
                   <input
@@ -612,50 +614,50 @@ export default function DiscoverPage() {
                     value={manualForm.contactName}
                     onChange={(e) => setManualForm({ ...manualForm, contactName: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={manualForm.email}
                     onChange={(e) => setManualForm({ ...manualForm, email: e.target.value })}
-                    placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                    placeholder="name@company.com"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
+              {/* Problem Description */}
               <div>
-                <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                  What's their problem? *
+                <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
+                  What's their problem?
                 </label>
                 <textarea
                   value={manualForm.problemDescription}
                   onChange={(e) => setManualForm({ ...manualForm, problemDescription: e.target.value })}
                   placeholder="e.g., Struggling with urgent medication delivery to rural clinics"
-                  className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none resize-none"
+                  className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors resize-none"
                   rows={3}
                 />
-                {inferenceFailed ? (
-                  <p className="text-xs text-[#666666] mt-1">Select the category that best fits their business.</p>
-                ) : (
-                  <p className="text-xs text-[#AAAAAA] mt-1">System will intelligently infer the category and problem type</p>
-                )}
+                <p className="text-xs text-[#AAAAAA] mt-1.5">
+                  {inferenceFailed ? "Select category manually below" : "AI will infer category"}
+                </p>
               </div>
 
+              {/* Category (conditional) */}
               {inferenceFailed && (
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
-                    Category *
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
+                    Category
                   </label>
                   <select
                     value={manualForm.category}
                     onChange={(e) => setManualForm({ ...manualForm, category: e.target.value })}
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer transition-colors"
                   >
                     <option value="">Select a category</option>
                     {getAllCategories().map((category) => (
@@ -667,9 +669,10 @@ export default function DiscoverPage() {
                 </div>
               )}
 
+              {/* Optional Fields */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
                     Phone
                   </label>
                   <input
@@ -677,11 +680,11 @@ export default function DiscoverPage() {
                     value={manualForm.phone}
                     onChange={(e) => setManualForm({ ...manualForm, phone: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
                     City
                   </label>
                   <input
@@ -689,11 +692,11 @@ export default function DiscoverPage() {
                     value={manualForm.city}
                     onChange={(e) => setManualForm({ ...manualForm, city: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#888888] uppercase tracking-widest block mb-2">
+                  <label className="text-xs font-semibold text-[#0D0D0D] uppercase tracking-widest block mb-2">
                     Postcode
                   </label>
                   <input
@@ -701,31 +704,38 @@ export default function DiscoverPage() {
                     value={manualForm.postcode}
                     onChange={(e) => setManualForm({ ...manualForm, postcode: e.target.value })}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                    className="w-full px-4 py-2.5 text-sm border border-[#E8E8E8] rounded-lg bg-white text-[#0D0D0D] placeholder:text-[#AAAAAA] focus:border-[#0D0D0D] focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              {/* Action Buttons - Pill shaped */}
+              <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleManualAdd}
                   disabled={inferringProblem}
-                  className="flex-1 px-4 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                  className="flex-1 px-6 py-2.5 bg-white border border-[#0D0D0D] text-[#0D0D0D] text-sm font-semibold rounded-full hover:bg-[#F9F9F9] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {inferringProblem ? "Analyzing..." : "Add Prospect"}
+                  {inferringProblem ? "Analyzing..." : "Add to Queue"}
                 </button>
                 <button
                   onClick={handleSendReferralEmail}
                   disabled={sendingReferralEmail || !manualForm.email.trim()}
-                  className="flex-1 px-4 py-3 bg-[#1a7f5f] text-white text-sm font-semibold rounded-lg hover:bg-[#15664f] disabled:opacity-50 transition-colors"
+                  className="flex-1 px-6 py-2.5 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {sendingReferralEmail ? "Sending..." : "Send Referral Email"}
                 </button>
               </div>
+
+              {/* Status Message */}
               {referralEmailMessage && (
-                <p className="text-xs text-center mt-2 text-[#666666]">
+                <div className={`p-3 rounded-lg text-xs text-center ${
+                  referralEmailMessage.includes("✓")
+                    ? "bg-[#F0FFF4] text-[#2D5016]"
+                    : "bg-[#FFF5F5] text-[#6B2C2C]"
+                }`}>
                   {referralEmailMessage}
-                </p>
+                </div>
               )}
             </div>
           </div>
