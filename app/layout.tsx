@@ -21,7 +21,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const OG_IMAGE = `${BASE_URL}/og?title=Same-Day+Courier+Service&sub=Same-day+urgent+deliveries.+Reasonable+pricing.+Professional+drivers.`;
+const OG_IMAGE = `${BASE_URL}/og-image.svg`;
 
 export const metadata: Metadata = {
   title: "Saint & Story — Same-Day Courier Service UK",
