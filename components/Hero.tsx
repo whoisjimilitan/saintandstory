@@ -9,7 +9,7 @@ type Side = "customer" | "driver";
 
 const CONTENT = {
   customer: {
-    badge: "Verified drivers · Fixed price · Today",
+    badge: "Same-day couriers & removals · Fixed price",
     headline: (
       <>
         Find a driver.
@@ -18,7 +18,7 @@ const CONTENT = {
         <span className="font-display italic font-normal">o</span>ving.
       </>
     ),
-    sub: "Verified drivers. Fixed price. Zero faff.",
+    sub: "Same-day couriers and removals. Fixed price. Professional drivers.",
     cta: "Get a fixed price — free →",
     source: "hero_customer",
   },
