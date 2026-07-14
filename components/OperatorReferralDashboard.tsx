@@ -64,9 +64,9 @@ const StatCard = ({ label, value, trend, variant = "default" }: { label: string;
   };
 
   return (
-    <div className={`bg-white rounded-lg p-5 border ${borderColors[variant]}`}>
+    <div className={`bg-white rounded-lg p-4 md:p-5 border ${borderColors[variant]}`}>
       <p className="text-xs font-medium text-slate-500 mb-2">{label}</p>
-      <p className="text-2xl font-semibold text-slate-900">{value}</p>
+      <p className="text-xl md:text-2xl font-semibold text-slate-900">{value}</p>
       {trend && <p className="text-xs text-slate-500 mt-2">{trend}</p>}
     </div>
   );
@@ -422,19 +422,19 @@ export default function OperatorReferralDashboard() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
               <p className="text-xs text-slate-600 mb-1">Avg Commission</p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p className="text-base md:text-lg font-semibold text-slate-900">
                 £{stats.earnings.avgPerReferral.toFixed(2)}
               </p>
             </div>
             <div>
               <p className="text-xs text-slate-600 mb-1">WhatsApp Sent</p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p className="text-base md:text-lg font-semibold text-slate-900">
                 {stats.whatsapp.active}/{stats.referrers.total}
               </p>
             </div>
             <div>
               <p className="text-xs text-slate-600 mb-1">Completion Rate</p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p className="text-base md:text-lg font-semibold text-slate-900">
                 {stats.referrals.total > 0
                   ? ((stats.referrals.completed / stats.referrals.total) * 100).toFixed(0)
                   : "0"}

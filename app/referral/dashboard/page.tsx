@@ -152,16 +152,16 @@ function DashboardContent() {
           <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Balance</p>
           <div className="border border-[#E8E8E8] rounded-2xl p-6 md:p-8 bg-gradient-to-br from-white to-[#FAFAFA] shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-6 bg-white rounded-xl border border-[#E8E8E8]">
-                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">This Month</p>
-                <p className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3">£{earnings.thisMonth.toFixed(2)}</p>
+              <div className="p-4 md:p-6 bg-white rounded-xl border border-[#E8E8E8]">
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-3 font-semibold">This Month</p>
+                <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3">£{earnings.thisMonth.toFixed(2)}</p>
                 <div className="inline-block bg-[#F9F9F9] px-3 py-1 rounded-full">
                   <p className="text-xs text-[#666666]">{referrals.thisMonth} referrals</p>
                 </div>
               </div>
-              <div className="p-6 bg-white rounded-xl border border-[#E8E8E8]">
-                <p className="text-xs text-[#888888] uppercase tracking-widest mb-4 font-semibold">Pending</p>
-                <p className="text-4xl md:text-5xl font-black text-[#0D0D0D] mb-3">{referrals.pending}</p>
+              <div className="p-4 md:p-6 bg-white rounded-xl border border-[#E8E8E8]">
+                <p className="text-xs text-[#888888] uppercase tracking-widest mb-3 font-semibold">Pending</p>
+                <p className="text-2xl md:text-4xl font-black text-[#0D0D0D] mb-3">{referrals.pending}</p>
                 <div className="inline-block bg-[#F9F9F9] px-3 py-1 rounded-full">
                   <p className="text-xs text-[#666666]">awaiting confirmation</p>
                 </div>
@@ -173,17 +173,17 @@ function DashboardContent() {
         {/* Summary Info - Polished Pills */}
         <div className="mb-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border border-[#E8E8E8] rounded-full px-6 py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Referrals</p>
-              <p className="text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
+              <p className="text-2xl md:text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
             </div>
-            <div className="bg-white border border-[#E8E8E8] rounded-full px-6 py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Earn</p>
-              <p className="text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-xs font-normal text-[#999999]">per</span></p>
+              <p className="text-xl md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-xs font-normal text-[#999999]">per</span></p>
             </div>
-            <div className="bg-white border border-[#E8E8E8] rounded-full px-6 py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Next Payout</p>
-              <p className="text-base font-bold text-[#0D0D0D]">{new Date(data.nextPayoutDate).toLocaleDateString()}</p>
+              <p className="text-sm md:text-base font-bold text-[#0D0D0D]">{new Date(data.nextPayoutDate).toLocaleDateString()}</p>
             </div>
           </div>
         </div>
