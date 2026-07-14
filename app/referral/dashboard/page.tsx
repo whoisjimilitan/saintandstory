@@ -145,6 +145,23 @@ function DashboardContent() {
               <p className="font-mono font-black text-lg text-[#0D0D0D] tracking-wide">{referrer.code}</p>
             </div>
           </div>
+
+          {/* Bookmark Tip */}
+          <div className="bg-[#F9F9F9] border border-[#E8E8E8] rounded-lg px-4 py-3 flex items-start justify-between gap-4">
+            <p className="text-xs text-[#666666]">
+              <span className="font-semibold">Tip:</span> Bookmark this page to access your dashboard anytime without logging in.
+            </p>
+            <button
+              onClick={() => {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url);
+                alert("Link copied! Save it in your bookmarks.");
+              }}
+              className="whitespace-nowrap px-3 py-1 text-xs font-semibold text-[#0D0D0D] hover:bg-white rounded transition-colors"
+            >
+              Copy Link
+            </button>
+          </div>
         </div>
 
         {/* Earnings - Premium Card */}
@@ -172,14 +189,10 @@ function DashboardContent() {
 
         {/* Summary Info - Polished Pills */}
         <div className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Referrals</p>
               <p className="text-2xl md:text-3xl font-black text-[#0D0D0D]">{referrals.total}</p>
-            </div>
-            <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Earn</p>
-              <p className="text-xl md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-xs font-normal text-[#999999]">per</span></p>
             </div>
             <div className="bg-white border border-[#E8E8E8] rounded-full px-5 py-4 md:px-6 md:py-5 shadow-sm hover:shadow-md transition-shadow duration-200">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2 font-semibold">Next Payout</p>
