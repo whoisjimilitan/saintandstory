@@ -283,9 +283,39 @@ export async function POST(request: NextRequest) {
     postcode: body.postcode ?? "",
     radius_miles: body.radius_miles ?? 10,
     b2b_opt_in: body.b2b_opt_in ?? false,
+    referral_code: body.referral_code ?? "", // Custom referral code from referrer
+    referral_discount_applied: false, // Will be set to true if code is valid
   };
 
   console.log("[leads] New lead:", lead.id, lead.email, isDriver ? "DRIVER" : lead.serviceType);
+
+  // Validate referral code if provided (customer leads only)
+  if (!isDriver && lead.referral_code && typeof lead.referral_code === "string") {
+    try {
+      const { prisma } = await import("@/lib/prisma");
+      const referrer = await prisma.referrer.findFirst({
+        where: {
+          referralCode: {
+            equals: lead.referral_code as string,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (referrer) {
+        lead.referral_discount_applied = true;
+        lead.referrer_id = referrer.id;
+        lead.referrer_name = referrer.officeManagerName;
+        console.log("[leads] ✓ Referral code applied:", lead.referral_code, "Referrer:", referrer.id);
+      } else {
+        console.log("[leads] ⚠ Referral code not found:", lead.referral_code);
+        lead.referral_code = ""; // Clear invalid code
+      }
+    } catch (err) {
+      console.error("[leads] Error validating referral code:", err);
+      lead.referral_code = "";
+    }
+  }
 
   // For driver signups: create driver record with postcode, radius, B2B opt-in
   if (isDriver) {
@@ -299,7 +329,7 @@ export async function POST(request: NextRequest) {
     }
     sendPushToAdmins(
       "New order",
-      `${(lead.fullName as string) || "Customer"} · ${(lead.postcode_from as string) || "—"}${lead.postcode_to ? ` → ${lead.postcode_to as string}` : ""}`
+      `${(lead.fullName as string) || "Customer"} · ${(lead.postcode_from as string) || "—"}${lead.postcode_to ? ` → ${lead.postcode_to as string}` : ""}${lead.referral_discount_applied ? " [REFERRAL]" : ""}`
     ).catch(() => {});
     triggerAdminRefresh("new-order").catch(() => {});
   }
