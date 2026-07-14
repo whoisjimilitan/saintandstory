@@ -17,12 +17,12 @@ export async function POST(request: NextRequest) {
     console.log("[REFERRAL SIGNUP] Starting signup flow");
 
     const body = await request.json();
-    const { phone, officeName, officeManagerName, city, category } = body;
+    const { phone, officeName, officeManagerName, city, category, referralCode } = body;
 
-    if (!phone || !city) {
-      console.error("[REFERRAL SIGNUP] Missing required fields: phone, city");
+    if (!phone || !city || !referralCode) {
+      console.error("[REFERRAL SIGNUP] Missing required fields: phone, city, referralCode");
       return NextResponse.json(
-        { error: "Missing required fields: phone, city" },
+        { error: "Missing required fields: phone, city, referralCode" },
         { status: 400 }
       );
     }
@@ -55,10 +55,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique referral code (format: SH-EMMA-9254)
-    const referralCode = generateReferralCode(officeManagerName || "REF");
-
-    console.log("[REFERRAL SIGNUP] Creating referrer record...", {
+    // Use the custom referral code provided by the referrer
+    console.log("[REFERRAL SIGNUP] Creating referrer record with custom code...", {
       phone,
       officeName,
       city,

@@ -45,11 +45,14 @@ export default function ReferrerSignup() {
     city: "",
     category: "business",
     hasWhatsapp: true, // Pre-checked for better UX
+    referralCode: "", // Custom code they choose
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<SignupResponse | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
+  const [codeStatus, setCodeStatus] = useState<{ available: boolean; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
@@ -57,12 +60,66 @@ export default function ReferrerSignup() {
       ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
+
+    // Validate referral code in real-time
+    if (name === "referralCode") {
+      validateCode(value);
+    }
+  };
+
+  const validateCode = async (code: string) => {
+    if (!code) {
+      setCodeStatus(null);
+      return;
+    }
+
+    // Client-side validation first
+    if (code.length < 3) {
+      setCodeStatus({ available: false, message: "Minimum 3 characters" });
+      return;
+    }
+
+    if (code.length > 12) {
+      setCodeStatus({ available: false, message: "Maximum 12 characters" });
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9-]+$/.test(code)) {
+      setCodeStatus({ available: false, message: "Only letters, numbers, and hyphens allowed" });
+      return;
+    }
+
+    // Server-side uniqueness check
+    setCheckingCode(true);
+    try {
+      const response = await fetch("/api/referral/validate-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await response.json();
+      setCodeStatus(data);
+      console.log("[VALIDATE-CODE]", data);
+    } catch (err) {
+      console.error("[VALIDATE-CODE] Error:", err);
+      setCodeStatus({ available: false, message: "Error checking availability" });
+    } finally {
+      setCheckingCode(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Validate code is available
+    if (!codeStatus?.available) {
+      setError("Please choose an available referral code");
+      setLoading(false);
+      return;
+    }
 
     try {
       console.log("[SIGNUP] Submitting form:", formData);
@@ -258,9 +315,45 @@ export default function ReferrerSignup() {
                 ))}
               </select>
 
+              {/* Referral Code Input */}
+              <div>
+                <label className="block text-sm font-semibold text-[#0D0D0D] mb-2">
+                  Choose Your Referral Code
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="referralCode"
+                    value={formData.referralCode}
+                    onChange={handleChange}
+                    placeholder="e.g., EMMA or john-solicitors"
+                    required
+                    className={`w-full px-4 py-3 border rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:outline-none transition-all ${
+                      formData.referralCode === ""
+                        ? "border-[#E8E8E8] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D]"
+                        : codeStatus?.available
+                          ? "border-[#4CAF50] focus:border-[#4CAF50] focus:ring-1 focus:ring-[#4CAF50]"
+                          : "border-[#FF6B6B] focus:border-[#FF6B6B] focus:ring-1 focus:ring-[#FF6B6B]"
+                    }`}
+                  />
+                  {checkingCode && (
+                    <div className="absolute right-4 top-3">
+                      <div className="w-5 h-5 border-2 border-[#E8E8E8] border-t-[#0D0D0D] rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
+                {formData.referralCode && codeStatus && (
+                  <div className={`mt-2 text-xs font-medium ${codeStatus.available ? "text-[#4CAF50]" : "text-[#FF6B6B]"}`}>
+                    {codeStatus.available ? "✓ " : "✗ "}
+                    {codeStatus.message}
+                  </div>
+                )}
+                <p className="mt-2 text-xs text-[#888888]">3-12 characters. Letters, numbers, hyphens only. This is what people will use to get your referral rate.</p>
+              </div>
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !codeStatus?.available}
                 className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 {loading ? "Creating Code..." : "Get Your Code"}

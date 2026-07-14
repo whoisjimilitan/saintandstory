@@ -29,7 +29,7 @@ const STEPS = [
   },
   {
     id: "s3", type: "options", q: "When do you need this service?",
-    opts: ["I'm flexible", "As soon as possible", "On a specific date", "In the next few days", "In the next few weeks", "In next few months", "Other"],
+    opts: ["I’m flexible", "As soon as possible", "On a specific date", "In the next few days", "In the next few weeks", "In next few months", "Other"],
   },
   { id: "s4", type: "options", q: "Will there be anyone to help load/unload?", opts: ["Yes", "No"] },
   {
@@ -43,6 +43,7 @@ const STEPS = [
   { id: "s9",  type: "email",    q: "What email should we send your quotes to?", name: "email"  },
   { id: "s10", type: "phoneConsent", q: "Your number is safe with us."                         },
   { id: "s11", type: "name",     q: "What is your name?",                name: "full_name"     },
+  { id: "s11b", type: "referralCode", q: "Got a referral code?", name: "referral_code" },
   { id: "s12", type: "success",  q: "We’re on it."                                        },
 ] as const;
 
@@ -202,6 +203,23 @@ function StepName({ answers, setAnswers, onEnter }: { answers: Answers; setAnswe
   );
 }
 
+function StepReferralCode({ answers, setAnswers, onEnter }: { answers: Answers; setAnswers: (a: Answers) => void; onEnter: () => void }) {
+  return (
+    <div className="space-y-3">
+      <input
+        type="text"
+        value={(answers.referral_code as string) ?? ""}
+        onChange={(e) => setAnswers({ ...answers, referral_code: e.target.value })}
+        onKeyDown={(e) => e.key === "Enter" && onEnter()}
+        placeholder="e.g., EMMA or john-solicitors"
+        className={inputCls}
+        autoFocus
+      />
+      <p className="text-[#888888] text-xs">Enter the code from whoever referred you to get the best rate (optional).</p>
+    </div>
+  );
+}
+
 function StepSuccess({ answers, onClose }: { answers: Answers; onClose: () => void }) {
   const phone = (answers.phone as string) ?? "";
   const email = (answers.email as string) ?? "";
@@ -343,7 +361,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
     if (!validate()) return;
     track("lead_step_completed", { step: stepIdx, type: step.type });
 
-    if (step.type === "name") {
+    if (step.type === "referralCode") {
       setIsSubmitting(true);
       try {
         const params = new URLSearchParams(window.location.search);
@@ -457,6 +475,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
               {step.type === "email" && <StepEmail answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
               {step.type === "phoneConsent" && <StepPhoneConsent answers={answers} setAnswers={setAnswers} />}
               {step.type === "name" && <StepName answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
+              {step.type === "referralCode" && <StepReferralCode answers={answers} setAnswers={setAnswers} onEnter={handleNext} />}
               {step.type === "success" && <StepSuccess answers={answers} onClose={onClose} />}
             </div>
 
