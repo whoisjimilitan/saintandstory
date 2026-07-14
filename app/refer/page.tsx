@@ -171,12 +171,12 @@ export default function ReferrerSignup() {
             <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-4 text-center">Your Referral Code</p>
             <div className="bg-white rounded-xl p-8 border border-[#E8E8E8] mb-6">
               <p className="text-center font-mono text-5xl md:text-6xl font-black text-[#0D0D0D] tracking-wider">
-                {success.referralCode}
+                {success.referralCode.toUpperCase()}
               </p>
             </div>
             <button
               onClick={() => {
-                navigator.clipboard.writeText(success.referralCode);
+                navigator.clipboard.writeText(success.referralCode.toUpperCase());
                 alert("Copied to clipboard!");
               }}
               className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
@@ -239,8 +239,8 @@ export default function ReferrerSignup() {
         {/* Form & FAQ in grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Form */}
-          <div className="border border-[#E8E8E8] rounded-xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="border border-[#E8E8E8] rounded-2xl p-8 bg-gradient-to-br from-white to-[#FAFAFA] shadow-sm hover:shadow-md transition-all duration-200">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <div className="p-4 bg-[#FFF5F5] border border-[#FFE0E0] rounded-lg">
                   <p className="text-sm text-[#CC0000]">{error}</p>
@@ -254,7 +254,7 @@ export default function ReferrerSignup() {
                 onChange={handleChange}
                 placeholder="Your name"
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] bg-white hover:border-[#D0D0D0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
               />
 
               <input
@@ -362,7 +362,7 @@ export default function ReferrerSignup() {
           </div>
 
           {/* FAQ */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
               { q: "How much do I earn?", a: "£20 per referral. When your client books and mentions your code, you get paid." },
               { q: "When do I get paid?", a: "Monthly. Payouts processed on the 1st of each month to your bank." },
@@ -370,15 +370,16 @@ export default function ReferrerSignup() {
               { q: "Is there a minimum?", a: "No minimum. Earn as much or as little as you want." },
               { q: "Questions?", a: "Call 0203 051 9243 or reply to WhatsApp. We're here to help." },
             ].map((item, idx) => (
-              <div key={idx} className="border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] transition-colors">
+              <div key={idx} className="border border-[#E8E8E8] rounded-xl bg-white hover:shadow-sm transition-all duration-200 overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left p-5 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition text-sm"
+                  className="w-full text-left px-6 py-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-sm flex items-center justify-between"
                 >
                   {item.q}
+                  <span className="text-[#999999]">{openFaq === idx ? "−" : "+"}</span>
                 </button>
                 {openFaq === idx && (
-                  <div className="px-5 pb-5 text-sm text-[#666666] border-t border-[#E8E8E8] pt-4 leading-relaxed">
+                  <div className="px-6 pb-4 text-sm text-[#666666] border-t border-[#E8E8E8] pt-4 leading-relaxed">
                     {item.a}
                   </div>
                 )}

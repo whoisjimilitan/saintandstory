@@ -142,7 +142,7 @@ function DashboardContent() {
             </div>
             <div className="bg-gradient-to-br from-[#F9F9F9] to-[#FAFAFA] border border-[#E8E8E8] rounded-full px-6 py-4 shadow-sm">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Your code</p>
-              <p className="font-mono font-black text-lg text-[#0D0D0D] tracking-wide">{referrer.code}</p>
+              <p className="font-mono font-black text-lg text-[#0D0D0D] tracking-wide">{referrer.code.toUpperCase()}</p>
             </div>
           </div>
 

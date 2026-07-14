@@ -177,7 +177,7 @@ export default function ReferralNetworkPage() {
 
                     <div className="mb-3">
                       <p className="text-xs text-[#888888] mb-2">Code</p>
-                      <p className="font-mono font-black text-base text-[#0D0D0D] mb-3">{signup.code}</p>
+                      <p className="font-mono font-black text-base text-[#0D0D0D] mb-3">{signup.code.toUpperCase()}</p>
 
                       <button
                         onClick={() => {

@@ -190,7 +190,7 @@ export default function OperatorReferralDashboard() {
           <div className="text-right">
             <p className="text-xs text-slate-600">Code</p>
             <p className="text-sm font-mono font-semibold text-slate-900">
-              {selectedReferrer.code}
+              {selectedReferrer.code.toUpperCase()}
             </p>
           </div>
         </div>
@@ -369,7 +369,7 @@ export default function OperatorReferralDashboard() {
                     <p className="text-xs text-slate-600">{referrer.office}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-xs font-mono text-slate-900">{referrer.code}</p>
+                    <p className="text-xs font-mono text-slate-900">{referrer.code.toUpperCase()}</p>
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-sm text-slate-900">{referrer.city}</p>
