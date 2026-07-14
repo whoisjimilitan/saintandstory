@@ -21,7 +21,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 const BASE_URL = "https://saintandstoryltd.co.uk";
-const OG_IMAGE = `${BASE_URL}/og-image.svg`;
+const OG_IMAGE = `${BASE_URL}/og-image.png`;
 
 export const metadata: Metadata = {
   title: "Saint & Story — Same-Day Courier Service UK",
