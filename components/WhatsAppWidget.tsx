@@ -6,6 +6,7 @@ import { getPhonePlusFormat } from "@/lib/phone-utils";
 interface WidgetProps {
   position?: "bottom-right" | "bottom-left";
   companyName?: string;
+  useWaChatManager?: boolean; // Set to true to use wachatmanager:// protocol instead of wa.me
 }
 
 interface CityAvailability {
@@ -18,6 +19,7 @@ interface CityAvailability {
 export default function WhatsAppWidget({
   position = "bottom-right",
   companyName = "your company",
+  useWaChatManager = false, // Default to wa.me, set to true to use WAchat Manager
 }: WidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -131,19 +133,19 @@ export default function WhatsAppWidget({
       console.error("[WIDGET] Failed to log message:", error);
     }
 
-    // Detect platform: mobile vs desktop
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // Use wa.me by default for reliable cross-platform support
+    const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    console.log(`[WIDGET] Opening WhatsApp via wa.me: ${waWebUrl}`);
+    window.open(waWebUrl, "_blank");
 
-    if (isMobile) {
-      // On mobile: FORCE WA Chat Manager app (no web fallback)
-      const waChatManagerUrl = `wachatmanager://send?phone=${whatsappNumber}&text=${encodedMessage}`;
-      console.log(`[WIDGET] Mobile detected. Opening WA Chat Manager: ${waChatManagerUrl}`);
-      window.location.href = waChatManagerUrl;
-    } else {
-      // On desktop: use web WhatsApp (wa.me) for reliable cross-browser support
-      const waWebUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-      console.log(`[WIDGET] Desktop detected. Opening web WhatsApp: ${waWebUrl}`);
-      window.open(waWebUrl, "_blank");
+    // Alternative: Use WAchat Manager if explicitly enabled (can be reverted if needed)
+    if (useWaChatManager) {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        const waChatManagerUrl = `wachatmanager://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+        console.log(`[WIDGET] WAchat Manager enabled. Opening: ${waChatManagerUrl}`);
+        window.location.href = waChatManagerUrl;
+      }
     }
   };
 

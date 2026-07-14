@@ -8,6 +8,7 @@ import Testimonials from "@/components/Testimonials";
 import ClaimArea from "@/components/ClaimArea";
 import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 export const metadata: Metadata = {
   title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
@@ -54,6 +55,7 @@ export default function Home() {
       <ClaimArea />
       <SiteFooter />
       <MobileBar />
+      <WhatsAppWidget /> {/* Widget only on homepage, using wa.me by default */}
     </main>
   );
 }
