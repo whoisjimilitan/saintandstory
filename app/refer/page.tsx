@@ -95,44 +95,73 @@ export default function ReferrerSignup() {
     return (
       <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center px-4">
         <div className="max-w-2xl w-full">
-          <div className="text-center mb-12">
-            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-4">Your Code</p>
-            <p className="text-7xl font-black text-[#0D0D0D] font-mono mb-8">
-              {success.referralCode}
-            </p>
+          {/* Success Header */}
+          <div className="text-center mb-16">
+            <div className="mb-6 inline-flex items-center justify-center">
+              <div className="w-16 h-16 bg-[#F9F9F9] rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#0D0D0D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-3">Referral Code Created</p>
+            <h2 className="text-3xl md:text-4xl font-black text-[#0D0D0D] mb-4">You're All Set</h2>
+            <p className="text-sm text-[#666666] mb-8">Start sharing and earning £20 per referral</p>
+          </div>
+
+          {/* Code Card */}
+          <div className="mb-12 bg-gradient-to-br from-[#F9F9F9] to-[#FAFAFA] border border-[#E8E8E8] rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-200">
+            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-4 text-center">Your Referral Code</p>
+            <div className="bg-white rounded-xl p-8 border border-[#E8E8E8] mb-6">
+              <p className="text-center font-mono text-5xl md:text-6xl font-black text-[#0D0D0D] tracking-wider">
+                {success.referralCode}
+              </p>
+            </div>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(success.referralCode);
                 alert("Copied to clipboard!");
               }}
-              className="px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-lg hover:bg-[#333333] transition-colors"
+              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
             >
               Copy Code
             </button>
           </div>
 
-          <div className="mb-12 border border-[#E8E8E8] rounded-xl p-6 bg-white shadow-sm">
-            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-3">Share this message</p>
-            <p className="text-sm text-[#0D0D0D] mb-4 leading-relaxed">
-              "{success.message}"
-            </p>
+          {/* Share Message Card */}
+          <div className="mb-12 bg-white border border-[#E8E8E8] rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-200">
+            <p className="text-xs text-[#888888] uppercase tracking-widest font-semibold mb-4">Share This Message</p>
+            <div className="bg-[#F9F9F9] rounded-xl p-6 border-l-4 border-[#0D0D0D] mb-6">
+              <p className="text-sm text-[#0D0D0D] leading-relaxed font-medium">
+                "{success.message}"
+              </p>
+            </div>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(success.message);
                 alert("Message copied!");
               }}
-              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md"
+              className="w-full px-6 py-3 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
             >
               Copy Message
             </button>
           </div>
 
-          <Link
-            href={success.dashboard}
-            className="block w-full px-6 py-4 border border-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-lg hover:border-[#0D0D0D] transition-colors text-center"
-          >
-            View Dashboard
-          </Link>
+          {/* CTA Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link
+              href={success.dashboard}
+              className="px-6 py-4 bg-[#0D0D0D] text-white text-sm font-semibold rounded-full hover:bg-[#1A1A1A] transition-all duration-200 shadow-sm hover:shadow-md text-center active:scale-95"
+            >
+              View Dashboard
+            </Link>
+            <Link
+              href="/refer"
+              className="px-6 py-4 border border-[#E8E8E8] text-[#0D0D0D] text-sm font-semibold rounded-full hover:border-[#0D0D0D] hover:bg-[#F9F9F9] transition-all duration-200 text-center active:scale-95"
+            >
+              Go Back
+            </Link>
+          </div>
         </div>
       </div>
     );
