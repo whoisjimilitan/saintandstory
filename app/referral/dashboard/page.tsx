@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { generateReferralMessage } from "@/lib/referral-message";
+import { generateReferralMessage, getReferralLink } from "@/lib/referral-message";
 
 interface ReferrerData {
   success: boolean;
@@ -173,7 +173,7 @@ function DashboardContent() {
             </div>
             <div className="md:border-l md:border-r md:border-[#E8E8E8] md:px-8">
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Earn</p>
-              <p className="text-lg md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-sm font-normal text-[#999999]">per</span></p>
+              <p className="text-lg md:text-2xl font-black text-[#0D0D0D]">£{data.commission} <span className="text-sm font-normal text-[#999999]">per referral</span></p>
             </div>
             <div>
               <p className="text-xs text-[#888888] uppercase tracking-widest mb-2">Next Payout</p>
@@ -191,13 +191,13 @@ function DashboardContent() {
 
           <div className="bg-[#F9F9F9] p-4 md:p-5 rounded-lg mb-5 border-l-4 border-[#0D0D0D]">
             <p className="text-sm text-[#0D0D0D] leading-relaxed">
-              {generateReferralMessage(referrer.code)}
+              {generateReferralMessage(referrer.code, getReferralLink(referrer.city))}
             </p>
           </div>
 
           <button
             onClick={() => {
-              const text = generateReferralMessage(referrer.code);
+              const text = generateReferralMessage(referrer.code, getReferralLink(referrer.city));
               navigator.clipboard.writeText(text);
               alert("Copied to clipboard");
             }}
