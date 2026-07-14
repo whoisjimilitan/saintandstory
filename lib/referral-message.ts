@@ -5,11 +5,13 @@
  */
 
 export function generateReferralMessage(code: string, link?: string): string {
+  const message = `Whenever we have urgent deliveries, collections, or moves, we use Saint & Story. They're reliable, professional, and transparent with pricing. Use my code ${code} for £10 off your order.`;
+
   if (link) {
-    return `For urgent deliveries, I recommend Saint & Story. Use code ${code} at ${link} and get a discount.`;
+    return `${message} Book at ${link}`;
   }
 
-  return `For urgent deliveries, I recommend Saint & Story. Use code ${code}.`;
+  return message;
 }
 
 /**
