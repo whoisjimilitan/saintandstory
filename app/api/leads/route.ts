@@ -290,10 +290,11 @@ export async function POST(request: NextRequest) {
   console.log("[leads] New lead:", lead.id, lead.email, isDriver ? "DRIVER" : lead.serviceType);
 
   // Validate referral code if provided (customer leads only)
+  let referrer = null;
   if (!isDriver && lead.referral_code && typeof lead.referral_code === "string") {
     try {
       const { prisma } = await import("@/lib/prisma");
-      const referrer = await prisma.referrer.findFirst({
+      referrer = await prisma.referrer.findFirst({
         where: {
           referralCode: {
             equals: lead.referral_code as string,
@@ -326,6 +327,30 @@ export async function POST(request: NextRequest) {
     const trackingToken = await createJob(lead);
     if (trackingToken) {
       await sendCustomerConfirmation(lead, trackingToken);
+
+      // If referral code was applied, create ReferralJob record for tracking
+      if (referrer && lead.referral_discount_applied) {
+        try {
+          const { prisma } = await import("@/lib/prisma");
+          const jobId = (lead.id as string).split("-")[0]; // Use simplified ID reference
+          await prisma.referralJob.create({
+            data: {
+              jobId: trackingToken,
+              referrerId: referrer.id,
+              customerName: (lead.fullName as string) || "Customer",
+              customerEmail: (lead.email as string) || undefined,
+              customerPhone: (lead.phone as string) || undefined,
+              jobValue: 0, // To be updated when quote is confirmed
+              commission: referrer.commission || 20, // Use referrer's commission rate (default £20)
+              status: "new",
+            },
+          });
+          console.log("[leads] ✓ ReferralJob created for tracking:", trackingToken);
+        } catch (err) {
+          console.error("[leads] ⚠ Failed to create ReferralJob:", err);
+          // Non-fatal - lead is created even if referral tracking fails
+        }
+      }
     }
     sendPushToAdmins(
       "New order",
