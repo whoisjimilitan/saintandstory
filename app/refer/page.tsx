@@ -254,7 +254,7 @@ export default function ReferrerSignup() {
                 onChange={handleChange}
                 placeholder="Your name"
                 required
-                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-xs md:text-sm text-[#0D0D0D] placeholder-[#CCCCCC] bg-white hover:border-[#D0D0D0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
+                className="w-full px-4 py-3 border border-[#E8E8E8] rounded-lg text-sm text-[#0D0D0D] placeholder-[#CCCCCC] bg-white hover:border-[#D0D0D0] focus:border-[#0D0D0D] focus:ring-1 focus:ring-[#0D0D0D] focus:outline-none transition-all"
               />
 
               <input
@@ -348,6 +348,7 @@ export default function ReferrerSignup() {
                     {codeStatus.message}
                   </div>
                 )}
+                <p className="mt-2 text-xs text-[#888888]">3-12 characters. Letters, numbers, hyphens only. This is what people will use to get your referral rate.</p>
               </div>
 
               <button
@@ -372,13 +373,13 @@ export default function ReferrerSignup() {
               <div key={idx} className="border border-[#E8E8E8] rounded-xl bg-white hover:shadow-sm transition-all duration-200 overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left px-6 py-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-xs md:text-sm flex items-center justify-between"
+                  className="w-full text-left px-6 py-4 font-semibold text-[#0D0D0D] hover:bg-[#F9F9F9] transition-colors text-sm flex items-center justify-between"
                 >
                   {item.q}
                   <span className="text-[#999999]">{openFaq === idx ? "−" : "+"}</span>
                 </button>
                 {openFaq === idx && (
-                  <div className="px-6 pb-4 text-xs md:text-sm text-[#666666] border-t border-[#E8E8E8] pt-4 leading-relaxed">
+                  <div className="px-6 pb-4 text-sm text-[#666666] border-t border-[#E8E8E8] pt-4 leading-relaxed">
                     {item.a}
                   </div>
                 )}
