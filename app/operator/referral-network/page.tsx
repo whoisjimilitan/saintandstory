@@ -24,6 +24,7 @@ export default function ReferralNetworkPage() {
   });
   const [sentHistoryExpanded, setSentHistoryExpanded] = useState(false);
   const [markingSent, setMarkingSent] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -83,6 +84,33 @@ export default function ReferralNetworkPage() {
     }
   };
 
+  const deleteSignup = async (referrerId: string) => {
+    if (!window.confirm("Delete this signup? This cannot be undone.")) return;
+
+    setDeleting(referrerId);
+    try {
+      const response = await fetch("/api/referral/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ referrerId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to delete signup");
+
+      setReferrals({
+        pending: referrals.pending.filter((r) => r.id !== referrerId),
+        sent: referrals.sent.filter((r) => r.id !== referrerId),
+      });
+
+      console.log("[REFERRAL NETWORK] ✓ Deleted signup:", referrerId);
+    } catch (error) {
+      console.error("[REFERRAL NETWORK] Error deleting signup:", error);
+      alert("Failed to delete. Try again.");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
@@ -129,13 +157,22 @@ export default function ReferralNetworkPage() {
                         <p className="text-sm font-semibold text-[#0D0D0D]">{signup.name}</p>
                         <p className="text-xs text-[#888888] mt-1">{signup.office} • {signup.city}</p>
                       </div>
-                      <button
-                        onClick={() => markAsSent(signup.id)}
-                        disabled={markingSent === signup.id}
-                        className="px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
-                      >
-                        {markingSent === signup.id ? "Marking..." : "Mark Sent"}
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => markAsSent(signup.id)}
+                          disabled={markingSent === signup.id}
+                          className="px-4 py-2 bg-[#0D0D0D] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                        >
+                          {markingSent === signup.id ? "Marking..." : "Mark Sent"}
+                        </button>
+                        <button
+                          onClick={() => deleteSignup(signup.id)}
+                          disabled={deleting === signup.id}
+                          className="px-3 py-2 text-[#888888] text-xs font-semibold rounded-lg border border-[#E8E8E8] hover:border-[#0D0D0D] hover:text-[#0D0D0D] disabled:opacity-50 transition-colors"
+                        >
+                          {deleting === signup.id ? "Deleting..." : "✕"}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="mb-3">
