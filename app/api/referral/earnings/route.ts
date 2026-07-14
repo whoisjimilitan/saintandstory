@@ -76,6 +76,15 @@ export async function GET(request: NextRequest) {
       0
     );
 
+    // Get recent jobs (all statuses) for dashboard display
+    const recentJobsData = await prisma.referralJob.findMany({
+      where: {
+        referrerId: referrer.id,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+
     console.log("[REFERRAL EARNINGS] ✓ Earnings fetched successfully");
 
     return NextResponse.json({
@@ -101,7 +110,7 @@ export async function GET(request: NextRequest) {
         thisMonth: monthlyEarnings._count,
         pending: pendingJobs.length,
       },
-      recentJobs: pendingJobs.slice(0, 5).map((job) => ({
+      recentJobs: recentJobsData.map((job) => ({
         id: job.id,
         customer: job.customerName,
         value: Number(job.jobValue),

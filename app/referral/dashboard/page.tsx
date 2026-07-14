@@ -213,6 +213,80 @@ function DashboardContent() {
           </button>
         </div>
 
+        {/* Recent Referrals - Responsive Card Layout */}
+        {data.recentJobs && data.recentJobs.length > 0 && (
+          <div className="mb-12">
+            <p className="text-xs text-[#888888] uppercase tracking-widest mb-6 font-semibold">Recent Referrals</p>
+            <div className="space-y-3 border border-[#E8E8E8] rounded-lg overflow-hidden">
+              {/* Header row - hidden on mobile */}
+              <div className="hidden md:grid grid-cols-4 gap-4 px-6 py-4 bg-[#F9F9F9] border-b border-[#E8E8E8] text-xs font-semibold text-[#666666] uppercase tracking-wider">
+                <div>Customer</div>
+                <div>Value</div>
+                <div>Status</div>
+                <div>Date</div>
+              </div>
+
+              {/* Job rows */}
+              <div className="divide-y divide-[#E8E8E8]">
+                {data.recentJobs.map((job) => (
+                  <div key={job.id} className="p-4 md:p-6 bg-white hover:bg-[#F9F9F9] transition-colors">
+                    {/* Mobile card layout */}
+                    <div className="md:hidden space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-[#0D0D0D]">{job.customer}</p>
+                          <p className="text-xs text-[#888888] mt-1">{new Date(job.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-base font-black text-[#0D0D0D]">£{job.value.toFixed(2)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-[#E8E8E8]">
+                        <div>
+                          <p className="text-xs text-[#888888] mb-1">Commission</p>
+                          <p className="text-sm font-bold text-[#0D0D0D]">£{job.commission.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-[#888888] mb-1">Status</p>
+                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                            job.status === 'completed' ? 'bg-[#E8F5E9] text-[#2E7D32]' :
+                            job.status === 'pending' ? 'bg-[#FFF3E0] text-[#E65100]' :
+                            'bg-[#F3E5F5] text-[#512DA8]'
+                          }`}>
+                            {job.status}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop table row layout */}
+                    <div className="hidden md:grid grid-cols-4 gap-4 items-center">
+                      <div>
+                        <p className="text-sm font-semibold text-[#0D0D0D]">{job.customer}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#0D0D0D]">£{job.value.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                          job.status === 'completed' ? 'bg-[#E8F5E9] text-[#2E7D32]' :
+                          job.status === 'pending' ? 'bg-[#FFF3E0] text-[#E65100]' :
+                          'bg-[#F3E5F5] text-[#512DA8]'
+                        }`}>
+                          {job.status}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-[#888888]">{new Date(job.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="text-center pt-12 border-t border-[#E8E8E8]">
           <p className="text-sm text-[#666666] mb-2">Need help?</p>
