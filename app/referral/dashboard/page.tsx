@@ -255,42 +255,54 @@ function DashboardContent() {
                 </div>
               </div>
 
-              {/* Mobile: Horizontally scrollable table */}
+              {/* Mobile: Compact horizontally scrollable table */}
               <div className="md:hidden overflow-x-auto">
-                <div className="inline-block min-w-full">
-                  {/* Header row */}
-                  <div className="flex gap-6 px-4 py-4 bg-[#F9F9F9] border-b border-[#E8E8E8] text-xs font-semibold text-[#666666] uppercase tracking-wider min-w-max">
-                    <div className="w-32">Customer</div>
-                    <div className="w-20">Value</div>
-                    <div className="w-24">Status</div>
-                    <div className="w-20">Date</div>
+                {/* Header row */}
+                <div className="inline-flex min-w-full bg-[#F9F9F9] border-b border-[#E8E8E8]">
+                  <div style={{ width: '75px' }} className="flex-shrink-0 px-2 py-3">
+                    <p className="text-xs font-semibold text-[#666666] uppercase tracking-wider">Customer</p>
                   </div>
+                  <div style={{ width: '60px' }} className="flex-shrink-0 px-2 py-3">
+                    <p className="text-xs font-semibold text-[#666666] uppercase tracking-wider">Value</p>
+                  </div>
+                  <div style={{ width: '70px' }} className="flex-shrink-0 px-2 py-3">
+                    <p className="text-xs font-semibold text-[#666666] uppercase tracking-wider">Commission</p>
+                  </div>
+                  <div style={{ width: '70px' }} className="flex-shrink-0 px-2 py-3">
+                    <p className="text-xs font-semibold text-[#666666] uppercase tracking-wider">Status</p>
+                  </div>
+                  <div style={{ width: '60px' }} className="flex-shrink-0 px-2 py-3">
+                    <p className="text-xs font-semibold text-[#666666] uppercase tracking-wider">Date</p>
+                  </div>
+                </div>
 
-                  {/* Table rows */}
-                  <div className="divide-y divide-[#E8E8E8]">
-                    {data.recentJobs.map((job) => (
-                      <div key={job.id} className="flex gap-6 px-4 py-4 bg-white hover:bg-[#F9F9F9] transition-colors min-w-max">
-                        <div className="w-32">
-                          <p className="text-sm font-semibold text-[#0D0D0D]">{job.customer}</p>
-                        </div>
-                        <div className="w-20">
-                          <p className="text-sm font-bold text-[#0D0D0D]">£{job.value.toFixed(2)}</p>
-                        </div>
-                        <div className="w-24">
-                          <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                            job.status === 'completed' ? 'bg-[#E8F5E9] text-[#2E7D32]' :
-                            job.status === 'pending' ? 'bg-[#FFF3E0] text-[#E65100]' :
-                            'bg-[#F3E5F5] text-[#512DA8]'
-                          }`}>
-                            {job.status}
-                          </div>
-                        </div>
-                        <div className="w-20">
-                          <p className="text-xs text-[#888888]">{new Date(job.createdAt).toLocaleDateString()}</p>
+                {/* Table rows */}
+                <div className="divide-y divide-[#E8E8E8]">
+                  {data.recentJobs.map((job) => (
+                    <div key={job.id} className="inline-flex min-w-full bg-white hover:bg-[#F9F9F9] transition-colors">
+                      <div style={{ width: '75px' }} className="flex-shrink-0 px-2 py-3 flex items-center">
+                        <p className="text-xs font-semibold text-[#0D0D0D] truncate">{job.customer}</p>
+                      </div>
+                      <div style={{ width: '60px' }} className="flex-shrink-0 px-2 py-3 flex items-center">
+                        <p className="text-xs font-bold text-[#0D0D0D]">£{job.value.toFixed(0)}</p>
+                      </div>
+                      <div style={{ width: '70px' }} className="flex-shrink-0 px-2 py-3 flex items-center">
+                        <p className="text-xs font-bold text-[#0D0D0D]">£{job.commission.toFixed(0)}</p>
+                      </div>
+                      <div style={{ width: '70px' }} className="flex-shrink-0 px-2 py-3 flex items-center">
+                        <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                          job.status === 'completed' ? 'bg-[#E8F5E9] text-[#2E7D32]' :
+                          job.status === 'pending' ? 'bg-[#FFF3E0] text-[#E65100]' :
+                          'bg-[#F3E5F5] text-[#512DA8]'
+                        }`}>
+                          {job.status === 'completed' ? 'Done' : job.status === 'pending' ? 'Pending' : job.status}
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ width: '60px' }} className="flex-shrink-0 px-2 py-3 flex items-center">
+                        <p className="text-xs text-[#888888]">{new Date(job.createdAt).toLocaleDateString('en-GB', { month: '2-digit', day: '2-digit' })}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
