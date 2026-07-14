@@ -10,17 +10,17 @@ import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 
 export const metadata: Metadata = {
-  title: "UK Removal Company | Fixed Price. Verified Driver. | Saint & Story",
+  title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
   description:
-    "Book a verified removal driver instantly. Man and van, house moves, office removals — fixed price, confirmed on the call. No hidden fees. London, Manchester, Birmingham & 30+ UK cities.",
+    "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
   icons: {
     icon: "/favicon.svg",
   },
   manifest: "/manifest.json",
   openGraph: {
-    title: "UK Removal Company | Fixed Price. Verified Driver. | Saint & Story",
+    title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
     description:
-      "Book a verified removal driver instantly. Fixed price in 60 seconds. Man and van, house moves, office removals. No hidden fees. 30+ UK cities.",
+      "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     url: "https://saintandstoryltd.co.uk",
     siteName: "Saint & Story",
     type: "website",
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "UK Removal Company | Fixed Price. Verified Driver.",
+    title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
     description:
-      "Book a verified removal driver instantly. Fixed price in 60 seconds. Man and van, house moves, office removals.",
+      "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
     images: ["https://saintandstoryltd.co.uk/og-image.png"],
   },
 };
