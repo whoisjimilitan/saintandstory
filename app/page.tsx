@@ -24,12 +24,21 @@ export const metadata: Metadata = {
     url: "https://saintandstoryltd.co.uk",
     siteName: "Saint & Story",
     type: "website",
+    images: [
+      {
+        url: "https://saintandstoryltd.co.uk/og-image.png",
+        width: 3560,
+        height: 1184,
+        alt: "Logistics without the luck",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "UK Removal Company | Fixed Price. Verified Driver.",
     description:
       "Book a verified removal driver instantly. Fixed price in 60 seconds. Man and van, house moves, office removals.",
+    images: ["https://saintandstoryltd.co.uk/og-image.png"],
   },
 };
 
