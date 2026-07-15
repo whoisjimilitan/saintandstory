@@ -9,17 +9,16 @@ type Side = "customer" | "driver";
 
 const CONTENT = {
   customer: {
-    badge: "Verified drivers · Transparent pricing",
+    badge: "Same-day courier · Collections · Office moves",
     headline: (
       <>
-        Find a driver.
+        R<span className="font-display italic font-normal">e</span>liable business
         <br />
-        G<span className="font-display italic font-normal">e</span>t m
-        <span className="font-display italic font-normal">o</span>ving.
+        deliveries and removals.
       </>
     ),
-    sub: "Same-day couriers and removals. Reasonable pricing. Professional drivers.",
-    cta: "Get a fixed price — free →",
+    sub: "When your business needs something moved, collected, or delivered today. Professional support you can depend on.",
+    cta: "Get a quote →",
     source: "hero_customer",
   },
   driver: {

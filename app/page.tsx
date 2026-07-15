@@ -11,17 +11,17 @@ import MobileBar from "@/components/MobileBar";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 export const metadata: Metadata = {
-  title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
+  title: "Reliable Business Deliveries & Removals — Saint & Story",
   description:
-    "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
+    "When your business needs things moved, collected, or delivered today. Professional support you can depend on.",
   icons: {
     icon: "/favicon.svg",
   },
   manifest: "/manifest.json",
   openGraph: {
-    title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
+    title: "Reliable Business Deliveries & Removals — Saint & Story",
     description:
-      "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
+      "When your business needs things moved, collected, or delivered today. Professional support you can depend on.",
     url: "https://saintandstoryltd.co.uk",
     siteName: "Saint & Story",
     type: "website",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Same-Day Couriers & UK Removals — Saint & Story Logistics",
+    title: "Reliable Business Deliveries & Removals — Saint & Story",
     description:
-      "Same-day urgent deliveries. Reasonable pricing. Professional drivers.",
+      "When your business needs things moved, collected, or delivered today. Professional support you can depend on.",
     images: ["https://saintandstoryltd.co.uk/og-image.png"],
   },
 };
