@@ -29,6 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const servicePages = [
+    { path: "/services", priority: 0.9 },
+    { path: "/same-day-courier", priority: 0.87 },
+    { path: "/medical-courier", priority: 0.87 },
+    { path: "/man-and-van", priority: 0.87 },
+    { path: "/legal-documents", priority: 0.87 },
     { path: "/office-moves", priority: 0.85 },
     { path: "/student-moves", priority: 0.85 },
     { path: "/piano-moving", priority: 0.85 },
