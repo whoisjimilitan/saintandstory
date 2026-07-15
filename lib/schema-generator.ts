@@ -82,9 +82,10 @@ export function generateOrganizationSchema() {
     "@type": "Organization",
     "@id": "https://saintandstoryltd.co.uk#organization",
     "name": "Saint & Story",
+    "alternateName": ["Saint and Story", "Saint and Story Limited", "Saint and Story Logistics"],
     "url": "https://saintandstoryltd.co.uk",
     "logo": "https://saintandstoryltd.co.uk/logo.svg",
-    "description": "UK removal and delivery service. Fixed price, verified drivers, same-day available in 30+ cities.",
+    "description": "Same day courier, removals and delivery service. Fixed price, verified drivers, same-day available in 30+ UK cities. Man and van, medical courier, legal documents.",
     "sameAs": [
       "https://www.google.com/maps/place/Saint+%26+Story",
       "https://www.trustpilot.com/review/saintandstoryltd.co.uk",
