@@ -4,92 +4,164 @@ import Nav from "@/components/Nav";
 import MobileBar from "@/components/MobileBar";
 import ModalCTA from "@/components/ModalCTA";
 import SiteFooter from "@/components/SiteFooter";
+import { generateOrganizationSchema } from "@/lib/schema-generator";
 
 export const metadata: Metadata = {
-  title: "UK Removal Services | House, Office, Student, Piano | Saint & Story",
+  title: "Same Day Courier, Removals & Delivery Services | Saint & Story",
   description:
-    "Every type of removal, handled properly. House moves, office relocations, student moves, piano transport, same-day, clearance — fixed price, verified drivers.",
+    "Same day courier, removals, medical delivery, legal documents, man and van, dedicated drivers, business collections. Fixed price. Verified drivers. 30+ UK cities. 7 days a week.",
+  keywords: "same day courier, removals, delivery services, medical courier, legal documents, man and van, urgent delivery, business deliveries",
   openGraph: {
-    title: "UK Removal Services | House, Office, Student, Piano | Saint & Story",
+    title: "Same Day Courier, Removals & Delivery Services | Saint & Story",
     description:
-      "House moves, office relocations, student moves, piano transport — fixed price, verified drivers, 30+ UK cities.",
+      "Same day courier, removals, medical delivery, legal documents, man and van. Fixed price, verified drivers, 30+ UK cities.",
     url: "https://saintandstoryltd.co.uk/services",
     siteName: "Saint & Story",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "UK Removal Services | Fixed Price | Saint & Story",
-    description: "House moves, office relocations, student moves, piano transport — fixed price, 30+ UK cities.",
+    title: "Same Day Courier & Removals | Fixed Price | Saint & Story",
+    description: "Same day courier, removals, medical delivery, legal documents — fixed price, verified drivers, 30+ UK cities.",
   },
 };
 
 const SERVICES = [
   {
-    title: "House moves",
-    badge: "Most booked",
-    context: "1-bed flat from £135",
-    desc: "We load, drive, and unload. Studio to 5-bed, all floors. Need full packing too? Just say the word.",
-    from: "From £135",
-    source: "services_home",
+    title: "Same Day Courier",
+    badge: "Urgent",
+    context: "Document or parcel from £25",
+    desc: "Urgent delivery of documents, parcels, and items. Same-day courier service across 30+ UK cities. Fixed price. 7am-10pm.",
+    from: "From £25",
+    source: "services_courier",
+    keywords: "same day courier, urgent delivery, same day delivery",
   },
   {
-    title: "Office relocations",
+    title: "Medical Courier",
+    context: "Prescription delivery from £15",
+    desc: "Reliable transport of prescriptions, medical samples, and healthcare supplies. Compliant, professional, time-critical.",
+    from: "From £15",
+    source: "services_medical",
+    keywords: "medical courier, pharmacy delivery, medical logistics",
+  },
+  {
+    title: "Legal Document Delivery",
+    context: "Court documents from £30",
+    desc: "Court documents, contracts, and legal papers delivered on time, every time. Time-critical, reliable, professional.",
+    from: "From £30",
+    source: "services_legal",
+    keywords: "legal document delivery, court courier, contract delivery",
+  },
+  {
+    title: "Man and Van",
+    context: "Single item from £50",
+    desc: "Single furniture items, deliveries, or small moves. Professional drivers. Fixed price. No surprises.",
+    from: "From £50",
+    source: "services_man_van",
+    keywords: "man and van, van with driver, furniture delivery",
+  },
+  {
+    title: "Dedicated Driver",
+    context: "Regular service from £35/hour",
+    desc: "Exclusive driver for ongoing collections and deliveries. Regular schedule. Business-focused. Flexible.",
+    from: "From £35/hr",
+    source: "services_dedicated",
+    keywords: "dedicated driver, dedicated vehicle, business driver",
+  },
+  {
+    title: "House Removals",
+    badge: "Most booked",
+    context: "1-bed flat from £135",
+    desc: "Full house moves, studio to 5-bed. Professional team. Fixed price. 30+ UK cities. Same-day available.",
+    from: "From £135",
+    source: "services_home",
+    pageHref: "/london-home-moves",
+    keywords: "house removals, home removals, moving company",
+  },
+  {
+    title: "Office Relocations",
     context: "10-desk office from £210",
-    desc: "Desks, IT, filing. Handling work weekends so your team walks in Monday morning ready to go.",
+    desc: "Office moves, desks, IT, filing. Weekend work. Your team walks in Monday ready to go.",
     from: "From £210",
     source: "services_office",
     pageHref: "/office-moves",
+    keywords: "office moves, office relocation, business moving",
   },
   {
-    title: "Need it today?",
-    context: "Same-day from £110",
-    desc: "Post before 10am. We cover 30+ UK cities, 7 days a week. Urgent? Call us directly.",
-    from: "From £110",
-    source: "services_sameday",
+    title: "Collections & Distribution",
+    context: "Scheduled collection from £40",
+    desc: "Regular scheduled collections. Multi-stop deliveries. Business-focused. Reliable frequency.",
+    from: "From £40",
+    source: "services_collections",
+    keywords: "regular collections, scheduled collections, business collections",
   },
   {
-    title: "Specialist items",
-    context: "Piano or antique from £165",
-    desc: "Pianos, antiques, gym equipment. Specialist rigging and padded wrapping on every job.",
+    title: "Piano & Specialist Items",
+    context: "Piano move from £165",
+    desc: "Pianos, antiques, gym equipment. Specialist rigging. Padded wrapping. Expert handling.",
     from: "From £165",
     source: "services_specialist",
     pageHref: "/piano-moving",
+    keywords: "piano moving, specialist transport, antique delivery",
   },
   {
-    title: "Student moves",
+    title: "Student Moves",
     context: "Halls to flat from £75",
-    desc: "End of term, halls to flat, city to city. Fixed price. No van hire, no borrowed favours.",
+    desc: "End of term moves. Halls to flat. City to city. Fixed price. No van hire. No stress.",
     from: "From £75",
     source: "services_student",
     pageHref: "/student-moves",
+    keywords: "student moves, university removals, halls to flat",
   },
   {
-    title: "Clearance",
+    title: "House Clearance",
     context: "Single room from £90",
-    desc: "Furniture, appliances, the lot. We sort what gets recycled, donated, and disposed of properly.",
+    desc: "Full house clearance. Furniture, appliances. Recycled, donated, or disposed properly.",
     from: "From £90",
     source: "services_clearance",
     href: "/house-clearance",
+    keywords: "house clearance, furniture removal, junk removal",
   },
 ];
 
 export default function ServicesPage() {
+  const organizationSchema = generateOrganizationSchema();
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://saintandstoryltd.co.uk"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Services",
+        "item": "https://saintandstoryltd.co.uk/services"
+      }
+    ]
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <Nav />
 
       <section className="bg-white pt-28 pb-16 md:pt-36 md:pb-20 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
-            Removal services · UK
+            Courier services · Removals · Delivery · UK
           </p>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl leading-[1.05] tracking-tight mb-4 max-w-xl">
-            Every kind of m<span className="font-display italic font-normal">o</span>ve.
-            <br />One platform.
+          <h1 className="font-sans font-black text-[#0D0D0D] text-4xl md:text-5xl leading-[1.05] tracking-tight mb-4 max-w-2xl">
+            Same day courier, removals <span className="font-display italic font-normal">&amp;</span> delivery.
           </h1>
-          <p className="text-[#888888] text-base max-w-sm">
-            Fixed price. Verified driver. Done properly.
+          <p className="text-[#888888] text-base max-w-lg">
+            Fixed price. Verified drivers. Available 7am-10pm, seven days a week. Covering 30+ UK cities. Same-day available most days.
           </p>
         </div>
       </section>

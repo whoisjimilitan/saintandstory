@@ -258,6 +258,25 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
     ratingCount: 120,
   });
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://saintandstoryltd.co.uk"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${data.city} Removals`,
+        "item": `${BASE_URL}/${data.source.replace(/_/g, "-")}`
+      }
+    ]
+  };
+
   return (
     <>
       <ModalProvider />
@@ -267,6 +286,7 @@ export default function CityLandingPage({ data }: { data: CityPageData }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
         <Nav />
 
       {/* Hero */}

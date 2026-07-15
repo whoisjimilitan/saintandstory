@@ -9,6 +9,7 @@ import ClaimArea from "@/components/ClaimArea";
 import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import { generateOrganizationSchema } from "@/lib/schema-generator";
 
 export const metadata: Metadata = {
   title: "Reliable Business Deliveries & Removals — Saint & Story",
@@ -44,8 +45,25 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+  const organizationSchema = generateOrganizationSchema();
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://saintandstoryltd.co.uk"
+      }
+    ]
+  };
+
   return (
     <main className="pb-20 md:pb-0">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <Nav />
       <Hero />
       <WhySection />
