@@ -14,7 +14,7 @@ const CONTENT = {
       <>
         R<span className="font-display italic font-normal">e</span>liable business
         <br />
-        deliveries and removals.
+        d<span className="font-display italic font-normal">e</span>liveries and removals.
       </>
     ),
     sub: "When your business needs something moved, collected, or delivered today. Professional support you can depend on.",
