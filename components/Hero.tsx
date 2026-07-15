@@ -14,7 +14,7 @@ const CONTENT = {
       <>
         Reliable business
         <br />
-        deliveries and removals.
+        deliveries and r<span className="font-display italic font-normal">e</span>movals.
       </>
     ),
     sub: "When your business needs something moved, collected, or delivered today. Professional support you can depend on.",
