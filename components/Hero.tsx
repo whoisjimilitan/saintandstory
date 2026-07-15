@@ -9,7 +9,7 @@ type Side = "customer" | "driver";
 
 const CONTENT = {
   customer: {
-    badge: "Same-day courier · Collections · Office moves",
+    badge: "Same-day logistics",
     headline: (
       <>
         R<span className="font-display italic font-normal">e</span>liable business
