@@ -12,9 +12,9 @@ const CONTENT = {
     badge: "Same-day logistics",
     headline: (
       <>
-        R<span className="font-display italic font-normal">e</span>liable business
+        Reliable business
         <br />
-        d<span className="font-display italic font-normal">e</span>liveries and removals.
+        deliveries and removals.
       </>
     ),
     sub: "When your business needs something moved, collected, or delivered today. Professional support you can depend on.",
