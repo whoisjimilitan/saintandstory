@@ -119,7 +119,7 @@ export default function SiteFooter() {
             <ul className="space-y-2.5">
               <li>
                 <a href="tel:+442030517408" className="text-sm text-[#0D0D0D] hover:text-[#888888] transition-colors">
-                  0203 051 9243
+                  0203 432 3991
                 </a>
               </li>
               <li>

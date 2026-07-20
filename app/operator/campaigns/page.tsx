@@ -372,7 +372,7 @@ That's it. No sales calls, no pressure. Just say "I know a reliable courier" whe
 Share your code: ${referralCode}
 Dashboard: https://saintandstoryltd.co.uk/referral/dashboard?code=${referralCode}
 
-Questions? Reply here or call 0203 051 9243.
+Questions? Reply here or call 0203 432 3991.
 
 ---
 James

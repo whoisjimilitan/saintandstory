@@ -53,7 +53,7 @@ export default function DeliveryChecklist() {
   const handleWhatsApp = () => {
     const message = `Hi, we're in ${userCity} and need help with same-day deliveries. Can we discuss options?`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappNumber = "442030519243";
+    const whatsappNumber = "442034323991";
     window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, "_blank");
   };
 

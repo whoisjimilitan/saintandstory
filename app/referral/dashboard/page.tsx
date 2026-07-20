@@ -325,7 +325,7 @@ function DashboardContent() {
         {/* Footer */}
         <div className="text-center pt-12 border-t border-[#E8E8E8]">
           <p className="text-sm text-[#666666] mb-2">Need help?</p>
-          <p className="text-xs text-[#999999]">Call <span className="font-mono font-semibold text-[#0D0D0D]">0203 051 9243</span> or reply to your WhatsApp message</p>
+          <p className="text-xs text-[#999999]">Call <span className="font-mono font-semibold text-[#0D0D0D]">0203 432 3991</span> or reply to your WhatsApp message</p>
         </div>
       </div>
     </div>

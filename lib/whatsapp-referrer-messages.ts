@@ -35,7 +35,7 @@ https://saintandstoryltd.co.uk/referral/dashboard?code=${referrer.referralCode}
 
 No limits. No catch. Refer as much as you want.
 
-❓ Questions? Reply here or call 0203 051 9243`;
+❓ Questions? Reply here or call 0203 432 3991`;
 
   await sendWhatsAppMessage(referrer.phone, message);
 }

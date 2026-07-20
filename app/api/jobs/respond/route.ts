@@ -121,7 +121,7 @@ async function notifyCustomerConfirmed(job: Record<string, unknown>) {
         <a href="${trackingUrl}" style="display:inline-block;background:#0D0D0D;color:#fff;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;font-size:14px;margin-bottom:24px;">
           Track your booking →
         </a>
-        <p style="color:#888;font-size:13px;">Questions? Call us on <a href="tel:02030519243" style="color:#0D0D0D;">0203 051 9243</a>.</p>
+        <p style="color:#888;font-size:13px;">Questions? Call us on <a href="tel:02034323991" style="color:#0D0D0D;">0203 432 3991</a>.</p>
         <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e8e8e8;">
           <p style="color:#bbb;font-size:11px;margin:0;">Saint &amp; Story Ltd · London</p>
         </div>

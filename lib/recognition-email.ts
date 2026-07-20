@@ -48,7 +48,7 @@ export function generateRecognitionEmailTemplate(
     </div>
     <div class="footer">
       <p>Saint & Story Ltd · Removal & Logistics Partner</p>
-      <p>Phone: 0203 051 9243 | Email: info@saintandstoryltd.co.uk</p>
+      <p>Phone: 0203 432 3991 | Email: info@saintandstoryltd.co.uk</p>
       <p>Reply directly to this email or click the link above.</p>
     </div>
   </div>

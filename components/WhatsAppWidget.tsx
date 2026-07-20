@@ -111,8 +111,8 @@ export default function WhatsAppWidget({
     const message = `Hi, we're in ${userCity} and need urgent same-day delivery. Are you available today?`;
     const encodedMessage = encodeURIComponent(message);
 
-    // Business WhatsApp number: +442030519243
-    const whatsappNumber = getPhonePlusFormat("+442030519243").replace("+", "");
+    // Business WhatsApp number: +442034323991
+    const whatsappNumber = getPhonePlusFormat("+442034323991").replace("+", "");
 
     // Log message to backend so it appears in /operator dashboard
     try {

@@ -58,7 +58,7 @@ Google Business Profiles are required for LSA eligibility. You don't need 16 sep
    - **Business name:** Saint & Story
    - **Category:** Moving & Storage / Courier Service
    - **Address:** Your office address (or HQ location)
-   - **Phone:** 0203 051 9243
+   - **Phone:** 0203 432 3991
    - **Website:** https://saintandstoryltd.co.uk
 5. Click **Create**
 
@@ -184,7 +184,7 @@ Google Business Profiles are required for LSA eligibility. You don't need 16 sep
 ### Step 3.6 — Add Customer Lead Notifications
 
 1. **Customer lead notification email:** james@saintandstoryltd.co.uk
-2. **Customer lead notification phone:** 0203 051 9243
+2. **Customer lead notification phone:** 0203 432 3991
 3. Google will send you alerts when someone contacts you via LSA
 4. Click **Next**
 

@@ -24,7 +24,7 @@ Print this and check off each item as you complete it. Total time: 2-3 hours.
 - [ ] Create business profile for "Saint & Story"
 - [ ] Set category: Moving & Storage / Courier Service
 - [ ] Add address: Your HQ/office
-- [ ] Add phone: 0203 051 9243
+- [ ] Add phone: 0203 432 3991
 - [ ] Add website: https://saintandstoryltd.co.uk
 - [ ] Verify via email (check james@saintandstoryltd.co.uk)
 
@@ -75,7 +75,7 @@ Print this and check off each item as you complete it. Total time: 2-3 hours.
 - [ ] Set daily budget: £15 (test phase)
 - [ ] Set customer lead notifications:
   - [ ] Email: james@saintandstoryltd.co.uk
-  - [ ] Phone: 0203 051 9243
+  - [ ] Phone: 0203 432 3991
 - [ ] Review and create campaign
 - [ ] Check campaign status: **ACTIVE**
 

@@ -224,7 +224,7 @@ export default function ReferrerSignup() {
               { q: "When do I get paid?", a: "Monthly. Payouts processed on the 1st of each month to your bank." },
               { q: "Do I need to do anything?", a: "Just share your code. We handle the rest." },
               { q: "Is there a minimum?", a: "No minimum. Earn as much or as little as you want." },
-              { q: "Questions?", a: "Call 0203 051 9243 or reply to WhatsApp. We're here to help." },
+              { q: "Questions?", a: "Call 0203 432 3991 or reply to WhatsApp. We're here to help." },
             ].map((item, idx) => (
               <div key={idx} className="border border-[#E8E8E8] rounded-lg bg-white hover:border-[#0D0D0D] transition-colors">
                 <button

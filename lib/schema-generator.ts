@@ -20,7 +20,7 @@ export function generateLocalBusinessSchema(input: SchemaGeneratorInput) {
     "image": "https://saintandstoryltd.co.uk/logo.svg",
     "description": `${input.city} removals service. Fixed price, verified drivers, same-day available.`,
     "url": "https://saintandstoryltd.co.uk",
-    "telephone": "0203 051 9243",
+    "telephone": "0203 432 3991",
     "email": "hello@saintandstoryltd.co.uk",
     "areaServed": {
       "@type": "City",
@@ -93,7 +93,7 @@ export function generateOrganizationSchema() {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Service",
-      "telephone": "0203 051 9243",
+      "telephone": "0203 432 3991",
       "email": "hello@saintandstoryltd.co.uk",
       "areaServed": "GB",
       "hoursAvailable": "Mo-Su 07:00-22:00",

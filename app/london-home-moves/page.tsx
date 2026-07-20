@@ -60,7 +60,7 @@ const FAQS = [
   { q: "Are there hidden charges — congestion, ULEZ, parking?", a: "None. Congestion charge, ULEZ, and parking permits are all included in your quote. We don't spring extras on you on moving day." },
   { q: "What if something gets damaged?", a: "Every move is fully insured. If anything is damaged we cover it directly. No complicated claims process, no argument." },
   { q: "Do I need to be present during the move?", a: "Present at the start and end. During transit you're free to travel ahead. We keep you updated throughout via text or call." },
-  { q: "Can I book same-day in London?", a: "Same-day is our speciality. Post before 10am for same-day availability. Need it urgently? Call us directly: 0203 051 9243." },
+  { q: "Can I book same-day in London?", a: "Same-day is our speciality. Post before 10am for same-day availability. Need it urgently? Call us directly: 0203 432 3991." },
 ];
 
 export default function LondonHomeMoves() {
