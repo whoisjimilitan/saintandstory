@@ -91,16 +91,16 @@ export default function UKRemovals() {
       </header>
 
       {/* Hero */}
-      <section className="bg-white pt-16 min-h-[88vh] flex items-center border-b border-[#E8E8E8]">
+      <section className="bg-[#0D0D0D] pt-16 min-h-[88vh] flex items-center border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-24 w-full">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-6">
+          <p className="text-[10px] font-semibold text-white/50 uppercase tracking-[0.22em] mb-7">
             UK-wide · Post · Match · Move
           </p>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-7 max-w-2xl">
+          <h1 className="font-sans font-black text-white text-5xl md:text-6xl xl:text-7xl leading-[1.05] tracking-tight mb-8 max-w-2xl">
             Rem<span className="font-display italic font-normal">o</span>vals &amp; delivery.
             <br />Anywhere in the UK.
           </h1>
-          <p className="text-[#888888] text-base mb-12 max-w-sm leading-relaxed">
+          <p className="text-white/60 text-base mb-14 max-w-md leading-relaxed">
             Tell us what&apos;s moving. We call back with a fixed price and a verified driver, wherever you are in the UK.
           </p>
           <LandingHeroSearch
@@ -108,8 +108,9 @@ export default function UKRemovals() {
             placeholder="Your postcode or area…"
             ctaLabel="Get a fixed price →"
             glow
+            glowTone="light"
           />
-          <p className="text-[#888888] text-xs mt-6">Free to post. No account needed. Fixed price guaranteed.</p>
+          <p className="text-white/35 text-xs mt-7">Free to post. No account needed. Fixed price guaranteed.</p>
         </div>
       </section>
 

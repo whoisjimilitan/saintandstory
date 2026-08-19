@@ -103,6 +103,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   animation: glow-ring 2.8s ease-in-out infinite;
 }
 
+/* Glow ring, light variant — for a white input sitting on a dark background */
+@keyframes glow-ring-light {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.14), 0 0 22px 2px rgba(255, 255, 255, 0.10); }
+  50%      { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08), 0 0 40px 12px rgba(255, 255, 255, 0.18); }
+}
+
+.animate-glow-ring-light {
+  animation: glow-ring-light 2.8s ease-in-out infinite;
+}
+
 /* 6. HOVER EFFECTS — Interactive Elevation */
 button:not(:disabled):hover, [role="button"]:hover, a[href]:hover {
   transform: translateY(-1px);
@@ -183,7 +193,8 @@ a[href]:not([class*="no-underline"]):hover {
   .animate-marquee,
   .animate-pulse,
   .animate-ping,
-  .animate-glow-ring {
+  .animate-glow-ring,
+  .animate-glow-ring-light {
     animation: none !important;
   }
   html {

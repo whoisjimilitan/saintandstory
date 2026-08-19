@@ -5,15 +5,18 @@ interface LandingHeroSearchProps {
   ctaLabel?: string;
   placeholder?: string;
   glow?: boolean;
+  glowTone?: "dark" | "light";
 }
 
-export default function LandingHeroSearch({ city, ctaLabel = "Find drivers →", placeholder, glow = false }: LandingHeroSearchProps) {
+export default function LandingHeroSearch({ city, ctaLabel = "Find drivers →", placeholder, glow = false, glowTone = "dark" }: LandingHeroSearchProps) {
   function open() {
     document.dispatchEvent(new CustomEvent("open-lead-modal"));
   }
 
+  const glowClass = glow ? (glowTone === "light" ? "animate-glow-ring-light" : "animate-glow-ring") : "";
+
   return (
-    <div className={`flex items-stretch max-w-[480px] bg-white rounded-full overflow-hidden shadow-2xl shadow-black/20 ${glow ? "animate-glow-ring" : ""}`}>
+    <div className={`flex items-stretch max-w-[480px] bg-white rounded-full overflow-hidden shadow-2xl shadow-black/20 ${glowClass}`}>
       <input
         type="text"
         readOnly
