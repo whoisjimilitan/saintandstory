@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const cityPages = [
+    { path: "/uk-removals", priority: 0.95 },
     { path: "/london-home-moves", priority: 0.95 },
     { path: "/birmingham-removals", priority: 0.9 },
     { path: "/leeds-removals", priority: 0.9 },
