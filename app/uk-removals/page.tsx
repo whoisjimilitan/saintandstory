@@ -91,28 +91,33 @@ export default function UKRemovals() {
       </header>
 
       {/* Hero */}
-      <section className="bg-white pt-16 min-h-[85vh] flex items-center border-b border-[#E8E8E8]">
-        <div className="max-w-6xl mx-auto px-6 py-20 w-full">
-          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-5">
+      <section className="bg-white pt-16 min-h-[88vh] flex items-center border-b border-[#E8E8E8]">
+        <div className="max-w-6xl mx-auto px-6 py-24 w-full">
+          <p className="text-[10px] font-semibold text-[#888888] uppercase tracking-[0.2em] mb-6">
             UK-wide · Post · Match · Move
           </p>
-          <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-6 max-w-2xl">
+          <h1 className="font-sans font-black text-[#0D0D0D] text-5xl md:text-6xl xl:text-7xl leading-[1.0] tracking-tight mb-7 max-w-2xl">
             Rem<span className="font-display italic font-normal">o</span>vals &amp; delivery.
             <br />Anywhere in the UK.
           </h1>
-          <p className="text-[#888888] text-base mb-10 max-w-sm">
+          <p className="text-[#888888] text-base mb-12 max-w-sm leading-relaxed">
             Tell us what&apos;s moving. We call back with a fixed price and a verified driver, wherever you are in the UK.
           </p>
-          <LandingHeroSearch city="UK" />
-          <p className="text-[#888888] text-xs mt-5">Free to post. No account needed. Fixed price guaranteed.</p>
+          <LandingHeroSearch
+            city="UK"
+            placeholder="Your postcode or area…"
+            ctaLabel="Get a fixed price →"
+            glow
+          />
+          <p className="text-[#888888] text-xs mt-6">Free to post. No account needed. Fixed price guaranteed.</p>
         </div>
       </section>
 
       {/* Stats bar */}
       <section className="bg-[#F5F5F5] py-12 px-6 border-b border-[#E8E8E8]">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-[#E8E8E8] text-center">
           {STATS.map(({ stat, label }) => (
-            <div key={label}>
+            <div key={label} className="px-4">
               <p className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl mb-1 tracking-tight">{stat}</p>
               <p className="text-[#888888] text-xs uppercase tracking-[0.15em]">{label}</p>
             </div>
@@ -145,9 +150,9 @@ export default function UKRemovals() {
             Real m<span className="font-display italic font-normal">o</span>ves.
             <br />Every p<span className="font-display italic font-normal">o</span>stcode.
           </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TESTIMONIALS.map((r) => (
-              <div key={r.name} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
+              <div key={r.name} className="bg-white border border-[#E8E8E8] rounded-2xl p-7 transition-smooth hover-shadow">
                 <div className="flex gap-0.5 mb-5">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-3 h-3 fill-[#0D0D0D]" viewBox="0 0 20 20">
@@ -180,7 +185,7 @@ export default function UKRemovals() {
           </h2>
           <div className="space-y-3">
             {FEATURES.map((f) => (
-              <div key={f.title} className="bg-[#F5F5F5] rounded-2xl px-6 py-5">
+              <div key={f.title} className="bg-[#F5F5F5] rounded-2xl px-6 py-5 transition-smooth hover-shadow">
                 <p className="font-sans font-semibold text-[#0D0D0D] text-sm mb-1">{f.title}</p>
                 <p className="text-[#888888] text-sm">{f.desc}</p>
               </div>
