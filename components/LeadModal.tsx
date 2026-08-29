@@ -9,13 +9,14 @@ function track(event: string, props?: Record<string, unknown>) {
 }
 
 const STEPS = [
-  { id: "s1", type: "name", q: "What is your name?", name: "full_name" },
-  { id: "s2", type: "phone", q: "What is your phone number?", name: "phone" },
-  { id: "s3", type: "email", q: "What email should we send your quote to?", name: "email" },
-  { id: "s4", type: "postcode", q: "What is the pickup postcode?", name: "postcode_from" },
-  { id: "s5", type: "postcode", q: "What is the delivery postcode?", name: "postcode_to" },
-  { id: "s6", type: "urgency", q: "When are you ready to move?", opts: ["Now", "This week", "This month", "Later"] },
-  { id: "s7", type: "success", q: "We're finding your driver..." },
+  { id: "s1", type: "intro", q: "Let's match you with a driver", subtitle: "We need a few details to find the right fit" },
+  { id: "s2", type: "name", q: "What is your name?", name: "full_name" },
+  { id: "s3", type: "phone", q: "What is your phone number?", name: "phone" },
+  { id: "s4", type: "email", q: "What email should we send your quote to?", name: "email" },
+  { id: "s5", type: "postcode", q: "What is the pickup postcode?", name: "postcode_from" },
+  { id: "s6", type: "postcode", q: "What is the delivery postcode?", name: "postcode_to" },
+  { id: "s7", type: "urgency", q: "When are you ready to move?", opts: ["Now", "This week", "This month", "Later"] },
+  { id: "s8", type: "success", q: "We're finding your driver..." },
 ] as const;
 
 const TOTAL = STEPS.length;
@@ -53,6 +54,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   const isSuccess = step.type === "success";
 
   const validate = useCallback(() => {
+    if (step.type === "intro") return true;
     if (step.type === "name") return (answers.full_name || "").trim().length > 0;
     if (step.type === "phone") return (answers.phone || "").trim().length > 0;
     if (step.type === "email") return (answers.email || "").includes("@");
@@ -133,20 +135,33 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
           ) : (
             <>
               <div className="mb-8">
-                <div className="flex gap-1 mb-6">
-                  {Array.from({ length: TOTAL - 1 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1 flex-1 rounded-full transition-colors ${
-                        i < stepIdx ? "bg-[#0D0D0D]" : i === stepIdx ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"
-                      }`}
-                    />
-                  ))}
-                </div>
+                {step.type !== "intro" && (
+                  <div className="flex gap-1 mb-6">
+                    {Array.from({ length: TOTAL - 2 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          i < stepIdx - 1 ? "bg-[#0D0D0D]" : i === stepIdx - 1 ? "bg-[#0D0D0D]" : "bg-[#E8E8E8]"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
                 <h2 className="text-2xl font-black text-[#0D0D0D] leading-tight">{step.q}</h2>
+                {(step as any).subtitle && (
+                  <p className="text-sm text-[#888888] mt-2">{(step as any).subtitle}</p>
+                )}
               </div>
 
               <div className="mb-8">
+                {step.type === "intro" && (
+                  <div className="text-center py-8">
+                    <p className="text-[#888888] text-sm leading-relaxed">
+                      We'll match you with the nearest available driver and get you a quote in 90 seconds.
+                    </p>
+                  </div>
+                )}
+
                 {step.type === "name" && (
                   <input
                     type="text"
