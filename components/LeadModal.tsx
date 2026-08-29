@@ -11,9 +11,9 @@ function track(event: string, props?: Record<string, unknown>) {
 const STEPS = [
   { id: "s1", type: "name", q: "What is your name?", name: "full_name" },
   { id: "s2", type: "phone", q: "What is your phone number?", name: "phone" },
-  { id: "s3", type: "email", q: "What email should we contact you on?", name: "email" },
-  { id: "s4", type: "postcode", q: "What postcode are you moving from?", name: "postcode_from" },
-  { id: "s5", type: "postcode", q: "What postcode are you moving to?", name: "postcode_to" },
+  { id: "s3", type: "email", q: "What email should we send your quote to?", name: "email" },
+  { id: "s4", type: "postcode", q: "What is the pickup postcode?", name: "postcode_from" },
+  { id: "s5", type: "postcode", q: "What is the delivery postcode?", name: "postcode_to" },
   { id: "s6", type: "urgency", q: "When are you ready to move?", opts: ["Now", "This week", "This month", "Later"] },
   { id: "s7", type: "success", q: "We're finding your driver..." },
 ] as const;
