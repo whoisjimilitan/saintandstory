@@ -10,6 +10,7 @@ import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 import AutoOpenModal from "@/components/AutoOpenModal";
+import LeadSuccessCard from "@/components/LeadSuccessCard";
 import { generateOrganizationSchema } from "@/lib/schema-generator";
 
 export const metadata: Metadata = {
@@ -76,6 +77,7 @@ export default function Home() {
       <SiteFooter />
       <MobileBar />
       <WhatsAppWidget /> {/* Widget only on homepage, using wa.me by default */}
+      <LeadSuccessCard />
     </main>
   );
 }
