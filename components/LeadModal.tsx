@@ -20,6 +20,7 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const validate = useCallback(() => {
     return (
@@ -74,10 +75,34 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
 
   if (!isOpen) return null;
 
+  if (isMinimized) {
+    return (
+      <div className="fixed top-0 left-0 right-0 bg-[#0D0D0D] text-white px-6 py-3 z-40 flex items-center justify-between">
+        <span className="font-black text-sm">Get your quote in 90 seconds</span>
+        <button
+          onClick={() => setIsMinimized(false)}
+          className="bg-white text-[#0D0D0D] font-black px-4 py-2 rounded-lg hover:bg-[#E8E8E8] transition text-sm"
+        >
+          Expand
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl max-w-md w-full">
-        <div className="p-8">
+        <div className="p-8 flex justify-between items-start mb-4">
+          <div />
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="text-[#888888] hover:text-[#0D0D0D] transition text-xl font-black"
+            title="Minimize"
+          >
+            −
+          </button>
+        </div>
+        <div className="px-8 pb-8">
           {isSuccess ? (
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-black text-[#0D0D0D]">We're matching you with a driver</h2>
