@@ -73,12 +73,13 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            full_name: answers.full_name,
+            fullName: answers.full_name,
             phone: answers.phone,
+            phoneConsent: !!answers.phone,
             email: answers.email,
             postcode_from: answers.postcode_from,
             postcode_to: answers.postcode_to,
-            urgency: answers.urgency,
+            timeframe: answers.urgency,
             utm: {
               utm_source: params.get("utm_source") ?? "",
               utm_medium: params.get("utm_medium") ?? "",
