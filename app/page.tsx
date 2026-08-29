@@ -9,6 +9,7 @@ import ClaimArea from "@/components/ClaimArea";
 import SiteFooter from "@/components/SiteFooter";
 import MobileBar from "@/components/MobileBar";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import AutoOpenModal from "@/components/AutoOpenModal";
 import { generateOrganizationSchema } from "@/lib/schema-generator";
 
 export const metadata: Metadata = {
@@ -64,6 +65,7 @@ export default function Home() {
     <main className="pb-20 md:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <AutoOpenModal delayMs={2000} />
       <Nav />
       <Hero />
       <WhySection />
