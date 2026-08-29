@@ -76,7 +76,7 @@ export default function Home() {
       <ClaimArea />
       <SiteFooter />
       <MobileBar />
-      <WhatsAppWidget /> {/* Widget only on homepage, using wa.me by default */}
+      <div className="hidden"><WhatsAppWidget /></div> {/* Hidden to focus conversion on lead form */}
       <LeadSuccessCard />
     </main>
   );
