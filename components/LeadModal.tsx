@@ -25,12 +25,14 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   useEffect(() => {
     if (isOpen) {
       setIsMinimized(false);
+      setIsSuccess(false);
     }
   }, [isOpen]);
 
   useEffect(() => {
     const handleOpenModal = () => {
       setIsMinimized(false);
+      setIsSuccess(false);
     };
 
     document.addEventListener("open-lead-modal", handleOpenModal);
