@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import posthog from "posthog-js";
 
 function track(event: string, props?: Record<string, unknown>) {
@@ -21,6 +21,21 @@ export default function LeadModal({ isOpen, onClose }: LeadModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsMinimized(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleOpenModal = () => {
+      setIsMinimized(false);
+    };
+
+    document.addEventListener("open-lead-modal", handleOpenModal);
+    return () => document.removeEventListener("open-lead-modal", handleOpenModal);
+  }, []);
 
   const validate = useCallback(() => {
     return (
