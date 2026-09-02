@@ -162,7 +162,7 @@ export default function Testimonials() {
               <br />B<span className="font-display italic font-normal">o</span>th sides.
             </h2>
           </div>
-          <p className="text-[#888888] text-sm">4.9 · 315+ verified reviews</p>
+          <p className="text-[#888888] text-sm">4.58 · 315+ verified reviews</p>
         </div>
 
         <ReviewGrid reviews={customerReviews} title="From Customers" />
