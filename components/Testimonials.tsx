@@ -54,7 +54,7 @@ const REVIEWS = [
     name: "Mark C.",
     role: "Customer" as const,
     location: "Manchester to Liverpool",
-    stars: 5,
+    stars: 4,
     quote: "Office furniture, 4 locations, one day. Tracking was transparent. Saved us thousands on logistics overhead.",
   },
   {
@@ -62,7 +62,7 @@ const REVIEWS = [
     name: "Nadia K.",
     role: "Driver" as const,
     location: "Birmingham to Coventry",
-    stars: 5,
+    stars: 4,
     quote: "Steady work without the cold shoulder. Network here respects the work—no discrimination, all support.",
   },
   {
@@ -70,7 +70,7 @@ const REVIEWS = [
     name: "Robert P.",
     role: "Customer" as const,
     location: "Glasgow Removals",
-    stars: 5,
+    stars: 4,
     quote: "Full house removal, 180 miles, zero damage. They treated our belongings like they mattered. They did.",
   },
   {
@@ -86,7 +86,7 @@ const REVIEWS = [
     name: "Carla P.",
     role: "Customer" as const,
     location: "Bristol to Bath",
-    stars: 5,
+    stars: 4,
     quote: "Same-day pickup and delivery on vintage antiques. Insurance included. Worth every penny for the peace of mind.",
   },
   {
