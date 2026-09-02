@@ -105,37 +105,52 @@ function Stars() {
 }
 
 export default function Testimonials() {
+  const customerReviews = REVIEWS.filter(r => r.role === "Customer");
+  const driverReviews = REVIEWS.filter(r => r.role === "Driver");
+
+  const ReviewGrid = ({ reviews, title }: { reviews: typeof REVIEWS; title: string }) => (
+    <div className="mb-16 last:mb-0">
+      <h3 className="font-sans font-black text-[#0D0D0D] text-2xl md:text-3xl mb-8 tracking-tight">
+        {title}
+      </h3>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {reviews.map((r) => (
+          <div key={r.name} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
+            <Stars />
+            <p className="text-[#0D0D0D] text-sm leading-relaxed mb-6">
+              &ldquo;{r.quote}&rdquo;
+            </p>
+            <div className="flex items-center gap-3 border-t border-[#E8E8E8] pt-5">
+              <IllustratedAvatar initials={r.initials} name={r.name} role={r.role} />
+              <div>
+                <p className="text-[#0D0D0D] text-sm font-semibold">{r.name}</p>
+                <p className="text-[#888888] text-xs">{r.location}</p>
+              </div>
+              <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.1em] border px-2.5 py-1 rounded-full ${ROLE_STYLE[r.role]}`}>
+                {r.role}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <section className="bg-[#F5F5F5] py-24 px-6 border-t border-[#E8E8E8]">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4">
-          <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
-            Real results.
-            <br />B<span className="font-display italic font-normal">o</span>th sides.
-          </h2>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4 pb-8 border-b border-[#E8E8E8]">
+          <div>
+            <h2 className="font-sans font-black text-[#0D0D0D] text-3xl md:text-4xl leading-tight tracking-tight">
+              Real results.
+              <br />B<span className="font-display italic font-normal">o</span>th sides.
+            </h2>
+          </div>
           <p className="text-[#888888] text-sm">4.9 · 315+ verified reviews</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {REVIEWS.map((r) => (
-            <div key={r.name} className="bg-white border border-[#E8E8E8] rounded-2xl p-7">
-              <Stars />
-              <p className="text-[#0D0D0D] text-sm leading-relaxed mb-6">
-                &ldquo;{r.quote}&rdquo;
-              </p>
-              <div className="flex items-center gap-3 border-t border-[#E8E8E8] pt-5">
-                <IllustratedAvatar initials={r.initials} name={r.name} role={r.role} />
-                <div>
-                  <p className="text-[#0D0D0D] text-sm font-semibold">{r.name}</p>
-                  <p className="text-[#888888] text-xs">{r.location}</p>
-                </div>
-                <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.1em] border px-2.5 py-1 rounded-full ${ROLE_STYLE[r.role]}`}>
-                  {r.role}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ReviewGrid reviews={customerReviews} title="From Customers" />
+        <ReviewGrid reviews={driverReviews} title="From Our Drivers" />
       </div>
     </section>
   );
